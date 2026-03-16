@@ -1,475 +1,142 @@
-# Corr2Surrogate
+# Relaytic - The Relay Inference Lab
 
-Corr2Surrogate is a local-first framework for converting real-world sensor data into validated surrogate-model candidates.
+Relaytic is a local-first inference engineering system for structured data. It investigates datasets before it commits to modeling assumptions, preserves user intent through policy and mandate layers, keeps deterministic execution as the floor, and exposes its judgment through inspectable artifacts and local tool surfaces.
 
-## What It Does
-- Agent 1 (`Analyst`) ingests CSV/XLS/XLSX data, checks data quality, runs correlation analysis, ranks surrogate candidates, and performs lightweight probe-model screening to recommend which model families Agent 2 should test first.
-- Agent 2 (`Modeler`) now has a first executable training path: split-safe train/validation/test modeling for both regression and classification, with local linear/logistic baselines, local tree baselines, reproducible artifacts, and result interpretation. The intended search order remains pragmatic: start with linear or lagged baselines, escalate to tree ensembles when interaction or piecewise evidence is real, and only test sequence models when temporal probes justify it.
+This repository is in an active transformation from a legacy prototype into the Relaytic product. The public package, CLI, docs, and migration controls now use Relaytic naming. Remaining legacy internals are tracked explicitly and are being removed slice by slice.
 
-## Key Capabilities
-- CSV/XLS/XLSX ingestion with sheet selection and header/data-start inference
-- Quality checks (missingness, duplicates, outliers, timestamp integrity)
-- Correlation analysis (Pearson, Spearman, Kendall, distance, lag-aware)
-- Feature-engineering scans (including `rate_change`)
-- Probe-model screening (linear, interaction-aware, tiny regression tree, lagged linear)
-- Residual nonlinearity and regime diagnostics to support model-family selection
-- Model-family recommendations for Agent 2 search order
-- Evidence-backed recommendation blocks with probe inputs, quick metrics, and confidence
-- Dependency-aware surrogate ranking
-- Dataset-scoped reports and artifact export
-- Task-type detection for regression, balanced classification, and fraud/anomaly-style labels
-- User task override command: `task regression`, `task binary_classification`, `task fraud_detection`, `task auto`
-- Split-safe Agent 2 training (train-only preprocessing, time-ordered splits for time series, stratified steady-state splits for classification labels)
-- Executable classifier baselines: `logistic_regression` and `bagged_tree_classifier`
-- Executable time-series classifier baselines: `lagged_logistic_regression` and `lagged_tree_classifier`
-- Stronger boosted-tree baselines:
-  - `boosted_tree_ensemble` (regression)
-  - `boosted_tree_classifier` (classification)
-- Validation-tuned decision thresholds for binary classification and fraud screening
-- Adaptive bounded optimization in Agent 2:
-  - safe model-family switches
-  - feature-set expansion
-  - lag-window expansion
-  - threshold-policy retuning for binary classifiers
-- Post-stall experiment guidance:
-  - when retries stop, Agent 2 proposes concrete next data-collection trajectories instead of only saying "collect more data"
-- Professional training diagnostics on every run:
-  - train/validation generalization gaps
-  - overfit/underfit risk flags
-  - high-error region summaries and next-step suggestions
-- First nonlinear modeling baseline: local bagged tree ensemble / tree classifier
-- Candidate comparison with LLM-assisted model interpretation in the CLI
-- Deterministic inference from saved checkpoints/run artifacts with batch prediction export
-- Inference diagnostics: train-range OOD checks, feature drift scoring, and retraining recommendations
-- Local runtime by default; optional API mode via explicit opt-in
+## What Relaytic Is
 
-## Privacy Defaults
-- Keep private datasets in `data/private/`.
-- `data/private/`, `reports/`, and `artifacts/` are git-ignored by default.
+Relaytic is not an AutoML wrapper. It is a local-first inference engineering system that investigates data, forms competing hypotheses, runs challenger science, quantifies uncertainty, preserves mandate-aware user intent, recommends missing data, and exposes its judgment as reusable local tools.
 
-## Prerequisites
-- Python `>=3.10` (project default tested with Python 3.11)
-- Git
-- For local LLM mode:
-  - Windows: `llama.cpp` or Ollama
-  - macOS: `llama.cpp` (recommended) or Ollama
+The intended product is:
 
-## Quickstart (Windows)
-1. Clone and enter repo:
-```powershell
-git clone <your-repo-url>
-cd Corr2Surrogate
-```
-2. Create virtual environment and install:
-```powershell
-py -3.11 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-.\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
-```
-3. Set up local LLM runtime (Qwen 4B local profile):
-```powershell
-& .\.venv\Scripts\corr2surrogate.exe setup-local-llm --provider llama_cpp --install-provider
-```
-4. Start analyst session:
-```powershell
-# works even if you stay in conda base/ml
-& .\.venv\Scripts\corr2surrogate.exe run-agent-session --agent analyst
-```
+- local-first by default
+- deterministic at the core
+- autonomous but steerable
+- multi-specialist rather than single-planner
+- artifact-rich and auditable
+- lifecycle-aware beyond one-off model fitting
 
-## Quickstart (macOS)
-1. Install `llama.cpp`:
+## Repository State
+
+The source of truth for the transformation is:
+
+1. `RELAYTIC_VISION_MASTER.md`
+2. `RELAYTIC_BUILD_MASTER.md`
+3. `ARCHITECTURE_CONTRACT.md`
+4. `IMPLEMENTATION_STATUS.md`
+5. `MIGRATION_MAP.md`
+6. `RELAYTIC_SLICING_PLAN.md`
+
+Current normalization status:
+
+- public package name: `relaytic`
+- public CLI name: `relaytic`
+- compatibility import shim: `corr2surrogate` (temporary)
+- top-level build and migration docs: present
+- security baseline: enforced through `.gitignore` and leak scan tooling
+
+## Quick Start
+
+Create an environment and install the editable package:
+
 ```bash
-brew install llama.cpp
-```
-2. Clone and enter repo:
-```bash
-git clone <your-repo-url>
-cd Corr2Surrogate
-```
-3. Create virtual environment and install:
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
-```
-4. Set up local LLM runtime:
-```bash
-corr2surrogate setup-local-llm --provider llama_cpp
-```
-5. Start analyst session:
-```bash
-./.venv/bin/corr2surrogate run-agent-session --agent analyst
-```
-
-## Optional Extras
-Install optional extras when you want richer local analytics:
-- `stats` adds SciPy-backed Kendall calculations.
-- `viz` adds Matplotlib plot artifacts.
-
-```bash
 python -m pip install -e ".[dev,stats,viz]"
 ```
 
-PowerShell equivalent:
-```powershell
-.\.venv\Scripts\python.exe -m pip install -e ".[dev,stats,viz]"
-```
+Smoke-check the public CLI:
 
-## Analyst Session Usage
-At startup you can:
-- paste a `.csv/.xlsx/.xls` path, or
-- type `default` to run the built-in public test dataset.
-- for fast first runs on large datasets, choose a small target subset and a reduced sample budget when prompted.
-
-Default dataset note:
-- `data/public/public_testbench_dataset_20k_minmax.csv` is sanitized and intentionally includes ~5% missing values in three representative signals (`B`, `D`, `F`), while all other signals and `time` remain complete. This lets users test missing-data handling and leakage warnings without collapsing row count when trying `drop_rows`.
-- Additional synthetic public datasets are available for task detection checks:
-  - `data/public/public_binary_classification_dataset.csv`
-  - `data/public/public_fraud_screening_dataset.csv`
-
-Useful commands:
-- `/help`
-- `/context`
-- `/reset`
-- `/exit`
-- `task regression`
-- `task binary_classification`
-- `task fraud_detection`
-- `task auto`
-
-Target selection shortcuts:
-- `list`
-- `list <filter>`
-- `all`
-- comma-separated signal names
-- numeric index
-
-Hypothesis syntax:
-- Correlation: `hypothesis corr target:pred1,pred2; target2:pred3`
-- Feature: `hypothesis feature target:signal->rate_change; signal2->square`
-
-Agent 1 also produces model-strategy guidance for Agent 2:
-- start with `linear_ridge` or `lagged_linear` baselines
-- treat `tree_ensemble_candidate` as "worth testing next" only when probe gains or regime evidence are material
-- only test `sequence_model_candidate` when temporal probes justify it after lagged/tabular baselines
-- after Agent 1 finishes in the analyst session, the CLI now prints the structured handoff path and can immediately continue into Agent 2 without restarting a separate session
-
-Interpretation rule:
-- a detected nonlinear dependence alone is not enough to recommend trees or sequence models
-- Agent 1 uses cheap validation probes to decide whether those heavier families are likely to outperform the linear baseline
-- Agent 1 also infers whether a target behaves like regression, classification, or fraud/anomaly screening and records the recommended split policy for Agent 2
-
-## Optional API Mode (Explicit Opt-In)
-Default policy is local-only. API mode must be explicitly enabled.
-
-### PowerShell
-```powershell
-$env:C2S_PROVIDER="openai"
-$env:C2S_REQUIRE_LOCAL_MODELS="false"
-$env:C2S_BLOCK_REMOTE_ENDPOINTS="false"
-$env:C2S_API_CALLS_ALLOWED="true"
-$env:C2S_OFFLINE_MODE="false"
-$env:C2S_API_KEY="<your_api_key>"
-$env:C2S_MODEL="gpt-4.1-mini"
-# optional:
-# $env:C2S_ENDPOINT="https://api.openai.com/v1/chat/completions"
-
-& .\.venv\Scripts\corr2surrogate.exe setup-local-llm --provider openai
-```
-
-### Bash/Zsh
 ```bash
-export C2S_PROVIDER=openai
-export C2S_REQUIRE_LOCAL_MODELS=false
-export C2S_BLOCK_REMOTE_ENDPOINTS=false
-export C2S_API_CALLS_ALLOWED=true
-export C2S_OFFLINE_MODE=false
-export C2S_API_KEY=<your_api_key>
-export C2S_MODEL=gpt-4.1-mini
-# optional:
-# export C2S_ENDPOINT=https://api.openai.com/v1/chat/completions
-
-corr2surrogate setup-local-llm --provider openai
+relaytic --help
+python -m relaytic.ui.cli --help
 ```
 
-## Deterministic Agent 1 (No LLM Call)
+Run the repository leak scan before commits:
+
 ```bash
-corr2surrogate run-agent1-analysis --data-path data/private/run1.csv --timestamp-column time
+python -m relaytic.ui.cli scan-git-safety
 ```
 
-Example with advanced options:
+## Current CLI Baseline
+
+The current CLI surface is still the legacy harness baseline, now exposed through the Relaytic name while the larger architecture is being built out in slices.
+
+Examples:
+
 ```bash
-corr2surrogate run-agent1-analysis \
-  --data-path data/private/run1.csv \
-  --timestamp-column time \
-  --target-signals y \
-  --max-lag 12 \
-  --confidence-top-k 10 \
-  --bootstrap-rounds 40 \
-  --stability-windows 4 \
-  --strategy-search-candidates 4
+relaytic setup-local-llm --provider llama_cpp
+relaytic run-agent-session --agent analyst
+relaytic run-agent1-analysis --data-path data/private/run1.csv
+relaytic run-inference --run-dir artifacts/<run_dir> --data-path data/private/run1.csv
 ```
 
-## Deterministic Inference From Saved Artifacts
-Run inference on a new CSV/XLSX dataset using an existing Agent 2 checkpoint or run directory.
+## Security Baseline
 
-By checkpoint id:
-```bash
-corr2surrogate run-inference \
-  --checkpoint-id ckpt_20260301_084009_43c566cb \
-  --data-path data/private/new_batch.csv
+This repository treats security hygiene as non-negotiable:
+
+- do not commit `.env` files, virtual environments, private datasets, generated reports, or local model artifacts
+- do not commit API keys, tokens, passwords, certificates, or machine-specific paths
+- do not persist raw secrets into artifacts or docs
+- run `python -m relaytic.ui.cli scan-git-safety` before opening a PR
+
+Relevant files:
+
+- `SECURITY.md`
+- `.gitignore`
+- `src/relaytic/security/git_guard.py`
+
+## Build Discipline
+
+Relaytic will be built in bounded slices. The next load-bearing slices are:
+
+1. Slice 01 - contracts and scaffolding
+2. Slice 02 - mandate and context foundation
+3. Slice 03 - Focus Council and investigation baseline
+
+The completed normalization slice established:
+
+- Relaytic naming across public surfaces
+- migration control documents
+- repo-local agent instructions
+- a tracked compatibility boundary for the old package name
+- a formal security baseline for envs, secrets, and local artifacts
+
+## Current Layout
+
+```text
+src/relaytic/          Main runtime package and current implementation baseline
+src/corr2surrogate/    Temporary compatibility import shim
+configs/               Runtime configuration
+docs/build_slices/     Incremental implementation slices
+artifacts/             Generated run artifacts (ignored except sentinels)
+reports/               Generated reports (ignored except sentinels)
+tests/                 Automated regression coverage
 ```
 
-By run directory:
-```bash
-corr2surrogate run-inference \
-  --run-dir artifacts/run_20260301_084009 \
-  --data-path data/private/new_batch.xlsx \
-  --sheet-name Sheet1 \
-  --decision-threshold 0.35
-```
+## Professional Standard
 
-Outputs:
-- JSON report (default: `reports/inference/<dataset_slug>/inference_<timestamp>.json`)
-- prediction CSV (same folder, `..._predictions.csv`)
-- diagnostics for OOD/drift and inference-time quality (if target exists in incoming data)
+The repo should read like a product, not a scratchpad. That means:
 
-## Planned Agent 2 Modeling Roadmap
-Agent 1 now emits a model-strategy prior for each target. Agent 2 should treat that as a search-order hint, not a guarantee.
+- one public name
+- one public CLI
+- explicit contracts
+- explicit migration notes
+- no leaked secrets
+- no checked-in local environments
+- no ambiguous legacy branding in new work
 
-Current executable model families:
-- `linear_ridge`
-- `logistic_regression`
-- `lagged_logistic_regression`
-- `bagged_tree_classifier`
-- `boosted_tree_classifier`
-- `lagged_linear`
-- `lagged_tree_classifier`
-- `lagged_tree_ensemble`
-- `bagged_tree_ensemble`
-- `boosted_tree_ensemble`
-
-Current classification note:
-- Agent 2 now detects classification / fraud-like targets, applies the correct split policy (stratified for steady-state labels, ordered for time-based labels), and trains the local classifier baselines instead of falling back to regression.
-- Default acceptance checks are task-aware:
-  - balanced classification defaults to `f1` + `accuracy`
-  - fraud / anomaly screening defaults to `recall` + `pr_auc`
-- Binary classifier thresholds are validation-tuned by default, and users can override the next run with:
-  - `threshold favor_recall`
-  - `threshold favor_precision`
-  - `threshold favor_f1`
-  - `threshold favor_pr_auc`
-  - `threshold 0.35`
-  - `threshold auto`
-
-Prioritized roadmap (next):
-1. Deepen weak-spot intelligence:
-   - region-aware error localization and targeted experiment proposals with clearer coverage metrics
-   - keep this as the first priority because it directly drives scientific data collection quality
-2. Add bounded Optuna tuning on top of deterministic baselines:
-   - tune only after split-safe baseline paths are stable
-   - keep strict acceptance gates to avoid overfitting/metric chasing
-3. Add uncertainty and calibration reporting:
-   - confidence intervals / reliability checks for model outputs and thresholds
-4. Add evidence-gated DNN families:
-   - start with `FFN` for tabular nonlinear residuals
-   - add `RNN`/`GRU`/`LSTM` only when lagged/tabular families still miss temporal structure
-5. Add deployment hardening for larger models:
-   - pruning and quantization profiles after DNN baselines show validated gains
-
-Operational rule:
-- do not jump directly to LSTM just because a target is time-based
-- require evidence from lag benefit, autocorrelation, and failed simpler baselines first
-
-## Concrete Implementation Sequence
-This is the planned implementation order to maximize practical value while keeping the system scientifically defensible.
-
-1. Build executable `Agent2Handoff` consumption:
-   - Agent 2 must accept Agent 1 target, predictor, normalization, and constraint payloads directly.
-2. Implement split-safe preprocessing:
-   - split first
-   - fit imputation/normalization on train only
-   - apply unchanged transforms to validation/test
-3. Implement the first true end-to-end baseline trainers:
-   - steady-state: `Ridge` / `ElasticNet`
-   - time-series: `lagged linear`
-4. Add the first nonlinear baseline:
-   - `HistGradientBoostingRegressor` or `ExtraTreesRegressor`
-5. Add model comparison and acceptance logic:
-   - compare baseline vs higher-capacity models on validation/test
-   - promote only when the more complex model shows meaningful validated gain
-6. Persist reproducible artifacts:
-   - model weights/parameters
-   - feature list / lag schema
-   - split metadata
-   - normalization state
-   - metrics and lineage
-7. Add post-model failure analysis:
-   - identify operating regions with high error
-   - recommend concrete new lab/testbench trajectories
-8. Add deterministic inference workflows:
-   - load persisted artifacts
-   - score new datasets
-   - export prediction files plus OOD/drift diagnostics
-
-9. Deepen weak-spot experiment planning:
-   - produce region-aware operating-space gaps and trajectory priorities from residual/error maps
-
-10. Add bounded Optuna tuning:
-   - Optuna only after the deterministic training pipeline is correct and monitored
-
-11. Add uncertainty and calibration:
-   - confidence/reliability outputs for both regression and classification
-
-12. Add evidence-gated DNN families:
-   - FFN first for tabular residual nonlinearity
-   - RNN/GRU/LSTM only after lagged/tabular baselines prove insufficient
-
-13. Add model compression for deployability:
-   - pruning and quantization profiles after DNN validation
-
-Current state:
-- steps 1-8 are now implemented in the first production path
-- the current modeler loop already performs bounded retries across model family, feature set, lag horizon, and binary threshold policy when the loop policy allows it
-- the current loop also prints concrete next experiment trajectories when retries stall
-- deterministic inference workflows are now in place via `run-inference`
-- the next highest-value gaps are deeper region-aware weak-spot planning, bounded Optuna tuning, uncertainty/calibration, and then evidence-gated DNN + compression
-
-## Modeling Entry Modes
-Two user entry paths are part of the intended product behavior:
-
-1. Handoff-driven mode:
-   - run Agent 1 analysis first
-   - pass Agent 1 recommendations into Agent 2 as a prior
-2. Direct modeler mode (skip Agent 1):
-   - user may immediately ask Agent 2 to build a model with explicit inputs and target
-   - current executable implementation supports `auto`, `linear_ridge`, `logistic_regression`, `lagged_logistic_regression`, `bagged_tree_classifier`, `boosted_tree_classifier`, `lagged_linear`, `lagged_tree_classifier`, `lagged_tree_ensemble`, `bagged_tree_ensemble`, and `boosted_tree_ensemble`
-   - example intent: "build model `linear_ridge` with inputs `A,B,C` and target `D`"
-   - this fast path should not require a prior Agent 1 handoff
-
-Session entry examples:
-```powershell
-& .\.venv\Scripts\corr2surrogate.exe run-agent-session --agent modeler
-```
-
-Example direct modeler request:
-- `build model linear_ridge with inputs A,B,C and target D`
-- `build model tree with inputs torque,temp,flow and target pressure`
-
-Current implementation note:
-- the direct modeler session currently executes `auto`, `linear_ridge` / `ridge` / `linear`, `logistic_regression` / `logistic` / `logit` / `linear_classifier`, `lagged_logistic_regression` / `lagged_logistic` / `lagged_logit` / `temporal_classifier`, `bagged_tree_classifier` / `tree_classifier`, `boosted_tree_classifier` / `gradient_boosting_classifier`, `lagged_linear` / `lagged` / `temporal_linear` / `arx`, `lagged_tree_classifier` / `temporal_tree_classifier`, `lagged_tree_ensemble` / `lagged_tree` / `lag_window_tree` / `temporal_tree`, `bagged_tree_ensemble` / `tree`, and `boosted_tree_ensemble` / `gradient_boosting` / `hist_gradient_boosting`
-- the modeler CLI now runs a split-safe comparison between the linear baseline and the available temporal/nonlinear comparators, performs a bounded acceptance check, and can retry with the next safe model family, expanded feature set, wider lag window, or retuned binary threshold when policy allows it
-- if the selected target looks like classification or fraud detection, the modeler reports that explicitly, applies the correct split policy, trains the local classifier candidates, and evaluates them with classification-aware metrics
-- if retries stop without meeting quality, the modeler prints concrete experiment recommendations for the next data collection pass
-- every training attempt now includes professional diagnostics (generalization gaps, risk flags, and targeted suggestions) in both artifacts and CLI output
-- after a successful model build, Agent 2 now asks whether to run inference immediately; if the user opts in, it requests a dataset path (or `same`) and executes inference in-session; if the user says no, it simply continues
-- before a modeler run, users can steer binary decision policy with:
-  - `threshold favor_recall`
-  - `threshold favor_precision`
-  - `threshold favor_f1`
-  - `threshold favor_pr_auc`
-  - `threshold 0.35`
-  - `threshold auto`
-
-## User Override Rules For Agent 2
-Even when a valid Agent 1 handoff exists, the user must remain in control of the modeling scope.
-
-Agent 2 should offer these choices:
-- use Agent 1 recommended target/predictors/model family
-- choose a specific target manually
-- choose specific predictor inputs manually (with `list` / filtered list support)
-- choose a specific model architecture manually
-
-Priority rule:
-- explicit user choices override Agent 1 recommendations unless they violate a hard policy or missing-data / split-safety constraint
-
-Example override intents after handoff:
-- `use the recommended target but only inputs A,C,F`
-- `show signal list`
-- `train a tree ensemble for target D using inputs A,B,C`
-
-## LLM Role And Boundaries
-The LLM should be used as an agent, but only inside a bounded control loop.
-
-Use the LLM for:
-- conversational steering and clarification
-- choosing the next safe tool call among registered tools
-- explaining analysis and modeling results in plain scientific language
-- proposing next experiments, architecture changes, or feature hypotheses
-
-Keep deterministic tools as the source of truth for:
-- data loading and schema inference
-- correlation metrics and probe-model scores
-- split creation, preprocessing, training, and persisted artifacts
-- acceptance decisions based on measured validation/test metrics
-
-Prompting guidance to improve agent quality:
-- always include the current `workflow_stage`
-- include the last 5 user prompts plus the latest compact tool result
-- include hard constraints (critical signals, non-virtualizable signals, accepted overrides)
-- explicitly remind the model that correlation is not causality and time-series does not imply LSTM by default
-- require the assistant to answer naturally, then steer back to the pending required input or next tool decision
-
-## Behavior and Prompt Control
-- Runtime defaults: `configs/default.yaml`
-- Analyst prompt: `src/corr2surrogate/agents/prompts/analyst_system.txt`
-- Modeler prompt: `src/corr2surrogate/agents/prompts/modeler_system.txt`
-- Optional prompt overrides:
-  - `prompts.analyst_system_path`
-  - `prompts.modeler_system_path`
-  - `prompts.extra_instructions`
-
-## Output Structure
-Outputs are grouped by dataset slug under `reports/<dataset_slug>/`:
-- Markdown report: `agent1_<timestamp>.md`
-- Lineage JSON: `agent1_<timestamp>.lineage.json`
-- Artifact directory: `agent1_<timestamp>_artifacts/`
-- Agent 1 report now includes a dedicated "Model Strategy Recommendations (Agent 2 Planning)" section with probe-model scores and suggested search order.
-
-## Quality and Security Checks
-CI now runs tests + leak scan on every push/PR via `.github/workflows/ci.yml`.
+## Development
 
 Run tests:
+
 ```bash
-./.venv/bin/python -m pytest
+python -m pytest -q
 ```
-Run leak scan before commit/push:
+
+If you touch packaging, CLI, or security surfaces, also run:
+
 ```bash
-./.venv/bin/c2s-guard
-# or
-./.venv/bin/python -m corr2surrogate.ui.cli scan-git-safety
+python -m relaytic.ui.cli scan-git-safety
+relaytic --help
 ```
-
-Windows equivalents:
-```powershell
-& .\.venv\Scripts\python.exe -m pytest
-& .\.venv\Scripts\c2s-guard.exe
-# or
-& .\.venv\Scripts\python.exe -m corr2surrogate.ui.cli scan-git-safety
-```
-
-Public release checklist:
-1. Run `pytest` in a clean venv.
-2. Run `scan-git-safety`.
-3. Smoke test CLI help: `corr2surrogate --help`.
-4. Smoke test deterministic analysis on a public dataset.
-5. Confirm `data/private/`, `reports/`, and `artifacts/` contain no tracked files before push.
-
-## Troubleshooting
-- `corr2surrogate` without path only works when the venv is active or the script is on `PATH`.
-- If `corr2surrogate` is not recognized on Windows, use:
-```powershell
-& .\.venv\Scripts\corr2surrogate.exe --help
-```
-- If local provider is not reachable, run:
-```bash
-corr2surrogate setup-local-llm
-```
-
-## License
-MIT (`LICENSE`)
-
-## Contributing
-See `CONTRIBUTING.md` for setup, quality gates, and PR expectations.

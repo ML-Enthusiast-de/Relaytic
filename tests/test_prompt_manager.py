@@ -1,6 +1,6 @@
-from pathlib import Path
+﻿from pathlib import Path
 
-from corr2surrogate.agents.prompt_manager import load_system_prompt
+from relaytic.agents.prompt_manager import load_system_prompt
 
 
 def test_load_default_prompt_bundle() -> None:
@@ -19,3 +19,4 @@ def test_load_prompt_override(tmp_path: Path) -> None:
     )
     assert "override prompt" in bundle.content
     assert "Additional run instructions" in bundle.content
+

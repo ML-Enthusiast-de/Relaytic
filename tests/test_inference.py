@@ -1,7 +1,7 @@
-from pathlib import Path
+﻿from pathlib import Path
 
-from corr2surrogate.modeling.inference import run_inference_from_artifacts
-from corr2surrogate.orchestration.default_tools import build_default_registry
+from relaytic.modeling.inference import run_inference_from_artifacts
+from relaytic.orchestration.default_tools import build_default_registry
 
 
 def test_inference_from_checkpoint_supports_regression_and_shift_diagnostics(
@@ -96,3 +96,4 @@ def test_inference_from_run_dir_supports_classification_threshold_override(
     assert payload["evaluation"]["available"] is True
     assert "f1" in payload["evaluation"]["metrics"]
     assert payload["predictions_preview"]
+

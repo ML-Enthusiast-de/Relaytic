@@ -1,9 +1,10 @@
-from pathlib import Path
+﻿from pathlib import Path
 
-from corr2surrogate.orchestration.harness_runner import (
+from relaytic.orchestration.harness_runner import (
     _extract_data_path_hints,
     run_local_agent_once,
 )
+from relaytic.orchestration.tool_registry import ToolRegistry
 
 
 def test_run_local_agent_once_returns_structured_payload(monkeypatch, tmp_path: Path) -> None:
@@ -46,8 +47,12 @@ def test_run_local_agent_once_returns_structured_payload(monkeypatch, tmp_path: 
         return {"action": "respond", "message": "ok"}
 
     monkeypatch.setattr(
-        "corr2surrogate.orchestration.local_provider.LocalLLMResponder.__call__",
+        "relaytic.orchestration.local_provider.LocalLLMResponder.__call__",
         fake_call,
+    )
+    monkeypatch.setattr(
+        "relaytic.orchestration.harness_runner.build_default_registry",
+        lambda: ToolRegistry(),
     )
 
     result = run_local_agent_once(
@@ -107,8 +112,12 @@ def test_run_local_agent_once_handles_max_turns_without_crash(
         }
 
     monkeypatch.setattr(
-        "corr2surrogate.orchestration.local_provider.LocalLLMResponder.__call__",
+        "relaytic.orchestration.local_provider.LocalLLMResponder.__call__",
         fake_call,
+    )
+    monkeypatch.setattr(
+        "relaytic.orchestration.harness_runner.build_default_registry",
+        lambda: ToolRegistry(),
     )
 
     result = run_local_agent_once(
@@ -147,7 +156,7 @@ def test_run_local_agent_once_supports_openai_opt_in(monkeypatch, tmp_path: Path
                 "    openai: https://api.openai.com/v1/chat/completions",
                 "  profiles:",
                 "    small_cpu:",
-                "      model: c2s-4b",
+                "      model: relaytic-4b",
                 "      cpu_only: true",
                 "      n_gpu_layers: 0",
                 "      max_context: 4096",
@@ -167,10 +176,14 @@ def test_run_local_agent_once_supports_openai_opt_in(monkeypatch, tmp_path: Path
         return {"action": "respond", "message": "api-ok"}
 
     monkeypatch.setattr(
-        "corr2surrogate.orchestration.local_provider.LocalLLMResponder.__call__",
+        "relaytic.orchestration.local_provider.LocalLLMResponder.__call__",
         fake_call,
     )
-    monkeypatch.setenv("C2S_API_KEY", "dummy-key")
+    monkeypatch.setattr(
+        "relaytic.orchestration.harness_runner.build_default_registry",
+        lambda: ToolRegistry(),
+    )
+    monkeypatch.setenv("RELAYTIC_API_KEY", "dummy-key")
 
     result = run_local_agent_once(
         agent="analyst",
@@ -182,3 +195,4 @@ def test_run_local_agent_once_supports_openai_opt_in(monkeypatch, tmp_path: Path
     assert result["event"]["message"] == "api-ok"
     assert result["runtime"]["provider"] == "openai"
     assert result["runtime"]["model"] == "gpt-4.1-mini"
+

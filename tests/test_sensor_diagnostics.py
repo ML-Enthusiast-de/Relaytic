@@ -1,7 +1,7 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 
-from corr2surrogate.analytics.sensor_diagnostics import run_sensor_diagnostics
+from relaytic.analytics.sensor_diagnostics import run_sensor_diagnostics
 
 
 def test_run_sensor_diagnostics_flags_saturation_and_stuck() -> None:
@@ -23,3 +23,4 @@ def test_run_sensor_diagnostics_flags_saturation_and_stuck() -> None:
     assert "stuck" in by_signal
     assert any(flag in by_signal["sat"]["flags"] for flag in ["saturation", "quantized"])
     assert "stuck_segments" in by_signal["stuck"]["flags"]
+

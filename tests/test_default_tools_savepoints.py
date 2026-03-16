@@ -1,6 +1,6 @@
-from pathlib import Path
+﻿from pathlib import Path
 
-from corr2surrogate.orchestration.default_tools import build_default_registry
+from relaytic.orchestration.default_tools import build_default_registry
 
 
 def test_default_tools_train_resume_and_analyze(monkeypatch, tmp_path: Path) -> None:
@@ -67,3 +67,4 @@ def test_default_tools_train_resume_and_analyze(monkeypatch, tmp_path: Path) -> 
     )
     assert analyze_result.status == "ok"
     assert analyze_result.output["feedback"]["trajectory_suggestions"]
+

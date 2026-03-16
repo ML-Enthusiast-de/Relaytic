@@ -1,5 +1,5 @@
-from corr2surrogate.analytics.ranking import ForcedModelingDirective, RankedSignal
-from corr2surrogate.orchestration.workflow import (
+﻿from relaytic.analytics.ranking import ForcedModelingDirective, RankedSignal
+from relaytic.orchestration.workflow import (
     build_modeling_directives,
     evaluate_training_iteration,
     prepare_ingestion_step,
@@ -7,12 +7,12 @@ from corr2surrogate.orchestration.workflow import (
 
 
 def test_prepare_ingestion_returns_sheet_options(monkeypatch) -> None:
-    from corr2surrogate.ingestion.csv_loader import SheetSelectionRequiredError
+    from relaytic.ingestion.csv_loader import SheetSelectionRequiredError
 
     def fake_loader(*args, **kwargs):
         raise SheetSelectionRequiredError(["A", "B"])
 
-    monkeypatch.setattr("corr2surrogate.orchestration.workflow.load_tabular_data", fake_loader)
+    monkeypatch.setattr("relaytic.orchestration.workflow.load_tabular_data", fake_loader)
     result = prepare_ingestion_step(path="dummy.xlsx")
     assert result.status == "needs_user_input"
     assert result.options == ["A", "B"]
@@ -72,3 +72,4 @@ def test_evaluate_training_iteration_adds_trajectory_guidance_when_stalled() -> 
     assert "recall" in decision.unmet_criteria
     assert decision.trajectory_recommendations
     assert any("positive-event" in item or "sequential windows" in item for item in decision.trajectory_recommendations)
+

@@ -1,4 +1,4 @@
-from corr2surrogate.orchestration.runtime_policy import (
+﻿from relaytic.orchestration.runtime_policy import (
     RuntimePolicyError,
     apply_environment_overrides,
     load_runtime_policy,
@@ -113,7 +113,7 @@ def test_runtime_policy_applies_model_override_from_env() -> None:
         },
     }
     policy = load_runtime_policy(config)
-    overridden = apply_environment_overrides(policy, env={"C2S_MODEL": "local-override"})
+    overridden = apply_environment_overrides(policy, env={"RELAYTIC_MODEL": "local-override"})
     options = overridden.runtime_options(profile_name="small_cpu")
     assert options["model"] == "local-override"
 
@@ -129,7 +129,7 @@ def test_runtime_policy_allows_remote_provider_when_opted_in() -> None:
             "remote_default_model": "gpt-4.1-mini",
             "profiles": {
                 "small_cpu": {
-                    "model": "c2s-4b",
+                    "model": "relaytic-4b",
                     "cpu_only": True,
                     "n_gpu_layers": 0,
                     "max_context": 4096,
@@ -155,7 +155,7 @@ def test_runtime_policy_blocks_remote_provider_without_opt_in() -> None:
             "offline_mode": True,
             "profiles": {
                 "small_cpu": {
-                    "model": "c2s-4b",
+                    "model": "relaytic-4b",
                     "cpu_only": True,
                     "n_gpu_layers": 0,
                     "max_context": 4096,
@@ -170,3 +170,4 @@ def test_runtime_policy_blocks_remote_provider_without_opt_in() -> None:
     except RuntimePolicyError:
         return
     raise AssertionError("Expected RuntimePolicyError when remote provider is used without opt-in.")
+

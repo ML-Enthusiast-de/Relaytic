@@ -1,10 +1,10 @@
-from pathlib import Path
+﻿from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from corr2surrogate.modeling.baselines import IncrementalLinearSurrogate
-from corr2surrogate.modeling.checkpoints import ModelCheckpointStore
+from relaytic.modeling.baselines import IncrementalLinearSurrogate
+from relaytic.modeling.checkpoints import ModelCheckpointStore
 
 
 def _sample_frame() -> pd.DataFrame:
@@ -55,3 +55,4 @@ def test_checkpoint_store_create_load_list(tmp_path: Path) -> None:
     listed = store.list_checkpoints(model_name="incremental_linear_surrogate", limit=10)
     assert listed
     assert listed[0].checkpoint_id == checkpoint.checkpoint_id
+

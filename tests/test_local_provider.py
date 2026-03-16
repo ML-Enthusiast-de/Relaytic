@@ -1,5 +1,5 @@
-from corr2surrogate.orchestration.agent_loop import AgentTurnEvent, AgentAction
-from corr2surrogate.orchestration.local_provider import (
+﻿from relaytic.orchestration.agent_loop import AgentTurnEvent, AgentAction
+from relaytic.orchestration.local_provider import (
     LocalLLMResponder,
     LocalProviderError,
     LocalResponderConfig,
@@ -16,7 +16,7 @@ def test_local_responder_ollama_path(monkeypatch) -> None:
             }
         }
 
-    monkeypatch.setattr("corr2surrogate.orchestration.local_provider._http_post_json", fake_post)
+    monkeypatch.setattr("relaytic.orchestration.local_provider._http_post_json", fake_post)
 
     responder = LocalLLMResponder(
         config=LocalResponderConfig(
@@ -44,7 +44,7 @@ def test_local_responder_includes_recent_history(monkeypatch) -> None:
             }
         }
 
-    monkeypatch.setattr("corr2surrogate.orchestration.local_provider._http_post_json", fake_post)
+    monkeypatch.setattr("relaytic.orchestration.local_provider._http_post_json", fake_post)
 
     responder = LocalLLMResponder(
         config=LocalResponderConfig(
@@ -80,7 +80,7 @@ def test_local_responder_chat_only_instruction_forces_respond(monkeypatch) -> No
             }
         }
 
-    monkeypatch.setattr("corr2surrogate.orchestration.local_provider._http_post_json", fake_post)
+    monkeypatch.setattr("relaytic.orchestration.local_provider._http_post_json", fake_post)
 
     responder = LocalLLMResponder(
         config=LocalResponderConfig(
@@ -128,7 +128,7 @@ def test_local_responder_openai_includes_bearer_header(monkeypatch) -> None:
             ]
         }
 
-    monkeypatch.setattr("corr2surrogate.orchestration.local_provider._http_post_json", fake_post)
+    monkeypatch.setattr("relaytic.orchestration.local_provider._http_post_json", fake_post)
 
     responder = LocalLLMResponder(
         config=LocalResponderConfig(
@@ -151,7 +151,7 @@ def test_http_post_json_wraps_oserror_timeout(monkeypatch) -> None:
     def _raise_timeout(*_args, **_kwargs):
         raise OSError("timed out")
 
-    monkeypatch.setattr("corr2surrogate.orchestration.local_provider.urlopen", _raise_timeout)
+    monkeypatch.setattr("relaytic.orchestration.local_provider.urlopen", _raise_timeout)
     try:
         _http_post_json(
             "http://127.0.0.1:8000/v1/chat/completions",
@@ -161,3 +161,4 @@ def test_http_post_json_wraps_oserror_timeout(monkeypatch) -> None:
         assert False, "expected LocalProviderError"
     except LocalProviderError as exc:
         assert "timed out" in str(exc).lower()
+

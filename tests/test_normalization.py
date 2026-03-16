@@ -1,7 +1,7 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 
-from corr2surrogate.modeling.normalization import MinMaxNormalizer
+from relaytic.modeling.normalization import MinMaxNormalizer
 
 
 def test_minmax_normalization_and_inverse_target() -> None:
@@ -23,3 +23,4 @@ def test_minmax_normalization_and_inverse_target() -> None:
     y_scaled = norm.transform_target(frame["y"])
     y_restored = norm.inverse_transform_target(y_scaled)
     assert np.allclose(y_restored.to_numpy(), frame["y"].to_numpy())
+

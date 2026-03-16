@@ -1,8 +1,8 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 import warnings
 
-from corr2surrogate.analytics.correlations import (
+from relaytic.analytics.correlations import (
     build_candidate_signals_from_correlations,
     run_correlation_analysis,
 )
@@ -109,3 +109,4 @@ def test_run_correlation_analysis_filters_non_finite_values_without_runtime_warn
     ]
     assert not any("invalid value encountered" in msg for msg in runtime_warnings)
     assert bundle.target_analyses
+

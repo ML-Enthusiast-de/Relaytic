@@ -1,4 +1,4 @@
-# RELAYTIC_SLICING_PLAN.md
+﻿# RELAYTIC_SLICING_PLAN.md
 
 This file turns the Relaytic vision into bounded implementation slices.
 
@@ -14,7 +14,25 @@ Every slice must:
 - keep optional dependencies optional
 - leave the repository coherent after completion
 
-## Slice 01 — Contracts and scaffolding
+## Slice 00 - Normalization and contract freeze
+
+Goal:
+- freeze public naming on Relaytic
+- add missing build-control docs
+- add the public `relaytic` package and CLI surface
+- establish security and env-handling rules
+- track the temporary legacy compatibility boundary explicitly
+
+Required outputs:
+- `ARCHITECTURE_CONTRACT.md`
+- `IMPLEMENTATION_STATUS.md`
+- `MIGRATION_MAP.md`
+- `docs/build_slices/phase_00.md`
+- `AGENTS.md`
+- Relaytic-branded README and package metadata
+- temporary `corr2surrogate` compatibility shim
+
+## Slice 01 â€” Contracts and scaffolding
 
 Goal:
 - create package scaffold
@@ -29,7 +47,7 @@ Required outputs:
 - manifest helper
 - policy loader stub
 
-## Slice 02 — Mandate and context foundation
+## Slice 02 â€” Mandate and context foundation
 
 Goal:
 - stable mandate objects
@@ -45,7 +63,7 @@ Required outputs:
 - `domain_brief.json`
 - `task_brief.json`
 
-## Slice 03 — Focus Council and investigation baseline
+## Slice 03 â€” Focus Council and investigation baseline
 
 Goal:
 - Scout baseline
@@ -64,7 +82,7 @@ Required outputs:
 - `optimization_profile.json`
 - `feature_strategy_profile.json`
 
-## Slice 04 — Planning and first working route
+## Slice 04 â€” Planning and first working route
 
 Goal:
 - Strategist baseline
@@ -81,7 +99,7 @@ Required outputs:
 - `experiment_priority_report.json`
 - `marginal_value_of_next_experiment.json`
 
-## Slice 05 — Experimentation, challenger, audit, reports
+## Slice 05 â€” Experimentation, challenger, audit, reports
 
 Goal:
 - experiment registry
@@ -98,7 +116,7 @@ Required outputs:
 - `reports/technical_report.md`
 - `reports/decision_memo.md`
 
-## Slice 06 — Completion judgment and visible workflow state
+## Slice 06 â€” Completion judgment and visible workflow state
 
 Goal:
 - Completion Judge
@@ -111,7 +129,7 @@ Required outputs:
 - `run_state.json`
 - `stage_timeline.json`
 
-## Slice 07 — Lifecycle baseline
+## Slice 07 â€” Lifecycle baseline
 
 Goal:
 - monitor vs recalibrate vs retrain baseline
@@ -124,7 +142,7 @@ Required outputs:
 - `rollback_decision.json`
 - `champion_vs_candidate.json`
 
-## Slice 08 — Intelligence amplification and local-LLM assistance
+## Slice 08 â€” Intelligence amplification and local-LLM assistance
 
 Goal:
 - intelligence modes
@@ -143,7 +161,7 @@ Required outputs:
 - `semantic_task_results.json`
 - `intelligence_escalation.json`
 
-## Slice 09 — Feedback assimilation
+## Slice 09 â€” Feedback assimilation
 
 Goal:
 - feedback intake
@@ -158,7 +176,7 @@ Required outputs:
 - `policy_update_suggestions.json`
 - `route_prior_updates.json`
 
-## Slice 10 — Benchmark parity and reference approaches
+## Slice 10 â€” Benchmark parity and reference approaches
 
 Goal:
 - benchmark doctrine
@@ -172,7 +190,7 @@ Required outputs:
 - `benchmark_parity_report.json`
 - `gold_standard_comparison.json`
 
-## Slice 11 — Dojo mode and guarded self-improvement
+## Slice 11 â€” Dojo mode and guarded self-improvement
 
 Goal:
 - explicit dojo mode
@@ -187,7 +205,7 @@ Required outputs:
 - `dojo_promotions.json`
 - `architecture_proposals.json`
 
-## Slice 12 — Accelerated and distributed local execution
+## Slice 12 â€” Accelerated and distributed local execution
 
 Goal:
 - execution-profile detection
@@ -203,7 +221,7 @@ Required outputs:
 - `checkpoint_state.json`
 - `execution_strategy_report.json`
 
-## Slice 13 — Physics-aware exploration constraints
+## Slice 13 â€” Physics-aware exploration constraints
 
 Goal:
 - physical-system detection hooks
@@ -216,7 +234,7 @@ Required outputs:
 - `feasible_region_map.json`
 - `extrapolation_risk_report.json`
 
-## Slice 14 — Packaging, integrations, demos, polish
+## Slice 14 â€” Packaging, integrations, demos, polish
 
 Goal:
 - package extras
@@ -244,3 +262,4 @@ If you want the highest chance of success, only do these first:
 - Slice 03
 
 Then stop, test, and review.
+

@@ -3,16 +3,16 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "corr2surrogate"
+name = "relaytic"
 version = "0.1.0"
-description = "Local-first agentic framework from real-world data to surrogate models"
+description = "Relaytic - The Relay Inference Lab"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [
-  { name = "Corr2Surrogate Contributors" },
+  { name = "Relaytic Contributors" },
 ]
-keywords = ["surrogate-modeling", "time-series", "classification", "local-llm", "agentic-workflow"]
+keywords = ["inference-engineering", "structured-data", "local-first", "agentic-workflow", "mlops"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
@@ -32,8 +32,8 @@ dependencies = [
 ]
 
 [project.scripts]
-corr2surrogate = "corr2surrogate.ui.cli:main"
-c2s-guard = "corr2surrogate.security.git_guard:main"
+relaytic = "relaytic.ui.cli:main"
+relaytic-guard = "relaytic.security.git_guard:main"
 
 [project.optional-dependencies]
 dev = [
@@ -53,4 +53,4 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-"corr2surrogate.agents.prompts" = ["*.txt"]
+"relaytic.agents.prompts" = ["*.txt"]

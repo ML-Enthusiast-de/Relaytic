@@ -2,7 +2,7 @@
 from pathlib import Path
 import json
 
-from corr2surrogate.ui.cli import (
+from relaytic.ui.cli import (
     _build_analysis_interpretation_prompt,
     _extract_top3_correlations_global,
     _format_top3_correlations_line,
@@ -66,7 +66,7 @@ def _stub_llm_interpretation(**_kwargs):
 
 def test_cli_run_agent1_analysis_omits_none_fields(monkeypatch) -> None:
     registry = _DummyRegistry()
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
     exit_code = main(
         [
             "run-agent1-analysis",
@@ -100,7 +100,7 @@ def test_cli_run_agent1_analysis_prints_strict_json_for_nonfinite_values(
                 }
             )
 
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: _NonFiniteRegistry())
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: _NonFiniteRegistry())
     exit_code = main(
         [
             "run-agent1-analysis",
@@ -134,7 +134,7 @@ def test_cli_setup_local_llm_invokes_setup(monkeypatch) -> None:
         captured.update(kwargs)
         return {"ready": True}
 
-    monkeypatch.setattr("corr2surrogate.ui.cli.setup_local_llm", fake_setup_local_llm)
+    monkeypatch.setattr("relaytic.ui.cli.setup_local_llm", fake_setup_local_llm)
     exit_code = main(
         [
             "setup-local-llm",
@@ -154,7 +154,7 @@ def test_cli_setup_local_llm_handles_runtime_error(monkeypatch, capsys) -> None:
     def fake_setup_local_llm(**_kwargs):
         raise RuntimeError("policy-blocked")
 
-    monkeypatch.setattr("corr2surrogate.ui.cli.setup_local_llm", fake_setup_local_llm)
+    monkeypatch.setattr("relaytic.ui.cli.setup_local_llm", fake_setup_local_llm)
     exit_code = main(
         [
             "setup-local-llm",
@@ -176,7 +176,7 @@ def test_cli_run_inference_invokes_runner(monkeypatch, capsys) -> None:
         return {"status": "ok", "prediction_count": 12}
 
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli.run_inference_from_artifacts",
+        "relaytic.ui.cli.run_inference_from_artifacts",
         fake_run_inference_from_artifacts,
     )
     exit_code = main(
@@ -221,7 +221,7 @@ def test_cli_run_agent_session_basic_flow(monkeypatch) -> None:
         }
 
     monkeypatch.setattr("builtins.input", fake_input)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
     exit_code = main(
         [
             "run-agent-session",
@@ -260,7 +260,7 @@ def test_cli_run_agent_session_persists_messages_between_turns(monkeypatch) -> N
         }
 
     monkeypatch.setattr("builtins.input", fake_input)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
     exit_code = main(
         [
             "run-agent-session",
@@ -301,7 +301,7 @@ def test_cli_run_agent_session_context_includes_last_five_user_prompts(monkeypat
         return {"event": {"message": f"reply to {user_message}"}}
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert len(calls) == 6
@@ -370,8 +370,8 @@ def test_cli_run_agent_session_analyst_autopilot_runs_analysis(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
@@ -518,8 +518,8 @@ def test_cli_run_agent_session_analyst_can_continue_directly_into_modeler(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
@@ -580,8 +580,8 @@ def test_cli_run_agent_session_analyst_autopilot_multi_sheet(monkeypatch, tmp_pa
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
@@ -652,9 +652,9 @@ def test_cli_run_agent_session_autopilot_interpretation_runtime_error_is_suppres
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli.run_local_agent_once",
+        "relaytic.ui.cli.run_local_agent_once",
         lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("boom")),
     )
 
@@ -744,8 +744,8 @@ def test_cli_run_agent_session_autopilot_interpretation_retries_with_compact_pro
         return {"event": {"message": "Recovered interpretation on retry."}}
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
 
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
@@ -836,9 +836,9 @@ def test_cli_run_agent_session_analyst_autopilot_multi_sheet_handles_small_talk(
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli.run_local_agent_once",
+        "relaytic.ui.cli.run_local_agent_once",
         lambda **kwargs: {"event": {"message": "LLM detour reply (sheet)."}},
     )
 
@@ -893,8 +893,8 @@ def test_cli_run_agent_session_analyst_autopilot_header_override(monkeypatch, tm
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
@@ -950,9 +950,9 @@ def test_cli_run_agent_session_analyst_autopilot_header_confirmation_handles_sma
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli.run_local_agent_once",
+        "relaytic.ui.cli.run_local_agent_once",
         lambda **kwargs: {"event": {"message": "LLM detour reply (header confirm)."}},
     )
 
@@ -1010,9 +1010,9 @@ def test_cli_run_agent_session_analyst_autopilot_header_override_handles_small_t
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli.run_local_agent_once",
+        "relaytic.ui.cli.run_local_agent_once",
         lambda **kwargs: {"event": {"message": "LLM detour reply (header override)."}},
     )
 
@@ -1065,8 +1065,8 @@ def test_cli_run_agent_session_analyst_target_prompt_accepts_list_command(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
@@ -1120,8 +1120,8 @@ def test_cli_run_agent_session_analyst_target_prompt_accepts_hypothesis_command(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
@@ -1171,9 +1171,9 @@ def test_cli_run_agent_session_analyst_target_prompt_handles_small_talk(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli.run_local_agent_once",
+        "relaytic.ui.cli.run_local_agent_once",
         lambda **kwargs: {"event": {"message": "LLM detour reply (target)."}},
     )
     exit_code = main(["run-agent-session", "--agent", "analyst"])
@@ -1206,7 +1206,7 @@ def test_cli_run_agent_session_rewrites_greeting_tool_error_fallback(monkeypatch
         }
 
     monkeypatch.setattr("builtins.input", fake_input)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert calls["count"] >= 2
@@ -1235,7 +1235,7 @@ def test_cli_run_agent_session_meaning_of_life_uses_llm_detour_on_fallback(
         }
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert calls["normal"] == 1
@@ -1253,7 +1253,7 @@ def test_cli_run_agent_session_greeting_uses_llm(monkeypatch, capsys) -> None:
         calls.append((agent, user_message))
         return {"event": {"message": "LLM says hello"}}
 
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert calls and calls[0][1] == "hello"
@@ -1270,7 +1270,7 @@ def test_cli_run_agent_session_how_are_you_uses_llm(monkeypatch, capsys) -> None
         calls.append((agent, user_message))
         return {"event": {"message": "LLM says I am fine."}}
 
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert calls and calls[0][1] == "how are you"
@@ -1293,7 +1293,7 @@ def test_cli_run_agent_session_awaiting_dataset_stage_reprompts_after_chat(
             }
         }
 
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     output = capsys.readouterr().out
@@ -1315,8 +1315,8 @@ def test_cli_run_agent_session_provider_connection_error_is_friendly(monkeypatch
             "<urlopen error [WinError 10061] connection refused>"
         )
 
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _raise_provider_error)
-    monkeypatch.setattr("corr2surrogate.ui.cli.setup_local_llm", lambda **_: {"ready": False})
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _raise_provider_error)
+    monkeypatch.setattr("relaytic.ui.cli.setup_local_llm", lambda **_: {"ready": False})
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert calls["count"] == 2
@@ -1329,13 +1329,13 @@ def test_cli_run_agent_session_provider_connection_error_is_friendly(monkeypatch
 def test_cli_run_agent_session_analyst_autopilot_handles_internal_error(monkeypatch, capsys) -> None:
     inputs = iter(["hello", "/exit"])
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: _SessionRegistry({}))
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: _SessionRegistry({}))
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli._run_analyst_autopilot_turn",
+        "relaytic.ui.cli._run_analyst_autopilot_turn",
         lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("boom with internal details")),
     )
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli.run_local_agent_once",
+        "relaytic.ui.cli.run_local_agent_once",
         lambda **_: (_ for _ in ()).throw(AssertionError("LLM path should not run for this test")),
     )
 
@@ -1394,8 +1394,8 @@ def test_cli_run_agent_session_analyst_autopilot_drops_none_optional_args(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert registry.calls[1][0] == "run_agent1_analysis"
@@ -1446,8 +1446,8 @@ def test_cli_run_agent_session_analyst_lag_prompt_sets_max_lag(monkeypatch, tmp_
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert registry.calls[1][0] == "run_agent1_analysis"
@@ -1500,8 +1500,8 @@ def test_cli_run_agent_session_analyst_prompts_missing_and_length_handling(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert registry.calls[1][0] == "run_agent1_analysis"
@@ -1552,12 +1552,12 @@ def test_cli_run_agent_session_analyst_default_dataset_runs_autopilot(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli._resolve_default_public_dataset_path",
+        "relaytic.ui.cli._resolve_default_public_dataset_path",
         lambda: default_path,
     )
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     assert registry.calls[0][0] == "prepare_ingestion_step"
@@ -1572,7 +1572,7 @@ def test_cli_run_agent_session_analyst_default_dataset_missing_is_reported(
     inputs = iter(["default", "/exit"])
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli._resolve_default_public_dataset_path",
+        "relaytic.ui.cli._resolve_default_public_dataset_path",
         lambda: None,
     )
     exit_code = main(["run-agent-session", "--agent", "analyst"])
@@ -1587,7 +1587,7 @@ def test_cli_run_agent_session_prints_welcome_message(monkeypatch, capsys) -> No
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     output = capsys.readouterr().out
-    assert "Welcome to Corr2Surrogate" in output
+    assert "Welcome to Relaytic" in output
     assert "Useful commands" in output
     assert "Dataset choice" in output
 
@@ -1647,8 +1647,8 @@ def test_cli_run_agent_session_prints_header_preview_on_confirmation(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
     exit_code = main(["run-agent-session", "--agent", "analyst"])
     assert exit_code == 0
     output = capsys.readouterr().out
@@ -1727,8 +1727,8 @@ def test_cli_run_agent_session_modeler_direct_request_then_dataset(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -1811,10 +1811,10 @@ def test_cli_modeler_runs_inference_in_session_when_user_opts_in(
         }
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli.run_inference_from_artifacts",
+        "relaytic.ui.cli.run_inference_from_artifacts",
         fake_run_inference_from_artifacts,
     )
 
@@ -1930,8 +1930,8 @@ def test_cli_run_agent_session_modeler_handoff_allows_override_prompts(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2023,8 +2023,8 @@ def test_cli_run_agent_session_modeler_direct_lagged_request_passes_temporal_arg
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2122,8 +2122,8 @@ def test_cli_run_agent_session_modeler_direct_lagged_classifier_request_passes_t
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2241,8 +2241,8 @@ def test_cli_run_agent_session_modeler_handoff_uses_structured_contract_defaults
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2378,8 +2378,8 @@ def test_cli_run_agent_session_modeler_auto_retries_to_next_safe_family(
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2471,8 +2471,8 @@ def test_cli_run_agent_session_modeler_explicit_model_does_not_auto_switch(
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2566,8 +2566,8 @@ def test_cli_modeler_prints_experiment_recommendations_when_stalled(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2670,8 +2670,8 @@ def test_cli_modeler_prints_professional_analysis_and_suggestions(
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2752,8 +2752,8 @@ def test_cli_modeler_threshold_override_is_applied_to_training_args(
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2872,8 +2872,8 @@ def test_cli_modeler_retries_with_feature_set_expansion(
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -2997,8 +2997,8 @@ def test_cli_modeler_retries_with_lag_horizon_expansion(
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -3167,8 +3167,8 @@ def test_cli_run_agent_session_modeler_keeps_best_attempt_when_retry_is_worse(
         }
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
@@ -3186,7 +3186,7 @@ def test_cli_run_agent_session_modeler_invalid_handoff_is_safe(
     handoff_path.write_text(json.dumps({"foo": "bar"}), encoding="utf-8")
     inputs = iter([f"use handoff {handoff_path}", "/exit"])
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
     output = capsys.readouterr().out
@@ -3230,8 +3230,8 @@ def test_cli_run_agent_session_modeler_lagged_request_on_non_time_series_is_safe
         message="Lagged model families require time-series structure and a usable timestamp column.",
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
     exit_code = main(["run-agent-session", "--agent", "modeler"])
     assert exit_code == 0
     output = capsys.readouterr().out
@@ -3322,9 +3322,9 @@ def test_cli_run_agent_session_modeler_suppresses_runtime_fallback_as_fake_inter
     )
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.build_default_registry", lambda: registry)
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: registry)
     monkeypatch.setattr(
-        "corr2surrogate.ui.cli.run_local_agent_once",
+        "relaytic.ui.cli.run_local_agent_once",
         lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("boom")),
     )
 
@@ -3353,7 +3353,7 @@ def test_cli_run_agent_session_task_override_is_persisted(monkeypatch) -> None:
         return {"event": {"message": "reply"}}
 
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", fake_run_local_agent_once)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", fake_run_local_agent_once)
     exit_code = main(["run-agent-session", "--agent", "analyst", "--max-turns", "4"])
     assert exit_code == 0
     assert len(calls) == 1
@@ -3381,7 +3381,7 @@ def test_cli_modeler_trains_classification_dataset_without_crashing(
         ]
     )
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler", "--max-turns", "5"])
     assert exit_code == 0
@@ -3451,7 +3451,7 @@ def test_cli_modeler_handoff_trains_fraud_classifier(
 
     inputs = iter([f"use handoff {handoff_path}", "", "", "", "/exit"])
     monkeypatch.setattr("builtins.input", lambda _prompt: next(inputs))
-    monkeypatch.setattr("corr2surrogate.ui.cli.run_local_agent_once", _stub_llm_interpretation)
+    monkeypatch.setattr("relaytic.ui.cli.run_local_agent_once", _stub_llm_interpretation)
 
     exit_code = main(["run-agent-session", "--agent", "modeler", "--max-turns", "6"])
     assert exit_code == 0
@@ -3496,3 +3496,4 @@ def test_generate_analysis_interpretation_handles_chat_timeout() -> None:
 def test_is_provider_connection_error_detects_timeout_markers() -> None:
     assert _is_provider_connection_error(TimeoutError("timed out")) is True
     assert _is_provider_connection_error(RuntimeError("provider request timed out")) is True
+

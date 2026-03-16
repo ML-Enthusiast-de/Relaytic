@@ -1,6 +1,6 @@
-import pandas as pd
+﻿import pandas as pd
 
-from corr2surrogate.analytics.quality_checks import run_quality_checks
+from relaytic.analytics.quality_checks import run_quality_checks
 
 
 def test_run_quality_checks_detects_duplicates_missing_and_outliers() -> None:
@@ -53,3 +53,4 @@ def test_run_quality_checks_comma_decimal_time_column_has_no_false_duplicates() 
     assert payload["invalid_timestamps"] == 0
     assert payload["monotonic_timestamp"] is True
     assert not any("duplicate timestamps" in item for item in payload["warnings"])
+

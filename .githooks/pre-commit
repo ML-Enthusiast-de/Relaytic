@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 set -eu
 
-PYTHONPATH=src python -m corr2surrogate.security.git_guard
+PYTHONPATH=src python -m relaytic.security.git_guard

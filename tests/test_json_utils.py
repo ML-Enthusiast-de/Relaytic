@@ -1,8 +1,8 @@
-import json
+﻿import json
 from pathlib import Path
 
-from corr2surrogate.analytics.reporting import save_agent1_artifacts
-from corr2surrogate.core.json_utils import dumps_json
+from relaytic.analytics.reporting import save_agent1_artifacts
+from relaytic.core.json_utils import dumps_json
 
 
 def test_dumps_json_converts_nonfinite_to_null() -> None:
@@ -54,3 +54,4 @@ def test_save_agent1_artifacts_writes_strict_json(tmp_path: Path) -> None:
     assert decoded["experiment_recommendations"][0]["score"] is None
     assert decoded["sensor_diagnostics"]["diagnostics"][0]["trust_score"] is None
     assert decoded["planner_trace"][0]["score"] is None
+

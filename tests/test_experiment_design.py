@@ -1,8 +1,8 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 
-from corr2surrogate.analytics.correlations import run_correlation_analysis
-from corr2surrogate.analytics.experiment_design import recommend_data_trajectories
+from relaytic.analytics.correlations import run_correlation_analysis
+from relaytic.analytics.experiment_design import recommend_data_trajectories
 
 
 def test_recommend_data_trajectories_returns_actionable_items() -> None:
@@ -27,3 +27,4 @@ def test_recommend_data_trajectories_returns_actionable_items() -> None:
     assert recs
     assert recs[0].target_signal == "y"
     assert "suggestion" in recs[0].__dict__
+

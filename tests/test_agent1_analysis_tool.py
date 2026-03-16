@@ -1,6 +1,6 @@
-from pathlib import Path
+﻿from pathlib import Path
 
-from corr2surrogate.orchestration.default_tools import build_default_registry
+from relaytic.orchestration.default_tools import build_default_registry
 
 
 def test_run_agent1_analysis_tool_end_to_end(monkeypatch, tmp_path: Path) -> None:
@@ -205,3 +205,4 @@ def test_run_agent1_analysis_respects_user_preprocessing_when_strategy_search_en
         "drop_rows_drop_sparse",
         "keep_keep",
     }
+

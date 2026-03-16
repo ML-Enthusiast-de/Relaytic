@@ -1,7 +1,7 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 
-from corr2surrogate.analytics.stationarity import assess_stationarity
+from relaytic.analytics.stationarity import assess_stationarity
 
 
 def test_assess_stationarity_flags_trend_as_non_stationary() -> None:
@@ -16,3 +16,4 @@ def test_assess_stationarity_flags_trend_as_non_stationary() -> None:
     by_signal = {item.signal: item for item in summary.results}
     assert by_signal["trend_sig"].status == "non_stationary"
     assert by_signal["stationary_sig"].status in {"stationary", "non_stationary"}
+

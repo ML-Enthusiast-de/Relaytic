@@ -1,4 +1,4 @@
-from corr2surrogate.orchestration.tool_registry import (
+﻿from relaytic.orchestration.tool_registry import (
     ToolRegistry,
     ToolValidationError,
 )
@@ -120,3 +120,4 @@ def test_tool_registry_rejects_required_null_field_values() -> None:
     except ToolValidationError:
         return
     raise AssertionError("Expected ToolValidationError for required null value.")
+

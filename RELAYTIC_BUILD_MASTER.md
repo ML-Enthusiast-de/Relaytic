@@ -29,6 +29,7 @@ Codex must:
 ## Current intended build order
 
 Start with:
+0. normalization and contract freeze
 1. contracts and scaffolding
 2. mandate and context foundation
 3. focus council and investigation baseline
@@ -84,4 +85,4 @@ If files disagree, use:
 
 ## Immediate instruction to Codex
 
-Read the vision, then the build docs, then execute the first slice only.
+Read the vision, then the build docs, then execute one bounded slice only.

@@ -1,6 +1,6 @@
-import pandas as pd
+﻿import pandas as pd
 
-from corr2surrogate.ingestion.csv_loader import _infer_header_and_data_start, load_tabular_data
+from relaytic.ingestion.csv_loader import _infer_header_and_data_start, load_tabular_data
 
 
 def test_infer_header_identifies_textual_header_row() -> None:
@@ -64,3 +64,4 @@ def test_infer_header_prefers_dense_signal_row_over_sparse_description_row() -> 
     preview = raw.head(5)
     inferred = _infer_header_and_data_start(preview, raw, confidence_threshold=0.70)
     assert inferred.header_row == 0
+

@@ -1,4 +1,4 @@
-from corr2surrogate.analytics.ranking import CandidateSignal, rank_surrogate_candidates
+﻿from relaytic.analytics.ranking import CandidateSignal, rank_surrogate_candidates
 
 
 def test_dependency_aware_ranking_penalizes_virtual_dependencies() -> None:
@@ -52,3 +52,4 @@ def test_dependency_aware_ranking_without_constraints_does_not_assume_virtual() 
     assert ranked[0].feasible
     assert ranked[0].missing_physical_dependencies == []
     assert "feasibility is unverified" in ranked[0].rationale.lower()
+

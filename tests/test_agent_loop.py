@@ -1,5 +1,5 @@
-from corr2surrogate.orchestration.agent_loop import AgentLoop, AgentLoopLimits, parse_agent_action
-from corr2surrogate.orchestration.tool_registry import ToolRegistry
+﻿from relaytic.orchestration.agent_loop import AgentLoop, AgentLoopLimits, parse_agent_action
+from relaytic.orchestration.tool_registry import ToolRegistry
 
 
 def test_parse_agent_action_accepts_json_string() -> None:
@@ -88,3 +88,4 @@ def test_agent_loop_run_falls_back_after_repeated_same_tool_result_error() -> No
     event = loop.run(responder=responder, context={})
     assert event.status == "respond"
     assert "repeating the same failing tool call result" in event.message
+

@@ -1,6 +1,6 @@
-import pandas as pd
+﻿import pandas as pd
 
-from corr2surrogate.analytics.task_detection import (
+from relaytic.analytics.task_detection import (
     assess_task_profile,
     assess_task_profiles,
     normalize_task_type_hint,
@@ -73,3 +73,4 @@ def test_normalize_task_type_hint_handles_aliases() -> None:
     assert normalize_task_type_hint("classification") == "binary_classification"
     assert normalize_task_type_hint("fraud") == "fraud_detection"
     assert normalize_task_type_hint("task") is None
+

@@ -1,6 +1,6 @@
-import numpy as np
+﻿import numpy as np
 
-from corr2surrogate.modeling.splitters import build_train_validation_test_split
+from relaytic.modeling.splitters import build_train_validation_test_split
 
 
 def test_build_train_validation_test_split_keeps_time_series_order() -> None:
@@ -34,3 +34,4 @@ def test_build_train_validation_test_split_stratifies_classification_labels() ->
     test_rate = positive_fraction(split.test_indices)
     assert abs(train_rate - val_rate) < 0.08
     assert abs(train_rate - test_rate) < 0.08
+

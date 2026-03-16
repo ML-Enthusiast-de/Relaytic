@@ -1,6 +1,6 @@
-from pathlib import Path
+﻿from pathlib import Path
 
-from corr2surrogate.orchestration.default_tools import build_default_registry
+from relaytic.orchestration.default_tools import build_default_registry
 def test_train_surrogate_candidates_tool_runs_split_safe_linear_and_tree(
     monkeypatch, tmp_path: Path
 ) -> None:
@@ -425,3 +425,4 @@ def test_train_surrogate_candidates_supports_boosted_tree_classifier(
     assert payload["selected_metrics"]["test"]["f1"] > 0.75
     analysis = payload["professional_analysis"]
     assert isinstance(analysis.get("high_error_regions"), list)
+

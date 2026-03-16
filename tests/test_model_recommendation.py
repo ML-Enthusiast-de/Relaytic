@@ -1,7 +1,7 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 
-from corr2surrogate.analytics import recommend_model_strategies, run_correlation_analysis
+from relaytic.analytics import recommend_model_strategies, run_correlation_analysis
 
 
 def test_recommend_model_strategies_prefers_linear_for_linear_signal() -> None:
@@ -53,3 +53,4 @@ def test_recommend_model_strategies_flags_tree_candidate_for_interactions() -> N
     assert any(item.model_family == "tiny_tree_probe" for item in rec.candidate_models)
     assert rec.best_probe_model_family in {"tiny_tree_probe", "interaction_ridge"}
     assert "For target `target`, start with `tree_ensemble_candidate`." in rec.recommendation_statement
+

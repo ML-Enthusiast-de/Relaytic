@@ -1,6 +1,6 @@
-from pathlib import Path
+﻿from pathlib import Path
 
-from corr2surrogate.orchestration.local_llm_setup import setup_local_llm
+from relaytic.orchestration.local_llm_setup import setup_local_llm
 
 
 def test_setup_local_llm_llama_cpp_ready(monkeypatch, tmp_path: Path) -> None:
@@ -29,17 +29,17 @@ def test_setup_local_llm_llama_cpp_ready(monkeypatch, tmp_path: Path) -> None:
     model_path = tmp_path / "local.gguf"
     model_path.write_bytes(b"gguf")
 
-    monkeypatch.setattr("corr2surrogate.orchestration.local_llm_setup.load_config", lambda _: config)
+    monkeypatch.setattr("relaytic.orchestration.local_llm_setup.load_config", lambda _: config)
     monkeypatch.setattr(
-        "corr2surrogate.orchestration.local_llm_setup._find_llama_server_binary",
+        "relaytic.orchestration.local_llm_setup._find_llama_server_binary",
         lambda: "llama-server",
     )
     monkeypatch.setattr(
-        "corr2surrogate.orchestration.local_llm_setup._resolve_llama_model_path",
+        "relaytic.orchestration.local_llm_setup._resolve_llama_model_path",
         lambda model, override_path: model_path,
     )
     monkeypatch.setattr(
-        "corr2surrogate.orchestration.local_llm_setup._llama_server_ready",
+        "relaytic.orchestration.local_llm_setup._llama_server_ready",
         lambda endpoint, timeout_seconds: True,
     )
 
@@ -50,7 +50,7 @@ def test_setup_local_llm_llama_cpp_ready(monkeypatch, tmp_path: Path) -> None:
     )
     assert result["ready"] is True
     assert result["provider"] == "llama_cpp"
-    assert result["suggested_env"]["C2S_PROVIDER"] == "llama_cpp"
+    assert result["suggested_env"]["RELAYTIC_PROVIDER"] == "llama_cpp"
 
 
 def test_setup_local_llm_ollama_missing_binary(monkeypatch) -> None:
@@ -76,8 +76,8 @@ def test_setup_local_llm_ollama_missing_binary(monkeypatch) -> None:
             "fallback_order": ["small_cpu"],
         },
     }
-    monkeypatch.setattr("corr2surrogate.orchestration.local_llm_setup.load_config", lambda _: config)
-    monkeypatch.setattr("corr2surrogate.orchestration.local_llm_setup.shutil.which", lambda _: None)
+    monkeypatch.setattr("relaytic.orchestration.local_llm_setup.load_config", lambda _: config)
+    monkeypatch.setattr("relaytic.orchestration.local_llm_setup.shutil.which", lambda _: None)
 
     result = setup_local_llm(provider="ollama", install_provider=False)
     assert result["ready"] is False
@@ -98,7 +98,7 @@ def test_setup_local_llm_openai_provider_requires_key(monkeypatch) -> None:
             },
             "profiles": {
                 "small_cpu": {
-                    "model": "c2s-4b",
+                    "model": "relaytic-4b",
                     "cpu_only": True,
                     "n_gpu_layers": 0,
                     "max_context": 2048,
@@ -108,10 +108,12 @@ def test_setup_local_llm_openai_provider_requires_key(monkeypatch) -> None:
             "fallback_order": ["small_cpu"],
         },
     }
-    monkeypatch.setattr("corr2surrogate.orchestration.local_llm_setup.load_config", lambda _: config)
+    monkeypatch.setattr("relaytic.orchestration.local_llm_setup.load_config", lambda _: config)
+    monkeypatch.delenv("RELAYTIC_API_KEY", raising=False)
     monkeypatch.delenv("C2S_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
 
     result = setup_local_llm(provider="openai")
     assert result["ready"] is False
     assert any("Missing API key" in item for item in result["errors"])
+

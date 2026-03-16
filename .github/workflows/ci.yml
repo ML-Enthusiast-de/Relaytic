@@ -31,4 +31,4 @@ jobs:
         run: python -m pytest -q
 
       - name: Run leak scan
-        run: python -m corr2surrogate.ui.cli scan-git-safety
+        run: python -m relaytic.ui.cli scan-git-safety

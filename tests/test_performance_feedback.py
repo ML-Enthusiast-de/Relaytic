@@ -1,7 +1,7 @@
-import numpy as np
+﻿import numpy as np
 import pandas as pd
 
-from corr2surrogate.modeling.performance_feedback import analyze_model_performance
+from relaytic.modeling.performance_feedback import analyze_model_performance
 
 
 def test_analyze_model_performance_returns_regions_and_suggestions() -> None:
@@ -26,3 +26,4 @@ def test_analyze_model_performance_returns_regions_and_suggestions() -> None:
     assert "summary" in payload
     assert payload["bad_regions"]
     assert payload["trajectory_suggestions"]
+
