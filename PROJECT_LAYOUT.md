@@ -28,6 +28,10 @@ Relaytic/
     build_slices/
   src/
     relaytic/
+      artifacts/
+      context/
+      mandate/
+      policies/
     corr2surrogate/  # temporary compatibility shim
   tests/
   README.md

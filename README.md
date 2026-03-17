@@ -65,6 +65,11 @@ The current CLI surface is still the legacy harness baseline, now exposed throug
 Examples:
 
 ```bash
+relaytic policy resolve --output artifacts/run_demo/policy_resolved.yaml
+relaytic manifest init --run-dir artifacts/run_demo --entry policy_resolved.yaml
+relaytic foundation init --run-dir artifacts/run_demo
+relaytic mandate init --run-dir artifacts/run_demo --objective best_robust_pareto_front
+relaytic context init --run-dir artifacts/run_demo --problem-statement "Predict off-spec batches early."
 relaytic setup-local-llm --provider llama_cpp
 relaytic run-agent-session --agent analyst
 relaytic run-agent1-analysis --data-path data/private/run1.csv
@@ -107,6 +112,10 @@ The completed normalization slice established:
 ```text
 src/relaytic/          Main runtime package and current implementation baseline
 src/corr2surrogate/    Temporary compatibility import shim
+src/relaytic/mandate/  Mandate foundation objects and writers
+src/relaytic/context/  Context foundation objects and writers
+src/relaytic/policies/ Canonical resolved policy helpers
+src/relaytic/artifacts/ Manifest helpers
 configs/               Runtime configuration
 docs/build_slices/     Incremental implementation slices
 artifacts/             Generated run artifacts (ignored except sentinels)

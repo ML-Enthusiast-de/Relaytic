@@ -63,6 +63,13 @@ The public CLI command is `relaytic`.
 Minimum guaranteed surfaces at this stage:
 
 - `relaytic --help`
+- `relaytic manifest init`
+- `relaytic policy resolve`
+- `relaytic mandate init`
+- `relaytic mandate show`
+- `relaytic context init`
+- `relaytic context show`
+- `relaytic foundation init`
 - `relaytic setup-local-llm`
 - `relaytic run-agent-session`
 - `relaytic run-agent1-analysis`

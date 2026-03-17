@@ -10,6 +10,18 @@ from pathlib import Path
 from typing import Any, Callable
 
 
+def artifact_entry(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.artifacts import artifact_entry as _artifact_entry
+
+    return _artifact_entry(*args, **kwargs)
+
+
+def write_manifest(*args: Any, **kwargs: Any) -> Path:
+    from relaytic.artifacts import write_manifest as _write_manifest
+
+    return _write_manifest(*args, **kwargs)
+
+
 def _supported_task_types() -> list[str]:
     from relaytic.analytics import SUPPORTED_TASK_TYPES
 
@@ -70,6 +82,18 @@ def git_guard_main(argv: list[str] | None = None) -> int:
     from relaytic.security.git_guard import main as _git_guard_main
 
     return _git_guard_main(argv)
+
+
+def load_policy(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.policies import load_policy as _load_policy
+
+    return _load_policy(*args, **kwargs)
+
+
+def write_resolved_policy(*args: Any, **kwargs: Any) -> Path:
+    from relaytic.policies import write_resolved_policy as _write_resolved_policy
+
+    return _write_resolved_policy(*args, **kwargs)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -334,6 +358,162 @@ def build_parser() -> argparse.ArgumentParser:
         nargs="*",
         help="Optional files/directories. If omitted, scans git-tracked files.",
     )
+
+    manifest = sub.add_parser(
+        "manifest",
+        help="Create or inspect Relaytic artifact manifest scaffolds.",
+    )
+    manifest_sub = manifest.add_subparsers(dest="manifest_command", required=True)
+
+    manifest_init = manifest_sub.add_parser(
+        "init",
+        help="Initialize `manifest.json` in a run directory.",
+    )
+    manifest_init.add_argument(
+        "--run-dir",
+        required=True,
+        help="Run directory where `manifest.json` should be written.",
+    )
+    manifest_init.add_argument(
+        "--run-id",
+        default=None,
+        help="Optional stable run id override. Defaults to the run directory name.",
+    )
+    manifest_init.add_argument(
+        "--policy-source",
+        default=None,
+        help="Optional policy source path to record in the manifest.",
+    )
+    manifest_init.add_argument(
+        "--label",
+        action="append",
+        default=[],
+        help="Optional `key=value` labels. May be provided multiple times.",
+    )
+    manifest_init.add_argument(
+        "--entry",
+        action="append",
+        default=[],
+        help="Optional relative artifact path to register. May be provided multiple times.",
+    )
+
+    policy = sub.add_parser(
+        "policy",
+        help="Resolve and materialize Relaytic policy/config scaffolds.",
+    )
+    policy_sub = policy.add_subparsers(dest="policy_command", required=True)
+
+    policy_resolve = policy_sub.add_parser(
+        "resolve",
+        help="Write `policy_resolved.yaml` from the configured policy source.",
+    )
+    policy_resolve.add_argument(
+        "--config",
+        default=None,
+        help="Optional source config path. Defaults to standard Relaytic config resolution.",
+    )
+    policy_resolve.add_argument(
+        "--output",
+        required=True,
+        help="Destination for the resolved policy YAML.",
+    )
+
+    mandate = sub.add_parser(
+        "mandate",
+        help="Initialize or inspect mandate foundation artifacts.",
+    )
+    mandate_sub = mandate.add_subparsers(dest="mandate_command", required=True)
+
+    mandate_init = mandate_sub.add_parser(
+        "init",
+        help="Write `lab_mandate.json`, `work_preferences.json`, and `run_brief.json`.",
+    )
+    mandate_init.add_argument("--run-dir", required=True, help="Run directory for mandate artifacts.")
+    mandate_init.add_argument("--config", default=None, help="Optional config/policy source.")
+    mandate_init.add_argument("--overwrite", action="store_true", help="Allow overwriting existing mandate artifacts.")
+    mandate_init.add_argument("--disable-mandate", action="store_true", help="Disable mandate influence in the written controls.")
+    mandate_init.add_argument("--influence-mode", choices=["off", "advisory", "weighted", "binding", "constitutional"], default=None)
+    mandate_init.add_argument("--lab-value", action="append", default=[], help="Repeatable long-term lab value.")
+    mandate_init.add_argument("--hard-constraint", action="append", default=[], help="Repeatable hard constraint.")
+    mandate_init.add_argument("--soft-preference", action="append", default=[], help="Repeatable soft preference.")
+    mandate_init.add_argument("--prohibited-action", action="append", default=[], help="Repeatable prohibited action.")
+    mandate_init.add_argument("--lab-notes", default="", help="Free-form lab mandate notes.")
+    mandate_init.add_argument("--work-execution-mode", default=None, help="Preferred execution mode.")
+    mandate_init.add_argument("--work-operation-mode", default=None, help="Preferred operation mode.")
+    mandate_init.add_argument("--report-style", default="concise", help="Preferred report style.")
+    mandate_init.add_argument("--effort-tier", default=None, help="Preferred effort tier.")
+    mandate_init.add_argument("--work-notes", default="", help="Free-form work-preferences notes.")
+    mandate_init.add_argument("--objective", default=None, help="Run objective override.")
+    mandate_init.add_argument("--target-column", default=None, help="Target column for this run.")
+    mandate_init.add_argument("--deployment-target", default=None, help="Deployment target description.")
+    mandate_init.add_argument("--success-criterion", action="append", default=[], help="Repeatable success criterion.")
+    mandate_init.add_argument("--binding-constraint", action="append", default=[], help="Repeatable run-level binding constraint.")
+    mandate_init.add_argument("--run-notes", default="", help="Free-form run-brief notes.")
+
+    mandate_show = mandate_sub.add_parser(
+        "show",
+        help="Print mandate artifacts from a run directory.",
+    )
+    mandate_show.add_argument("--run-dir", required=True, help="Run directory containing mandate artifacts.")
+
+    context = sub.add_parser(
+        "context",
+        help="Initialize or inspect context foundation artifacts.",
+    )
+    context_sub = context.add_subparsers(dest="context_command", required=True)
+
+    context_init = context_sub.add_parser(
+        "init",
+        help="Write `data_origin.json`, `domain_brief.json`, and `task_brief.json`.",
+    )
+    context_init.add_argument("--run-dir", required=True, help="Run directory for context artifacts.")
+    context_init.add_argument("--config", default=None, help="Optional config/policy source.")
+    context_init.add_argument("--overwrite", action="store_true", help="Allow overwriting existing context artifacts.")
+    context_init.add_argument("--source-name", default=None, help="Human-readable data source name.")
+    context_init.add_argument("--source-type", default=None, help="Source type such as snapshot, table, or stream.")
+    context_init.add_argument("--acquisition-notes", default=None, help="How the data was acquired.")
+    context_init.add_argument("--owner", default=None, help="Owning team or system.")
+    context_init.add_argument("--contains-pii", action="store_true", help="Mark the dataset as containing PII.")
+    context_init.add_argument("--access-constraint", action="append", default=[], help="Repeatable access constraint.")
+    context_init.add_argument("--refresh-cadence", default=None, help="Expected data refresh cadence.")
+    context_init.add_argument("--system-name", default=None, help="Name of the real-world system.")
+    context_init.add_argument("--domain-summary", default=None, help="Domain summary.")
+    context_init.add_argument("--target-meaning", default=None, help="Meaning of the target in domain terms.")
+    context_init.add_argument("--known-caveat", action="append", default=[], help="Repeatable domain caveat.")
+    context_init.add_argument("--suspicious-column", action="append", default=[], help="Repeatable suspicious column.")
+    context_init.add_argument("--forbidden-feature", action="append", default=[], help="Repeatable forbidden feature.")
+    context_init.add_argument("--domain-binding-constraint", action="append", default=[], help="Repeatable binding domain constraint.")
+    context_init.add_argument("--domain-assumption", action="append", default=[], help="Repeatable domain assumption.")
+    context_init.add_argument("--problem-statement", default=None, help="Task problem statement.")
+    context_init.add_argument("--task-target-column", default=None, help="Target column referenced by the task brief.")
+    context_init.add_argument("--prediction-horizon", default=None, help="Prediction horizon if applicable.")
+    context_init.add_argument("--decision-type", default=None, help="Decision type description.")
+    context_init.add_argument("--primary-stakeholder", default=None, help="Primary stakeholder for the task.")
+    context_init.add_argument("--task-success-criterion", action="append", default=[], help="Repeatable task success criterion.")
+    context_init.add_argument("--failure-cost", action="append", default=[], help="Repeatable failure cost note.")
+    context_init.add_argument("--task-notes", default="", help="Free-form task-brief notes.")
+
+    context_show = context_sub.add_parser(
+        "show",
+        help="Print context artifacts from a run directory.",
+    )
+    context_show.add_argument("--run-dir", required=True, help="Run directory containing context artifacts.")
+
+    foundation = sub.add_parser(
+        "foundation",
+        help="Create the full Slice 02 run foundation in one command.",
+    )
+    foundation_sub = foundation.add_subparsers(dest="foundation_command", required=True)
+
+    foundation_init = foundation_sub.add_parser(
+        "init",
+        help="Write policy, mandate, context, and manifest artifacts for a run directory.",
+    )
+    foundation_init.add_argument("--run-dir", required=True, help="Run directory to initialize.")
+    foundation_init.add_argument("--config", default=None, help="Optional config/policy source.")
+    foundation_init.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    foundation_init.add_argument("--overwrite", action="store_true", help="Allow overwriting existing foundation artifacts.")
+    foundation_init.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
     return parser
 
 
@@ -344,6 +524,109 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "scan-git-safety":
         passthrough = list(args.paths)
         return git_guard_main(passthrough)
+
+    if args.command == "manifest":
+        if args.manifest_command != "init":
+            parser.error("Unsupported manifest subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        entries = [
+            artifact_entry(item, run_dir=args.run_dir, kind="artifact")
+            for item in args.entry
+        ]
+        path = write_manifest(
+            run_dir=args.run_dir,
+            run_id=args.run_id,
+            policy_source=args.policy_source,
+            labels=labels,
+            entries=entries,
+        )
+        print(
+            dumps_json(
+                {
+                    "status": "ok",
+                    "manifest_path": str(path),
+                    "run_dir": str(Path(args.run_dir)),
+                    "entry_count": len(entries) + 1,
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
+        return 0
+
+    if args.command == "policy":
+        if args.policy_command != "resolve":
+            parser.error("Unsupported policy subcommand.")
+            return 2
+        resolved = load_policy(args.config)
+        output_path = write_resolved_policy(args.output, path=args.config)
+        print(
+            dumps_json(
+                {
+                    "status": "ok",
+                    "output_path": str(output_path),
+                    "source_path": resolved.source_path,
+                    "schema_version": resolved.schema_version,
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
+        return 0
+
+    if args.command == "mandate":
+        if args.mandate_command == "init":
+            try:
+                payload = _init_mandate_foundation(args)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            print(dumps_json(payload, indent=2, ensure_ascii=False))
+            return 0
+        if args.mandate_command == "show":
+            print(dumps_json(_read_json_bundle(args.run_dir, bundle="mandate"), indent=2, ensure_ascii=False))
+            return 0
+        parser.error("Unsupported mandate subcommand.")
+        return 2
+
+    if args.command == "context":
+        if args.context_command == "init":
+            try:
+                payload = _init_context_foundation(args)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            print(dumps_json(payload, indent=2, ensure_ascii=False))
+            return 0
+        if args.context_command == "show":
+            print(dumps_json(_read_json_bundle(args.run_dir, bundle="context"), indent=2, ensure_ascii=False))
+            return 0
+        parser.error("Unsupported context subcommand.")
+        return 2
+
+    if args.command == "foundation":
+        if args.foundation_command != "init":
+            parser.error("Unsupported foundation subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _init_run_foundation(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        print(dumps_json(payload, indent=2, ensure_ascii=False))
+        return 0
 
     if args.command == "run-agent-once":
         try:
@@ -496,6 +779,347 @@ def _parse_context(raw: str) -> dict[str, Any]:
     if not isinstance(parsed, dict):
         raise ValueError("--context-json must decode to a JSON object.")
     return parsed
+
+
+def _parse_key_value_pairs(raw_pairs: list[str]) -> dict[str, str]:
+    labels: dict[str, str] = {}
+    for raw in raw_pairs:
+        if "=" not in raw:
+            raise ValueError(f"Expected key=value label, got: {raw!r}")
+        key, value = raw.split("=", 1)
+        normalized_key = key.strip()
+        if not normalized_key:
+            raise ValueError(f"Expected non-empty label key, got: {raw!r}")
+        labels[normalized_key] = value.strip()
+    return labels
+
+
+def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
+    if bundle == "mandate":
+        from relaytic.mandate import read_mandate_bundle
+
+        return read_mandate_bundle(run_dir)
+    if bundle == "context":
+        from relaytic.context import read_context_bundle
+
+        return read_context_bundle(run_dir)
+    raise ValueError(f"Unsupported bundle '{bundle}'.")
+
+
+def _init_run_foundation(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.context import (
+        build_context_controls_from_policy,
+        default_data_origin,
+        default_domain_brief,
+        default_task_brief,
+        write_context_bundle,
+    )
+    from relaytic.mandate import (
+        build_mandate_controls_from_policy,
+        build_run_brief,
+        build_work_preferences,
+        default_lab_mandate,
+        write_mandate_bundle,
+    )
+
+    root = Path(run_dir)
+    foundation_paths = _foundation_output_paths(root)
+    _ensure_paths_absent(
+        [
+            foundation_paths["lab_mandate"],
+            foundation_paths["work_preferences"],
+            foundation_paths["run_brief"],
+            foundation_paths["data_origin"],
+            foundation_paths["domain_brief"],
+            foundation_paths["task_brief"],
+            foundation_paths["manifest"],
+        ],
+        overwrite=overwrite,
+    )
+    resolved, policy_path = _ensure_policy_resolved(root, config_path=config_path, overwrite=overwrite)
+    mandate_controls = build_mandate_controls_from_policy(resolved.policy)
+    context_controls = build_context_controls_from_policy(resolved.policy)
+
+    mandate_paths = write_mandate_bundle(
+        root,
+        lab_mandate=default_lab_mandate(mandate_controls),
+        work_preferences=build_work_preferences(mandate_controls, policy=resolved.policy),
+        run_brief=build_run_brief(mandate_controls, policy=resolved.policy),
+    )
+    context_paths = write_context_bundle(
+        root,
+        data_origin=default_data_origin(context_controls),
+        domain_brief=default_domain_brief(context_controls),
+        task_brief=default_task_brief(context_controls),
+    )
+    manifest_path = _refresh_foundation_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_path,
+        labels=labels,
+    )
+    return {
+        "status": "ok",
+        "run_dir": str(root),
+        "policy_resolved": str(policy_path),
+        "mandate_paths": {key: str(value) for key, value in mandate_paths.items()},
+        "context_paths": {key: str(value) for key, value in context_paths.items()},
+        "manifest_path": str(manifest_path),
+        "source_format": resolved.source_format,
+    }
+
+
+def _init_mandate_foundation(args: argparse.Namespace) -> dict[str, Any]:
+    from relaytic.mandate import (
+        MandateControl,
+        build_mandate_controls_from_policy,
+        build_run_brief,
+        build_work_preferences,
+        default_lab_mandate,
+        write_mandate_bundle,
+    )
+
+    root = Path(args.run_dir)
+    targets = _foundation_output_paths(root)
+    _ensure_paths_absent(
+        [targets["lab_mandate"], targets["work_preferences"], targets["run_brief"]],
+        overwrite=bool(args.overwrite),
+    )
+    resolved, policy_path = _ensure_policy_resolved(
+        root,
+        config_path=args.config,
+        overwrite=bool(args.overwrite),
+    )
+    derived_controls = build_mandate_controls_from_policy(resolved.policy)
+    controls = MandateControl(
+        enabled=False if bool(args.disable_mandate) else derived_controls.enabled,
+        influence_mode=args.influence_mode or derived_controls.influence_mode,
+        allow_agent_challenges=derived_controls.allow_agent_challenges,
+        require_disagreement_logging=derived_controls.require_disagreement_logging,
+        allow_soft_preference_override_with_evidence=derived_controls.allow_soft_preference_override_with_evidence,
+    )
+    lab_mandate = default_lab_mandate(controls)
+    if args.lab_value:
+        lab_mandate = type(lab_mandate)(
+            controls=controls,
+            values=list(args.lab_value),
+            hard_constraints=list(args.hard_constraint),
+            soft_preferences=list(args.soft_preference),
+            prohibited_actions=list(args.prohibited_action),
+            notes=args.lab_notes,
+        )
+    else:
+        lab_mandate = type(lab_mandate)(
+            controls=controls,
+            values=lab_mandate.values,
+            hard_constraints=list(args.hard_constraint or lab_mandate.hard_constraints),
+            soft_preferences=list(args.soft_preference or lab_mandate.soft_preferences),
+            prohibited_actions=list(args.prohibited_action or lab_mandate.prohibited_actions),
+            notes=args.lab_notes or lab_mandate.notes,
+        )
+    work_preferences = build_work_preferences(
+        controls,
+        policy=resolved.policy,
+        execution_mode_preference=args.work_execution_mode,
+        operation_mode_preference=args.work_operation_mode,
+        preferred_report_style=args.report_style,
+        preferred_effort_tier=args.effort_tier,
+        notes=args.work_notes,
+    )
+    run_brief = build_run_brief(
+        controls,
+        policy=resolved.policy,
+        objective=args.objective,
+        target_column=args.target_column,
+        deployment_target=args.deployment_target,
+        success_criteria=list(args.success_criterion),
+        binding_constraints=list(args.binding_constraint),
+        notes=args.run_notes,
+    )
+    written = write_mandate_bundle(
+        root,
+        lab_mandate=lab_mandate,
+        work_preferences=work_preferences,
+        run_brief=run_brief,
+    )
+    manifest_path = _refresh_foundation_manifest(root, policy_source=policy_path)
+    return {
+        "status": "ok",
+        "run_dir": str(root),
+        "policy_resolved": str(policy_path),
+        "paths": {key: str(value) for key, value in written.items()},
+        "manifest_path": str(manifest_path),
+    }
+
+
+def _init_context_foundation(args: argparse.Namespace) -> dict[str, Any]:
+    from relaytic.context import (
+        build_context_controls_from_policy,
+        default_data_origin,
+        default_domain_brief,
+        default_task_brief,
+        write_context_bundle,
+    )
+
+    root = Path(args.run_dir)
+    targets = _foundation_output_paths(root)
+    _ensure_paths_absent(
+        [targets["data_origin"], targets["domain_brief"], targets["task_brief"]],
+        overwrite=bool(args.overwrite),
+    )
+    resolved, policy_path = _ensure_policy_resolved(
+        root,
+        config_path=args.config,
+        overwrite=bool(args.overwrite),
+    )
+    controls = build_context_controls_from_policy(resolved.policy)
+    data_origin = default_data_origin(
+        controls,
+        source_name=args.source_name,
+        source_type=args.source_type,
+        acquisition_notes=args.acquisition_notes,
+        owner=args.owner,
+        contains_pii=True if bool(args.contains_pii) else None,
+        access_constraints=list(args.access_constraint),
+        refresh_cadence=args.refresh_cadence,
+    )
+    domain_brief = default_domain_brief(
+        controls,
+        system_name=args.system_name,
+        summary=args.domain_summary,
+        target_meaning=args.target_meaning,
+        known_caveats=list(args.known_caveat),
+        suspicious_columns=list(args.suspicious_column),
+        forbidden_features=list(args.forbidden_feature),
+        binding_constraints=list(args.domain_binding_constraint),
+        assumptions=list(args.domain_assumption),
+    )
+    task_brief = default_task_brief(
+        controls,
+        problem_statement=args.problem_statement,
+        target_column=args.task_target_column,
+        prediction_horizon=args.prediction_horizon,
+        decision_type=args.decision_type,
+        primary_stakeholder=args.primary_stakeholder,
+        success_criteria=list(args.task_success_criterion),
+        failure_costs=list(args.failure_cost),
+        notes=args.task_notes,
+    )
+    written = write_context_bundle(
+        root,
+        data_origin=data_origin,
+        domain_brief=domain_brief,
+        task_brief=task_brief,
+    )
+    manifest_path = _refresh_foundation_manifest(root, policy_source=policy_path)
+    return {
+        "status": "ok",
+        "run_dir": str(root),
+        "policy_resolved": str(policy_path),
+        "paths": {key: str(value) for key, value in written.items()},
+        "manifest_path": str(manifest_path),
+    }
+
+
+def _ensure_policy_resolved(
+    run_dir: Path,
+    *,
+    config_path: str | None,
+    overwrite: bool,
+) -> tuple[Any, Path]:
+    import yaml
+    from relaytic.policies.loader import ResolvedPolicy
+
+    policy_path = run_dir / "policy_resolved.yaml"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    if policy_path.exists() and not overwrite:
+        payload = yaml.safe_load(policy_path.read_text(encoding="utf-8")) or {}
+        return (
+            ResolvedPolicy(
+                schema_version=str(payload.get("schema_version", "")),
+                resolved_at=str(payload.get("resolved_at", "")),
+                source_path=str(payload.get("source_path", "")),
+                source_format=str(payload.get("source_format", "canonical")),
+                policy=dict(payload.get("policy", {})),
+            ),
+            policy_path,
+        )
+    resolved = load_policy(config_path)
+    policy_path.write_text(
+        yaml.safe_dump(resolved.to_dict(), sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+    return resolved, policy_path
+
+
+def _foundation_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "policy_resolved": run_dir / "policy_resolved.yaml",
+        "lab_mandate": run_dir / "lab_mandate.json",
+        "work_preferences": run_dir / "work_preferences.json",
+        "run_brief": run_dir / "run_brief.json",
+        "data_origin": run_dir / "data_origin.json",
+        "domain_brief": run_dir / "domain_brief.json",
+        "task_brief": run_dir / "task_brief.json",
+        "manifest": run_dir / "manifest.json",
+    }
+
+
+def _ensure_paths_absent(paths: list[Path], *, overwrite: bool) -> None:
+    if overwrite:
+        return
+    existing = [str(path) for path in paths if path.exists()]
+    if existing:
+        raise ValueError(
+            "Refusing to overwrite existing artifacts without --overwrite: "
+            + ", ".join(existing)
+        )
+
+
+def _refresh_foundation_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = [
+        artifact_entry("policy_resolved.yaml", run_dir=root, kind="policy", required=True),
+        artifact_entry("lab_mandate.json", run_dir=root, required=True),
+        artifact_entry("work_preferences.json", run_dir=root, required=True),
+        artifact_entry("run_brief.json", run_dir=root, required=True),
+        artifact_entry("data_origin.json", run_dir=root, required=True),
+        artifact_entry("domain_brief.json", run_dir=root, required=True),
+        artifact_entry("task_brief.json", run_dir=root, required=True),
+    ]
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=entries,
+    )
+
+
+def _read_existing_manifest_metadata(run_dir: Path) -> dict[str, Any]:
+    manifest_path = run_dir / "manifest.json"
+    if not manifest_path.exists():
+        return {}
+    try:
+        return json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
 
 
 def _parse_json_object(raw: str, *, arg_name: str) -> dict[str, Any]:
