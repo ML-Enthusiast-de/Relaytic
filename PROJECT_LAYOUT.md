@@ -1,10 +1,16 @@
 # Relaytic Project Layout
 
-This document describes the current repository shape during the Relaytic migration.
+This document describes the current repository structure and ownership boundaries. It is descriptive, not normative.
 
-## Source Of Truth
+## Primary Docs
 
-For architecture decisions, use:
+Public-facing docs:
+
+1. `README.md`
+2. `ARCHITECTURE.md`
+3. `SECURITY.md`
+
+Implementation control docs:
 
 1. `ARCHITECTURE_CONTRACT.md`
 2. `IMPLEMENTATION_STATUS.md`
@@ -12,9 +18,7 @@ For architecture decisions, use:
 4. `RELAYTIC_BUILD_MASTER.md`
 5. `RELAYTIC_SLICING_PLAN.md`
 
-This file is descriptive, not normative.
-
-## Current Layout
+## Repository Shape
 
 ```text
 Relaytic/
@@ -34,9 +38,10 @@ Relaytic/
       investigation/
       mandate/
       policies/
-    corr2surrogate/  # temporary compatibility shim with explicit ui/security forwarding
+    corr2surrogate/  # compatibility shim only
   tests/
   README.md
+  ARCHITECTURE.md
   SECURITY.md
   AGENTS.md
   ARCHITECTURE_CONTRACT.md
@@ -47,22 +52,25 @@ Relaytic/
   RELAYTIC_SLICING_PLAN.md
 ```
 
-## Package Boundary
+## Package Ownership
 
-- `src/relaytic/` is the canonical product package.
-- `src/corr2surrogate/` exists only to keep old imports from crashing during migration.
-- New work must target `relaytic`, not `corr2surrogate`.
+- `src/relaytic/` is the canonical product package
+- `src/relaytic/mandate/` owns mandate foundation objects and writers
+- `src/relaytic/context/` owns context foundation objects and writers
+- `src/relaytic/intake/` owns intake translation and interpretation artifacts
+- `src/relaytic/investigation/` owns investigation specialists and focus artifacts
+- `src/relaytic/artifacts/` owns manifest helpers
+- `src/relaytic/policies/` owns policy loading and resolved-policy writing
+- `src/corr2surrogate/` exists only to preserve a narrow temporary compatibility boundary
 
 ## Operational Directories
 
-- `configs/` stores checked-in defaults.
-- `data/private/` is reserved for local private inputs and must stay ignored.
-- `artifacts/`, `reports/`, and `models/` contain generated outputs and must stay ignored except for sentinel files.
+- `configs/` stores checked-in defaults
+- `data/private/` is reserved for local private inputs and must remain ignored
+- `artifacts/`, `reports/`, and `models/` contain generated outputs and must remain ignored except for sentinel files
+- `docs/build_slices/` tracks bounded implementation slices
+- `tests/` provides regression coverage for both product and compatibility boundaries
 
-## Documentation Standard
+## Naming Rule
 
-Top-level documents should present the repository as:
-
-`Relaytic - The Relay Inference Lab`
-
-They should avoid legacy branding unless they are explicitly describing a tracked compatibility shim or migration step.
+All new public-facing work must use `Relaytic`, `relaytic`, and `relaytic`. Legacy names should appear only when documenting an explicit compatibility boundary.

@@ -1,51 +1,42 @@
 # Relaytic - The Relay Inference Lab
 
-Relaytic is a local-first inference engineering system for structured data. It investigates datasets before it commits to modeling assumptions, preserves user intent through policy and mandate layers, interprets human and external-agent input into structured run context, keeps deterministic execution as the floor, proceeds autonomously when non-critical clarification goes unanswered, and exposes its judgment through inspectable artifacts and local tool surfaces.
+Relaytic is a local-first inference engineering system for structured data. It turns datasets, operator intent, and optional local semantic help into auditable modeling decisions, structured artifacts, and reusable local tooling.
 
-This repository is in an active transformation from a legacy prototype into the Relaytic product. The public package, CLI, docs, and migration controls now use Relaytic naming. Remaining legacy internals are tracked explicitly and are being removed slice by slice.
+Relaytic is designed around a deterministic floor, specialist-agent reasoning, explicit policy and mandate handling, and artifact-first execution. The system should be able to continue autonomously when non-critical ambiguity remains, while still making its assumptions inspectable.
 
-## What Relaytic Is
+## Current Product Baseline
 
-Relaytic is not an AutoML wrapper. It is a local-first inference engineering system that investigates data, forms competing hypotheses, runs challenger science, quantifies uncertainty, preserves mandate-aware user intent, translates free-form human or agent input into structured operating context, recommends missing data, and exposes its judgment as reusable local tools.
+The repository already supports a working early product baseline:
 
-The intended product is:
+- installable `relaytic` package and CLI
+- resolved policy writing and manifest creation
+- mandate and context foundation artifacts
+- free-form intake translation from human or external-agent input
+- optional clarification queues with explicit fallback assumptions
+- investigation specialists that profile datasets and resolve early modeling focus
+- optional local-LLM advisory paths that remain non-required
+
+The next load-bearing implementation step is Slice 05: planning and the first end-to-end deterministic route from data to model within the Relaytic architecture.
+
+## Design Principles
 
 - local-first by default
 - deterministic at the core
 - autonomous but steerable
-- multi-specialist rather than single-planner
 - artifact-rich and auditable
-- lifecycle-aware beyond one-off model fitting
-
-## Repository State
-
-The source of truth for the transformation is:
-
-1. `RELAYTIC_VISION_MASTER.md`
-2. `RELAYTIC_BUILD_MASTER.md`
-3. `ARCHITECTURE_CONTRACT.md`
-4. `IMPLEMENTATION_STATUS.md`
-5. `MIGRATION_MAP.md`
-6. `RELAYTIC_SLICING_PLAN.md`
-
-Current normalization status:
-
-- public package name: `relaytic`
-- public CLI name: `relaytic`
-- compatibility import shim: `corr2surrogate` (temporary)
-- top-level build and migration docs: present
-- security baseline: enforced through `.gitignore` and leak scan tooling
+- specialist-driven rather than single-planner
+- security-conscious by default
 
 ## Quick Start
 
-Create an environment and install the editable package:
+Install the package in editable mode:
 
 ```bash
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev,stats,viz]"
 ```
 
-Smoke-check the public CLI:
+Check the public CLI surface:
 
 ```bash
 relaytic --help
@@ -58,97 +49,46 @@ Run the repository leak scan before commits:
 python -m relaytic.ui.cli scan-git-safety
 ```
 
-## Current CLI Baseline
+## Example Workflow
 
-The current CLI surface is still the legacy harness baseline, now exposed through the Relaytic name while the larger architecture is being built out in slices.
-
-Examples:
+The current baseline supports a clean foundation -> intake -> investigation flow:
 
 ```bash
-relaytic policy resolve --output artifacts/run_demo/policy_resolved.yaml
-relaytic manifest init --run-dir artifacts/run_demo --entry policy_resolved.yaml
 relaytic foundation init --run-dir artifacts/run_demo
-relaytic intake interpret --run-dir artifacts/run_demo --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
+relaytic intake interpret --run-dir artifacts/run_demo --data-path path/to/data.csv --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
 relaytic intake questions --run-dir artifacts/run_demo
-relaytic investigate --run-dir artifacts/run_demo --data-path data/private/run1.csv
-relaytic mandate init --run-dir artifacts/run_demo --objective best_robust_pareto_front
-relaytic context init --run-dir artifacts/run_demo --problem-statement "Predict off-spec batches early."
-relaytic setup-local-llm --provider llama_cpp
-relaytic run-agent-session --agent analyst
-relaytic run-agent1-analysis --data-path data/private/run1.csv
-relaytic run-inference --run-dir artifacts/<run_dir> --data-path data/private/run1.csv
+relaytic investigate --run-dir artifacts/run_demo --data-path path/to/data.csv
 ```
 
-## Security Baseline
+That flow produces:
 
-This repository treats security hygiene as non-negotiable:
+- resolved policy and manifest artifacts
+- mandate and context foundation bundles
+- intake provenance, semantic mappings, autonomy state, clarification queue, and assumption log
+- investigation outputs such as dataset profile, domain memo, objective hypotheses, and focus artifacts
 
-- do not commit `.env` files, virtual environments, private datasets, generated reports, or local model artifacts
-- do not commit API keys, tokens, passwords, certificates, or machine-specific paths
-- do not persist raw secrets into artifacts or docs
-- run `python -m relaytic.ui.cli scan-git-safety` before opening a PR
+## Documentation Map
 
-Relevant files:
+Public-facing technical docs:
 
-- `SECURITY.md`
-- `.gitignore`
-- `src/relaytic/security/git_guard.py`
+- `ARCHITECTURE.md` for the system overview
+- `SECURITY.md` for security and repo hygiene rules
+- `PROJECT_LAYOUT.md` for repository structure and ownership boundaries
 
-## Build Discipline
+Implementation control docs:
 
-Relaytic is being built in bounded slices. Completed load-bearing slices are:
+1. `RELAYTIC_VISION_MASTER.md`
+2. `RELAYTIC_BUILD_MASTER.md`
+3. `ARCHITECTURE_CONTRACT.md`
+4. `IMPLEMENTATION_STATUS.md`
+5. `MIGRATION_MAP.md`
+6. `RELAYTIC_SLICING_PLAN.md`
 
-1. Slice 01 - contracts and scaffolding
-2. Slice 02 - mandate and context foundation
-3. Slice 03 - Focus Council and investigation baseline
-4. Slice 04 - intake and translation layer
-
-The next recommended build step is:
-
-5. Slice 05 - planning and first working route
-
-The completed normalization slice established:
-
-- Relaytic naming across public surfaces
-- migration control documents
-- repo-local agent instructions
-- a tracked compatibility boundary for the old package name
-- a formal security baseline for envs, secrets, and local artifacts
-
-## Current Layout
-
-```text
-src/relaytic/          Main runtime package and current implementation baseline
-src/corr2surrogate/    Temporary compatibility import shim
-src/relaytic/mandate/  Mandate foundation objects and writers
-src/relaytic/context/  Context foundation objects and writers
-src/relaytic/intake/   Slice 04 intake translation and interpretation artifacts
-src/relaytic/investigation/ Slice 03 specialist agents and investigation artifacts
-src/relaytic/policies/ Canonical resolved policy helpers
-src/relaytic/artifacts/ Manifest helpers
-configs/               Runtime configuration
-docs/build_slices/     Incremental implementation slices
-artifacts/             Generated run artifacts (ignored except sentinels)
-reports/               Generated reports (ignored except sentinels)
-tests/                 Automated regression coverage
-```
-
-## Professional Standard
-
-The repo should read like a product, not a scratchpad. That means:
-
-- one public name
-- one public CLI
-- explicit contracts
-- explicit migration notes
-- explicit assumptions when Relaytic proceeds autonomously
-- no leaked secrets
-- no checked-in local environments
-- no ambiguous legacy branding in new work
+The control docs exist to keep implementation rigorous and incremental. They are intentionally more operational than the public overview.
 
 ## Development
 
-Run tests:
+Run the test suite:
 
 ```bash
 python -m pytest -q
@@ -160,3 +100,7 @@ If you touch packaging, CLI, or security surfaces, also run:
 python -m relaytic.ui.cli scan-git-safety
 relaytic --help
 ```
+
+## Compatibility Note
+
+The public package and CLI are `relaytic`. Any remaining legacy import shims are compatibility-only and should not be used in new code, docs, or examples.

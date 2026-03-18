@@ -1,86 +1,96 @@
 # Implementation Status
 
-## Current Slice
+This document tracks the operational state of the repository. It is an implementation control file, not product marketing copy.
 
-- completed: Slice 04 - intake and translation layer
-- next recommended slice: Slice 05 - planning and first working route
+## Current Baseline
 
-## Completed
+- completed slices: 00 through 04
+- next recommended slice: 05, planning and first working route
+- current public package: `relaytic`
+- current public CLI: `relaytic`
+
+## Operational Capabilities
+
+The repository currently supports:
+
+- policy resolution and manifest writing
+- mandate and context foundation artifacts
+- free-form intake translation with provenance and semantic mapping
+- autonomous proceed-with-assumptions behavior for non-critical intake ambiguity
+- investigation artifacts from Scout, Scientist, and Focus Council
+- optional local-LLM advisory support without making local LLMs a hard requirement
+
+## Implemented Slices
 
 ### Slice 00
 
-- public package renamed to `relaytic`
-- public CLI renamed to `relaytic`
-- top-level docs rewritten to Relaytic branding
-- architecture, status, migration, security, and repo agent docs added
-- temporary `corr2surrogate` import compatibility boundary established
-- security baseline made explicit
+- locked public naming on `Relaytic`, `relaytic`, and `relaytic`
+- established security, migration, and implementation control documents
+- introduced the temporary `corr2surrogate` compatibility boundary
 
 ### Slice 01
 
-- added `relaytic.artifacts.manifests` with manifest creation and writing helpers
-- added `relaytic.policies.loader` with resolved-policy loading and YAML materialization
+- added manifest helpers under `src/relaytic/artifacts/`
+- added canonical policy loading and resolved-policy writing under `src/relaytic/policies/`
 - added `relaytic manifest init`
 - added `relaytic policy resolve`
-- added targeted tests for manifest scaffolding, policy scaffolding, CLI shells, config precedence, and local stub LLM integration
+- added targeted scaffold and CLI tests
 
 ### Slice 02
 
-- added stable mandate models and artifact writers under `src/relaytic/mandate/`
-- added stable context models and artifact writers under `src/relaytic/context/`
-- normalized legacy config into a canonical resolved Relaytic policy shell
-- added `relaytic mandate init`
-- added `relaytic mandate show`
-- added `relaytic context init`
-- added `relaytic context show`
+- added stable mandate models and writers under `src/relaytic/mandate/`
+- added stable context models and writers under `src/relaytic/context/`
+- added `relaytic mandate init` and `relaytic mandate show`
+- added `relaytic context init` and `relaytic context show`
 - added `relaytic foundation init`
-- added tests for mandate/context objects, CLI flows, overwrite protection, policy reuse, and local-stub-LLM consumption of foundation artifacts
+- added targeted foundation and CLI tests
 
 ### Slice 03
 
-- added `src/relaytic/investigation/` with typed Slice 03 artifact models, storage helpers, deterministic specialist agents, and optional local-LLM advisory integration
-- implemented Scout as a deterministic dataset inspector that emits `dataset_profile.json`
-- implemented Scientist as a grounded hypothesis generator that emits `domain_memo.json`
-- implemented Focus Council as a structured objective resolver that emits `objective_hypotheses.json`, `focus_debate.json`, `focus_profile.json`, `optimization_profile.json`, and `feature_strategy_profile.json`
+- added `src/relaytic/investigation/` with typed investigation artifacts and storage helpers
+- implemented Scout for dataset profiling
+- implemented Scientist for grounded domain and objective hypotheses
+- implemented Focus Council for early objective resolution
 - added `relaytic investigate`
-- made `relaytic investigate` ensure foundation artifacts exist before writing Slice 03 outputs
-- added targeted tests for deterministic investigation, CLI artifact writing, overwrite protection, and local-stub-LLM advisory behavior
-- tightened the dependency contract to `pandas>=2.0,<3.0` after `pandas 3.0.1` proved unstable in the current environment
+- added targeted investigation, CLI, and local-stub-LLM tests
 
 ### Slice 04
 
-- added `src/relaytic/intake/` with typed intake artifact models, storage helpers, deterministic translation agents, and optional local-LLM advisory integration
-- implemented `StewardAgent` to translate free-form user or agent input into mandate, work-preference, and run-brief updates
-- implemented `ContextInterpreterAgent` to translate free-form input plus optional dataset schema into data-origin, domain-brief, and task-brief updates
+- added `src/relaytic/intake/` with typed intake artifacts and storage helpers
+- implemented `StewardAgent` for mandate, work-preference, and run-brief translation
+- implemented `ContextInterpreterAgent` for data-origin, domain, and task translation
 - added `relaytic intake interpret`
 - added `relaytic intake show`
 - added `relaytic intake questions`
-- made `relaytic intake interpret` ensure the Slice 02 foundation exists before writing Slice 04 artifacts and updating normalized foundation bundles
-- added explicit `autonomy_mode.json`, `clarification_queue.json`, and `assumption_log.json` so unanswered non-critical questions become auditable assumptions instead of blockers
-- made intake clarification optional by default and allowed explicit operator autonomy signals such as "do everything on your own" to suppress non-critical question noise while preserving the queue
-- added targeted tests for deterministic intake translation, autonomous proceed-with-assumptions behavior, CLI artifact writing, overwrite protection, manifest preservation, and local-stub-LLM advisory behavior
+- added `autonomy_mode.json`, `clarification_queue.json`, and `assumption_log.json`
+- made intake clarification optional by default and auditable through explicit assumptions
+- added targeted intake, CLI, and local-stub-LLM tests
 
-## Pending
+## Compatibility Boundary
 
-- Slice 05 - planning and first working route
+The remaining compatibility surface is intentionally narrow:
 
-## Temporary Shims
+- `src/corr2surrogate/__init__.py` forwards legacy imports
+- legacy `C2S_*` environment variable fallbacks may still be accepted where required
 
-- `src/corr2surrogate/__init__.py` compatibility import shim
-- legacy `C2S_*` environment variable fallback support where still required
+New code and docs must target `relaytic` and `RELAYTIC_*`.
 
-## Known Non-Final Areas
+## Known Gaps
 
-- the current runtime still reflects the legacy harness baseline internally
-- the artifact contract is only partially implemented beyond manifest, policy, mandate, context, intake, and investigation scaffolding
-- README describes the product direction and current baseline, not the full end-state feature set
+The repository is not yet at the final product state. The main remaining gaps are:
+
+- Slice 05 planning and the first deterministic data-to-model route are not yet implemented
+- experimentation, challenger, reporting, completion judgment, and lifecycle slices are still pending
+- some deeper runtime surfaces still retain compatibility-era internals while newer product layers are being built on top
 
 ## Immediate Next Work
 
-Build Slice 05:
+Slice 05 should land:
 
-- strategist baseline
-- first working deterministic tabular route
-- metric selection
-- split selection
+- Strategist baseline
+- `plan.json`
+- `alternatives.json`
+- `hypotheses.json`
+- first deterministic tabular route
+- metric and split selection
 - feature-strategy integration

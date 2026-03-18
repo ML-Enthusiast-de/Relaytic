@@ -1,25 +1,27 @@
 # Migration Map
 
-## Public Naming Migration
+This file tracks explicit compatibility boundaries while the repository continues moving toward the final Relaytic product surface.
 
-- old product name: `Corr2Surrogate`
-- new product name: `Relaytic`
-- old public package: `corr2surrogate`
-- new public package: `relaytic`
-- old public CLI: `corr2surrogate`
-- new public CLI: `relaytic`
+## Public Naming
 
-## Compatibility Boundary
+- product name: `Relaytic`
+- public package: `relaytic`
+- public CLI: `relaytic`
 
-Current compatibility promise:
+Legacy `Corr2Surrogate` naming exists only where compatibility is still being preserved deliberately.
 
-- old Python imports rooted at `corr2surrogate` continue through a temporary shim
-- new code and docs must import `relaytic`
-- the old CLI command is no longer the public contract
+## Compatibility Surface
 
-## Environment Variable Migration
+Current temporary compatibility promises:
 
-Preferred:
+- legacy Python imports rooted at `corr2surrogate` continue through a narrow shim
+- legacy `C2S_*` environment variables may still be accepted as fallbacks in some runtime paths
+
+These are compatibility mechanisms, not active public product surfaces.
+
+## Preferred Environment Variables
+
+Use:
 
 - `RELAYTIC_CONFIG_PATH`
 - `RELAYTIC_PROVIDER`
@@ -28,7 +30,7 @@ Preferred:
 - `RELAYTIC_ENDPOINT`
 - `RELAYTIC_API_KEY`
 
-Compatibility-only legacy names may still be accepted temporarily:
+Avoid introducing new references to:
 
 - `C2S_CONFIG_PATH`
 - `C2S_PROVIDER`
@@ -43,22 +45,25 @@ Compatibility-only legacy names may still be accepted temporarily:
 - `corr2surrogate.ui.cli` -> `relaytic.ui.cli`
 - `corr2surrogate.security.git_guard` -> `relaytic.security.git_guard`
 
-## Slice 03 Boundary Additions
+## Boundary Additions By Slice
 
-- new canonical package boundary: `src/relaytic/investigation/`
-- new public command: `relaytic investigate`
-- legacy compatibility was tightened so repo-local `src/corr2surrogate/ui/*` and `src/corr2surrogate/security/*` forward directly to Relaytic surfaces instead of relying on external installs
+### Slice 03
 
-## Slice 04 Boundary Additions
+- introduced the canonical package boundary `src/relaytic/investigation/`
+- introduced the public command `relaytic investigate`
+- tightened compatibility wrappers so repo-local forwarding is explicit rather than accidental
 
-- new canonical package boundary: `src/relaytic/intake/`
-- new public commands: `relaytic intake interpret`, `relaytic intake show`, and `relaytic intake questions`
-- the manifest contract now preserves Slice 04 intake artifacts alongside foundation and investigation artifacts when present
-- free-form human or external-agent notes can now update normalized foundation artifacts through a bounded translation layer instead of requiring direct JSON editing
-- intake now emits explicit autonomy, clarification, and assumption artifacts so the system can proceed autonomously without hiding fallback decisions
+### Slice 04
 
-## Removal Plan
+- introduced the canonical package boundary `src/relaytic/intake/`
+- introduced the public commands `relaytic intake interpret`, `relaytic intake show`, and `relaytic intake questions`
+- expanded the artifact boundary to include autonomous intake artifacts such as `autonomy_mode.json`, `clarification_queue.json`, and `assumption_log.json`
 
-1. Keep the import shim until at least Slice 05 is stable.
-2. Remove the shim only after tests and docs no longer depend on legacy imports.
-3. Remove legacy `C2S_*` env fallbacks after the new Relaytic env contract is fully adopted.
+## Removal Criteria
+
+The remaining compatibility layer can be removed when all of the following are true:
+
+1. tests no longer depend on `corr2surrogate` imports
+2. docs and examples no longer mention legacy package paths except historical notes
+3. runtime paths no longer require `C2S_*` fallbacks
+4. the next stable slices no longer rely on compatibility forwarding
