@@ -96,6 +96,18 @@ def write_resolved_policy(*args: Any, **kwargs: Any) -> Path:
     return _write_resolved_policy(*args, **kwargs)
 
 
+def run_investigation(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.investigation import run_investigation as _run_investigation
+
+    return _run_investigation(*args, **kwargs)
+
+
+def run_intake_interpretation(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.intake import run_intake_interpretation as _run_intake_interpretation
+
+    return _run_intake_interpretation(*args, **kwargs)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="relaytic", description="Relaytic CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -514,6 +526,76 @@ def build_parser() -> argparse.ArgumentParser:
     foundation_init.add_argument("--run-id", default=None, help="Optional manifest run id.")
     foundation_init.add_argument("--overwrite", action="store_true", help="Allow overwriting existing foundation artifacts.")
     foundation_init.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+
+    intake = sub.add_parser(
+        "intake",
+        help="Capture and interpret free-form user or agent input into foundation artifacts.",
+    )
+    intake_sub = intake.add_subparsers(dest="intake_command", required=True)
+
+    intake_interpret = intake_sub.add_parser(
+        "interpret",
+        help="Write Slice 04 intake artifacts and update mandate/context bundles.",
+    )
+    intake_interpret.add_argument("--run-dir", required=True, help="Run directory for intake artifacts.")
+    intake_interpret.add_argument("--config", default=None, help="Optional config/policy source.")
+    intake_interpret.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    intake_interpret.add_argument("--text", default=None, help="Free-form intake text.")
+    intake_interpret.add_argument(
+        "--text-file",
+        default=None,
+        help="Optional UTF-8 text file containing the intake note.",
+    )
+    intake_interpret.add_argument(
+        "--actor-type",
+        choices=["user", "operator", "agent"],
+        default="user",
+        help="Who produced the intake text.",
+    )
+    intake_interpret.add_argument("--actor-name", default=None, help="Optional actor display name.")
+    intake_interpret.add_argument("--channel", default="cli", help="Intake channel label.")
+    intake_interpret.add_argument("--data-path", default=None, help="Optional CSV/XLSX dataset for schema alignment.")
+    intake_interpret.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
+    intake_interpret.add_argument("--header-row", type=int, default=None, help="Optional header row.")
+    intake_interpret.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
+    intake_interpret.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Allow overwriting existing Slice 04 intake artifacts.",
+    )
+    intake_interpret.add_argument(
+        "--label",
+        action="append",
+        default=[],
+        help="Optional `key=value` label for the manifest.",
+    )
+
+    intake_show = intake_sub.add_parser(
+        "show",
+        help="Print Slice 04 intake artifacts from a run directory.",
+    )
+    intake_show.add_argument("--run-dir", required=True, help="Run directory containing intake artifacts.")
+
+    intake_questions = intake_sub.add_parser(
+        "questions",
+        help="Print the optional clarification queue and assumption log for a run directory.",
+    )
+    intake_questions.add_argument("--run-dir", required=True, help="Run directory containing intake artifacts.")
+
+    investigate = sub.add_parser(
+        "investigate",
+        help="Run the Slice 03 investigation layer and write specialist artifacts.",
+    )
+    investigate.add_argument("--run-dir", required=True, help="Run directory for investigation artifacts.")
+    investigate.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    investigate.add_argument("--config", default=None, help="Optional config/policy source.")
+    investigate.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    investigate.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
+    investigate.add_argument("--header-row", type=int, default=None, help="Optional header row.")
+    investigate.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
+    investigate.add_argument("--timestamp-column", default=None, help="Optional timestamp column override.")
+    investigate.add_argument("--overwrite", action="store_true", help="Allow overwriting existing Slice 03 artifacts.")
+    investigate.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
     return parser
 
 
@@ -619,6 +701,72 @@ def main(argv: list[str] | None = None) -> int:
                 run_dir=args.run_dir,
                 config_path=args.config,
                 run_id=args.run_id,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        print(dumps_json(payload, indent=2, ensure_ascii=False))
+        return 0
+
+    if args.command == "intake":
+        if args.intake_command == "show":
+            print(dumps_json(_read_json_bundle(args.run_dir, bundle="intake"), indent=2, ensure_ascii=False))
+            return 0
+        if args.intake_command == "questions":
+            bundle = _read_json_bundle(args.run_dir, bundle="intake")
+            print(
+                dumps_json(
+                    {
+                        "autonomy_mode": bundle.get("autonomy_mode", {}),
+                        "clarification_queue": bundle.get("clarification_queue", {}),
+                        "assumption_log": bundle.get("assumption_log", {}),
+                    },
+                    indent=2,
+                    ensure_ascii=False,
+                )
+            )
+            return 0
+        if args.intake_command != "interpret":
+            parser.error("Unsupported intake subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            intake_text = _resolve_intake_text(text=args.text, text_file=args.text_file)
+            payload = _run_intake_phase(
+                run_dir=args.run_dir,
+                message=intake_text,
+                actor_type=args.actor_type,
+                actor_name=args.actor_name,
+                channel=args.channel,
+                config_path=args.config,
+                run_id=args.run_id,
+                data_path=args.data_path,
+                sheet_name=args.sheet_name,
+                header_row=args.header_row,
+                data_start_row=args.data_start_row,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        print(dumps_json(payload, indent=2, ensure_ascii=False))
+        return 0
+
+    if args.command == "investigate":
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_investigation_phase(
+                run_dir=args.run_dir,
+                data_path=args.data_path,
+                config_path=args.config,
+                run_id=args.run_id,
+                sheet_name=args.sheet_name,
+                header_row=args.header_row,
+                data_start_row=args.data_start_row,
+                timestamp_column=args.timestamp_column,
                 overwrite=bool(args.overwrite),
                 labels=labels,
             )
@@ -794,6 +942,18 @@ def _parse_key_value_pairs(raw_pairs: list[str]) -> dict[str, str]:
     return labels
 
 
+def _resolve_intake_text(*, text: str | None, text_file: str | None) -> str:
+    if bool(text) == bool(text_file):
+        raise ValueError("Provide exactly one of --text or --text-file.")
+    if text:
+        resolved = text.strip()
+    else:
+        resolved = Path(str(text_file)).read_text(encoding="utf-8").strip()
+    if not resolved:
+        raise ValueError("Intake text must not be empty.")
+    return resolved
+
+
 def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
     if bundle == "mandate":
         from relaytic.mandate import read_mandate_bundle
@@ -803,6 +963,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.context import read_context_bundle
 
         return read_context_bundle(run_dir)
+    if bundle == "intake":
+        from relaytic.intake import read_intake_bundle
+
+        return read_intake_bundle(run_dir)
     raise ValueError(f"Unsupported bundle '{bundle}'.")
 
 
@@ -873,6 +1037,218 @@ def _init_run_foundation(
         "context_paths": {key: str(value) for key, value in context_paths.items()},
         "manifest_path": str(manifest_path),
         "source_format": resolved.source_format,
+    }
+
+
+def _ensure_run_foundation_present(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.context import (
+        build_context_controls_from_policy,
+        default_data_origin,
+        default_domain_brief,
+        default_task_brief,
+        write_context_bundle,
+    )
+    from relaytic.mandate import (
+        build_mandate_controls_from_policy,
+        build_run_brief,
+        build_work_preferences,
+        default_lab_mandate,
+        write_mandate_bundle,
+    )
+
+    root = Path(run_dir)
+    resolved, policy_path = _ensure_policy_resolved(root, config_path=config_path, overwrite=False)
+    foundation_paths = _foundation_output_paths(root)
+    if not all(
+        foundation_paths[key].exists()
+        for key in ("lab_mandate", "work_preferences", "run_brief")
+    ):
+        mandate_controls = build_mandate_controls_from_policy(resolved.policy)
+        write_mandate_bundle(
+            root,
+            lab_mandate=default_lab_mandate(mandate_controls),
+            work_preferences=build_work_preferences(mandate_controls, policy=resolved.policy),
+            run_brief=build_run_brief(mandate_controls, policy=resolved.policy),
+        )
+    if not all(
+        foundation_paths[key].exists()
+        for key in ("data_origin", "domain_brief", "task_brief")
+    ):
+        context_controls = build_context_controls_from_policy(resolved.policy)
+        write_context_bundle(
+            root,
+            data_origin=default_data_origin(context_controls),
+            domain_brief=default_domain_brief(context_controls),
+            task_brief=default_task_brief(context_controls),
+        )
+    manifest_path = _refresh_foundation_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_path,
+        labels=labels,
+    )
+    return {
+        "resolved": resolved,
+        "policy_path": policy_path,
+        "manifest_path": manifest_path,
+    }
+
+
+def _run_intake_phase(
+    *,
+    run_dir: str | Path,
+    message: str,
+    actor_type: str,
+    actor_name: str | None,
+    channel: str,
+    config_path: str | None,
+    run_id: str | None,
+    data_path: str | None,
+    sheet_name: str | None,
+    header_row: int | None,
+    data_start_row: int | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.context import write_context_bundle
+    from relaytic.intake import write_intake_bundle
+    from relaytic.mandate import write_mandate_bundle
+
+    root = Path(run_dir)
+    targets = _intake_output_paths(root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    resolution = run_intake_interpretation(
+        message=message,
+        actor_type=actor_type,
+        actor_name=actor_name,
+        channel=channel,
+        policy=foundation_state["resolved"].policy,
+        mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+        context_bundle=_read_json_bundle(root, bundle="context"),
+        config_path=config_path,
+        data_path=data_path,
+        sheet_name=sheet_name,
+        header_row=header_row,
+        data_start_row=data_start_row,
+    )
+    mandate_paths = write_mandate_bundle(
+        root,
+        lab_mandate=resolution.lab_mandate,
+        work_preferences=resolution.work_preferences,
+        run_brief=resolution.run_brief,
+    )
+    context_paths = write_context_bundle(
+        root,
+        data_origin=resolution.data_origin,
+        domain_brief=resolution.domain_brief,
+        task_brief=resolution.task_brief,
+    )
+    intake_paths = write_intake_bundle(root, bundle=resolution.intake_bundle)
+    manifest_path = _refresh_intake_manifest(
+        root,
+        run_id=run_id,
+        policy_source=foundation_state["policy_path"],
+        labels=labels,
+    )
+    return {
+        "status": "ok",
+        "run_dir": str(root),
+        "policy_resolved": str(foundation_state["policy_path"]),
+        "mandate_paths": {key: str(value) for key, value in mandate_paths.items()},
+        "context_paths": {key: str(value) for key, value in context_paths.items()},
+        "intake_paths": {key: str(value) for key, value in intake_paths.items()},
+        "manifest_path": str(manifest_path),
+        "autonomy_mode": resolution.intake_bundle.autonomy_mode.to_dict(),
+        "clarification_queue": resolution.intake_bundle.clarification_queue.to_dict(),
+        "assumption_log": resolution.intake_bundle.assumption_log.to_dict(),
+        "clarification_questions": resolution.intake_bundle.context_interpretation.clarification_questions,
+        "assumptions": resolution.intake_bundle.context_interpretation.assumptions,
+        "conflicts": resolution.intake_bundle.context_interpretation.conflicts,
+    }
+
+
+def _run_investigation_phase(
+    *,
+    run_dir: str | Path,
+    data_path: str,
+    config_path: str | None,
+    run_id: str | None,
+    sheet_name: str | None,
+    header_row: int | None,
+    data_start_row: int | None,
+    timestamp_column: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.investigation import write_investigation_bundle
+
+    root = Path(run_dir)
+    targets = _investigation_output_paths(root)
+    _ensure_paths_absent(
+        [
+            targets["dataset_profile"],
+            targets["domain_memo"],
+            targets["objective_hypotheses"],
+            targets["focus_debate"],
+            targets["focus_profile"],
+            targets["optimization_profile"],
+            targets["feature_strategy_profile"],
+        ],
+        overwrite=overwrite,
+    )
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    bundle = run_investigation(
+        data_path=data_path,
+        policy=foundation_state["resolved"].policy,
+        mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+        context_bundle=_read_json_bundle(root, bundle="context"),
+        config_path=config_path,
+        sheet_name=sheet_name,
+        header_row=header_row,
+        data_start_row=data_start_row,
+        timestamp_column=timestamp_column,
+    )
+    written = write_investigation_bundle(root, bundle=bundle)
+    manifest_path = _refresh_investigation_manifest(
+        root,
+        run_id=run_id,
+        policy_source=foundation_state["policy_path"],
+        labels=labels,
+    )
+    focus_profile = bundle.focus_profile.to_dict()
+    return {
+        "status": "ok",
+        "run_dir": str(root),
+        "data_path": str(Path(data_path)),
+        "policy_resolved": str(foundation_state["policy_path"]),
+        "paths": {key: str(value) for key, value in written.items()},
+        "manifest_path": str(manifest_path),
+        "focus_profile": {
+            "primary_objective": focus_profile.get("primary_objective"),
+            "secondary_objectives": focus_profile.get("secondary_objectives"),
+            "resolution_mode": focus_profile.get("resolution_mode"),
+        },
+        "optimization_profile": {
+            "primary_metric": bundle.optimization_profile.primary_metric,
+            "split_strategy_bias": bundle.optimization_profile.split_strategy_bias,
+        },
     }
 
 
@@ -1072,6 +1448,30 @@ def _foundation_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _investigation_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "dataset_profile": run_dir / "dataset_profile.json",
+        "domain_memo": run_dir / "domain_memo.json",
+        "objective_hypotheses": run_dir / "objective_hypotheses.json",
+        "focus_debate": run_dir / "focus_debate.json",
+        "focus_profile": run_dir / "focus_profile.json",
+        "optimization_profile": run_dir / "optimization_profile.json",
+        "feature_strategy_profile": run_dir / "feature_strategy_profile.json",
+    }
+
+
+def _intake_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "intake_record": run_dir / "intake_record.json",
+        "autonomy_mode": run_dir / "autonomy_mode.json",
+        "clarification_queue": run_dir / "clarification_queue.json",
+        "assumption_log": run_dir / "assumption_log.json",
+        "context_interpretation": run_dir / "context_interpretation.json",
+        "context_constraints": run_dir / "context_constraints.json",
+        "semantic_mapping": run_dir / "semantic_mapping.json",
+    }
+
+
 def _ensure_paths_absent(paths: list[Path], *, overwrite: bool) -> None:
     if overwrite:
         return
@@ -1102,6 +1502,97 @@ def _refresh_foundation_manifest(
         artifact_entry("data_origin.json", run_dir=root, required=True),
         artifact_entry("domain_brief.json", run_dir=root, required=True),
         artifact_entry("task_brief.json", run_dir=root, required=True),
+    ]
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=entries,
+    )
+
+
+def _refresh_intake_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = [
+        artifact_entry("policy_resolved.yaml", run_dir=root, kind="policy", required=True),
+        artifact_entry("lab_mandate.json", run_dir=root, required=True),
+        artifact_entry("work_preferences.json", run_dir=root, required=True),
+        artifact_entry("run_brief.json", run_dir=root, required=True),
+        artifact_entry("data_origin.json", run_dir=root, required=True),
+        artifact_entry("domain_brief.json", run_dir=root, required=True),
+        artifact_entry("task_brief.json", run_dir=root, required=True),
+        artifact_entry("intake_record.json", run_dir=root, required=True),
+        artifact_entry("autonomy_mode.json", run_dir=root, required=True),
+        artifact_entry("clarification_queue.json", run_dir=root, required=True),
+        artifact_entry("assumption_log.json", run_dir=root, required=True),
+        artifact_entry("context_interpretation.json", run_dir=root, required=True),
+        artifact_entry("context_constraints.json", run_dir=root, required=True),
+        artifact_entry("semantic_mapping.json", run_dir=root, required=True),
+    ]
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=entries,
+    )
+
+
+def _refresh_investigation_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = [
+        artifact_entry("policy_resolved.yaml", run_dir=root, kind="policy", required=True),
+        artifact_entry("lab_mandate.json", run_dir=root, required=True),
+        artifact_entry("work_preferences.json", run_dir=root, required=True),
+        artifact_entry("run_brief.json", run_dir=root, required=True),
+        artifact_entry("data_origin.json", run_dir=root, required=True),
+        artifact_entry("domain_brief.json", run_dir=root, required=True),
+        artifact_entry("task_brief.json", run_dir=root, required=True),
+        artifact_entry("intake_record.json", run_dir=root, required=(root / "intake_record.json").exists()),
+        artifact_entry("autonomy_mode.json", run_dir=root, required=(root / "autonomy_mode.json").exists()),
+        artifact_entry(
+            "clarification_queue.json",
+            run_dir=root,
+            required=(root / "clarification_queue.json").exists(),
+        ),
+        artifact_entry("assumption_log.json", run_dir=root, required=(root / "assumption_log.json").exists()),
+        artifact_entry(
+            "context_interpretation.json",
+            run_dir=root,
+            required=(root / "context_interpretation.json").exists(),
+        ),
+        artifact_entry(
+            "context_constraints.json",
+            run_dir=root,
+            required=(root / "context_constraints.json").exists(),
+        ),
+        artifact_entry("semantic_mapping.json", run_dir=root, required=(root / "semantic_mapping.json").exists()),
+        artifact_entry("dataset_profile.json", run_dir=root, required=True),
+        artifact_entry("domain_memo.json", run_dir=root, required=True),
+        artifact_entry("objective_hypotheses.json", run_dir=root, required=True),
+        artifact_entry("focus_debate.json", run_dir=root, required=True),
+        artifact_entry("focus_profile.json", run_dir=root, required=True),
+        artifact_entry("optimization_profile.json", run_dir=root, required=True),
+        artifact_entry("feature_strategy_profile.json", run_dir=root, required=True),
     ]
     return write_manifest(
         run_dir=root,

@@ -33,15 +33,18 @@ Start with:
 1. contracts and scaffolding
 2. mandate and context foundation
 3. focus council and investigation baseline
-4. planning and first working route
-5. experimentation, challenger, audit, and reports
-6. completion judgment and lifecycle baseline
-7. intelligence amplification and local-LLM setup assistance
-8. feedback assimilation and benchmark parity
-9. dojo mode and guarded self-improvement
-10. accelerated/distributed local execution
-11. physics-aware exploration constraints
-12. packaging, integrations, demos, and polish
+4. intake and translation layer
+5. planning and first working route
+6. experimentation, challenger, audit, and reports
+7. completion judgment and visible workflow state
+8. lifecycle baseline
+9. intelligence amplification and local-LLM setup assistance
+10. feedback assimilation
+11. benchmark parity and reference approaches
+12. dojo mode and guarded self-improvement
+13. accelerated/distributed local execution
+14. physics-aware exploration constraints
+15. packaging, integrations, demos, and polish
 
 ## MVP boundary
 
@@ -53,6 +56,8 @@ The first working Relaytic should include only the load-bearing core:
 - artifact manifest
 - mandate objects
 - context objects
+- intake and translation layer for human/agent inputs
+- non-blocking intake clarification with explicit assumption logging and autonomous proceed behavior
 - Focus Council baseline
 - Scout / Scientist / Strategist / Builder baseline
 - Completion Judge baseline

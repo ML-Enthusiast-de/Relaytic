@@ -2,8 +2,8 @@
 
 ## Current Slice
 
-- completed: Slice 02 - mandate and context foundation
-- next recommended slice: Slice 03 - Focus Council and investigation baseline
+- completed: Slice 04 - intake and translation layer
+- next recommended slice: Slice 05 - planning and first working route
 
 ## Completed
 
@@ -36,9 +36,33 @@
 - added `relaytic foundation init`
 - added tests for mandate/context objects, CLI flows, overwrite protection, policy reuse, and local-stub-LLM consumption of foundation artifacts
 
+### Slice 03
+
+- added `src/relaytic/investigation/` with typed Slice 03 artifact models, storage helpers, deterministic specialist agents, and optional local-LLM advisory integration
+- implemented Scout as a deterministic dataset inspector that emits `dataset_profile.json`
+- implemented Scientist as a grounded hypothesis generator that emits `domain_memo.json`
+- implemented Focus Council as a structured objective resolver that emits `objective_hypotheses.json`, `focus_debate.json`, `focus_profile.json`, `optimization_profile.json`, and `feature_strategy_profile.json`
+- added `relaytic investigate`
+- made `relaytic investigate` ensure foundation artifacts exist before writing Slice 03 outputs
+- added targeted tests for deterministic investigation, CLI artifact writing, overwrite protection, and local-stub-LLM advisory behavior
+- tightened the dependency contract to `pandas>=2.0,<3.0` after `pandas 3.0.1` proved unstable in the current environment
+
+### Slice 04
+
+- added `src/relaytic/intake/` with typed intake artifact models, storage helpers, deterministic translation agents, and optional local-LLM advisory integration
+- implemented `StewardAgent` to translate free-form user or agent input into mandate, work-preference, and run-brief updates
+- implemented `ContextInterpreterAgent` to translate free-form input plus optional dataset schema into data-origin, domain-brief, and task-brief updates
+- added `relaytic intake interpret`
+- added `relaytic intake show`
+- added `relaytic intake questions`
+- made `relaytic intake interpret` ensure the Slice 02 foundation exists before writing Slice 04 artifacts and updating normalized foundation bundles
+- added explicit `autonomy_mode.json`, `clarification_queue.json`, and `assumption_log.json` so unanswered non-critical questions become auditable assumptions instead of blockers
+- made intake clarification optional by default and allowed explicit operator autonomy signals such as "do everything on your own" to suppress non-critical question noise while preserving the queue
+- added targeted tests for deterministic intake translation, autonomous proceed-with-assumptions behavior, CLI artifact writing, overwrite protection, manifest preservation, and local-stub-LLM advisory behavior
+
 ## Pending
 
-- Slice 03 - Focus Council and investigation baseline
+- Slice 05 - planning and first working route
 
 ## Temporary Shims
 
@@ -48,16 +72,15 @@
 ## Known Non-Final Areas
 
 - the current runtime still reflects the legacy harness baseline internally
-- the artifact contract is only partially implemented beyond manifest, policy, mandate, and context scaffolding
+- the artifact contract is only partially implemented beyond manifest, policy, mandate, context, intake, and investigation scaffolding
 - README describes the product direction and current baseline, not the full end-state feature set
 
 ## Immediate Next Work
 
-Build Slice 03:
+Build Slice 05:
 
-- scout baseline
-- scientist baseline
-- focus council baseline
-- dataset profile
-- domain memo
-- objective artifacts
+- strategist baseline
+- first working deterministic tabular route
+- metric selection
+- split selection
+- feature-strategy integration

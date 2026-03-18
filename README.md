@@ -1,12 +1,12 @@
 # Relaytic - The Relay Inference Lab
 
-Relaytic is a local-first inference engineering system for structured data. It investigates datasets before it commits to modeling assumptions, preserves user intent through policy and mandate layers, keeps deterministic execution as the floor, and exposes its judgment through inspectable artifacts and local tool surfaces.
+Relaytic is a local-first inference engineering system for structured data. It investigates datasets before it commits to modeling assumptions, preserves user intent through policy and mandate layers, interprets human and external-agent input into structured run context, keeps deterministic execution as the floor, proceeds autonomously when non-critical clarification goes unanswered, and exposes its judgment through inspectable artifacts and local tool surfaces.
 
 This repository is in an active transformation from a legacy prototype into the Relaytic product. The public package, CLI, docs, and migration controls now use Relaytic naming. Remaining legacy internals are tracked explicitly and are being removed slice by slice.
 
 ## What Relaytic Is
 
-Relaytic is not an AutoML wrapper. It is a local-first inference engineering system that investigates data, forms competing hypotheses, runs challenger science, quantifies uncertainty, preserves mandate-aware user intent, recommends missing data, and exposes its judgment as reusable local tools.
+Relaytic is not an AutoML wrapper. It is a local-first inference engineering system that investigates data, forms competing hypotheses, runs challenger science, quantifies uncertainty, preserves mandate-aware user intent, translates free-form human or agent input into structured operating context, recommends missing data, and exposes its judgment as reusable local tools.
 
 The intended product is:
 
@@ -68,6 +68,9 @@ Examples:
 relaytic policy resolve --output artifacts/run_demo/policy_resolved.yaml
 relaytic manifest init --run-dir artifacts/run_demo --entry policy_resolved.yaml
 relaytic foundation init --run-dir artifacts/run_demo
+relaytic intake interpret --run-dir artifacts/run_demo --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
+relaytic intake questions --run-dir artifacts/run_demo
+relaytic investigate --run-dir artifacts/run_demo --data-path data/private/run1.csv
 relaytic mandate init --run-dir artifacts/run_demo --objective best_robust_pareto_front
 relaytic context init --run-dir artifacts/run_demo --problem-statement "Predict off-spec batches early."
 relaytic setup-local-llm --provider llama_cpp
@@ -93,11 +96,16 @@ Relevant files:
 
 ## Build Discipline
 
-Relaytic will be built in bounded slices. The next load-bearing slices are:
+Relaytic is being built in bounded slices. Completed load-bearing slices are:
 
 1. Slice 01 - contracts and scaffolding
 2. Slice 02 - mandate and context foundation
 3. Slice 03 - Focus Council and investigation baseline
+4. Slice 04 - intake and translation layer
+
+The next recommended build step is:
+
+5. Slice 05 - planning and first working route
 
 The completed normalization slice established:
 
@@ -114,6 +122,8 @@ src/relaytic/          Main runtime package and current implementation baseline
 src/corr2surrogate/    Temporary compatibility import shim
 src/relaytic/mandate/  Mandate foundation objects and writers
 src/relaytic/context/  Context foundation objects and writers
+src/relaytic/intake/   Slice 04 intake translation and interpretation artifacts
+src/relaytic/investigation/ Slice 03 specialist agents and investigation artifacts
 src/relaytic/policies/ Canonical resolved policy helpers
 src/relaytic/artifacts/ Manifest helpers
 configs/               Runtime configuration
@@ -131,6 +141,7 @@ The repo should read like a product, not a scratchpad. That means:
 - one public CLI
 - explicit contracts
 - explicit migration notes
+- explicit assumptions when Relaytic proceeds autonomously
 - no leaked secrets
 - no checked-in local environments
 - no ambiguous legacy branding in new work

@@ -30,9 +30,11 @@ Relaytic/
     relaytic/
       artifacts/
       context/
+      intake/
+      investigation/
       mandate/
       policies/
-    corr2surrogate/  # temporary compatibility shim
+    corr2surrogate/  # temporary compatibility shim with explicit ui/security forwarding
   tests/
   README.md
   SECURITY.md

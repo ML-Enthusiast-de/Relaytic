@@ -1012,6 +1012,7 @@ Responsible for:
 - interpreting work preferences
 - interpreting run-specific brief
 - translating mandate into structured constraints and preferences
+- translating free-form human or agent intent into mandate updates with confidence and provenance
 - tracking alignment drift during autonomous execution
 - participating in debates when evidence conflicts with mandate
 - logging tradeoff decisions
@@ -1803,6 +1804,11 @@ Expert context interpretation must support two paths:
 - **deterministic interpretation path**
 - **optional local-LLM interpretation path**
 
+Structured context may be provided directly, but Relaytic must also support
+free-form user or external-agent input that is translated into the same
+foundation objects with provenance, confidence, optional clarification, and
+explicit fallback assumptions before those objects are updated.
+
 ### Deterministic interpretation path
 
 Without any LLM, the system should still extract useful structure from expert context using:
@@ -2359,7 +2365,7 @@ Effort should include:
 ### New orchestration loop
 
 ```text
-configure mandate -> configure optional context -> focus selection -> investigate -> resolve understanding -> hypothesize -> plan -> feature strategy -> execute batch -> challenge -> ablate -> audit -> completion review -> decide next step
+configure mandate -> configure optional context -> intake and translate user/agent inputs -> focus selection -> investigate -> resolve understanding -> hypothesize -> plan -> feature strategy -> execute batch -> challenge -> ablate -> audit -> completion review -> decide next step
 ```
 
 ### Required loop decisions
@@ -3291,6 +3297,8 @@ External agents must be able to provide mandate context, run briefs, data origin
 - which inputs are optional
 - which are advisory
 - how provenance is handled
+- how free-form notes are translated into structured artifacts
+- when Relaytic will ask clarifying questions instead of guessing
 - how retrain/promotion tools are expected to be used
 - how session vs daemon mode works
 - how live data should flow into monitoring vs retraining
@@ -4375,14 +4383,21 @@ Codex must implement in this order:
 - first-run UI forms
 - resolved config writing
 
-#### Slice group 3: investigation and planning
+#### Slice group 3: intake and interpretation
+- raw user/agent intake
+- free-form mandate/context translation
+- semantic mapping to dataset schema and artifact fields
+- optional clarification-question generation plus proceed-with-assumptions behavior
+- optional bounded local-LLM interpretation
+
+#### Slice group 4: investigation and planning
 - scout/scientist/strategist baseline
 - dataset profile
 - domain memo
 - plan/hypothesis artifacts
 - lightweight deterministic routes
 
-#### Slice group 4: experimentation and evidence
+#### Slice group 5: experimentation and evidence
 - strategist translation of focus profile
 - experiment registry
 - challenger
@@ -4390,7 +4405,7 @@ Codex must implement in this order:
 - audit outputs
 - reports
 
-#### Slice group 5: intelligence amplification
+#### Slice group 6: intelligence amplification
 - intelligence modes
 - minimum local LLM baseline abstraction
 - backend discovery and setup guidance
@@ -4398,13 +4413,13 @@ Codex must implement in this order:
 - debate/verifier/reflection
 - schema-constrained action layer
 
-#### Slice group 6: lifecycle operations
+#### Slice group 7: lifecycle operations
 - dataset/schema versioning
 - retrain/recalibrate/promotion/rollback decisions
 - champion/candidate registry
 - lifecycle reports
 
-#### Slice group 7: distribution and polish
+#### Slice group 8: distribution and polish
 - packaging extras
 - Docker surfaces
 - macOS/Linux install notes

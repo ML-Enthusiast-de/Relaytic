@@ -17,6 +17,8 @@ New docs, code, examples, and tests must target `relaytic`.
 Current package rule:
 
 - `src/relaytic/` is canonical
+- `src/relaytic/intake/` owns Slice 04 intake translation and interpretation artifacts
+- `src/relaytic/investigation/` owns Slice 03 specialist-agent investigation and focus artifacts
 - `src/corr2surrogate/` is a temporary shim that forwards legacy imports
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
@@ -32,6 +34,7 @@ These files are required and must stay current:
 - `docs/build_slices/phase_01.md`
 - `docs/build_slices/phase_02.md`
 - `docs/build_slices/phase_03.md`
+- `docs/build_slices/phase_04.md`
 
 ## Early Artifact Contract
 
@@ -45,6 +48,13 @@ The first slices must preserve these names:
 - `data_origin.json`
 - `domain_brief.json`
 - `task_brief.json`
+- `intake_record.json`
+- `autonomy_mode.json`
+- `clarification_queue.json`
+- `assumption_log.json`
+- `context_interpretation.json`
+- `context_constraints.json`
+- `semantic_mapping.json`
 - `dataset_profile.json`
 - `domain_memo.json`
 - `objective_hypotheses.json`
@@ -70,6 +80,10 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic context init`
 - `relaytic context show`
 - `relaytic foundation init`
+- `relaytic intake interpret`
+- `relaytic intake show`
+- `relaytic intake questions`
+- `relaytic investigate`
 - `relaytic setup-local-llm`
 - `relaytic run-agent-session`
 - `relaytic run-agent1-analysis`
@@ -82,6 +96,13 @@ Minimum guaranteed surfaces at this stage:
 - Repo-specific environment variables should use the `RELAYTIC_*` prefix
 - Legacy `C2S_*` variables may be accepted only as compatibility fallbacks
 - No raw secrets may be written into tracked docs, tests, or artifacts
+
+## Intake Autonomy Contract
+
+- Slice 04 clarification must be optional by default
+- unanswered non-critical intake questions must degrade confidence, not block the run
+- Relaytic must log fallback assumptions explicitly when it proceeds without answers
+- local LLMs may improve interpretation quality but must not be required for the deterministic intake floor
 
 ## Migration Rule
 

@@ -1,0 +1,51 @@
+"""Slice 03 investigation subsystem exports."""
+
+from .agents import run_investigation
+from .models import (
+    DATASET_PROFILE_SCHEMA_VERSION,
+    DOMAIN_MEMO_SCHEMA_VERSION,
+    FEATURE_STRATEGY_PROFILE_SCHEMA_VERSION,
+    FOCUS_DEBATE_SCHEMA_VERSION,
+    FOCUS_PROFILE_SCHEMA_VERSION,
+    INVESTIGATION_CONTROLS_SCHEMA_VERSION,
+    OBJECTIVE_HYPOTHESES_SCHEMA_VERSION,
+    OPTIMIZATION_PROFILE_SCHEMA_VERSION,
+    DatasetProfile,
+    DomainMemo,
+    FeatureStrategyProfile,
+    FocusDebate,
+    FocusProfile,
+    InvestigationBundle,
+    InvestigationControls,
+    ObjectiveHypotheses,
+    OptimizationProfile,
+    SpecialistTrace,
+    build_investigation_controls_from_policy,
+)
+from .storage import INVESTIGATION_FILENAMES, read_investigation_bundle, write_investigation_bundle
+
+__all__ = [
+    "DATASET_PROFILE_SCHEMA_VERSION",
+    "DOMAIN_MEMO_SCHEMA_VERSION",
+    "FEATURE_STRATEGY_PROFILE_SCHEMA_VERSION",
+    "FOCUS_DEBATE_SCHEMA_VERSION",
+    "FOCUS_PROFILE_SCHEMA_VERSION",
+    "INVESTIGATION_CONTROLS_SCHEMA_VERSION",
+    "INVESTIGATION_FILENAMES",
+    "OBJECTIVE_HYPOTHESES_SCHEMA_VERSION",
+    "OPTIMIZATION_PROFILE_SCHEMA_VERSION",
+    "DatasetProfile",
+    "DomainMemo",
+    "FeatureStrategyProfile",
+    "FocusDebate",
+    "FocusProfile",
+    "InvestigationBundle",
+    "InvestigationControls",
+    "ObjectiveHypotheses",
+    "OptimizationProfile",
+    "SpecialistTrace",
+    "build_investigation_controls_from_policy",
+    "read_investigation_bundle",
+    "run_investigation",
+    "write_investigation_bundle",
+]
