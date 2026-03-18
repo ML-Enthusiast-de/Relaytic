@@ -6,6 +6,7 @@ import argparse
 import json
 import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
@@ -106,6 +107,42 @@ def run_intake_interpretation(*args: Any, **kwargs: Any) -> Any:
     from relaytic.intake import run_intake_interpretation as _run_intake_interpretation
 
     return _run_intake_interpretation(*args, **kwargs)
+
+
+def run_planning(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.planning import run_planning as _run_planning
+
+    return _run_planning(*args, **kwargs)
+
+
+def execute_planned_route(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.planning import execute_planned_route as _execute_planned_route
+
+    return _execute_planned_route(*args, **kwargs)
+
+
+def run_evidence_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.evidence import run_evidence_review as _run_evidence_review
+
+    return _run_evidence_review(*args, **kwargs)
+
+
+def materialize_run_summary(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.runs import materialize_run_summary as _materialize_run_summary
+
+    return _materialize_run_summary(*args, **kwargs)
+
+
+def read_run_summary(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.runs import read_run_summary as _read_run_summary
+
+    return _read_run_summary(*args, **kwargs)
+
+
+def read_evidence_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.evidence import read_evidence_bundle as _read_evidence_bundle
+
+    return _read_evidence_bundle(*args, **kwargs)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -527,6 +564,81 @@ def build_parser() -> argparse.ArgumentParser:
     foundation_init.add_argument("--overwrite", action="store_true", help="Allow overwriting existing foundation artifacts.")
     foundation_init.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
 
+    run_surface = sub.add_parser(
+        "run",
+        help="Run the first Relaytic MVP flow end to end on a dataset.",
+    )
+    run_surface.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    run_surface.add_argument("--run-dir", default=None, help="Optional run directory. Defaults to a generated path under `artifacts/`.")
+    run_surface.add_argument("--config", default=None, help="Optional config/policy source.")
+    run_surface.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    run_surface.add_argument("--text", default=None, help="Optional free-form request text.")
+    run_surface.add_argument(
+        "--text-file",
+        default=None,
+        help="Optional UTF-8 text file containing the run request.",
+    )
+    run_surface.add_argument(
+        "--actor-type",
+        choices=["user", "operator", "agent"],
+        default="user",
+        help="Who produced the run request.",
+    )
+    run_surface.add_argument("--actor-name", default=None, help="Optional actor display name.")
+    run_surface.add_argument("--channel", default="cli", help="Run-request channel label.")
+    run_surface.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
+    run_surface.add_argument("--header-row", type=int, default=None, help="Optional header row.")
+    run_surface.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
+    run_surface.add_argument("--timestamp-column", default=None, help="Optional timestamp column override for investigation.")
+    run_surface.add_argument("--overwrite", action="store_true", help="Allow overwriting existing intake, planning, and model artifacts.")
+    run_surface.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    run_surface.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    show_surface = sub.add_parser(
+        "show",
+        help="Render a concise Relaytic run summary for humans or agents.",
+    )
+    show_surface.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    show_surface.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    predict_surface = sub.add_parser(
+        "predict",
+        help="Run inference through the accessible Relaytic prediction surface.",
+    )
+    predict_surface.add_argument("--run-dir", required=True, help="Run directory containing model artifacts.")
+    predict_surface.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    predict_surface.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
+    predict_surface.add_argument("--header-row", type=int, default=None, help="Optional header row.")
+    predict_surface.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
+    predict_surface.add_argument("--delimiter", default=None, help="Optional CSV delimiter override.")
+    predict_surface.add_argument(
+        "--decision-threshold",
+        type=float,
+        default=None,
+        help="Optional binary threshold override (0..1).",
+    )
+    predict_surface.add_argument(
+        "--output-path",
+        default=None,
+        help="Optional output JSON path for persisted prediction payloads.",
+    )
+    predict_surface.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     intake = sub.add_parser(
         "intake",
         help="Capture and interpret free-form user or agent input into foundation artifacts.",
@@ -581,6 +693,87 @@ def build_parser() -> argparse.ArgumentParser:
         help="Print the optional clarification queue and assumption log for a run directory.",
     )
     intake_questions.add_argument("--run-dir", required=True, help="Run directory containing intake artifacts.")
+
+    plan = sub.add_parser(
+        "plan",
+        help="Create Slice 05 planning artifacts and execute the first deterministic route.",
+    )
+    plan_sub = plan.add_subparsers(dest="plan_command", required=True)
+
+    plan_create = plan_sub.add_parser(
+        "create",
+        help="Write Slice 05 planning artifacts.",
+    )
+    plan_create.add_argument("--run-dir", required=True, help="Run directory for planning artifacts.")
+    plan_create.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    plan_create.add_argument("--config", default=None, help="Optional config/policy source.")
+    plan_create.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    plan_create.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
+    plan_create.add_argument("--header-row", type=int, default=None, help="Optional header row.")
+    plan_create.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
+    plan_create.add_argument("--timestamp-column", default=None, help="Optional timestamp column override for investigation.")
+    plan_create.add_argument("--overwrite", action="store_true", help="Allow overwriting existing Slice 05 artifacts.")
+    plan_create.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+
+    plan_run = plan_sub.add_parser(
+        "run",
+        help="Write Slice 05 planning artifacts and execute the first deterministic Builder route.",
+    )
+    plan_run.add_argument("--run-dir", required=True, help="Run directory for planning and model artifacts.")
+    plan_run.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    plan_run.add_argument("--config", default=None, help="Optional config/policy source.")
+    plan_run.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    plan_run.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
+    plan_run.add_argument("--header-row", type=int, default=None, help="Optional header row.")
+    plan_run.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
+    plan_run.add_argument("--timestamp-column", default=None, help="Optional timestamp column override for investigation.")
+    plan_run.add_argument("--overwrite", action="store_true", help="Allow overwriting existing Slice 05 and model artifacts.")
+    plan_run.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+
+    plan_show = plan_sub.add_parser(
+        "show",
+        help="Print Slice 05 planning artifacts from a run directory.",
+    )
+    plan_show.add_argument("--run-dir", required=True, help="Run directory containing planning artifacts.")
+
+    evidence = sub.add_parser(
+        "evidence",
+        help="Run or inspect Slice 06 challenger, ablation, audit, and report artifacts.",
+    )
+    evidence_sub = evidence.add_subparsers(dest="evidence_command", required=True)
+
+    evidence_run = evidence_sub.add_parser(
+        "run",
+        help="Execute the Slice 06 evidence layer for an existing or freshly planned run.",
+    )
+    evidence_run.add_argument("--run-dir", required=True, help="Run directory for evidence artifacts.")
+    evidence_run.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    evidence_run.add_argument("--config", default=None, help="Optional config/policy source.")
+    evidence_run.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    evidence_run.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
+    evidence_run.add_argument("--header-row", type=int, default=None, help="Optional header row.")
+    evidence_run.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
+    evidence_run.add_argument("--timestamp-column", default=None, help="Optional timestamp column override for investigation.")
+    evidence_run.add_argument("--overwrite", action="store_true", help="Allow overwriting existing evidence artifacts.")
+    evidence_run.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    evidence_run.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    evidence_show = evidence_sub.add_parser(
+        "show",
+        help="Render the current Slice 06 decision memo and evidence summary.",
+    )
+    evidence_show.add_argument("--run-dir", required=True, help="Run directory containing evidence artifacts.")
+    evidence_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     investigate = sub.add_parser(
         "investigate",
@@ -710,6 +903,71 @@ def main(argv: list[str] | None = None) -> int:
         print(dumps_json(payload, indent=2, ensure_ascii=False))
         return 0
 
+    if args.command == "run":
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_access_flow(
+                run_dir=args.run_dir,
+                data_path=args.data_path,
+                config_path=args.config,
+                run_id=args.run_id,
+                text=args.text,
+                text_file=args.text_file,
+                actor_type=args.actor_type,
+                actor_name=args.actor_name,
+                channel=args.channel,
+                sheet_name=args.sheet_name,
+                header_row=args.header_row,
+                data_start_row=args.data_start_row,
+                timestamp_column=args.timestamp_column,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "show":
+        try:
+            payload = _show_access_run(run_dir=args.run_dir)
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "predict":
+        try:
+            prediction = run_inference_from_artifacts(
+                data_path=args.data_path,
+                run_dir=args.run_dir,
+                sheet_name=args.sheet_name,
+                header_row=args.header_row,
+                data_start_row=args.data_start_row,
+                delimiter=args.delimiter,
+                decision_threshold=args.decision_threshold,
+                output_path=args.output_path,
+            )
+        except Exception as exc:
+            print(dumps_json({"status": "error", "message": str(exc)}, indent=2, ensure_ascii=False))
+            return 1
+        _emit_structured_surface_output(
+            payload=prediction,
+            human_text=_render_prediction_output(prediction),
+            output_format=args.format,
+        )
+        return 0
+
     if args.command == "intake":
         if args.intake_command == "show":
             print(dumps_json(_read_json_bundle(args.run_dir, bundle="intake"), indent=2, ensure_ascii=False))
@@ -753,6 +1011,74 @@ def main(argv: list[str] | None = None) -> int:
             parser.error(str(exc))
             return 2
         print(dumps_json(payload, indent=2, ensure_ascii=False))
+        return 0
+
+    if args.command == "plan":
+        if args.plan_command == "show":
+            print(dumps_json(_read_json_bundle(args.run_dir, bundle="planning"), indent=2, ensure_ascii=False))
+            return 0
+        if args.plan_command not in {"create", "run"}:
+            parser.error("Unsupported plan subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_planning_phase(
+                run_dir=args.run_dir,
+                data_path=args.data_path,
+                config_path=args.config,
+                run_id=args.run_id,
+                sheet_name=args.sheet_name,
+                header_row=args.header_row,
+                data_start_row=args.data_start_row,
+                timestamp_column=args.timestamp_column,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+                execute_route=args.plan_command == "run",
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        print(dumps_json(payload, indent=2, ensure_ascii=False))
+        return 0
+
+    if args.command == "evidence":
+        if args.evidence_command == "show":
+            try:
+                payload = _show_evidence_surface(run_dir=args.run_dir)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.evidence_command != "run":
+            parser.error("Unsupported evidence subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_evidence_phase(
+                run_dir=args.run_dir,
+                data_path=args.data_path,
+                config_path=args.config,
+                run_id=args.run_id,
+                sheet_name=args.sheet_name,
+                header_row=args.header_row,
+                data_start_row=args.data_start_row,
+                timestamp_column=args.timestamp_column,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
         return 0
 
     if args.command == "investigate":
@@ -954,6 +1280,203 @@ def _resolve_intake_text(*, text: str | None, text_file: str | None) -> str:
     return resolved
 
 
+def _resolve_access_request(
+    *,
+    run_dir: str | Path,
+    text: str | None,
+    text_file: str | None,
+) -> tuple[str | None, str]:
+    if text and text_file:
+        raise ValueError("Provide at most one of --text or --text-file.")
+    if text:
+        resolved = text.strip()
+        if not resolved:
+            raise ValueError("Run request text must not be empty.")
+        return resolved, "inline_text"
+    if text_file:
+        resolved = Path(text_file).read_text(encoding="utf-8").strip()
+        if not resolved:
+            raise ValueError("Run request text must not be empty.")
+        return resolved, "text_file"
+    if (Path(run_dir) / "intake_record.json").exists():
+        return None, "existing_intake_artifacts"
+    return _default_access_request_text(), "autonomous_default"
+
+
+def _default_access_request_text() -> str:
+    return (
+        "Do everything on your own. Infer the target if it is not explicit, keep the run local-first, "
+        "avoid future, post-outcome, or leakage-prone features, and build the strongest auditable first route."
+    )
+
+
+def _default_access_run_dir(*, data_path: str | Path) -> Path:
+    dataset_stem = re.sub(r"[^A-Za-z0-9]+", "_", Path(data_path).stem).strip("_").lower() or "dataset"
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    return Path("artifacts") / f"run_{dataset_stem}_{stamp}"
+
+
+def _emit_structured_surface_output(
+    *,
+    payload: dict[str, Any],
+    human_text: str,
+    output_format: str,
+) -> None:
+    if output_format == "human":
+        print(human_text.rstrip())
+        return
+    if output_format == "json":
+        print(dumps_json(payload, indent=2, ensure_ascii=False))
+        return
+    print(human_text.rstrip())
+    print()
+    print(dumps_json(payload, indent=2, ensure_ascii=False))
+
+
+def _render_prediction_output(payload: dict[str, Any]) -> str:
+    return "\n".join(
+        [
+            "# Relaytic Prediction Summary",
+            "",
+            f"- Status: `{payload.get('status', 'unknown')}`",
+            f"- Model: `{payload.get('model_name', 'unknown')}`",
+            f"- Predictions: `{payload.get('prediction_count', 0)}`",
+            f"- Rows after preprocessing: `{payload.get('rows_after_preprocessing', 0)}`",
+            f"- Output path: `{payload.get('output_path') or 'not persisted'}`",
+        ]
+    ) + "\n"
+
+
+def _run_access_flow(
+    *,
+    run_dir: str | None,
+    data_path: str,
+    config_path: str | None,
+    run_id: str | None,
+    text: str | None,
+    text_file: str | None,
+    actor_type: str,
+    actor_name: str | None,
+    channel: str,
+    sheet_name: str | None,
+    header_row: int | None,
+    data_start_row: int | None,
+    timestamp_column: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    root = Path(run_dir) if run_dir else _default_access_run_dir(data_path=data_path)
+    request_text, request_source = _resolve_access_request(
+        run_dir=root,
+        text=text,
+        text_file=text_file,
+    )
+    intake_payload: dict[str, Any] | None = None
+    if request_text is not None:
+        intake_payload = _run_intake_phase(
+            run_dir=root,
+            message=request_text,
+            actor_type=actor_type,
+            actor_name=actor_name,
+            channel=channel,
+            config_path=config_path,
+            run_id=run_id,
+            data_path=data_path,
+            sheet_name=sheet_name,
+            header_row=header_row,
+            data_start_row=data_start_row,
+            overwrite=overwrite,
+            labels=labels,
+        )
+    planning_payload = _run_planning_phase(
+        run_dir=root,
+        data_path=data_path,
+        config_path=config_path,
+        run_id=run_id,
+        sheet_name=sheet_name,
+        header_row=header_row,
+        data_start_row=data_start_row,
+        timestamp_column=timestamp_column,
+        overwrite=overwrite,
+        labels=labels,
+        execute_route=True,
+    )
+    evidence_payload = _run_evidence_phase(
+        run_dir=root,
+        data_path=data_path,
+        config_path=config_path,
+        run_id=run_id,
+        sheet_name=sheet_name,
+        header_row=header_row,
+        data_start_row=data_start_row,
+        timestamp_column=timestamp_column,
+        overwrite=overwrite,
+        labels=labels,
+    )
+    summary_materialized = materialize_run_summary(
+        run_dir=root,
+        data_path=data_path,
+        request_source=request_source,
+        request_text=request_text,
+    )
+    manifest_path = _refresh_access_manifest(
+        root,
+        run_id=run_id,
+        policy_source=planning_payload.get("policy_resolved"),
+        labels=labels,
+        training_result=planning_payload.get("training_result"),
+    )
+    surface_payload = {
+        "status": "ok",
+        "run_dir": str(root),
+        "data_path": str(Path(data_path)),
+        "request_source": request_source,
+        "intake_skipped": request_text is None,
+        "manifest_path": str(manifest_path),
+        "summary_path": str(summary_materialized["summary_path"]),
+        "report_path": str(summary_materialized["report_path"]),
+        "run_summary": summary_materialized["summary"],
+    }
+    if intake_payload is not None:
+        surface_payload["intake"] = {
+            "autonomy_mode": intake_payload.get("autonomy_mode", {}),
+            "assumptions": intake_payload.get("assumptions", []),
+        }
+    surface_payload["plan"] = planning_payload.get("plan", {})
+    surface_payload["training_result"] = planning_payload.get("training_result", {})
+    surface_payload["evidence"] = evidence_payload["surface_payload"].get("evidence", {})
+    return {
+        "surface_payload": surface_payload,
+        "human_output": summary_materialized["report_markdown"],
+    }
+
+
+def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    existing_summary = read_run_summary(root)
+    request = dict(existing_summary.get("request", {})) if isinstance(existing_summary, dict) else {}
+    summary_materialized = materialize_run_summary(
+        run_dir=root,
+        data_path=dict(existing_summary.get("data", {})).get("data_path") if isinstance(existing_summary, dict) else None,
+        request_source=str(request.get("source", "")).strip() or None,
+        request_text=str(request.get("text_preview", "")).strip() or None,
+    )
+    manifest_path = _refresh_access_manifest(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "summary_path": str(summary_materialized["summary_path"]),
+            "report_path": str(summary_materialized["report_path"]),
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": summary_materialized["report_markdown"],
+    }
+
+
 def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
     if bundle == "mandate":
         from relaytic.mandate import read_mandate_bundle
@@ -967,6 +1490,18 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.intake import read_intake_bundle
 
         return read_intake_bundle(run_dir)
+    if bundle == "investigation":
+        from relaytic.investigation import read_investigation_bundle
+
+        return read_investigation_bundle(run_dir)
+    if bundle == "planning":
+        from relaytic.planning import read_planning_bundle
+
+        return read_planning_bundle(run_dir)
+    if bundle == "evidence":
+        from relaytic.evidence import read_evidence_bundle
+
+        return read_evidence_bundle(run_dir)
     raise ValueError(f"Unsupported bundle '{bundle}'.")
 
 
@@ -1252,6 +1787,307 @@ def _run_investigation_phase(
     }
 
 
+def _run_planning_phase(
+    *,
+    run_dir: str | Path,
+    data_path: str,
+    config_path: str | None,
+    run_id: str | None,
+    sheet_name: str | None,
+    header_row: int | None,
+    data_start_row: int | None,
+    timestamp_column: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+    execute_route: bool,
+) -> dict[str, Any]:
+    from relaytic.planning import write_planning_bundle
+
+    root = Path(run_dir)
+    targets = _planning_output_paths(root)
+    protected_paths = list(targets.values())
+    if execute_route:
+        protected_paths.extend(_planning_model_artifact_paths(root))
+    _ensure_paths_absent(protected_paths, overwrite=overwrite)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    investigation_state = _ensure_investigation_present(
+        run_dir=root,
+        data_path=data_path,
+        config_path=config_path,
+        run_id=run_id,
+        sheet_name=sheet_name,
+        header_row=header_row,
+        data_start_row=data_start_row,
+        timestamp_column=timestamp_column,
+        labels=labels,
+    )
+    planning_bundle = run_planning(
+        data_path=data_path,
+        policy=foundation_state["resolved"].policy,
+        mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+        context_bundle=_read_json_bundle(root, bundle="context"),
+        investigation_bundle=investigation_state["bundle"],
+        config_path=config_path,
+        sheet_name=sheet_name,
+        header_row=header_row,
+        data_start_row=data_start_row,
+    )
+    training_result: dict[str, Any] | None = None
+    if execute_route:
+        execution = execute_planned_route(
+            run_dir=root,
+            data_path=data_path,
+            planning_bundle=planning_bundle,
+            sheet_name=sheet_name,
+            header_row=header_row,
+            data_start_row=data_start_row,
+        )
+        planning_bundle = execution.planning_bundle
+        training_result = execution.training_result
+    written = write_planning_bundle(root, bundle=planning_bundle)
+    manifest_path = _refresh_planning_manifest(
+        root,
+        run_id=run_id,
+        policy_source=foundation_state["policy_path"],
+        labels=labels,
+        training_result=training_result,
+    )
+    payload = {
+        "status": "ok",
+        "run_dir": str(root),
+        "data_path": str(Path(data_path)),
+        "policy_resolved": str(foundation_state["policy_path"]),
+        "paths": {key: str(value) for key, value in written.items()},
+        "manifest_path": str(manifest_path),
+        "plan": {
+            "selected_route_id": planning_bundle.plan.selected_route_id,
+            "selected_route_title": planning_bundle.plan.selected_route_title,
+            "target_column": planning_bundle.plan.target_column,
+            "primary_metric": planning_bundle.plan.primary_metric,
+            "split_strategy": planning_bundle.plan.split_strategy,
+        },
+        "builder_handoff": planning_bundle.plan.builder_handoff,
+    }
+    if training_result is not None:
+        payload["training_result"] = {
+            "selected_model_family": training_result.get("selected_model_family"),
+            "best_validation_model_family": training_result.get("best_validation_model_family"),
+            "checkpoint_id": training_result.get("checkpoint_id"),
+            "model_params_path": training_result.get("model_params_path"),
+            "model_state_path": training_result.get("model_state_path"),
+            "run_dir": training_result.get("run_dir"),
+            "selected_metrics": training_result.get("selected_metrics"),
+        }
+    return payload
+
+
+def _run_evidence_phase(
+    *,
+    run_dir: str | Path,
+    data_path: str,
+    config_path: str | None,
+    run_id: str | None,
+    sheet_name: str | None,
+    header_row: int | None,
+    data_start_row: int | None,
+    timestamp_column: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.evidence import write_evidence_bundle
+
+    root = Path(run_dir)
+    targets = _evidence_output_paths(root)
+    if not overwrite:
+        _ensure_paths_absent(
+            [
+                path
+                for key, path in targets.items()
+                if key
+                in {
+                    "experiment_registry",
+                    "challenger_report",
+                    "ablation_report",
+                    "audit_report",
+                    "belief_update",
+                    "leaderboard",
+                    "technical_report",
+                    "decision_memo",
+                }
+            ],
+            overwrite=False,
+        )
+    planning_bundle_existing = _read_json_bundle(root, bundle="planning")
+    existing_plan = dict(planning_bundle_existing.get("plan", {}))
+    if existing_plan and dict(existing_plan.get("execution_summary", {})):
+        planning_state = {
+            "status": "ok",
+            "run_dir": str(root),
+            "data_path": str(Path(data_path)),
+            "plan": {
+                "selected_route_id": existing_plan.get("selected_route_id"),
+                "selected_route_title": existing_plan.get("selected_route_title"),
+                "target_column": existing_plan.get("target_column"),
+                "primary_metric": existing_plan.get("primary_metric"),
+                "split_strategy": existing_plan.get("split_strategy"),
+            },
+            "training_result": dict(existing_plan.get("execution_summary", {})),
+        }
+    else:
+        planning_state = _run_planning_phase(
+            run_dir=root,
+            data_path=data_path,
+            config_path=config_path,
+            run_id=run_id,
+            sheet_name=sheet_name,
+            header_row=header_row,
+            data_start_row=data_start_row,
+            timestamp_column=timestamp_column,
+            overwrite=overwrite,
+            labels=labels,
+            execute_route=True,
+        )
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    evidence_result = run_evidence_review(
+        run_dir=root,
+        data_path=data_path,
+        policy=foundation_state["resolved"].policy,
+        mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+        context_bundle=_read_json_bundle(root, bundle="context"),
+        intake_bundle=_read_json_bundle(root, bundle="intake"),
+        investigation_bundle=_read_json_bundle(root, bundle="investigation"),
+        planning_bundle=_read_json_bundle(root, bundle="planning"),
+        config_path=config_path,
+        sheet_name=sheet_name,
+        header_row=header_row,
+        data_start_row=data_start_row,
+    )
+    written = write_evidence_bundle(
+        root,
+        bundle=evidence_result.bundle,
+        leaderboard_rows=evidence_result.leaderboard_rows,
+        technical_report_markdown=evidence_result.technical_report_markdown,
+        decision_memo_markdown=evidence_result.decision_memo_markdown,
+    )
+    manifest_path = _refresh_evidence_manifest(
+        root,
+        run_id=run_id,
+        policy_source=foundation_state["policy_path"],
+        labels=labels,
+    )
+    materialize_run_summary(run_dir=root, data_path=data_path)
+    payload = {
+        "status": "ok",
+        "run_dir": str(root),
+        "data_path": str(Path(data_path)),
+        "manifest_path": str(manifest_path),
+        "paths": {key: str(value) for key, value in written.items()},
+        "evidence": {
+            "provisional_recommendation": evidence_result.bundle.audit_report.provisional_recommendation,
+            "readiness_level": evidence_result.bundle.audit_report.readiness_level,
+            "challenger_winner": evidence_result.bundle.challenger_report.winner,
+            "recommended_action": evidence_result.bundle.belief_update.recommended_action,
+        },
+        "plan": planning_state.get("plan", {}),
+        "training_result": planning_state.get("training_result", {}),
+    }
+    return {
+        "surface_payload": payload,
+        "human_output": evidence_result.decision_memo_markdown,
+    }
+
+
+def _show_evidence_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = read_evidence_bundle(root)
+    if not bundle:
+        raise ValueError(f"No Slice 06 evidence artifacts found in {root}.")
+    summary_materialized = materialize_run_summary(run_dir=root)
+    decision_memo_path = root / "reports" / "decision_memo.md"
+    if decision_memo_path.exists():
+        human_output = decision_memo_path.read_text(encoding="utf-8")
+    else:
+        human_output = summary_materialized["report_markdown"]
+    manifest_path = _refresh_evidence_manifest(root)
+    audit_report = dict(bundle.get("audit_report", {}))
+    belief_update = dict(bundle.get("belief_update", {}))
+    challenger_report = dict(bundle.get("challenger_report", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "summary_path": str(summary_materialized["summary_path"]),
+            "report_path": str(decision_memo_path if decision_memo_path.exists() else summary_materialized["report_path"]),
+            "evidence": {
+                "provisional_recommendation": audit_report.get("provisional_recommendation"),
+                "readiness_level": audit_report.get("readiness_level"),
+                "challenger_winner": challenger_report.get("winner"),
+                "recommended_action": belief_update.get("recommended_action"),
+            },
+            "bundle": bundle,
+        },
+        "human_output": human_output,
+    }
+
+
+def _ensure_investigation_present(
+    *,
+    run_dir: str | Path,
+    data_path: str,
+    config_path: str | None,
+    run_id: str | None,
+    sheet_name: str | None,
+    header_row: int | None,
+    data_start_row: int | None,
+    timestamp_column: str | None,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    targets = _investigation_output_paths(root)
+    if all(path.exists() for path in targets.values()):
+        return {"bundle": _read_json_bundle(root, bundle="investigation")}
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    bundle = run_investigation(
+        data_path=data_path,
+        policy=foundation_state["resolved"].policy,
+        mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+        context_bundle=_read_json_bundle(root, bundle="context"),
+        config_path=config_path,
+        sheet_name=sheet_name,
+        header_row=header_row,
+        data_start_row=data_start_row,
+        timestamp_column=timestamp_column,
+    )
+    from relaytic.investigation import write_investigation_bundle
+
+    write_investigation_bundle(root, bundle=bundle)
+    _refresh_investigation_manifest(
+        root,
+        run_id=run_id,
+        policy_source=foundation_state["policy_path"],
+        labels=labels,
+    )
+    return {"bundle": bundle.to_dict()}
+
+
 def _init_mandate_foundation(args: argparse.Namespace) -> dict[str, Any]:
     from relaytic.mandate import (
         MandateControl,
@@ -1472,6 +2308,58 @@ def _intake_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _planning_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "plan": run_dir / "plan.json",
+        "alternatives": run_dir / "alternatives.json",
+        "hypotheses": run_dir / "hypotheses.json",
+        "experiment_priority_report": run_dir / "experiment_priority_report.json",
+        "marginal_value_of_next_experiment": run_dir / "marginal_value_of_next_experiment.json",
+    }
+
+
+def _evidence_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "experiment_registry": run_dir / "experiment_registry.json",
+        "challenger_report": run_dir / "challenger_report.json",
+        "ablation_report": run_dir / "ablation_report.json",
+        "audit_report": run_dir / "audit_report.json",
+        "belief_update": run_dir / "belief_update.json",
+        "leaderboard": run_dir / "leaderboard.csv",
+        "technical_report": run_dir / "reports" / "technical_report.md",
+        "decision_memo": run_dir / "reports" / "decision_memo.md",
+    }
+
+
+def _access_surface_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "run_summary": run_dir / "run_summary.json",
+        "summary_report": run_dir / "reports" / "summary.md",
+    }
+
+
+def _planning_model_artifact_paths(run_dir: Path) -> list[Path]:
+    candidates: list[Path] = [
+        run_dir / "model_params.json",
+        run_dir / "model_state.json",
+        run_dir / "normalization_state.json",
+        run_dir / "checkpoints",
+    ]
+    candidates.extend(sorted(run_dir.glob("*_state.json")))
+    checkpoint_dir = run_dir / "checkpoints"
+    if checkpoint_dir.exists():
+        candidates.extend(sorted(checkpoint_dir.glob("ckpt_*.json")))
+    deduped: list[Path] = []
+    seen: set[Path] = set()
+    for path in candidates:
+        resolved = Path(path)
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        deduped.append(resolved)
+    return deduped
+
+
 def _ensure_paths_absent(paths: list[Path], *, overwrite: bool) -> None:
     if overwrite:
         return
@@ -1600,6 +2488,260 @@ def _refresh_investigation_manifest(
         policy_source=policy_source or existing.get("policy_source"),
         labels=merged_labels,
         entries=entries,
+    )
+
+
+def _refresh_planning_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+    training_result: dict[str, Any] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = [
+        artifact_entry("policy_resolved.yaml", run_dir=root, kind="policy", required=True),
+        artifact_entry("lab_mandate.json", run_dir=root, required=True),
+        artifact_entry("work_preferences.json", run_dir=root, required=True),
+        artifact_entry("run_brief.json", run_dir=root, required=True),
+        artifact_entry("data_origin.json", run_dir=root, required=True),
+        artifact_entry("domain_brief.json", run_dir=root, required=True),
+        artifact_entry("task_brief.json", run_dir=root, required=True),
+    ]
+
+    for filename in [
+        "intake_record.json",
+        "autonomy_mode.json",
+        "clarification_queue.json",
+        "assumption_log.json",
+        "context_interpretation.json",
+        "context_constraints.json",
+        "semantic_mapping.json",
+    ]:
+        path = root / filename
+        if path.exists():
+            entries.append(artifact_entry(filename, run_dir=root, required=True))
+
+    for filename in [
+        "dataset_profile.json",
+        "domain_memo.json",
+        "objective_hypotheses.json",
+        "focus_debate.json",
+        "focus_profile.json",
+        "optimization_profile.json",
+        "feature_strategy_profile.json",
+    ]:
+        path = root / filename
+        if path.exists():
+            entries.append(artifact_entry(filename, run_dir=root, required=True))
+
+    for filename in [
+        "plan.json",
+        "alternatives.json",
+        "hypotheses.json",
+        "experiment_priority_report.json",
+        "marginal_value_of_next_experiment.json",
+    ]:
+        path = root / filename
+        if path.exists():
+            entries.append(artifact_entry(filename, run_dir=root, required=True))
+
+    model_required = training_result is not None
+    state_candidates = sorted(
+        path
+        for path in root.glob("*_state.json")
+        if path.name != "normalization_state.json"
+    )
+    explicit_state_path = None
+    if training_result is not None:
+        raw_state_path = str(training_result.get("model_state_path", "")).strip()
+        if raw_state_path:
+            explicit_state_path = Path(raw_state_path)
+
+    if (root / "model_params.json").exists() or model_required:
+        entries.append(
+            artifact_entry(
+                "model_params.json",
+                run_dir=root,
+                kind="model",
+                required=model_required or (root / "model_params.json").exists(),
+            )
+        )
+    if (root / "normalization_state.json").exists():
+        entries.append(
+            artifact_entry(
+                "normalization_state.json",
+                run_dir=root,
+                kind="preprocessing",
+                required=True,
+            )
+        )
+    if explicit_state_path is not None:
+        entries.append(artifact_entry(explicit_state_path, run_dir=root, kind="model", required=True))
+    elif state_candidates:
+        entries.extend(
+            artifact_entry(path, run_dir=root, kind="model", required=True)
+            for path in state_candidates
+        )
+
+    checkpoint_dir = root / "checkpoints"
+    if checkpoint_dir.exists():
+        entries.append(artifact_entry("checkpoints", run_dir=root, kind="checkpoint", required=True))
+        entries.extend(
+            artifact_entry(path, run_dir=root, kind="checkpoint", required=True)
+            for path in sorted(checkpoint_dir.glob("ckpt_*.json"))
+        )
+
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_evidence_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_planning_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+        training_result=None,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    if (root / "experiments").exists():
+        entries.append(artifact_entry("experiments", run_dir=root, kind="experiment", required=True))
+    for filename, kind in [
+        ("experiment_registry.json", "registry"),
+        ("challenger_report.json", "report"),
+        ("ablation_report.json", "report"),
+        ("audit_report.json", "report"),
+        ("belief_update.json", "report"),
+        ("leaderboard.csv", "report"),
+        ("reports/technical_report.md", "report"),
+        ("reports/decision_memo.md", "report"),
+    ]:
+        path = root / filename
+        if path.exists():
+            entries.append(artifact_entry(filename, run_dir=root, kind=kind, required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_access_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+    training_result: dict[str, Any] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_evidence_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    surface_paths = _access_surface_output_paths(root)
+    if surface_paths["run_summary"].exists():
+        entries.append(
+            artifact_entry(
+                "run_summary.json",
+                run_dir=root,
+                kind="summary",
+                required=True,
+            )
+        )
+    if surface_paths["summary_report"].exists():
+        entries.append(
+            artifact_entry(
+                "reports/summary.md",
+                run_dir=root,
+                kind="report",
+                required=True,
+            )
+        )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
     )
 
 

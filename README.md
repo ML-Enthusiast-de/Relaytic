@@ -9,14 +9,19 @@ Relaytic is designed around a deterministic floor, specialist-agent reasoning, e
 The repository already supports a working early product baseline:
 
 - installable `relaytic` package and CLI
+- one-shot `relaytic run` orchestration for a first usable MVP surface
 - resolved policy writing and manifest creation
 - mandate and context foundation artifacts
 - free-form intake translation from human or external-agent input
 - optional clarification queues with explicit fallback assumptions
 - investigation specialists that profile datasets and resolve early modeling focus
+- Strategist planning artifacts with a concrete Builder handoff
+- a first deterministic local route from data to model inside one Relaytic run directory
+- challenger, ablation, audit, and decision-memo evidence around the first built route
+- concise run summaries for humans and stable summary artifacts for agents
 - optional local-LLM advisory paths that remain non-required
 
-The next load-bearing implementation step is Slice 05: planning and the first end-to-end deterministic route from data to model within the Relaytic architecture.
+The next load-bearing implementation step is Slice 07: completion judgment and visible workflow state.
 
 ## Design Principles
 
@@ -51,13 +56,33 @@ python -m relaytic.ui.cli scan-git-safety
 
 ## Example Workflow
 
-The current baseline supports a clean foundation -> intake -> investigation flow:
+The primary MVP surface is now a single end-to-end run command:
+
+```bash
+relaytic run --data-path path/to/data.csv --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
+```
+
+That command now carries the run through intake, investigation, planning, execution, challenger pressure, ablation checks, audit, and summary materialization.
+
+Then inspect or reuse the run:
+
+```bash
+relaytic show --run-dir artifacts/run_your_dataset_...
+relaytic evidence show --run-dir artifacts/run_your_dataset_...
+relaytic predict --run-dir artifacts/run_your_dataset_... --data-path path/to/data.csv
+```
+
+Advanced users and other agents can still use the explicit staged flow:
 
 ```bash
 relaytic foundation init --run-dir artifacts/run_demo
 relaytic intake interpret --run-dir artifacts/run_demo --data-path path/to/data.csv --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
 relaytic intake questions --run-dir artifacts/run_demo
 relaytic investigate --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic plan create --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic plan run --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic evidence run --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic run-inference --run-dir artifacts/run_demo --data-path path/to/data.csv
 ```
 
 That flow produces:
@@ -66,6 +91,12 @@ That flow produces:
 - mandate and context foundation bundles
 - intake provenance, semantic mappings, autonomy state, clarification queue, and assumption log
 - investigation outputs such as dataset profile, domain memo, objective hypotheses, and focus artifacts
+- planning outputs such as `plan.json`, route alternatives, hypotheses, and experiment priorities
+- model artifacts such as `model_params.json`, model state, and local checkpoints
+- evidence artifacts such as `experiment_registry.json`, `challenger_report.json`, `ablation_report.json`, `audit_report.json`, and `belief_update.json`
+- operator-facing reports such as `reports/technical_report.md` and `reports/decision_memo.md`
+- a machine-readable `run_summary.json`
+- a human-readable `reports/summary.md`
 
 ## Documentation Map
 

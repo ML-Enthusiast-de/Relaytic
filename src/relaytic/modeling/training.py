@@ -129,6 +129,10 @@ def train_surrogate_candidates(
     run_id: str | None = None,
     checkpoint_tag: str | None = None,
     data_references: list[str] | None = None,
+    selection_metric: str | None = None,
+    preferred_candidate_order: list[str] | None = None,
+    output_run_dir: str | Path | None = None,
+    checkpoint_base_dir: str | Path | None = None,
 ) -> dict[str, Any]:
     """Train a split-safe linear baseline and optional nonlinear comparator."""
     if not feature_columns:
@@ -184,6 +188,10 @@ def train_surrogate_candidates(
             run_id=run_id,
             checkpoint_tag=checkpoint_tag,
             data_references=data_references,
+            selection_metric=selection_metric,
+            preferred_candidate_order=preferred_candidate_order,
+            output_run_dir=output_run_dir,
+            checkpoint_base_dir=checkpoint_base_dir,
         )
     split_frames = {
         "train": frame.iloc[split.train_indices].reset_index(drop=True),
@@ -318,11 +326,18 @@ def train_surrogate_candidates(
             )
         )
 
-    best_by_validation = _select_best_candidate(candidates, task_type=task_profile.task_type)
+    best_by_validation = _select_best_candidate(
+        candidates,
+        task_type=task_profile.task_type,
+        selection_metric=selection_metric,
+        preferred_candidate_order=preferred_candidate_order,
+    )
     selected_candidate = _resolve_selected_candidate(
         requested=requested,
         candidates=candidates,
         task_type=task_profile.task_type,
+        selection_metric=selection_metric,
+        preferred_candidate_order=preferred_candidate_order,
     )
     selected_model_name = selected_candidate.model_family
     selected_model_obj: Any
@@ -340,7 +355,11 @@ def train_surrogate_candidates(
         raise RuntimeError("Selected model object is unavailable.")
 
     artifact_store = ArtifactStore()
-    run_dir = artifact_store.create_run_dir(run_id=run_id)
+    if output_run_dir is not None:
+        run_dir = Path(output_run_dir)
+        run_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        run_dir = artifact_store.create_run_dir(run_id=run_id)
     normalizer_path: str | None = None
     if normalizer is not None:
         normalizer_path = str(artifact_store.save_normalizer(run_dir=run_dir, normalizer=normalizer))
@@ -387,9 +406,11 @@ def train_surrogate_candidates(
             "preprocessing": preprocessing,
             "comparison": [item.to_dict() for item in candidates],
             "professional_analysis": professional_analysis,
+            "selection_metric": str(selection_metric or "").strip() or "auto",
+            "preferred_candidate_order": list(preferred_candidate_order or []),
         },
     )
-    checkpoint_store = ModelCheckpointStore()
+    checkpoint_store = ModelCheckpointStore(base_dir=checkpoint_base_dir or "artifacts/checkpoints")
     checkpoint = checkpoint_store.create_checkpoint(
         model_name=selected_model_name,
         run_dir=run_dir,
@@ -432,6 +453,8 @@ def train_surrogate_candidates(
             "validation": selected_candidate.validation_metrics,
             "test": selected_candidate.test_metrics,
         },
+        "selection_metric": str(selection_metric or "").strip() or "auto",
+        "preferred_candidate_order": list(preferred_candidate_order or []),
     }
 
 
@@ -478,6 +501,10 @@ def _train_classification_candidates(
     run_id: str | None,
     checkpoint_tag: str | None,
     data_references: list[str] | None,
+    selection_metric: str | None,
+    preferred_candidate_order: list[str] | None,
+    output_run_dir: str | Path | None,
+    checkpoint_base_dir: str | Path | None,
 ) -> dict[str, Any]:
     split_frames = {
         "train": frame.iloc[split.train_indices].reset_index(drop=True),
@@ -641,11 +668,18 @@ def _train_classification_candidates(
             lagged_tree_candidate.train_metrics.get("decision_threshold", 0.5)
         )
 
-    best_by_validation = _select_best_candidate(candidates, task_type=str(task_profile.task_type))
+    best_by_validation = _select_best_candidate(
+        candidates,
+        task_type=str(task_profile.task_type),
+        selection_metric=selection_metric,
+        preferred_candidate_order=preferred_candidate_order,
+    )
     selected_candidate = _resolve_selected_candidate(
         requested=requested,
         candidates=candidates,
         task_type=str(task_profile.task_type),
+        selection_metric=selection_metric,
+        preferred_candidate_order=preferred_candidate_order,
     )
     selected_model_name = selected_candidate.model_family
     if selected_model_name == "logistic_regression":
@@ -662,7 +696,11 @@ def _train_classification_candidates(
         raise RuntimeError("Selected classifier model object is unavailable.")
 
     artifact_store = ArtifactStore()
-    run_dir = artifact_store.create_run_dir(run_id=run_id)
+    if output_run_dir is not None:
+        run_dir = Path(output_run_dir)
+        run_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        run_dir = artifact_store.create_run_dir(run_id=run_id)
     normalizer_path: str | None = None
     if normalizer is not None:
         normalizer_path = str(artifact_store.save_normalizer(run_dir=run_dir, normalizer=normalizer))
@@ -778,9 +816,11 @@ def _train_classification_candidates(
             "threshold_policy": str(threshold_policy or "").strip() or "auto",
             "lag_horizon_samples": int(lagged_horizon) if lagged_horizon is not None else 0,
             "professional_analysis": professional_analysis,
+            "selection_metric": str(selection_metric or "").strip() or "auto",
+            "preferred_candidate_order": list(preferred_candidate_order or []),
         },
     )
-    checkpoint_store = ModelCheckpointStore()
+    checkpoint_store = ModelCheckpointStore(base_dir=checkpoint_base_dir or "artifacts/checkpoints")
     checkpoint = checkpoint_store.create_checkpoint(
         model_name=selected_model_name,
         run_dir=run_dir,
@@ -822,6 +862,8 @@ def _train_classification_candidates(
             "validation": selected_candidate.validation_metrics,
             "test": selected_candidate.test_metrics,
         },
+        "selection_metric": str(selection_metric or "").strip() or "auto",
+        "preferred_candidate_order": list(preferred_candidate_order or []),
     }
 
 
@@ -1721,11 +1763,23 @@ def _select_best_candidate(
     candidates: list[CandidateMetrics],
     *,
     task_type: str,
+    selection_metric: str | None = None,
+    preferred_candidate_order: list[str] | None = None,
 ) -> CandidateMetrics:
+    preferred_order = {
+        str(model_family).strip(): index
+        for index, model_family in enumerate(preferred_candidate_order or [])
+        if str(model_family).strip()
+    }
     ranked = sorted(
         candidates,
         key=lambda item: (
-            _candidate_validation_rank(item=item, task_type=task_type),
+            _candidate_validation_rank(
+                item=item,
+                task_type=task_type,
+                selection_metric=selection_metric,
+            ),
+            preferred_order.get(item.model_family, len(preferred_order) + _MODEL_TIEBREAK.get(item.model_family, 9)),
             _MODEL_TIEBREAK.get(item.model_family, 9),
         ),
     )
@@ -1737,17 +1791,41 @@ def _resolve_selected_candidate(
     requested: str,
     candidates: list[CandidateMetrics],
     task_type: str,
+    selection_metric: str | None = None,
+    preferred_candidate_order: list[str] | None = None,
 ) -> CandidateMetrics:
     if requested == "auto":
-        return _select_best_candidate(candidates, task_type=task_type)
+        return _select_best_candidate(
+            candidates,
+            task_type=task_type,
+            selection_metric=selection_metric,
+            preferred_candidate_order=preferred_candidate_order,
+        )
     for item in candidates:
         if item.model_family == requested:
             return item
-    return _select_best_candidate(candidates, task_type=task_type)
+    return _select_best_candidate(
+        candidates,
+        task_type=task_type,
+        selection_metric=selection_metric,
+        preferred_candidate_order=preferred_candidate_order,
+    )
 
 
-def _candidate_validation_rank(*, item: CandidateMetrics, task_type: str) -> tuple[float, ...]:
+def _candidate_validation_rank(
+    *,
+    item: CandidateMetrics,
+    task_type: str,
+    selection_metric: str | None = None,
+) -> tuple[float, ...]:
     metrics = item.validation_metrics
+    explicit_metric_rank = _explicit_selection_metric_rank(
+        metrics=metrics,
+        task_type=task_type,
+        selection_metric=selection_metric,
+    )
+    if explicit_metric_rank is not None:
+        return explicit_metric_rank
     if is_classification_task(task_type):
         if task_type in {"fraud_detection", "anomaly_detection"}:
             return (
@@ -1768,6 +1846,53 @@ def _candidate_validation_rank(*, item: CandidateMetrics, task_type: str) -> tup
         float(metrics.get("mae", float("inf"))),
         float(metrics.get("rmse", float("inf"))),
     )
+
+
+def _explicit_selection_metric_rank(
+    *,
+    metrics: dict[str, float],
+    task_type: str,
+    selection_metric: str | None,
+) -> tuple[float, ...] | None:
+    normalized = str(selection_metric or "").strip().lower().replace("-", "_")
+    aliases = {
+        "": None,
+        "auto": None,
+        "stability_adjusted_mae": "mae",
+        "mae_per_latency": "mae",
+        "latency_weighted_f1": "f1",
+    }
+    resolved = aliases.get(normalized, normalized)
+    if resolved is None:
+        return None
+    higher_is_better = {"accuracy", "precision", "recall", "f1", "pr_auc", "roc_auc", "r2"}
+    lower_is_better = {"log_loss", "mae", "rmse"}
+    if is_classification_task(task_type) and resolved in higher_is_better:
+        return (
+            -float(metrics.get(resolved, 0.0)),
+            -float(metrics.get("f1", 0.0)),
+            -float(metrics.get("accuracy", 0.0)),
+            float(metrics.get("log_loss", float("inf"))),
+        )
+    if is_classification_task(task_type) and resolved in lower_is_better:
+        return (
+            float(metrics.get(resolved, float("inf"))),
+            -float(metrics.get("f1", 0.0)),
+            -float(metrics.get("accuracy", 0.0)),
+        )
+    if not is_classification_task(task_type) and resolved in lower_is_better:
+        return (
+            float(metrics.get(resolved, float("inf"))),
+            float(metrics.get("mae", float("inf"))),
+            float(metrics.get("rmse", float("inf"))),
+        )
+    if not is_classification_task(task_type) and resolved in higher_is_better:
+        return (
+            -float(metrics.get(resolved, 0.0)),
+            float(metrics.get("mae", float("inf"))),
+            float(metrics.get("rmse", float("inf"))),
+        )
+    return None
 
 
 def _save_selected_model_state(*, model: Any, run_dir: Path, model_name: str) -> Path:

@@ -138,14 +138,14 @@ def write_manifest(
 
 def _relative_path(path: Path, *, run_dir: str | Path | None) -> str:
     if run_dir is None:
-        return str(path)
+        return path.as_posix() if not path.is_absolute() else str(path)
     root = Path(run_dir)
     if path.is_absolute():
         try:
-            return str(path.relative_to(root))
+            return path.relative_to(root).as_posix()
         except ValueError:
             return str(path)
-    return str(path)
+    return path.as_posix()
 
 
 def _resolve_entry_path(path: Path, *, run_dir: str | Path | None) -> Path:

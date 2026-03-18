@@ -13,7 +13,7 @@ def test_artifact_entry_tracks_relative_paths_and_size(tmp_path: Path) -> None:
 
     entry = artifact_entry(report, run_dir=run_dir, kind="report", required=True)
 
-    assert entry.path == str(Path("reports") / "summary.md")
+    assert entry.path == Path("reports/summary.md").as_posix()
     assert entry.kind == "report"
     assert entry.required is True
     assert entry.exists is True

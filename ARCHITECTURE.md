@@ -15,7 +15,9 @@ Relaytic is organized as a staged artifact pipeline.
 3. Investigation
    Specialist agents inspect the dataset, generate grounded hypotheses, and resolve the initial modeling focus.
 4. Planning and execution
-   Later slices will add Strategist, the first deterministic end-to-end modeling route, challenger paths, and lifecycle decisions.
+   Strategist turns investigation outputs into a concrete Builder handoff, and the first deterministic route executes into the same Relaytic run directory.
+5. Evidence pressure
+   Challenger, ablation, and audit specialists treat the first built route as a provisional champion, then write leaderboard, report, and belief-update artifacts for humans and external agents.
 
 ## Core System Principles
 
@@ -34,6 +36,8 @@ They can improve:
 - free-form intake interpretation
 - semantic mapping from human language to dataset schema
 - bounded advisory support inside investigation specialists
+- bounded advisory support inside planning and route selection
+- bounded advisory support inside evidence review and memo refinement
 
 They must not replace:
 
@@ -50,8 +54,11 @@ The repository currently implements the following product layers:
 - Slice 02: mandate and context foundation
 - Slice 03: investigation baseline with Scout, Scientist, and Focus Council
 - Slice 04: intake and translation with autonomy, clarification, and assumption artifacts
+- Slice 05: Strategist planning, Builder handoff, and the first deterministic route from data to model
+- Slice 05A: MVP-access orchestration with `relaytic run`, `relaytic show`, `relaytic predict`, and persisted run summaries
+- Slice 06: challenger, ablation, provisional audit, leaderboard, and decision-memo evidence around the first built route
 
-The next planned layer is Slice 05: planning and the first deterministic route from data to model.
+The next planned layer is Slice 07: completion judgment and visible workflow state.
 
 ## Current Artifact Baseline
 
@@ -79,6 +86,21 @@ Relaytic already standardizes several load-bearing artifacts:
 - `focus_profile.json`
 - `optimization_profile.json`
 - `feature_strategy_profile.json`
+- `plan.json`
+- `alternatives.json`
+- `hypotheses.json`
+- `experiment_priority_report.json`
+- `marginal_value_of_next_experiment.json`
+- `run_summary.json`
+- `reports/summary.md`
+- `experiment_registry.json`
+- `challenger_report.json`
+- `ablation_report.json`
+- `audit_report.json`
+- `belief_update.json`
+- `leaderboard.csv`
+- `reports/technical_report.md`
+- `reports/decision_memo.md`
 
 ## Current CLI Baseline
 
@@ -95,6 +117,14 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic intake show`
 - `relaytic intake questions`
 - `relaytic investigate`
+- `relaytic plan create`
+- `relaytic plan run`
+- `relaytic plan show`
+- `relaytic evidence run`
+- `relaytic evidence show`
+- `relaytic run`
+- `relaytic show`
+- `relaytic predict`
 
 Additional runtime commands from earlier repository layers still exist while later slices replace deeper internal paths. Those commands are not the long-term architectural center of the product.
 

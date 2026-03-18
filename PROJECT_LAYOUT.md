@@ -37,7 +37,10 @@ Relaytic/
       intake/
       investigation/
       mandate/
+      evidence/
+      planning/
       policies/
+      runs/
     corr2surrogate/  # compatibility shim only
   tests/
   README.md
@@ -59,9 +62,17 @@ Relaytic/
 - `src/relaytic/context/` owns context foundation objects and writers
 - `src/relaytic/intake/` owns intake translation and interpretation artifacts
 - `src/relaytic/investigation/` owns investigation specialists and focus artifacts
+- `src/relaytic/planning/` owns Strategist planning, Builder handoff, and planning artifact storage
+- `src/relaytic/evidence/` owns challenger, ablation, audit, leaderboard, and decision-memo artifacts
+- `src/relaytic/runs/` owns MVP-access summaries, run reports, and top-level run presentation helpers
 - `src/relaytic/artifacts/` owns manifest helpers
 - `src/relaytic/policies/` owns policy loading and resolved-policy writing
 - `src/corr2surrogate/` exists only to preserve a narrow temporary compatibility boundary
+
+## Reserved Next Package Boundaries
+
+- `src/relaytic/completion/` is reserved for the Slice 07 completion-governor layer
+- `src/relaytic/memory/` is reserved for the Slice 09A analog-retrieval and run-memory layer
 
 ## Operational Directories
 

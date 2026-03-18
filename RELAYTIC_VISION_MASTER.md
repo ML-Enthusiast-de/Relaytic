@@ -72,6 +72,85 @@ Transform this repository from a “data -> surrogate model” framework into a 
 
 ---
 
+## Frontier sharpness doctrine
+
+Relaytic is not frontier because it contains agents, many artifacts, or optional LLMs.
+
+Relaytic is frontier only if it materially expands what a local inference system can:
+
+- discover about an unfamiliar dataset
+- justify with auditable evidence
+- improve through challenger pressure
+- control under real mandate and policy constraints
+- expose as a reusable judgment surface for humans and other agents
+
+The frontier thesis is therefore not "more orchestration."
+It is:
+
+- **problem-formulation search**, not just model-family search
+- **evidence-pressure loops**, not just single-pass training
+- **mandate-aware autonomous judgment**, not just score chasing
+- **agent-usable decision surfaces**, not just human-readable reports
+- **validated self-improvement**, not just prompt churn or hidden heuristic drift
+
+Any slice that does not strengthen at least one of those axes is polish, not frontier progress.
+
+## Anti-mediocrity guardrails
+
+Relaytic must not degrade into:
+
+- **planner theater**
+  many agent names but one real decision path
+- **artifact theater**
+  more JSON without stronger judgment or controllability
+- **benchmark theater**
+  polished benchmark claims without hard reference comparisons and failure reports
+- **LLM theater**
+  vague semantic authority replacing deterministic evidence
+- **UI theater**
+  a polished shell over weak model-search and weak challenge loops
+
+If a proposed feature mostly increases surface area without increasing search power, evidence quality, autonomy, operator leverage, or benchmark strength, it should be deprioritized.
+
+## Proof obligations
+
+Every ambitious Relaytic claim should be falsifiable and backed by at least one of:
+
+- a deterministic artifact
+- a regression or adversarial test
+- a golden-path demo
+- a benchmark or reference-comparison protocol
+- an explicit failure report plus next-experiment recommendation when Relaytic loses
+
+By the time the product is mature, Relaytic should be able to show, not just claim, that:
+
+- it can match strong standard baselines on ordinary structured-data tasks
+- it can exceed them when mandate, reliability, lifecycle, or operator constraints matter
+- it can be driven end to end by either a human or an external agent through stable tool surfaces
+- it can explain why it continued, stopped, recalibrated, retrained, promoted, or rolled back
+- it improves itself only through validated method changes rather than silent behavior drift
+
+All major performance claims should always be separated into:
+
+- deterministic floor
+- local-LLM-amplified mode
+- optional frontier-assisted mode
+- dojo-improved mode
+
+This separation is mandatory. Otherwise the repo will drift into confusing or inflated claims.
+
+## Current leverage points
+
+For the repository as it exists today, the next major leverage points are not "more agents" or "more reports."
+
+They are:
+
+- a real completion governor that fuses the full artifact graph into explicit next-step judgment
+- memory-guided analog retrieval that improves route choice and challenger design
+- benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, and lifecycle constraints actually matter
+
+These are the places where the project most needs to become stronger if it wants to look like the next big thing rather than a well-structured research product.
+
 ## 1. Product definition
 
 ### New product identity

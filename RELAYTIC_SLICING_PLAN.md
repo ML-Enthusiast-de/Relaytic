@@ -12,7 +12,31 @@ Every slice must:
 - update `IMPLEMENTATION_STATUS.md`
 - update `MIGRATION_MAP.md` if boundaries move
 - keep optional dependencies optional
+- strengthen at least one frontier axis once the repo has a working route
+- keep human and agent control surfaces aligned
+- map every new intelligence claim to artifacts plus tests or benchmark hooks
 - leave the repository coherent after completion
+
+## Frontier proof track
+
+The slices are not only a feature order. They are also a proof order.
+
+From Slice 05 onward, Relaytic should keep these cross-cutting proof tracks alive:
+
+- **golden autonomous path**
+  one stable dataset -> intent -> judged model run that proves the main loop still works
+- **challenger path**
+  one case where the first answer can be overturned or materially weakened by challenger pressure
+- **agent-control path**
+  one non-interactive JSON-first flow that another agent could drive end to end
+- **governor path**
+  one case where Relaytic explicitly decides whether to stop, continue, benchmark, or seek more evidence and the reason is inspectable
+- **memory path**
+  once Slice 09A lands, one case where analog retrieval materially changes route choice, challenger design, or completion reasoning with visible provenance
+- **benchmark path**
+  formal benchmark parity is Slice 11, but benchmark harness stubs and reference logging should start earlier whenever route, evidence, or completion logic changes
+
+If a later slice adds "smartness" without strengthening at least one of those proof tracks, it is not sharp enough.
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -106,11 +130,13 @@ Required outputs:
 
 Goal:
 - Strategist baseline
+- explicit Strategist -> Builder handoff
 - one working deterministic tabular route
 - metric selection
 - split selection
 - feature-strategy integration
 - experiment-priority integration
+- same-run planning plus model artifact execution
 
 Required outputs:
 - `plan.json`
@@ -119,35 +145,86 @@ Required outputs:
 - `experiment_priority_report.json`
 - `marginal_value_of_next_experiment.json`
 
+Expected behavior:
+- `relaytic plan create` must write a concrete Builder handoff, not just abstract route notes
+- `relaytic plan run` must execute the first deterministic route in the same run directory
+- planning must distinguish hard feature guardrails from soft heuristic risk signals so autonomous runs do not collapse when investigation heuristics are overly conservative
+
+## Slice 05A - MVP access and operator surface
+
+Goal:
+- one obvious end-to-end entrypoint
+- human-friendly summary surface
+- stable agent-friendly summary artifact
+- simple prediction surface for built runs
+- preserve the specialist architecture underneath
+
+Required outputs:
+- `run_summary.json`
+- `reports/summary.md`
+
+Required behavior:
+- `relaytic run` must orchestrate intake, investigation, planning, and the first execution route
+- `relaytic show` must summarize a run even if the summary artifacts were not originally created
+- `relaytic predict` must make inference discoverable without forcing users into the lower-level command surface
+- the MVP shell must remain a thin access layer over the real Relaytic pipeline, not a replacement for it
+
 ## Slice 06 - Experimentation, challenger, audit, reports
 
 Goal:
-- experiment registry
-- challenger baseline
-- ablation baseline
-- audit outputs
-- first real reports
+- treat the selected Builder route as a challengeable champion, not a silent winner
+- add one real challenger branch
+- add one bounded ablation suite
+- add one provisional audit pass
+- expose the outcome as clear human and agent surfaces
+- keep the MVP one-command usable while preserving explicit specialist control
 
 Required outputs:
+- `experiment_registry.json`
+- `challenger_report.json`
 - `leaderboard.csv`
 - `ablation_report.json`
+- `audit_report.json`
 - `belief_update.json`
 - `reports/summary.md`
 - `reports/technical_report.md`
 - `reports/decision_memo.md`
 
+Required behavior:
+- `relaytic evidence run` must be able to attach Slice 06 evidence to an existing executed run or autonomously ensure the executed route exists first
+- `relaytic run` must include Slice 06 evidence pressure by default so the MVP does not stop at the first built model
+- the evidence layer must remain deterministic by default and only use local-LLM advisory help for bounded memo refinement
+- the output must make the provisional recommendation visible to both humans and external agents
+
 ## Slice 07 - Completion judgment and visible workflow state
 
 Goal:
-- Completion Judge
+- Completion Judge as Inference Governor
 - stage tracking
-- status board baseline
+- explicit blocking-layer diagnosis
+- mandate-vs-evidence adjudication
+- machine-actionable next-action queue
 - clear done/continue outputs
 
 Required outputs:
 - `completion_decision.json`
 - `run_state.json`
 - `stage_timeline.json`
+- `mandate_evidence_review.json`
+- `blocking_analysis.json`
+- `next_action_queue.json`
+
+Required behavior:
+- completion must consume mandate, context, intake, investigation, planning, and evidence artifacts together rather than only final metrics
+- completion outputs must be machine-actionable, not narrative only
+- the current stage and next recommended action must be visible in both human and agent surfaces
+- completion should turn ambiguity into explicit confidence and blocking reasons rather than hidden state
+- completion must explicitly diagnose whether the current bottleneck is route breadth, evidence insufficiency, unresolved semantic ambiguity, missing benchmark comparison, missing memory support, or operator/policy constraint
+- completion must be able to say "continue experimentation because the challenger space is still too narrow" rather than treating every executed run as equally complete
+- completion must standardize its primary action vocabulary rather than inventing per-run phrasing
+- completion must expose whether mandate and evidence agree, conflict, or remain unresolved
+- completion must leave an explicit handoff into Slice 09A or Slice 11 when the real limitation is missing memory support or missing benchmark context
+- completion must remain deterministic by default, with optional local-LLM help limited to bounded explanation refinement
 
 ## Slice 08 - Lifecycle baseline
 
@@ -161,6 +238,10 @@ Required outputs:
 - `promotion_decision.json`
 - `rollback_decision.json`
 - `champion_vs_candidate.json`
+
+Required behavior:
+- lifecycle decisions must be evidence-backed, reversible, and easy for an external agent to consume
+- Relaytic must distinguish "keep current champion", "recalibrate", "retrain", "promote challenger", and "roll back" as separate actions, not one blended outcome
 
 ## Slice 09 - Intelligence amplification and local-LLM assistance
 
@@ -181,6 +262,29 @@ Required outputs:
 - `semantic_task_results.json`
 - `intelligence_escalation.json`
 
+Required behavior:
+- intelligence amplification must improve bounded semantic and strategic tasks without collapsing the deterministic floor
+- Relaytic must always be able to state which judgments came from deterministic evidence and which were LLM-amplified
+
+## Slice 09A - Run memory and analog retrieval
+
+Goal:
+- run memory retrieval
+- analog-case search
+- route-prior recovery
+- challenger-prior suggestions
+
+Required outputs:
+- `memory_retrieval.json`
+- `analog_run_candidates.json`
+- `route_prior_context.json`
+- `challenger_prior_suggestions.json`
+
+Required behavior:
+- memory must be advisory, provenance-carrying, and challengeable by current-run evidence
+- retrieved analogs must influence planning, challenger design, and completion reasoning without silently overriding the current dataset
+- memory failures or low-confidence retrieval must degrade gracefully into deterministic no-memory behavior
+
 ## Slice 10 - Feedback assimilation
 
 Goal:
@@ -196,6 +300,11 @@ Required outputs:
 - `policy_update_suggestions.json`
 - `route_prior_updates.json`
 
+Required behavior:
+- validated feedback may change future defaults, but no accepted feedback may silently rewrite behavior without an inspectable effect report
+- adversarial or low-quality feedback should degrade trust, not quietly pollute priors
+- feedback updates must remain distinct from run-memory retrieval so Relaytic can tell whether a prior came from historical evidence, accepted feedback, or both
+
 ## Slice 11 - Benchmark parity and reference approaches
 
 Goal:
@@ -209,6 +318,11 @@ Required outputs:
 - `reference_approach_matrix.json`
 - `benchmark_parity_report.json`
 - `gold_standard_comparison.json`
+
+Required behavior:
+- benchmark results must separate deterministic-floor Relaytic, local-LLM-amplified Relaytic, and dojo-improved Relaytic
+- benchmark suites must include both ordinary structured-data cases and operator-constrained or mandate-heavy cases
+- benchmark failures must emit next-experiment recommendations, not just pass/fail summaries
 
 ## Slice 12 - Dojo mode and guarded self-improvement
 
@@ -224,6 +338,10 @@ Required outputs:
 - `dojo_results.json`
 - `dojo_promotions.json`
 - `architecture_proposals.json`
+
+Required behavior:
+- dojo outputs must remain quarantined until they beat the incumbent on benchmark and golden-case validation
+- no dojo promotion may become default behavior without an explicit promotion artifact
 
 ## Slice 13 - Accelerated and distributed local execution
 
