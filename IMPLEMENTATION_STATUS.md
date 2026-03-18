@@ -136,6 +136,7 @@ The repository currently supports:
 - wired Pandera into intake validation, statsmodels into evidence audit diagnostics, imbalanced-learn into rare-event challenger execution, and PyOD into anomaly challenger execution
 - adopted bundled public datasets for stable end-to-end regression, binary-classification, and multiclass-classification tests without introducing network-bound CI behavior
 - sharpened `RELAYTIC_SLICING_PLAN.md` into a stricter future-slice execution contract with explicit intelligence sources, proof obligations, fallbacks, and a preferred post-MVP execution order
+- folded explicit optional SOTA routine tracks into the slicing plan so future lifecycle, memory, benchmark, and polish slices know where MAPIE, Evidently, MLflow, OpenTelemetry, OpenLineage, FLAML, and later Feast fit
 
 ## Compatibility Boundary
 

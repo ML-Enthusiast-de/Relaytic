@@ -13,6 +13,7 @@ Every slice must:
 - update `MIGRATION_MAP.md` if boundaries move
 - keep optional dependencies optional
 - prefer mature OSS libraries behind explicit adapters when they strengthen deterministic validation, baselines, diagnostics, feature breadth, or benchmark parity
+- prefer high-leverage optional adapters for uncertainty, monitoring, lineage, registries, and benchmark baselines when they strengthen the proof track faster than in-core reimplementation
 - strengthen at least one frontier axis once the repo has a working route
 - keep human and agent control surfaces aligned
 - map every new intelligence claim to artifacts plus tests or benchmark hooks
@@ -60,6 +61,39 @@ Disallowed intelligence claims:
 - hidden prompt magic without artifacts
 - silent behavior changes from optional dependencies
 - benchmark claims without separation between deterministic, local-LLM, frontier, and dojo modes
+
+## High-leverage external routines to consider
+
+These are not mandatory core dependencies. They are pre-approved optional adapter candidates because they can accelerate frontier-grade capability without diluting Relaytic's judgment core.
+
+- **MAPIE**
+  use for conformal uncertainty, calibrated prediction intervals/sets, and abstention-aware lifecycle decisions
+  strongest fit: Slice 08 and Slice 11
+- **Evidently**
+  use for drift, data-quality, and monitoring-oriented evidence views
+  strongest fit: Slice 08 and later lifecycle/reporting work
+- **MLflow registry/tracking**
+  use for optional export of model versions, aliases, promotion ledgers, and artifact lineage
+  strongest fit: Slice 08 and Slice 15
+- **OpenTelemetry**
+  use for traces, metrics, and structured observability around agent and run execution
+  strongest fit: Slice 08 and Slice 15
+- **OpenLineage**
+  use for dataset/job/run lineage beyond Relaytic's internal artifact graph
+  strongest fit: Slice 08 and Slice 15
+- **FLAML**
+  use as a strong reference AutoML baseline in benchmark and parity work
+  strongest fit: Slice 11
+- **Feast**
+  use later for point-in-time feature retrieval and feature-serving alignment
+  strongest fit: late lifecycle/serving work after Slice 08 and Slice 15
+
+Adapter rule:
+
+- every external routine must stay behind an explicit Relaytic adapter
+- every adapter must expose self-checks, version capture, and graceful fallback
+- no optional library may become a hidden source of truth for mandate, policy, or final judgment
+- no optional library should enter the guaranteed baseline unless the deterministic floor remains intact without it
 
 ## Frontier proof track
 
@@ -315,14 +349,17 @@ Required behavior:
 - lifecycle must use current evidence, completion state, and fresh-data behavior together rather than watching only one scalar metric
 - lifecycle must tell the difference between "model still good", "calibration is stale", "data shifted but route may still hold", and "route choice is no longer strong enough"
 - lifecycle must leave a clean handoff into monitoring and later feedback/memory slices rather than burying state inside one report
+- optional uncertainty and monitoring adapters should be considered here first, especially MAPIE for conformal decision support and Evidently for richer drift/data-quality evidence
+- optional registry and observability exports should be considered here second, especially MLflow for promotion ledgers and OpenTelemetry/OpenLineage for run observability and lineage
 
 First implementation moves:
 
 1. Add `src/relaytic/lifecycle/` models, storage, and decision agents.
 2. Build champion/candidate loaders over existing run, evidence, and completion artifacts.
 3. Implement a deterministic lifecycle governor with explicit action thresholds and reason codes.
-4. Add a minimal human/agent CLI surface for lifecycle review.
-5. Add fresh-data and stale-data tests that force recalibrate, retrain, promote, and rollback branches.
+4. Add optional adapter slots for conformal uncertainty, richer monitoring evidence, registry export, and observability export.
+5. Add a minimal human/agent CLI surface for lifecycle review.
+6. Add fresh-data and stale-data tests that force recalibrate, retrain, promote, and rollback branches.
 
 Minimum proof:
 
@@ -477,14 +514,16 @@ Required behavior:
 - benchmark failures must emit next-experiment recommendations, not just pass/fail summaries
 - benchmark reporting must compare Relaytic against explicit reference approaches, not against vague internal expectations
 - benchmark results must expose where Relaytic wins because of judgment, lifecycle handling, or constraints rather than raw score alone
+- strong optional reference baselines should be used here where they increase honesty faster than in-core baseline rebuilding, especially FLAML for AutoML parity and MAPIE-backed uncertainty-aware comparisons where relevant
 
 First implementation moves:
 
 1. Freeze the benchmark schema and result taxonomy.
-2. Build reference baselines with the current mature-library adapter stack.
+2. Build reference baselines with the current mature-library adapter stack plus optional FLAML where it materially strengthens parity claims.
 3. Add ordinary public datasets plus constrained/operator-heavy cases that the raw-score baseline does not optimize for.
-4. Emit benchmark gap reports with next-experiment recommendations.
-5. Keep deterministic, local-LLM, frontier, and dojo modes separate in every report.
+4. Add uncertainty-aware comparisons where abstention, calibration, or coverage matter.
+5. Emit benchmark gap reports with next-experiment recommendations.
+6. Keep deterministic, local-LLM, frontier, and dojo modes separate in every report.
 
 Minimum proof:
 
@@ -611,6 +650,7 @@ Required behavior:
 - polish must not erase inspectability or the specialist architecture
 - demos must prove substance, not only CLI cosmetics
 - onboarding, backup, restore, doctor, and integrations should make Relaytic survivable for real operator use
+- optional ecosystem exports should be made operable here only after their upstream slices are proven, especially registry export, observability export, and later feature-serving alignment
 
 Minimum proof:
 

@@ -25,6 +25,8 @@ Do not let them replace:
 
 - `scikit-learn`
   Use for reference baselines, bundled public datasets, preprocessing, calibration, and metric parity checks.
+- `MAPIE`
+  Use for conformal uncertainty, calibrated prediction intervals/sets, and abstention-aware decision support.
 - `imbalanced-learn`
   Use for rare-event challengers and imbalance-focused ablations.
 - `statsmodels`
@@ -33,6 +35,16 @@ Do not let them replace:
   Use for dataframe schema validation around intake, execution, and agent-facing payloads.
 - `PyOD`
   Use for anomaly challengers when the native challenger space needs broader detector families.
+- `Evidently`
+  Use for drift, data quality, and monitoring-oriented lifecycle evidence.
+- `MLflow`
+  Use for optional tracking and registry export when promotion, aliases, and lineage need stronger external interoperability.
+- `OpenTelemetry`
+  Use for traces, metrics, and structured observability across agent and run execution.
+- `OpenLineage`
+  Use for job/run/dataset lineage when Relaytic needs interoperable external lineage views.
+- `FLAML`
+  Use as a strong benchmark and parity baseline for Slice 11.
 
 ## Targeted Later Candidates
 
@@ -46,8 +58,8 @@ Do not let them replace:
   For streaming, drift, and incremental-monitoring slices.
 - `SHAP`
   For selective post-hoc explanation surfaces.
-- `Evidently`
-  For optional monitoring and reporting views.
+- `Feast`
+  For point-in-time feature retrieval and later feature-serving alignment once lifecycle and serving surfaces mature.
 
 ## Integration Rules
 
@@ -56,6 +68,7 @@ Do not let them replace:
 - record library name and version when results influence artifacts
 - treat third-party outputs as evidence inputs, not hidden sources of truth
 - prefer offline-stable public datasets in tests over network-bound dataset fetches
+- add self-check and graceful fallback behavior before trusting any new adapter in the main proof path
 
 ## Discoverability
 

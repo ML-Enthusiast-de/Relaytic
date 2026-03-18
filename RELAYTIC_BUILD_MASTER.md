@@ -29,6 +29,15 @@ Codex must:
 - keep a golden proof path alive while building
 - keep artifacts stable and inspectable
 
+When mature external routines can strengthen a slice faster than in-core reinvention, prefer explicit optional adapters with self-checks and graceful fallback. Current high-leverage candidates are:
+
+- MAPIE for conformal uncertainty
+- Evidently for monitoring evidence
+- MLflow registry/tracking export
+- OpenTelemetry and OpenLineage for observability and lineage
+- FLAML for reference benchmark parity
+- Feast later for feature retrieval/serving alignment
+
 ## Frontier discipline
 
 Relaytic should be treated as frontier work only when a slice strengthens at least one of these axes:
@@ -130,6 +139,7 @@ If the goal is to turn the current implementation into something that looks genu
 - benchmark-separated proof that Relaytic is stronger under mandate, reliability, and lifecycle constraints rather than only on raw score
 
 Slices 07, 09A, and 11 should be treated as the main novelty unlocks, not just as supporting features.
+Slices 08 and 09 are the main operability and bounded-intelligence unlocks that make those novelty slices more believable.
 
 ## Source of truth precedence
 
