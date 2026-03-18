@@ -22,11 +22,12 @@ Current package rule:
 - `src/relaytic/planning/` owns Slice 05 Strategist planning, Builder handoff, and planning artifact persistence
 - `src/relaytic/runs/` owns Slice 05A MVP-access summaries and human-readable run presentation
 - `src/relaytic/evidence/` owns Slice 06 challenger, ablation, audit, leaderboard, and evidence-report artifacts
+- `src/relaytic/completion/` owns Slice 07 completion-governor logic and artifact persistence
+- `src/relaytic/integrations/` owns optional third-party capability discovery and adapter-scoped inventory surfaces
 - `src/corr2surrogate/` is a temporary shim that forwards legacy imports
 
 Reserved next canonical boundaries:
 
-- `src/relaytic/completion/` is reserved for Slice 07 completion-governor logic and artifact persistence
 - `src/relaytic/memory/` is reserved for Slice 09A analog retrieval, route priors, and challenger priors
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
@@ -131,9 +132,13 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic plan show`
 - `relaytic evidence run`
 - `relaytic evidence show`
+- `relaytic status`
+- `relaytic completion review`
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
+- `relaytic integrations show`
+- `relaytic integrations self-check`
 - `relaytic setup-local-llm`
 - `relaytic run-agent-session`
 - `relaytic run-agent1-analysis`
@@ -189,6 +194,13 @@ Minimum guaranteed surfaces at this stage:
 - repo-specific environment variables should use the `RELAYTIC_*` prefix
 - legacy `C2S_*` variables may be accepted only as compatibility fallbacks
 - no raw secrets may be written into tracked docs, tests, or artifacts
+
+## External Capability Contract
+
+- mature third-party libraries may be adopted when they strengthen baselines, diagnostics, validation, feature breadth, monitoring, or benchmark parity
+- those dependencies must remain behind explicit adapter boundaries instead of becoming hidden core requirements
+- Relaytic artifacts remain the source of truth for policy, judgment, and provenance even when external libraries contribute evidence
+- offline-stable public datasets are preferred in automated tests over network-bound dataset fetches
 
 ## Intake Autonomy Contract
 

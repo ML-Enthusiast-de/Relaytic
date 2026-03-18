@@ -31,6 +31,25 @@ def _write_dataset(path: Path) -> Path:
     return path
 
 
+def _write_multiclass_dataset(path: Path) -> Path:
+    rows = [
+        ["feature_a", "feature_b", "wine_class"],
+        [0.1, 1.2, 0],
+        [0.2, 1.1, 0],
+        [0.3, 1.0, 0],
+        [1.1, 2.2, 1],
+        [1.2, 2.1, 1],
+        [1.3, 2.0, 1],
+        [2.1, 3.2, 2],
+        [2.2, 3.1, 2],
+        [2.3, 3.0, 2],
+    ]
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerows(rows)
+    return path
+
+
 def _build_foundation(policy: dict) -> tuple[dict, dict]:
     mandate_controls = build_mandate_controls_from_policy(policy)
     context_controls = build_context_controls_from_policy(policy)
@@ -73,6 +92,8 @@ def test_run_intake_interpretation_deterministically_updates_foundation(tmp_path
     assert resolution.run_brief.deployment_target is not None
     assert "laptop" in resolution.run_brief.deployment_target
     assert "do not require remote APIs by default" in resolution.lab_mandate.hard_constraints
+    assert resolution.intake_bundle.intake_record.schema_validation
+    assert resolution.intake_bundle.intake_record.schema_validation[0]["integration"] == "pandera"
     assert any(match.field == "task_brief.target_column" for match in resolution.intake_bundle.semantic_mapping.field_matches)
 
 
@@ -110,6 +131,49 @@ def test_run_intake_interpretation_parses_structured_template_fields(tmp_path: P
     assert resolution.work_preferences.preferred_report_style == "detailed"
     assert resolution.work_preferences.preferred_effort_tier == "deep"
     assert "protect local-first defaults" in resolution.lab_mandate.values
+
+
+def test_run_intake_interpretation_infers_task_type_and_domain_archetype_hints(tmp_path: Path) -> None:
+    data_path = _write_dataset(tmp_path / "fraud_intake.csv")
+    policy = load_policy().policy
+    mandate_bundle, context_bundle = _build_foundation(policy)
+
+    resolution = run_intake_interpretation(
+        message=(
+            "Detect fraud_flag from transaction risk signals. "
+            "Fraud review capacity is limited, but missed fraud is expensive."
+        ),
+        actor_type="user",
+        actor_name="risk_lead",
+        channel="cli",
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        data_path=str(data_path),
+    )
+
+    assert resolution.task_brief.task_type_hint == "fraud_detection"
+    assert resolution.task_brief.domain_archetype_hint == "fraud_risk"
+
+
+def test_run_intake_interpretation_uses_dataset_evidence_for_multiclass_targets(tmp_path: Path) -> None:
+    data_path = _write_multiclass_dataset(tmp_path / "multiclass_intake.csv")
+    policy = load_policy().policy
+    mandate_bundle, context_bundle = _build_foundation(policy)
+
+    resolution = run_intake_interpretation(
+        message="Classify wine_class from the available measurements. Do everything on your own.",
+        actor_type="user",
+        actor_name="operator_multi",
+        channel="cli",
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        data_path=str(data_path),
+    )
+
+    assert resolution.task_brief.target_column == "wine_class"
+    assert resolution.task_brief.task_type_hint == "multiclass_classification"
 
 
 def test_run_intake_interpretation_logs_conflict_instead_of_overwriting_existing_target(tmp_path: Path) -> None:

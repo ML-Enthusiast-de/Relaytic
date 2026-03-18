@@ -44,6 +44,7 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - lets specialists disagree with the mandate when they find materially better ideas, while still obeying binding constraints
 - can optionally use user-provided context, uploaded documents, and policy-gated external knowledge retrieval
 - still works when no expert context is provided
+- uses a deterministic expert-prior substrate so specialists can reason about common business and data archetypes before any LLM help is available
 - can optionally exploit strong local or frontier LLMs for deeper interpretation, hypothesis generation, challenger design, and synthesis without making LLMs a hard dependency
 - can optionally use a small quantized local LLM baseline for dataset-label understanding, note interpretation, and conversational UX on personal computers
 - can detect stronger available local LLM capacity and suggest better intelligence modes when it would materially improve insight
@@ -233,6 +234,7 @@ Relaytic is:
 
 10. **Optional knowledge grounding**
    - The system should support expert grounding through:
+     - deterministic expert priors derived from dataset and context evidence
      - user-supplied domain context
      - uploaded documents
      - prior-run memory
@@ -2034,7 +2036,7 @@ Instead, define:
 For the architecture, assume:
 - baseline local semantic helper: small 4B–8B quantized instruct model when available
 - stronger local model: larger local instruct/reasoning model when available
-- frontier model: optional external high-end reasoning model if policy allows
+- frontier model: optional external high-end reasoning model if policy allows, used as an amplifier or challenger backend rather than a hard dependency for the core run loop
 
 The exact model name should remain configurable rather than baked into the core design.
 

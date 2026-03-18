@@ -12,10 +12,54 @@ Every slice must:
 - update `IMPLEMENTATION_STATUS.md`
 - update `MIGRATION_MAP.md` if boundaries move
 - keep optional dependencies optional
+- prefer mature OSS libraries behind explicit adapters when they strengthen deterministic validation, baselines, diagnostics, feature breadth, or benchmark parity
 - strengthen at least one frontier axis once the repo has a working route
 - keep human and agent control surfaces aligned
 - map every new intelligence claim to artifacts plus tests or benchmark hooks
+- state what becomes newly autonomous, newly challengeable, and newly inspectable after the slice lands
+- define the deterministic fallback for every optional dependency, model, or external library it introduces
+- leave at least one golden-path case and one adversarial case stronger than before
 - leave the repository coherent after completion
+
+## Slice execution contract
+
+From Slice 08 onward, every slice should be specified and implemented in the same shape:
+
+- **load-bearing improvement**
+  what Relaytic can do after the slice that it could not do before
+- **human surface**
+  what a human operator can now see, ask for, or control
+- **agent surface**
+  what another agent can now drive or consume non-interactively
+- **intelligence source**
+  whether the slice gets smarter through deterministic priors, retrieval, bounded semantic tasks, optional model help, external adapters, or some combination
+- **proof obligation**
+  what test, adversarial case, benchmark hook, or demo must pass so the slice is believable
+- **fallback rule**
+  what happens when the new intelligence path, integration, or optional runtime is missing
+
+If a proposed slice cannot be written in that shape, it is not sharp enough yet.
+
+## Intelligence source rules
+
+Relaytic should become more intelligent through explicit, inspectable mechanisms only.
+
+Allowed intelligence sources:
+
+- stronger deterministic priors
+- stronger evidence extraction from current-run artifacts
+- optional mature-library adapters behind stable contracts
+- bounded local semantic tasks
+- memory and analog retrieval
+- optional policy-gated frontier amplification
+- benchmark-validated dojo improvements
+
+Disallowed intelligence claims:
+
+- vague "the agent knows"
+- hidden prompt magic without artifacts
+- silent behavior changes from optional dependencies
+- benchmark claims without separation between deterministic, local-LLM, frontier, and dojo modes
 
 ## Frontier proof track
 
@@ -37,6 +81,28 @@ From Slice 05 onward, Relaytic should keep these cross-cutting proof tracks aliv
   formal benchmark parity is Slice 11, but benchmark harness stubs and reference logging should start earlier whenever route, evidence, or completion logic changes
 
 If a later slice adds "smartness" without strengthening at least one of those proof tracks, it is not sharp enough.
+
+## Preferred post-MVP execution order
+
+Stable slice numbering stays the same, but the preferred execution order after Slice 07 is:
+
+1. Slice 08
+2. Slice 09A
+3. Slice 09
+4. Slice 11
+5. Slice 10
+6. Slice 12
+7. Slice 13
+8. Slice 14
+9. Slice 15
+
+Why:
+
+- Slice 08 makes Relaytic operational over time instead of one-run-only
+- Slice 09A is the highest-leverage intelligence upgrade because it makes later agents smarter across runs
+- Slice 09 improves bounded semantic and strategic lift without redefining the core
+- Slice 11 gives honest proof before feedback or dojo behavior expands too far
+- Slice 10 becomes safer after memory and benchmark doctrine exist
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -93,6 +159,7 @@ Goal:
 - Scout baseline
 - Scientist baseline
 - Focus Council baseline
+- deterministic expert-prior substrate for common structured-data archetypes
 - dataset profile
 - domain memo
 - objective artifacts
@@ -111,6 +178,7 @@ Required outputs:
 Goal:
 - raw user and external-agent intake
 - deterministic translation of free-form notes into mandate/context/run fields
+- explicit task-type and domain-archetype hint extraction from free-form intake
 - schema alignment between typed language and dataset columns
 - optional local-LLM semantic help with bounded provenance
 - optional clarification generation for later refinement, never as the default blocking path
@@ -232,6 +300,8 @@ Goal:
 - monitor vs recalibrate vs retrain baseline
 - champion/candidate comparison
 - promotion/rollback baseline
+- explicit lifecycle state transitions instead of one-shot run conclusions
+- evidence-backed distinction between performance drift, calibration drift, route failure, and candidate superiority
 
 Required outputs:
 - `retrain_decision.json`
@@ -242,6 +312,24 @@ Required outputs:
 Required behavior:
 - lifecycle decisions must be evidence-backed, reversible, and easy for an external agent to consume
 - Relaytic must distinguish "keep current champion", "recalibrate", "retrain", "promote challenger", and "roll back" as separate actions, not one blended outcome
+- lifecycle must use current evidence, completion state, and fresh-data behavior together rather than watching only one scalar metric
+- lifecycle must tell the difference between "model still good", "calibration is stale", "data shifted but route may still hold", and "route choice is no longer strong enough"
+- lifecycle must leave a clean handoff into monitoring and later feedback/memory slices rather than burying state inside one report
+
+First implementation moves:
+
+1. Add `src/relaytic/lifecycle/` models, storage, and decision agents.
+2. Build champion/candidate loaders over existing run, evidence, and completion artifacts.
+3. Implement a deterministic lifecycle governor with explicit action thresholds and reason codes.
+4. Add a minimal human/agent CLI surface for lifecycle review.
+5. Add fresh-data and stale-data tests that force recalibrate, retrain, promote, and rollback branches.
+
+Minimum proof:
+
+- one case where recalibration is preferred over retraining
+- one case where challenger promotion is preferred over keeping the champion
+- one case where rollback is recommended because the current route is no longer trustworthy
+- one non-interactive agent-driven lifecycle review flow
 
 ## Slice 09 - Intelligence amplification and local-LLM assistance
 
@@ -264,7 +352,30 @@ Required outputs:
 
 Required behavior:
 - intelligence amplification must improve bounded semantic and strategic tasks without collapsing the deterministic floor
+- stronger local models or doc-grounded semantic flows must amplify the expert-prior substrate rather than replace it
 - Relaytic must always be able to state which judgments came from deterministic evidence and which were LLM-amplified
+- the semantic task primitive must stay schema-bound, policy-bound, and artifact-backed
+- local/backend discovery and setup guidance must make the intelligence surface operable for humans and external agents, not just configurable in code
+- optional frontier backends must plug into the same bounded semantic-task contract rather than opening an uncontrolled side channel
+
+First implementation moves:
+
+1. Freeze one canonical semantic-task request/response schema.
+2. Implement backend discovery and health checks over the existing local-LLM setup path.
+3. Route intake, investigation, planning, and completion advisory calls through the structured semantic-task primitive.
+4. Add deterministic-vs-amplified comparison tests on messy natural-language intake and doc-grounded resolution cases.
+5. Add backend health and escalation artifacts that explain why Relaytic stayed deterministic or escalated.
+
+Minimum proof:
+
+- one case where semantic amplification materially improves schema or context interpretation
+- one case where the same task degrades gracefully to deterministic behavior with no model available
+- one case where the system explicitly records that a judgment was LLM-amplified and what evidence constrained it
+
+Innovation hook:
+
+- Relaytic should not become "call an LLM everywhere"
+- it should become better at bounded semantic labor while staying inspectable, local-first, and challengeable
 
 ## Slice 09A - Run memory and analog retrieval
 
@@ -273,6 +384,7 @@ Goal:
 - analog-case search
 - route-prior recovery
 - challenger-prior suggestions
+- cross-run intelligence that improves future judgment without overriding current evidence
 
 Required outputs:
 - `memory_retrieval.json`
@@ -284,6 +396,26 @@ Required behavior:
 - memory must be advisory, provenance-carrying, and challengeable by current-run evidence
 - retrieved analogs must influence planning, challenger design, and completion reasoning without silently overriding the current dataset
 - memory failures or low-confidence retrieval must degrade gracefully into deterministic no-memory behavior
+- memory must be able to explain *why* an analog was retrieved: task family, schema pattern, risk shape, evidence pattern, route history, or lifecycle similarity
+- memory influence must be visible as a counterfactual whenever practical: what Relaytic would have done without memory vs with memory
+
+First implementation moves:
+
+1. Add `src/relaytic/memory/` with run indexing, retrieval, and prior-suggestion helpers.
+2. Build retrieval over current run summaries, evidence artifacts, completion artifacts, and lifecycle outcomes.
+3. Inject retrieved priors into planning, challenger design, and completion review behind explicit advisory boundaries.
+4. Add tests where analog retrieval changes route choice or challenger choice and where weak retrieval is ignored.
+5. Add one cross-run demo fixture that proves memory changes behavior with visible provenance.
+
+Minimum proof:
+
+- one case where memory materially changes the selected route or challenger design
+- one case where the retrieved analog is overruled by current-run evidence
+- one case where low-confidence retrieval cleanly falls back to no-memory behavior
+
+Innovation hook:
+
+- this is the first slice where Relaytic should become meaningfully smarter across runs instead of only within a run
 
 ## Slice 10 - Feedback assimilation
 
@@ -304,6 +436,26 @@ Required behavior:
 - validated feedback may change future defaults, but no accepted feedback may silently rewrite behavior without an inspectable effect report
 - adversarial or low-quality feedback should degrade trust, not quietly pollute priors
 - feedback updates must remain distinct from run-memory retrieval so Relaytic can tell whether a prior came from historical evidence, accepted feedback, or both
+- accepted feedback must remain reversible, attributable, and benchmark-aware
+- no feedback-derived change should become a default promotion path without surviving the benchmark doctrine from Slice 11
+
+First implementation moves:
+
+1. Add feedback intake, validation, and trust-scoring primitives.
+2. Separate accepted feedback memory from passive run memory.
+3. Generate route-prior and policy-update suggestions rather than mutating live behavior directly.
+4. Add adversarial feedback tests and rollback tests.
+5. Gate feedback promotions behind explicit effect reports.
+
+Minimum proof:
+
+- one accepted feedback case that improves a later decision path
+- one rejected or downgraded feedback case that avoids polluting priors
+- one rollback of a feedback-derived prior update
+
+Innovation hook:
+
+- Relaytic should learn from humans and external agents without becoming fragile or manipulable
 
 ## Slice 11 - Benchmark parity and reference approaches
 
@@ -323,6 +475,26 @@ Required behavior:
 - benchmark results must separate deterministic-floor Relaytic, local-LLM-amplified Relaytic, and dojo-improved Relaytic
 - benchmark suites must include both ordinary structured-data cases and operator-constrained or mandate-heavy cases
 - benchmark failures must emit next-experiment recommendations, not just pass/fail summaries
+- benchmark reporting must compare Relaytic against explicit reference approaches, not against vague internal expectations
+- benchmark results must expose where Relaytic wins because of judgment, lifecycle handling, or constraints rather than raw score alone
+
+First implementation moves:
+
+1. Freeze the benchmark schema and result taxonomy.
+2. Build reference baselines with the current mature-library adapter stack.
+3. Add ordinary public datasets plus constrained/operator-heavy cases that the raw-score baseline does not optimize for.
+4. Emit benchmark gap reports with next-experiment recommendations.
+5. Keep deterministic, local-LLM, frontier, and dojo modes separate in every report.
+
+Minimum proof:
+
+- one report showing parity or near-parity on a standard public task
+- one report showing Relaytic advantage on a constrained or mandate-heavy task
+- one failure case that emits an honest gap report and next experiment recommendations
+
+Innovation hook:
+
+- this is the slice that turns architectural ambition into externally credible proof
 
 ## Slice 12 - Dojo mode and guarded self-improvement
 
@@ -342,6 +514,26 @@ Required outputs:
 Required behavior:
 - dojo outputs must remain quarantined until they beat the incumbent on benchmark and golden-case validation
 - no dojo promotion may become default behavior without an explicit promotion artifact
+- dojo must improve strategies, priors, challenger design, and route search before it is allowed to touch deeper architecture proposals
+- every dojo promotion must preserve rollback, provenance, and benchmark comparability
+
+First implementation moves:
+
+1. Add a quarantined dojo workspace and promotion ledger.
+2. Restrict early dojo scope to strategy, challenger, and prior improvements.
+3. Wire dojo outputs into benchmark and golden-case validation gates.
+4. Add promotion, rejection, and rollback tests for dojo proposals.
+5. Only after that, allow experimental architecture proposals.
+
+Minimum proof:
+
+- one dojo proposal that is rejected with clear reasons
+- one dojo proposal that is promoted only after beating the incumbent on required validations
+- one rollback of a previously promoted dojo artifact
+
+Innovation hook:
+
+- Relaytic should self-improve like a lab, not mutate like an unstable agent demo
 
 ## Slice 13 - Accelerated and distributed local execution
 
@@ -359,6 +551,18 @@ Required outputs:
 - `checkpoint_state.json`
 - `execution_strategy_report.json`
 
+Required behavior:
+
+- execution acceleration must preserve provenance, checkpointing, and replayability
+- device-aware planning must change *how* Relaytic executes, not silently change *what* it believes
+- distributed execution must remain resumable and safe for long local runs
+
+Minimum proof:
+
+- one same-plan run that succeeds across two execution profiles
+- one interrupted distributed run that resumes from checkpoint
+- one agent-consumable execution strategy report
+
 ## Slice 14 - Physics-aware exploration constraints
 
 Goal:
@@ -371,6 +575,16 @@ Required outputs:
 - `trajectory_constraint_report.json`
 - `feasible_region_map.json`
 - `extrapolation_risk_report.json`
+
+Required behavior:
+
+- physical or feasibility constraints must be explicit inputs to proposal generation, not cosmetic warnings after the fact
+- Relaytic must distinguish "promising", "unproven", and "physically implausible" proposals
+
+Minimum proof:
+
+- one domain case where physically implausible proposals are suppressed
+- one case where feasibility constraints materially alter route or recommendation output
 
 ## Slice 15 - Packaging, integrations, demos, polish
 
@@ -391,6 +605,18 @@ Required outputs:
 - one benchmark-parity demo
 - one dojo demo
 - one accelerated execution demo
+
+Required behavior:
+
+- polish must not erase inspectability or the specialist architecture
+- demos must prove substance, not only CLI cosmetics
+- onboarding, backup, restore, doctor, and integrations should make Relaytic survivable for real operator use
+
+Minimum proof:
+
+- one clean new-user path from install to judged run
+- one external-agent path that uses the JSON surfaces only
+- one recovery path that proves backup/restore or doctor behavior
 
 ## First four slices to build before anything fancy
 

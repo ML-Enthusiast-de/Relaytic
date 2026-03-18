@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from relaytic.analytics import assess_task_profile, normalize_task_type_hint
 from relaytic.context import (
     ContextControl,
     DataOrigin,
@@ -15,6 +16,7 @@ from relaytic.context import (
     TaskBrief,
     build_context_controls_from_policy,
 )
+from relaytic.integrations import validate_frame_contract
 from relaytic.ingestion import load_tabular_data
 from relaytic.mandate import (
     LabMandate,
@@ -97,6 +99,10 @@ STRUCTURED_TEMPLATE_FIELDS = {
     "task_problem_statement": "problem_statement",
     "prediction_horizon": "prediction_horizon",
     "decision_type": "decision_type",
+    "task_type": "task_type_hint",
+    "task_type_hint": "task_type_hint",
+    "domain_archetype": "domain_archetype_hint",
+    "domain_archetype_hint": "domain_archetype_hint",
     "primary_stakeholder": "primary_stakeholder",
     "success_criteria": "task_success_criteria",
     "task_success_criteria": "task_success_criteria",
@@ -233,6 +239,7 @@ class _ParsedInput:
     sentences: list[str]
     normalized_text: str
     schema_columns: list[str]
+    dataset_frame: Any | None
     dataset_path: str | None
     selected_sheet: str | None
     header_row: int | None
@@ -499,6 +506,34 @@ class ContextInterpreterAgent:
         decision_type = _explicit_scalar(parsed, "decision_type") or _infer_decision_type(parsed.normalized_text)
         if decision_type:
             task_brief_updates["decision_type"] = decision_type
+        explicit_task_type_hint = normalize_task_type_hint(_explicit_scalar(parsed, "task_type_hint"))
+        target_column = str(task_brief_updates.get("target_column") or "")
+        dataset_task_type_hint = None
+        if explicit_task_type_hint in {None, "auto"}:
+            dataset_task_type_hint = _infer_task_type_hint_from_data(
+                parsed=parsed,
+                target_column=target_column,
+            )
+        task_type_hint = (
+            explicit_task_type_hint
+            or dataset_task_type_hint
+            or _infer_task_type_hint(
+                normalized_text=parsed.normalized_text,
+                target_column=target_column,
+            )
+        )
+        if task_type_hint and task_type_hint != "auto":
+            task_brief_updates["task_type_hint"] = task_type_hint
+            if dataset_task_type_hint:
+                evidence.append(
+                    f"Resolved task type from dataset evidence for target `{target_column}` as `{task_type_hint}`."
+                )
+        domain_archetype_hint = _explicit_scalar(parsed, "domain_archetype_hint") or _infer_domain_archetype_hint(
+            normalized_text=parsed.normalized_text,
+            target_column=str(task_brief_updates.get("target_column") or ""),
+        )
+        if domain_archetype_hint:
+            task_brief_updates["domain_archetype_hint"] = domain_archetype_hint
         primary_stakeholder = _explicit_scalar(parsed, "primary_stakeholder") or _infer_primary_stakeholder(
             parsed.message
         )
@@ -580,6 +615,7 @@ def run_intake_interpretation(
         sentences=_split_sentences(normalized_message),
         normalized_text=_normalize_text(normalized_message),
         schema_columns=schema_info["schema_columns"],
+        dataset_frame=schema_info["dataset_frame"],
         dataset_path=schema_info["dataset_path"],
         selected_sheet=schema_info["selected_sheet"],
         header_row=schema_info["header_row"],
@@ -677,7 +713,39 @@ def run_intake_interpretation(
         selected_sheet=parsed.selected_sheet,
         header_row=parsed.header_row,
         data_start_row=parsed.data_start_row,
+        schema_validation=[],
     )
+
+    if parsed.dataset_frame is not None:
+        schema_validation = validate_frame_contract(
+            frame=parsed.dataset_frame,
+            required_columns=parsed.schema_columns,
+            target_column=str(resolved["task_brief_updates"].get("target_column", "")).strip() or None,
+            surface="intake",
+        )
+        intake_record = IntakeRecord(
+            schema_version=intake_record.schema_version,
+            captured_at=intake_record.captured_at,
+            controls=intake_record.controls,
+            actor_type=intake_record.actor_type,
+            actor_name=intake_record.actor_name,
+            channel=intake_record.channel,
+            source_format=intake_record.source_format,
+            message=intake_record.message,
+            dataset_path=intake_record.dataset_path,
+            selected_sheet=intake_record.selected_sheet,
+            header_row=intake_record.header_row,
+            data_start_row=intake_record.data_start_row,
+            schema_validation=[schema_validation],
+        )
+        if schema_validation.get("status") == "validation_failed":
+            combined_conflicts.append(
+                "Pandera validation flagged the current dataset contract; review intake target and schema assumptions."
+            )
+        if schema_validation.get("status") in {"ok", "validation_failed"}:
+            trace.deterministic_evidence.append(
+                f"Pandera schema validation returned `{schema_validation.get('status')}` for the current intake frame."
+            )
 
     field_matches = _dedupe_matches(
         list(steward_result["field_matches"]) + list(context_result["field_matches"])
@@ -830,6 +898,7 @@ def _load_schema_info(
     if not data_path:
         return {
             "schema_columns": [],
+            "dataset_frame": None,
             "dataset_path": None,
             "selected_sheet": None,
             "header_row": header_row,
@@ -843,6 +912,7 @@ def _load_schema_info(
     )
     return {
         "schema_columns": [str(column) for column in ingestion.frame.columns],
+        "dataset_frame": ingestion.frame.copy(),
         "dataset_path": str(Path(data_path)),
         "selected_sheet": ingestion.selected_sheet,
         "header_row": int(ingestion.inferred_header.header_row),
@@ -1010,6 +1080,52 @@ def _infer_decision_type(normalized_text: str) -> str | None:
         return "detection"
     if "estimate" in normalized_text or "regression" in normalized_text:
         return "regression"
+    return None
+
+
+def _infer_task_type_hint(*, normalized_text: str, target_column: str) -> str | None:
+    combined = f"{normalized_text} {str(target_column).strip().lower()}".strip()
+    if any(token in combined for token in ("fraud", "chargeback", "scam", "abuse")):
+        return "fraud_detection"
+    if any(token in combined for token in ("anomaly", "outlier", "fault", "alert", "attack")):
+        return "anomaly_detection"
+    if any(token in combined for token in ("multiclass", "multi class", "multi-class")):
+        return "multiclass_classification"
+    if any(token in combined for token in ("classify", "classification", "binary", "label", "status", "flag")):
+        return "binary_classification"
+    if any(token in combined for token in ("forecast", "estimate", "regression", "amount", "score", "price", "revenue")):
+        return "regression"
+    return None
+
+
+def _infer_task_type_hint_from_data(*, parsed: _ParsedInput, target_column: str) -> str | None:
+    if not target_column or parsed.dataset_frame is None or target_column not in parsed.dataset_frame.columns:
+        return None
+    try:
+        profile = assess_task_profile(
+            frame=parsed.dataset_frame,
+            target_column=target_column,
+            data_mode="steady_state",
+        )
+    except Exception:
+        return None
+    return str(profile.task_type).strip() or None
+
+
+def _infer_domain_archetype_hint(*, normalized_text: str, target_column: str) -> str | None:
+    combined = f"{normalized_text} {str(target_column).strip().lower()}".strip()
+    if any(token in combined for token in ("fraud", "chargeback", "abuse", "scam", "transaction")):
+        return "fraud_risk"
+    if any(token in combined for token in ("anomaly", "outlier", "fault", "alert", "attack")):
+        return "anomaly_monitoring"
+    if any(token in combined for token in ("quality", "yield", "scrap", "defect", "off-spec", "batch", "lot", "sensor", "line")):
+        return "manufacturing_quality"
+    if any(token in combined for token in ("churn", "attrition", "retention", "cancel", "unsubscribe")):
+        return "churn_retention"
+    if any(token in combined for token in ("forecast", "demand", "inventory", "sales", "orders", "volume")):
+        return "demand_forecasting"
+    if any(token in combined for token in ("price", "pricing", "quote", "revenue", "margin", "cost")):
+        return "pricing_estimation"
     return None
 
 
@@ -1535,6 +1651,11 @@ def _apply_task_brief_updates(
         target_column=_merge_scalar(existing.get("target_column"), updates.get("target_column")),
         prediction_horizon=_merge_scalar(existing.get("prediction_horizon"), updates.get("prediction_horizon")),
         decision_type=_merge_scalar(existing.get("decision_type"), updates.get("decision_type")),
+        task_type_hint=_merge_scalar(existing.get("task_type_hint"), updates.get("task_type_hint")),
+        domain_archetype_hint=_merge_scalar(
+            existing.get("domain_archetype_hint"),
+            updates.get("domain_archetype_hint"),
+        ),
         primary_stakeholder=_merge_scalar(
             existing.get("primary_stakeholder"), updates.get("primary_stakeholder")
         ),

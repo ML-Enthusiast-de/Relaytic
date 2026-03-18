@@ -8,7 +8,8 @@ Public-facing docs:
 
 1. `README.md`
 2. `ARCHITECTURE.md`
-3. `SECURITY.md`
+3. `OPEN_SOURCE_STACK.md`
+4. `SECURITY.md`
 
 Implementation control docs:
 
@@ -38,6 +39,8 @@ Relaytic/
       investigation/
       mandate/
       evidence/
+      completion/
+      integrations/
       planning/
       policies/
       runs/
@@ -64,6 +67,8 @@ Relaytic/
 - `src/relaytic/investigation/` owns investigation specialists and focus artifacts
 - `src/relaytic/planning/` owns Strategist planning, Builder handoff, and planning artifact storage
 - `src/relaytic/evidence/` owns challenger, ablation, audit, leaderboard, and decision-memo artifacts
+- `src/relaytic/completion/` owns the completion-governor layer, run-state artifacts, and status synthesis
+- `src/relaytic/integrations/` owns optional-library discovery, compatibility self-checks, and adapter-scoped capability inventory
 - `src/relaytic/runs/` owns MVP-access summaries, run reports, and top-level run presentation helpers
 - `src/relaytic/artifacts/` owns manifest helpers
 - `src/relaytic/policies/` owns policy loading and resolved-policy writing
@@ -71,7 +76,6 @@ Relaytic/
 
 ## Reserved Next Package Boundaries
 
-- `src/relaytic/completion/` is reserved for the Slice 07 completion-governor layer
 - `src/relaytic/memory/` is reserved for the Slice 09A analog-retrieval and run-memory layer
 
 ## Operational Directories

@@ -35,3 +35,23 @@ def test_build_train_validation_test_split_stratifies_classification_labels() ->
     assert abs(train_rate - val_rate) < 0.08
     assert abs(train_rate - test_rate) < 0.08
 
+
+def test_build_train_validation_test_split_keeps_minority_class_in_train_for_small_rare_event_sets() -> None:
+    labels = np.array([1 if idx % 4 == 0 else 0 for idx in range(18)], dtype=int)
+    split = build_train_validation_test_split(
+        n_rows=18,
+        data_mode="steady_state",
+        task_type="fraud_detection",
+        stratify_labels=labels,
+    )
+
+    train_labels = labels[split.train_indices]
+    val_labels = labels[split.validation_indices]
+    test_labels = labels[split.test_indices]
+
+    assert 1 in set(train_labels.tolist())
+    assert 0 in set(train_labels.tolist())
+    assert train_labels.size >= 6
+    assert val_labels.size >= 2
+    assert test_labels.size >= 2
+

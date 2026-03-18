@@ -118,7 +118,6 @@ def _build_steady_state_stratified_split(
     if labels.shape[0] != n_rows:
         raise ValueError("stratify_labels length must match n_rows.")
     idx = np.arange(n_rows, dtype=int)
-    pattern = np.arange(20, dtype=int)
     train_mask = np.zeros(n_rows, dtype=bool)
     val_mask = np.zeros(n_rows, dtype=bool)
     test_mask = np.zeros(n_rows, dtype=bool)
@@ -136,13 +135,13 @@ def _build_steady_state_stratified_split(
         class_indices = idx[labels == label]
         if class_indices.size == 0:
             continue
-        local_pattern = pattern[np.arange(class_indices.size) % pattern.size]
-        test_local = local_pattern < 3
-        val_local = (local_pattern >= 3) & (local_pattern < 6)
-        train_local = ~(test_local | val_local)
-        test_mask[class_indices[test_local]] = True
-        val_mask[class_indices[val_local]] = True
-        train_mask[class_indices[train_local]] = True
+        ordered_class_indices = _deterministic_class_order(class_indices)
+        train_count, val_count, test_count = _allocate_class_counts(int(class_indices.size))
+        train_end = train_count
+        val_end = train_count + val_count
+        train_mask[ordered_class_indices[:train_end]] = True
+        val_mask[ordered_class_indices[train_end:val_end]] = True
+        test_mask[ordered_class_indices[val_end : val_end + test_count]] = True
 
     if int(np.sum(test_mask)) < 2 or int(np.sum(val_mask)) < 2 or int(np.sum(train_mask)) < 6:
         return None
@@ -153,3 +152,41 @@ def _build_steady_state_stratified_split(
         strategy="stratified_deterministic_modulo_70_15_15",
         data_mode="steady_state",
     )
+
+
+def _allocate_class_counts(class_size: int) -> tuple[int, int, int]:
+    if class_size <= 0:
+        return 0, 0, 0
+    if class_size == 1:
+        return 1, 0, 0
+    if class_size == 2:
+        return 1, 0, 1
+    if class_size == 3:
+        return 1, 1, 1
+
+    train_count = max(1, int(round(class_size * 0.70)))
+    val_count = max(1, int(round(class_size * 0.15)))
+    test_count = class_size - train_count - val_count
+    if test_count < 1:
+        test_count = 1
+        if train_count >= val_count and train_count > 1:
+            train_count -= 1
+        elif val_count > 1:
+            val_count -= 1
+    while train_count + val_count + test_count > class_size:
+        if train_count >= val_count and train_count > 1:
+            train_count -= 1
+        elif val_count > 1:
+            val_count -= 1
+        else:
+            test_count -= 1
+    return train_count, val_count, test_count
+
+
+def _deterministic_class_order(class_indices: np.ndarray) -> np.ndarray:
+    if class_indices.size <= 2:
+        return class_indices
+    positions = np.arange(class_indices.size, dtype=int)
+    multiplier = 7 if class_indices.size % 7 else 5
+    order = np.argsort((positions * multiplier) % class_indices.size, kind="stable")
+    return class_indices[order]

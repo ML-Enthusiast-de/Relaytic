@@ -46,9 +46,9 @@ Slice 07 must consume, at minimum:
 
 It must not operate on final metrics alone.
 
-## Planned Package Boundary
+## Canonical Package Boundary
 
-Slice 07 should introduce:
+Slice 07 introduced:
 
 - `src/relaytic/completion/`
 
@@ -92,9 +92,9 @@ That package should own completion-governor logic, artifact persistence, and top
 - if the real limitation is missing memory support or missing benchmark context, completion must say so explicitly and hand off into Slice 09A or Slice 11 rather than pretending the run is self-sufficient
 - optional local-LLM help may refine summaries, but must not decide the completion action
 
-## Planned CLI Surface
+## Public CLI Surface
 
-Slice 07 should add at least:
+Slice 07 adds:
 
 - `relaytic status`
 - `relaytic completion review`
@@ -109,6 +109,20 @@ Slice 07 is acceptable only if:
 2. an external agent can read one JSON artifact and know the next action without reading long prose
 3. the completion layer can explicitly say when the current run is limited by narrow challenger breadth, missing benchmark context, or missing memory support
 4. the result is auditable and deterministic
+
+## Landed
+
+- `src/relaytic/completion/` now owns the completion-governor logic and artifact persistence
+- `relaytic run` now includes Slice 07 by default after the evidence stage
+- `relaytic show` now surfaces the governed run state rather than evidence-only posture
+- `relaytic status` and `relaytic completion review` now expose stable human and agent control surfaces
+
+## Verification
+
+- targeted Slice 07 agent tests
+- targeted Slice 07 CLI tests
+- targeted Slice 07 local-stub-LLM tests
+- end-to-end `relaytic run` coverage through completion artifacts
 
 ## Required Verification
 

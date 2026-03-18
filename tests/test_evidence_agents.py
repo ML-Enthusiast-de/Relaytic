@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
 
+import relaytic.evidence.agents as evidence_agents
 from relaytic.context import (
     build_context_controls_from_policy,
     default_data_origin,
@@ -39,6 +40,19 @@ def _write_dataset(path: Path) -> Path:
         ["2025-01-01T00:13:00", 23.0, 113.0, 0, 0, 0],
         ["2025-01-01T00:14:00", 24.0, 114.0, 1, 1, 1],
     ]
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        csv.writer(handle).writerows(rows)
+    return path
+
+
+def _write_fraud_dataset(path: Path) -> Path:
+    rows = [["transaction_id", "amount_norm", "device_risk", "velocity_score", "fraud_flag"]]
+    for index in range(24):
+        fraud = 1 if index % 5 == 0 else 0
+        amount = 0.94 if fraud else 0.18 + (index % 4) * 0.05
+        device = 0.97 if fraud else 0.12 + (index % 3) * 0.06
+        velocity = 0.92 if fraud else 0.15 + (index % 5) * 0.04
+        rows.append([f"T{index:04d}", round(amount, 5), round(device, 5), round(velocity, 5), fraud])
     with path.open("w", newline="", encoding="utf-8") as handle:
         csv.writer(handle).writerows(rows)
     return path
@@ -190,3 +204,163 @@ def test_run_evidence_review_keeps_inference_ready_run_intact(tmp_path: Path) ->
     assert inference["status"] == "ok"
     assert inference["prediction_count"] == 15
     assert result.bundle.audit_report.readiness_level in {"strong", "conditional"}
+
+
+def test_run_evidence_review_uses_external_resampled_challenger_when_available(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    data_path = _write_fraud_dataset(tmp_path / "slice06_fraud.csv")
+    run_dir = tmp_path / "run_slice06_fraud"
+    policy = load_policy().policy
+    mandate_bundle, context_bundle = _build_foundation(policy)
+    mandate_bundle["run_brief"]["target_column"] = "fraud_flag"
+    context_bundle["task_brief"]["target_column"] = "fraud_flag"
+    context_bundle["task_brief"]["task_type_hint"] = "fraud_detection"
+    context_bundle["domain_brief"]["summary"] = "Detect payment fraud from transaction risk signals."
+
+    monkeypatch.setattr(
+        evidence_agents,
+        "run_resampled_logistic_challenger",
+        lambda **kwargs: {
+            "integration": "imbalanced_learn",
+            "package_name": "imbalanced-learn",
+            "version": "test",
+            "surface": "evidence.challenger",
+            "status": "ok",
+            "compatible": True,
+            "notes": ["stubbed imbalanced-learn challenger"],
+            "details": {
+                "model_family": "imblearn_resampled_logistic",
+                "selected_metrics": {
+                    "validation": {"pr_auc": 0.88},
+                    "test": {"pr_auc": 0.91},
+                },
+            },
+        },
+    )
+    monkeypatch.setattr(
+        evidence_agents,
+        "run_pyod_anomaly_challenger",
+        lambda **kwargs: {
+            "integration": "pyod",
+            "package_name": "pyod",
+            "version": None,
+            "surface": "evidence.challenger",
+            "status": "skipped",
+            "compatible": True,
+            "notes": ["not applicable"],
+            "details": {},
+        },
+    )
+
+    investigation_bundle = run_investigation(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+    ).to_dict()
+    planning_bundle = run_planning(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        investigation_bundle=investigation_bundle,
+    )
+    execution = execute_planned_route(
+        run_dir=run_dir,
+        data_path=str(data_path),
+        planning_bundle=planning_bundle,
+    )
+
+    result = run_evidence_review(
+        run_dir=run_dir,
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        intake_bundle={"assumption_log": {"entries": []}},
+        investigation_bundle=investigation_bundle,
+        planning_bundle=execution.planning_bundle.to_dict(),
+    )
+
+    challenger_entry = next(
+        item for item in result.bundle.experiment_registry.experiments if item.get("role") == "challenger"
+    )
+    assert challenger_entry["integration"] == "imbalanced_learn"
+    assert result.bundle.challenger_report.comparison["integration"] == "imbalanced_learn"
+
+
+def test_run_evidence_review_records_statsmodels_audit_findings(tmp_path: Path, monkeypatch) -> None:
+    data_path = _write_dataset(tmp_path / "slice06_statsmodels.csv")
+    run_dir = tmp_path / "run_slice06_statsmodels"
+    policy = load_policy().policy
+    mandate_bundle, context_bundle = _build_foundation(policy)
+    mandate_bundle["run_brief"]["target_column"] = "sensor_b"
+    context_bundle["task_brief"]["target_column"] = "sensor_b"
+    context_bundle["task_brief"]["task_type_hint"] = "regression"
+    context_bundle["task_brief"]["problem_statement"] = "Estimate sensor_b from upstream process signals."
+    context_bundle["domain_brief"]["forbidden_features"] = []
+
+    monkeypatch.setattr(
+        evidence_agents,
+        "compute_regression_residual_diagnostics",
+        lambda **kwargs: {
+            "integration": "statsmodels",
+            "package_name": "statsmodels",
+            "version": "test",
+            "surface": "evidence.audit",
+            "status": "ok",
+            "compatible": True,
+            "notes": ["stubbed statsmodels diagnostics"],
+            "details": {
+                "findings": [
+                    {
+                        "severity": "medium",
+                        "title": "Residual autocorrelation is visible.",
+                        "detail": "Stubbed statsmodels result.",
+                        "source": "statsmodels",
+                    }
+                ]
+            },
+        },
+    )
+
+    investigation_bundle = run_investigation(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+    ).to_dict()
+    planning_bundle = run_planning(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        investigation_bundle=investigation_bundle,
+    )
+    execution = execute_planned_route(
+        run_dir=run_dir,
+        data_path=str(data_path),
+        planning_bundle=planning_bundle,
+    )
+
+    result = run_evidence_review(
+        run_dir=run_dir,
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        intake_bundle={"assumption_log": {"entries": []}},
+        investigation_bundle=investigation_bundle,
+        planning_bundle=execution.planning_bundle.to_dict(),
+    )
+
+    assert result.bundle.audit_report.external_diagnostics
+    assert any(
+        item.get("integration") == "statsmodels" for item in result.bundle.audit_report.external_diagnostics
+    )
+    assert any(
+        finding.get("title") == "Residual autocorrelation is visible."
+        for finding in result.bundle.audit_report.findings
+    )

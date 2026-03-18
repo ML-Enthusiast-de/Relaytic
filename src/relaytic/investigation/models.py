@@ -104,7 +104,10 @@ class DomainMemo:
     controls: InvestigationControls
     operational_problem_statement: str
     domain_summary: str
+    domain_archetype: str
     target_candidates: list[dict[str, Any]]
+    expert_priors: dict[str, Any]
+    knowledge_sources: list[dict[str, Any]]
     route_hypotheses: list[dict[str, Any]]
     split_hypotheses: list[dict[str, Any]]
     feature_hypotheses: list[dict[str, Any]]

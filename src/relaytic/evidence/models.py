@@ -124,6 +124,7 @@ class AuditReport:
     provisional_recommendation: str
     readiness_level: str
     findings: list[dict[str, Any]]
+    external_diagnostics: list[dict[str, Any]]
     inference_audit_path: str | None
     llm_advisory: dict[str, Any] | None
     summary: str

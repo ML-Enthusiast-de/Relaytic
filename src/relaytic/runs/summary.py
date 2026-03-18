@@ -87,6 +87,17 @@ def build_run_summary(
             "belief_update": "belief_update.json",
         },
     )
+    completion_bundle = _read_bundle(
+        root,
+        {
+            "completion_decision": "completion_decision.json",
+            "run_state": "run_state.json",
+            "stage_timeline": "stage_timeline.json",
+            "mandate_evidence_review": "mandate_evidence_review.json",
+            "blocking_analysis": "blocking_analysis.json",
+            "next_action_queue": "next_action_queue.json",
+        },
+    )
     model_params = _read_json(root / "model_params.json")
     manifest = _read_json(root / "manifest.json")
 
@@ -104,6 +115,11 @@ def build_run_summary(
     ablation_report = _bundle_item(evidence_bundle, "ablation_report")
     audit_report = _bundle_item(evidence_bundle, "audit_report")
     belief_update = _bundle_item(evidence_bundle, "belief_update")
+    completion_decision = _bundle_item(completion_bundle, "completion_decision")
+    run_state = _bundle_item(completion_bundle, "run_state")
+    mandate_evidence_review = _bundle_item(completion_bundle, "mandate_evidence_review")
+    blocking_analysis = _bundle_item(completion_bundle, "blocking_analysis")
+    next_action_queue = _bundle_item(completion_bundle, "next_action_queue")
     execution_summary = dict(plan.get("execution_summary") or {})
     builder_handoff = dict(plan.get("builder_handoff") or {})
     marginal_value = _bundle_item(planning_bundle, "marginal_value_of_next_experiment")
@@ -127,6 +143,7 @@ def build_run_summary(
             plan=plan,
             execution_summary=execution_summary,
             audit_report=audit_report,
+            completion_decision=completion_decision,
         ),
         "stage_completed": _resolve_stage(
             plan=plan,
@@ -134,6 +151,7 @@ def build_run_summary(
             investigation_bundle=investigation_bundle,
             intake_bundle=intake_bundle,
             evidence_bundle=evidence_bundle,
+            completion_bundle=completion_bundle,
         ),
         "request": {
             "source": request_source or str(intake_record.get("message_source", "")).strip() or "unknown",
@@ -153,11 +171,13 @@ def build_run_summary(
             "objective": str(run_brief.get("objective", "")).strip() or None,
             "deployment_target": str(run_brief.get("deployment_target", "")).strip() or None,
             "problem_statement": str(task_brief.get("problem_statement", "")).strip() or None,
+            "domain_archetype": str(_bundle_item(investigation_bundle, "domain_memo").get("domain_archetype", "")).strip() or str(task_brief.get("domain_archetype_hint", "")).strip() or None,
             "autonomy_mode": str(autonomy_mode.get("requested_mode", "")).strip() or None,
             "operator_signal": str(autonomy_mode.get("operator_signal", "")).strip() or None,
         },
         "decision": {
             "target_column": str(plan.get("target_column") or task_brief.get("target_column") or "").strip() or None,
+            "task_type": str(plan.get("task_type", "")).strip() or str(task_brief.get("task_type_hint", "")).strip() or None,
             "primary_objective": str(focus_profile.get("primary_objective", "")).strip() or None,
             "selected_route_id": str(plan.get("selected_route_id", "")).strip() or None,
             "selected_route_title": str(plan.get("selected_route_title", "")).strip() or None,
@@ -187,6 +207,16 @@ def build_run_summary(
                 if str(item.get("interpretation", "")).strip().startswith("Load-bearing")
             ][:5],
         },
+        "completion": {
+            "action": str(completion_decision.get("action", "")).strip() or None,
+            "confidence": str(completion_decision.get("confidence", "")).strip() or None,
+            "current_stage": str(run_state.get("current_stage", "")).strip() or None,
+            "blocking_layer": str(completion_decision.get("blocking_layer", "")).strip() or str(blocking_analysis.get("blocking_layer", "")).strip() or None,
+            "mandate_alignment": str(completion_decision.get("mandate_alignment", "")).strip() or str(mandate_evidence_review.get("alignment", "")).strip() or None,
+            "evidence_state": str(completion_decision.get("evidence_state", "")).strip() or None,
+            "complete_for_mode": completion_decision.get("complete_for_mode"),
+            "next_action_count": len(next_action_queue.get("actions", [])) if isinstance(next_action_queue.get("actions"), list) else 0,
+        },
         "assumptions": {
             "count": len(assumption_entries),
             "items": [str(item.get("assumption", "")).strip() for item in assumption_entries if str(item.get("assumption", "")).strip()][:5],
@@ -195,11 +225,12 @@ def build_run_summary(
             "recommended_experiment_id": str(marginal_value.get("recommended_experiment_id", "")).strip() or None,
             "estimated_value_band": str(marginal_value.get("estimated_value_band", "")).strip() or None,
             "rationale": str(
-                belief_update.get("summary", "")
+                completion_decision.get("summary", "")
+                or belief_update.get("summary", "")
                 or marginal_value.get("rationale", "")
             ).strip()
             or None,
-            "recommended_action": str(belief_update.get("recommended_action", "")).strip() or None,
+            "recommended_action": str(completion_decision.get("action", "")).strip() or str(belief_update.get("recommended_action", "")).strip() or None,
         },
         "artifacts": {
             "manifest_path": _path_if_exists(root / "manifest.json"),
@@ -210,6 +241,7 @@ def build_run_summary(
             "leaderboard_path": _path_if_exists(root / "leaderboard.csv"),
             "technical_report_path": _path_if_exists(root / "reports" / "technical_report.md"),
             "decision_memo_path": _path_if_exists(root / "reports" / "decision_memo.md"),
+            "completion_decision_path": _path_if_exists(root / "completion_decision.json"),
         },
     }
     summary["headline"] = _build_headline(summary)
@@ -223,6 +255,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     intent = dict(summary.get("intent", {}))
     metrics = dict(summary.get("metrics", {}))
     evidence = dict(summary.get("evidence", {}))
+    completion = dict(summary.get("completion", {}))
     assumptions = dict(summary.get("assumptions", {}))
     next_step = dict(summary.get("next_step", {}))
     lines = [
@@ -233,6 +266,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         "## Result",
         f"- Status: `{summary.get('status', 'unknown')}`",
         f"- Target: `{decision.get('target_column') or 'unknown'}`",
+        f"- Task type: `{decision.get('task_type') or 'unknown'}`",
         f"- Route: `{decision.get('selected_route_title') or decision.get('selected_route_id') or 'not planned'}`",
         f"- Model: `{decision.get('selected_model_family') or 'not executed'}`",
         f"- Primary metric: `{decision.get('primary_metric') or 'unknown'}`",
@@ -241,6 +275,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         f"- Objective: `{intent.get('objective') or 'unspecified'}`",
         f"- Autonomy mode: `{intent.get('autonomy_mode') or 'unknown'}`",
         f"- Deployment target: `{intent.get('deployment_target') or 'unspecified'}`",
+        f"- Domain archetype: `{intent.get('domain_archetype') or 'generic_tabular'}`",
         "",
         "## Data",
         f"- Rows: `{data.get('row_count', 0)}`",
@@ -292,6 +327,18 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         load_bearing = list(evidence.get("load_bearing_features", []))
         if load_bearing:
             lines.append(f"- Load-bearing features: `{', '.join(load_bearing)}`")
+    if completion:
+        lines.extend(
+            [
+                "",
+                "## Completion",
+                f"- Current stage: `{completion.get('current_stage') or summary.get('stage_completed') or 'unknown'}`",
+                f"- Recommended action: `{completion.get('action') or next_step.get('recommended_action') or 'unknown'}`",
+                f"- Blocking layer: `{completion.get('blocking_layer') or 'none'}`",
+                f"- Mandate alignment: `{completion.get('mandate_alignment') or 'unknown'}`",
+                f"- Complete for mode: `{completion.get('complete_for_mode')}`",
+            ]
+        )
     lines.extend(
         [
             "",
@@ -384,7 +431,11 @@ def _resolve_stage(
     investigation_bundle: dict[str, Any],
     intake_bundle: dict[str, Any],
     evidence_bundle: dict[str, Any],
+    completion_bundle: dict[str, Any],
 ) -> str:
+    if completion_bundle:
+        run_state = _bundle_item(completion_bundle, "run_state")
+        return str(run_state.get("current_stage", "")).strip() or "completion_reviewed"
     if evidence_bundle:
         return "evidence_reviewed"
     if execution_summary:
@@ -403,7 +454,12 @@ def _resolve_run_status(
     plan: dict[str, Any],
     execution_summary: dict[str, Any],
     audit_report: dict[str, Any],
+    completion_decision: dict[str, Any],
 ) -> str:
+    if completion_decision:
+        action = str(completion_decision.get("action", "")).strip()
+        if action:
+            return action
     if audit_report:
         recommendation = str(audit_report.get("provisional_recommendation", "")).strip()
         if recommendation:
@@ -445,10 +501,17 @@ def _preview_text(value: Any, *, limit: int = 160) -> str | None:
 def _build_headline(summary: dict[str, Any]) -> str:
     decision = dict(summary.get("decision", {}))
     evidence = dict(summary.get("evidence", {}))
+    completion = dict(summary.get("completion", {}))
     target = decision.get("target_column") or "unknown target"
     route = decision.get("selected_route_title") or decision.get("selected_route_id") or "no selected route"
     model = decision.get("selected_model_family")
     if model:
+        completion_action = completion.get("action")
+        if completion_action:
+            return (
+                f"Relaytic built `{model}` for `{target}` using the `{route}` route and "
+                f"currently judges the run as `{completion_action}`."
+            )
         recommendation = evidence.get("provisional_recommendation")
         if recommendation:
             return (

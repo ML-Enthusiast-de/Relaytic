@@ -66,6 +66,7 @@ class IntakeRecord:
     selected_sheet: str | None
     header_row: int | None
     data_start_row: int | None
+    schema_validation: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)

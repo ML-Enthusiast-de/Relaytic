@@ -70,6 +70,8 @@ class TaskBrief:
     target_column: str | None = None
     prediction_horizon: str | None = None
     decision_type: str | None = None
+    task_type_hint: str | None = None
+    domain_archetype_hint: str | None = None
     primary_stakeholder: str | None = None
     success_criteria: list[str] = field(default_factory=list)
     failure_costs: list[str] = field(default_factory=list)
@@ -150,6 +152,8 @@ def default_task_brief(
     target_column: str | None = None,
     prediction_horizon: str | None = None,
     decision_type: str | None = None,
+    task_type_hint: str | None = None,
+    domain_archetype_hint: str | None = None,
     primary_stakeholder: str | None = None,
     success_criteria: list[str] | None = None,
     failure_costs: list[str] | None = None,
@@ -166,6 +170,8 @@ def default_task_brief(
         target_column=target_column,
         prediction_horizon=prediction_horizon,
         decision_type=decision_type,
+        task_type_hint=task_type_hint,
+        domain_archetype_hint=domain_archetype_hint,
         primary_stakeholder=primary_stakeholder,
         success_criteria=criteria,
         failure_costs=list(failure_costs or []),

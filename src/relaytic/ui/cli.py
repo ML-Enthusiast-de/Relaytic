@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -85,6 +86,36 @@ def git_guard_main(argv: list[str] | None = None) -> int:
     return _git_guard_main(argv)
 
 
+def build_integration_inventory(*args: Any, **kwargs: Any) -> dict[str, Any]:
+    from relaytic.integrations import build_integration_inventory as _build_integration_inventory
+
+    return _build_integration_inventory(*args, **kwargs)
+
+
+def render_integration_inventory_markdown(*args: Any, **kwargs: Any) -> str:
+    from relaytic.integrations import (
+        render_integration_inventory_markdown as _render_integration_inventory_markdown,
+    )
+
+    return _render_integration_inventory_markdown(*args, **kwargs)
+
+
+def build_integration_self_check_report(*args: Any, **kwargs: Any) -> dict[str, Any]:
+    from relaytic.integrations import (
+        build_integration_self_check_report as _build_integration_self_check_report,
+    )
+
+    return _build_integration_self_check_report(*args, **kwargs)
+
+
+def render_integration_self_check_markdown(*args: Any, **kwargs: Any) -> str:
+    from relaytic.integrations import (
+        render_integration_self_check_markdown as _render_integration_self_check_markdown,
+    )
+
+    return _render_integration_self_check_markdown(*args, **kwargs)
+
+
 def load_policy(*args: Any, **kwargs: Any) -> Any:
     from relaytic.policies import load_policy as _load_policy
 
@@ -143,6 +174,26 @@ def read_evidence_bundle(*args: Any, **kwargs: Any) -> Any:
     from relaytic.evidence import read_evidence_bundle as _read_evidence_bundle
 
     return _read_evidence_bundle(*args, **kwargs)
+
+
+def run_completion_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.completion import run_completion_review as _run_completion_review
+
+    return _run_completion_review(*args, **kwargs)
+
+
+def read_completion_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.completion import read_completion_bundle as _read_completion_bundle
+
+    return _read_completion_bundle(*args, **kwargs)
+
+
+def render_completion_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.completion import (
+        render_completion_review_markdown as _render_completion_review_markdown,
+    )
+
+    return _render_completion_review_markdown(*args, **kwargs)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -406,6 +457,34 @@ def build_parser() -> argparse.ArgumentParser:
         "paths",
         nargs="*",
         help="Optional files/directories. If omitted, scans git-tracked files.",
+    )
+
+    integrations = sub.add_parser(
+        "integrations",
+        help="Inspect optional OSS capabilities Relaytic can adopt through explicit adapters.",
+    )
+    integrations_sub = integrations.add_subparsers(dest="integrations_command", required=True)
+
+    integrations_show = integrations_sub.add_parser(
+        "show",
+        help="List optional integrations and whether they are installed locally.",
+    )
+    integrations_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    integrations_self_check = integrations_sub.add_parser(
+        "self-check",
+        help="Run compatibility smoke checks for the currently wired optional integrations.",
+    )
+    integrations_self_check.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
     manifest = sub.add_parser(
@@ -775,6 +854,40 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    status_surface = sub.add_parser(
+        "status",
+        help="Render the current Slice 07 completion-governor status for a run.",
+    )
+    status_surface.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    status_surface.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    completion = sub.add_parser(
+        "completion",
+        help="Run or inspect Slice 07 completion-governor artifacts.",
+    )
+    completion_sub = completion.add_subparsers(dest="completion_command", required=True)
+
+    completion_review = completion_sub.add_parser(
+        "review",
+        help="Execute Slice 07 completion judgment for an existing run.",
+    )
+    completion_review.add_argument("--run-dir", required=True, help="Run directory for completion artifacts.")
+    completion_review.add_argument("--config", default=None, help="Optional config/policy source.")
+    completion_review.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    completion_review.add_argument("--overwrite", action="store_true", help="Allow overwriting existing completion artifacts.")
+    completion_review.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    completion_review.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     investigate = sub.add_parser(
         "investigate",
         help="Run the Slice 03 investigation layer and write specialist artifacts.",
@@ -799,6 +912,33 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "scan-git-safety":
         passthrough = list(args.paths)
         return git_guard_main(passthrough)
+
+    if args.command == "integrations":
+        if args.integrations_command == "show":
+            payload = {
+                "status": "ok",
+                **build_integration_inventory(),
+            }
+            _emit_structured_surface_output(
+                payload=payload,
+                human_text=render_integration_inventory_markdown(payload["integrations"]),
+                output_format=args.format,
+            )
+            return 0
+        if args.integrations_command == "self-check":
+            payload = {
+                "status": "ok",
+                **build_integration_self_check_report(),
+            }
+            _emit_structured_surface_output(
+                payload=payload,
+                human_text=render_integration_self_check_markdown(payload),
+                output_format=args.format,
+            )
+            return 0
+        else:
+            parser.error("Unsupported integrations subcommand.")
+            return 2
 
     if args.command == "manifest":
         if args.manifest_command != "init":
@@ -1068,6 +1208,42 @@ def main(argv: list[str] | None = None) -> int:
                 header_row=args.header_row,
                 data_start_row=args.data_start_row,
                 timestamp_column=args.timestamp_column,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "status":
+        try:
+            payload = _show_completion_status(run_dir=args.run_dir)
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "completion":
+        if args.completion_command != "review":
+            parser.error("Unsupported completion subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_completion_phase(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
                 overwrite=bool(args.overwrite),
                 labels=labels,
             )
@@ -1412,6 +1588,14 @@ def _run_access_flow(
         timestamp_column=timestamp_column,
         overwrite=overwrite,
         labels=labels,
+        planning_state=planning_payload,
+    )
+    completion_payload = _run_completion_phase(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=labels,
     )
     summary_materialized = materialize_run_summary(
         run_dir=root,
@@ -1445,6 +1629,7 @@ def _run_access_flow(
     surface_payload["plan"] = planning_payload.get("plan", {})
     surface_payload["training_result"] = planning_payload.get("training_result", {})
     surface_payload["evidence"] = evidence_payload["surface_payload"].get("evidence", {})
+    surface_payload["completion"] = completion_payload["surface_payload"].get("completion", {})
     return {
         "surface_payload": surface_payload,
         "human_output": summary_materialized["report_markdown"],
@@ -1455,6 +1640,7 @@ def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
+    _ensure_completion_present(root)
     existing_summary = read_run_summary(root)
     request = dict(existing_summary.get("request", {})) if isinstance(existing_summary, dict) else {}
     summary_materialized = materialize_run_summary(
@@ -1475,6 +1661,24 @@ def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
         },
         "human_output": summary_materialized["report_markdown"],
     }
+
+
+def _ensure_completion_present(run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    bundle = _read_json_bundle(root, bundle="completion")
+    if bundle:
+        return bundle
+    evidence_bundle = _read_json_bundle(root, bundle="evidence")
+    if not evidence_bundle:
+        return {}
+    payload = _run_completion_phase(
+        run_dir=root,
+        config_path=None,
+        run_id=None,
+        overwrite=False,
+        labels=None,
+    )
+    return dict(payload["surface_payload"].get("bundle", {}))
 
 
 def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
@@ -1502,6 +1706,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.evidence import read_evidence_bundle
 
         return read_evidence_bundle(run_dir)
+    if bundle == "completion":
+        from relaytic.completion import read_completion_bundle
+
+        return read_completion_bundle(run_dir)
     raise ValueError(f"Unsupported bundle '{bundle}'.")
 
 
@@ -1824,6 +2032,7 @@ def _run_planning_phase(
         header_row=header_row,
         data_start_row=data_start_row,
         timestamp_column=timestamp_column,
+        overwrite=overwrite,
         labels=labels,
     )
     planning_bundle = run_planning(
@@ -1898,47 +2107,49 @@ def _run_evidence_phase(
     timestamp_column: str | None,
     overwrite: bool,
     labels: dict[str, str] | None,
+    planning_state: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     from relaytic.evidence import write_evidence_bundle
 
     root = Path(run_dir)
     targets = _evidence_output_paths(root)
-    if not overwrite:
-        _ensure_paths_absent(
-            [
-                path
-                for key, path in targets.items()
-                if key
-                in {
-                    "experiment_registry",
-                    "challenger_report",
-                    "ablation_report",
-                    "audit_report",
-                    "belief_update",
-                    "leaderboard",
-                    "technical_report",
-                    "decision_memo",
-                }
-            ],
-            overwrite=False,
-        )
-    planning_bundle_existing = _read_json_bundle(root, bundle="planning")
-    existing_plan = dict(planning_bundle_existing.get("plan", {}))
-    if existing_plan and dict(existing_plan.get("execution_summary", {})):
-        planning_state = {
-            "status": "ok",
-            "run_dir": str(root),
-            "data_path": str(Path(data_path)),
-            "plan": {
-                "selected_route_id": existing_plan.get("selected_route_id"),
-                "selected_route_title": existing_plan.get("selected_route_title"),
-                "target_column": existing_plan.get("target_column"),
-                "primary_metric": existing_plan.get("primary_metric"),
-                "split_strategy": existing_plan.get("split_strategy"),
-            },
-            "training_result": dict(existing_plan.get("execution_summary", {})),
-        }
-    else:
+    _ensure_paths_absent(
+        [
+            path
+            for key, path in targets.items()
+            if key
+            in {
+                "experiment_registry",
+                "challenger_report",
+                "ablation_report",
+                "audit_report",
+                "belief_update",
+                "leaderboard",
+                "technical_report",
+                "decision_memo",
+            }
+        ],
+        overwrite=overwrite,
+    )
+    selected_planning_state = planning_state
+    if selected_planning_state is None:
+        planning_bundle_existing = _read_json_bundle(root, bundle="planning")
+        existing_plan = dict(planning_bundle_existing.get("plan", {}))
+        if not overwrite and existing_plan and dict(existing_plan.get("execution_summary", {})):
+            selected_planning_state = {
+                "status": "ok",
+                "run_dir": str(root),
+                "data_path": str(Path(data_path)),
+                "plan": {
+                    "selected_route_id": existing_plan.get("selected_route_id"),
+                    "selected_route_title": existing_plan.get("selected_route_title"),
+                    "target_column": existing_plan.get("target_column"),
+                    "primary_metric": existing_plan.get("primary_metric"),
+                    "split_strategy": existing_plan.get("split_strategy"),
+                },
+                "training_result": dict(existing_plan.get("execution_summary", {})),
+            }
+    if selected_planning_state is None:
         planning_state = _run_planning_phase(
             run_dir=root,
             data_path=data_path,
@@ -1952,6 +2163,8 @@ def _run_evidence_phase(
             labels=labels,
             execute_route=True,
         )
+    else:
+        planning_state = selected_planning_state
     foundation_state = _ensure_run_foundation_present(
         run_dir=root,
         config_path=config_path,
@@ -2043,6 +2256,100 @@ def _show_evidence_surface(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _run_completion_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.completion import write_completion_bundle
+
+    root = Path(run_dir)
+    targets = _completion_output_paths(root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    evidence_bundle = _read_json_bundle(root, bundle="evidence")
+    if not evidence_bundle:
+        raise ValueError(f"Slice 07 completion requires Slice 06 evidence artifacts in {root}.")
+    completion_result = run_completion_review(
+        run_dir=root,
+        policy=foundation_state["resolved"].policy,
+        mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+        context_bundle=_read_json_bundle(root, bundle="context"),
+        intake_bundle=_read_json_bundle(root, bundle="intake"),
+        investigation_bundle=_read_json_bundle(root, bundle="investigation"),
+        planning_bundle=_read_json_bundle(root, bundle="planning"),
+        evidence_bundle=evidence_bundle,
+        config_path=config_path,
+    )
+    written = write_completion_bundle(root, bundle=completion_result.bundle)
+    manifest_path = _refresh_completion_manifest(
+        root,
+        run_id=run_id,
+        policy_source=foundation_state["policy_path"],
+        labels=labels,
+    )
+    materialize_run_summary(run_dir=root)
+    decision = completion_result.bundle.completion_decision
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "paths": {key: str(value) for key, value in written.items()},
+            "completion": {
+                "action": decision.action,
+                "confidence": decision.confidence,
+                "current_stage": decision.current_stage,
+                "blocking_layer": decision.blocking_layer,
+                "mandate_alignment": decision.mandate_alignment,
+                "complete_for_mode": decision.complete_for_mode,
+            },
+            "bundle": completion_result.bundle.to_dict(),
+        },
+        "human_output": completion_result.review_markdown,
+    }
+
+
+def _show_completion_status(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    completion_bundle = _ensure_completion_present(root)
+    if not completion_bundle:
+        raise ValueError(f"No Slice 07 completion artifacts found or materializable in {root}.")
+    summary_materialized = materialize_run_summary(run_dir=root)
+    manifest_path = _refresh_completion_manifest(root)
+    human_output = render_completion_review_markdown(completion_bundle)
+    decision = dict(completion_bundle.get("completion_decision", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "summary_path": str(summary_materialized["summary_path"]),
+            "report_path": str(summary_materialized["report_path"]),
+            "completion": {
+                "action": decision.get("action"),
+                "confidence": decision.get("confidence"),
+                "current_stage": decision.get("current_stage"),
+                "blocking_layer": decision.get("blocking_layer"),
+                "mandate_alignment": decision.get("mandate_alignment"),
+                "complete_for_mode": decision.get("complete_for_mode"),
+            },
+            "bundle": completion_bundle,
+        },
+        "human_output": human_output,
+    }
+
+
 def _ensure_investigation_present(
     *,
     run_dir: str | Path,
@@ -2053,11 +2360,12 @@ def _ensure_investigation_present(
     header_row: int | None,
     data_start_row: int | None,
     timestamp_column: str | None,
+    overwrite: bool,
     labels: dict[str, str] | None,
 ) -> dict[str, Any]:
     root = Path(run_dir)
     targets = _investigation_output_paths(root)
-    if all(path.exists() for path in targets.values()):
+    if not overwrite and all(path.exists() for path in targets.values()):
         return {"bundle": _read_json_bundle(root, bundle="investigation")}
     foundation_state = _ensure_run_foundation_present(
         run_dir=root,
@@ -2331,6 +2639,17 @@ def _evidence_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _completion_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "completion_decision": run_dir / "completion_decision.json",
+        "run_state": run_dir / "run_state.json",
+        "stage_timeline": run_dir / "stage_timeline.json",
+        "mandate_evidence_review": run_dir / "mandate_evidence_review.json",
+        "blocking_analysis": run_dir / "blocking_analysis.json",
+        "next_action_queue": run_dir / "next_action_queue.json",
+    }
+
+
 def _access_surface_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "run_summary": run_dir / "run_summary.json",
@@ -2361,9 +2680,23 @@ def _planning_model_artifact_paths(run_dir: Path) -> list[Path]:
 
 
 def _ensure_paths_absent(paths: list[Path], *, overwrite: bool) -> None:
+    deduped: list[Path] = []
+    seen: set[Path] = set()
+    for path in paths:
+        if path in seen:
+            continue
+        seen.add(path)
+        deduped.append(path)
     if overwrite:
+        for path in deduped:
+            if not path.exists():
+                continue
+            if path.is_dir():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
         return
-    existing = [str(path) for path in paths if path.exists()]
+    existing = [str(path) for path in deduped if path.exists()]
     if existing:
         raise ValueError(
             "Refusing to overwrite existing artifacts without --overwrite: "
@@ -2677,6 +3010,65 @@ def _refresh_evidence_manifest(
     )
 
 
+def _refresh_completion_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_evidence_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for filename in [
+        "completion_decision.json",
+        "run_state.json",
+        "stage_timeline.json",
+        "mandate_evidence_review.json",
+        "blocking_analysis.json",
+        "next_action_queue.json",
+    ]:
+        path = root / filename
+        if path.exists():
+            entries.append(artifact_entry(filename, run_dir=root, kind="status", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
 def _refresh_access_manifest(
     run_dir: str | Path,
     *,
@@ -2686,7 +3078,7 @@ def _refresh_access_manifest(
     training_result: dict[str, Any] | None = None,
 ) -> Path:
     root = Path(run_dir)
-    _refresh_evidence_manifest(
+    _refresh_completion_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,

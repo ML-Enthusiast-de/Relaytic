@@ -4,9 +4,9 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 06
-- next recommended slice: 07, completion judgment and visible workflow state
-- next reserved follow-on after 07: 09A, run memory and analog retrieval
+- completed slices: 00 through 07
+- next recommended slice: 08, lifecycle baseline
+- next high-leverage frontier follow-on: 09A, run memory and analog retrieval
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 
@@ -24,7 +24,16 @@ The repository currently supports:
 - a first human-friendly and agent-friendly MVP shell via `relaytic run`, `relaytic show`, `relaytic predict`, and `relaytic evidence`
 - persisted `run_summary.json` plus `reports/summary.md` for concise run understanding
 - challenger, ablation, audit, leaderboard, and decision-memo evidence around the first Builder route
+- completion-governor judgment that fuses mandate, context, intake, investigation, planning, and evidence into a machine-actionable next step
+- visible run-state and blocking-layer artifacts via `relaytic status` and `relaytic completion review`
 - optional local-LLM advisory support without making local LLMs a hard requirement
+- optional frontier-model use remains in-plan as a policy-gated amplifier rather than a baseline dependency
+- deterministic expert-prior inference that converts task/domain evidence into archetype-aware metric, route, feature, and risk priors
+- optional integration inventory via `relaytic integrations show` so humans and external agents can discover mature OSS capabilities without smearing them into the core contract
+- wired integration adapters for Pandera intake validation, statsmodels residual diagnostics, imbalanced-learn rare-event challengers, and PyOD anomaly challengers with a default Windows runtime guard for the current unstable PyOD stack
+- adapter compatibility self-checks via `relaytic integrations self-check` so upgrades can be verified without guessing
+- current task-family support across the main path for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event detection
+- public-dataset end-to-end regression, binary-classification, and multiclass-classification coverage using stable bundled open datasets in the test suite
 
 ## Implemented Slices
 
@@ -57,6 +66,7 @@ The repository currently supports:
 - implemented Scout for dataset profiling
 - implemented Scientist for grounded domain and objective hypotheses
 - implemented Focus Council for early objective resolution
+- added deterministic expert-prior reasoning so Scientist and Focus Council can carry archetype-aware knowledge without requiring an LLM
 - added `relaytic investigate`
 - added targeted investigation, CLI, and local-stub-LLM tests
 
@@ -65,6 +75,8 @@ The repository currently supports:
 - added `src/relaytic/intake/` with typed intake artifacts and storage helpers
 - implemented `StewardAgent` for mandate, work-preference, and run-brief translation
 - implemented `ContextInterpreterAgent` for data-origin, domain, and task translation
+- added task-type and domain-archetype hint extraction from free-form intake so later specialists can receive stronger structured intent
+- upgraded intake so explicit targets can resolve task-type hints from dataset evidence instead of relying only on generic language cues
 - added `relaytic intake interpret`
 - added `relaytic intake show`
 - added `relaytic intake questions`
@@ -104,6 +116,27 @@ The repository currently supports:
 - extended `run_summary.json` and `reports/summary.md` so humans and agents can see the provisional recommendation and evidence posture
 - added targeted Slice 06 agent, CLI, and local-stub-LLM tests
 
+### Slice 07
+
+- added `src/relaytic/completion/` with typed completion-governor artifacts, storage helpers, and optional local advisory
+- implemented a state tracker that records visible workflow stage and stage timeline
+- implemented a mandate review layer that checks target alignment and constraint conflicts against the executed route
+- implemented a completion governor that emits a stable action vocabulary, blocking-layer diagnosis, and machine-actionable next-action queue
+- added `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
+- added `relaytic status` and `relaytic completion review`
+- upgraded `relaytic run` and `relaytic show` so the MVP flow now ends in an explicit governed state rather than a provisional evidence memo only
+- tightened `--overwrite` behavior so reruns refresh targeted investigation, planning, evidence, and completion artifacts instead of mixing stale upstream state into later governed outputs
+- added targeted Slice 07 agent, CLI, local-stub-LLM, and end-to-end tests
+
+### Cross-Cutting Hardening
+
+- added `src/relaytic/integrations/` as the canonical optional-library discovery boundary
+- added `relaytic integrations show` for human and agent visibility into mature OSS capabilities
+- added `relaytic integrations self-check` so wired adapters can be compatibility-checked after package changes
+- wired Pandera into intake validation, statsmodels into evidence audit diagnostics, imbalanced-learn into rare-event challenger execution, and PyOD into anomaly challenger execution
+- adopted bundled public datasets for stable end-to-end regression, binary-classification, and multiclass-classification tests without introducing network-bound CI behavior
+- sharpened `RELAYTIC_SLICING_PLAN.md` into a stricter future-slice execution contract with explicit intelligence sources, proof obligations, fallbacks, and a preferred post-MVP execution order
+
 ## Compatibility Boundary
 
 The remaining compatibility surface is intentionally narrow:
@@ -118,23 +151,21 @@ New code and docs must target `relaytic` and `RELAYTIC_*`.
 The repository is not yet at the final product state. The main remaining gaps are:
 
 - the current challenger layer is real but still narrow; it does not yet prove broad challenger science
-- the current evidence layer does not yet fuse mandate, context, investigation, and evidence into a final machine-actionable governor decision
-- completion judgment, lifecycle decisions, and memory-guided route improvement are still pending
+- lifecycle decisions and memory-guided route improvement are still pending
 - benchmark-separated proof of strength under constrained/operator-heavy settings is still pending
 - some deeper runtime surfaces still retain compatibility-era internals while newer product layers are being built on top
 
 ## Immediate Next Work
 
-Slice 07 should land:
+Slice 08 should land:
 
-- Completion Judge as Inference Governor
-- visible workflow state for humans and external agents
-- explicit mandate-vs-evidence review
-- explicit blocking-layer diagnosis
-- machine-actionable next-action queue
-- explicit continue/stop/recalibrate/retrain/benchmark/collect-more-evidence style outputs
+- monitor vs recalibrate vs retrain baseline
+- champion/candidate comparison
+- promotion and rollback decisions
+- lifecycle actions that remain reversible and easy for external agents to consume
 
-After Slice 07, the next high-leverage follow-on should include:
+After Slice 08, the next high-leverage frontier follow-ons should include:
 
 - Slice 09A run memory and analog retrieval
+- Slice 09 intelligence amplification and bounded semantic-task infrastructure
 - Slice 11 benchmark-separated proof under constrained settings

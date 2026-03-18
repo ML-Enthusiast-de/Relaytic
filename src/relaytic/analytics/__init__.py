@@ -10,6 +10,7 @@ from .correlations import (
     run_correlation_analysis,
 )
 from .quality_checks import QualityCheckResult, run_quality_checks
+from .expert_priors import ExpertPriorProfile, KnowledgeSource, infer_expert_priors
 from .sensor_diagnostics import (
     SensorDiagnostic,
     SensorDiagnosticsSummary,
@@ -58,6 +59,8 @@ __all__ = [
     "PairCorrelationResult",
     "ProbeModelScore",
     "QualityCheckResult",
+    "ExpertPriorProfile",
+    "KnowledgeSource",
     "SensorDiagnostic",
     "SensorDiagnosticsSummary",
     "ExperimentRecommendation",
@@ -73,6 +76,7 @@ __all__ = [
     "rank_surrogate_candidates",
     "run_correlation_analysis",
     "run_quality_checks",
+    "infer_expert_priors",
     "run_sensor_diagnostics",
     "recommend_data_trajectories",
     "recommendations_to_dict",

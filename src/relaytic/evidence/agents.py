@@ -8,8 +8,16 @@ import math
 from pathlib import Path
 from typing import Any
 
+import pandas as pd
+
 from relaytic.ingestion import load_tabular_data
+from relaytic.integrations import (
+    compute_regression_residual_diagnostics,
+    run_pyod_anomaly_challenger,
+    run_resampled_logistic_challenger,
+)
 from relaytic.modeling import run_inference_from_artifacts, train_surrogate_candidates
+from relaytic.core.json_utils import write_json
 
 from .models import (
     ABLATION_REPORT_SCHEMA_VERSION,
@@ -57,6 +65,14 @@ class ChallengerAgent:
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         summary = dict(plan.get("execution_summary") or {})
         handoff = dict(plan.get("builder_handoff") or {})
+        external = _run_external_challenger(
+            frame=frame,
+            run_dir=run_dir,
+            plan=plan,
+            handoff=handoff,
+        )
+        if external is not None:
+            return external
         champion_family = str(summary.get("selected_model_family", "")).strip() or str(
             champion_experiment.get("model_family", "")
         ).strip()
@@ -347,6 +363,7 @@ class AuditAgent:
         *,
         run_dir: str | Path,
         data_path: str,
+        source_frame: Any,
         plan: dict[str, Any],
         intake_bundle: dict[str, Any],
         challenger_result: dict[str, Any],
@@ -378,6 +395,7 @@ class AuditAgent:
         drift_summary = dict(inference_audit.get("drift_summary") or {})
         assumptions = list((dict(intake_bundle.get("assumption_log") or {})).get("entries", []))
         feature_risk_flags = list((dict(plan.get("builder_handoff") or {})).get("feature_risk_flags", []))
+        external_diagnostics: list[dict[str, Any]] = []
         load_bearing_features = [
             str(item.get("removed_feature", "")).strip()
             for item in ablations
@@ -445,6 +463,16 @@ class AuditAgent:
                     "detail": f"Relaytic logged {len(assumptions)} assumption(s) rather than waiting for clarification.",
                 }
             )
+        task_type = str(plan.get("task_type", "")).strip()
+        target_column = str((dict(plan.get("builder_handoff") or {})).get("target_column", "")).strip()
+        statsmodels_report = _statsmodels_audit_report(
+            source_frame=source_frame,
+            inference_audit=inference_audit,
+            target_column=target_column,
+            task_type=task_type,
+        )
+        external_diagnostics.append(statsmodels_report)
+        findings.extend(_integration_findings(statsmodels_report))
         if not findings:
             findings.append(
                 {
@@ -500,6 +528,7 @@ class AuditAgent:
                 "challenger_comparison",
                 "feature_ablation_runs",
                 "inference_shift_diagnostics",
+                "optional_external_diagnostics",
             ],
             advisory_notes=advisory_notes,
         )
@@ -537,6 +566,7 @@ class AuditAgent:
                 "provisional_recommendation": provisional_recommendation,
                 "readiness_level": readiness_level,
                 "findings": findings,
+                "external_diagnostics": external_diagnostics,
                 "inference_audit_path": str(inference_path),
                 "llm_advisory": llm_advisory,
                 "summary": _audit_summary(provisional_recommendation, readiness_level, findings),
@@ -613,6 +643,7 @@ def run_evidence_review(
     audit_payload, belief_payload, audit_trace = audit_agent.run(
         run_dir=root,
         data_path=data_path,
+        source_frame=frame,
         plan=plan,
         intake_bundle=intake_bundle,
         challenger_result=challenger_result,
@@ -696,6 +727,10 @@ def run_evidence_review(
                 if challenger_registry_entry
                 else None,
                 "status": challenger_result.get("status"),
+                "integration": challenger_registry_entry.get("integration") if challenger_registry_entry else None,
+                "integration_version": challenger_registry_entry.get("integration_version")
+                if challenger_registry_entry
+                else None,
             },
             llm_advisory=llm_advisory or None,
             trace=challenger_trace,
@@ -719,6 +754,7 @@ def run_evidence_review(
             provisional_recommendation=str(audit_payload["provisional_recommendation"]),
             readiness_level=str(audit_payload["readiness_level"]),
             findings=list(audit_payload["findings"]),
+            external_diagnostics=list(audit_payload.get("external_diagnostics", [])),
             inference_audit_path=str(audit_payload["inference_audit_path"]),
             llm_advisory=audit_payload["llm_advisory"],
             summary=str(audit_payload["summary"]),
@@ -1024,6 +1060,207 @@ def _belief_summary(recommendation: str, readiness_level: str, updated_belief: s
         f"Belief updated toward `{recommendation}` with `{readiness_level}` confidence. "
         f"{updated_belief}"
     )
+
+
+def _run_external_challenger(
+    *,
+    frame: Any,
+    run_dir: str | Path,
+    plan: dict[str, Any],
+    handoff: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]] | None:
+    task_type = _optional_str(handoff.get("task_type")) or str(plan.get("task_type", "")).strip()
+    feature_columns = [str(item) for item in handoff.get("feature_columns", []) if str(item).strip()]
+    target_column = str(handoff.get("target_column", "")).strip()
+    if not feature_columns or not target_column:
+        return None
+
+    candidate_reports: list[dict[str, Any]] = []
+    if task_type in {"fraud_detection", "anomaly_detection"}:
+        candidate_reports.append(
+            run_resampled_logistic_challenger(
+                frame=frame,
+                feature_columns=feature_columns,
+                target_column=target_column,
+                task_type=task_type,
+                surface="evidence.challenger",
+            )
+        )
+    if task_type == "anomaly_detection":
+        candidate_reports.append(
+            run_pyod_anomaly_challenger(
+                frame=frame,
+                feature_columns=feature_columns,
+                target_column=target_column,
+                task_type=task_type,
+                surface="evidence.challenger",
+            )
+        )
+
+    chosen = next((item for item in candidate_reports if str(item.get("status", "")).strip() == "ok"), None)
+    if chosen is None:
+        return None
+
+    details = dict(chosen.get("details") or {})
+    experiment_id = f"challenger_{_slug(str(details.get('model_family', chosen.get('integration', 'external'))))}"
+    experiment_root = Path(run_dir) / "experiments" / experiment_id
+    experiment_root.mkdir(parents=True, exist_ok=True)
+    artifact_path = write_json(experiment_root / "external_challenger_result.json", chosen, indent=2)
+    comparison_metric = str(plan.get("primary_metric", "")).strip() or str(details.get("primary_metric", "unknown")).strip() or "unknown"
+    comparison_split, champion_value = _primary_metric_snapshot(
+        metrics=dict(plan.get("execution_summary", {}).get("selected_metrics") or {}),
+        primary_metric=comparison_metric,
+    )
+    selected_metrics = dict(details.get("selected_metrics") or {})
+    challenger_value = _metric_value(dict(selected_metrics.get("test") or {}), comparison_metric)
+    if challenger_value is None:
+        challenger_value = _metric_value(dict(selected_metrics.get("validation") or {}), comparison_metric)
+        comparison_split = "validation"
+    delta = _metric_delta(
+        metric_name=comparison_metric,
+        baseline=champion_value,
+        candidate=challenger_value,
+    )
+    challenger_wins = _candidate_beats_baseline(
+        metric_name=comparison_metric,
+        baseline=champion_value,
+        candidate=challenger_value,
+    )
+    selected_family = str(details.get("model_family", "")).strip() or str(chosen.get("integration", "external_challenger"))
+    summary = (
+        f"External challenger `{selected_family}` from `{chosen.get('integration')}` "
+        f"{'beat' if challenger_wins else 'did not beat'} the champion on `{comparison_metric}` ({comparison_split})."
+    )
+    return (
+        {
+            "experiment_id": experiment_id,
+            "status": "ok",
+            "winner": "challenger" if challenger_wins else "champion",
+            "comparison_metric": comparison_metric,
+            "comparison_split": comparison_split,
+            "delta_to_champion": delta,
+            "summary": summary,
+            "result": {
+                "selected_model_family": selected_family,
+                "selected_metrics": selected_metrics,
+                "integration": chosen.get("integration"),
+                "integration_version": chosen.get("version"),
+                "artifact_path": str(artifact_path),
+            },
+        },
+        {
+            "experiment_id": experiment_id,
+            "role": "challenger",
+            "status": "ok",
+            "model_family": selected_family,
+            "primary_metric": comparison_metric,
+            "evaluation_split": comparison_split,
+            "primary_metric_value": challenger_value,
+            "delta_from_champion": delta,
+            "feature_count": len(feature_columns),
+            "artifact_root": str(experiment_root),
+            "integration": chosen.get("integration"),
+            "integration_version": chosen.get("version"),
+            "note": summary,
+        },
+    )
+
+
+def _statsmodels_audit_report(
+    *,
+    source_frame: Any,
+    inference_audit: dict[str, Any],
+    target_column: str,
+    task_type: str,
+) -> dict[str, Any]:
+    if str(task_type).strip() != "regression":
+        return {
+            "integration": "statsmodels",
+            "package_name": "statsmodels",
+            "version": None,
+            "surface": "evidence.audit",
+            "status": "skipped",
+            "compatible": True,
+            "notes": ["statsmodels audit is currently limited to regression routes."],
+            "details": {"task_type": task_type},
+        }
+    predictions_path = str(inference_audit.get("predictions_path", "")).strip()
+    if not predictions_path:
+        return {
+            "integration": "statsmodels",
+            "package_name": "statsmodels",
+            "version": None,
+            "surface": "evidence.audit",
+            "status": "skipped",
+            "compatible": True,
+            "notes": ["Inference audit did not provide a predictions file for residual diagnostics."],
+            "details": {},
+        }
+    try:
+        prediction_frame = load_tabular_data(predictions_path).frame.copy()
+    except Exception as exc:
+        return {
+            "integration": "statsmodels",
+            "package_name": "statsmodels",
+            "version": None,
+            "surface": "evidence.audit",
+            "status": "error",
+            "compatible": False,
+            "notes": [f"Could not load inference predictions for statsmodels audit: {exc}"],
+            "details": {},
+        }
+    if "source_row" not in prediction_frame.columns or "prediction" not in prediction_frame.columns:
+        return {
+            "integration": "statsmodels",
+            "package_name": "statsmodels",
+            "version": None,
+            "surface": "evidence.audit",
+            "status": "skipped",
+            "compatible": True,
+            "notes": ["Prediction artifact does not expose `source_row` and `prediction` columns."],
+            "details": {},
+        }
+    aligned_source = source_frame.reset_index(drop=True).reset_index(names="source_row")
+    merged = prediction_frame.merge(aligned_source, on="source_row", how="inner")
+    if target_column not in merged.columns:
+        return {
+            "integration": "statsmodels",
+            "package_name": "statsmodels",
+            "version": None,
+            "surface": "evidence.audit",
+            "status": "skipped",
+            "compatible": True,
+            "notes": [f"Target column `{target_column}` is unavailable for residual diagnostics."],
+            "details": {},
+        }
+    y_true = [float(item) for item in pd.to_numeric(merged[target_column], errors="coerce").dropna().tolist()]
+    prediction_series = pd.to_numeric(merged["prediction"], errors="coerce")
+    aligned = merged.loc[prediction_series.notna()].reset_index(drop=True)
+    y_true = pd.to_numeric(aligned[target_column], errors="coerce")
+    y_pred = pd.to_numeric(aligned["prediction"], errors="coerce")
+    valid = y_true.notna() & y_pred.notna()
+    return compute_regression_residual_diagnostics(
+        y_true=y_true.loc[valid].tolist(),
+        y_pred=y_pred.loc[valid].tolist(),
+        surface="evidence.audit",
+    )
+
+
+def _integration_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
+    details = dict(report.get("details") or {})
+    findings = list(details.get("findings") or [])
+    if findings:
+        return findings
+    if str(report.get("status", "")).strip() == "error":
+        return [
+            {
+                "severity": "low",
+                "title": f"{report.get('integration')} integration encountered an error.",
+                "detail": "; ".join(str(item) for item in report.get("notes", [])) or "No details recorded.",
+                "source": str(report.get("integration", "integration")),
+            }
+        ]
+    return []
 
 
 def _choose_challenger_family(*, plan: dict[str, Any], champion_family: str) -> str | None:

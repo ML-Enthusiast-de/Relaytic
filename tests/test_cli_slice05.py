@@ -6,25 +6,20 @@ from relaytic.modeling import run_inference_from_artifacts
 from relaytic.ui.cli import main
 
 
-def _write_dataset(path: Path) -> Path:
-    rows = [
-        ["timestamp", "sensor_a", "sensor_b", "failure_flag", "future_failure_flag", "post_inspection_flag"],
-        ["2025-01-01T00:00:00", 10.0, 100.0, 0, 0, 0],
-        ["2025-01-01T00:01:00", 11.0, 102.0, 0, 0, 0],
-        ["2025-01-01T00:02:00", 12.0, 101.0, 1, 1, 1],
-        ["2025-01-01T00:03:00", 13.0, 103.0, 0, 0, 0],
-        ["2025-01-01T00:04:00", 14.0, 105.0, 1, 1, 1],
-        ["2025-01-01T00:05:00", 15.0, 104.0, 0, 0, 0],
-        ["2025-01-01T00:06:00", 16.0, 106.0, 1, 1, 1],
-        ["2025-01-01T00:07:00", 17.0, 108.0, 0, 0, 0],
-        ["2025-01-01T00:08:00", 18.0, 107.0, 1, 1, 1],
-        ["2025-01-01T00:09:00", 19.0, 109.0, 0, 0, 0],
-        ["2025-01-01T00:10:00", 20.0, 110.0, 1, 1, 1],
-        ["2025-01-01T00:11:00", 21.0, 111.0, 0, 0, 0],
-        ["2025-01-01T00:12:00", 22.0, 112.0, 1, 1, 1],
-        ["2025-01-01T00:13:00", 23.0, 113.0, 0, 0, 0],
-        ["2025-01-01T00:14:00", 24.0, 114.0, 1, 1, 1],
-    ]
+def _write_dataset(path: Path, *, count: int = 15) -> Path:
+    rows = [["timestamp", "sensor_a", "sensor_b", "failure_flag", "future_failure_flag", "post_inspection_flag"]]
+    for index in range(count):
+        failure_flag = index % 2
+        rows.append(
+            [
+                f"2025-01-01T00:{index:02d}:00",
+                10.0 + index,
+                100.0 + index + (index % 3),
+                failure_flag,
+                failure_flag,
+                failure_flag,
+            ]
+        )
     with path.open("w", newline="", encoding="utf-8") as handle:
         csv.writer(handle).writerows(rows)
     return path
@@ -134,3 +129,28 @@ def test_cli_plan_run_requires_overwrite_when_slice05_or_model_artifacts_exist(t
         assert exc.code == 2
         return
     raise AssertionError("Expected parser failure when overwriting Slice 05 artifacts without --overwrite.")
+
+
+def test_cli_plan_run_overwrite_refreshes_investigation_bundle(tmp_path: Path) -> None:
+    run_dir = tmp_path / "run_slice05_refresh"
+    data_path = _write_dataset(tmp_path / "slice05_refresh.csv", count=15)
+
+    assert main(
+        [
+            "intake",
+            "interpret",
+            "--run-dir",
+            str(run_dir),
+            "--data-path",
+            str(data_path),
+            "--text",
+            "Predict failure_flag. Do not use future_failure_flag or post_inspection_flag.",
+        ]
+    ) == 0
+    assert main(["plan", "run", "--run-dir", str(run_dir), "--data-path", str(data_path)]) == 0
+
+    _write_dataset(data_path, count=18)
+    assert main(["plan", "run", "--run-dir", str(run_dir), "--data-path", str(data_path), "--overwrite"]) == 0
+
+    dataset_profile = json.loads((run_dir / "dataset_profile.json").read_text(encoding="utf-8"))
+    assert dataset_profile["row_count"] == 18

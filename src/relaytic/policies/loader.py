@@ -178,8 +178,8 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "recalibration_only_allowed": True,
             "rollback_allowed": True,
             "champion_candidate_registry_enabled": False,
-            "completion_judge_enabled": False,
-            "stage_visibility_enabled": False,
+            "completion_judge_enabled": True,
+            "stage_visibility_enabled": True,
         },
         "dojo": {
             "enabled": False,

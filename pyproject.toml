@@ -38,6 +38,14 @@ relaytic-guard = "relaytic.security.git_guard:main"
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
+  "scikit-learn>=1.5",
+]
+integrations = [
+  "scikit-learn>=1.5",
+  "pandera>=0.20",
+  "statsmodels>=0.14",
+  "imbalanced-learn>=0.12",
+  "pyod>=2.0",
 ]
 stats = [
   "scipy>=1.11",

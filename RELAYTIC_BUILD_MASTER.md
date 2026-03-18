@@ -63,6 +63,27 @@ Start with:
 14. physics-aware exploration constraints
 15. packaging, integrations, demos, and polish
 
+## Preferred post-MVP execution order
+
+Stable numbering stays the same, but once Slice 07 is complete the preferred execution order is:
+
+1. Slice 08
+2. Slice 09A
+3. Slice 09
+4. Slice 11
+5. Slice 10
+6. Slice 12
+7. Slice 13
+8. Slice 14
+9. Slice 15
+
+Reason:
+
+- Slice 08 makes Relaytic lifecycle-capable
+- Slice 09A is the highest-leverage intelligence upgrade
+- Slice 09 makes semantic and strategic amplification operational
+- Slice 11 gives honest proof before feedback and dojo expansion
+
 ## MVP boundary
 
 The first working Relaytic should include only the load-bearing core:
@@ -122,3 +143,4 @@ If files disagree, use:
 ## Immediate instruction to Codex
 
 Read the vision, then the build docs, then execute one bounded slice only.
+For future slices, follow the slice-execution contract in `RELAYTIC_SLICING_PLAN.md`: load-bearing improvement, human surface, agent surface, intelligence source, proof obligation, and fallback rule.

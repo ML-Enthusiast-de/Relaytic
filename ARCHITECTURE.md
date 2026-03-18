@@ -18,6 +18,8 @@ Relaytic is organized as a staged artifact pipeline.
    Strategist turns investigation outputs into a concrete Builder handoff, and the first deterministic route executes into the same Relaytic run directory.
 5. Evidence pressure
    Challenger, ablation, and audit specialists treat the first built route as a provisional champion, then write leaderboard, report, and belief-update artifacts for humans and external agents.
+6. Completion governor
+   Completion specialists fuse the full artifact graph into a visible run state, mandate-evidence review, blocking-layer diagnosis, and machine-actionable next action.
 
 ## Core System Principles
 
@@ -27,7 +29,7 @@ Relaytic is organized as a staged artifact pipeline.
 - Artifact-first behavior: important decisions are written as inspectable artifacts, not hidden in transient agent state.
 - Specialist decomposition: focused agents handle bounded responsibilities rather than collapsing everything into a single planner.
 
-## Role Of Local LLMs
+## Role Of Local And Frontier Models
 
 Local LLMs are optional advisory components, not a hard dependency for the product contract.
 
@@ -39,12 +41,46 @@ They can improve:
 - bounded advisory support inside planning and route selection
 - bounded advisory support inside evidence review and memo refinement
 
+Policy-gated frontier models remain part of the long-term design as optional high-end reasoning or challenger backends. They should only be used when explicitly allowed, and they must enrich Relaytic's artifact graph rather than replace the deterministic floor.
+
 They must not replace:
 
 - the deterministic intake floor
 - policy enforcement
 - artifact provenance
 - the ability to continue autonomously without model availability
+
+## Where Agent Knowledge Comes From
+
+Relaytic's specialists are not pretrained domain experts in the product-contract sense.
+
+They get their working knowledge from:
+
+- the dataset itself and deterministic profiling outputs
+- deterministic expert-prior libraries that map artifact evidence into domain archetypes and task-specific priors
+- structured mandate and context artifacts
+- policy and safety constraints
+- persisted evidence from planning, execution, challenger, audit, and completion stages
+- optional uploaded notes or structured context when provided
+- optional local-LLM advisory help for bounded semantic refinement
+
+So the main intelligence path is artifact-grounded reasoning, not hidden pretrained authority. Local LLMs can improve interpretation and synthesis, but they do not replace the deterministic floor or the auditable evidence chain.
+
+At the current baseline, that means Relaytic can already reason over and route common structured-data work such as regression, binary classification, multiclass classification, fraud-style rare-event detection, and anomaly-style detection. The specialist layer is still not equivalent to a fully pretrained PhD-level domain expert; the roadmap for that is stronger memory, reference-doc grounding, and optional intelligence amplification, not opaque magic.
+
+## Reuse Mature Libraries Through Adapters
+
+Relaytic should not reinvent mature commodity tooling where the ecosystem is already strong.
+
+The correct pattern is:
+
+- use mature libraries for baselines, diagnostics, schema validation, feature extraction, drift signals, and benchmark parity
+- keep those capabilities behind explicit adapter boundaries
+- preserve Relaytic-native artifacts as the source of truth for policy, judgment, and provenance
+- expose local availability to both humans and external agents through `relaytic integrations show`
+- expose adapter compatibility through `relaytic integrations self-check`
+
+The repository's current adoption policy lives in `OPEN_SOURCE_STACK.md`.
 
 ## Current Implemented Layers
 
@@ -57,8 +93,9 @@ The repository currently implements the following product layers:
 - Slice 05: Strategist planning, Builder handoff, and the first deterministic route from data to model
 - Slice 05A: MVP-access orchestration with `relaytic run`, `relaytic show`, `relaytic predict`, and persisted run summaries
 - Slice 06: challenger, ablation, provisional audit, leaderboard, and decision-memo evidence around the first built route
+- Slice 07: completion-governor judgment with visible run state, blocking analysis, mandate-evidence review, and next-action queue
 
-The next planned layer is Slice 07: completion judgment and visible workflow state.
+The next planned layer is Slice 08: lifecycle baseline.
 
 ## Current Artifact Baseline
 
@@ -101,6 +138,12 @@ Relaytic already standardizes several load-bearing artifacts:
 - `leaderboard.csv`
 - `reports/technical_report.md`
 - `reports/decision_memo.md`
+- `completion_decision.json`
+- `run_state.json`
+- `stage_timeline.json`
+- `mandate_evidence_review.json`
+- `blocking_analysis.json`
+- `next_action_queue.json`
 
 ## Current CLI Baseline
 
@@ -122,9 +165,13 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic plan show`
 - `relaytic evidence run`
 - `relaytic evidence show`
+- `relaytic status`
+- `relaytic completion review`
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
+- `relaytic integrations show`
+- `relaytic integrations self-check`
 
 Additional runtime commands from earlier repository layers still exist while later slices replace deeper internal paths. Those commands are not the long-term architectural center of the product.
 

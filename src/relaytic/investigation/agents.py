@@ -9,7 +9,7 @@ from typing import Any
 
 import pandas as pd
 
-from relaytic.analytics import assess_stationarity, run_quality_checks
+from relaytic.analytics import assess_stationarity, infer_expert_priors, run_quality_checks
 from relaytic.analytics.task_detection import assess_task_profile, is_classification_task
 from relaytic.ingestion import load_tabular_data
 
@@ -260,6 +260,14 @@ class ScientistAgent:
             run_brief=run_brief,
         )
         primary_target = target_candidates[0] if target_candidates else {}
+        expert_priors = infer_expert_priors(
+            dataset_profile=dataset_profile.to_dict(),
+            primary_target=primary_target,
+            task_brief=task_brief,
+            domain_brief=domain_brief,
+            run_brief=run_brief,
+            data_origin=data_origin,
+        ).to_dict()
         route_hypotheses = _route_hypotheses(
             dataset_profile=dataset_profile,
             primary_target=primary_target,
@@ -296,6 +304,19 @@ class ScientistAgent:
             task_brief=task_brief,
             run_brief=run_brief,
             primary_target=primary_target,
+        )
+        route_hypotheses = _merge_expert_route_hypotheses(
+            route_hypotheses=route_hypotheses,
+            expert_priors=expert_priors,
+            dataset_profile=dataset_profile,
+        )
+        feature_hypotheses.extend(_expert_feature_hypotheses(expert_priors))
+        additional_data_hypotheses.extend(_expert_additional_data_hypotheses(expert_priors))
+        unresolved_questions.extend(_string_list(expert_priors.get("questions")))
+        domain_risks.extend(_string_list(expert_priors.get("risks")))
+        domain_summary = _enrich_domain_summary(
+            domain_summary=domain_summary,
+            expert_priors=expert_priors,
         )
         llm_advisory: dict[str, Any] | None = None
         llm_status = "not_requested"
@@ -365,6 +386,7 @@ class ScientistAgent:
             dataset_profile=dataset_profile,
             split_hypotheses=split_hypotheses,
             unresolved_questions=unresolved_questions,
+            domain_archetype=str(expert_priors.get("domain_archetype", "generic_tabular")),
         )
         return DomainMemo(
             schema_version=DOMAIN_MEMO_SCHEMA_VERSION,
@@ -372,7 +394,10 @@ class ScientistAgent:
             controls=self.controls,
             operational_problem_statement=operational_problem_statement,
             domain_summary=domain_summary,
+            domain_archetype=str(expert_priors.get("domain_archetype", "generic_tabular")),
             target_candidates=target_candidates,
+            expert_priors=expert_priors,
+            knowledge_sources=list(expert_priors.get("knowledge_sources", [])),
             route_hypotheses=route_hypotheses,
             split_hypotheses=split_hypotheses,
             feature_hypotheses=feature_hypotheses,
@@ -947,6 +972,7 @@ def _scientist_target_candidates(
     run_brief: dict[str, Any],
 ) -> list[dict[str, Any]]:
     explicit_target = str(task_brief.get("target_column") or run_brief.get("target_column") or "").strip()
+    explicit_task_type_hint = str(task_brief.get("task_type_hint", "")).strip() or None
     candidates: list[dict[str, Any]] = []
     for column in dataset_profile.candidate_target_columns[:4]:
         if column not in frame.columns:
@@ -955,10 +981,16 @@ def _scientist_target_candidates(
             frame=frame,
             target_column=column,
             data_mode=dataset_profile.data_mode,
+            task_type_hint=explicit_task_type_hint if explicit_target and column == explicit_target else None,
         )
         confidence = 0.55
         if column == explicit_target:
             confidence += 0.3
+        if explicit_task_type_hint:
+            if profile.task_type == explicit_task_type_hint:
+                confidence += 0.07
+            elif is_classification_task(profile.task_type) == is_classification_task(explicit_task_type_hint):
+                confidence += 0.03
         if any(token in column.lower() for token in TARGET_KEYWORDS):
             confidence += 0.08
         if column in dataset_profile.hidden_key_candidates:
@@ -1284,14 +1316,84 @@ def _scientist_summary(
     dataset_profile: DatasetProfile,
     split_hypotheses: list[dict[str, Any]],
     unresolved_questions: list[str],
+    domain_archetype: str,
 ) -> str:
     target_text = str(primary_target.get("target_column", "unspecified")).strip() or "unspecified"
     split_text = str(split_hypotheses[0].get("strategy", "unspecified")).strip() if split_hypotheses else "unspecified"
     ambiguity_note = " Target ambiguity remains open." if unresolved_questions else ""
     return (
         f"Scientist currently prefers `{target_text}` as the working target, expects a "
-        f"`{split_text}` split bias, and will carry forward {dataset_profile.leakage_risk_level} leakage caution.{ambiguity_note}"
+        f"`{split_text}` split bias, matched the `{domain_archetype}` archetype, and will carry forward "
+        f"{dataset_profile.leakage_risk_level} leakage caution.{ambiguity_note}"
     )
+
+
+def _merge_expert_route_hypotheses(
+    *,
+    route_hypotheses: list[dict[str, Any]],
+    expert_priors: dict[str, Any],
+    dataset_profile: DatasetProfile,
+) -> list[dict[str, Any]]:
+    priors = _string_list(expert_priors.get("model_family_bias"))
+    if not priors:
+        return route_hypotheses
+    route_hypotheses = list(route_hypotheses)
+    route_hypotheses.append(
+        {
+            "route_id": "expert_prior_route_bias",
+            "title": "Deterministic expert-prior route bias",
+            "confidence": max(0.4, min(0.92, float(expert_priors.get("confidence", 0.5)) - 0.08)),
+            "rationale": (
+                f"Matched `{expert_priors.get('domain_archetype', 'generic_tabular')}`; plausible model families "
+                f"include {', '.join(priors[:3])} for {dataset_profile.data_mode} data."
+            ),
+        }
+    )
+    return route_hypotheses
+
+
+def _expert_feature_hypotheses(expert_priors: dict[str, Any]) -> list[dict[str, Any]]:
+    hypotheses: list[dict[str, Any]] = []
+    for family in _string_list(expert_priors.get("feature_priorities")):
+        hypotheses.append(
+            {
+                "name": family,
+                "priority": "high",
+                "source": "deterministic_expert_prior",
+                "rationale": (
+                    f"The `{expert_priors.get('domain_archetype', 'generic_tabular')}` archetype treats "
+                    f"`{family}` as a load-bearing feature family."
+                ),
+            }
+        )
+    return hypotheses
+
+
+def _expert_additional_data_hypotheses(expert_priors: dict[str, Any]) -> list[dict[str, Any]]:
+    hypotheses: list[dict[str, Any]] = []
+    for need in _string_list(expert_priors.get("additional_data_needs")):
+        hypotheses.append(
+            {
+                "need": need,
+                "priority": "high",
+                "rationale": (
+                    f"The `{expert_priors.get('domain_archetype', 'generic_tabular')}` archetype often improves "
+                    f"materially when `{need}` is available."
+                ),
+            }
+        )
+    return hypotheses
+
+
+def _enrich_domain_summary(*, domain_summary: str, expert_priors: dict[str, Any]) -> str:
+    summary = str(domain_summary).strip()
+    archetype = str(expert_priors.get("domain_archetype", "")).strip()
+    expert_summary = str(expert_priors.get("summary", "")).strip()
+    if not archetype or not expert_summary:
+        return summary
+    if archetype in summary and expert_summary in summary:
+        return summary
+    return f"{summary} {expert_summary}".strip()
 
 
 def _lens_scores(
@@ -1382,6 +1484,9 @@ def _lens_scores(
     if minority_fraction is not None and float(minority_fraction) < 0.15:
         scores["value"] += 0.05
         scores["reliability"] += 0.05
+    for objective, delta in dict(domain_memo.expert_priors.get("objective_bias", {})).items():
+        if objective in scores:
+            scores[objective] += float(delta)
     return {key: max(0.05, min(1.0, value)) for key, value in scores.items()}
 
 
@@ -1409,6 +1514,8 @@ def _context_corpus(
             if value:
                 parts.append(value)
     parts.append(domain_memo.domain_summary)
+    parts.append(domain_memo.domain_archetype)
+    parts.append(str(domain_memo.expert_priors.get("summary", "")).strip())
     parts.append(domain_memo.operational_problem_statement)
     return " ".join(parts).lower()
 
@@ -1600,6 +1707,7 @@ def _optimization_profile(
     domain_memo: DomainMemo,
 ) -> OptimizationProfile:
     primary_target = domain_memo.target_candidates[0] if domain_memo.target_candidates else {}
+    expert_priors = dict(domain_memo.expert_priors)
     task_type = str(primary_target.get("task_type", "")).strip()
     primary = focus_profile.primary_objective
     classification = is_classification_task(task_type)
@@ -1619,6 +1727,11 @@ def _optimization_profile(
             primary_metric = "mae_per_latency"
         else:
             primary_metric = "mae"
+    expert_primary_metric = str(expert_priors.get("recommended_primary_metric", "")).strip()
+    if expert_primary_metric and (
+        primary_metric in {"f1", "mae"} or task_type in {"fraud_detection", "anomaly_detection"}
+    ):
+        primary_metric = expert_primary_metric
     secondary_metrics: list[str] = []
     if "reliability" in focus_profile.active_lenses:
         secondary_metrics.extend(["calibration", "stability"])
@@ -1643,6 +1756,7 @@ def _optimization_profile(
         model_family_bias = ["logistic", "tree_classifier", "boosted_tree_classifier"]
     else:
         model_family_bias = ["linear_ridge", "tree_ensemble", "boosted_tree"]
+    model_family_bias.extend(_string_list(expert_priors.get("model_family_bias")))
     if primary == "accuracy":
         search_budget_posture = "aggressive"
     elif primary in {"efficiency", "sustainability", "interpretability"}:
@@ -1654,9 +1768,13 @@ def _optimization_profile(
         threshold_objective = "favor_recall"
     elif classification and primary == "reliability":
         threshold_objective = "calibrated_threshold"
+    expert_threshold_objective = str(expert_priors.get("threshold_policy_hint", "")).strip()
+    if classification and expert_threshold_objective:
+        threshold_objective = expert_threshold_objective
     notes = [
         f"Primary focus is `{focus_profile.primary_objective}`.",
         f"Resolved split bias is `{split_bias}`.",
+        str(expert_priors.get("summary", "")).strip(),
     ]
     return OptimizationProfile(
         schema_version=OPTIMIZATION_PROFILE_SCHEMA_VERSION,
@@ -1686,6 +1804,7 @@ def _feature_strategy_profile(
     context_bundle: dict[str, Any],
 ) -> FeatureStrategyProfile:
     domain_brief = _bundle_item(context_bundle, "domain_brief")
+    expert_priors = dict(domain_memo.expert_priors)
     prioritize_lag_features = dataset_profile.data_mode == "time_series"
     prioritize_interactions = (
         focus_profile.primary_objective in {"accuracy", "value"}
@@ -1716,6 +1835,7 @@ def _feature_strategy_profile(
         preferred_feature_families.append("group_history_features")
     if prioritize_simple_features:
         preferred_feature_families.append("raw_auditable_features")
+    preferred_feature_families.extend(_string_list(expert_priors.get("feature_priorities")))
     de_emphasized_feature_families = ["high_cardinality_ids", "post_outcome_proxies"]
     if prioritize_simple_features:
         de_emphasized_feature_families.append("deep_feature_search")
@@ -1732,6 +1852,7 @@ def _feature_strategy_profile(
     notes = [
         f"Primary focus is `{focus_profile.primary_objective}`.",
         f"Preferred feature families: {', '.join(_dedupe_strings(preferred_feature_families)) or 'raw_auditable_features'}.",
+        str(expert_priors.get("summary", "")).strip(),
     ]
     return FeatureStrategyProfile(
         schema_version=FEATURE_STRATEGY_PROFILE_SCHEMA_VERSION,

@@ -81,15 +81,24 @@ Avoid introducing new references to:
 - expanded the artifact boundary to include `experiment_registry.json`, `challenger_report.json`, `ablation_report.json`, `audit_report.json`, `belief_update.json`, `leaderboard.csv`, `reports/technical_report.md`, and `reports/decision_memo.md`
 - upgraded the MVP access shell so `relaytic run` now drives the evidence layer by default while preserving lower-level specialist surfaces
 
+### Slice 07
+
+- introduced the canonical package boundary `src/relaytic/completion/`
+- introduced the public commands `relaytic status` and `relaytic completion review`
+- expanded the artifact boundary to include `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
+- upgraded the MVP access shell so `relaytic run` and `relaytic show` now surface an explicit governed run state rather than stopping at provisional evidence only
+
+### Post-Slice 07 Cross-Cutting Additions
+
+- introduced the canonical package boundary `src/relaytic/integrations/`
+- introduced the public command `relaytic integrations show`
+- introduced the public command `relaytic integrations self-check`
+- wired adapter-scoped third-party surfaces for intake validation and evidence diagnostics/challengers without broadening the legacy compatibility surface
+- kept third-party capabilities optional and adapter-scoped rather than broadening the core or legacy compatibility surface
+
 ## Reserved Next Boundaries
 
 These boundaries are frozen for the next major slices so implementation can proceed without reopening naming or ownership questions.
-
-### Slice 07
-
-- reserve the canonical package boundary `src/relaytic/completion/`
-- reserve the future public commands `relaytic status` and `relaytic completion review`
-- reserve the artifact boundary for `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
 
 ### Slice 09A
 

@@ -167,8 +167,11 @@ def _infer_task_profile(
     fraud_named = any(token in name_lower for token in _FRAUD_KEYWORDS)
     anomaly_named = any(token in name_lower for token in _ANOMALY_KEYWORDS)
     discrete_threshold = max(3, min(16, int(round(math.sqrt(row_count) * 0.6))))
+    small_class_limit = max(3, min(8, int(round(math.sqrt(row_count)))))
     classification_like = bool_like or (
-        integer_like and class_count <= discrete_threshold and distinct_ratio <= 0.12
+        integer_like
+        and class_count <= discrete_threshold
+        and (distinct_ratio <= 0.12 or class_count <= small_class_limit)
     )
 
     if class_count == 2 and classification_like:

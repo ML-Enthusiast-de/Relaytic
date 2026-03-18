@@ -35,6 +35,20 @@ def _write_regression_dataset(path: Path) -> Path:
     return path
 
 
+def _write_fraud_dataset(path: Path) -> Path:
+    rows = [["transaction_id", "amount_norm", "device_risk", "velocity_score", "fraud_flag"]]
+    for index in range(24):
+        fraud = 1 if index % 7 == 0 else 0
+        amount = 0.9 if fraud else 0.2 + (index % 5) * 0.05
+        device_risk = 0.95 if fraud else 0.15 + (index % 4) * 0.04
+        velocity = 0.88 if fraud else 0.2 + (index % 3) * 0.06
+        rows.append([f"T{index:04d}", round(amount, 5), round(device_risk, 5), round(velocity, 5), fraud])
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerows(rows)
+    return path
+
+
 def _build_foundation(policy: dict, *, target_column: str) -> tuple[dict, dict]:
     mandate_controls = build_mandate_controls_from_policy(policy)
     context_controls = build_context_controls_from_policy(policy)
@@ -109,3 +123,26 @@ def test_run_investigation_activates_value_and_reliability_lenses(tmp_path: Path
     assert "value" in bundle.focus_profile.active_lenses
     assert "reliability" in bundle.focus_profile.active_lenses
     assert bundle.focus_debate.resolution["primary_objective"] == bundle.focus_profile.primary_objective
+
+
+def test_run_investigation_applies_expert_priors_for_fraud_like_use_cases(tmp_path: Path) -> None:
+    data_path = _write_fraud_dataset(tmp_path / "fraud.csv")
+    policy = load_policy().policy
+    mandate_bundle, context_bundle = _build_foundation(policy, target_column="fraud_flag")
+    context_bundle["task_brief"]["problem_statement"] = "Detect fraudulent transactions before approval."
+    context_bundle["task_brief"]["task_type_hint"] = "fraud_detection"
+    context_bundle["task_brief"]["domain_archetype_hint"] = "fraud_risk"
+    context_bundle["domain_brief"]["summary"] = "Score transaction fraud risk for payment review."
+
+    bundle = run_investigation(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+    )
+
+    assert bundle.domain_memo.domain_archetype == "fraud_risk"
+    assert bundle.domain_memo.target_candidates[0]["task_type"] == "fraud_detection"
+    assert bundle.domain_memo.expert_priors["recommended_primary_metric"] == "pr_auc"
+    assert "group_history_features" in bundle.feature_strategy_profile.preferred_feature_families
+    assert bundle.optimization_profile.primary_metric == "pr_auc"

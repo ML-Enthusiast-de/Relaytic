@@ -42,6 +42,22 @@ def test_assess_task_profile_detects_fraud_by_name_and_imbalance() -> None:
     assert profile.minority_class_fraction == 0.05
 
 
+def test_assess_task_profile_detects_multiclass_classification() -> None:
+    frame = pd.DataFrame(
+        {
+            "feature_a": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+            "tier_label": [0, 1, 2, 0, 1, 2],
+        }
+    )
+    profile = assess_task_profile(
+        frame=frame,
+        target_column="tier_label",
+        data_mode="steady_state",
+    )
+    assert profile.task_type == "multiclass_classification"
+    assert profile.task_family == "classification"
+
+
 def test_assess_task_profile_respects_override() -> None:
     frame = pd.DataFrame(
         {

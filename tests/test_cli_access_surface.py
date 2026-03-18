@@ -5,25 +5,46 @@ from pathlib import Path
 from relaytic.ui.cli import main
 
 
-def _write_dataset(path: Path) -> Path:
-    rows = [
-        ["timestamp", "sensor_a", "sensor_b", "failure_flag", "future_failure_flag", "post_inspection_flag"],
-        ["2025-01-01T00:00:00", 10.0, 100.0, 0, 0, 0],
-        ["2025-01-01T00:01:00", 11.0, 102.0, 0, 0, 0],
-        ["2025-01-01T00:02:00", 12.0, 101.0, 1, 1, 1],
-        ["2025-01-01T00:03:00", 13.0, 103.0, 0, 0, 0],
-        ["2025-01-01T00:04:00", 14.0, 105.0, 1, 1, 1],
-        ["2025-01-01T00:05:00", 15.0, 104.0, 0, 0, 0],
-        ["2025-01-01T00:06:00", 16.0, 106.0, 1, 1, 1],
-        ["2025-01-01T00:07:00", 17.0, 108.0, 0, 0, 0],
-        ["2025-01-01T00:08:00", 18.0, 107.0, 1, 1, 1],
-        ["2025-01-01T00:09:00", 19.0, 109.0, 0, 0, 0],
-        ["2025-01-01T00:10:00", 20.0, 110.0, 1, 1, 1],
-        ["2025-01-01T00:11:00", 21.0, 111.0, 0, 0, 0],
-        ["2025-01-01T00:12:00", 22.0, 112.0, 1, 1, 1],
-        ["2025-01-01T00:13:00", 23.0, 113.0, 0, 0, 0],
-        ["2025-01-01T00:14:00", 24.0, 114.0, 1, 1, 1],
-    ]
+def _write_dataset(path: Path, *, count: int = 15) -> Path:
+    rows = [["timestamp", "sensor_a", "sensor_b", "failure_flag", "future_failure_flag", "post_inspection_flag"]]
+    for index in range(count):
+        failure_flag = index % 2
+        rows.append(
+            [
+                f"2025-01-01T00:{index:02d}:00",
+                10.0 + index,
+                100.0 + index + (index % 3),
+                failure_flag,
+                failure_flag,
+                failure_flag,
+            ]
+        )
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        csv.writer(handle).writerows(rows)
+    return path
+
+
+def _write_regression_dataset(path: Path, *, count: int = 15) -> Path:
+    rows = [["sensor_a", "sensor_b", "quality_score", "future_quality_score"]]
+    for index in range(count):
+        sensor_a = 10.0 + index
+        sensor_b = 100.0 + index * 1.5
+        quality = round(0.35 * sensor_a + 0.02 * sensor_b, 5)
+        future_quality = round(quality + 0.2, 5)
+        rows.append([sensor_a, sensor_b, quality, future_quality])
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        csv.writer(handle).writerows(rows)
+    return path
+
+
+def _write_fraud_dataset(path: Path, *, count: int = 18) -> Path:
+    rows = [["transaction_id", "amount_norm", "device_risk", "velocity_score", "fraud_flag"]]
+    for index in range(count):
+        fraud = 1 if index % 4 == 0 else 0
+        amount = 0.92 if fraud else 0.18 + (index % 5) * 0.04
+        device = 0.96 if fraud else 0.12 + (index % 4) * 0.05
+        velocity = 0.9 if fraud else 0.15 + (index % 3) * 0.05
+        rows.append([f"T{index:04d}", round(amount, 5), round(device, 5), round(velocity, 5), fraud])
     with path.open("w", newline="", encoding="utf-8") as handle:
         csv.writer(handle).writerows(rows)
     return path
@@ -159,3 +180,100 @@ def test_cli_show_bootstraps_summary_for_existing_plan_run_dirs(tmp_path: Path, 
     assert (run_dir / "reports" / "summary.md").exists()
     assert payload["run_summary"]["decision"]["selected_model_family"]
     assert payload["run_summary"]["evidence"]["experiment_count"] == 0
+
+
+def test_cli_run_overwrite_refreshes_upstream_artifacts(tmp_path: Path, capsys) -> None:
+    run_dir = tmp_path / "run_access_overwrite"
+    data_path = _write_dataset(tmp_path / "run_access_overwrite.csv", count=15)
+
+    assert main(
+        [
+            "run",
+            "--run-dir",
+            str(run_dir),
+            "--data-path",
+            str(data_path),
+            "--text",
+            "Do everything on your own. Predict failure_flag. Do not use future_failure_flag or post_inspection_flag.",
+            "--format",
+            "json",
+        ]
+    ) == 0
+    capsys.readouterr()
+
+    _write_dataset(data_path, count=18)
+    assert main(
+        [
+            "run",
+            "--run-dir",
+            str(run_dir),
+            "--data-path",
+            str(data_path),
+            "--text",
+            "Do everything on your own. Predict failure_flag. Do not use future_failure_flag or post_inspection_flag.",
+            "--overwrite",
+            "--format",
+            "json",
+        ]
+    ) == 0
+    payload = json.loads(capsys.readouterr().out)
+    dataset_profile = json.loads((run_dir / "dataset_profile.json").read_text(encoding="utf-8"))
+
+    assert dataset_profile["row_count"] == 18
+    assert payload["run_summary"]["data"]["row_count"] == 18
+
+
+def test_cli_run_supports_regression_routes_end_to_end(tmp_path: Path, capsys) -> None:
+    run_dir = tmp_path / "run_access_regression"
+    data_path = _write_regression_dataset(tmp_path / "run_access_regression.csv")
+
+    assert main(
+        [
+            "run",
+            "--run-dir",
+            str(run_dir),
+            "--data-path",
+            str(data_path),
+            "--text",
+            "Estimate quality_score from sensor_a and sensor_b. Do everything on your own. Do not use future_quality_score.",
+            "--format",
+            "json",
+        ]
+    ) == 0
+
+    payload = json.loads(capsys.readouterr().out)
+    plan = json.loads((run_dir / "plan.json").read_text(encoding="utf-8"))
+
+    assert payload["run_summary"]["decision"]["task_type"] == "regression"
+    assert plan["selected_route_id"] == "steady_state_tabular_regression_route"
+    assert payload["run_summary"]["decision"]["selected_model_family"] in {
+        "linear_ridge",
+        "bagged_tree_ensemble",
+        "boosted_tree_ensemble",
+    }
+
+
+def test_cli_run_supports_fraud_detection_routes_end_to_end(tmp_path: Path, capsys) -> None:
+    run_dir = tmp_path / "run_access_fraud"
+    data_path = _write_fraud_dataset(tmp_path / "run_access_fraud.csv")
+
+    assert main(
+        [
+            "run",
+            "--run-dir",
+            str(run_dir),
+            "--data-path",
+            str(data_path),
+            "--text",
+            "Detect fraud_flag from transaction risk features. Do everything on your own.",
+            "--format",
+            "json",
+        ]
+    ) == 0
+
+    payload = json.loads(capsys.readouterr().out)
+    plan = json.loads((run_dir / "plan.json").read_text(encoding="utf-8"))
+
+    assert payload["run_summary"]["decision"]["task_type"] == "fraud_detection"
+    assert payload["run_summary"]["intent"]["domain_archetype"] == "fraud_risk"
+    assert plan["primary_metric"] == "pr_auc"
