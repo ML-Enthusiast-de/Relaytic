@@ -39,6 +39,7 @@ relaytic-guard = "relaytic.security.git_guard:main"
 dev = [
   "pytest>=8.0",
   "scikit-learn>=1.5",
+  "mcp>=1.26,<2",
 ]
 integrations = [
   "scikit-learn>=1.5",
@@ -47,10 +48,24 @@ integrations = [
   "imbalanced-learn>=0.12",
   "pyod>=2.0",
 ]
+interop = [
+  "mcp>=1.26,<2",
+]
 stats = [
   "scipy>=1.11",
 ]
 viz = [
+  "matplotlib>=3.8",
+]
+full = [
+  "pytest>=8.0",
+  "scikit-learn>=1.5",
+  "pandera>=0.20",
+  "statsmodels>=0.14",
+  "imbalanced-learn>=0.12",
+  "pyod>=2.0",
+  "mcp>=1.26,<2",
+  "scipy>=1.11",
   "matplotlib>=3.8",
 ]
 

@@ -25,6 +25,8 @@ Do not let them replace:
 
 - `scikit-learn`
   Use for reference baselines, bundled public datasets, preprocessing, calibration, and metric parity checks.
+- `mcp`
+  Use through the official Python MCP SDK for host-neutral tool serving, local interoperability self-checks, and compatibility tests across agent ecosystems.
 - `MAPIE`
   Use for conformal uncertainty, calibrated prediction intervals/sets, and abstention-aware decision support.
 - `imbalanced-learn`
@@ -87,6 +89,8 @@ That surface is meant for both humans and external agents.
 
 - `pandera`
   Wired into intake dataframe-contract validation and recorded in `intake_record.json`.
+- `mcp`
+  Wired into the interoperability layer for local `stdio`/`streamable-http` serving, bundle validation, and live compatibility smoke checks.
 - `statsmodels`
   Wired into regression evidence audit for residual diagnostics and finding enrichment.
 - `imbalanced-learn`

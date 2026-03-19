@@ -196,6 +196,80 @@ def render_completion_review_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_completion_review_markdown(*args, **kwargs)
 
 
+def run_lifecycle_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.lifecycle import run_lifecycle_review as _run_lifecycle_review
+
+    return _run_lifecycle_review(*args, **kwargs)
+
+
+def read_lifecycle_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.lifecycle import read_lifecycle_bundle as _read_lifecycle_bundle
+
+    return _read_lifecycle_bundle(*args, **kwargs)
+
+
+def render_lifecycle_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.lifecycle import (
+        render_lifecycle_review_markdown as _render_lifecycle_review_markdown,
+    )
+
+    return _render_lifecycle_review_markdown(*args, **kwargs)
+
+
+def build_doctor_report(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.ui.doctor import build_doctor_report as _build_doctor_report
+
+    return _build_doctor_report(*args, **kwargs)
+
+
+def render_doctor_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.ui.doctor import render_doctor_markdown as _render_doctor_markdown
+
+    return _render_doctor_markdown(*args, **kwargs)
+
+
+def build_interoperability_inventory(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.interoperability import build_interoperability_inventory as _build_interoperability_inventory
+
+    return _build_interoperability_inventory(*args, **kwargs)
+
+
+def render_interoperability_inventory_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.interoperability import (
+        render_interoperability_inventory_markdown as _render_interoperability_inventory_markdown,
+    )
+
+    return _render_interoperability_inventory_markdown(*args, **kwargs)
+
+
+def build_interoperability_self_check_report(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.interoperability import (
+        build_interoperability_self_check_report as _build_interoperability_self_check_report,
+    )
+
+    return _build_interoperability_self_check_report(*args, **kwargs)
+
+
+def render_interoperability_self_check_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.interoperability import (
+        render_interoperability_self_check_markdown as _render_interoperability_self_check_markdown,
+    )
+
+    return _render_interoperability_self_check_markdown(*args, **kwargs)
+
+
+def export_host_bundles(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.interoperability import export_host_bundles as _export_host_bundles
+
+    return _export_host_bundles(*args, **kwargs)
+
+
+def serve_relaytic_mcp(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.interoperability import serve_relaytic_mcp as _serve_relaytic_mcp
+
+    return _serve_relaytic_mcp(*args, **kwargs)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="relaytic", description="Relaytic CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -459,6 +533,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional files/directories. If omitted, scans git-tracked files.",
     )
 
+    doctor = sub.add_parser(
+        "doctor",
+        help="Verify install health, required dependencies, and wired integration compatibility.",
+    )
+    doctor.add_argument(
+        "--expected-profile",
+        choices=["core", "full"],
+        default="core",
+        help="Dependency profile to verify.",
+    )
+    doctor.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     integrations = sub.add_parser(
         "integrations",
         help="Inspect optional OSS capabilities Relaytic can adopt through explicit adapters.",
@@ -485,6 +576,103 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["human", "json", "both"],
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    interoperability = sub.add_parser(
+        "interoperability",
+        help="Inspect, export, or serve Relaytic interoperability surfaces for common agent hosts.",
+    )
+    interoperability_sub = interoperability.add_subparsers(dest="interoperability_command", required=True)
+
+    interoperability_show = interoperability_sub.add_parser(
+        "show",
+        help="Describe the current Relaytic MCP/tool surface and checked-in host bundles.",
+    )
+    interoperability_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    interoperability_self_check = interoperability_sub.add_parser(
+        "self-check",
+        help="Validate checked-in host bundles and optionally run a live Relaytic MCP stdio smoke test.",
+    )
+    interoperability_self_check.add_argument(
+        "--live",
+        action="store_true",
+        help="Run a live stdio MCP smoke check in addition to static bundle validation.",
+    )
+    interoperability_self_check.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    interoperability_export = interoperability_sub.add_parser(
+        "export",
+        help="Export Relaytic host bundles for Claude, Codex/OpenAI, OpenClaw, or ChatGPT.",
+    )
+    interoperability_export.add_argument(
+        "--host",
+        choices=["claude", "codex", "openclaw", "chatgpt", "all"],
+        default="all",
+        help="Which host bundle to export.",
+    )
+    interoperability_export.add_argument(
+        "--output-dir",
+        required=True,
+        help="Directory where the host bundle should be written.",
+    )
+    interoperability_export.add_argument(
+        "--mcp-command",
+        default="python",
+        help="Command that host wrappers should use to launch Relaytic MCP locally.",
+    )
+    interoperability_export.add_argument(
+        "--public-mcp-url",
+        default="https://example.com/mcp",
+        help="Public HTTPS `/mcp` URL placeholder used in ChatGPT connector guidance.",
+    )
+    interoperability_export.add_argument(
+        "--force",
+        action="store_true",
+        help="Allow overwriting existing bundle files in the output directory.",
+    )
+    interoperability_export.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    interoperability_serve = interoperability_sub.add_parser(
+        "serve-mcp",
+        help="Serve Relaytic over MCP using stdio or streamable HTTP.",
+    )
+    interoperability_serve.add_argument(
+        "--transport",
+        choices=["stdio", "streamable-http"],
+        default="stdio",
+        help="MCP transport to expose.",
+    )
+    interoperability_serve.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Bind host for streamable HTTP transport. Relaytic stays local-only by default.",
+    )
+    interoperability_serve.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Bind port for streamable HTTP transport.",
+    )
+    interoperability_serve.add_argument(
+        "--mount-path",
+        default="/mcp",
+        help="HTTP mount path for streamable HTTP transport.",
     )
 
     manifest = sub.add_parser(
@@ -888,6 +1076,42 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    lifecycle = sub.add_parser(
+        "lifecycle",
+        help="Run or inspect Slice 08 lifecycle-governor artifacts.",
+    )
+    lifecycle_sub = lifecycle.add_subparsers(dest="lifecycle_command", required=True)
+
+    lifecycle_review = lifecycle_sub.add_parser(
+        "review",
+        help="Execute Slice 08 lifecycle review for an existing run.",
+    )
+    lifecycle_review.add_argument("--run-dir", required=True, help="Run directory for lifecycle artifacts.")
+    lifecycle_review.add_argument("--data-path", default=None, help="Optional fresh-data path; defaults to the run dataset when discoverable.")
+    lifecycle_review.add_argument("--config", default=None, help="Optional config/policy source.")
+    lifecycle_review.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    lifecycle_review.add_argument("--overwrite", action="store_true", help="Allow overwriting existing lifecycle artifacts.")
+    lifecycle_review.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    lifecycle_review.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    lifecycle_show = lifecycle_sub.add_parser(
+        "show",
+        help="Render the current Slice 08 lifecycle review for a run.",
+    )
+    lifecycle_show.add_argument("--run-dir", required=True, help="Run directory containing lifecycle artifacts.")
+    lifecycle_show.add_argument("--data-path", default=None, help="Optional fresh-data path if lifecycle artifacts must be materialized.")
+    lifecycle_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     investigate = sub.add_parser(
         "investigate",
         help="Run the Slice 03 investigation layer and write specialist artifacts.",
@@ -912,6 +1136,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "scan-git-safety":
         passthrough = list(args.paths)
         return git_guard_main(passthrough)
+
+    if args.command == "doctor":
+        payload = build_doctor_report(expected_profile=args.expected_profile)
+        _emit_structured_surface_output(
+            payload=payload,
+            human_text=render_doctor_markdown(payload),
+            output_format=args.format,
+        )
+        return 1 if str(payload.get("status", "")).strip() == "error" else 0
 
     if args.command == "integrations":
         if args.integrations_command == "show":
@@ -939,6 +1172,65 @@ def main(argv: list[str] | None = None) -> int:
         else:
             parser.error("Unsupported integrations subcommand.")
             return 2
+
+    if args.command == "interoperability":
+        if args.interoperability_command == "show":
+            payload = build_interoperability_inventory()
+            _emit_structured_surface_output(
+                payload=payload,
+                human_text=render_interoperability_inventory_markdown(payload),
+                output_format=args.format,
+            )
+            return 0
+        if args.interoperability_command == "self-check":
+            payload = build_interoperability_self_check_report(live=args.live)
+            _emit_structured_surface_output(
+                payload=payload,
+                human_text=render_interoperability_self_check_markdown(payload),
+                output_format=args.format,
+            )
+            return 1 if str(payload.get("status", "")).strip() == "error" else 0
+        if args.interoperability_command == "export":
+            try:
+                payload = export_host_bundles(
+                    output_dir=args.output_dir,
+                    host=args.host,
+                    force=args.force,
+                    mcp_command=args.mcp_command,
+                    public_mcp_url=args.public_mcp_url,
+                )
+            except Exception as exc:
+                print(dumps_json({"status": "error", "message": str(exc)}, indent=2, ensure_ascii=False))
+                return 1
+            human_lines = [
+                "# Relaytic Host Bundle Export",
+                "",
+                f"- Status: `{payload.get('status', 'unknown')}`",
+                f"- Output directory: `{payload.get('output_dir', 'unknown')}`",
+                f"- Manifest: `{payload.get('manifest_path', 'unknown')}`",
+            ]
+            for host in payload.get("hosts", []):
+                human_lines.append(f"- Host `{host.get('host')}` -> `{', '.join(host.get('files', []))}`")
+            _emit_structured_surface_output(
+                payload=payload,
+                human_text="\n".join(human_lines) + "\n",
+                output_format=args.format,
+            )
+            return 0
+        if args.interoperability_command == "serve-mcp":
+            try:
+                serve_relaytic_mcp(
+                    transport=args.transport,
+                    host=args.host,
+                    port=args.port,
+                    mount_path=args.mount_path,
+                )
+            except Exception as exc:
+                print(dumps_json({"status": "error", "message": str(exc)}, indent=2, ensure_ascii=False))
+                return 1
+            return 0
+        parser.error("Unsupported interoperability subcommand.")
+        return 2
 
     if args.command == "manifest":
         if args.manifest_command != "init":
@@ -1242,6 +1534,45 @@ def main(argv: list[str] | None = None) -> int:
             labels = _parse_key_value_pairs(args.label)
             payload = _run_completion_phase(
                 run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "lifecycle":
+        if args.lifecycle_command == "show":
+            try:
+                payload = _show_lifecycle_surface(
+                    run_dir=args.run_dir,
+                    data_path=args.data_path,
+                )
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.lifecycle_command != "review":
+            parser.error("Unsupported lifecycle subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_lifecycle_phase(
+                run_dir=args.run_dir,
+                data_path=args.data_path,
                 config_path=args.config,
                 run_id=args.run_id,
                 overwrite=bool(args.overwrite),
@@ -1597,6 +1928,14 @@ def _run_access_flow(
         overwrite=overwrite,
         labels=labels,
     )
+    lifecycle_payload = _run_lifecycle_phase(
+        run_dir=root,
+        data_path=data_path,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=labels,
+    )
     summary_materialized = materialize_run_summary(
         run_dir=root,
         data_path=data_path,
@@ -1630,6 +1969,7 @@ def _run_access_flow(
     surface_payload["training_result"] = planning_payload.get("training_result", {})
     surface_payload["evidence"] = evidence_payload["surface_payload"].get("evidence", {})
     surface_payload["completion"] = completion_payload["surface_payload"].get("completion", {})
+    surface_payload["lifecycle"] = lifecycle_payload["surface_payload"].get("lifecycle", {})
     return {
         "surface_payload": surface_payload,
         "human_output": summary_materialized["report_markdown"],
@@ -1641,6 +1981,7 @@ def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
     _ensure_completion_present(root)
+    _ensure_lifecycle_present(root)
     existing_summary = read_run_summary(root)
     request = dict(existing_summary.get("request", {})) if isinstance(existing_summary, dict) else {}
     summary_materialized = materialize_run_summary(
@@ -1681,6 +2022,26 @@ def _ensure_completion_present(run_dir: str | Path) -> dict[str, Any]:
     return dict(payload["surface_payload"].get("bundle", {}))
 
 
+def _ensure_lifecycle_present(run_dir: str | Path, data_path: str | None = None) -> dict[str, Any]:
+    root = Path(run_dir)
+    bundle = _read_json_bundle(root, bundle="lifecycle")
+    if bundle:
+        return bundle
+    completion_bundle = _ensure_completion_present(root)
+    if not completion_bundle:
+        return {}
+    resolved_data_path = data_path or _resolve_run_data_path(root)
+    payload = _run_lifecycle_phase(
+        run_dir=root,
+        data_path=resolved_data_path,
+        config_path=None,
+        run_id=None,
+        overwrite=False,
+        labels=None,
+    )
+    return dict(payload["surface_payload"].get("bundle", {}))
+
+
 def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
     if bundle == "mandate":
         from relaytic.mandate import read_mandate_bundle
@@ -1710,7 +2071,28 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.completion import read_completion_bundle
 
         return read_completion_bundle(run_dir)
+    if bundle == "lifecycle":
+        from relaytic.lifecycle import read_lifecycle_bundle
+
+        return read_lifecycle_bundle(run_dir)
     raise ValueError(f"Unsupported bundle '{bundle}'.")
+
+
+def _resolve_run_data_path(run_dir: str | Path) -> str | None:
+    root = Path(run_dir)
+    existing_summary = read_run_summary(root)
+    if isinstance(existing_summary, dict):
+        data_path = str(dict(existing_summary.get("data", {})).get("data_path", "")).strip()
+        if data_path:
+            return data_path
+    planning_bundle = _read_json_bundle(root, bundle="planning")
+    plan = dict(planning_bundle.get("plan", {}))
+    builder_handoff = dict(plan.get("builder_handoff", {}))
+    for value in builder_handoff.get("data_references", []):
+        text = str(value).strip()
+        if text:
+            return text
+    return None
 
 
 def _init_run_foundation(
@@ -2350,6 +2732,104 @@ def _show_completion_status(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _run_lifecycle_phase(
+    *,
+    run_dir: str | Path,
+    data_path: str | None,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.lifecycle import write_lifecycle_bundle
+
+    root = Path(run_dir)
+    targets = _lifecycle_output_paths(root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    completion_bundle = _ensure_completion_present(root)
+    if not completion_bundle:
+        raise ValueError(f"Slice 08 lifecycle requires Slice 07 completion artifacts in {root}.")
+    resolved_data_path = data_path or _resolve_run_data_path(root)
+    lifecycle_result = run_lifecycle_review(
+        run_dir=root,
+        data_path=resolved_data_path,
+        policy=foundation_state["resolved"].policy,
+        mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+        context_bundle=_read_json_bundle(root, bundle="context"),
+        investigation_bundle=_read_json_bundle(root, bundle="investigation"),
+        planning_bundle=_read_json_bundle(root, bundle="planning"),
+        evidence_bundle=_read_json_bundle(root, bundle="evidence"),
+        completion_bundle=completion_bundle,
+        config_path=config_path,
+    )
+    written = write_lifecycle_bundle(root, bundle=lifecycle_result.bundle)
+    manifest_path = _refresh_lifecycle_manifest(
+        root,
+        run_id=run_id,
+        policy_source=foundation_state["policy_path"],
+        labels=labels,
+    )
+    materialize_run_summary(run_dir=root, data_path=resolved_data_path)
+    promotion = lifecycle_result.bundle.promotion_decision
+    retrain = lifecycle_result.bundle.retrain_decision
+    recalibration = lifecycle_result.bundle.recalibration_decision
+    rollback = lifecycle_result.bundle.rollback_decision
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "paths": {key: str(value) for key, value in written.items()},
+            "lifecycle": {
+                "promotion_action": promotion.action,
+                "recalibration_action": recalibration.action,
+                "retrain_action": retrain.action,
+                "rollback_action": rollback.action,
+            },
+            "bundle": lifecycle_result.bundle.to_dict(),
+        },
+        "human_output": lifecycle_result.review_markdown,
+    }
+
+
+def _show_lifecycle_surface(*, run_dir: str | Path, data_path: str | None = None) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    lifecycle_bundle = _ensure_lifecycle_present(root, data_path=data_path)
+    if not lifecycle_bundle:
+        raise ValueError(f"No Slice 08 lifecycle artifacts found or materializable in {root}.")
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=data_path or _resolve_run_data_path(root))
+    manifest_path = _refresh_lifecycle_manifest(root)
+    promotion = dict(lifecycle_bundle.get("promotion_decision", {}))
+    recalibration = dict(lifecycle_bundle.get("recalibration_decision", {}))
+    retrain = dict(lifecycle_bundle.get("retrain_decision", {}))
+    rollback = dict(lifecycle_bundle.get("rollback_decision", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "summary_path": str(summary_materialized["summary_path"]),
+            "report_path": str(summary_materialized["report_path"]),
+            "lifecycle": {
+                "promotion_action": promotion.get("action"),
+                "recalibration_action": recalibration.get("action"),
+                "retrain_action": retrain.get("action"),
+                "rollback_action": rollback.get("action"),
+            },
+            "bundle": lifecycle_bundle,
+        },
+        "human_output": render_lifecycle_review_markdown(lifecycle_bundle),
+    }
+
+
 def _ensure_investigation_present(
     *,
     run_dir: str | Path,
@@ -2647,6 +3127,16 @@ def _completion_output_paths(run_dir: Path) -> dict[str, Path]:
         "mandate_evidence_review": run_dir / "mandate_evidence_review.json",
         "blocking_analysis": run_dir / "blocking_analysis.json",
         "next_action_queue": run_dir / "next_action_queue.json",
+    }
+
+
+def _lifecycle_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "champion_vs_candidate": run_dir / "champion_vs_candidate.json",
+        "recalibration_decision": run_dir / "recalibration_decision.json",
+        "retrain_decision": run_dir / "retrain_decision.json",
+        "promotion_decision": run_dir / "promotion_decision.json",
+        "rollback_decision": run_dir / "rollback_decision.json",
     }
 
 
@@ -3069,6 +3559,64 @@ def _refresh_completion_manifest(
     )
 
 
+def _refresh_lifecycle_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_completion_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for filename in [
+        "champion_vs_candidate.json",
+        "recalibration_decision.json",
+        "retrain_decision.json",
+        "promotion_decision.json",
+        "rollback_decision.json",
+    ]:
+        path = root / filename
+        if path.exists():
+            entries.append(artifact_entry(filename, run_dir=root, kind="lifecycle", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
 def _refresh_access_manifest(
     run_dir: str | Path,
     *,
@@ -3078,7 +3626,7 @@ def _refresh_access_manifest(
     training_result: dict[str, Any] | None = None,
 ) -> Path:
     root = Path(run_dir)
-    _refresh_completion_manifest(
+    _refresh_lifecycle_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,

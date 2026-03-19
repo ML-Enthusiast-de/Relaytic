@@ -20,6 +20,10 @@ Relaytic is organized as a staged artifact pipeline.
    Challenger, ablation, and audit specialists treat the first built route as a provisional champion, then write leaderboard, report, and belief-update artifacts for humans and external agents.
 6. Completion governor
    Completion specialists fuse the full artifact graph into a visible run state, mandate-evidence review, blocking-layer diagnosis, and machine-actionable next action.
+7. Lifecycle
+   Lifecycle specialists compare the current champion, challenger evidence, completion state, and fresh-data behavior to decide whether to keep, recalibrate, retrain, promote, or roll back.
+8. Interoperability and host adapters
+   Relaytic exposes the same MVP and slice-level surfaces through a host-neutral MCP server plus thin host wrappers for common agent ecosystems.
 
 ## Core System Principles
 
@@ -61,6 +65,7 @@ They get their working knowledge from:
 - structured mandate and context artifacts
 - policy and safety constraints
 - persisted evidence from planning, execution, challenger, audit, and completion stages
+- fresh-data behavior and lifecycle review after completion
 - optional uploaded notes or structured context when provided
 - optional local-LLM advisory help for bounded semantic refinement
 
@@ -94,8 +99,11 @@ The repository currently implements the following product layers:
 - Slice 05A: MVP-access orchestration with `relaytic run`, `relaytic show`, `relaytic predict`, and persisted run summaries
 - Slice 06: challenger, ablation, provisional audit, leaderboard, and decision-memo evidence around the first built route
 - Slice 07: completion-governor judgment with visible run state, blocking analysis, mandate-evidence review, and next-action queue
+- Slice 08: lifecycle-governor judgment with champion/candidate comparison and explicit keep, recalibrate, retrain, promote, and rollback actions
+- Slice 08A: host-neutral MCP interoperability with checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
+- Slice 08B: host activation and discovery state with repo/workspace auto-discovery where the host permits it
 
-The next planned layer is Slice 08: lifecycle baseline.
+The next planned layer is Slice 09A: run memory and analog retrieval.
 
 ## Current Artifact Baseline
 
@@ -144,6 +152,11 @@ Relaytic already standardizes several load-bearing artifacts:
 - `mandate_evidence_review.json`
 - `blocking_analysis.json`
 - `next_action_queue.json`
+- `champion_vs_candidate.json`
+- `recalibration_decision.json`
+- `retrain_decision.json`
+- `promotion_decision.json`
+- `rollback_decision.json`
 
 ## Current CLI Baseline
 
@@ -167,13 +180,33 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic evidence show`
 - `relaytic status`
 - `relaytic completion review`
+- `relaytic lifecycle review`
+- `relaytic lifecycle show`
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
+- `relaytic doctor`
+- `relaytic interoperability show`
+- `relaytic interoperability self-check`
+- `relaytic interoperability export`
+- `relaytic interoperability serve-mcp`
 - `relaytic integrations show`
 - `relaytic integrations self-check`
 
 Additional runtime commands from earlier repository layers still exist while later slices replace deeper internal paths. Those commands are not the long-term architectural center of the product.
+
+## Interoperability Baseline
+
+Relaytic now exposes a local-first interoperability layer on top of the same product contract.
+
+- `stdio` MCP is the default path for local agent hosts that can spawn Relaytic as a subprocess
+- `streamable-http` MCP is available for local connector-style clients on `127.0.0.1`
+- checked-in host bundles exist for Claude, Codex/OpenAI skills, OpenClaw, and ChatGPT connector guidance
+- the checked-in wrappers are intentionally thin and must not become a second source of truth
+- `relaytic interoperability show` now makes host readiness explicit instead of pretending all hosts discover Relaytic the same way
+- OpenClaw workspace discovery is supported through `skills/relaytic/SKILL.md`, while ChatGPT still requires explicit connector registration against a public HTTPS `/mcp` endpoint
+
+See `INTEROPERABILITY.md` for concrete usage patterns and safety notes.
 
 ## Implementation Control Docs
 

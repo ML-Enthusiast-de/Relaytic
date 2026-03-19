@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "relaytic": {
+      "command": "python",
+      "args": [
+        "-m",
+        "relaytic.ui.cli",
+        "interoperability",
+        "serve-mcp",
+        "--transport",
+        "stdio"
+      ],
+      "env": {
+        "PYTHONUTF8": "1"
+      }
+    }
+  }
+}

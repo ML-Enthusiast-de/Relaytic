@@ -121,18 +121,22 @@ If a later slice adds "smartness" without strengthening at least one of those pr
 Stable slice numbering stays the same, but the preferred execution order after Slice 07 is:
 
 1. Slice 08
-2. Slice 09A
-3. Slice 09
-4. Slice 11
-5. Slice 10
-6. Slice 12
-7. Slice 13
-8. Slice 14
-9. Slice 15
+2. Slice 08A
+3. Slice 08B
+4. Slice 09A
+5. Slice 09
+6. Slice 11
+7. Slice 10
+8. Slice 12
+9. Slice 13
+10. Slice 14
+11. Slice 15
 
 Why:
 
 - Slice 08 makes Relaytic operational over time instead of one-run-only
+- Slice 08A makes Relaytic reachable from the most common agent hosts without collapsing into a vendor-specific shell
+- Slice 08B makes host discovery and activation explicit, which is necessary for honest mass usage
 - Slice 09A is the highest-leverage intelligence upgrade because it makes later agents smarter across runs
 - Slice 09 improves bounded semantic and strategic lift without redefining the core
 - Slice 11 gives honest proof before feedback or dojo behavior expands too far
@@ -367,6 +371,85 @@ Minimum proof:
 - one case where challenger promotion is preferred over keeping the champion
 - one case where rollback is recommended because the current route is no longer trustworthy
 - one non-interactive agent-driven lifecycle review flow
+
+## Slice 08A - Interoperability and host adapters
+
+Goal:
+- host-neutral MCP server
+- safe local-first stdio and streamable HTTP transports
+- checked-in Claude, Codex/OpenAI, and OpenClaw host wrappers
+- ChatGPT connector export guidance
+- compatibility self-checks and compact transport-safe health tools
+
+Required outputs:
+- checked-in `.mcp.json`
+- checked-in `.claude/agents/relaytic.md`
+- checked-in `.agents/skills/relaytic/SKILL.md`
+- checked-in `openclaw/skills/relaytic/SKILL.md`
+- checked-in `connectors/chatgpt/README.md`
+- exportable `relaytic_host_bundle_manifest.json`
+
+Required behavior:
+- Relaytic must expose a host-neutral MCP tool surface rather than separate ad hoc wrappers per platform
+- stdio must remain the local-default transport for developer tools and project-scoped hosts
+- streamable HTTP must be available for connector-style deployment surfaces
+- interoperability must stay local-first and safe by default: local bind host only, no checked-in secrets, no machine-specific paths, no remote exposure by accident
+- external hosts must be able to access at least the current MVP run/show/status/predict/lifecycle surfaces through the same stable MCP contract
+- the checked-in host bundles must remain drift-checked against generated templates
+- interoperability self-checks must validate both static bundle correctness and at least one live stdio MCP handshake/tool call
+- Relaytic must provide one compact transport-safe server-health tool so hosts can verify availability without pulling large artifacts
+
+First implementation moves:
+
+1. Add `src/relaytic/interoperability/` for MCP serving, host-bundle generation, and compatibility self-checks.
+2. Freeze one canonical Relaytic MCP tool contract over the current MVP and phase-level surfaces.
+3. Add local stdio and streamable HTTP transports with safe local defaults.
+4. Add checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper/guidance files.
+5. Add live stdio and streamable HTTP tests plus one public-dataset end-to-end Relaytic run through the interoperability layer.
+
+Minimum proof:
+
+- one live stdio MCP handshake and tool call
+- one live streamable HTTP handshake and tool call
+- one public-dataset end-to-end Relaytic run through the MCP surface
+- one host-bundle export flow with no machine-specific paths or secrets
+
+Innovation hook:
+
+- Relaytic should become reachable from major human and agent surfaces without flattening into one vendor, one shell, or one opaque remote service
+
+## Slice 08B - Host activation and discovery
+
+Goal:
+- explicit host discovery state
+- workspace-level auto-discovery where the host supports it
+- clear machine-readable activation requirements
+- honest distinction between repo-local reachability and remote connector registration
+
+Required outputs:
+- checked-in `skills/relaytic/SKILL.md`
+- expanded machine-readable host readiness in `relaytic interoperability show`
+- updated ChatGPT connector guidance with explicit non-auto-discovery language
+
+Required behavior:
+- Claude readiness must be shown as repo-local/project-local discovery plus one approval step
+- Codex/OpenAI readiness must be shown as repo-local skill discovery
+- OpenClaw readiness must be shown as workspace-local `skills/` discovery
+- ChatGPT readiness must be shown as connector-registration-only, requiring a public HTTPS `/mcp` endpoint
+- Relaytic should no longer imply that all hosts can discover it directly from the same files
+
+First implementation moves:
+
+1. Add activation/discovery fields to host-bundle metadata.
+2. Add a checked-in workspace-level `skills/relaytic/SKILL.md` mirror for OpenClaw.
+3. Expose `discoverable_now`, `requires_activation`, `requires_public_https`, and `next_step` in `relaytic interoperability show`.
+4. Update docs so users and external agents can see the host truth immediately.
+
+Minimum proof:
+
+- interoperability inventory shows correct readiness states for Claude, Codex/OpenAI, OpenClaw, and ChatGPT
+- exported host bundles include the workspace-level OpenClaw skill path
+- ChatGPT remains explicitly non-auto-discoverable from repo files alone
 
 ## Slice 09 - Intelligence amplification and local-LLM assistance
 

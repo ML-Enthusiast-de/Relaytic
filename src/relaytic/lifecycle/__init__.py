@@ -1,0 +1,53 @@
+"""Slice 08 lifecycle subsystem exports."""
+
+from .agents import LifecycleRunResult, render_lifecycle_review_markdown, run_lifecycle_review
+from .models import (
+    CHAMPION_VS_CANDIDATE_SCHEMA_VERSION,
+    LIFECYCLE_CONTROLS_SCHEMA_VERSION,
+    PROMOTION_ACTIONS,
+    PROMOTION_DECISION_SCHEMA_VERSION,
+    RECALIBRATION_ACTIONS,
+    RECALIBRATION_DECISION_SCHEMA_VERSION,
+    RETRAIN_ACTIONS,
+    RETRAIN_DECISION_SCHEMA_VERSION,
+    ROLLBACK_ACTIONS,
+    ROLLBACK_DECISION_SCHEMA_VERSION,
+    ChampionVsCandidate,
+    LifecycleBundle,
+    LifecycleControls,
+    LifecycleTrace,
+    PromotionDecision,
+    RecalibrationDecision,
+    RetrainDecision,
+    RollbackDecision,
+    build_lifecycle_controls_from_policy,
+)
+from .storage import LIFECYCLE_FILENAMES, read_lifecycle_bundle, write_lifecycle_bundle
+
+__all__ = [
+    "CHAMPION_VS_CANDIDATE_SCHEMA_VERSION",
+    "ChampionVsCandidate",
+    "LIFECYCLE_CONTROLS_SCHEMA_VERSION",
+    "LIFECYCLE_FILENAMES",
+    "LifecycleBundle",
+    "LifecycleControls",
+    "LifecycleRunResult",
+    "LifecycleTrace",
+    "PROMOTION_ACTIONS",
+    "PROMOTION_DECISION_SCHEMA_VERSION",
+    "PromotionDecision",
+    "RECALIBRATION_ACTIONS",
+    "RECALIBRATION_DECISION_SCHEMA_VERSION",
+    "RecalibrationDecision",
+    "RETRAIN_ACTIONS",
+    "RETRAIN_DECISION_SCHEMA_VERSION",
+    "RetrainDecision",
+    "ROLLBACK_ACTIONS",
+    "ROLLBACK_DECISION_SCHEMA_VERSION",
+    "RollbackDecision",
+    "build_lifecycle_controls_from_policy",
+    "read_lifecycle_bundle",
+    "render_lifecycle_review_markdown",
+    "run_lifecycle_review",
+    "write_lifecycle_bundle",
+]

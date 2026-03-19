@@ -63,6 +63,8 @@ Start with:
 6. experimentation, challenger, audit, and reports
 7. completion judgment and visible workflow state
 8. lifecycle baseline
+8A. interoperability and host adapters
+8B. host activation and discovery
 9. intelligence amplification and local-LLM setup assistance
 9A. run memory and analog retrieval
 10. feedback assimilation
@@ -77,18 +79,22 @@ Start with:
 Stable numbering stays the same, but once Slice 07 is complete the preferred execution order is:
 
 1. Slice 08
-2. Slice 09A
-3. Slice 09
-4. Slice 11
-5. Slice 10
-6. Slice 12
-7. Slice 13
-8. Slice 14
-9. Slice 15
+2. Slice 08A
+3. Slice 08B
+4. Slice 09A
+5. Slice 09
+6. Slice 11
+7. Slice 10
+8. Slice 12
+9. Slice 13
+10. Slice 14
+11. Slice 15
 
 Reason:
 
 - Slice 08 makes Relaytic lifecycle-capable
+- Slice 08A makes Relaytic reachable from the most common local agent hosts while preserving one host-neutral tool contract
+- Slice 08B makes host discovery and activation explicit instead of leaving platform reachability to guesswork
 - Slice 09A is the highest-leverage intelligence upgrade
 - Slice 09 makes semantic and strategic amplification operational
 - Slice 11 gives honest proof before feedback and dojo expansion

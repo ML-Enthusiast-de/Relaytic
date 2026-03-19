@@ -8,8 +8,9 @@ Public-facing docs:
 
 1. `README.md`
 2. `ARCHITECTURE.md`
-3. `OPEN_SOURCE_STACK.md`
-4. `SECURITY.md`
+3. `INTEROPERABILITY.md`
+4. `OPEN_SOURCE_STACK.md`
+5. `SECURITY.md`
 
 Implementation control docs:
 
@@ -23,14 +24,27 @@ Implementation control docs:
 
 ```text
 Relaytic/
+  .agents/
+    skills/
+      relaytic/
+  .claude/
+    agents/
+  .mcp.json
   configs/
     default.yaml
   data/
   artifacts/
+  connectors/
+    chatgpt/
+  openclaw/
+    skills/
   reports/
   models/
   docs/
     build_slices/
+  skills/
+    relaytic/
+  scripts/
   src/
     relaytic/
       artifacts/
@@ -40,6 +54,8 @@ Relaytic/
       mandate/
       evidence/
       completion/
+      lifecycle/
+      interoperability/
       integrations/
       planning/
       policies/
@@ -48,6 +64,7 @@ Relaytic/
   tests/
   README.md
   ARCHITECTURE.md
+  INTEROPERABILITY.md
   SECURITY.md
   AGENTS.md
   ARCHITECTURE_CONTRACT.md
@@ -68,6 +85,8 @@ Relaytic/
 - `src/relaytic/planning/` owns Strategist planning, Builder handoff, and planning artifact storage
 - `src/relaytic/evidence/` owns challenger, ablation, audit, leaderboard, and decision-memo artifacts
 - `src/relaytic/completion/` owns the completion-governor layer, run-state artifacts, and status synthesis
+- `src/relaytic/lifecycle/` owns champion/candidate comparison, recalibration, retraining, promotion, and rollback artifacts
+- `src/relaytic/interoperability/` owns MCP serving, host-bundle generation, and interoperability self-checks
 - `src/relaytic/integrations/` owns optional-library discovery, compatibility self-checks, and adapter-scoped capability inventory
 - `src/relaytic/runs/` owns MVP-access summaries, run reports, and top-level run presentation helpers
 - `src/relaytic/artifacts/` owns manifest helpers
@@ -81,9 +100,12 @@ Relaytic/
 ## Operational Directories
 
 - `configs/` stores checked-in defaults
+- `.agents/`, `.claude/`, `openclaw/`, and `connectors/` store checked-in agent-host wrapper surfaces and guidance
+- `skills/` stores workspace-local skill mirrors for hosts that auto-discover from the current repository
 - `data/private/` is reserved for local private inputs and must remain ignored
 - `artifacts/`, `reports/`, and `models/` contain generated outputs and must remain ignored except for sentinel files
 - `docs/build_slices/` tracks bounded implementation slices
+- `scripts/` stores local bootstrap and support scripts such as `install_relaytic.py`
 - `tests/` provides regression coverage for both product and compatibility boundaries
 
 ## Naming Rule

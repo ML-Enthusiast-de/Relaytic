@@ -88,11 +88,33 @@ Avoid introducing new references to:
 - expanded the artifact boundary to include `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
 - upgraded the MVP access shell so `relaytic run` and `relaytic show` now surface an explicit governed run state rather than stopping at provisional evidence only
 
+### Slice 08
+
+- introduced the canonical package boundary `src/relaytic/lifecycle/`
+- introduced the public commands `relaytic lifecycle review` and `relaytic lifecycle show`
+- expanded the artifact boundary to include `champion_vs_candidate.json`, `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json`
+- upgraded the MVP access shell so `relaytic run` and `relaytic show` now surface lifecycle posture by default instead of stopping at completion-only state
+
+### Slice 08A
+
+- introduced the canonical package boundary `src/relaytic/interoperability/`
+- introduced the public commands `relaytic interoperability show`, `relaytic interoperability self-check`, `relaytic interoperability export`, and `relaytic interoperability serve-mcp`
+- introduced checked-in host bundle surfaces at `.mcp.json`, `.claude/agents/relaytic.md`, `.agents/skills/relaytic/SKILL.md`, `openclaw/skills/relaytic/SKILL.md`, and `connectors/chatgpt/README.md`
+- introduced a Relaytic-owned MCP tool contract so host wrappers stay thin and local-first rather than becoming new product centers
+
+### Slice 08B
+
+- expanded the existing interoperability boundary to include explicit host activation/discovery metadata
+- introduced the checked-in workspace discovery mirror `skills/relaytic/SKILL.md` for OpenClaw-style hosts
+- upgraded `relaytic interoperability show` so host readiness is explicit instead of implied
+
 ### Post-Slice 07 Cross-Cutting Additions
 
 - introduced the canonical package boundary `src/relaytic/integrations/`
 - introduced the public command `relaytic integrations show`
 - introduced the public command `relaytic integrations self-check`
+- introduced the public command `relaytic doctor`
+- introduced the one-line bootstrap script `scripts/install_relaytic.py`
 - wired adapter-scoped third-party surfaces for intake validation and evidence diagnostics/challengers without broadening the legacy compatibility surface
 - kept third-party capabilities optional and adapter-scoped rather than broadening the core or legacy compatibility surface
 

@@ -98,6 +98,16 @@ def build_run_summary(
             "next_action_queue": "next_action_queue.json",
         },
     )
+    lifecycle_bundle = _read_bundle(
+        root,
+        {
+            "champion_vs_candidate": "champion_vs_candidate.json",
+            "recalibration_decision": "recalibration_decision.json",
+            "retrain_decision": "retrain_decision.json",
+            "promotion_decision": "promotion_decision.json",
+            "rollback_decision": "rollback_decision.json",
+        },
+    )
     model_params = _read_json(root / "model_params.json")
     manifest = _read_json(root / "manifest.json")
 
@@ -120,6 +130,11 @@ def build_run_summary(
     mandate_evidence_review = _bundle_item(completion_bundle, "mandate_evidence_review")
     blocking_analysis = _bundle_item(completion_bundle, "blocking_analysis")
     next_action_queue = _bundle_item(completion_bundle, "next_action_queue")
+    champion_vs_candidate = _bundle_item(lifecycle_bundle, "champion_vs_candidate")
+    recalibration_decision = _bundle_item(lifecycle_bundle, "recalibration_decision")
+    retrain_decision = _bundle_item(lifecycle_bundle, "retrain_decision")
+    promotion_decision = _bundle_item(lifecycle_bundle, "promotion_decision")
+    rollback_decision = _bundle_item(lifecycle_bundle, "rollback_decision")
     execution_summary = dict(plan.get("execution_summary") or {})
     builder_handoff = dict(plan.get("builder_handoff") or {})
     marginal_value = _bundle_item(planning_bundle, "marginal_value_of_next_experiment")
@@ -144,6 +159,7 @@ def build_run_summary(
             execution_summary=execution_summary,
             audit_report=audit_report,
             completion_decision=completion_decision,
+            lifecycle_bundle=lifecycle_bundle,
         ),
         "stage_completed": _resolve_stage(
             plan=plan,
@@ -152,6 +168,7 @@ def build_run_summary(
             intake_bundle=intake_bundle,
             evidence_bundle=evidence_bundle,
             completion_bundle=completion_bundle,
+            lifecycle_bundle=lifecycle_bundle,
         ),
         "request": {
             "source": request_source or str(intake_record.get("message_source", "")).strip() or "unknown",
@@ -217,6 +234,16 @@ def build_run_summary(
             "complete_for_mode": completion_decision.get("complete_for_mode"),
             "next_action_count": len(next_action_queue.get("actions", [])) if isinstance(next_action_queue.get("actions"), list) else 0,
         },
+        "lifecycle": {
+            "promotion_action": str(promotion_decision.get("action", "")).strip() or None,
+            "promotion_target": str(promotion_decision.get("selected_model_family", "")).strip() or None,
+            "recalibration_action": str(recalibration_decision.get("action", "")).strip() or None,
+            "retrain_action": str(retrain_decision.get("action", "")).strip() or None,
+            "rollback_action": str(rollback_decision.get("action", "")).strip() or None,
+            "challenger_winner": str(champion_vs_candidate.get("challenger_winner", "")).strip() or None,
+            "drift_score": (dict(champion_vs_candidate.get("fresh_data_behavior") or {}).get("drift_summary") or {}).get("overall_drift_score"),
+            "ood_fraction": (dict(champion_vs_candidate.get("fresh_data_behavior") or {}).get("ood_summary") or {}).get("overall_ood_fraction"),
+        },
         "assumptions": {
             "count": len(assumption_entries),
             "items": [str(item.get("assumption", "")).strip() for item in assumption_entries if str(item.get("assumption", "")).strip()][:5],
@@ -230,7 +257,10 @@ def build_run_summary(
                 or marginal_value.get("rationale", "")
             ).strip()
             or None,
-            "recommended_action": str(completion_decision.get("action", "")).strip() or str(belief_update.get("recommended_action", "")).strip() or None,
+            "recommended_action": _lifecycle_primary_action(lifecycle_bundle)
+            or str(completion_decision.get("action", "")).strip()
+            or str(belief_update.get("recommended_action", "")).strip()
+            or None,
         },
         "artifacts": {
             "manifest_path": _path_if_exists(root / "manifest.json"),
@@ -242,6 +272,7 @@ def build_run_summary(
             "technical_report_path": _path_if_exists(root / "reports" / "technical_report.md"),
             "decision_memo_path": _path_if_exists(root / "reports" / "decision_memo.md"),
             "completion_decision_path": _path_if_exists(root / "completion_decision.json"),
+            "promotion_decision_path": _path_if_exists(root / "promotion_decision.json"),
         },
     }
     summary["headline"] = _build_headline(summary)
@@ -256,6 +287,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     metrics = dict(summary.get("metrics", {}))
     evidence = dict(summary.get("evidence", {}))
     completion = dict(summary.get("completion", {}))
+    lifecycle = dict(summary.get("lifecycle", {}))
     assumptions = dict(summary.get("assumptions", {}))
     next_step = dict(summary.get("next_step", {}))
     lines = [
@@ -339,6 +371,23 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Complete for mode: `{completion.get('complete_for_mode')}`",
             ]
         )
+    if lifecycle and any(value is not None for value in lifecycle.values()):
+        lines.extend(
+            [
+                "",
+                "## Lifecycle",
+                f"- Promotion: `{lifecycle.get('promotion_action') or 'unknown'}`",
+                f"- Recalibration: `{lifecycle.get('recalibration_action') or 'unknown'}`",
+                f"- Retrain: `{lifecycle.get('retrain_action') or 'unknown'}`",
+                f"- Rollback: `{lifecycle.get('rollback_action') or 'unknown'}`",
+            ]
+        )
+        if lifecycle.get("promotion_target"):
+            lines.append(f"- Promotion target: `{lifecycle.get('promotion_target')}`")
+        if lifecycle.get("drift_score") is not None:
+            lines.append(f"- Drift score: `{float(lifecycle.get('drift_score', 0.0)):.4f}`")
+        if lifecycle.get("ood_fraction") is not None:
+            lines.append(f"- OOD fraction: `{float(lifecycle.get('ood_fraction', 0.0)):.4f}`")
     lines.extend(
         [
             "",
@@ -432,7 +481,10 @@ def _resolve_stage(
     intake_bundle: dict[str, Any],
     evidence_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
+    lifecycle_bundle: dict[str, Any],
 ) -> str:
+    if lifecycle_bundle:
+        return "lifecycle_reviewed"
     if completion_bundle:
         run_state = _bundle_item(completion_bundle, "run_state")
         return str(run_state.get("current_stage", "")).strip() or "completion_reviewed"
@@ -455,7 +507,22 @@ def _resolve_run_status(
     execution_summary: dict[str, Any],
     audit_report: dict[str, Any],
     completion_decision: dict[str, Any],
+    lifecycle_bundle: dict[str, Any],
 ) -> str:
+    if lifecycle_bundle:
+        rollback = _bundle_item(lifecycle_bundle, "rollback_decision")
+        if str(rollback.get("action", "")).strip() == "rollback_required":
+            return "rollback_required"
+        retrain = _bundle_item(lifecycle_bundle, "retrain_decision")
+        if str(retrain.get("action", "")).strip() == "retrain":
+            return "retrain"
+        recalibration = _bundle_item(lifecycle_bundle, "recalibration_decision")
+        if str(recalibration.get("action", "")).strip() == "recalibrate":
+            return "recalibrate"
+        promotion = _bundle_item(lifecycle_bundle, "promotion_decision")
+        action = str(promotion.get("action", "")).strip()
+        if action:
+            return action
     if completion_decision:
         action = str(completion_decision.get("action", "")).strip()
         if action:
@@ -474,6 +541,21 @@ def _resolve_run_status(
 
 def _path_if_exists(path: Path) -> str | None:
     return str(path) if path.exists() else None
+
+
+def _lifecycle_primary_action(lifecycle_bundle: dict[str, Any]) -> str | None:
+    if not lifecycle_bundle:
+        return None
+    for key in (
+        "rollback_decision",
+        "retrain_decision",
+        "recalibration_decision",
+        "promotion_decision",
+    ):
+        action = str(_bundle_item(lifecycle_bundle, key).get("action", "")).strip()
+        if action and action not in {"no_rollback", "no_retrain", "no_recalibration"}:
+            return action
+    return None
 
 
 def _resolve_model_state_path(root: Path, *, execution_summary: dict[str, Any]) -> str | None:
@@ -502,10 +584,35 @@ def _build_headline(summary: dict[str, Any]) -> str:
     decision = dict(summary.get("decision", {}))
     evidence = dict(summary.get("evidence", {}))
     completion = dict(summary.get("completion", {}))
+    lifecycle = dict(summary.get("lifecycle", {}))
     target = decision.get("target_column") or "unknown target"
     route = decision.get("selected_route_title") or decision.get("selected_route_id") or "no selected route"
     model = decision.get("selected_model_family")
     if model:
+        promotion_action = lifecycle.get("promotion_action")
+        retrain_action = lifecycle.get("retrain_action")
+        recalibration_action = lifecycle.get("recalibration_action")
+        rollback_action = lifecycle.get("rollback_action")
+        if rollback_action == "rollback_required":
+            return (
+                f"Relaytic built `{model}` for `{target}` using the `{route}` route and "
+                "now recommends rollback because the current route is no longer trustworthy."
+            )
+        if retrain_action == "retrain":
+            return (
+                f"Relaytic built `{model}` for `{target}` using the `{route}` route and "
+                "now recommends retraining under lifecycle review."
+            )
+        if recalibration_action == "recalibrate":
+            return (
+                f"Relaytic built `{model}` for `{target}` using the `{route}` route and "
+                "now recommends recalibration rather than a full route reset."
+            )
+        if promotion_action:
+            return (
+                f"Relaytic built `{model}` for `{target}` using the `{route}` route and "
+                f"currently applies the lifecycle decision `{promotion_action}`."
+            )
         completion_action = completion.get("action")
         if completion_action:
             return (

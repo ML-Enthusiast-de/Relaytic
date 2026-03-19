@@ -844,21 +844,25 @@ def _write_top_predictor_plot(*, artifact_dir: Path, rows: list[dict[str, Any]])
     if not rows:
         return None
     try:
-        import matplotlib.pyplot as plt  # type: ignore
+        from matplotlib.backends.backend_agg import FigureCanvasAgg  # type: ignore
+        from matplotlib.figure import Figure  # type: ignore
     except Exception:
         return None
     top = rows[:10]
     labels = [str(row.get("predictor_signal", "n/a")) for row in top]
     scores = [_safe_float(row.get("best_abs_score")) for row in top]
-    fig, ax = plt.subplots(figsize=(10, 4))
+    fig = Figure(figsize=(10, 4))
+    FigureCanvasAgg(fig)
+    ax = fig.add_subplot(1, 1, 1)
     ax.bar(labels, scores)
     ax.set_ylabel("best_abs_score")
     ax.set_title("Top Predictor Strength")
     ax.set_ylim(0.0, 1.0)
-    plt.xticks(rotation=30, ha="right")
+    ax.tick_params(axis="x", rotation=30)
+    for label in ax.get_xticklabels():
+        label.set_horizontalalignment("right")
     fig.tight_layout()
     path = artifact_dir / "top_predictors.png"
     fig.savefig(path)
-    plt.close(fig)
     return str(path)
 

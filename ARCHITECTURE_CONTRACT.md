@@ -23,6 +23,8 @@ Current package rule:
 - `src/relaytic/runs/` owns Slice 05A MVP-access summaries and human-readable run presentation
 - `src/relaytic/evidence/` owns Slice 06 challenger, ablation, audit, leaderboard, and evidence-report artifacts
 - `src/relaytic/completion/` owns Slice 07 completion-governor logic and artifact persistence
+- `src/relaytic/lifecycle/` owns Slice 08 lifecycle-governor logic and artifact persistence
+- `src/relaytic/interoperability/` owns Slice 08A host-neutral MCP serving, host-bundle generation, and interoperability self-checks
 - `src/relaytic/integrations/` owns optional third-party capability discovery and adapter-scoped inventory surfaces
 - `src/corr2surrogate/` is a temporary shim that forwards legacy imports
 
@@ -48,6 +50,9 @@ These files are required and must stay current:
 - `docs/build_slices/phase_05a.md`
 - `docs/build_slices/phase_06.md`
 - `docs/build_slices/phase_07.md`
+- `docs/build_slices/phase_08.md`
+- `docs/build_slices/phase_08a.md`
+- `docs/build_slices/phase_08b.md`
 - `docs/build_slices/phase_09a.md`
 
 ## Artifact Contract
@@ -97,6 +102,11 @@ The current slices must preserve these names:
 - `mandate_evidence_review.json`
 - `blocking_analysis.json`
 - `next_action_queue.json`
+- `champion_vs_candidate.json`
+- `recalibration_decision.json`
+- `retrain_decision.json`
+- `promotion_decision.json`
+- `rollback_decision.json`
 - `memory_retrieval.json`
 - `analog_run_candidates.json`
 - `route_prior_context.json`
@@ -134,9 +144,16 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic evidence show`
 - `relaytic status`
 - `relaytic completion review`
+- `relaytic lifecycle review`
+- `relaytic lifecycle show`
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
+- `relaytic doctor`
+- `relaytic interoperability show`
+- `relaytic interoperability self-check`
+- `relaytic interoperability export`
+- `relaytic interoperability serve-mcp`
 - `relaytic integrations show`
 - `relaytic integrations self-check`
 - `relaytic setup-local-llm`
@@ -181,6 +198,33 @@ Minimum guaranteed surfaces at this stage:
 - `next_action_queue.json` entries must be machine-actionable and include at minimum: `action`, `priority`, `reason_code`, `source_artifact`, and `blocking`
 - completion may use bounded local-LLM help for explanation polish, but the completion decision itself must remain deterministic and auditable
 
+## Slice 08 Lifecycle Contract
+
+- lifecycle must consume current evidence, completion state, and fresh-data behavior together rather than only a single scalar score
+- lifecycle must distinguish `keep_current_champion`, `promote_challenger`, `recalibrate`, `retrain`, and `rollback_required` as separate machine-readable outcomes
+- `champion_vs_candidate.json` must expose the current champion, first challenger, fresh-data behavior, and adapter-slot visibility in one artifact
+- `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json` must each carry an explicit `action`, `confidence`, `reason_codes`, and `next_step`
+- `relaytic lifecycle review` must be able to materialize Slice 08 from an already completed MVP run without requiring manual slice-by-slice rebuilding
+- lifecycle may expose optional uncertainty, monitoring, registry, and observability adapter slots, but canonical lifecycle judgment must remain deterministic and auditable
+
+## Slice 08A Interoperability Contract
+
+- interoperability must expose a Relaytic-owned, host-neutral MCP tool contract instead of relying on vendor-specific wrappers as the source of truth
+- the MCP surface must support `stdio` for local agent hosts and `streamable-http` for connector-style deployments
+- the checked-in host bundles must remain secret-free, machine-path-free, and local-first by default
+- `relaytic interoperability self-check` must verify bundle drift and be able to run a live local stdio smoke check
+- the interoperability surface must include at least one compact health tool that is safe to call before larger run operations
+- host adapters for Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing guidance must remain thin wrappers over the same Relaytic MCP/CLI contract
+- public HTTPS exposure of `/mcp` is never the default; remote deployment guidance must require trusted TLS and authentication controls
+
+## Slice 08B Host Activation Contract
+
+- `relaytic interoperability show` must expose per-host discovery state, activation requirements, and the next step needed to make Relaytic callable from that host
+- host readiness must distinguish repo-local auto-discovery, workspace-local auto-discovery, and remote connector registration instead of flattening them into a single "ready" label
+- OpenClaw workspace discovery must be supported through a checked-in `skills/relaytic/SKILL.md` mirror inside the repository root
+- ChatGPT-facing guidance must say explicitly that repository files are not auto-discovered and that a public HTTPS `/mcp` endpoint still must be registered as a connector
+- activation metadata must remain machine-readable so other agents can decide whether Relaytic is callable now or still needs user setup
+
 ## Slice 09A Memory Contract
 
 - run memory must be advisory and provenance-bearing rather than silently authoritative
@@ -194,6 +238,7 @@ Minimum guaranteed surfaces at this stage:
 - repo-specific environment variables should use the `RELAYTIC_*` prefix
 - legacy `C2S_*` variables may be accepted only as compatibility fallbacks
 - no raw secrets may be written into tracked docs, tests, or artifacts
+- checked-in host-bundle configs must not contain user-specific filesystem paths, tokens, or remote endpoints that are live by default
 
 ## External Capability Contract
 

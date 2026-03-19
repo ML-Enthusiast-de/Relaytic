@@ -3374,6 +3374,50 @@ relaytic status
 - `inspect_hardware_and_resolve_budgets`
 - `materialize_training_snapshot`
 
+### Current bounded implementation baseline
+
+The current bounded implementation for this vision layer is Slice 08A.
+
+It already provides:
+
+- a Relaytic-owned MCP server boundary rather than vendor-specific wrappers as the source of truth
+- local `stdio` serving for subprocess-based hosts
+- local `streamable-http` serving for connector-style clients
+- a compact health tool plus live local interoperability self-checks
+- checked-in wrapper surfaces for Claude, Codex/OpenAI skills, OpenClaw, and ChatGPT connector guidance
+- explicit host activation/discovery state so Relaytic can say which ecosystems can call it immediately and which still need connector registration
+
+The current exported tool surface covers the implemented MVP and slice-level flows:
+
+- `relaytic_server_info`
+- `relaytic_run`
+- `relaytic_show_run`
+- `relaytic_get_status`
+- `relaytic_predict`
+- `relaytic_intake_interpret`
+- `relaytic_investigate_dataset`
+- `relaytic_generate_plan`
+- `relaytic_run_evidence_review`
+- `relaytic_review_completion`
+- `relaytic_review_lifecycle`
+- `relaytic_show_lifecycle`
+- `relaytic_doctor`
+- `relaytic_integrations_show`
+
+Current safety posture:
+
+- local-first by default
+- checked-in host bundles must stay secret-free and machine-path-free
+- public HTTPS exposure of `/mcp` is optional and must sit behind trusted TLS/auth controls
+- host wrappers remain thin and must not become a second source of truth
+
+Current activation truth:
+
+- Claude can discover the project-local MCP and agent surfaces from the repository, then asks for one approval step
+- Codex/OpenAI local skill environments can discover the checked-in repository skill surface
+- OpenClaw-style workspace discovery can use `skills/relaytic/SKILL.md`
+- ChatGPT still requires explicit connector registration against a public HTTPS `/mcp` endpoint
+
 External agents must be able to provide mandate context, run briefs, data origin notes, domain briefs, and reference documents. They should also be told clearly in docs and tool cards:
 - which inputs are optional
 - which are advisory

@@ -19,12 +19,16 @@ The repository already supports a working early product baseline:
 - a first deterministic local route from data to model inside one Relaytic run directory
 - challenger, ablation, audit, and decision-memo evidence around the first built route
 - completion-governor judgment with visible run state and machine-actionable next actions
+- lifecycle-governor judgment with explicit keep, recalibrate, retrain, promote, and rollback decisions
 - concise run summaries for humans and stable summary artifacts for agents
+- one-line bootstrap install plus post-install dependency verification
+- host-neutral MCP interoperability with checked-in wrappers for Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing connector guidance
+- explicit host activation/discovery state so Relaytic can say which tools can call it immediately and which still need connector registration
 - optional local-LLM advisory paths that remain non-required
 - deterministic expert-prior reasoning for common structured-data archetypes such as manufacturing quality, fraud risk, anomaly monitoring, churn, demand, and pricing
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 
-The next load-bearing implementation step is Slice 08: lifecycle baseline.
+The next load-bearing implementation step is Slice 09A: run memory and analog retrieval.
 
 ## Design Principles
 
@@ -84,12 +88,20 @@ The default product path remains local-first and deterministic. Frontier or exte
 
 ## Quick Start
 
-Install the package in editable mode:
+Preferred one-line bootstrap:
+
+```bash
+python scripts/install_relaytic.py
+```
+
+That command installs the full local Relaytic stack in editable mode and immediately runs `relaytic doctor` to verify the environment.
+
+Manual install:
 
 ```bash
 python -m pip install --upgrade pip
-python -m pip install -e ".[dev,stats,viz]"
-python -m pip install -e ".[dev,integrations]"  # optional adapter stack
+python -m pip install -e ".[full]"
+relaytic doctor --expected-profile full
 ```
 
 Check the public CLI surface:
@@ -99,11 +111,67 @@ relaytic --help
 python -m relaytic.ui.cli --help
 ```
 
+Check the interoperability surface:
+
+```bash
+relaytic interoperability show
+relaytic interoperability self-check --live
+```
+
 Run the repository leak scan before commits:
 
 ```bash
 python -m relaytic.ui.cli scan-git-safety
 ```
+
+## Interoperability
+
+Relaytic can now be reached from common local agent hosts through a Relaytic-owned MCP layer instead of host-specific forks.
+
+Inspect the current interoperability inventory:
+
+```bash
+relaytic interoperability show
+relaytic interoperability show --format json
+relaytic interoperability self-check
+relaytic interoperability self-check --live --format json
+```
+
+Serve local MCP over stdio for subprocess-based hosts:
+
+```bash
+relaytic interoperability serve-mcp --transport stdio
+```
+
+Serve local MCP over loopback HTTP for connector-style clients:
+
+```bash
+relaytic interoperability serve-mcp --transport streamable-http --host 127.0.0.1 --port 8000 --mount-path /mcp
+```
+
+Export fresh host bundles into another directory:
+
+```bash
+relaytic interoperability export --host all --output-dir artifacts/interop_export --force
+```
+
+The checked-in host surfaces are:
+
+- `.mcp.json` for Claude Code style project-local MCP
+- `.claude/agents/relaytic.md` for Claude agent guidance
+- `.agents/skills/relaytic/SKILL.md` for Codex/OpenAI skills
+- `skills/relaytic/SKILL.md` for workspace-level OpenClaw discovery
+- `openclaw/skills/relaytic/SKILL.md` for OpenClaw
+- `connectors/chatgpt/README.md` for ChatGPT connector guidance
+
+Current activation truth:
+
+- Claude Code can discover Relaytic from this repository, then asks for one MCP approval
+- Codex/OpenAI local skill environments can discover the checked-in Relaytic skill from this repository
+- OpenClaw can discover Relaytic from the repository workspace through `skills/relaytic/SKILL.md`
+- ChatGPT still requires a registered connector against a public HTTPS `/mcp` endpoint; repository files alone are not enough
+
+See `INTEROPERABILITY.md` for the transport model, safety rules, and verification flow.
 
 ## Example Workflow
 
@@ -121,6 +189,7 @@ Then inspect or reuse the run:
 relaytic show --run-dir artifacts/run_your_dataset_...
 relaytic status --run-dir artifacts/run_your_dataset_...
 relaytic evidence show --run-dir artifacts/run_your_dataset_...
+relaytic lifecycle show --run-dir artifacts/run_your_dataset_...
 relaytic predict --run-dir artifacts/run_your_dataset_... --data-path path/to/data.csv
 ```
 
@@ -135,6 +204,7 @@ relaytic plan create --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic plan run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic evidence run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic completion review --run-dir artifacts/run_demo
+relaytic lifecycle review --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic run-inference --run-dir artifacts/run_demo --data-path path/to/data.csv
 ```
 
@@ -148,6 +218,7 @@ That flow produces:
 - model artifacts such as `model_params.json`, model state, and local checkpoints
 - evidence artifacts such as `experiment_registry.json`, `challenger_report.json`, `ablation_report.json`, `audit_report.json`, and `belief_update.json`
 - completion artifacts such as `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
+- lifecycle artifacts such as `champion_vs_candidate.json`, `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json`
 - operator-facing reports such as `reports/technical_report.md` and `reports/decision_memo.md`
 - a machine-readable `run_summary.json`
 - a human-readable `reports/summary.md`
@@ -157,6 +228,7 @@ That flow produces:
 Public-facing technical docs:
 
 - `ARCHITECTURE.md` for the system overview
+- `INTEROPERABILITY.md` for MCP transports, host bundles, and safety rules
 - `OPEN_SOURCE_STACK.md` for the mature-library adoption policy
 - `SECURITY.md` for security and repo hygiene rules
 - `PROJECT_LAYOUT.md` for repository structure and ownership boundaries
@@ -183,6 +255,7 @@ python -m pytest -q
 If you touch packaging, CLI, or security surfaces, also run:
 
 ```bash
+python scripts/install_relaytic.py --skip-install --expected-profile core
 python -m relaytic.ui.cli scan-git-safety
 relaytic --help
 ```

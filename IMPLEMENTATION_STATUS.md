@@ -4,8 +4,8 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 07
-- next recommended slice: 08, lifecycle baseline
+- completed slices: 00 through 08B
+- next recommended slice: 09A, run memory and analog retrieval
 - next high-leverage frontier follow-on: 09A, run memory and analog retrieval
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -26,6 +26,10 @@ The repository currently supports:
 - challenger, ablation, audit, leaderboard, and decision-memo evidence around the first Builder route
 - completion-governor judgment that fuses mandate, context, intake, investigation, planning, and evidence into a machine-actionable next step
 - visible run-state and blocking-layer artifacts via `relaytic status` and `relaytic completion review`
+- lifecycle-governor judgment that distinguishes keep, recalibrate, retrain, promote, and rollback actions from the same run surface
+- one-line bootstrap via `python scripts/install_relaytic.py` plus install-health verification via `relaytic doctor`
+- host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
+- machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement
 - optional frontier-model use remains in-plan as a policy-gated amplifier rather than a baseline dependency
 - deterministic expert-prior inference that converts task/domain evidence into archetype-aware metric, route, feature, and risk priors
@@ -128,12 +132,40 @@ The repository currently supports:
 - tightened `--overwrite` behavior so reruns refresh targeted investigation, planning, evidence, and completion artifacts instead of mixing stale upstream state into later governed outputs
 - added targeted Slice 07 agent, CLI, local-stub-LLM, and end-to-end tests
 
+### Slice 08
+
+- added `src/relaytic/lifecycle/` with typed lifecycle artifacts, storage helpers, and deterministic lifecycle review logic
+- implemented champion-vs-candidate comparison that fuses evidence, completion state, and fresh-data behavior
+- implemented distinct recalibration, retraining, promotion, and rollback decisions with machine-readable reason codes
+- added `champion_vs_candidate.json`, `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json`
+- added `relaytic lifecycle review` and `relaytic lifecycle show`
+- upgraded `relaytic run` and `relaytic show` so the MVP flow now includes lifecycle review by default
+- extended `run_summary.json` and `reports/summary.md` so humans and agents can see lifecycle posture in the same surface
+- added targeted Slice 08 agent, CLI, doctor, bootstrap, and public-dataset end-to-end tests
+
+### Slice 08A
+
+- added `src/relaytic/interoperability/` with a Relaytic-owned MCP server boundary, host-bundle generation, and interoperability self-checks
+- implemented a host-neutral MCP tool contract over the current Relaytic MVP and phase-level surfaces
+- added `relaytic interoperability show`, `relaytic interoperability self-check`, `relaytic interoperability export`, and `relaytic interoperability serve-mcp`
+- added checked-in `.mcp.json`, `.claude/agents/relaytic.md`, `.agents/skills/relaytic/SKILL.md`, `openclaw/skills/relaytic/SKILL.md`, and `connectors/chatgpt/README.md`
+- added transport-safe compact health tooling and live stdio/streamable HTTP smoke coverage
+- added public-dataset end-to-end MCP coverage so Relaytic can be exercised through the interoperability surface rather than CLI only
+
+### Slice 08B
+
+- expanded host-bundle metadata with explicit discovery mode, activation requirements, HTTPS requirements, and next-step guidance
+- added workspace-level `skills/relaytic/SKILL.md` so OpenClaw-style workspace discovery can work directly from this repository
+- upgraded `relaytic interoperability show` so humans and agents can see which hosts are callable now versus which still need registration or approval
+- tightened ChatGPT connector guidance so repository-local files are not mistaken for automatic ChatGPT availability
+
 ### Cross-Cutting Hardening
 
 - added `src/relaytic/integrations/` as the canonical optional-library discovery boundary
 - added `relaytic integrations show` for human and agent visibility into mature OSS capabilities
 - added `relaytic integrations self-check` so wired adapters can be compatibility-checked after package changes
 - wired Pandera into intake validation, statsmodels into evidence audit diagnostics, imbalanced-learn into rare-event challenger execution, and PyOD into anomaly challenger execution
+- added `relaytic doctor` as the canonical runtime/install-health surface and a one-line bootstrap script at `scripts/install_relaytic.py`
 - adopted bundled public datasets for stable end-to-end regression, binary-classification, and multiclass-classification tests without introducing network-bound CI behavior
 - sharpened `RELAYTIC_SLICING_PLAN.md` into a stricter future-slice execution contract with explicit intelligence sources, proof obligations, fallbacks, and a preferred post-MVP execution order
 - folded explicit optional SOTA routine tracks into the slicing plan so future lifecycle, memory, benchmark, and polish slices know where MAPIE, Evidently, MLflow, OpenTelemetry, OpenLineage, FLAML, and later Feast fit
@@ -152,20 +184,19 @@ New code and docs must target `relaytic` and `RELAYTIC_*`.
 The repository is not yet at the final product state. The main remaining gaps are:
 
 - the current challenger layer is real but still narrow; it does not yet prove broad challenger science
-- lifecycle decisions and memory-guided route improvement are still pending
+- memory-guided route improvement is still pending
 - benchmark-separated proof of strength under constrained/operator-heavy settings is still pending
 - some deeper runtime surfaces still retain compatibility-era internals while newer product layers are being built on top
 
 ## Immediate Next Work
 
-Slice 08 should land:
+Slice 09A should land:
 
-- monitor vs recalibrate vs retrain baseline
-- champion/candidate comparison
-- promotion and rollback decisions
-- lifecycle actions that remain reversible and easy for external agents to consume
+- run memory and analog retrieval
+- route priors and challenger priors with provenance
+- visible memory support for planning, challenger design, and completion/lifecycle review
 
-After Slice 08, the next high-leverage frontier follow-ons should include:
+After Slice 08B, the next high-leverage frontier follow-ons should include:
 
 - Slice 09A run memory and analog retrieval
 - Slice 09 intelligence amplification and bounded semantic-task infrastructure
