@@ -2,8 +2,22 @@ name: ci
 
 on:
   push:
-    branches: ["**"]
+    branches: ["main"]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - ".agents/**"
+      - ".claude/**"
+      - "openclaw/**"
+      - "connectors/**"
+      - "skills/**"
   pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:

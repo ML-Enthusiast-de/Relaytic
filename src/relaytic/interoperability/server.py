@@ -54,7 +54,6 @@ def create_relaytic_mcp_server(
         port=port,
         streamable_http_path=mount_path,
         dependencies=("relaytic",),
-        website_url="https://github.com/gehra/Relaytic",
         log_level="ERROR",
     )
     for spec in build_interoperability_tool_specs():
