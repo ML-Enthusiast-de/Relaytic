@@ -18,11 +18,15 @@ Relaytic is organized as a staged artifact pipeline.
    Strategist turns investigation outputs into a concrete Builder handoff, and the first deterministic route executes into the same Relaytic run directory.
 5. Evidence pressure
    Challenger, ablation, and audit specialists treat the first built route as a provisional champion, then write leaderboard, report, and belief-update artifacts for humans and external agents.
-6. Completion governor
+6. Cross-run memory
+   Relaytic retrieves prior analog runs from local artifacts, derives route and challenger priors, and flushes reflection memory back to disk without making memory silently authoritative.
+7. Completion governor
    Completion specialists fuse the full artifact graph into a visible run state, mandate-evidence review, blocking-layer diagnosis, and machine-actionable next action.
-7. Lifecycle
+8. Lifecycle
    Lifecycle specialists compare the current champion, challenger evidence, completion state, and fresh-data behavior to decide whether to keep, recalibrate, retrain, promote, or roll back.
-8. Interoperability and host adapters
+9. Runtime gateway
+   The local runtime owns append-only event emission, checkpoints, hook audit, and capability-scoped specialist visibility so CLI and MCP share one control plane.
+10. Interoperability and host adapters
    Relaytic exposes the same MVP and slice-level surfaces through a host-neutral MCP server plus thin host wrappers for common agent ecosystems.
 
 ## Core System Principles
@@ -102,8 +106,10 @@ The repository currently implements the following product layers:
 - Slice 08: lifecycle-governor judgment with champion/candidate comparison and explicit keep, recalibrate, retrain, promote, and rollback actions
 - Slice 08A: host-neutral MCP interoperability with checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - Slice 08B: host activation and discovery state with repo/workspace auto-discovery where the host permits it
+- Slice 09A: run memory and analog retrieval with route priors, challenger priors, reflection memory, and pre-close memory flush artifacts
+- Slice 09B: local runtime gateway with append-only event traces, capability profiles, hook audit, and shared CLI/MCP run-state coordination
 
-The next planned layer is Slice 09A: run memory and analog retrieval.
+The next planned layer is Slice 09: structured semantic tasks, document grounding, and bounded intelligence amplification.
 
 ## Current Artifact Baseline
 
@@ -146,6 +152,18 @@ Relaytic already standardizes several load-bearing artifacts:
 - `leaderboard.csv`
 - `reports/technical_report.md`
 - `reports/decision_memo.md`
+- `memory_retrieval.json`
+- `analog_run_candidates.json`
+- `route_prior_context.json`
+- `challenger_prior_suggestions.json`
+- `reflection_memory.json`
+- `memory_flush_report.json`
+- `lab_event_stream.jsonl`
+- `hook_execution_log.json`
+- `run_checkpoint_manifest.json`
+- `capability_profiles.json`
+- `data_access_audit.json`
+- `context_influence_report.json`
 - `completion_decision.json`
 - `run_state.json`
 - `stage_timeline.json`
@@ -182,6 +200,10 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic completion review`
 - `relaytic lifecycle review`
 - `relaytic lifecycle show`
+- `relaytic memory retrieve`
+- `relaytic memory show`
+- `relaytic runtime show`
+- `relaytic runtime events`
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
@@ -207,6 +229,7 @@ Relaytic now exposes a local-first interoperability layer on top of the same pro
 - OpenClaw workspace discovery is supported through `skills/relaytic/SKILL.md`, while ChatGPT still requires explicit connector registration against a public HTTPS `/mcp` endpoint
 
 See `INTEROPERABILITY.md` for concrete usage patterns and safety notes.
+See `RUNTIME.md` for the local gateway, event stream, hook model, and capability-profile surface.
 
 ## Implementation Control Docs
 

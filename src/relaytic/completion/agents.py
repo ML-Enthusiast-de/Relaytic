@@ -64,8 +64,12 @@ class StateTrackerAgent:
         investigation_bundle: dict[str, Any],
         planning_bundle: dict[str, Any],
         evidence_bundle: dict[str, Any],
+        memory_bundle: dict[str, Any] | None = None,
+        intelligence_bundle: dict[str, Any] | None = None,
         completion_bundle: dict[str, Any] | None = None,
     ) -> tuple[_StateFrame, CompletionTrace]:
+        memory_bundle = memory_bundle or {}
+        intelligence_bundle = intelligence_bundle or {}
         root = Path(run_dir)
         artifact_presence = {
             "foundation": bool(mandate_bundle) and bool(context_bundle),
@@ -73,7 +77,9 @@ class StateTrackerAgent:
             "investigation": bool(investigation_bundle),
             "planning": bool(_bundle_item(planning_bundle, "plan")),
             "execution": bool(dict(_bundle_item(planning_bundle, "plan").get("execution_summary") or {})),
+            "memory": bool(memory_bundle),
             "evidence": bool(evidence_bundle),
+            "intelligence": bool(intelligence_bundle),
             "completion": True,
         }
         stage_specs = [
@@ -82,7 +88,9 @@ class StateTrackerAgent:
             ("investigation_ready", artifact_presence["investigation"], "focus_profile.json", _artifact_time(root / "focus_profile.json", investigation_bundle.get("focus_profile"))),
             ("planning_ready", artifact_presence["planning"], "plan.json", _artifact_time(root / "plan.json", planning_bundle.get("plan"))),
             ("route_executed", artifact_presence["execution"], "model_params.json", _artifact_time(root / "model_params.json", _read_json(root / "model_params.json"))),
+            ("memory_retrieved", artifact_presence["memory"], "memory_retrieval.json", _artifact_time(root / "memory_retrieval.json", memory_bundle.get("memory_retrieval"))),
             ("evidence_reviewed", artifact_presence["evidence"], "audit_report.json", _artifact_time(root / "audit_report.json", evidence_bundle.get("audit_report"))),
+            ("intelligence_reviewed", artifact_presence["intelligence"], "semantic_debate_report.json", _artifact_time(root / "semantic_debate_report.json", intelligence_bundle.get("semantic_debate_report"))),
         ]
         stages = [
             {
@@ -262,9 +270,13 @@ class CompletionJudgeAgent:
         investigation_bundle: dict[str, Any],
         planning_bundle: dict[str, Any],
         evidence_bundle: dict[str, Any],
+        memory_bundle: dict[str, Any] | None,
+        intelligence_bundle: dict[str, Any] | None,
         state_frame: _StateFrame,
         mandate_review: dict[str, Any],
     ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], CompletionTrace]:
+        memory_bundle = memory_bundle or {}
+        intelligence_bundle = intelligence_bundle or {}
         run_brief = _bundle_item(mandate_bundle, "run_brief")
         task_brief = _bundle_item(context_bundle, "task_brief")
         plan = _bundle_item(planning_bundle, "plan")
@@ -274,6 +286,9 @@ class CompletionJudgeAgent:
         ablation_report = _bundle_item(evidence_bundle, "ablation_report")
         audit_report = _bundle_item(evidence_bundle, "audit_report")
         belief_update = _bundle_item(evidence_bundle, "belief_update")
+        semantic_debate = _bundle_item(intelligence_bundle, "semantic_debate_report")
+        semantic_uncertainty = _bundle_item(intelligence_bundle, "semantic_uncertainty_report")
+        intelligence_escalation = _bundle_item(intelligence_bundle, "intelligence_escalation")
         clarification_queue = _bundle_item(intake_bundle, "clarification_queue")
         assumption_log = _bundle_item(intake_bundle, "assumption_log")
         focus_profile = _bundle_item(investigation_bundle, "focus_profile")
@@ -306,13 +321,26 @@ class CompletionJudgeAgent:
             "benchmark_parity_report.json",
             "gold_standard_comparison.json",
         ])
-        memory_present = any((Path(run_dir) / name).exists() for name in [
-            "memory_retrieval.json",
-            "analog_run_candidates.json",
-            "route_prior_context.json",
-            "challenger_prior_suggestions.json",
-        ])
+        memory_retrieval = _bundle_item(memory_bundle, "memory_retrieval")
+        route_prior_context = _bundle_item(memory_bundle, "route_prior_context")
+        challenger_prior = _bundle_item(memory_bundle, "challenger_prior_suggestions")
+        memory_present = bool(memory_retrieval)
+        memory_attempted = memory_present and str(memory_retrieval.get("status", "")).strip() in {
+            "retrieval_completed",
+            "no_credible_analogs",
+            "disabled",
+        }
+        memory_helpful = bool(
+            int(memory_retrieval.get("selected_analog_count", 0) or 0) > 0
+            or str(route_prior_context.get("status", "")).strip() == "memory_influenced"
+            or str(challenger_prior.get("status", "")).strip() == "memory_influenced"
+        )
         autonomous_mode = _is_autonomous_mode(intake_bundle=intake_bundle, mandate_bundle=mandate_bundle)
+        semantic_followup = str(semantic_debate.get("recommended_followup_action", "")).strip()
+        semantic_confidence = str(semantic_debate.get("confidence", "")).strip()
+        semantic_unresolved_items = [
+            item for item in semantic_uncertainty.get("unresolved_items", []) if isinstance(item, dict)
+        ]
         route_narrowness = bool(
             challenger_winner == "challenger"
             or (
@@ -320,11 +348,15 @@ class CompletionJudgeAgent:
                 and len(alternatives) >= 1
                 and provisional_recommendation in {"review_challenger_before_promotion", "continue_experimentation"}
             )
+            or semantic_followup == "expand_challenger_portfolio"
         )
         semantic_ambiguity = bool(
             clarification_count > 0
             or assumption_count >= 3
             or not str(plan.get("target_column", "")).strip()
+            or semantic_unresolved_items
+            or bool(intelligence_escalation.get("escalation_required", False))
+            or semantic_confidence == "low"
         )
         evidence_insufficiency = bool(
             readiness_level != "strong"
@@ -334,7 +366,7 @@ class CompletionJudgeAgent:
         )
         memory_support_missing = bool(
             autonomous_mode
-            and not memory_present
+            and not memory_attempted
             and route_narrowness
             and provisional_recommendation in {"review_challenger_before_promotion", "continue_experimentation"}
         )
@@ -346,7 +378,7 @@ class CompletionJudgeAgent:
             _diagnosis(layer="semantic_ambiguity", triggered=semantic_ambiguity, severity="medium", reason_code="semantic_ambiguity", evidence="Optional clarification items or assumption load are still visible in the run."),
             _diagnosis(layer="route_narrowness", triggered=route_narrowness, severity="high" if challenger_winner == "challenger" else "medium", reason_code="route_narrowness", evidence="The current search breadth is still narrow relative to the observed challenger pressure."),
             _diagnosis(layer="evidence_insufficiency", triggered=evidence_insufficiency, severity="medium", reason_code="evidence_insufficiency", evidence="Readiness remains conditional or the evidence bundle still carries open questions."),
-            _diagnosis(layer="missing_memory_support", triggered=memory_support_missing, severity="medium", reason_code="missing_memory_support", evidence="Autonomous continuation would benefit from prior analog retrieval, but no memory artifacts are present."),
+            _diagnosis(layer="missing_memory_support", triggered=memory_support_missing, severity="medium", reason_code="missing_memory_support", evidence="Autonomous continuation would benefit from prior analog retrieval, but no memory retrieval attempt has been recorded."),
             _diagnosis(layer="missing_benchmark_context", triggered=benchmark_missing, severity="medium", reason_code="missing_benchmark_context", evidence="The mandate asks for benchmark or reference proof, but no benchmark artifacts are present."),
         ]
 
@@ -372,6 +404,10 @@ class CompletionJudgeAgent:
             blocking_layer = "evidence_insufficiency"
             action = "collect_more_data"
             reason_codes.append("operating_envelope_risk")
+        elif semantic_followup == "collect_more_data":
+            blocking_layer = "evidence_insufficiency"
+            action = "collect_more_data"
+            reason_codes.append("semantic_data_gap")
         elif provisional_recommendation == "continue_experimentation" or belief_action == "continue_experimentation":
             blocking_layer = "route_narrowness" if route_narrowness else "evidence_insufficiency"
             action = "continue_experimentation"
@@ -394,8 +430,12 @@ class CompletionJudgeAgent:
 
         if semantic_ambiguity:
             reason_codes.append("semantic_ambiguity")
+        if semantic_followup:
+            reason_codes.append(f"semantic_followup_{semantic_followup}")
         if load_bearing_count >= 2:
             reason_codes.append("feature_dependency_high")
+        if memory_helpful:
+            reason_codes.append("memory_support_available")
         if not str(plan.get("primary_metric", "")).strip():
             reason_codes.append("missing_primary_metric")
         if not str(focus_profile.get("primary_objective", "")).strip():
@@ -442,7 +482,15 @@ class CompletionJudgeAgent:
             operating_mode="deterministic_plus_advisory" if self.advisor is not None else "deterministic_only",
             llm_used=llm_used,
             llm_status=llm_status,
-            deterministic_evidence=["mandate_bundle", "context_bundle", "intake_bundle", "investigation_bundle", "planning_bundle", "evidence_bundle"],
+            deterministic_evidence=[
+                "mandate_bundle",
+                "context_bundle",
+                "intake_bundle",
+                "investigation_bundle",
+                "planning_bundle",
+                "evidence_bundle",
+                "intelligence_bundle",
+            ],
             advisory_notes=advisory_notes,
         )
         next_actions = _build_next_actions(
@@ -489,6 +537,8 @@ def run_completion_review(
     investigation_bundle: dict[str, Any],
     planning_bundle: dict[str, Any],
     evidence_bundle: dict[str, Any],
+    memory_bundle: dict[str, Any] | None = None,
+    intelligence_bundle: dict[str, Any] | None = None,
     config_path: str | None = None,
 ) -> CompletionRunResult:
     """Execute the Slice 07 completion-governor stage for a Relaytic run."""
@@ -507,6 +557,8 @@ def run_completion_review(
         investigation_bundle=investigation_bundle,
         planning_bundle=planning_bundle,
         evidence_bundle=evidence_bundle,
+        memory_bundle=memory_bundle,
+        intelligence_bundle=intelligence_bundle,
     )
     mandate_payload, mandate_trace = mandate_reviewer.run(
         mandate_bundle=mandate_bundle,
@@ -523,6 +575,8 @@ def run_completion_review(
         investigation_bundle=investigation_bundle,
         planning_bundle=planning_bundle,
         evidence_bundle=evidence_bundle,
+        memory_bundle=memory_bundle,
+        intelligence_bundle=intelligence_bundle,
         state_frame=state_frame,
         mandate_review=mandate_payload,
     )

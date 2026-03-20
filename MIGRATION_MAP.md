@@ -108,6 +108,20 @@ Avoid introducing new references to:
 - introduced the checked-in workspace discovery mirror `skills/relaytic/SKILL.md` for OpenClaw-style hosts
 - upgraded `relaytic interoperability show` so host readiness is explicit instead of implied
 
+### Slice 09A
+
+- introduced the canonical package boundary `src/relaytic/memory/`
+- introduced the public commands `relaytic memory retrieve` and `relaytic memory show`
+- expanded the artifact boundary to include `memory_retrieval.json`, `analog_run_candidates.json`, `route_prior_context.json`, `challenger_prior_suggestions.json`, `reflection_memory.json`, and `memory_flush_report.json`
+- upgraded planning, evidence, completion, lifecycle, `relaytic run`, and `relaytic show` so memory artifacts can influence current runs without widening the legacy compatibility surface
+
+### Slice 09B
+
+- introduced the canonical package boundary `src/relaytic/runtime/`
+- introduced the public commands `relaytic runtime show` and `relaytic runtime events`
+- expanded the artifact boundary to include `lab_event_stream.jsonl`, `hook_execution_log.json`, `run_checkpoint_manifest.json`, `capability_profiles.json`, `data_access_audit.json`, and `context_influence_report.json`
+- upgraded CLI and MCP orchestration so stage transitions share one local runtime instead of parallel surface-specific state
+
 ### Post-Slice 07 Cross-Cutting Additions
 
 - introduced the canonical package boundary `src/relaytic/integrations/`
@@ -122,11 +136,17 @@ Avoid introducing new references to:
 
 These boundaries are frozen for the next major slices so implementation can proceed without reopening naming or ownership questions.
 
-### Slice 09A
+### Slice 09
 
-- reserve the canonical package boundary `src/relaytic/memory/`
-- reserve the future public command `relaytic memory retrieve`
-- reserve the artifact boundary for `memory_retrieval.json`, `analog_run_candidates.json`, `route_prior_context.json`, and `challenger_prior_suggestions.json`
+- reserve the canonical package boundary `src/relaytic/intelligence/`
+- reserve future artifact boundaries for `intelligence_mode.json`, `llm_backend_discovery.json`, `llm_health_check.json`, `llm_upgrade_suggestions.json`, `semantic_task_request.json`, `semantic_task_results.json`, `intelligence_escalation.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_access_audit.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
+- reserve future public commands for intelligence inspection and structured semantic-task execution
+
+### Slice 09C
+
+- reserve the canonical package boundary `src/relaytic/autonomy/`
+- reserve future artifact boundaries for `autonomy_loop_state.json`, `autonomy_round_report.json`, `challenger_queue.json`, `branch_outcome_matrix.json`, `retrain_run_request.json`, `recalibration_run_request.json`, `champion_lineage.json`, and `loop_budget_report.json`
+- reserve future public commands for bounded autonomy-loop execution, inspection, and explicit retrain/recalibration branch control
 
 ## Removal Criteria
 

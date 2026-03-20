@@ -72,6 +72,7 @@ The MCP server exposes Relaytic-owned tools over the current MVP and specialist 
 
 - `relaytic_run`
 - `relaytic_show_run`
+- `relaytic_show_runtime`
 - `relaytic_get_status`
 - `relaytic_predict`
 - `relaytic_intake_interpret`
@@ -99,5 +100,5 @@ Recommended verification after changing interoperability code:
 
 ```bash
 relaytic interoperability self-check --live
-python -m pytest tests/test_cli_slice08a.py tests/test_interoperability_mcp.py -q
+python -m pytest tests/test_cli_slice08a.py tests/test_interoperability_mcp.py tests/test_cli_slice09b.py -q
 ```

@@ -77,9 +77,11 @@ def test_cli_run_executes_end_to_end_and_writes_access_artifacts(tmp_path: Path,
 
     assert payload["status"] == "ok"
     assert payload["run_summary"]["decision"]["selected_model_family"]
+    assert payload["run_summary"]["stage_completed"] == "autonomy_reviewed"
     assert payload["run_summary"]["decision"]["selected_route_id"] == "temporal_calibrated_classifier_route"
     assert payload["run_summary"]["request"]["source"] == "inline_text"
     assert payload["run_summary"]["evidence"]["provisional_recommendation"]
+    assert payload["run_summary"]["runtime"]["current_stage"] == "autonomy"
     assert (run_dir / "run_summary.json").exists()
     assert (run_dir / "reports" / "summary.md").exists()
     assert (run_dir / "reports" / "decision_memo.md").exists()

@@ -52,3 +52,32 @@ def test_load_policy_accepts_canonical_policy_shape(tmp_path: Path) -> None:
 
     assert resolved.source_format == "canonical"
     assert resolved.policy["mandate"]["enabled"] is False
+
+
+def test_load_policy_maps_top_level_autonomy_and_intelligence_controls(tmp_path: Path) -> None:
+    config = tmp_path / "legacy_extended.yaml"
+    config.write_text(
+        "\n".join(
+            [
+                "autonomy:",
+                "  execution_mode: autonomous",
+                "  allow_auto_run: true",
+                "  max_followup_rounds: 2",
+                "  max_branches_per_round: 3",
+                "intelligence:",
+                "  enabled: true",
+                "  intelligence_mode: advisory_local_llm",
+                "  allow_frontier_llm: false",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    resolved = load_policy(config)
+
+    assert resolved.source_format == "legacy_top_level"
+    assert resolved.policy["autonomy"]["execution_mode"] == "autonomous"
+    assert resolved.policy["autonomy"]["max_followup_rounds"] == 2
+    assert resolved.policy["autonomy"]["max_branches_per_round"] == 3
+    assert resolved.policy["intelligence"]["enabled"] is True
+    assert resolved.policy["intelligence"]["intelligence_mode"] == "advisory_local_llm"

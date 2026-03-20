@@ -84,6 +84,7 @@ class ChampionVsCandidate:
     fresh_data_behavior: dict[str, Any]
     completion_signal: dict[str, Any]
     evidence_signal: dict[str, Any]
+    memory_signal: dict[str, Any]
     adapter_slots: list[dict[str, Any]]
     summary: str
     trace: LifecycleTrace

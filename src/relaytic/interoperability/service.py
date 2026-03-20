@@ -56,6 +56,12 @@ def relaytic_show_run(*, run_dir: str) -> dict[str, Any]:
     return cli._show_access_run(run_dir=run_dir)
 
 
+def relaytic_show_runtime(*, run_dir: str, limit: int = 20) -> dict[str, Any]:
+    """Render the current runtime gateway surface for a Relaytic run."""
+    cli = _cli()
+    return cli._show_runtime_surface(run_dir=run_dir, limit=max(1, int(limit)))
+
+
 def relaytic_get_status(*, run_dir: str) -> dict[str, Any]:
     """Render the completion-governor status for a Relaytic run."""
     cli = _cli()
@@ -120,6 +126,8 @@ def relaytic_intake_interpret(
         data_start_row=data_start_row,
         overwrite=overwrite,
         labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_intake_interpret",
     )
 
 
@@ -150,6 +158,8 @@ def relaytic_investigate_dataset(
         timestamp_column=timestamp_column,
         overwrite=overwrite,
         labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_investigate_dataset",
     )
 
 
@@ -182,6 +192,8 @@ def relaytic_generate_plan(
         overwrite=overwrite,
         labels=_normalize_labels(labels),
         execute_route=execute_route,
+        runtime_surface="mcp",
+        runtime_command="relaytic_generate_plan",
     )
 
 
@@ -212,6 +224,8 @@ def relaytic_run_evidence_review(
         overwrite=overwrite,
         labels=_normalize_labels(labels),
         planning_state=None,
+        runtime_surface="mcp",
+        runtime_command="relaytic_run_evidence_review",
     )
 
 
@@ -231,7 +245,36 @@ def relaytic_review_completion(
         run_id=run_id,
         overwrite=overwrite,
         labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_review_completion",
     )
+
+
+def relaytic_run_intelligence(
+    *,
+    run_dir: str,
+    config_path: str | None = None,
+    run_id: str | None = None,
+    overwrite: bool = False,
+    labels: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Execute the Slice 09 intelligence review for an existing run."""
+    cli = _cli()
+    return cli._run_intelligence_phase(
+        run_dir=run_dir,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_run_intelligence",
+    )
+
+
+def relaytic_show_intelligence(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 09 intelligence surface for a run."""
+    cli = _cli()
+    return cli._show_intelligence_surface(run_dir=run_dir)
 
 
 def relaytic_review_lifecycle(
@@ -252,7 +295,38 @@ def relaytic_review_lifecycle(
         run_id=run_id,
         overwrite=overwrite,
         labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_review_lifecycle",
     )
+
+
+def relaytic_run_autonomy(
+    *,
+    run_dir: str,
+    data_path: str | None = None,
+    config_path: str | None = None,
+    run_id: str | None = None,
+    overwrite: bool = False,
+    labels: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Execute the Slice 09C autonomy loop for an existing run."""
+    cli = _cli()
+    return cli._run_autonomy_phase(
+        run_dir=run_dir,
+        data_path=data_path,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_run_autonomy",
+    )
+
+
+def relaytic_show_autonomy(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 09C autonomy surface for a run."""
+    cli = _cli()
+    return cli._show_autonomy_surface(run_dir=run_dir)
 
 
 def relaytic_show_lifecycle(*, run_dir: str, data_path: str | None = None) -> dict[str, Any]:
@@ -278,8 +352,11 @@ def relaytic_server_info() -> dict[str, Any]:
         "inspection_tools": [
             "relaytic_server_info",
             "relaytic_show_run",
+            "relaytic_show_runtime",
             "relaytic_get_status",
+            "relaytic_show_intelligence",
             "relaytic_show_lifecycle",
+            "relaytic_show_autonomy",
             "relaytic_doctor",
             "relaytic_integrations_show",
         ],
@@ -289,8 +366,10 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_investigate_dataset",
             "relaytic_generate_plan",
             "relaytic_run_evidence_review",
+            "relaytic_run_intelligence",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
+            "relaytic_run_autonomy",
             "relaytic_predict",
         ],
     }
@@ -335,12 +414,28 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             handler=relaytic_show_run,
         ),
         InteropToolSpec(
+            name="relaytic_show_runtime",
+            title="Show Relaytic Runtime",
+            description="Render the current Relaytic runtime gateway state, including recent events, hook activity, and capability enforcement.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_runtime,
+        ),
+        InteropToolSpec(
             name="relaytic_get_status",
             title="Get Relaytic Status",
             description="Read the Slice 07 completion-governor status for a Relaytic run.",
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_get_status,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_intelligence",
+            title="Show Relaytic Intelligence",
+            description="Render the current Slice 09 semantic debate and uncertainty surface for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_intelligence,
         ),
         InteropToolSpec(
             name="relaytic_predict",
@@ -383,6 +478,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             handler=relaytic_run_evidence_review,
         ),
         InteropToolSpec(
+            name="relaytic_run_intelligence",
+            title="Run Intelligence Review",
+            description="Execute the Slice 09 structured semantic debate layer for an existing Relaytic run.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_run_intelligence,
+        ),
+        InteropToolSpec(
             name="relaytic_review_completion",
             title="Review Completion",
             description="Execute the completion-governor review for an existing Relaytic run.",
@@ -405,6 +508,22 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_lifecycle,
+        ),
+        InteropToolSpec(
+            name="relaytic_run_autonomy",
+            title="Run Autonomy Loop",
+            description="Execute the Slice 09C bounded autonomous follow-up loop for an existing Relaytic run.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_run_autonomy,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_autonomy",
+            title="Show Autonomy",
+            description="Render the current autonomy-loop posture and branch results for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_autonomy,
         ),
         InteropToolSpec(
             name="relaytic_doctor",

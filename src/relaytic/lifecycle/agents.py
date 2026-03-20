@@ -51,13 +51,19 @@ class ChampionCandidateAgent:
         planning_bundle: dict[str, Any],
         evidence_bundle: dict[str, Any],
         completion_bundle: dict[str, Any],
+        memory_bundle: dict[str, Any] | None = None,
+        intelligence_bundle: dict[str, Any] | None = None,
     ) -> ChampionVsCandidate:
+        memory_bundle = memory_bundle or {}
+        intelligence_bundle = intelligence_bundle or {}
         plan = _bundle_item(planning_bundle, "plan")
         execution_summary = dict(plan.get("execution_summary") or {})
         challenger_report = _bundle_item(evidence_bundle, "challenger_report")
         audit_report = _bundle_item(evidence_bundle, "audit_report")
         belief_update = _bundle_item(evidence_bundle, "belief_update")
         completion_decision = _bundle_item(completion_bundle, "completion_decision")
+        semantic_debate = _bundle_item(intelligence_bundle, "semantic_debate_report")
+        semantic_uncertainty = _bundle_item(intelligence_bundle, "semantic_uncertainty_report")
         task_brief = _bundle_item(context_bundle, "task_brief")
 
         primary_metric = (
@@ -96,12 +102,16 @@ class ChampionCandidateAgent:
                 "blocking_layer": str(completion_decision.get("blocking_layer", "")).strip() or None,
                 "mandate_alignment": str(completion_decision.get("mandate_alignment", "")).strip() or None,
                 "complete_for_mode": bool(completion_decision.get("complete_for_mode", False)),
+                "semantic_followup_action": str(semantic_debate.get("recommended_followup_action", "")).strip() or None,
+                "semantic_confidence": str(semantic_debate.get("confidence", "")).strip() or None,
+                "semantic_uncertainty_band": str(semantic_uncertainty.get("confidence_band", "")).strip() or None,
             },
             evidence_signal={
                 "provisional_recommendation": str(audit_report.get("provisional_recommendation", "")).strip() or None,
                 "readiness_level": str(audit_report.get("readiness_level", "")).strip() or None,
                 "recommended_action": str(belief_update.get("recommended_action", "")).strip() or None,
             },
+            memory_signal=_memory_signal(memory_bundle),
             adapter_slots=_adapter_slots(),
             summary=_comparison_summary(
                 champion_model_family=champion_model_family,
@@ -322,6 +332,8 @@ def run_lifecycle_review(
     planning_bundle: dict[str, Any],
     evidence_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
+    memory_bundle: dict[str, Any] | None = None,
+    intelligence_bundle: dict[str, Any] | None = None,
     config_path: str | None = None,
 ) -> LifecycleRunResult:
     """Run Slice 08 lifecycle review against the current run."""
@@ -336,6 +348,8 @@ def run_lifecycle_review(
         planning_bundle=planning_bundle,
         evidence_bundle=evidence_bundle,
         completion_bundle=completion_bundle,
+        memory_bundle=memory_bundle,
+        intelligence_bundle=intelligence_bundle,
     )
     recalibration, retrain, promotion, rollback = governor.run(comparison=comparison)
     bundle = LifecycleBundle(
@@ -383,6 +397,18 @@ def render_lifecycle_review_markdown(bundle: dict[str, Any]) -> str:
                 f"- Metrics: {_format_metric_block(dict(evaluation.get('metrics') or {}))}",
             ]
         )
+    memory_signal = dict(comparison.get("memory_signal") or {})
+    if memory_signal:
+        lines.extend(
+            [
+                "",
+                "## Memory",
+                f"- Retrieval status: `{memory_signal.get('retrieval_status') or 'unknown'}`",
+                f"- Analog count: `{memory_signal.get('analog_count', 0)}`",
+                f"- Route prior applied: `{memory_signal.get('route_prior_applied')}`",
+                f"- Challenger prior: `{memory_signal.get('preferred_challenger_family') or 'none'}`",
+            ]
+        )
     lines.extend(
         [
             "",
@@ -418,6 +444,11 @@ def _optional_float(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _optional_str(value: Any) -> str | None:
+    text = str(value or "").strip()
+    return text or None
 
 
 def _primary_metric_value(*, execution_summary: dict[str, Any], primary_metric: str) -> float | None:
@@ -599,6 +630,18 @@ def _rollback_summary(*, action: str, target_available: bool) -> str:
             return "Relaytic recommends rollback to the last stable champion because the current route is no longer trustworthy."
         return "Relaytic recommends rollback, but no local prior stable checkpoint is attached to this run yet."
     return "Relaytic does not see a rollback trigger right now."
+
+
+def _memory_signal(memory_bundle: dict[str, Any]) -> dict[str, Any]:
+    retrieval = _bundle_item(memory_bundle, "memory_retrieval")
+    route_prior = _bundle_item(memory_bundle, "route_prior_context")
+    challenger_prior = _bundle_item(memory_bundle, "challenger_prior_suggestions")
+    return {
+        "retrieval_status": _optional_str(retrieval.get("status")) or "not_available",
+        "analog_count": int(retrieval.get("selected_analog_count", 0) or 0),
+        "route_prior_applied": str(route_prior.get("status", "")).strip() == "memory_influenced",
+        "preferred_challenger_family": _optional_str(challenger_prior.get("preferred_challenger_family")),
+    }
 
 
 def _format_metric_block(metrics: dict[str, Any]) -> str:

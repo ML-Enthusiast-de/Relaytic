@@ -64,6 +64,27 @@ agent_behavior:
   always_inform_user: true
   ask_when_ambiguous: true
 
+autonomy:
+  execution_mode: autonomous
+  operation_mode: bounded_loop
+  allow_auto_run: true
+  max_followup_rounds: 1
+  max_branches_per_round: 2
+  min_relative_improvement: 0.02
+  allow_architecture_switch: true
+  allow_feature_set_expansion: true
+  suggest_more_data_when_stalled: true
+
+intelligence:
+  enabled: true
+  intelligence_mode: deterministic
+  prefer_local_llm: true
+  allow_frontier_llm: false
+  enable_backend_discovery: true
+  allow_upgrade_suggestions: true
+  require_schema_constrained_actions: true
+  require_verifier_for_high_impact_decisions: true
+
 prompts:
   analyst_system_path: ""
   modeler_system_path: ""
@@ -74,6 +95,13 @@ runtime:
   require_local_models: true
   block_remote_endpoints: true
   offline_mode: true
+  gateway_enabled: true
+  read_only_hooks_enabled: true
+  allow_write_hooks: false
+  checkpoint_on_stage_complete: true
+  capability_enforcement_enabled: true
+  semantic_rowless_default: true
+  max_recent_events: 50
   remote_default_model: gpt-4.1-mini
   temperature: 0.0
   timeout_seconds: 120

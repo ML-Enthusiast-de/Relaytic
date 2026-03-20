@@ -61,6 +61,11 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - includes a focus-selection layer that debates whether a run should prioritize accuracy, business value, reliability, efficiency, interpretability, sustainability, or a multi-objective blend
 - keeps major subsystems replaceable through explicit engine slots instead of hard-wiring every backend choice
 - carries bounded evidence bundles between specialists instead of relying only on implicit shared state
+- uses a local lab gateway and append-only event stream so CLI, MCP, UI, and automation share the same run-control truth
+- treats on-disk artifacts as canonical truth and any memory index, semantic cache, or retrieval structure as a derived view
+- gives each specialist an explicit capability profile instead of ambient full-data, full-tool access
+- defaults semantic helpers and optional LLM paths to rowless, redacted, schema-bound context unless policy explicitly grants richer access
+- flushes durable reflection and memory summaries before retries, compaction, and final completion/lifecycle handoff
 - includes operator onboarding, health, backup, restore, and diagnostics as first-class product features
 - defines trust boundaries for every integration so external systems are useful but never unquestionable
 - includes a small structured semantic-task primitive for safe, schema-bound semantic reasoning
@@ -148,6 +153,9 @@ They are:
 
 - a real completion governor that fuses the full artifact graph into explicit next-step judgment
 - memory-guided analog retrieval that improves route choice and challenger design
+- semantically grounded expert deliberation that can generate counterpositions, verifier findings, and doc-grounded challenger or retraining ideas
+- bounded autonomous second-pass loops that can actually execute challenger expansion, recalibration, retraining, or re-planning
+- champion lineage and small challenger portfolios rather than one narrow challenger branch
 - benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, and lifecycle constraints actually matter
 
 These are the places where the project most needs to become stronger if it wants to look like the next big thing rather than a well-structured research product.
@@ -565,6 +573,9 @@ Relaytic should define explicit slots for:
 - **intelligence backend slot**
 - **lifecycle policy slot**
 - **semantic-task engine slot**
+- **document-grounding slot**
+- **hook policy slot**
+- **capability policy slot**
 
 ### Rules for engine slots
 
@@ -572,6 +583,8 @@ Relaytic should define explicit slots for:
 - The slot interface must be narrower than the backend itself.
 - Backends can be swapped without rewriting Relaytic’s judgment layer.
 - Slot outputs must remain compatible with artifact contracts and handoff rules.
+- One active backend should be resolved per slot at runtime.
+- Hidden auto-loaded plugins are out of contract.
 
 ### Why this matters
 
@@ -585,6 +598,80 @@ Relaytic should remain:
 - `engine_slots.json`
 - `backend_capabilities.json`
 - `slot_resolution.json`
+
+---
+
+## 3A.2 Local lab gateway, event stream, and hook bus
+
+Relaytic should not coordinate long runs only through loose CLI glue and scattered function calls.
+
+It should gain a **local lab gateway** that acts as the control plane for:
+
+- run-state transitions
+- append-only event emission
+- hook dispatch
+- checkpointing
+- MCP, CLI, and later UI coherence
+
+### Required gateway rules
+
+- local-first by default
+- no public exposure by default
+- append-only machine-readable event stream
+- idempotent handling for side-effecting run transitions where practical
+- deterministic fallback when hooks are absent or rejected
+- explicit policy around read-only vs write-capable hooks
+
+### Required artifacts
+
+- `lab_event_stream.jsonl`
+- `hook_execution_log.json`
+- `run_checkpoint_manifest.json`
+
+### Why this matters
+
+This is the runtime discipline that turns Relaytic from a pipeline with agent names into a real inference lab.
+
+It also makes memory flush, retry behavior, specialist coordination, and external-agent control much safer.
+
+---
+
+## 3A.3 Capability-scoped specialists and data minimization
+
+Relaytic specialists should not all see the same raw material by default.
+
+Each specialist should have an explicit **capability profile** covering:
+
+- artifact read scope
+- artifact write scope
+- raw-row access
+- semantic-task access
+- external-adapter access
+- network allowance
+
+### Default rule
+
+Semantic helpers, optional LLM-backed specialists, and external semantic adapters should receive:
+
+- rowless summaries
+- bounded evidence bundles
+- redacted notes
+- schema and diagnostics
+
+unless policy explicitly grants richer access.
+
+### Required artifacts
+
+- `capability_profiles.json`
+- `data_access_audit.json`
+- `context_influence_report.json`
+
+### Required effect
+
+Relaytic should become both smarter and safer:
+
+- smarter because context assembly becomes deliberate
+- safer because every broader access grant is visible and challengeable
 
 ---
 
@@ -2258,6 +2345,39 @@ Any escalation suggestion must state:
 
 ---
 
+## 10A.6 Semantic debate, verifier, and counterposition packets
+
+Relaytic should use stronger semantic help for the hard parts of expert discussion, not as a vague all-purpose oracle.
+
+### Purpose
+
+When task framing, challenger direction, retrain-vs-recalibrate choice, or domain interpretation is materially ambiguous, Relaytic should be able to run a bounded semantic discussion that produces:
+
+- one proposed interpretation
+- one counterposition
+- one verifier pass
+- one explicit uncertainty report
+
+### Rules
+
+- the debate must stay schema-bound and artifact-backed
+- the debate must operate on rowless or explicitly minimized context by default
+- extracted facts, hypotheses, counterarguments, and verifier findings must be separate fields rather than one blended paragraph
+- no semantic debate packet may silently override deterministic evidence
+- debate packets should be allowed to influence challenger design, retraining rationale, and target interpretation only through explicit artifacts
+
+### Required artifacts
+
+- `semantic_debate_report.json`
+- `semantic_counterposition_pack.json`
+- `semantic_uncertainty_report.json`
+
+### Why it belongs in Relaytic
+
+This is how Relaytic makes its internal discussions feel like expert reasoning instead of a chain of thin heuristics or decorative agent labels.
+
+---
+
 ## 11. Unknown-domain investigation
 
 ### Required artifact
@@ -2315,6 +2435,8 @@ Planner must produce:
 - `memory_retrieval.json`
 - `plan_archetype.json`
 - `historical_analogs.json`
+- `reflection_memory.json`
+- `memory_flush_report.json`
 
 ### Required capabilities
 - retrieve similar prior runs
@@ -2324,6 +2446,9 @@ Planner must produce:
 - compare current run against historical analogs
 - retrieve similar mandate patterns and tradeoffs
 - retrieve similar retraining and promotion decisions
+- write durable reflection memory before retries, compaction, and final completion/lifecycle decisions
+- keep any retrieval index derived from on-disk artifacts rather than authoritative on its own
+- explain the counterfactual effect of memory whenever it changes route or challenger choice
 
 ---
 
@@ -2446,7 +2571,7 @@ Effort should include:
 ### New orchestration loop
 
 ```text
-configure mandate -> configure optional context -> intake and translate user/agent inputs -> focus selection -> investigate -> resolve understanding -> hypothesize -> plan -> feature strategy -> execute batch -> challenge -> ablate -> audit -> completion review -> decide next step
+configure mandate -> configure optional context -> intake and translate user/agent inputs -> focus selection -> investigate -> resolve understanding -> hypothesize -> plan -> feature strategy -> execute batch -> challenge -> ablate -> audit -> completion review -> lifecycle review -> decide next step -> execute one bounded follow-up round when value remains -> rejudge champion lineage -> stop and report
 ```
 
 ### Required loop decisions
@@ -2454,14 +2579,30 @@ configure mandate -> configure optional context -> intake and translate user/age
 - `refine_promising_branch`
 - `promote_branch`
 - `queue_challenger_branch`
+- `expand_challenger_portfolio`
 - `run_ablation_suite`
 - `calibrate_top_models`
+- `execute_recalibration_pass`
+- `execute_retrain_pass`
 - `run_uncertainty_wrap`
 - `run_robustness_checks`
+- `launch_semantic_counterposition`
+- `replan_with_counterposition`
 - `run_high_effort_reasoning_pass`
 - `request_more_data`
+- `rejudge_champion_lineage`
+- `stop_after_plateau`
+- `stop_after_budget_limit`
 - `emit_completion_decision`
 - `stop_and_report`
+
+### Loop discipline
+
+- completion and lifecycle judgments should be executable when policy and budget allow, not merely descriptive
+- every loop round must record why it was chosen, what budget it consumed, what changed, and whether the current champion survived
+- challenger science should expand into a small portfolio when route narrowness or challenger pressure is detected
+- autonomous loops must be bounded by explicit budgets, plateau rules, and policy boundaries
+- if the next round is not expected to pay for itself, Relaytic should stop honestly rather than perform search theater
 
 ---
 

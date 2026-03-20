@@ -58,6 +58,34 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         assert status_payload["surface_payload"]["status"] == "ok"
                         assert status_payload["surface_payload"]["completion"]["action"] is not None
 
+                        intelligence_result = await session.call_tool(
+                            "relaytic_show_intelligence",
+                            {"run_dir": str(run_dir)},
+                        )
+                        intelligence_payload = _structured_payload(intelligence_result)
+                        assert intelligence_payload["surface_payload"]["status"] == "ok"
+                        assert (
+                            intelligence_payload["surface_payload"]["intelligence"]["recommended_followup_action"]
+                            is not None
+                        )
+
+                        runtime_result = await session.call_tool(
+                            "relaytic_show_runtime",
+                            {"run_dir": str(run_dir), "limit": 12},
+                        )
+                        runtime_payload = _structured_payload(runtime_result)
+                        assert runtime_payload["surface_payload"]["status"] == "ok"
+                        assert runtime_payload["surface_payload"]["runtime"]["event_count"] >= 10
+                        assert runtime_payload["surface_payload"]["runtime"]["last_surface"] == "mcp"
+
+                        autonomy_result = await session.call_tool(
+                            "relaytic_show_autonomy",
+                            {"run_dir": str(run_dir)},
+                        )
+                        autonomy_payload = _structured_payload(autonomy_result)
+                        assert autonomy_payload["surface_payload"]["status"] == "ok"
+                        assert autonomy_payload["surface_payload"]["autonomy"]["selected_action"] is not None
+
                         predict_result = await session.call_tool(
                             "relaytic_predict",
                             {

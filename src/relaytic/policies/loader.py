@@ -87,6 +87,9 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     runtime_cfg = dict(config.get("runtime", {}))
     modeling_cfg = dict(config.get("modeling", {}))
     checkpoints_cfg = dict(modeling_cfg.get("checkpoints", {}))
+    autonomy_cfg = dict(config.get("autonomy", {}))
+    intelligence_cfg = dict(config.get("intelligence", {}))
+    agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
 
     return {
         "locality": {
@@ -94,13 +97,32 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "local_models_only": bool(runtime_cfg.get("require_local_models", True)),
             "allow_optional_remote_baselines": bool(privacy_cfg.get("api_calls_allowed", False)),
         },
+        "privacy": {
+            "local_only": bool(privacy_cfg.get("local_only", True)),
+            "api_calls_allowed": bool(privacy_cfg.get("api_calls_allowed", False)),
+            "telemetry_allowed": bool(privacy_cfg.get("telemetry_allowed", False)),
+        },
         "autonomy": {
-            "execution_mode": "guided",
-            "operation_mode": "session",
-            "allow_auto_run": bool(modeling_cfg.get("agentic_loops", {}).get("enabled", True)),
+            "execution_mode": str(autonomy_cfg.get("execution_mode", "guided")),
+            "operation_mode": str(autonomy_cfg.get("operation_mode", "session")),
+            "allow_auto_run": bool(autonomy_cfg.get("allow_auto_run", agentic_loops_cfg.get("enabled", True))),
             "allow_indefinite_operation": False,
             "approval_required_for_expensive_runs": True,
             "approval_required_for_optional_backends": True,
+            "max_followup_rounds": int(autonomy_cfg.get("max_followup_rounds", agentic_loops_cfg.get("max_attempts", 1)) or 1),
+            "max_branches_per_round": int(autonomy_cfg.get("max_branches_per_round", 2) or 2),
+            "min_relative_improvement": float(
+                autonomy_cfg.get("min_relative_improvement", agentic_loops_cfg.get("min_relative_improvement", 0.02)) or 0.02
+            ),
+            "allow_architecture_switch": bool(
+                autonomy_cfg.get("allow_architecture_switch", agentic_loops_cfg.get("allow_architecture_switch", True))
+            ),
+            "allow_feature_set_expansion": bool(
+                autonomy_cfg.get("allow_feature_set_expansion", agentic_loops_cfg.get("allow_feature_set_expansion", True))
+            ),
+            "suggest_more_data_when_stalled": bool(
+                autonomy_cfg.get("suggest_more_data_when_stalled", agentic_loops_cfg.get("suggest_more_data_when_stalled", True))
+            ),
         },
         "compute": {
             "autodetect_hardware_if_unspecified": True,
@@ -140,9 +162,11 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "require_challenger_science": True,
         },
         "memory": {
-            "enable_run_memory": False,
-            "allow_prior_retrieval": False,
+            "enable_run_memory": True,
+            "allow_prior_retrieval": True,
             "feedback_learning_enabled": False,
+            "max_analog_runs": 5,
+            "min_similarity_score": 0.45,
         },
         "mandate": {
             "enabled": True,
@@ -158,19 +182,28 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "require_provenance": True,
             "semantic_task_enabled": True,
         },
+        "runtime": {
+            "gateway_enabled": bool(runtime_cfg.get("gateway_enabled", True)),
+            "read_only_hooks_enabled": bool(runtime_cfg.get("read_only_hooks_enabled", True)),
+            "allow_write_hooks": bool(runtime_cfg.get("allow_write_hooks", False)),
+            "checkpoint_on_stage_complete": bool(runtime_cfg.get("checkpoint_on_stage_complete", True)),
+            "capability_enforcement_enabled": bool(runtime_cfg.get("capability_enforcement_enabled", True)),
+            "semantic_rowless_default": bool(runtime_cfg.get("semantic_rowless_default", True)),
+            "max_recent_events": int(runtime_cfg.get("max_recent_events", 50) or 50),
+        },
         "intelligence": {
-            "enabled": True,
-            "intelligence_mode": "none",
-            "prefer_local_llm": True,
-            "allow_frontier_llm": False,
-            "allow_max_reasoning": False,
-            "minimum_local_llm_enabled": False,
-            "minimum_local_llm_profile": "none",
-            "enable_backend_discovery": True,
-            "allow_upgrade_suggestions": True,
-            "allow_automatic_local_upgrade": False,
-            "require_schema_constrained_actions": True,
-            "require_verifier_for_high_impact_decisions": True,
+            "enabled": bool(intelligence_cfg.get("enabled", True)),
+            "intelligence_mode": str(intelligence_cfg.get("intelligence_mode", "none")),
+            "prefer_local_llm": bool(intelligence_cfg.get("prefer_local_llm", True)),
+            "allow_frontier_llm": bool(intelligence_cfg.get("allow_frontier_llm", False)),
+            "allow_max_reasoning": bool(intelligence_cfg.get("allow_max_reasoning", False)),
+            "minimum_local_llm_enabled": bool(intelligence_cfg.get("minimum_local_llm_enabled", False)),
+            "minimum_local_llm_profile": str(intelligence_cfg.get("minimum_local_llm_profile", "none")),
+            "enable_backend_discovery": bool(intelligence_cfg.get("enable_backend_discovery", True)),
+            "allow_upgrade_suggestions": bool(intelligence_cfg.get("allow_upgrade_suggestions", True)),
+            "allow_automatic_local_upgrade": bool(intelligence_cfg.get("allow_automatic_local_upgrade", False)),
+            "require_schema_constrained_actions": bool(intelligence_cfg.get("require_schema_constrained_actions", True)),
+            "require_verifier_for_high_impact_decisions": bool(intelligence_cfg.get("require_verifier_for_high_impact_decisions", True)),
         },
         "lifecycle": {
             "scheduled_retraining_enabled": False,
@@ -209,7 +242,7 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "create_experiment_graph": False,
             "create_handoff_graph": False,
             "create_data_recommendations": bool(
-                modeling_cfg.get("agentic_loops", {}).get("suggest_more_data_when_stalled", True)
+                autonomy_cfg.get("suggest_more_data_when_stalled", agentic_loops_cfg.get("suggest_more_data_when_stalled", True))
             ),
             "create_decision_memo": False,
         },

@@ -82,6 +82,7 @@ class ChallengerReport:
     delta_to_champion: float | None
     summary: str
     comparison: dict[str, Any]
+    memory_context: dict[str, Any] | None
     llm_advisory: dict[str, Any] | None
     trace: EvidenceTrace
 

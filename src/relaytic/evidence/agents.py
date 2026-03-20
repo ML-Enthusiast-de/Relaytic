@@ -62,7 +62,9 @@ class ChallengerAgent:
         run_dir: str | Path,
         plan: dict[str, Any],
         champion_experiment: dict[str, Any],
+        memory_bundle: dict[str, Any] | None = None,
     ) -> tuple[dict[str, Any], dict[str, Any]]:
+        memory_bundle = memory_bundle or {}
         summary = dict(plan.get("execution_summary") or {})
         handoff = dict(plan.get("builder_handoff") or {})
         external = _run_external_challenger(
@@ -76,7 +78,11 @@ class ChallengerAgent:
         champion_family = str(summary.get("selected_model_family", "")).strip() or str(
             champion_experiment.get("model_family", "")
         ).strip()
-        challenger_family = _choose_challenger_family(plan=plan, champion_family=champion_family)
+        challenger_family = _choose_challenger_family(
+            plan=plan,
+            champion_family=champion_family,
+            challenger_prior_suggestions=_bundle_item(memory_bundle, "challenger_prior_suggestions"),
+        )
         if not challenger_family:
             return (
                 {
@@ -595,6 +601,7 @@ def run_evidence_review(
     intake_bundle: dict[str, Any],
     investigation_bundle: dict[str, Any],
     planning_bundle: dict[str, Any],
+    memory_bundle: dict[str, Any] | None = None,
     config_path: str | None = None,
     sheet_name: str | None = None,
     header_row: int | None = None,
@@ -602,6 +609,7 @@ def run_evidence_review(
 ) -> EvidenceRunResult:
     """Execute the Slice 06 evidence stage for an executed Relaytic run."""
     del mandate_bundle, context_bundle, investigation_bundle
+    memory_bundle = memory_bundle or {}
     root = Path(run_dir)
     plan = _bundle_item(planning_bundle, "plan")
     if not plan:
@@ -628,6 +636,7 @@ def run_evidence_review(
         run_dir=root,
         plan=plan,
         champion_experiment=champion_experiment,
+        memory_bundle=memory_bundle,
     )
 
     ablation_agent = AblationAgent(controls=controls)
@@ -732,6 +741,17 @@ def run_evidence_review(
                 if challenger_registry_entry
                 else None,
             },
+            memory_context={
+                "preferred_challenger_family": _optional_str(
+                    _bundle_item(memory_bundle, "challenger_prior_suggestions").get("preferred_challenger_family")
+                ),
+                "memory_influenced": str(
+                    _bundle_item(memory_bundle, "challenger_prior_suggestions").get("status", "")
+                ).strip()
+                == "memory_influenced",
+            }
+            if memory_bundle
+            else None,
             llm_advisory=llm_advisory or None,
             trace=challenger_trace,
         ),
@@ -1220,7 +1240,7 @@ def _statsmodels_audit_report(
             "notes": ["Prediction artifact does not expose `source_row` and `prediction` columns."],
             "details": {},
         }
-    aligned_source = source_frame.reset_index(drop=True).reset_index(names="source_row")
+    aligned_source = source_frame.reset_index(drop=True).reset_index().rename(columns={"index": "source_row"})
     merged = prediction_frame.merge(aligned_source, on="source_row", how="inner")
     if target_column not in merged.columns:
         return {
@@ -1263,7 +1283,19 @@ def _integration_findings(report: dict[str, Any]) -> list[dict[str, Any]]:
     return []
 
 
-def _choose_challenger_family(*, plan: dict[str, Any], champion_family: str) -> str | None:
+def _choose_challenger_family(
+    *,
+    plan: dict[str, Any],
+    champion_family: str,
+    challenger_prior_suggestions: dict[str, Any],
+) -> str | None:
+    preferred = str(challenger_prior_suggestions.get("preferred_challenger_family", "")).strip()
+    if preferred and preferred != champion_family:
+        return preferred
+    for item in challenger_prior_suggestions.get("ranked_families", []):
+        candidate = str(dict(item).get("model_family", "")).strip()
+        if candidate and candidate != champion_family:
+            return candidate
     handoff = dict(plan.get("builder_handoff") or {})
     for item in handoff.get("preferred_candidate_order", []):
         candidate = str(item).strip()

@@ -98,6 +98,38 @@ def build_run_summary(
             "next_action_queue": "next_action_queue.json",
         },
     )
+    memory_bundle = _read_bundle(
+        root,
+        {
+            "memory_retrieval": "memory_retrieval.json",
+            "analog_run_candidates": "analog_run_candidates.json",
+            "route_prior_context": "route_prior_context.json",
+            "challenger_prior_suggestions": "challenger_prior_suggestions.json",
+            "reflection_memory": "reflection_memory.json",
+            "memory_flush_report": "memory_flush_report.json",
+        },
+    )
+    intelligence_bundle = _read_bundle(
+        root,
+        {
+            "intelligence_mode": "intelligence_mode.json",
+            "llm_backend_discovery": "llm_backend_discovery.json",
+            "semantic_debate_report": "semantic_debate_report.json",
+            "semantic_counterposition_pack": "semantic_counterposition_pack.json",
+            "semantic_uncertainty_report": "semantic_uncertainty_report.json",
+            "intelligence_escalation": "intelligence_escalation.json",
+        },
+    )
+    runtime_bundle = _read_bundle(
+        root,
+        {
+            "hook_execution_log": "hook_execution_log.json",
+            "run_checkpoint_manifest": "run_checkpoint_manifest.json",
+            "capability_profiles": "capability_profiles.json",
+            "data_access_audit": "data_access_audit.json",
+            "context_influence_report": "context_influence_report.json",
+        },
+    )
     lifecycle_bundle = _read_bundle(
         root,
         {
@@ -106,6 +138,16 @@ def build_run_summary(
             "retrain_decision": "retrain_decision.json",
             "promotion_decision": "promotion_decision.json",
             "rollback_decision": "rollback_decision.json",
+        },
+    )
+    autonomy_bundle = _read_bundle(
+        root,
+        {
+            "autonomy_loop_state": "autonomy_loop_state.json",
+            "autonomy_round_report": "autonomy_round_report.json",
+            "branch_outcome_matrix": "branch_outcome_matrix.json",
+            "champion_lineage": "champion_lineage.json",
+            "loop_budget_report": "loop_budget_report.json",
         },
     )
     model_params = _read_json(root / "model_params.json")
@@ -130,14 +172,37 @@ def build_run_summary(
     mandate_evidence_review = _bundle_item(completion_bundle, "mandate_evidence_review")
     blocking_analysis = _bundle_item(completion_bundle, "blocking_analysis")
     next_action_queue = _bundle_item(completion_bundle, "next_action_queue")
+    memory_retrieval = _bundle_item(memory_bundle, "memory_retrieval")
+    analog_run_candidates = _bundle_item(memory_bundle, "analog_run_candidates")
+    route_prior_context = _bundle_item(memory_bundle, "route_prior_context")
+    challenger_prior_suggestions = _bundle_item(memory_bundle, "challenger_prior_suggestions")
+    reflection_memory = _bundle_item(memory_bundle, "reflection_memory")
+    memory_flush_report = _bundle_item(memory_bundle, "memory_flush_report")
+    intelligence_mode = _bundle_item(intelligence_bundle, "intelligence_mode")
+    semantic_debate_report = _bundle_item(intelligence_bundle, "semantic_debate_report")
+    semantic_uncertainty_report = _bundle_item(intelligence_bundle, "semantic_uncertainty_report")
+    intelligence_escalation = _bundle_item(intelligence_bundle, "intelligence_escalation")
+    hook_execution_log = _bundle_item(runtime_bundle, "hook_execution_log")
+    run_checkpoint_manifest = _bundle_item(runtime_bundle, "run_checkpoint_manifest")
+    capability_profiles = _bundle_item(runtime_bundle, "capability_profiles")
+    data_access_audit = _bundle_item(runtime_bundle, "data_access_audit")
+    context_influence_report = _bundle_item(runtime_bundle, "context_influence_report")
     champion_vs_candidate = _bundle_item(lifecycle_bundle, "champion_vs_candidate")
     recalibration_decision = _bundle_item(lifecycle_bundle, "recalibration_decision")
     retrain_decision = _bundle_item(lifecycle_bundle, "retrain_decision")
     promotion_decision = _bundle_item(lifecycle_bundle, "promotion_decision")
     rollback_decision = _bundle_item(lifecycle_bundle, "rollback_decision")
+    autonomy_loop_state = _bundle_item(autonomy_bundle, "autonomy_loop_state")
+    autonomy_round_report = _bundle_item(autonomy_bundle, "autonomy_round_report")
+    branch_outcome_matrix = _bundle_item(autonomy_bundle, "branch_outcome_matrix")
+    champion_lineage = _bundle_item(autonomy_bundle, "champion_lineage")
+    loop_budget_report = _bundle_item(autonomy_bundle, "loop_budget_report")
+    runtime_events = _read_jsonl(root / "lab_event_stream.jsonl")
     execution_summary = dict(plan.get("execution_summary") or {})
     builder_handoff = dict(plan.get("builder_handoff") or {})
     marginal_value = _bundle_item(planning_bundle, "marginal_value_of_next_experiment")
+    hook_executions = list(hook_execution_log.get("executions", [])) if isinstance(hook_execution_log.get("executions"), list) else []
+    runtime_last_event = runtime_events[-1] if runtime_events else {}
 
     resolved_data_path = (
         str(Path(data_path))
@@ -167,41 +232,46 @@ def build_run_summary(
             investigation_bundle=investigation_bundle,
             intake_bundle=intake_bundle,
             evidence_bundle=evidence_bundle,
+            intelligence_bundle=intelligence_bundle,
             completion_bundle=completion_bundle,
             lifecycle_bundle=lifecycle_bundle,
+            autonomy_bundle=autonomy_bundle,
         ),
         "request": {
-            "source": request_source or str(intake_record.get("message_source", "")).strip() or "unknown",
+            "source": _clean_text(request_source) or _clean_text(intake_record.get("message_source")) or "unknown",
             "text_preview": _preview_text(request_text) or _preview_text(intake_record.get("message")),
-            "actor_type": str(intake_record.get("actor_type", "")).strip() or None,
-            "actor_name": str(intake_record.get("actor_name", "")).strip() or None,
-            "channel": str(intake_record.get("channel", "")).strip() or None,
+            "actor_type": _clean_text(intake_record.get("actor_type")),
+            "actor_name": _clean_text(intake_record.get("actor_name")),
+            "channel": _clean_text(intake_record.get("channel")),
         },
         "data": {
             "data_path": resolved_data_path,
             "row_count": int(dataset_profile.get("row_count", 0) or 0),
             "column_count": int(dataset_profile.get("column_count", 0) or 0),
-            "data_mode": str(dataset_profile.get("data_mode", "")).strip() or None,
-            "timestamp_column": str(dataset_profile.get("timestamp_column", "")).strip() or None,
+            "data_mode": _clean_text(dataset_profile.get("data_mode")),
+            "timestamp_column": _clean_text(dataset_profile.get("timestamp_column")),
         },
         "intent": {
-            "objective": str(run_brief.get("objective", "")).strip() or None,
-            "deployment_target": str(run_brief.get("deployment_target", "")).strip() or None,
-            "problem_statement": str(task_brief.get("problem_statement", "")).strip() or None,
-            "domain_archetype": str(_bundle_item(investigation_bundle, "domain_memo").get("domain_archetype", "")).strip() or str(task_brief.get("domain_archetype_hint", "")).strip() or None,
-            "autonomy_mode": str(autonomy_mode.get("requested_mode", "")).strip() or None,
-            "operator_signal": str(autonomy_mode.get("operator_signal", "")).strip() or None,
+            "objective": _clean_text(run_brief.get("objective")),
+            "deployment_target": _clean_text(run_brief.get("deployment_target")),
+            "problem_statement": _clean_text(task_brief.get("problem_statement")),
+            "domain_archetype": _clean_text(_bundle_item(investigation_bundle, "domain_memo").get("domain_archetype"))
+            or _clean_text(task_brief.get("domain_archetype_hint")),
+            "autonomy_mode": _clean_text(autonomy_mode.get("requested_mode")),
+            "operator_signal": _clean_text(autonomy_mode.get("operator_signal")),
         },
         "decision": {
-            "target_column": str(plan.get("target_column") or task_brief.get("target_column") or "").strip() or None,
-            "task_type": str(plan.get("task_type", "")).strip() or str(task_brief.get("task_type_hint", "")).strip() or None,
-            "primary_objective": str(focus_profile.get("primary_objective", "")).strip() or None,
-            "selected_route_id": str(plan.get("selected_route_id", "")).strip() or None,
-            "selected_route_title": str(plan.get("selected_route_title", "")).strip() or None,
-            "selected_model_family": str(execution_summary.get("selected_model_family", "")).strip() or str(model_params.get("model_name", "")).strip() or None,
-            "best_validation_model_family": str(execution_summary.get("best_validation_model_family", "")).strip() or None,
-            "primary_metric": str(plan.get("primary_metric", "")).strip() or str(_bundle_item(investigation_bundle, "optimization_profile").get("primary_metric", "")).strip() or None,
-            "split_strategy": str(plan.get("split_strategy", "")).strip() or None,
+            "target_column": _clean_text(plan.get("target_column") or task_brief.get("target_column")),
+            "task_type": _clean_text(plan.get("task_type")) or _clean_text(task_brief.get("task_type_hint")),
+            "primary_objective": _clean_text(focus_profile.get("primary_objective")),
+            "selected_route_id": _clean_text(plan.get("selected_route_id")),
+            "selected_route_title": _clean_text(plan.get("selected_route_title")),
+            "selected_model_family": _clean_text(execution_summary.get("selected_model_family"))
+            or _clean_text(model_params.get("model_name")),
+            "best_validation_model_family": _clean_text(execution_summary.get("best_validation_model_family")),
+            "primary_metric": _clean_text(plan.get("primary_metric"))
+            or _clean_text(_bundle_item(investigation_bundle, "optimization_profile").get("primary_metric")),
+            "split_strategy": _clean_text(plan.get("split_strategy")),
             "feature_columns": [str(item) for item in plan.get("feature_columns", []) if str(item).strip()],
             "guardrails": [str(item) for item in plan.get("guardrails", []) if str(item).strip()],
             "feature_risk_flags": list(builder_handoff.get("feature_risk_flags", [])),
@@ -212,12 +282,12 @@ def build_run_summary(
         },
         "evidence": {
             "experiment_count": len(experiment_registry.get("experiments", [])) if isinstance(experiment_registry.get("experiments"), list) else 0,
-            "challenger_winner": str(challenger_report.get("winner", "")).strip() or None,
+            "challenger_winner": _clean_text(challenger_report.get("winner")),
             "challenger_delta_to_champion": challenger_report.get("delta_to_champion"),
-            "provisional_recommendation": str(audit_report.get("provisional_recommendation", "")).strip() or None,
-            "readiness_level": str(audit_report.get("readiness_level", "")).strip() or None,
-            "recommended_action": str(belief_update.get("recommended_action", "")).strip() or None,
-            "updated_belief": str(belief_update.get("updated_belief", "")).strip() or None,
+            "provisional_recommendation": _clean_text(audit_report.get("provisional_recommendation")),
+            "readiness_level": _clean_text(audit_report.get("readiness_level")),
+            "recommended_action": _clean_text(belief_update.get("recommended_action")),
+            "updated_belief": _clean_text(belief_update.get("updated_belief")),
             "load_bearing_features": [
                 str(item.get("removed_feature", "")).strip()
                 for item in ablation_report.get("ablations", [])
@@ -225,42 +295,120 @@ def build_run_summary(
             ][:5],
         },
         "completion": {
-            "action": str(completion_decision.get("action", "")).strip() or None,
-            "confidence": str(completion_decision.get("confidence", "")).strip() or None,
-            "current_stage": str(run_state.get("current_stage", "")).strip() or None,
-            "blocking_layer": str(completion_decision.get("blocking_layer", "")).strip() or str(blocking_analysis.get("blocking_layer", "")).strip() or None,
-            "mandate_alignment": str(completion_decision.get("mandate_alignment", "")).strip() or str(mandate_evidence_review.get("alignment", "")).strip() or None,
-            "evidence_state": str(completion_decision.get("evidence_state", "")).strip() or None,
+            "action": _clean_text(completion_decision.get("action")),
+            "confidence": _clean_text(completion_decision.get("confidence")),
+            "current_stage": _clean_text(run_state.get("current_stage")),
+            "blocking_layer": _clean_text(completion_decision.get("blocking_layer"))
+            or _clean_text(blocking_analysis.get("blocking_layer")),
+            "mandate_alignment": _clean_text(completion_decision.get("mandate_alignment"))
+            or _clean_text(mandate_evidence_review.get("alignment")),
+            "evidence_state": _clean_text(completion_decision.get("evidence_state")),
             "complete_for_mode": completion_decision.get("complete_for_mode"),
             "next_action_count": len(next_action_queue.get("actions", [])) if isinstance(next_action_queue.get("actions"), list) else 0,
         },
+        "memory": {
+            "status": _clean_text(memory_retrieval.get("status")),
+            "analog_count": int(memory_retrieval.get("selected_analog_count", 0) or 0),
+            "top_analog_run_ids": [
+                str(item)
+                for item in memory_retrieval.get("analog_run_ids", [])
+                if str(item).strip()
+            ][:5],
+            "route_prior_applied": str(route_prior_context.get("status", "")).strip() == "memory_influenced",
+            "challenger_prior_family": _clean_text(challenger_prior_suggestions.get("preferred_challenger_family")),
+            "reflection_stage": _clean_text(reflection_memory.get("current_stage")),
+            "flush_stage": _clean_text(memory_flush_report.get("flush_stage")),
+            "memory_delta": [
+                str(item)
+                for item in reflection_memory.get("memory_delta", [])
+                if str(item).strip()
+            ][:5],
+            "top_relevance_reason": (
+                _clean_text(dict((analog_run_candidates.get("candidates") or [{}])[0]).get("relevance_reason"))
+                if isinstance(analog_run_candidates.get("candidates"), list) and analog_run_candidates.get("candidates")
+                else None
+            ),
+        },
+        "intelligence": {
+            "configured_mode": _clean_text(intelligence_mode.get("configured_mode")),
+            "effective_mode": _clean_text(intelligence_mode.get("effective_mode")),
+            "backend_status": _clean_text(intelligence_mode.get("backend_status")),
+            "recommended_followup_action": _clean_text(semantic_debate_report.get("recommended_followup_action")),
+            "debate_confidence": _clean_text(semantic_debate_report.get("confidence")),
+            "uncertainty_band": _clean_text(semantic_uncertainty_report.get("confidence_band")),
+            "escalation_required": bool(intelligence_escalation.get("escalation_required", False)),
+        },
+        "runtime": {
+            "current_stage": _resolve_runtime_stage(
+                root,
+                latest_stage=str(run_checkpoint_manifest.get("latest_stage", "")).strip(),
+                last_event_stage=str(runtime_last_event.get("stage", "")).strip(),
+            ),
+            "event_count": len(runtime_events),
+            "checkpoint_count": len(run_checkpoint_manifest.get("checkpoints", []))
+            if isinstance(run_checkpoint_manifest.get("checkpoints"), list)
+            else 0,
+            "denied_access_count": int(data_access_audit.get("denied_count", 0) or 0),
+            "active_specialist_count": len(capability_profiles.get("profiles", []))
+            if isinstance(capability_profiles.get("profiles"), list)
+            else 0,
+            "read_only_hook_count": sum(1 for item in hook_executions if str(item.get("hook_type", "")).strip() == "read_only"),
+            "write_hook_executed_count": sum(
+                1
+                for item in hook_executions
+                if str(item.get("hook_type", "")).strip() == "write"
+                and str(item.get("status", "")).strip() == "executed"
+            ),
+            "write_hook_blocked_count": sum(
+                1
+                for item in hook_executions
+                if str(item.get("hook_type", "")).strip() == "write"
+                and str(item.get("status", "")).strip() == "blocked_by_policy"
+            ),
+            "semantic_rowless_default": bool(dict(capability_profiles.get("controls", {})).get("semantic_rowless_default", True))
+            if capability_profiles
+            else None,
+            "last_surface": _clean_text(runtime_last_event.get("source_surface")),
+            "last_event_type": _clean_text(runtime_last_event.get("event_type")),
+            "context_record_count": len(context_influence_report.get("stage_reports", []))
+            if isinstance(context_influence_report.get("stage_reports"), list)
+            else 0,
+        },
         "lifecycle": {
-            "promotion_action": str(promotion_decision.get("action", "")).strip() or None,
-            "promotion_target": str(promotion_decision.get("selected_model_family", "")).strip() or None,
-            "recalibration_action": str(recalibration_decision.get("action", "")).strip() or None,
-            "retrain_action": str(retrain_decision.get("action", "")).strip() or None,
-            "rollback_action": str(rollback_decision.get("action", "")).strip() or None,
-            "challenger_winner": str(champion_vs_candidate.get("challenger_winner", "")).strip() or None,
+            "promotion_action": _clean_text(promotion_decision.get("action")),
+            "promotion_target": _clean_text(promotion_decision.get("selected_model_family")),
+            "recalibration_action": _clean_text(recalibration_decision.get("action")),
+            "retrain_action": _clean_text(retrain_decision.get("action")),
+            "rollback_action": _clean_text(rollback_decision.get("action")),
+            "challenger_winner": _clean_text(champion_vs_candidate.get("challenger_winner")),
             "drift_score": (dict(champion_vs_candidate.get("fresh_data_behavior") or {}).get("drift_summary") or {}).get("overall_drift_score"),
             "ood_fraction": (dict(champion_vs_candidate.get("fresh_data_behavior") or {}).get("ood_summary") or {}).get("overall_ood_fraction"),
+        },
+        "autonomy": {
+            "status": _clean_text(autonomy_loop_state.get("status")),
+            "selected_action": _clean_text(autonomy_loop_state.get("selected_action")),
+            "promotion_applied": bool(autonomy_loop_state.get("promotion_applied", False)),
+            "winning_branch_id": _clean_text(branch_outcome_matrix.get("winning_branch_id")),
+            "executed_branch_count": len(branch_outcome_matrix.get("branches", [])) if isinstance(branch_outcome_matrix.get("branches"), list) else 0,
+            "current_champion": _clean_text(champion_lineage.get("current_model_family")),
+            "budget_remaining": loop_budget_report.get("budget_remaining"),
+            "local_data_candidate_count": len(autonomy_round_report.get("local_data_candidates", [])) if isinstance(autonomy_round_report.get("local_data_candidates"), list) else 0,
         },
         "assumptions": {
             "count": len(assumption_entries),
             "items": [str(item.get("assumption", "")).strip() for item in assumption_entries if str(item.get("assumption", "")).strip()][:5],
         },
         "next_step": {
-            "recommended_experiment_id": str(marginal_value.get("recommended_experiment_id", "")).strip() or None,
-            "estimated_value_band": str(marginal_value.get("estimated_value_band", "")).strip() or None,
-            "rationale": str(
+            "recommended_experiment_id": _clean_text(marginal_value.get("recommended_experiment_id")),
+            "estimated_value_band": _clean_text(marginal_value.get("estimated_value_band")),
+            "rationale": _clean_text(
                 completion_decision.get("summary", "")
                 or belief_update.get("summary", "")
                 or marginal_value.get("rationale", "")
-            ).strip()
-            or None,
+            ),
             "recommended_action": _lifecycle_primary_action(lifecycle_bundle)
-            or str(completion_decision.get("action", "")).strip()
-            or str(belief_update.get("recommended_action", "")).strip()
-            or None,
+            or _clean_text(completion_decision.get("action"))
+            or _clean_text(belief_update.get("recommended_action")),
         },
         "artifacts": {
             "manifest_path": _path_if_exists(root / "manifest.json"),
@@ -273,6 +421,8 @@ def build_run_summary(
             "decision_memo_path": _path_if_exists(root / "reports" / "decision_memo.md"),
             "completion_decision_path": _path_if_exists(root / "completion_decision.json"),
             "promotion_decision_path": _path_if_exists(root / "promotion_decision.json"),
+            "event_stream_path": _path_if_exists(root / "lab_event_stream.jsonl"),
+            "capability_profiles_path": _path_if_exists(root / "capability_profiles.json"),
         },
     }
     summary["headline"] = _build_headline(summary)
@@ -287,7 +437,11 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     metrics = dict(summary.get("metrics", {}))
     evidence = dict(summary.get("evidence", {}))
     completion = dict(summary.get("completion", {}))
+    memory = dict(summary.get("memory", {}))
+    intelligence = dict(summary.get("intelligence", {}))
+    runtime = dict(summary.get("runtime", {}))
     lifecycle = dict(summary.get("lifecycle", {}))
+    autonomy = dict(summary.get("autonomy", {}))
     assumptions = dict(summary.get("assumptions", {}))
     next_step = dict(summary.get("next_step", {}))
     lines = [
@@ -371,6 +525,35 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Complete for mode: `{completion.get('complete_for_mode')}`",
             ]
         )
+    if memory and (memory.get("status") or memory.get("analog_count", 0)):
+        lines.extend(
+            [
+                "",
+                "## Memory",
+                f"- Retrieval status: `{memory.get('status') or 'unknown'}`",
+                f"- Analog candidates: `{memory.get('analog_count', 0)}`",
+                f"- Route prior applied: `{memory.get('route_prior_applied')}`",
+                f"- Challenger prior: `{memory.get('challenger_prior_family') or 'none'}`",
+            ]
+        )
+        if memory.get("top_relevance_reason"):
+            lines.append(f"- Top analog rationale: {memory['top_relevance_reason']}")
+        if memory.get("top_analog_run_ids"):
+            lines.append(f"- Top analog runs: `{', '.join(memory['top_analog_run_ids'])}`")
+    if intelligence and any(value is not None for value in intelligence.values()):
+        lines.extend(
+            [
+                "",
+                "## Intelligence",
+                f"- Effective mode: `{intelligence.get('effective_mode') or 'unknown'}`",
+                f"- Backend status: `{intelligence.get('backend_status') or 'unknown'}`",
+                f"- Semantic follow-up: `{intelligence.get('recommended_followup_action') or 'none'}`",
+                f"- Debate confidence: `{intelligence.get('debate_confidence') or 'unknown'}`",
+                f"- Uncertainty band: `{intelligence.get('uncertainty_band') or 'unknown'}`",
+            ]
+        )
+        if intelligence.get("escalation_required") is not None:
+            lines.append(f"- Escalation required: `{intelligence.get('escalation_required')}`")
     if lifecycle and any(value is not None for value in lifecycle.values()):
         lines.extend(
             [
@@ -388,6 +571,39 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
             lines.append(f"- Drift score: `{float(lifecycle.get('drift_score', 0.0)):.4f}`")
         if lifecycle.get("ood_fraction") is not None:
             lines.append(f"- OOD fraction: `{float(lifecycle.get('ood_fraction', 0.0)):.4f}`")
+    if autonomy and any(value is not None for value in autonomy.values()):
+        lines.extend(
+            [
+                "",
+                "## Autonomy",
+                f"- Status: `{autonomy.get('status') or 'unknown'}`",
+                f"- Selected action: `{autonomy.get('selected_action') or 'none'}`",
+                f"- Promotion applied: `{autonomy.get('promotion_applied')}`",
+                f"- Executed branches: `{autonomy.get('executed_branch_count', 0)}`",
+                f"- Winning branch: `{autonomy.get('winning_branch_id') or 'none'}`",
+            ]
+        )
+        if autonomy.get("current_champion"):
+            lines.append(f"- Current champion: `{autonomy.get('current_champion')}`")
+        if autonomy.get("budget_remaining") is not None:
+            lines.append(f"- Branch budget remaining: `{autonomy.get('budget_remaining')}`")
+    if runtime and (runtime.get("event_count", 0) or runtime.get("checkpoint_count", 0)):
+        lines.extend(
+            [
+                "",
+                "## Runtime",
+                f"- Current runtime stage: `{runtime.get('current_stage') or 'unknown'}`",
+                f"- Event count: `{runtime.get('event_count', 0)}`",
+                f"- Checkpoints: `{runtime.get('checkpoint_count', 0)}`",
+                f"- Denied accesses: `{runtime.get('denied_access_count', 0)}`",
+                f"- Specialists tracked: `{runtime.get('active_specialist_count', 0)}`",
+                f"- Write hooks: `{runtime.get('write_hook_executed_count', 0)}` executed, `{runtime.get('write_hook_blocked_count', 0)}` blocked",
+            ]
+        )
+        if runtime.get("last_event_type"):
+            lines.append(f"- Last event: `{runtime.get('last_event_type')}` via `{runtime.get('last_surface') or 'unknown'}`")
+        if runtime.get("semantic_rowless_default") is not None:
+            lines.append(f"- Rowless semantic default: `{runtime.get('semantic_rowless_default')}`")
     lines.extend(
         [
             "",
@@ -460,6 +676,38 @@ def _read_json(path: Path) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
+def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    records: list[dict[str, Any]] = []
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            for line in handle:
+                text = line.strip()
+                if not text:
+                    continue
+                try:
+                    payload = json.loads(text)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(payload, dict):
+                    records.append(payload)
+    except OSError:
+        return []
+    return records
+
+
+def _clean_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    if text.lower() in {"none", "null"}:
+        return None
+    return text
+
+
 def _bundle_item(bundle: dict[str, Any], key: str) -> dict[str, Any]:
     payload = bundle.get(key)
     return dict(payload) if isinstance(payload, dict) else {}
@@ -480,14 +728,20 @@ def _resolve_stage(
     investigation_bundle: dict[str, Any],
     intake_bundle: dict[str, Any],
     evidence_bundle: dict[str, Any],
+    intelligence_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
+    autonomy_bundle: dict[str, Any],
 ) -> str:
+    if autonomy_bundle:
+        return "autonomy_reviewed"
     if lifecycle_bundle:
         return "lifecycle_reviewed"
     if completion_bundle:
         run_state = _bundle_item(completion_bundle, "run_state")
         return str(run_state.get("current_stage", "")).strip() or "completion_reviewed"
+    if intelligence_bundle:
+        return "intelligence_reviewed"
     if evidence_bundle:
         return "evidence_reviewed"
     if execution_summary:
@@ -499,6 +753,32 @@ def _resolve_stage(
     if intake_bundle:
         return "interpreted"
     return "foundation_only"
+
+
+def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: str) -> str | None:
+    if latest_stage and latest_stage != "memory":
+        return latest_stage
+    if (root / "autonomy_loop_state.json").exists():
+        return "autonomy"
+    if (root / "promotion_decision.json").exists():
+        return "lifecycle"
+    if (root / "semantic_debate_report.json").exists():
+        return "intelligence"
+    if (root / "completion_decision.json").exists():
+        return "completion"
+    if (root / "audit_report.json").exists():
+        return "evidence"
+    if (root / "plan.json").exists():
+        return "planning"
+    if (root / "dataset_profile.json").exists():
+        return "investigation"
+    if (root / "intake_record.json").exists():
+        return "intake"
+    if latest_stage:
+        return latest_stage
+    if last_event_stage:
+        return last_event_stage
+    return None
 
 
 def _resolve_run_status(

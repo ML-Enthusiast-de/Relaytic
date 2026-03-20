@@ -1,0 +1,249 @@
+import json
+from pathlib import Path
+
+import pytest
+
+pytest.importorskip("sklearn.datasets")
+
+from relaytic.context import (
+    build_context_controls_from_policy,
+    default_data_origin,
+    default_domain_brief,
+    default_task_brief,
+)
+from relaytic.core.json_utils import write_json
+from relaytic.investigation import run_investigation
+from relaytic.mandate import (
+    build_mandate_controls_from_policy,
+    build_run_brief,
+    build_work_preferences,
+    default_lab_mandate,
+)
+from relaytic.memory import run_memory_retrieval, write_memory_bundle
+from relaytic.planning import run_planning
+from relaytic.policies import load_policy
+
+from tests.public_datasets import write_public_breast_cancer_dataset
+from tests.test_completion_agents import _build_executed_run
+
+
+def _build_binary_foundation(policy: dict) -> tuple[dict, dict]:
+    mandate_controls = build_mandate_controls_from_policy(policy)
+    context_controls = build_context_controls_from_policy(policy)
+    mandate_bundle = {
+        "lab_mandate": default_lab_mandate(mandate_controls).to_dict(),
+        "work_preferences": build_work_preferences(
+            mandate_controls,
+            policy=policy,
+            execution_mode_preference="autonomous",
+        ).to_dict(),
+        "run_brief": build_run_brief(
+            mandate_controls,
+            policy=policy,
+            objective="maximize early detection quality",
+            target_column="diagnosis_flag",
+            success_criteria=["Preserve strong classification quality with auditable local artifacts."],
+            binding_constraints=["Do everything locally."],
+        ).to_dict(),
+    }
+    context_bundle = {
+        "data_origin": default_data_origin(
+            context_controls,
+            source_name="public_breast_cancer_dataset",
+            source_type="historical_snapshot",
+        ).to_dict(),
+        "domain_brief": default_domain_brief(
+            context_controls,
+            system_name="screening_lab",
+            summary="Classify whether a case is malignant from measurement features.",
+        ).to_dict(),
+        "task_brief": default_task_brief(
+            context_controls,
+            problem_statement="Classify diagnosis_flag from tabular measurement features.",
+            target_column="diagnosis_flag",
+            success_criteria=["Maintain strong recall and usable discrimination."],
+            failure_costs=["Missed malignancy is costly."],
+        ).to_dict(),
+    }
+    return mandate_bundle, context_bundle
+
+
+def _write_prior_summary(
+    run_dir: Path,
+    *,
+    run_id: str,
+    domain_archetype: str,
+    row_count: int,
+    column_count: int,
+    selected_model_family: str,
+    primary_metric: str,
+    challenger_family: str | None = None,
+) -> None:
+    run_dir.mkdir(parents=True, exist_ok=True)
+    write_json(
+        run_dir / "run_summary.json",
+        {
+            "schema_version": "relaytic.run_summary.v1",
+            "generated_at": "2026-03-20T00:00:00+00:00",
+            "product": "Relaytic",
+            "run_id": run_id,
+            "run_dir": str(run_dir),
+            "status": "keep_current_champion",
+            "stage_completed": "lifecycle_reviewed",
+            "intent": {
+                "objective": "maximize early detection quality",
+                "domain_archetype": domain_archetype,
+                "autonomy_mode": "autonomous",
+            },
+            "data": {
+                "row_count": row_count,
+                "column_count": column_count,
+                "data_mode": "steady_state",
+            },
+            "decision": {
+                "target_column": "diagnosis_flag",
+                "task_type": "binary_classification",
+                "selected_route_id": "calibrated_tabular_classifier_route",
+                "selected_model_family": selected_model_family,
+                "primary_metric": primary_metric,
+            },
+            "evidence": {
+                "challenger_winner": "champion",
+                "readiness_level": "strong",
+            },
+            "completion": {
+                "action": "stop_for_now",
+                "blocking_layer": "none",
+            },
+            "lifecycle": {
+                "promotion_action": "keep_current_champion",
+                "promotion_target": challenger_family,
+            },
+        },
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+    write_json(
+        run_dir / "challenger_report.json",
+        {
+            "comparison": {
+                "challenger_model_family": challenger_family,
+            }
+        },
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+
+
+def test_run_memory_retrieval_produces_provenance_and_changes_planning_order(tmp_path: Path) -> None:
+    policy = load_policy().policy
+    data_path = write_public_breast_cancer_dataset(tmp_path / "breast_cancer.csv")
+    mandate_bundle, context_bundle = _build_binary_foundation(policy)
+    investigation_bundle = run_investigation(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+    ).to_dict()
+
+    prior_dir = tmp_path / "prior_binary_success"
+    _write_prior_summary(
+        prior_dir,
+        run_id="prior_binary_success",
+        domain_archetype=str(
+            investigation_bundle["domain_memo"].get("domain_archetype")
+            or context_bundle["task_brief"].get("domain_archetype_hint")
+            or "generic_tabular"
+        ),
+        row_count=int(investigation_bundle["dataset_profile"]["row_count"]),
+        column_count=int(investigation_bundle["dataset_profile"]["column_count"]),
+        selected_model_family="bagged_tree_classifier",
+        primary_metric=str(investigation_bundle["optimization_profile"]["primary_metric"]),
+        challenger_family="boosted_tree_classifier",
+    )
+
+    baseline = run_planning(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        investigation_bundle=investigation_bundle,
+    )
+    memory_result = run_memory_retrieval(
+        run_dir=tmp_path / "current_binary_run",
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        investigation_bundle=investigation_bundle,
+        search_roots=[tmp_path],
+    )
+    with_memory = run_planning(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        investigation_bundle=investigation_bundle,
+        memory_bundle=memory_result.bundle.to_dict(),
+    )
+
+    analogs = memory_result.bundle.analog_run_candidates.candidates
+    assert memory_result.bundle.memory_retrieval.status == "retrieval_completed"
+    assert analogs[0]["run_id"] == "prior_binary_success"
+    assert analogs[0]["provenance"]["summary_path"].endswith("run_summary.json")
+    assert baseline.plan.builder_handoff["preferred_candidate_order"][0] == "logistic_regression"
+    assert with_memory.plan.builder_handoff["preferred_candidate_order"][0] == "bagged_tree_classifier"
+    assert with_memory.plan.memory_context["changed"] is True
+
+
+def test_run_completion_review_respects_memory_attempt_and_flushes_reflection(tmp_path: Path) -> None:
+    data_path, run_dir, policy, mandate_bundle, context_bundle, payloads = _build_executed_run(tmp_path)
+    evidence_bundle = dict(payloads["evidence_bundle"])
+    evidence_bundle["challenger_report"] = {
+        **dict(evidence_bundle["challenger_report"]),
+        "winner": "champion",
+    }
+    evidence_bundle["audit_report"] = {
+        **dict(evidence_bundle["audit_report"]),
+        "provisional_recommendation": "continue_experimentation",
+        "readiness_level": "conditional",
+    }
+    evidence_bundle["belief_update"] = {
+        **dict(evidence_bundle["belief_update"]),
+        "recommended_action": "continue_experimentation",
+        "open_questions": ["Search breadth is still narrow."],
+    }
+
+    memory_result = run_memory_retrieval(
+        run_dir=run_dir,
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        intake_bundle=payloads["intake_bundle"],
+        investigation_bundle=payloads["investigation_bundle"],
+        planning_bundle=payloads["planning_bundle"],
+        evidence_bundle=evidence_bundle,
+        search_roots=[tmp_path / "isolated_memory_root"],
+    )
+    written = write_memory_bundle(run_dir, bundle=memory_result.bundle)
+
+    from relaytic.completion import run_completion_review
+
+    result = run_completion_review(
+        run_dir=run_dir,
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        intake_bundle=payloads["intake_bundle"],
+        investigation_bundle=payloads["investigation_bundle"],
+        planning_bundle=payloads["planning_bundle"],
+        evidence_bundle=evidence_bundle,
+        memory_bundle=memory_result.bundle.to_dict(),
+    )
+
+    assert memory_result.bundle.memory_retrieval.status == "no_credible_analogs"
+    assert Path(written["reflection_memory"]).exists()
+    assert Path(written["memory_flush_report"]).exists()
+    assert result.bundle.completion_decision.action == "continue_experimentation"
+    assert result.bundle.completion_decision.blocking_layer != "missing_memory_support"

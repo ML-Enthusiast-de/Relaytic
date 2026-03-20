@@ -20,6 +20,8 @@ The repository already supports a working early product baseline:
 - challenger, ablation, audit, and decision-memo evidence around the first built route
 - completion-governor judgment with visible run state and machine-actionable next actions
 - lifecycle-governor judgment with explicit keep, recalibrate, retrain, promote, and rollback decisions
+- run memory and analog retrieval with visible analog provenance, route priors, challenger priors, and reflection-memory flushes
+- a shared local runtime gateway with append-only events, capability-scoped specialists, checkpoints, hook audit, and one coherent control path for CLI and MCP
 - concise run summaries for humans and stable summary artifacts for agents
 - one-line bootstrap install plus post-install dependency verification
 - host-neutral MCP interoperability with checked-in wrappers for Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing connector guidance
@@ -28,7 +30,7 @@ The repository already supports a working early product baseline:
 - deterministic expert-prior reasoning for common structured-data archetypes such as manufacturing quality, fraud risk, anomaly monitoring, churn, demand, and pricing
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 
-The next load-bearing implementation step is Slice 09A: run memory and analog retrieval.
+The next load-bearing implementation step is Slice 09: structured semantic tasks, document grounding, and bounded intelligence amplification.
 
 ## Design Principles
 
@@ -116,6 +118,8 @@ Check the interoperability surface:
 ```bash
 relaytic interoperability show
 relaytic interoperability self-check --live
+relaytic runtime show --run-dir path/to/existing_run
+relaytic memory show --run-dir path/to/existing_run
 ```
 
 Run the repository leak scan before commits:
@@ -181,12 +185,15 @@ The primary MVP surface is now a single end-to-end run command:
 relaytic run --data-path path/to/data.csv --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
 ```
 
-That command now carries the run through intake, investigation, planning, execution, challenger pressure, ablation checks, audit, and summary materialization.
+That command now carries the run through intake, investigation, cross-run memory retrieval, planning, execution, challenger pressure, ablation checks, audit, completion, lifecycle review, and summary materialization.
 
 Then inspect or reuse the run:
 
 ```bash
 relaytic show --run-dir artifacts/run_your_dataset_...
+relaytic runtime show --run-dir artifacts/run_your_dataset_...
+relaytic runtime events --run-dir artifacts/run_your_dataset_...
+relaytic memory show --run-dir artifacts/run_your_dataset_...
 relaytic status --run-dir artifacts/run_your_dataset_...
 relaytic evidence show --run-dir artifacts/run_your_dataset_...
 relaytic lifecycle show --run-dir artifacts/run_your_dataset_...
@@ -200,11 +207,15 @@ relaytic foundation init --run-dir artifacts/run_demo
 relaytic intake interpret --run-dir artifacts/run_demo --data-path path/to/data.csv --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
 relaytic intake questions --run-dir artifacts/run_demo
 relaytic investigate --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic memory retrieve --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic plan create --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic plan run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic evidence run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic completion review --run-dir artifacts/run_demo
 relaytic lifecycle review --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic runtime show --run-dir artifacts/run_demo
+relaytic runtime events --run-dir artifacts/run_demo --limit 12
+relaytic memory show --run-dir artifacts/run_demo
 relaytic run-inference --run-dir artifacts/run_demo --data-path path/to/data.csv
 ```
 
@@ -217,6 +228,8 @@ That flow produces:
 - planning outputs such as `plan.json`, route alternatives, hypotheses, and experiment priorities
 - model artifacts such as `model_params.json`, model state, and local checkpoints
 - evidence artifacts such as `experiment_registry.json`, `challenger_report.json`, `ablation_report.json`, `audit_report.json`, and `belief_update.json`
+- memory artifacts such as `memory_retrieval.json`, `analog_run_candidates.json`, `route_prior_context.json`, `challenger_prior_suggestions.json`, `reflection_memory.json`, and `memory_flush_report.json`
+- runtime artifacts such as `lab_event_stream.jsonl`, `hook_execution_log.json`, `run_checkpoint_manifest.json`, `capability_profiles.json`, `data_access_audit.json`, and `context_influence_report.json`
 - completion artifacts such as `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
 - lifecycle artifacts such as `champion_vs_candidate.json`, `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json`
 - operator-facing reports such as `reports/technical_report.md` and `reports/decision_memo.md`
@@ -229,6 +242,7 @@ Public-facing technical docs:
 
 - `ARCHITECTURE.md` for the system overview
 - `INTEROPERABILITY.md` for MCP transports, host bundles, and safety rules
+- `RUNTIME.md` for the local gateway, event stream, checkpoints, and capability profiles
 - `OPEN_SOURCE_STACK.md` for the mature-library adoption policy
 - `SECURITY.md` for security and repo hygiene rules
 - `PROJECT_LAYOUT.md` for repository structure and ownership boundaries
@@ -250,6 +264,13 @@ Run the test suite:
 
 ```bash
 python -m pytest -q
+```
+
+Run the optional official-UCI domain dataset flows:
+
+```bash
+$env:RELAYTIC_ENABLE_NETWORK_DATASETS="1"
+python -m pytest tests/test_domain_dataset_flows.py -q
 ```
 
 If you touch packaging, CLI, or security surfaces, also run:

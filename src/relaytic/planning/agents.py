@@ -60,7 +60,9 @@ class StrategistAgent:
         mandate_bundle: dict[str, Any],
         context_bundle: dict[str, Any],
         investigation_bundle: dict[str, Any],
+        memory_bundle: dict[str, Any] | None = None,
     ) -> PlanningBundle:
+        memory_bundle = memory_bundle or {}
         dataset_profile = _bundle_item(investigation_bundle, "dataset_profile")
         domain_memo = _bundle_item(investigation_bundle, "domain_memo")
         focus_profile = _bundle_item(investigation_bundle, "focus_profile")
@@ -101,6 +103,10 @@ class StrategistAgent:
             task_type=task_profile.task_type,
             optimization_profile=optimization_profile,
         )
+        candidate_order, memory_context = _apply_memory_route_priors(
+            candidate_order=candidate_order,
+            route_prior_context=_bundle_item(memory_bundle, "route_prior_context"),
+        )
         feature_columns, feature_drop_reasons, feature_risk_flags = _select_feature_columns(
             frame=frame,
             dataset_profile=dataset_profile,
@@ -133,6 +139,9 @@ class StrategistAgent:
             "timestamp_column": str(dataset_profile.get("timestamp_column") or "").strip() or None,
             "requested_model_family": "auto",
             "preferred_candidate_order": candidate_order,
+            "baseline_preferred_candidate_order": list(
+                memory_context.get("baseline_candidate_order", candidate_order)
+            ),
             "selection_metric": selection_metric,
             "primary_metric": primary_metric,
             "secondary_metrics": secondary_metrics,
@@ -146,6 +155,7 @@ class StrategistAgent:
             "task_type": task_profile.task_type,
             "data_references": [str(data_path)],
             "feature_risk_flags": feature_risk_flags,
+            "memory_route_prior_applied": bool(memory_context.get("changed", False)),
         }
         guardrails = _dedupe_strings(
             _string_list(feature_strategy_profile.get("guardrails"))
@@ -275,6 +285,7 @@ class StrategistAgent:
             builder_handoff=builder_handoff,
             execution_steps=execution_steps,
             execution_summary=None,
+            memory_context=memory_context,
             llm_advisory=llm_advisory,
             summary=_plan_summary(route=route, target_column=target_column, primary_metric=primary_metric),
             trace=trace,
@@ -327,6 +338,7 @@ def run_planning(
     mandate_bundle: dict[str, Any],
     context_bundle: dict[str, Any],
     investigation_bundle: dict[str, Any],
+    memory_bundle: dict[str, Any] | None = None,
     config_path: str | None = None,
     sheet_name: str | None = None,
     header_row: int | None = None,
@@ -348,6 +360,7 @@ def run_planning(
         mandate_bundle=mandate_bundle,
         context_bundle=context_bundle,
         investigation_bundle=investigation_bundle,
+        memory_bundle=memory_bundle,
     )
 
 
@@ -634,8 +647,47 @@ def _resolve_candidate_order(
                 "bagged_tree_ensemble",
                 "boosted_tree_ensemble",
             ]
-        )
+    )
     return _dedupe_strings(ordered)
+
+
+def _apply_memory_route_priors(
+    *,
+    candidate_order: list[str],
+    route_prior_context: dict[str, Any],
+) -> tuple[list[str], dict[str, Any]]:
+    adjusted = [
+        str(item).strip()
+        for item in route_prior_context.get("adjusted_candidate_order", [])
+        if str(item).strip()
+    ]
+    baseline = [
+        str(item).strip()
+        for item in route_prior_context.get("baseline_candidate_order", [])
+        if str(item).strip()
+    ] or list(candidate_order)
+    if not adjusted:
+        adjusted = list(candidate_order)
+    if baseline == adjusted and not route_prior_context:
+        return list(candidate_order), {
+            "status": "not_available",
+            "baseline_candidate_order": list(candidate_order),
+            "adjusted_candidate_order": list(candidate_order),
+            "changed": False,
+            "influencing_analogs": [],
+            "family_bias": [],
+        }
+    changed = baseline != adjusted
+    return _dedupe_strings(adjusted), {
+        "status": str(route_prior_context.get("status", "retrieved_without_change")).strip() or "retrieved_without_change",
+        "baseline_candidate_order": baseline,
+        "adjusted_candidate_order": _dedupe_strings(adjusted),
+        "changed": changed,
+        "influencing_analogs": list(route_prior_context.get("influencing_analogs", [])),
+        "family_bias": list(route_prior_context.get("family_bias", [])),
+        "counterfactual": dict(route_prior_context.get("counterfactual", {})),
+        "summary": str(route_prior_context.get("summary", "")).strip() or None,
+    }
 
 
 def _bias_to_models(*, bias_name: str, task_type: str, data_mode: str) -> list[str]:

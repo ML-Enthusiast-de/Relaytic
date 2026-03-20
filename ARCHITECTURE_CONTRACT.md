@@ -24,13 +24,16 @@ Current package rule:
 - `src/relaytic/evidence/` owns Slice 06 challenger, ablation, audit, leaderboard, and evidence-report artifacts
 - `src/relaytic/completion/` owns Slice 07 completion-governor logic and artifact persistence
 - `src/relaytic/lifecycle/` owns Slice 08 lifecycle-governor logic and artifact persistence
+- `src/relaytic/memory/` owns Slice 09A analog retrieval, route priors, challenger priors, reflection memory, and memory artifact persistence
+- `src/relaytic/runtime/` owns Slice 09B local gateway, append-only event stream, hook dispatch, checkpoints, and capability-profile enforcement
 - `src/relaytic/interoperability/` owns Slice 08A host-neutral MCP serving, host-bundle generation, and interoperability self-checks
 - `src/relaytic/integrations/` owns optional third-party capability discovery and adapter-scoped inventory surfaces
 - `src/corr2surrogate/` is a temporary shim that forwards legacy imports
 
 Reserved next canonical boundaries:
 
-- `src/relaytic/memory/` is reserved for Slice 09A analog retrieval, route priors, and challenger priors
+- `src/relaytic/intelligence/` is reserved for Slice 09 structured semantic tasks, semantic debate/verifier flows, backend discovery, and document-grounding orchestration
+- `src/relaytic/autonomy/` is reserved for Slice 09C bounded autonomy loops, executable lifecycle follow-up, challenger queues, and champion-lineage management
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
 
@@ -53,7 +56,10 @@ These files are required and must stay current:
 - `docs/build_slices/phase_08.md`
 - `docs/build_slices/phase_08a.md`
 - `docs/build_slices/phase_08b.md`
+- `docs/build_slices/phase_09.md`
 - `docs/build_slices/phase_09a.md`
+- `docs/build_slices/phase_09b.md`
+- `docs/build_slices/phase_09c.md`
 
 ## Artifact Contract
 
@@ -107,10 +113,39 @@ The current slices must preserve these names:
 - `retrain_decision.json`
 - `promotion_decision.json`
 - `rollback_decision.json`
+- `intelligence_mode.json`
+- `llm_backend_discovery.json`
+- `llm_health_check.json`
+- `llm_upgrade_suggestions.json`
+- `semantic_task_request.json`
+- `semantic_task_results.json`
+- `intelligence_escalation.json`
+- `semantic_debate_report.json`
+- `semantic_counterposition_pack.json`
+- `semantic_uncertainty_report.json`
 - `memory_retrieval.json`
 - `analog_run_candidates.json`
 - `route_prior_context.json`
 - `challenger_prior_suggestions.json`
+- `reflection_memory.json`
+- `memory_flush_report.json`
+- `semantic_access_audit.json`
+- `lab_event_stream.jsonl`
+- `hook_execution_log.json`
+- `run_checkpoint_manifest.json`
+- `capability_profiles.json`
+- `data_access_audit.json`
+- `context_influence_report.json`
+- `autonomy_loop_state.json`
+- `autonomy_round_report.json`
+- `challenger_queue.json`
+- `branch_outcome_matrix.json`
+- `retrain_run_request.json`
+- `recalibration_run_request.json`
+- `champion_lineage.json`
+- `loop_budget_report.json`
+- `context_assembly_report.json`
+- `doc_grounding_report.json`
 
 When `relaytic plan run` executes the Builder handoff, the run directory must also contain:
 
@@ -146,6 +181,10 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic completion review`
 - `relaytic lifecycle review`
 - `relaytic lifecycle show`
+- `relaytic memory retrieve`
+- `relaytic memory show`
+- `relaytic runtime show`
+- `relaytic runtime events`
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
@@ -225,12 +264,46 @@ Minimum guaranteed surfaces at this stage:
 - ChatGPT-facing guidance must say explicitly that repository files are not auto-discovered and that a public HTTPS `/mcp` endpoint still must be registered as a connector
 - activation metadata must remain machine-readable so other agents can decide whether Relaytic is callable now or still needs user setup
 
+## Slice 09 Intelligence Contract
+
+- intelligence amplification must use one canonical semantic-task contract rather than ad hoc prompt calls spread across subsystems
+- semantic tasks must be JSON-only, schema-validated, policy-bound, and artifact-backed
+- context assembly for semantic work must be capability-aware and rowless by default
+- document grounding must rely on explicit local artifacts or operator-supplied documents rather than ambient hidden knowledge
+- Relaytic must emit machine-readable reports showing what context was assembled, what documents were used, and whether richer-than-summary access was granted
+- backend discovery, health, and escalation artifacts must explain why Relaytic stayed deterministic or escalated to stronger semantic help
+- semantically amplified internal discussion must emit extracted facts, competing hypotheses, counterarguments, verifier findings, and uncertainty notes rather than free-form advisory prose
+- semantically amplified challenger, completion, and retraining reasoning must go through the same bounded semantic-task contract instead of hidden model-specific prompt paths
+
+## Slice 09C Autonomy Contract
+
+- completion and lifecycle actions with clear reasons and available budget must be able to trigger bounded second-pass execution instead of stopping at reports only
+- bounded autonomy must support challenger expansion, recalibration pass, retrain pass, and re-plan-with-counterposition as explicit loop actions
+- every autonomous round must write loop state, budget consumption, branch choice, outcome, and updated champion lineage as inspectable artifacts
+- autonomous loops must stop on budget exhaustion, repeated non-improvement, policy conflict, or confidence plateau rather than drifting into open-ended search
+- challenger science must be able to grow from one challenger branch into a small bounded portfolio when route narrowness or challenger pressure is detected
+- deterministic fallback must remain available: when autonomous execution is disabled, Relaytic still emits the same branch requests and loop recommendations as artifacts
+
 ## Slice 09A Memory Contract
 
 - run memory must be advisory and provenance-bearing rather than silently authoritative
 - memory retrieval must surface analog candidates, route priors, and challenger priors as explicit artifacts
-- memory-aware planning and completion must always be able to explain what changed because memory was available
+- memory-aware planning, evidence, completion, and lifecycle review must always be able to explain what changed because memory was available
 - `analog_run_candidates.json` entries must include provenance and a comparable-score explanation rather than only a free-form note
+- on-disk Relaytic artifacts remain the canonical memory truth; any retrieval index or embedding structure must be derived and disposable
+- memory retrieval should prefer summaries, priors, reflections, and artifact-derived signals over raw-row persistence whenever practical
+- Relaytic must be able to flush reflection memory and retrieval deltas to disk before completion or lifecycle finalization
+- `relaytic memory retrieve` must be able to enrich an existing run directory without requiring the user to rebuild the entire run from scratch
+- `relaytic memory show` and `relaytic show` must both expose the current memory delta in a machine-readable way
+
+## Slice 09B Runtime Contract
+
+- the runtime layer must provide one local-first control plane for run state transitions, event emission, and hook dispatch across CLI, MCP, and later UI surfaces
+- `lab_event_stream.jsonl` must be append-only and rich enough to reconstruct stage transitions, retries, fallbacks, approvals, and major branch decisions
+- hooks must default to read-only, local-only, and run-dir-scoped; broader write scope requires explicit policy and auditability
+- every specialist must declare a capability profile covering artifact read scope, artifact write scope, raw-row access, semantic access, and external-adapter access
+- semantic helpers and optional LLM-backed specialists must consume rowless summaries by default unless policy explicitly grants richer context
+- the runtime must be able to checkpoint and flush state before retry, compaction, or final completion/lifecycle transitions
 
 ## Security Contract
 
@@ -239,6 +312,9 @@ Minimum guaranteed surfaces at this stage:
 - legacy `C2S_*` variables may be accepted only as compatibility fallbacks
 - no raw secrets may be written into tracked docs, tests, or artifacts
 - checked-in host-bundle configs must not contain user-specific filesystem paths, tokens, or remote endpoints that are live by default
+- semantic helpers, optional LLM paths, and external adapters must default to rowless or redacted context unless policy explicitly grants richer access
+- local artifacts remain the canonical truth; memory indexes, semantic caches, and retrieval stores must be derived rather than authoritative
+- one active backend per engine slot should be resolved explicitly; hidden plugin auto-loading is out of contract
 
 ## External Capability Contract
 

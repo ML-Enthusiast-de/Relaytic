@@ -9,8 +9,9 @@ Public-facing docs:
 1. `README.md`
 2. `ARCHITECTURE.md`
 3. `INTEROPERABILITY.md`
-4. `OPEN_SOURCE_STACK.md`
-5. `SECURITY.md`
+4. `RUNTIME.md`
+5. `OPEN_SOURCE_STACK.md`
+6. `SECURITY.md`
 
 Implementation control docs:
 
@@ -55,11 +56,13 @@ Relaytic/
       evidence/
       completion/
       lifecycle/
+      memory/
       interoperability/
       integrations/
       planning/
       policies/
       runs/
+      runtime/
     corr2surrogate/  # compatibility shim only
   tests/
   README.md
@@ -86,16 +89,18 @@ Relaytic/
 - `src/relaytic/evidence/` owns challenger, ablation, audit, leaderboard, and decision-memo artifacts
 - `src/relaytic/completion/` owns the completion-governor layer, run-state artifacts, and status synthesis
 - `src/relaytic/lifecycle/` owns champion/candidate comparison, recalibration, retraining, promotion, and rollback artifacts
+- `src/relaytic/memory/` owns analog retrieval, route priors, challenger priors, reflection memory, and memory artifact persistence
 - `src/relaytic/interoperability/` owns MCP serving, host-bundle generation, and interoperability self-checks
 - `src/relaytic/integrations/` owns optional-library discovery, compatibility self-checks, and adapter-scoped capability inventory
 - `src/relaytic/runs/` owns MVP-access summaries, run reports, and top-level run presentation helpers
+- `src/relaytic/runtime/` owns the local lab gateway, append-only event stream, hook audit, checkpoints, and capability-profile enforcement
 - `src/relaytic/artifacts/` owns manifest helpers
 - `src/relaytic/policies/` owns policy loading and resolved-policy writing
 - `src/corr2surrogate/` exists only to preserve a narrow temporary compatibility boundary
 
 ## Reserved Next Package Boundaries
 
-- `src/relaytic/memory/` is reserved for the Slice 09A analog-retrieval and run-memory layer
+- `src/relaytic/intelligence/` is reserved for the Slice 09 semantic-task, doc-grounding, and bounded-intelligence layer
 
 ## Operational Directories
 

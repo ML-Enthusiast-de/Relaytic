@@ -70,6 +70,7 @@ class Plan:
     builder_handoff: dict[str, Any]
     execution_steps: list[dict[str, Any]]
     execution_summary: dict[str, Any] | None
+    memory_context: dict[str, Any] | None
     llm_advisory: dict[str, Any] | None
     summary: str
     trace: PlanningTrace

@@ -28,6 +28,9 @@ Codex must:
 - avoid novelty theater
 - keep a golden proof path alive while building
 - keep artifacts stable and inspectable
+- keep local artifacts as the canonical source of truth
+- keep semantic and memory systems rowless by default unless policy grants richer access
+- keep specialist capabilities explicit instead of relying on ambient full-repo/full-data access
 
 When mature external routines can strengthen a slice faster than in-core reinvention, prefer explicit optional adapters with self-checks and graceful fallback. Current high-leverage candidates are:
 
@@ -65,8 +68,10 @@ Start with:
 8. lifecycle baseline
 8A. interoperability and host adapters
 8B. host activation and discovery
-9. intelligence amplification and local-LLM setup assistance
 9A. run memory and analog retrieval
+9B. local lab gateway, hook bus, and capability-scoped specialists
+9. intelligence amplification and local-LLM setup assistance
+9C. autonomous experimentation, executable lifecycle loops, and challenger portfolio expansion
 10. feedback assimilation
 11. benchmark parity and reference approaches
 12. dojo mode and guarded self-improvement
@@ -82,21 +87,25 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 2. Slice 08A
 3. Slice 08B
 4. Slice 09A
-5. Slice 09
-6. Slice 11
-7. Slice 10
-8. Slice 12
-9. Slice 13
-10. Slice 14
-11. Slice 15
+5. Slice 09B
+6. Slice 09
+7. Slice 09C
+8. Slice 11
+9. Slice 10
+10. Slice 12
+11. Slice 13
+12. Slice 14
+13. Slice 15
 
 Reason:
 
 - Slice 08 makes Relaytic lifecycle-capable
 - Slice 08A makes Relaytic reachable from the most common local agent hosts while preserving one host-neutral tool contract
 - Slice 08B makes host discovery and activation explicit instead of leaving platform reachability to guesswork
-- Slice 09A is the highest-leverage intelligence upgrade
-- Slice 09 makes semantic and strategic amplification operational
+- Slice 09A is the highest-leverage intelligence upgrade because it turns artifact memory into reusable judgment
+- Slice 09B gives Relaytic a true local lab runtime instead of loose process orchestration
+- Slice 09 makes semantic and strategic amplification operational once capability-scoped context assembly exists
+- Slice 09C turns judged recommendations into bounded autonomous second-pass execution and real challenger breadth
 - Slice 11 gives honest proof before feedback and dojo expansion
 
 ## MVP boundary
@@ -142,9 +151,11 @@ If the goal is to turn the current implementation into something that looks genu
 
 - a real completion governor that can diagnose why Relaytic should continue, stop, benchmark, or seek more evidence
 - memory-guided route and challenger improvement rather than one-run-local reasoning only
+- semantically grounded expert deliberation rather than shallow internal discussion
+- bounded autonomous second-pass execution for challenger expansion, recalibration, retraining, and re-planning
 - benchmark-separated proof that Relaytic is stronger under mandate, reliability, and lifecycle constraints rather than only on raw score
 
-Slices 07, 09A, and 11 should be treated as the main novelty unlocks, not just as supporting features.
+Slices 07, 09A, 09B, 09C, and 11 should be treated as the main novelty unlocks, not just as supporting features.
 Slices 08 and 09 are the main operability and bounded-intelligence unlocks that make those novelty slices more believable.
 
 ## Source of truth precedence
