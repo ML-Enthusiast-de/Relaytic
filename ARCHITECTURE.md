@@ -20,13 +20,17 @@ Relaytic is organized as a staged artifact pipeline.
    Challenger, ablation, and audit specialists treat the first built route as a provisional champion, then write leaderboard, report, and belief-update artifacts for humans and external agents.
 6. Cross-run memory
    Relaytic retrieves prior analog runs from local artifacts, derives route and challenger priors, and flushes reflection memory back to disk without making memory silently authoritative.
-7. Completion governor
+7. Semantically grounded deliberation
+   Intelligence specialists assemble capability-aware context, ground semantic work in local documents and artifacts, and emit counterposition/verifier outputs rather than one opaque semantic guess.
+8. Completion governor
    Completion specialists fuse the full artifact graph into a visible run state, mandate-evidence review, blocking-layer diagnosis, and machine-actionable next action.
-8. Lifecycle
+9. Lifecycle
    Lifecycle specialists compare the current champion, challenger evidence, completion state, and fresh-data behavior to decide whether to keep, recalibrate, retrain, promote, or roll back.
-9. Runtime gateway
+10. Bounded autonomy
+   Autonomy specialists can execute one budgeted follow-up round such as challenger expansion, recalibration, retraining, or re-plan follow-up while keeping lineage, branch outcomes, and stop rules visible.
+11. Runtime gateway
    The local runtime owns append-only event emission, checkpoints, hook audit, and capability-scoped specialist visibility so CLI and MCP share one control plane.
-10. Interoperability and host adapters
+12. Interoperability and host adapters
    Relaytic exposes the same MVP and slice-level surfaces through a host-neutral MCP server plus thin host wrappers for common agent ecosystems.
 
 ## Core System Principles
@@ -75,7 +79,7 @@ They get their working knowledge from:
 
 So the main intelligence path is artifact-grounded reasoning, not hidden pretrained authority. Local LLMs can improve interpretation and synthesis, but they do not replace the deterministic floor or the auditable evidence chain.
 
-At the current baseline, that means Relaytic can already reason over and route common structured-data work such as regression, binary classification, multiclass classification, fraud-style rare-event detection, and anomaly-style detection. The specialist layer is still not equivalent to a fully pretrained PhD-level domain expert; the roadmap for that is stronger memory, reference-doc grounding, and optional intelligence amplification, not opaque magic.
+At the current baseline, that means Relaytic can already reason over and route common structured-data work such as regression, binary classification, multiclass classification, fraud-style rare-event detection, and anomaly-style detection. The specialist layer is still not equivalent to a fully pretrained PhD-level domain expert; the roadmap for that is stronger memory, reference-doc grounding, privacy-safe external research retrieval from redacted run signatures, and optional intelligence amplification, not opaque magic.
 
 ## Reuse Mature Libraries Through Adapters
 
@@ -108,8 +112,12 @@ The repository currently implements the following product layers:
 - Slice 08B: host activation and discovery state with repo/workspace auto-discovery where the host permits it
 - Slice 09A: run memory and analog retrieval with route priors, challenger priors, reflection memory, and pre-close memory flush artifacts
 - Slice 09B: local runtime gateway with append-only event traces, capability profiles, hook audit, and shared CLI/MCP run-state coordination
+- Slice 09: structured semantic tasks, document grounding, semantic debate/counterposition artifacts, and bounded intelligence amplification
+- Slice 09C: bounded autonomous second-pass execution with challenger queues, executable recalibration/retrain requests, loop budgets, and champion lineage
+- Slice 09D: privacy-safe external research retrieval with redacted query planning, typed source inventory, method-transfer distillation, benchmark-reference capture, and explicit no-leak audit
+- Slice 09E: communicative assist surfaces with deterministic explanation, stage navigation, bounded takeover, optional local semantic lift, and host-connection guidance
 
-The next planned layer is Slice 09: structured semantic tasks, document grounding, and bounded intelligence amplification.
+The next planned layer is Slice 11: benchmark parity, constrained superiority proof, and honest reference comparison.
 
 ## Current Artifact Baseline
 
@@ -158,6 +166,29 @@ Relaytic already standardizes several load-bearing artifacts:
 - `challenger_prior_suggestions.json`
 - `reflection_memory.json`
 - `memory_flush_report.json`
+- `intelligence_mode.json`
+- `llm_backend_discovery.json`
+- `llm_health_check.json`
+- `llm_upgrade_suggestions.json`
+- `semantic_task_request.json`
+- `semantic_task_results.json`
+- `intelligence_escalation.json`
+- `context_assembly_report.json`
+- `doc_grounding_report.json`
+- `semantic_access_audit.json`
+- `semantic_debate_report.json`
+- `semantic_counterposition_pack.json`
+- `semantic_uncertainty_report.json`
+- `research_query_plan.json`
+- `research_source_inventory.json`
+- `research_brief.json`
+- `method_transfer_report.json`
+- `benchmark_reference_report.json`
+- `external_research_audit.json`
+- `assist_mode.json`
+- `assist_session_state.json`
+- `assistant_connection_guide.json`
+- `assist_turn_log.jsonl`
 - `lab_event_stream.jsonl`
 - `hook_execution_log.json`
 - `run_checkpoint_manifest.json`
@@ -175,6 +206,14 @@ Relaytic already standardizes several load-bearing artifacts:
 - `retrain_decision.json`
 - `promotion_decision.json`
 - `rollback_decision.json`
+- `autonomy_loop_state.json`
+- `autonomy_round_report.json`
+- `challenger_queue.json`
+- `branch_outcome_matrix.json`
+- `retrain_run_request.json`
+- `recalibration_run_request.json`
+- `champion_lineage.json`
+- `loop_budget_report.json`
 
 ## Current CLI Baseline
 
@@ -204,6 +243,13 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic memory show`
 - `relaytic runtime show`
 - `relaytic runtime events`
+- `relaytic intelligence run`
+- `relaytic intelligence show`
+- `relaytic assist show`
+- `relaytic assist turn`
+- `relaytic assist chat`
+- `relaytic autonomy run`
+- `relaytic autonomy show`
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`

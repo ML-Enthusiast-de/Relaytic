@@ -271,6 +271,8 @@ Relaytic is the local inference-engineering system in this workspace.
 - `relaytic run --data-path <data.csv> --text "<intent>"`
 - `relaytic show --run-dir <run_dir> --format json`
 - `relaytic status --run-dir <run_dir> --format json`
+- `relaytic assist show --run-dir <run_dir> --format json`
+- `relaytic assist turn --run-dir <run_dir> --message "<message>" --format json`
 - `relaytic predict --run-dir <run_dir> --data-path <new_data.csv> --format json`
 - `relaytic doctor --expected-profile full --format json`
 
@@ -279,6 +281,7 @@ Relaytic is the local inference-engineering system in this workspace.
 - Keep Relaytic local-first by default.
 - Do not expose `/mcp` publicly without trusted HTTPS and auth controls.
 - Treat `run_summary.json`, `completion_decision.json`, and lifecycle artifacts as the machine-facing source of truth.
+- Use the assist surface when a human or external agent needs explanations, stage navigation, or safe takeover rather than inventing ad hoc chat behavior.
 """
 
 

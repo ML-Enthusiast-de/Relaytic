@@ -1,5 +1,15 @@
 # Slice 09C - Autonomous experimentation, executable lifecycle loops, and challenger portfolio expansion
 
+## Status
+
+Implemented in the current baseline.
+
+Shipped surface:
+
+- package boundary: `src/relaytic/autonomy/`
+- public commands: `relaytic autonomy run` and `relaytic autonomy show`
+- current artifacts: `autonomy_loop_state.json`, `autonomy_round_report.json`, `challenger_queue.json`, `branch_outcome_matrix.json`, `retrain_run_request.json`, `recalibration_run_request.json`, `champion_lineage.json`, and `loop_budget_report.json`
+
 ## Intent
 
 Slice 09C is where Relaytic stops only recommending the next move and starts carrying out a bounded second pass itself.

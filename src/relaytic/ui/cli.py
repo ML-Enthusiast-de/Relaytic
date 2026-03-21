@@ -182,6 +182,36 @@ def run_intelligence_review(*args: Any, **kwargs: Any) -> Any:
     return _run_intelligence_review(*args, **kwargs)
 
 
+def run_research_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.research import run_research_review as _run_research_review
+
+    return _run_research_review(*args, **kwargs)
+
+
+def render_research_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.research import render_research_review_markdown as _render_research_review_markdown
+
+    return _render_research_review_markdown(*args, **kwargs)
+
+
+def build_assist_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.assist import build_assist_bundle as _build_assist_bundle
+
+    return _build_assist_bundle(*args, **kwargs)
+
+
+def plan_assist_turn(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.assist import plan_assist_turn as _plan_assist_turn
+
+    return _plan_assist_turn(*args, **kwargs)
+
+
+def render_assist_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.assist import render_assist_markdown as _render_assist_markdown
+
+    return _render_assist_markdown(*args, **kwargs)
+
+
 def render_intelligence_review_markdown(*args: Any, **kwargs: Any) -> Any:
     from relaytic.intelligence import (
         render_intelligence_review_markdown as _render_intelligence_review_markdown,
@@ -1132,6 +1162,52 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    research_surface = sub.add_parser(
+        "research",
+        help="Run or inspect Slice 09D privacy-safe external research retrieval.",
+    )
+    research_sub = research_surface.add_subparsers(dest="research_command", required=True)
+
+    research_gather = research_sub.add_parser(
+        "gather",
+        help="Execute Slice 09D research retrieval, method transfer, and benchmark-reference distillation for an existing run.",
+    )
+    research_gather.add_argument("--run-dir", required=True, help="Run directory for research artifacts.")
+    research_gather.add_argument("--config", default=None, help="Optional config/policy source.")
+    research_gather.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    research_gather.add_argument("--overwrite", action="store_true", help="Allow overwriting existing research artifacts.")
+    research_gather.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    research_gather.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    research_show = research_sub.add_parser(
+        "show",
+        help="Render the current Slice 09D research artifacts for a run.",
+    )
+    research_show.add_argument("--run-dir", required=True, help="Run directory containing research artifacts.")
+    research_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    research_sources = research_sub.add_parser(
+        "sources",
+        help="List the typed external sources captured by Slice 09D for a run.",
+    )
+    research_sources.add_argument("--run-dir", required=True, help="Run directory containing research artifacts.")
+    research_sources.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     autonomy_surface = sub.add_parser(
         "autonomy",
         help="Run or inspect Slice 09C bounded autonomous follow-up loops.",
@@ -1166,6 +1242,50 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+
+    assist_surface = sub.add_parser(
+        "assist",
+        help="Run or inspect Slice 09E communicative Relaytic assistance for humans and agents.",
+    )
+    assist_sub = assist_surface.add_subparsers(dest="assist_command", required=True)
+
+    assist_show = assist_sub.add_parser(
+        "show",
+        help="Render the current communicative assist state and connection guidance for a run.",
+    )
+    assist_show.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    assist_show.add_argument("--config", default=None, help="Optional config/policy source.")
+    assist_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    assist_turn = assist_sub.add_parser(
+        "turn",
+        help="Send one communicative turn to Relaytic so it can explain, guide, rerun a stage, or take over.",
+    )
+    assist_turn.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    assist_turn.add_argument("--message", required=True, help="Human or agent message for Relaytic assist.")
+    assist_turn.add_argument("--data-path", default=None, help="Optional dataset override for rerun/takeover flows.")
+    assist_turn.add_argument("--config", default=None, help="Optional config/policy source.")
+    assist_turn.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    assist_chat = assist_sub.add_parser(
+        "chat",
+        help="Run an interactive communicative Relaytic session over an existing run directory.",
+    )
+    assist_chat.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    assist_chat.add_argument("--data-path", default=None, help="Optional dataset override for rerun/takeover flows.")
+    assist_chat.add_argument("--config", default=None, help="Optional config/policy source.")
+    assist_chat.add_argument("--show-json", action="store_true", help="Print structured JSON payloads after each turn.")
+    assist_chat.add_argument("--max-turns", type=int, default=0, help="Optional positive turn cap. 0 means unlimited until /exit.")
 
     runtime_surface = sub.add_parser(
         "runtime",
@@ -1801,6 +1921,63 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
+    if args.command == "research":
+        if args.research_command == "show":
+            try:
+                payload = _show_research_surface(run_dir=args.run_dir)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.research_command == "sources":
+            try:
+                bundle = _read_json_bundle(args.run_dir, bundle="research")
+                inventory = dict(bundle.get("research_source_inventory", {}))
+                payload = {
+                    "surface_payload": {
+                        "status": "ok",
+                        "run_dir": str(Path(args.run_dir)),
+                        "source_count": len(inventory.get("sources", [])),
+                        "sources": list(inventory.get("sources", [])),
+                    },
+                    "human_output": _render_research_sources_markdown(inventory),
+                }
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.research_command != "gather":
+            parser.error("Unsupported research subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_research_phase(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
     if args.command == "autonomy":
         if args.autonomy_command == "show":
             try:
@@ -1836,6 +2013,47 @@ def main(argv: list[str] | None = None) -> int:
             output_format=args.format,
         )
         return 0
+
+    if args.command == "assist":
+        if args.assist_command == "show":
+            try:
+                payload = _show_assist_surface(run_dir=args.run_dir, config_path=args.config)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.assist_command == "turn":
+            try:
+                payload = _run_assist_turn(
+                    run_dir=args.run_dir,
+                    message=args.message,
+                    config_path=args.config,
+                    data_path=args.data_path,
+                )
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.assist_command == "chat":
+            return _run_assist_chat(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                data_path=args.data_path,
+                show_json=bool(args.show_json),
+                max_turns=int(args.max_turns),
+            )
+        parser.error("Unsupported assist subcommand.")
+        return 2
 
     if args.command == "plan":
         if args.plan_command == "show":
@@ -2349,6 +2567,15 @@ def _run_access_flow(
         runtime_surface=runtime_surface,
         runtime_command="relaytic run",
     )
+    research_payload = _run_research_phase(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=labels,
+        runtime_surface=runtime_surface,
+        runtime_command="relaytic run",
+    )
     completion_payload = _run_completion_phase(
         run_dir=root,
         config_path=config_path,
@@ -2431,6 +2658,7 @@ def _run_access_flow(
     surface_payload["training_result"] = planning_payload.get("training_result", {})
     surface_payload["evidence"] = evidence_payload["surface_payload"].get("evidence", {})
     surface_payload["intelligence"] = intelligence_payload["surface_payload"].get("intelligence", {})
+    surface_payload["research"] = research_payload["surface_payload"].get("research", {})
     surface_payload["completion"] = completion_payload["surface_payload"].get("completion", {})
     surface_payload["memory"] = memory_final_payload["surface_payload"].get("memory", {})
     surface_payload["lifecycle"] = lifecycle_payload["surface_payload"].get("lifecycle", {})
@@ -2448,6 +2676,7 @@ def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
     _ensure_runtime_present(root)
     _ensure_memory_present(root)
     _ensure_intelligence_present(root)
+    _ensure_research_present(root)
     _ensure_completion_present(root)
     _ensure_lifecycle_present(root)
     existing_summary = read_run_summary(root)
@@ -2472,6 +2701,186 @@ def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _show_assist_surface(*, run_dir: str | Path, config_path: str | None) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    assist_payload = _materialize_assist_surface(
+        run_dir=root,
+        config_path=config_path,
+        last_user_intent=None,
+        last_requested_stage=None,
+        last_action_kind=None,
+        increment_turn_count=False,
+    )
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(assist_payload["manifest_path"]),
+            "assist": assist_payload["bundle"],
+            "run_summary": assist_payload["run_summary"],
+        },
+        "human_output": render_assist_markdown(assist_payload["bundle"]),
+    }
+
+
+def _run_assist_turn(
+    *,
+    run_dir: str | Path,
+    message: str,
+    config_path: str | None,
+    data_path: str | None,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    base_payload = _materialize_assist_surface(
+        run_dir=root,
+        config_path=config_path,
+        last_user_intent=None,
+        last_requested_stage=None,
+        last_action_kind=None,
+        increment_turn_count=False,
+    )
+    bundle = dict(base_payload["bundle"])
+    run_summary = dict(base_payload["run_summary"])
+    stage_before = str(run_summary.get("stage_completed", "")).strip() or "unknown"
+    plan = plan_assist_turn(
+        message=message,
+        run_summary=run_summary,
+        assist_bundle=bundle,
+    )
+    executed_stages: list[str] = []
+    action_message = str(plan.response_message)
+    if plan.action_kind == "rerun_stage" and plan.requested_stage:
+        executed_stages = _run_assist_stage_pipeline(
+            run_dir=root,
+            start_stage=plan.requested_stage,
+            config_path=config_path,
+            data_path=data_path,
+            overwrite=True,
+        )
+        action_message = (
+            f"Relaytic reran `{plan.requested_stage}` and refreshed downstream stages: "
+            + ", ".join(executed_stages)
+            + "."
+        )
+    elif plan.action_kind == "take_over":
+        start_stage = _next_takeover_stage(run_dir=root, run_summary=run_summary)
+        if start_stage is None:
+            action_message = (
+                "Relaytic does not see a further safe automatic step from the current state. "
+                "You can ask for an explanation, a specific rerun like `go back to research`, "
+                "or continue once a new benchmark or feedback slice exists."
+            )
+        else:
+            executed_stages = _run_assist_stage_pipeline(
+                run_dir=root,
+                start_stage=start_stage,
+                config_path=config_path,
+                data_path=data_path,
+                overwrite=True,
+            )
+            action_message = (
+                f"Relaytic took over from `{start_stage}` and refreshed: "
+                + ", ".join(executed_stages)
+                + "."
+            )
+    refreshed = _materialize_assist_surface(
+        run_dir=root,
+        config_path=config_path,
+        last_user_intent=plan.intent.intent_type,
+        last_requested_stage=plan.requested_stage,
+        last_action_kind=plan.action_kind,
+        increment_turn_count=True,
+    )
+    stage_after = str(refreshed["run_summary"].get("stage_completed", "")).strip() or "unknown"
+    log_entry = {
+        "captured_at": datetime.now(timezone.utc).isoformat(),
+        "message": str(message),
+        "intent_type": plan.intent.intent_type,
+        "requested_stage": plan.requested_stage,
+        "action_kind": plan.action_kind,
+        "stage_before": stage_before,
+        "stage_after": stage_after,
+        "executed_stages": executed_stages,
+        "response_message": action_message,
+        "next_recommended_action": dict(refreshed["run_summary"].get("next_step", {})).get("recommended_action"),
+    }
+    from relaytic.assist import append_assist_turn_log
+
+    log_path = append_assist_turn_log(root, entry=log_entry)
+    _refresh_assist_manifest(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(refreshed["manifest_path"]),
+            "assist": refreshed["bundle"],
+            "run_summary": refreshed["run_summary"],
+            "turn": log_entry,
+            "log_path": str(log_path),
+        },
+        "human_output": action_message + "\n",
+    }
+
+
+def _run_assist_chat(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    data_path: str | None,
+    show_json: bool,
+    max_turns: int,
+) -> int:
+    if max_turns < 0:
+        print("max-turns must be >= 0")
+        return 2
+    print("relaytic> Communicative assist session started. Commands: /help, /show, /exit.")
+    turns = 0
+    while True:
+        try:
+            raw = input("you> ")
+        except EOFError:
+            print("\nSession ended.")
+            return 0
+        except KeyboardInterrupt:
+            print("\nSession interrupted.")
+            return 0
+        message = raw.strip()
+        if not message:
+            continue
+        lowered = message.lower()
+        if lowered in {"/exit", "/quit"}:
+            print("Session ended.")
+            return 0
+        if lowered == "/help":
+            print(
+                "relaytic> Ask for `status`, `why`, `connect claude`, `go back to research`, or `take over`."
+            )
+            continue
+        if lowered == "/show":
+            payload = _show_assist_surface(run_dir=run_dir, config_path=config_path)
+            print(payload["human_output"].rstrip())
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            continue
+        payload = _run_assist_turn(
+            run_dir=run_dir,
+            message=message,
+            config_path=config_path,
+            data_path=data_path,
+        )
+        print("relaytic> " + payload["human_output"].strip())
+        if show_json:
+            print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+        turns += 1
+        if max_turns > 0 and turns >= max_turns:
+            print("Session ended.")
+            return 0
+
+
 def _show_runtime_surface(*, run_dir: str | Path, limit: int = 20) -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
@@ -2493,6 +2902,317 @@ def _show_runtime_events(*, run_dir: str | Path, limit: int = 20) -> dict[str, A
     return {
         "surface_payload": payload,
         "human_output": render_runtime_events_markdown(payload),
+    }
+
+
+def _materialize_assist_surface(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    last_user_intent: str | None,
+    last_requested_stage: str | None,
+    last_action_kind: str | None,
+    increment_turn_count: bool,
+) -> dict[str, Any]:
+    from relaytic.assist import write_assist_bundle
+    from relaytic.intelligence import build_intelligence_controls_from_policy
+    from relaytic.intelligence.backends import discover_backend
+
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    existing_summary = read_run_summary(root)
+    request = dict(existing_summary.get("request", {})) if isinstance(existing_summary, dict) else {}
+    summary_materialized = materialize_run_summary(
+        run_dir=root,
+        data_path=_resolve_run_data_path(root),
+        request_source=str(request.get("source", "")).strip() or None,
+        request_text=str(request.get("text_preview", "")).strip() or None,
+    )
+    backend_discovery_payload: dict[str, Any]
+    try:
+        backend_discovery = discover_backend(
+            controls=build_intelligence_controls_from_policy(foundation_state["resolved"].policy),
+            config_path=config_path,
+        )
+        backend_discovery_payload = backend_discovery.to_dict()
+    except Exception as exc:
+        backend_discovery_payload = {
+            "status": "error",
+            "notes": [str(exc)],
+        }
+    existing_assist = _read_json_bundle(root, bundle="assist")
+    previous_state = dict(existing_assist.get("assist_session_state", {}))
+    previous_turn_count = int(previous_state.get("turn_count", 0) or 0)
+    bundle = build_assist_bundle(
+        policy=foundation_state["resolved"].policy,
+        run_summary=summary_materialized["summary"],
+        backend_discovery=backend_discovery_payload,
+        interoperability_inventory=build_interoperability_inventory(),
+        last_user_intent=last_user_intent or _clean_text(previous_state.get("last_user_intent")),
+        last_requested_stage=last_requested_stage or _clean_text(previous_state.get("last_requested_stage")),
+        last_action_kind=last_action_kind or _clean_text(previous_state.get("last_action_kind")),
+        turn_count=previous_turn_count + (1 if increment_turn_count else 0),
+    )
+    written = write_assist_bundle(root, bundle=bundle)
+    manifest_path = _refresh_assist_manifest(
+        root,
+        policy_source=foundation_state["policy_path"],
+    )
+    return {
+        "bundle": bundle.to_dict(),
+        "written": {key: str(value) for key, value in written.items()},
+        "manifest_path": manifest_path,
+        "run_summary": summary_materialized["summary"],
+    }
+
+
+def _next_takeover_stage(*, run_dir: str | Path, run_summary: dict[str, Any]) -> str | None:
+    root = Path(run_dir)
+    for stage_name, required_path in (
+        ("intake", root / "intake_record.json"),
+        ("investigation", root / "dataset_profile.json"),
+        ("memory", root / "memory_retrieval.json"),
+        ("planning", root / "plan.json"),
+        ("evidence", root / "audit_report.json"),
+        ("intelligence", root / "semantic_debate_report.json"),
+        ("research", root / "research_brief.json"),
+        ("completion", root / "completion_decision.json"),
+        ("lifecycle", root / "champion_vs_candidate.json"),
+        ("autonomy", root / "autonomy_loop_state.json"),
+    ):
+        if not required_path.exists():
+            return stage_name
+    next_action = _clean_text(dict(run_summary.get("next_step", {})).get("recommended_action"))
+    if next_action in {
+        "retrain",
+        "retrain_candidate",
+        "recalibrate",
+        "recalibration_candidate",
+        "continue_experimentation",
+        "review_challenger",
+        "memory_support_needed",
+    }:
+        return "autonomy"
+    return None
+
+
+def _run_assist_stage_pipeline(
+    *,
+    run_dir: str | Path,
+    start_stage: str,
+    config_path: str | None,
+    data_path: str | None,
+    overwrite: bool,
+) -> list[str]:
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    labels: dict[str, str] | None = None
+    executed: list[str] = []
+    resolved_data_path = data_path or _resolve_run_data_path(root)
+    stage_order = [
+        "foundation",
+        "intake",
+        "investigation",
+        "memory",
+        "planning",
+        "evidence",
+        "intelligence",
+        "research",
+        "completion",
+        "lifecycle",
+        "autonomy",
+    ]
+    if start_stage not in stage_order:
+        raise ValueError(f"Unsupported assist stage `{start_stage}`.")
+    for stage in stage_order[stage_order.index(start_stage) :]:
+        if stage == "foundation":
+            _init_run_foundation(
+                run_dir=root,
+                config_path=config_path,
+                run_id=None,
+                overwrite=overwrite,
+                labels=labels,
+            )
+            executed.append(stage)
+            continue
+        if stage == "intake":
+            intake_context = _assist_replay_intake_context(root=root)
+            if not intake_context["message"]:
+                raise ValueError("Relaytic assist cannot rerun intake because no prior intake message was found.")
+            _run_intake_phase(
+                run_dir=root,
+                message=str(intake_context["message"]),
+                actor_type=str(intake_context["actor_type"]),
+                actor_name=intake_context["actor_name"],
+                channel=str(intake_context["channel"]),
+                config_path=config_path,
+                run_id=None,
+                data_path=resolved_data_path or intake_context["data_path"],
+                sheet_name=intake_context["sheet_name"],
+                header_row=intake_context["header_row"],
+                data_start_row=intake_context["data_start_row"],
+                overwrite=True,
+                labels=labels,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            resolved_data_path = resolved_data_path or intake_context["data_path"]
+            executed.append(stage)
+            continue
+        if stage == "investigation":
+            if not resolved_data_path:
+                raise ValueError("Relaytic assist requires a dataset path to rerun investigation.")
+            _run_investigation_phase(
+                run_dir=root,
+                data_path=resolved_data_path,
+                config_path=config_path,
+                run_id=None,
+                sheet_name=None,
+                header_row=None,
+                data_start_row=None,
+                timestamp_column=None,
+                overwrite=True,
+                labels=labels,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+        if stage == "memory":
+            _run_memory_phase(
+                run_dir=root,
+                data_path=resolved_data_path,
+                config_path=config_path,
+                run_id=None,
+                labels=labels,
+                search_roots=None,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+        if stage == "planning":
+            if not resolved_data_path:
+                raise ValueError("Relaytic assist requires a dataset path to rerun planning.")
+            _run_planning_phase(
+                run_dir=root,
+                data_path=resolved_data_path,
+                config_path=config_path,
+                run_id=None,
+                sheet_name=None,
+                header_row=None,
+                data_start_row=None,
+                timestamp_column=None,
+                overwrite=True,
+                labels=labels,
+                execute_route=True,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+        if stage == "evidence":
+            if not resolved_data_path:
+                raise ValueError("Relaytic assist requires a dataset path to rerun evidence.")
+            _run_evidence_phase(
+                run_dir=root,
+                data_path=resolved_data_path,
+                config_path=config_path,
+                run_id=None,
+                overwrite=True,
+                labels=labels,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+        if stage == "intelligence":
+            _run_intelligence_phase(
+                run_dir=root,
+                config_path=config_path,
+                run_id=None,
+                overwrite=True,
+                labels=labels,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+        if stage == "research":
+            _run_research_phase(
+                run_dir=root,
+                config_path=config_path,
+                run_id=None,
+                overwrite=True,
+                labels=labels,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+        if stage == "completion":
+            _run_completion_phase(
+                run_dir=root,
+                config_path=config_path,
+                run_id=None,
+                overwrite=True,
+                labels=labels,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+        if stage == "lifecycle":
+            _run_lifecycle_phase(
+                run_dir=root,
+                data_path=resolved_data_path,
+                config_path=config_path,
+                run_id=None,
+                overwrite=True,
+                labels=labels,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+        if stage == "autonomy":
+            _run_autonomy_phase(
+                run_dir=root,
+                data_path=resolved_data_path,
+                config_path=config_path,
+                run_id=None,
+                overwrite=True,
+                labels=labels,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+    return executed
+
+
+def _assist_replay_intake_context(*, root: Path) -> dict[str, Any]:
+    intake_bundle = _read_json_bundle(root, bundle="intake")
+    intake_record = dict(intake_bundle.get("intake_record", {}))
+    return {
+        "message": _clean_text(intake_record.get("message")),
+        "actor_type": _clean_text(intake_record.get("actor_type")) or "user",
+        "actor_name": _clean_text(intake_record.get("actor_name")),
+        "channel": _clean_text(intake_record.get("channel")) or "assist",
+        "data_path": _clean_text(intake_record.get("dataset_path")) or _resolve_run_data_path(root),
+        "sheet_name": _clean_text(intake_record.get("selected_sheet")),
+        "header_row": intake_record.get("header_row"),
+        "data_start_row": intake_record.get("data_start_row"),
     }
 
 
@@ -2542,6 +3262,24 @@ def _ensure_intelligence_present(run_dir: str | Path) -> dict[str, Any]:
     if not evidence_bundle:
         return {}
     payload = _run_intelligence_phase(
+        run_dir=root,
+        config_path=None,
+        run_id=None,
+        overwrite=False,
+        labels=None,
+    )
+    return dict(payload["surface_payload"].get("bundle", {}))
+
+
+def _ensure_research_present(run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    bundle = _read_json_bundle(root, bundle="research")
+    if bundle:
+        return bundle
+    evidence_bundle = _read_json_bundle(root, bundle="evidence")
+    if not evidence_bundle:
+        return {}
+    payload = _run_research_phase(
         run_dir=root,
         config_path=None,
         run_id=None,
@@ -2625,6 +3363,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.intelligence import read_intelligence_bundle
 
         return read_intelligence_bundle(run_dir)
+    if bundle == "research":
+        from relaytic.research import read_research_bundle
+
+        return read_research_bundle(run_dir)
     if bundle == "runtime":
         from relaytic.runtime import read_runtime_bundle
 
@@ -2641,6 +3383,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.autonomy import read_autonomy_bundle
 
         return read_autonomy_bundle(run_dir)
+    if bundle == "assist":
+        from relaytic.assist import read_assist_bundle
+
+        return read_assist_bundle(run_dir)
     raise ValueError(f"Unsupported bundle '{bundle}'.")
 
 
@@ -3566,6 +4312,165 @@ def _show_intelligence_surface(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _run_research_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+) -> dict[str, Any]:
+    from relaytic.research import write_research_bundle
+
+    root = Path(run_dir)
+    targets = _research_output_paths(root)
+    if not overwrite and all(path.exists() for path in targets.values()):
+        return _show_research_surface(run_dir=root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    evidence_bundle = _read_json_bundle(root, bundle="evidence")
+    if not evidence_bundle:
+        raise ValueError(f"Slice 09D research requires Slice 06 evidence artifacts in {root}.")
+    _run_intelligence_phase(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=False,
+        labels=labels,
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+    )
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=foundation_state["resolved"].policy,
+        stage="research",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "run_brief.json",
+            "task_brief.json",
+            "dataset_profile.json",
+            "plan.json",
+            "audit_report.json",
+            "semantic_debate_report.json",
+        ],
+    )
+    try:
+        research_result = run_research_review(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            intake_bundle=_read_json_bundle(root, bundle="intake"),
+            investigation_bundle=_read_json_bundle(root, bundle="investigation"),
+            planning_bundle=_read_json_bundle(root, bundle="planning"),
+            evidence_bundle=evidence_bundle,
+            memory_bundle=_read_json_bundle(root, bundle="memory"),
+            intelligence_bundle=_read_json_bundle(root, bundle="intelligence"),
+        )
+        written = write_research_bundle(root, bundle=research_result.bundle)
+        manifest_path = _refresh_research_manifest(
+            root,
+            run_id=run_id,
+            policy_source=foundation_state["policy_path"],
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic built redacted research queries, gathered typed external references, and wrote explicit transfer and audit artifacts.",
+        )
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        brief = research_result.bundle.research_brief
+        inventory = research_result.bundle.research_source_inventory
+        transfer = research_result.bundle.method_transfer_report
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "research": {
+                    "status": inventory.status,
+                    "source_count": int(inventory.source_counts.get("total_sources", 0) or 0),
+                    "recommended_followup_action": brief.recommended_followup_action,
+                    "accepted_transfer_count": len(transfer.accepted_candidates),
+                    "benchmark_reference_count": research_result.bundle.benchmark_reference_report.reference_count,
+                },
+                "bundle": research_result.bundle.to_dict(),
+            },
+            "human_output": research_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_research_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="research")
+    if not bundle:
+        raise ValueError(f"No Slice 09D research artifacts found in {root}.")
+    materialize_run_summary(run_dir=root)
+    manifest_path = _refresh_research_manifest(root)
+    inventory = dict(bundle.get("research_source_inventory", {}))
+    brief = dict(bundle.get("research_brief", {}))
+    transfer = dict(bundle.get("method_transfer_report", {}))
+    benchmark = dict(bundle.get("benchmark_reference_report", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "research": {
+                "status": inventory.get("status"),
+                "source_count": int(dict(inventory.get("source_counts", {})).get("total_sources", 0) or 0),
+                "recommended_followup_action": brief.get("recommended_followup_action"),
+                "accepted_transfer_count": len(transfer.get("accepted_candidates", [])),
+                "benchmark_reference_count": int(benchmark.get("reference_count", 0) or 0),
+            },
+            "bundle": bundle,
+        },
+        "human_output": render_research_review_markdown(bundle),
+    }
+
+
+def _render_research_sources_markdown(inventory: dict[str, Any]) -> str:
+    sources = list(inventory.get("sources", []))
+    lines = [
+        "# Relaytic Research Sources",
+        "",
+        f"- Source inventory status: `{inventory.get('status') or 'unknown'}`",
+        f"- Source count: `{len(sources)}`",
+    ]
+    if sources:
+        lines.extend(["", "## Sources"])
+        for item in sources[:10]:
+            title = str(item.get("title", "")).strip() or "Untitled source"
+            provider = str(item.get("provider", "")).strip() or "unknown"
+            source_type = str(item.get("source_type", "")).strip() or "unknown"
+            year = str(item.get("year", "")).strip() or "n/a"
+            lines.append(f"- `{provider}` `{source_type}` `{year}`: {title}")
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def _show_evidence_surface(*, run_dir: str | Path) -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
@@ -3645,6 +4550,15 @@ def _run_completion_phase(
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
     )
+    _run_research_phase(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=labels,
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+    )
     runtime_token = _runtime_stage_token(
         run_dir=root,
         policy=foundation_state["resolved"].policy,
@@ -3657,6 +4571,8 @@ def _run_completion_phase(
             "belief_update.json",
             "route_prior_context.json",
             "memory_retrieval.json",
+            "research_brief.json",
+            "method_transfer_report.json",
             "run_summary.json",
         ],
     )
@@ -3671,6 +4587,7 @@ def _run_completion_phase(
             planning_bundle=_read_json_bundle(root, bundle="planning"),
             evidence_bundle=evidence_bundle,
             memory_bundle=_read_json_bundle(root, bundle="memory"),
+            research_bundle=_read_json_bundle(root, bundle="research"),
             intelligence_bundle=_read_json_bundle(root, bundle="intelligence"),
             config_path=config_path,
         )
@@ -3931,6 +4848,15 @@ def _run_autonomy_phase(
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
     )
+    _run_research_phase(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=False,
+        labels=labels,
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+    )
     runtime_token = _runtime_stage_token(
         run_dir=root,
         policy=foundation_state["resolved"].policy,
@@ -3938,7 +4864,7 @@ def _run_autonomy_phase(
         data_path=resolved_data_path,
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
-        input_artifacts=["plan.json", "completion_decision.json", "promotion_decision.json", "semantic_debate_report.json", "semantic_uncertainty_report.json"],
+        input_artifacts=["plan.json", "completion_decision.json", "promotion_decision.json", "semantic_debate_report.json", "semantic_uncertainty_report.json", "research_brief.json", "method_transfer_report.json"],
     )
     try:
         autonomy_result = run_autonomy_loop(
@@ -3949,6 +4875,7 @@ def _run_autonomy_phase(
             evidence_bundle=_read_json_bundle(root, bundle="evidence"),
             completion_bundle=_read_json_bundle(root, bundle="completion"),
             lifecycle_bundle=lifecycle_bundle,
+            research_bundle=_read_json_bundle(root, bundle="research"),
             intelligence_bundle=_read_json_bundle(root, bundle="intelligence"),
         )
         written = write_autonomy_bundle(root, bundle=autonomy_result.bundle)
@@ -4377,6 +5304,17 @@ def _intelligence_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _research_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "research_query_plan": run_dir / "research_query_plan.json",
+        "research_source_inventory": run_dir / "research_source_inventory.json",
+        "research_brief": run_dir / "research_brief.json",
+        "method_transfer_report": run_dir / "method_transfer_report.json",
+        "benchmark_reference_report": run_dir / "benchmark_reference_report.json",
+        "external_research_audit": run_dir / "external_research_audit.json",
+    }
+
+
 def _evidence_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "experiment_registry": run_dir / "experiment_registry.json",
@@ -4421,6 +5359,15 @@ def _autonomy_output_paths(run_dir: Path) -> dict[str, Path]:
         "recalibration_run_request": run_dir / "recalibration_run_request.json",
         "champion_lineage": run_dir / "champion_lineage.json",
         "loop_budget_report": run_dir / "loop_budget_report.json",
+    }
+
+
+def _assist_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "assist_mode": run_dir / "assist_mode.json",
+        "assist_session_state": run_dir / "assist_session_state.json",
+        "assistant_connection_guide": run_dir / "assistant_connection_guide.json",
+        "assist_turn_log": run_dir / "assist_turn_log.jsonl",
     }
 
 
@@ -4847,7 +5794,7 @@ def _refresh_completion_manifest(
     labels: dict[str, str] | None = None,
 ) -> Path:
     root = Path(run_dir)
-    _refresh_evidence_manifest(
+    _refresh_research_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,
@@ -5007,7 +5954,7 @@ def _refresh_intelligence_manifest(
     )
 
 
-def _refresh_autonomy_manifest(
+def _refresh_research_manifest(
     run_dir: str | Path,
     *,
     run_id: str | None = None,
@@ -5016,6 +5963,57 @@ def _refresh_autonomy_manifest(
 ) -> Path:
     root = Path(run_dir)
     _refresh_intelligence_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _research_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="research", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_autonomy_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_research_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,
@@ -5132,6 +6130,64 @@ def _refresh_access_manifest(
     )
 
 
+def _refresh_assist_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_access_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for key, path in _assist_output_paths(root).items():
+        if path.exists():
+            entries.append(
+                artifact_entry(
+                    path.name,
+                    run_dir=root,
+                    kind="assist",
+                    required=key != "assist_turn_log",
+                )
+            )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
 def _read_existing_manifest_metadata(run_dir: Path) -> dict[str, Any]:
     manifest_path = run_dir / "manifest.json"
     if not manifest_path.exists():
@@ -5178,6 +6234,11 @@ def _parse_threshold_override_command(user_message: str) -> str | None:
 
 def _drop_none_fields(payload: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in payload.items() if value is not None}
+
+
+def _clean_text(value: Any) -> str | None:
+    text = str(value or "").strip()
+    return text or None
 
 
 def _run_agent_session(

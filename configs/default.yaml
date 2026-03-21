@@ -85,6 +85,29 @@ intelligence:
   require_schema_constrained_actions: true
   require_verifier_for_high_impact_decisions: true
 
+communication:
+  enabled: true
+  allow_interactive_assist: true
+  allow_stage_navigation: true
+  allow_assistant_takeover: true
+  prefer_local_semantic_assist: true
+  allow_host_connection_guidance: true
+  max_turn_history: 20
+
+research:
+  enabled: false
+  require_redaction_default: true
+  allow_benchmark_reference_retrieval: true
+  allow_method_transfer: true
+  max_queries: 3
+  max_results_per_source: 5
+  source_order:
+    - semantic_scholar
+    - crossref
+  contact_email: ""
+  semantic_scholar_endpoint: https://api.semanticscholar.org/graph/v1/paper/search
+  crossref_endpoint: https://api.crossref.org/works
+
 prompts:
   analyst_system_path: ""
   modeler_system_path: ""

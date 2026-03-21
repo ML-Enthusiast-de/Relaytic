@@ -55,12 +55,14 @@ def run_autonomy_loop(
     evidence_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
+    research_bundle: dict[str, Any] | None = None,
     intelligence_bundle: dict[str, Any] | None = None,
 ) -> AutonomyRunResult:
     """Execute one bounded second-pass loop for the current Relaytic run."""
 
     controls = build_autonomy_controls_from_policy(policy)
     root = Path(run_dir)
+    research_bundle = research_bundle or {}
     intelligence_bundle = intelligence_bundle or {}
     trace = AutonomyTrace(
         agent="autonomy_controller",
@@ -78,6 +80,8 @@ def run_autonomy_loop(
 
     current_plan = _bundle_item(planning_bundle, "plan")
     execution_summary = dict(current_plan.get("execution_summary") or {})
+    research_brief = _bundle_item(research_bundle, "research_brief")
+    method_transfer = _bundle_item(research_bundle, "method_transfer_report")
     semantic_debate = _bundle_item(intelligence_bundle, "semantic_debate_report")
     uncertainty = _bundle_item(intelligence_bundle, "semantic_uncertainty_report")
     local_data_candidates = _find_local_data_candidates(
@@ -89,6 +93,7 @@ def run_autonomy_loop(
         controls=controls,
         completion_bundle=completion_bundle,
         lifecycle_bundle=lifecycle_bundle,
+        research_brief=research_brief,
         semantic_debate=semantic_debate,
         uncertainty=uncertainty,
         local_data_candidates=local_data_candidates,
@@ -98,6 +103,7 @@ def run_autonomy_loop(
         selected_action=selected_action,
         current_plan=current_plan,
         execution_summary=execution_summary,
+        research_bundle=research_bundle,
         semantic_debate=semantic_debate,
         local_data_candidates=local_data_candidates,
         data_path=data_path,
@@ -247,6 +253,7 @@ def _choose_action(
     controls: AutonomyControls,
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
+    research_brief: dict[str, Any],
     semantic_debate: dict[str, Any],
     uncertainty: dict[str, Any],
     local_data_candidates: list[dict[str, Any]],
@@ -256,6 +263,7 @@ def _choose_action(
     completion = _bundle_item(completion_bundle, "completion_decision")
     lifecycle_retrain = _bundle_item(lifecycle_bundle, "retrain_decision")
     lifecycle_recal = _bundle_item(lifecycle_bundle, "recalibration_decision")
+    research_action = _clean_text(research_brief.get("recommended_followup_action"))
     semantic_action = _clean_text(semantic_debate.get("recommended_followup_action"))
     completion_action = _clean_text(completion.get("action"))
     if _clean_text(lifecycle_retrain.get("action")) == "retrain":
@@ -266,6 +274,10 @@ def _choose_action(
         if semantic_action == "collect_more_data" and local_data_candidates:
             return "run_retrain_pass"
         return semantic_action
+    if research_action in {"run_recalibration_pass", "expand_challenger_portfolio", "collect_more_data", "benchmark_needed"}:
+        if research_action == "collect_more_data" and local_data_candidates:
+            return "run_retrain_pass"
+        return research_action
     if completion_action in {"retrain_candidate"}:
         return "run_retrain_pass"
     if completion_action in {"recalibration_candidate"}:
@@ -283,6 +295,7 @@ def _build_branch_queue(
     selected_action: str,
     current_plan: dict[str, Any],
     execution_summary: dict[str, Any],
+    research_bundle: dict[str, Any],
     semantic_debate: dict[str, Any],
     local_data_candidates: list[dict[str, Any]],
     data_path: str,
@@ -294,16 +307,31 @@ def _build_branch_queue(
     verifier = dict(semantic_debate.get("verifier_verdict") or {})
     if isinstance(verifier.get("preferred_model_family"), str):
         preferred_family = _clean_text(verifier.get("preferred_model_family"))
+    method_transfer = _bundle_item(research_bundle, "method_transfer_report")
+    research_families = [
+        _clean_text(item.get("value"))
+        for item in method_transfer.get("accepted_candidates", [])
+        if str(item.get("candidate_kind", "")).strip() == "challenger_family"
+    ]
+    research_families = [item for item in research_families if item]
+    research_evaluation_designs = {
+        _clean_text(item.get("value"))
+        for item in method_transfer.get("accepted_candidates", [])
+        if str(item.get("candidate_kind", "")).strip() == "evaluation_design"
+    }
     queue: list[dict[str, Any]] = []
     base_data_path = data_path
     if selected_action == "run_recalibration_pass":
+        recalibration_reason_codes = ["lifecycle_recalibration"]
+        if "calibration_review" in research_evaluation_designs:
+            recalibration_reason_codes.append("research_calibration_review")
         queue.append(
             {
                 "branch_id": "round01_recalibration",
                 "requested_model_family": current_family,
                 "threshold_policy": _preferred_threshold_policy(execution_summary=execution_summary),
                 "data_path": base_data_path,
-                "reason_codes": ["lifecycle_recalibration"],
+                "reason_codes": recalibration_reason_codes,
                 "branch_kind": "recalibration",
                 "priority": 1,
             }
@@ -322,33 +350,41 @@ def _build_branch_queue(
             }
         )
         if controls.allow_architecture_switch:
-            alt = next((item for item in ([preferred_family] + candidates) if item and item != current_family), None)
+            alt = next((item for item in (research_families + [preferred_family] + candidates) if item and item != current_family), None)
             if alt:
+                alt_reason_codes = ["autonomous_retrain_alt"]
+                if alt in research_families:
+                    alt_reason_codes.append("research_transfer_family")
                 queue.append(
                     {
                         "branch_id": "round01_retrain_alt",
                         "requested_model_family": alt,
                         "threshold_policy": None,
                         "data_path": retrain_data_path,
-                        "reason_codes": ["autonomous_retrain_alt"],
+                        "reason_codes": alt_reason_codes,
                         "branch_kind": "retrain_alt",
                         "priority": 2,
                     }
                 )
     elif selected_action == "expand_challenger_portfolio":
-        ordered = [item for item in [preferred_family] + candidates if item and item != current_family]
+        ordered = [item for item in research_families + [preferred_family] + candidates if item and item != current_family]
         seen: set[str] = set()
         for family in ordered:
             if family in seen:
                 continue
             seen.add(family)
+            reason_codes = ["challenger_portfolio"]
+            if family in research_families:
+                reason_codes.append("research_transfer_family")
+            if preferred_family and family == preferred_family:
+                reason_codes.append("semantic_preferred_family")
             queue.append(
                 {
                     "branch_id": f"round01_{family}",
                     "requested_model_family": family,
                     "threshold_policy": None,
                     "data_path": base_data_path,
-                    "reason_codes": ["challenger_portfolio"],
+                    "reason_codes": reason_codes,
                     "branch_kind": "challenger",
                     "priority": len(queue) + 1,
                 }

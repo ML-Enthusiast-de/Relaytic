@@ -74,14 +74,22 @@ The MCP server exposes Relaytic-owned tools over the current MVP and specialist 
 - `relaytic_show_run`
 - `relaytic_show_runtime`
 - `relaytic_get_status`
+- `relaytic_show_intelligence`
+- `relaytic_show_research`
+- `relaytic_show_assist`
 - `relaytic_predict`
 - `relaytic_intake_interpret`
 - `relaytic_investigate_dataset`
 - `relaytic_generate_plan`
 - `relaytic_run_evidence_review`
+- `relaytic_run_intelligence`
+- `relaytic_gather_research`
+- `relaytic_assist_turn`
 - `relaytic_review_completion`
 - `relaytic_review_lifecycle`
 - `relaytic_show_lifecycle`
+- `relaytic_run_autonomy`
+- `relaytic_show_autonomy`
 - `relaytic_doctor`
 - `relaytic_integrations_show`
 

@@ -88,8 +88,13 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     modeling_cfg = dict(config.get("modeling", {}))
     checkpoints_cfg = dict(modeling_cfg.get("checkpoints", {}))
     autonomy_cfg = dict(config.get("autonomy", {}))
+    communication_cfg = dict(config.get("communication", {}))
     intelligence_cfg = dict(config.get("intelligence", {}))
+    research_cfg = dict(config.get("research", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
+    contact_email = research_cfg.get("contact_email", "")
+    if contact_email is None:
+        contact_email = ""
 
     return {
         "locality": {
@@ -181,6 +186,33 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "allow_uploaded_docs": True,
             "require_provenance": True,
             "semantic_task_enabled": True,
+        },
+        "communication": {
+            "enabled": bool(communication_cfg.get("enabled", True)),
+            "allow_interactive_assist": bool(communication_cfg.get("allow_interactive_assist", True)),
+            "allow_stage_navigation": bool(communication_cfg.get("allow_stage_navigation", True)),
+            "allow_assistant_takeover": bool(communication_cfg.get("allow_assistant_takeover", True)),
+            "prefer_local_semantic_assist": bool(communication_cfg.get("prefer_local_semantic_assist", True)),
+            "allow_host_connection_guidance": bool(communication_cfg.get("allow_host_connection_guidance", True)),
+            "max_turn_history": int(communication_cfg.get("max_turn_history", 20) or 20),
+        },
+        "research": {
+            "enabled": bool(research_cfg.get("enabled", False)),
+            "require_redaction_default": bool(research_cfg.get("require_redaction_default", True)),
+            "allow_benchmark_reference_retrieval": bool(
+                research_cfg.get("allow_benchmark_reference_retrieval", True)
+            ),
+            "allow_method_transfer": bool(research_cfg.get("allow_method_transfer", True)),
+            "max_queries": int(research_cfg.get("max_queries", 3) or 3),
+            "max_results_per_source": int(research_cfg.get("max_results_per_source", 5) or 5),
+            "source_order": list(research_cfg.get("source_order", ["semantic_scholar", "crossref"])),
+            "contact_email": str(contact_email).strip() or None,
+            "semantic_scholar_endpoint": str(
+                research_cfg.get("semantic_scholar_endpoint", "https://api.semanticscholar.org/graph/v1/paper/search")
+            ).strip()
+            or "https://api.semanticscholar.org/graph/v1/paper/search",
+            "crossref_endpoint": str(research_cfg.get("crossref_endpoint", "https://api.crossref.org/works")).strip()
+            or "https://api.crossref.org/works",
         },
         "runtime": {
             "gateway_enabled": bool(runtime_cfg.get("gateway_enabled", True)),

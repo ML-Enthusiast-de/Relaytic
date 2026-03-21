@@ -1,5 +1,15 @@
 # Slice 09 - Intelligence amplification, document grounding, and semantically grounded expert deliberation
 
+## Status
+
+Implemented in the current baseline.
+
+Shipped surface:
+
+- package boundary: `src/relaytic/intelligence/`
+- public commands: `relaytic intelligence run` and `relaytic intelligence show`
+- current artifacts: `intelligence_mode.json`, `llm_backend_discovery.json`, `llm_health_check.json`, `llm_upgrade_suggestions.json`, `semantic_task_request.json`, `semantic_task_results.json`, `intelligence_escalation.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_access_audit.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
+
 ## Intent
 
 Slice 09 is where Relaytic stops treating semantic help as lightweight advisory polish and starts using it as a bounded expert-deliberation substrate.

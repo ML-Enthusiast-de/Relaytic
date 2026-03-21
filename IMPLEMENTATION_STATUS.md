@@ -4,10 +4,9 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 09B
-- next recommended slice: 09, structured semantic tasks, document grounding, and bounded intelligence amplification
-- next high-leverage frontier follow-on: 09, structured semantic tasks, doc grounding, and semantically grounded expert deliberation
-- next bounded-autonomy follow-on after 09: 09C, executable retraining/recalibration loops and challenger portfolio expansion
+- completed slices: 00 through 09E
+- next recommended slice: 11, reference parity and constrained superiority proof
+- next adaptive follow-on after 11: 10, feedback assimilation from operator and runtime evidence
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 
@@ -31,6 +30,14 @@ The repository currently supports:
 - run memory and analog retrieval with provenance-bearing analog candidates, route priors, challenger priors, reflection memory, and pre-close memory flush artifacts
 - visible memory support inside planning, challenger design, completion review, lifecycle review, `relaytic run`, `relaytic show`, and explicit `relaytic memory` surfaces
 - a shared local runtime gateway with append-only events, checkpoints, capability-scoped specialists, hook audit, and one coherent control path for CLI and MCP
+- bounded semantic-task execution with backend discovery, health reporting, capability-aware context assembly, document grounding, counterposition/verifier debate artifacts, and explicit semantic uncertainty
+- visible intelligence support inside completion, lifecycle, `relaytic run`, `relaytic show`, explicit `relaytic intelligence` surfaces, and the MCP contract
+- bounded autonomous second-pass execution with challenger queues, recalibration/retrain requests, loop budgeting, and champion lineage updates
+- visible autonomy support inside `relaytic run`, `relaytic show`, explicit `relaytic autonomy` surfaces, the runtime event stream, and the MCP contract
+- privacy-safe external research retrieval from redacted run signatures with typed source inventory, method-transfer distillation, benchmark-reference capture, and explicit no-raw-row audit
+- visible research support inside completion, autonomy, `relaytic run`, `relaytic show`, explicit `relaytic research` surfaces, and the MCP contract
+- communicative assist surfaces via `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat` so humans and agents can ask for explanations, request stage navigation, or let Relaytic take over safely
+- connection guidance that can recommend deterministic local-only use, lightweight local LLM setup, or local host connections for Claude, Codex/OpenAI, OpenClaw, and ChatGPT connector paths without making any of them mandatory
 - one-line bootstrap via `python scripts/install_relaytic.py` plus install-health verification via `relaytic doctor`
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
@@ -184,6 +191,45 @@ The repository currently supports:
 - upgraded `relaytic show`, `run_summary.json`, and the MCP layer so humans and external agents can inspect runtime posture, event counts, denied accesses, and hook behavior directly
 - added targeted Slice 09B runtime, CLI, MCP, and public-dataset end-to-end tests
 
+### Slice 09
+
+- added `src/relaytic/intelligence/` with typed semantic-task controls, backend discovery, health checks, document-grounding support, counterposition packaging, uncertainty reporting, and storage helpers
+- added `relaytic intelligence run` and `relaytic intelligence show`
+- added `intelligence_mode.json`, `llm_backend_discovery.json`, `llm_health_check.json`, `llm_upgrade_suggestions.json`, `semantic_task_request.json`, `semantic_task_results.json`, `intelligence_escalation.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_access_audit.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
+- implemented one canonical JSON-first semantic-task contract with proposer/counterposition/verifier style outputs instead of scattered prompt calls
+- made semantic work capability-aware and rowless by default while auditing richer-access requests explicitly
+- upgraded completion and lifecycle so semantically difficult target, constraint, challenger, and retrain judgments can influence the governed outcome visibly
+- upgraded `relaytic run`, `relaytic show`, and the MCP layer so intelligence posture is materialized automatically and remains inspectable for both humans and agents
+- added targeted Slice 09 CLI, local-LLM, and regression tests
+
+### Slice 09C
+
+- added `src/relaytic/autonomy/` with typed loop-state artifacts, challenger queues, branch-outcome tracking, executable follow-up requests, champion lineage, and storage helpers
+- added `relaytic autonomy run` and `relaytic autonomy show`
+- added `autonomy_loop_state.json`, `autonomy_round_report.json`, `challenger_queue.json`, `branch_outcome_matrix.json`, `retrain_run_request.json`, `recalibration_run_request.json`, `champion_lineage.json`, and `loop_budget_report.json`
+- implemented one bounded autonomous second pass that can expand challenger pressure, execute recalibration or retraining requests, and stop honestly on budget or plateau
+- upgraded runtime, memory, intelligence, completion, lifecycle, `relaytic run`, `relaytic show`, and the MCP contract so autonomous follow-up is visible and replayable instead of hidden control flow
+- preserved the deterministic fallback when autonomous execution is disabled or not justified by the judged state
+- added targeted Slice 09C CLI, local-LLM, and regression tests
+
+### Slice 09D
+
+- added `src/relaytic/research/` with typed redacted-query planning, bounded source adapters, method-transfer distillation, benchmark-reference capture, and research-audit persistence
+- added `relaytic research gather`, `relaytic research show`, and `relaytic research sources`
+- added `research_query_plan.json`, `research_source_inventory.json`, `research_brief.json`, `method_transfer_report.json`, `benchmark_reference_report.json`, and `external_research_audit.json`
+- wired research outputs into completion, autonomy, `relaytic run`, `relaytic show`, and MCP surfaces while preserving local evidence as the final arbiter
+- added targeted Slice 09D research, CLI, and privacy-regression tests
+
+### Slice 09E
+
+- added `src/relaytic/assist/` with typed communicative-assist controls, session-state artifacts, connection guidance, and turn-log persistence
+- added `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat`
+- added `assist_mode.json`, `assist_session_state.json`, `assistant_connection_guide.json`, and `assist_turn_log.jsonl`
+- implemented deterministic explanation, stage navigation, and bounded takeover over the current Relaytic artifact graph instead of a hidden chat-only shell
+- integrated lightweight local-LLM guidance and local host-connection guidance without making semantic assist mandatory
+- upgraded the MCP contract so external agents can use the same communicative assist surface non-interactively
+- added targeted Slice 09E CLI and interoperability tests
+
 ### Cross-Cutting Hardening
 
 - added `src/relaytic/integrations/` as the canonical optional-library discovery boundary
@@ -210,26 +256,38 @@ New code and docs must target `relaytic` and `RELAYTIC_*`.
 
 The repository is not yet at the final product state. The main remaining gaps are:
 
-- the current challenger layer is real but still narrow; it does not yet prove broad challenger science
-- completion and lifecycle now emit good next steps, but they still mostly stop at judgment rather than executing a bounded second pass automatically
-- run memory is now real, but long-horizon feedback learning and richer analog indexing are still pending
+- the current challenger layer is broader and now loop-capable, but it is still not a full challenger field or large search program
+- autonomous second-pass behavior is real, but its budgeted loop set is still intentionally narrow rather than deeply adaptive
+- run memory is now real, but longer-horizon feedback learning and richer analog indexing are still pending
 - benchmark-separated proof of strength under constrained/operator-heavy settings is still pending
-- the bounded semantic-task and document-grounding layer is still pending, so runtime capability control is ahead of runtime semantic intelligence
-- internal specialist discussion is still more deterministic artifact fusion than semantically strong counterposition, verification, and contradiction handling
+- privacy-safe external research retrieval is now real, but it is still limited to bounded source adapters and shallow transfer logic rather than a mature domain-research stack
+- communicative assist is now real, but it is still deterministic-first and intentionally bounded rather than a rich multi-agent conversational shell
+- reference-doc grounding is now real but still shallow compared with a mature domain corpus strategy
+- internal specialist discussion is now materially stronger, but still not equivalent to rich domain-specific expert systems or large benchmarked semantic stacks
 
 ## Immediate Next Work
 
-Slice 09 should land:
+Slices 09D and 09E have landed with:
 
-- one canonical semantic-task contract for bounded intelligence work
-- capability-aware context assembly and document grounding
-- explicit backend discovery, health, and escalation artifacts
-- rowless-by-default semantic assistance that integrates cleanly with the runtime gateway
-- semantically grounded proposer/counterposition/verifier microflows for difficult judgments
-- explicit semantic uncertainty and counterposition artifacts so challenger and retrain reasoning become sharper rather than just better worded
+- one redacted research-query planner that derives safe external queries from current-run artifacts
+- one source-tiered research inventory for papers and benchmark-oriented references through bounded adapters
+- one method-transfer report that converts retrieved knowledge into route, challenger, or evaluation hypotheses rather than hidden advisory text
+- one benchmark-reference report that strengthens Slice 11 setup before parity claims begin
+- one explicit external-research audit proving no raw rows or private identifiers were exported by default
+- one research-to-autonomy bridge that records research-driven recalibration and challenger signals in bounded follow-up behavior
+- one communicative assist layer that explains current state, lets humans or agents jump back to any bounded stage, and can safely take over from uncertainty or hesitation
+- one integrated local-versus-host connection guide that keeps the local-first security character explicit while making optional semantic assist easier to adopt
 
-After Slice 09, the next high-leverage frontier follow-ons should include:
+Next, Slice 11 should land with:
 
-- Slice 09 intelligence amplification and bounded semantic-task infrastructure
-- Slice 09C autonomous second-pass execution, challenger portfolio expansion, and executable lifecycle loops
-- Slice 11 benchmark-separated proof under constrained settings
+- one benchmark harness that compares Relaytic against strong reference approaches under the same split, metric, and operator-constraint contract
+- one proof track for constrained superiority rather than only raw-score comparison
+- one honest separation between deterministic, local-LLM, and bounded-autonomy modes in benchmark output
+- one visible uncertainty/calibration track where optional adapters like MAPIE can strengthen evaluation without becoming the source of truth
+- one benchmark/report surface that humans and external agents can consume without reading the full artifact tree first
+
+After Slice 11, the next high-leverage frontier follow-ons should include:
+
+- Slice 10 feedback assimilation from operator interventions, runtime failures, and later-run evidence
+- deeper autonomy breadth beyond the first bounded second pass
+- richer memory and doc-grounding corpora once benchmark doctrine is in place

@@ -131,6 +131,8 @@ From Slice 05 onward, Relaytic should keep these cross-cutting proof tracks aliv
   once Slice 09B lands, one case where CLI and MCP agree because they consume the same evented run state with visible capability enforcement
 - **closed-loop path**
   once Slice 09C lands, one case where Relaytic actually executes a second-pass challenger, recalibration, retrain, or replan action and either improves the result or stops honestly
+- **research path**
+  one case where a redacted run signature retrieves external methods or benchmark references, changes planning/evidence/autonomy design, and records explicit no-raw-row audit
 - **benchmark path**
   formal benchmark parity is Slice 11, but benchmark harness stubs and reference logging should start earlier whenever route, evidence, or completion logic changes
 
@@ -147,12 +149,14 @@ Stable slice numbering stays the same, but the preferred execution order after S
 5. Slice 09B
 6. Slice 09
 7. Slice 09C
-8. Slice 11
-9. Slice 10
-10. Slice 12
-11. Slice 13
-12. Slice 14
-13. Slice 15
+8. Slice 09D
+9. Slice 09E
+10. Slice 11
+11. Slice 10
+12. Slice 12
+13. Slice 13
+14. Slice 14
+15. Slice 15
 
 Why:
 
@@ -163,14 +167,16 @@ Why:
 - Slice 09B gives Relaytic a local lab runtime with evented coordination, hook discipline, and capability-scoped specialists instead of relying on loose process glue
 - Slice 09 improves bounded semantic and strategic lift without redefining the core, and becomes safer once runtime and capability profiles exist
 - Slice 09C turns judged recommendations into bounded autonomous second-pass action so Relaytic can execute challenger expansion, recalibration, retraining, and re-planning rather than only recommending them
+- Slice 09D lets Relaytic absorb external SOTA knowledge through redacted research queries, method-transfer artifacts, and benchmark-reference harvesting without exporting user data
+- Slice 09E gives Relaytic a communicative control surface so humans and external agents can ask for explanations, jump back to any bounded stage, or let Relaytic take over safely
 - Slice 11 gives honest proof before feedback or dojo behavior expands too far
 - Slice 10 becomes safer after memory and benchmark doctrine exist
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 09B
-- next execution target: Slice 09
-- next bounded autonomy target after Slice 09: Slice 09C
+- implemented baseline: Slice 00 through Slice 09E
+- next execution target: Slice 11
+- next proof follow-on after Slice 11: Slice 10
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -696,6 +702,87 @@ Minimum proof:
 Innovation hook:
 
 - this is the slice where Relaytic stops being a judged single-pass system and becomes a bounded autonomous inference lab that can actually carry its own next step out
+
+## Slice 09D - Private research retrieval, method transfer, and benchmark-aware domain intelligence
+
+Status:
+- implemented in the current baseline
+- shipped package boundary: `src/relaytic/research/`
+- shipped public commands: `relaytic research gather`, `relaytic research show`, and `relaytic research sources`
+- shipped artifacts: `research_query_plan.json`, `research_source_inventory.json`, `research_brief.json`, `method_transfer_report.json`, `benchmark_reference_report.json`, and `external_research_audit.json`
+
+Goal:
+- privacy-safe external research retrieval
+- rowless redacted query planning
+- source-tiered paper and benchmark harvesting
+- method-transfer suggestions for planning, challenger science, and evaluation
+- benchmark-reference capture without raw data leakage
+
+Required outputs:
+- `research_query_plan.json`
+- `research_source_inventory.json`
+- `research_brief.json`
+- `method_transfer_report.json`
+- `benchmark_reference_report.json`
+- `external_research_audit.json`
+
+Required behavior:
+- external research must be policy-gated and optional
+- default research queries must be built from abstracted run signatures such as task family, domain archetype, class imbalance, metric regime, time structure, deployment constraints, and risk flags
+- no raw rows, private identifiers, proprietary system names, machine paths, or full sensitive schema details may be sent to external research sources unless policy explicitly permits it
+- retrieved sources must be labeled by type and trust tier such as paper, benchmark, library docs, reference repo, or operator-supplied reference
+- research findings must become explicit hypotheses, challenger ideas, evaluation ideas, or benchmark references, never hidden authority inside prompt context
+- Relaytic must be able to reject, down-rank, or ignore retrieved advice when local evidence contradicts it
+- research retrieval must degrade cleanly to the current no-network behavior when disabled or unavailable
+
+First implementation moves:
+
+1. Add a redacted query planner that derives safe external research queries from current artifacts.
+2. Add bounded source adapters for papers, benchmark references, and method summaries.
+3. Distill results into local method-transfer and benchmark-reference artifacts rather than free-form notes.
+4. Wire research outputs into planning, evidence, autonomy, and later Slice 11 benchmark design.
+5. Add privacy, contradiction, and no-network fallback tests.
+
+Minimum proof:
+
+- one case where retrieved research changes challenger or evaluation design with visible provenance
+- one case where Relaytic records a no-leak research audit for an external query
+- one case where a retrieved suggestion is rejected because local evidence is stronger
+- one case where the entire feature degrades cleanly when networked research is disabled
+
+Innovation hook:
+
+- this is the slice where Relaytic starts acting like a private automated research lab that can import world knowledge without exporting user knowledge
+
+## Slice 09E - Communicative assist, guided navigation, and bounded takeover
+
+Status:
+- implemented in the current baseline
+- shipped package boundary: `src/relaytic/assist/`
+- shipped public commands: `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat`
+- shipped artifacts: `assist_mode.json`, `assist_session_state.json`, `assistant_connection_guide.json`, and `assist_turn_log.jsonl`
+
+Goal:
+- communicative explanation for humans and agents
+- jump-back navigation to any bounded stage
+- bounded takeover when the user or agent stops or is unsure
+- optional local semantic lift without making an LLM mandatory
+- integrated guidance for local lightweight LLMs and local host connections
+
+Required behavior:
+- assist must explain current state from the artifact graph rather than inventing hidden state
+- humans and external agents must share the same turn contract
+- stage navigation must rerun the requested stage and refresh downstream artifacts so the run stays coherent
+- takeover must remain bounded and policy-aware rather than open-ended
+- assist must work deterministically even when no local LLM is configured
+- connection guidance must remain honest about what is local, what is optional, and what requires host-specific activation
+
+Minimum proof:
+
+- one case where Relaytic explains current state and next action through the assist surface
+- one case where Relaytic jumps back to a bounded stage and refreshes downstream artifacts coherently
+- one case where a user or agent says “take over” and Relaytic executes the next safe step
+- one case where assist exposes local LLM and host-connection guidance without requiring either path
 
 ## Slice 10 - Feedback assimilation
 

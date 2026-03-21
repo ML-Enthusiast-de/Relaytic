@@ -26,14 +26,16 @@ Current package rule:
 - `src/relaytic/lifecycle/` owns Slice 08 lifecycle-governor logic and artifact persistence
 - `src/relaytic/memory/` owns Slice 09A analog retrieval, route priors, challenger priors, reflection memory, and memory artifact persistence
 - `src/relaytic/runtime/` owns Slice 09B local gateway, append-only event stream, hook dispatch, checkpoints, and capability-profile enforcement
+- `src/relaytic/intelligence/` owns Slice 09 structured semantic tasks, semantic debate/verifier flows, backend discovery, and document-grounding orchestration
+- `src/relaytic/autonomy/` owns Slice 09C bounded autonomy loops, executable lifecycle follow-up, challenger queues, and champion-lineage management
+- `src/relaytic/assist/` owns Slice 09E communicative assistance, stage-navigation planning, optional takeover coordination, and connection-guide persistence
 - `src/relaytic/interoperability/` owns Slice 08A host-neutral MCP serving, host-bundle generation, and interoperability self-checks
 - `src/relaytic/integrations/` owns optional third-party capability discovery and adapter-scoped inventory surfaces
 - `src/corr2surrogate/` is a temporary shim that forwards legacy imports
 
-Reserved next canonical boundaries:
+Current canonical boundaries:
 
-- `src/relaytic/intelligence/` is reserved for Slice 09 structured semantic tasks, semantic debate/verifier flows, backend discovery, and document-grounding orchestration
-- `src/relaytic/autonomy/` is reserved for Slice 09C bounded autonomy loops, executable lifecycle follow-up, challenger queues, and champion-lineage management
+- `src/relaytic/research/` owns Slice 09D redacted external research retrieval, source inventory, method-transfer distillation, benchmark-reference harvesting, and research-audit persistence
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
 
@@ -60,6 +62,7 @@ These files are required and must stay current:
 - `docs/build_slices/phase_09a.md`
 - `docs/build_slices/phase_09b.md`
 - `docs/build_slices/phase_09c.md`
+- `docs/build_slices/phase_09d.md`
 
 ## Artifact Contract
 
@@ -144,6 +147,12 @@ The current slices must preserve these names:
 - `recalibration_run_request.json`
 - `champion_lineage.json`
 - `loop_budget_report.json`
+- `research_query_plan.json`
+- `research_source_inventory.json`
+- `research_brief.json`
+- `method_transfer_report.json`
+- `benchmark_reference_report.json`
+- `external_research_audit.json`
 - `context_assembly_report.json`
 - `doc_grounding_report.json`
 
@@ -185,6 +194,10 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic memory show`
 - `relaytic runtime show`
 - `relaytic runtime events`
+- `relaytic intelligence run`
+- `relaytic intelligence show`
+- `relaytic autonomy run`
+- `relaytic autonomy show`
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
@@ -283,6 +296,28 @@ Minimum guaranteed surfaces at this stage:
 - autonomous loops must stop on budget exhaustion, repeated non-improvement, policy conflict, or confidence plateau rather than drifting into open-ended search
 - challenger science must be able to grow from one challenger branch into a small bounded portfolio when route narrowness or challenger pressure is detected
 - deterministic fallback must remain available: when autonomous execution is disabled, Relaytic still emits the same branch requests and loop recommendations as artifacts
+
+## Slice 09D Research Contract
+
+- external research retrieval must be policy-gated, optional, and non-authoritative
+- the public surface centers on `relaytic research gather`, `relaytic research show`, and `relaytic research sources`
+- research queries must default to redacted, rowless, generalized run signatures rather than raw rows, private identifiers, or proprietary schema details
+- research outputs must distinguish source tier and source type such as paper, benchmark reference, library docs, reference repo, or operator-supplied document
+- retrieved content must be distilled into explicit method-transfer and benchmark-reference artifacts rather than hidden prompt context
+- planning, evidence, autonomy, and benchmark design may consume research artifacts, but local evidence remains the final arbiter of route changes
+- every external research call must emit an audit artifact showing what was sent, what was redacted, what sources were used, and whether richer disclosure was policy-authorized
+- deterministic fallback must remain available: if external research is disabled or unavailable, Relaytic still runs with current local artifacts, priors, memory, and semantic layers only
+
+## Slice 09E Assist Contract
+
+- communicative assist must remain deterministic-first, optional, and fully local by default
+- the public surface centers on `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat`
+- assist turns must work for both humans and external agents through the same structured contract
+- assist must be able to explain current state, rerun from a bounded stage, and take over safely when policy allows
+- assist must not require an LLM; local semantic lift is optional and should remain an enhancement rather than the control plane
+- connection guidance must explain both lightweight local options and local host-connection options without implying any public exposure is required
+- assist stage navigation must refresh downstream artifacts so the run remains coherent after a jump-back request
+- every assist turn that changes state must be persisted in an explicit turn log rather than disappearing as ephemeral chat
 
 ## Slice 09A Memory Contract
 

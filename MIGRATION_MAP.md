@@ -122,6 +122,20 @@ Avoid introducing new references to:
 - expanded the artifact boundary to include `lab_event_stream.jsonl`, `hook_execution_log.json`, `run_checkpoint_manifest.json`, `capability_profiles.json`, `data_access_audit.json`, and `context_influence_report.json`
 - upgraded CLI and MCP orchestration so stage transitions share one local runtime instead of parallel surface-specific state
 
+### Slice 09
+
+- introduced the canonical package boundary `src/relaytic/intelligence/`
+- introduced the public commands `relaytic intelligence run` and `relaytic intelligence show`
+- expanded the artifact boundary to include `intelligence_mode.json`, `llm_backend_discovery.json`, `llm_health_check.json`, `llm_upgrade_suggestions.json`, `semantic_task_request.json`, `semantic_task_results.json`, `intelligence_escalation.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_access_audit.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
+- upgraded completion, lifecycle, `relaytic run`, `relaytic show`, and the MCP contract so bounded semantic deliberation is visible instead of hidden in advisory paths
+
+### Slice 09C
+
+- introduced the canonical package boundary `src/relaytic/autonomy/`
+- introduced the public commands `relaytic autonomy run` and `relaytic autonomy show`
+- expanded the artifact boundary to include `autonomy_loop_state.json`, `autonomy_round_report.json`, `challenger_queue.json`, `branch_outcome_matrix.json`, `retrain_run_request.json`, `recalibration_run_request.json`, `champion_lineage.json`, and `loop_budget_report.json`
+- upgraded runtime, memory, intelligence, lifecycle, `relaytic run`, `relaytic show`, and the MCP contract so bounded autonomous follow-up is replayable and inspectable rather than implied by later artifacts
+
 ### Post-Slice 07 Cross-Cutting Additions
 
 - introduced the canonical package boundary `src/relaytic/integrations/`
@@ -132,21 +146,21 @@ Avoid introducing new references to:
 - wired adapter-scoped third-party surfaces for intake validation and evidence diagnostics/challengers without broadening the legacy compatibility surface
 - kept third-party capabilities optional and adapter-scoped rather than broadening the core or legacy compatibility surface
 
-## Reserved Next Boundaries
+## Recent Boundary Changes
 
-These boundaries are frozen for the next major slices so implementation can proceed without reopening naming or ownership questions.
+### Slice 09D
 
-### Slice 09
+- introduced the canonical package boundary `src/relaytic/research/`
+- introduced artifact boundaries for `research_query_plan.json`, `research_source_inventory.json`, `research_brief.json`, `method_transfer_report.json`, `benchmark_reference_report.json`, and `external_research_audit.json`
+- introduced public commands `relaytic research gather`, `relaytic research show`, and `relaytic research sources`
+- wired research artifacts into completion, autonomy, run summary, and MCP service surfaces without widening the legacy compatibility boundary
 
-- reserve the canonical package boundary `src/relaytic/intelligence/`
-- reserve future artifact boundaries for `intelligence_mode.json`, `llm_backend_discovery.json`, `llm_health_check.json`, `llm_upgrade_suggestions.json`, `semantic_task_request.json`, `semantic_task_results.json`, `intelligence_escalation.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_access_audit.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
-- reserve future public commands for intelligence inspection and structured semantic-task execution
+### Slice 09E
 
-### Slice 09C
-
-- reserve the canonical package boundary `src/relaytic/autonomy/`
-- reserve future artifact boundaries for `autonomy_loop_state.json`, `autonomy_round_report.json`, `challenger_queue.json`, `branch_outcome_matrix.json`, `retrain_run_request.json`, `recalibration_run_request.json`, `champion_lineage.json`, and `loop_budget_report.json`
-- reserve future public commands for bounded autonomy-loop execution, inspection, and explicit retrain/recalibration branch control
+- introduced the canonical package boundary `src/relaytic/assist/`
+- introduced artifact boundaries for `assist_mode.json`, `assist_session_state.json`, `assistant_connection_guide.json`, and `assist_turn_log.jsonl`
+- introduced public commands `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat`
+- wired communicative assist into the CLI and MCP service surfaces without changing the deterministic core or widening the legacy compatibility boundary
 
 ## Removal Criteria
 

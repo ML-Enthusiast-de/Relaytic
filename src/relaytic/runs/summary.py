@@ -120,6 +120,17 @@ def build_run_summary(
             "intelligence_escalation": "intelligence_escalation.json",
         },
     )
+    research_bundle = _read_bundle(
+        root,
+        {
+            "research_query_plan": "research_query_plan.json",
+            "research_source_inventory": "research_source_inventory.json",
+            "research_brief": "research_brief.json",
+            "method_transfer_report": "method_transfer_report.json",
+            "benchmark_reference_report": "benchmark_reference_report.json",
+            "external_research_audit": "external_research_audit.json",
+        },
+    )
     runtime_bundle = _read_bundle(
         root,
         {
@@ -182,6 +193,12 @@ def build_run_summary(
     semantic_debate_report = _bundle_item(intelligence_bundle, "semantic_debate_report")
     semantic_uncertainty_report = _bundle_item(intelligence_bundle, "semantic_uncertainty_report")
     intelligence_escalation = _bundle_item(intelligence_bundle, "intelligence_escalation")
+    research_query_plan = _bundle_item(research_bundle, "research_query_plan")
+    research_source_inventory = _bundle_item(research_bundle, "research_source_inventory")
+    research_brief = _bundle_item(research_bundle, "research_brief")
+    method_transfer_report = _bundle_item(research_bundle, "method_transfer_report")
+    benchmark_reference_report = _bundle_item(research_bundle, "benchmark_reference_report")
+    external_research_audit = _bundle_item(research_bundle, "external_research_audit")
     hook_execution_log = _bundle_item(runtime_bundle, "hook_execution_log")
     run_checkpoint_manifest = _bundle_item(runtime_bundle, "run_checkpoint_manifest")
     capability_profiles = _bundle_item(runtime_bundle, "capability_profiles")
@@ -233,6 +250,7 @@ def build_run_summary(
             intake_bundle=intake_bundle,
             evidence_bundle=evidence_bundle,
             intelligence_bundle=intelligence_bundle,
+            research_bundle=research_bundle,
             completion_bundle=completion_bundle,
             lifecycle_bundle=lifecycle_bundle,
             autonomy_bundle=autonomy_bundle,
@@ -338,6 +356,23 @@ def build_run_summary(
             "uncertainty_band": _clean_text(semantic_uncertainty_report.get("confidence_band")),
             "escalation_required": bool(intelligence_escalation.get("escalation_required", False)),
         },
+        "research": {
+            "status": _clean_text(research_source_inventory.get("status")) or _clean_text(research_query_plan.get("status")),
+            "source_count": int(dict(research_source_inventory.get("source_counts", {})).get("total_sources", 0) or 0),
+            "provider_count": len(
+                {
+                    str(item.get("provider", "")).strip()
+                    for item in research_source_inventory.get("sources", [])
+                    if str(item.get("provider", "")).strip()
+                }
+            ),
+            "recommended_followup_action": _clean_text(research_brief.get("recommended_followup_action")),
+            "confidence": _clean_text(research_brief.get("confidence")),
+            "accepted_transfer_count": len(method_transfer_report.get("accepted_candidates", [])),
+            "rejected_transfer_count": len(method_transfer_report.get("rejected_candidates", [])),
+            "benchmark_reference_count": int(benchmark_reference_report.get("reference_count", 0) or 0),
+            "network_allowed": external_research_audit.get("network_allowed"),
+        },
         "runtime": {
             "current_stage": _resolve_runtime_stage(
                 root,
@@ -421,6 +456,9 @@ def build_run_summary(
             "decision_memo_path": _path_if_exists(root / "reports" / "decision_memo.md"),
             "completion_decision_path": _path_if_exists(root / "completion_decision.json"),
             "promotion_decision_path": _path_if_exists(root / "promotion_decision.json"),
+            "research_brief_path": _path_if_exists(root / "research_brief.json"),
+            "method_transfer_report_path": _path_if_exists(root / "method_transfer_report.json"),
+            "external_research_audit_path": _path_if_exists(root / "external_research_audit.json"),
             "event_stream_path": _path_if_exists(root / "lab_event_stream.jsonl"),
             "capability_profiles_path": _path_if_exists(root / "capability_profiles.json"),
         },
@@ -439,6 +477,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     completion = dict(summary.get("completion", {}))
     memory = dict(summary.get("memory", {}))
     intelligence = dict(summary.get("intelligence", {}))
+    research = dict(summary.get("research", {}))
     runtime = dict(summary.get("runtime", {}))
     lifecycle = dict(summary.get("lifecycle", {}))
     autonomy = dict(summary.get("autonomy", {}))
@@ -554,6 +593,20 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         )
         if intelligence.get("escalation_required") is not None:
             lines.append(f"- Escalation required: `{intelligence.get('escalation_required')}`")
+    if research and any(value is not None for value in research.values()):
+        lines.extend(
+            [
+                "",
+                "## Research",
+                f"- Status: `{research.get('status') or 'unknown'}`",
+                f"- Sources: `{research.get('source_count', 0)}`",
+                f"- Providers: `{research.get('provider_count', 0)}`",
+                f"- Follow-up: `{research.get('recommended_followup_action') or 'none'}`",
+                f"- Confidence: `{research.get('confidence') or 'unknown'}`",
+                f"- Accepted transfers: `{research.get('accepted_transfer_count', 0)}`",
+                f"- Benchmark references: `{research.get('benchmark_reference_count', 0)}`",
+            ]
+        )
     if lifecycle and any(value is not None for value in lifecycle.values()):
         lines.extend(
             [
@@ -729,6 +782,7 @@ def _resolve_stage(
     intake_bundle: dict[str, Any],
     evidence_bundle: dict[str, Any],
     intelligence_bundle: dict[str, Any],
+    research_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
     autonomy_bundle: dict[str, Any],
@@ -740,6 +794,8 @@ def _resolve_stage(
     if completion_bundle:
         run_state = _bundle_item(completion_bundle, "run_state")
         return str(run_state.get("current_stage", "")).strip() or "completion_reviewed"
+    if research_bundle:
+        return "research_reviewed"
     if intelligence_bundle:
         return "intelligence_reviewed"
     if evidence_bundle:
@@ -762,6 +818,8 @@ def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: s
         return "autonomy"
     if (root / "promotion_decision.json").exists():
         return "lifecycle"
+    if (root / "research_brief.json").exists():
+        return "research"
     if (root / "semantic_debate_report.json").exists():
         return "intelligence"
     if (root / "completion_decision.json").exists():

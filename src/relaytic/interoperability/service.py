@@ -277,6 +277,56 @@ def relaytic_show_intelligence(*, run_dir: str) -> dict[str, Any]:
     return cli._show_intelligence_surface(run_dir=run_dir)
 
 
+def relaytic_gather_research(
+    *,
+    run_dir: str,
+    config_path: str | None = None,
+    run_id: str | None = None,
+    overwrite: bool = False,
+    labels: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Execute the Slice 09D research retrieval layer for an existing run."""
+    cli = _cli()
+    return cli._run_research_phase(
+        run_dir=run_dir,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_gather_research",
+    )
+
+
+def relaytic_show_research(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 09D research surface for a run."""
+    cli = _cli()
+    return cli._show_research_surface(run_dir=run_dir)
+
+
+def relaytic_show_assist(*, run_dir: str, config_path: str | None = None) -> dict[str, Any]:
+    """Render the current Slice 09E communicative assist surface for a run."""
+    cli = _cli()
+    return cli._show_assist_surface(run_dir=run_dir, config_path=config_path)
+
+
+def relaytic_assist_turn(
+    *,
+    run_dir: str,
+    message: str,
+    data_path: str | None = None,
+    config_path: str | None = None,
+) -> dict[str, Any]:
+    """Send one communicative assist turn into Relaytic for explanation, navigation, or takeover."""
+    cli = _cli()
+    return cli._run_assist_turn(
+        run_dir=run_dir,
+        message=message,
+        config_path=config_path,
+        data_path=data_path,
+    )
+
+
 def relaytic_review_lifecycle(
     *,
     run_dir: str,
@@ -355,6 +405,8 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_runtime",
             "relaytic_get_status",
             "relaytic_show_intelligence",
+            "relaytic_show_research",
+            "relaytic_show_assist",
             "relaytic_show_lifecycle",
             "relaytic_show_autonomy",
             "relaytic_doctor",
@@ -367,6 +419,8 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_generate_plan",
             "relaytic_run_evidence_review",
             "relaytic_run_intelligence",
+            "relaytic_gather_research",
+            "relaytic_assist_turn",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
             "relaytic_run_autonomy",
@@ -438,6 +492,22 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             handler=relaytic_show_intelligence,
         ),
         InteropToolSpec(
+            name="relaytic_show_research",
+            title="Show Relaytic Research",
+            description="Render the current Slice 09D research, method-transfer, and benchmark-reference surface for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_research,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_assist",
+            title="Show Relaytic Assist",
+            description="Render the current Slice 09E communicative assist state, guidance, and connection options for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_assist,
+        ),
+        InteropToolSpec(
             name="relaytic_predict",
             title="Predict With Relaytic",
             description="Run inference from an existing Relaytic run directory against a new dataset.",
@@ -484,6 +554,22 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_run_intelligence,
+        ),
+        InteropToolSpec(
+            name="relaytic_gather_research",
+            title="Gather Research",
+            description="Execute the Slice 09D privacy-safe external research retrieval layer for an existing Relaytic run.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_gather_research,
+        ),
+        InteropToolSpec(
+            name="relaytic_assist_turn",
+            title="Assist Turn",
+            description="Send one communicative turn so Relaytic can explain state, guide connection options, rerun a stage, or take over safely.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_assist_turn,
         ),
         InteropToolSpec(
             name="relaytic_review_completion",

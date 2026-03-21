@@ -11,7 +11,7 @@
 **The Relay Inference Lab**
 
 ### Positioning line
-**Relaytic is a local-first inference engineering system for structured data, built around specialist agents that investigate data, form competing hypotheses, run challenger science, preserve mandate-aware user intent, optionally ground themselves in expert context, amplify their judgment when a powerful LLM is available, optionally use a minimum local LLM baseline when users want semantic help on-device, actively help users and external agents set up local LLMs when desired, debate what the run should optimize for, keep core subsystems replaceable, carry bounded evidence between specialists, and expose their judgment as reusable tools.**
+**Relaytic is a local-first inference engineering system for structured data, built around specialist agents that investigate data, form competing hypotheses, run challenger science, preserve mandate-aware user intent, optionally ground themselves in expert context, optionally perform privacy-safe external method and benchmark retrieval from redacted run signatures, amplify their judgment when a powerful LLM is available, optionally use a minimum local LLM baseline when users want semantic help on-device, actively help users and external agents set up local LLMs when desired, debate what the run should optimize for, keep core subsystems replaceable, carry bounded evidence between specialists, and expose their judgment as reusable tools.**
 
 ### Naming strategy
 Use a two-layer naming system throughout the repository and docs:
@@ -43,6 +43,7 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - preserves long-term lab values, work preferences, and run-specific intent through a mandate layer
 - lets specialists disagree with the mandate when they find materially better ideas, while still obeying binding constraints
 - can optionally use user-provided context, uploaded documents, and policy-gated external knowledge retrieval
+- can optionally retrieve papers, benchmark references, and method writeups from the web using rowless, redacted, generalized run signatures rather than private data
 - still works when no expert context is provided
 - uses a deterministic expert-prior substrate so specialists can reason about common business and data archetypes before any LLM help is available
 - can optionally exploit strong local or frontier LLMs for deeper interpretation, hypothesis generation, challenger design, and synthesis without making LLMs a hard dependency
@@ -65,6 +66,7 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - treats on-disk artifacts as canonical truth and any memory index, semantic cache, or retrieval structure as a derived view
 - gives each specialist an explicit capability profile instead of ambient full-data, full-tool access
 - defaults semantic helpers and optional LLM paths to rowless, redacted, schema-bound context unless policy explicitly grants richer access
+- treats external research retrieval the same way: rowless and redacted by default, never a backdoor for raw data leakage
 - flushes durable reflection and memory summaries before retries, compaction, and final completion/lifecycle handoff
 - includes operator onboarding, health, backup, restore, and diagnostics as first-class product features
 - defines trust boundaries for every integration so external systems are useful but never unquestionable
@@ -97,6 +99,7 @@ It is:
 - **evidence-pressure loops**, not just single-pass training
 - **mandate-aware autonomous judgment**, not just score chasing
 - **agent-usable decision surfaces**, not just human-readable reports
+- **private world-knowledge import without private-data export**, not just local heuristics or naive web calls
 - **validated self-improvement**, not just prompt churn or hidden heuristic drift
 
 Any slice that does not strengthen at least one of those axes is polish, not frontier progress.
@@ -113,6 +116,8 @@ Relaytic must not degrade into:
   polished benchmark claims without hard reference comparisons and failure reports
 - **LLM theater**
   vague semantic authority replacing deterministic evidence
+- **paper theater**
+  buzzword-heavy paper retrieval or SOTA name-dropping without redaction audits, method-transfer artifacts, contradiction handling, or local proof
 - **UI theater**
   a polished shell over weak model-search and weak challenge loops
 
@@ -127,6 +132,7 @@ Every ambitious Relaytic claim should be falsifiable and backed by at least one 
 - a golden-path demo
 - a benchmark or reference-comparison protocol
 - an explicit failure report plus next-experiment recommendation when Relaytic loses
+- for any external-research influence, a redaction audit plus explicit method-transfer or benchmark-reference artifact
 
 By the time the product is mature, Relaytic should be able to show, not just claim, that:
 
@@ -156,6 +162,7 @@ They are:
 - semantically grounded expert deliberation that can generate counterpositions, verifier findings, and doc-grounded challenger or retraining ideas
 - bounded autonomous second-pass loops that can actually execute challenger expansion, recalibration, retraining, or re-planning
 - champion lineage and small challenger portfolios rather than one narrow challenger branch
+- privacy-safe research retrieval that can turn external methods and benchmark references into explicit local hypotheses without exporting user knowledge
 - benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, and lifecycle constraints actually matter
 
 These are the places where the project most needs to become stronger if it wants to look like the next big thing rather than a well-structured research product.
@@ -574,6 +581,7 @@ Relaytic should define explicit slots for:
 - **lifecycle policy slot**
 - **semantic-task engine slot**
 - **document-grounding slot**
+- **research retrieval slot**
 - **hook policy slot**
 - **capability policy slot**
 
@@ -1366,6 +1374,13 @@ src/relaytic/
     discovery.py
     health.py
     setup_guidance.py
+  research/
+    query_planner.py
+    sources.py
+    distillation.py
+    transfer.py
+    benchmark_refs.py
+    audit.py
   features/
     tabular_basic.py
     tabular_interactions.py
@@ -1908,7 +1923,7 @@ The system must work in both modes:
 
 - **grounded mode**
   - user-supplied context and/or uploaded docs are available
-  - optional external literature retrieval may be enabled by policy
+  - optional private research retrieval may be enabled by policy
   - agents may use grounded evidence with provenance tracking
 
 ### Context layers
@@ -1925,8 +1940,8 @@ Represents what problem the user actually wants solved.
 #### D. Reference documents
 Represents uploaded PDFs, data dictionaries, schema docs, SOPs, papers, notes, and prior reports.
 
-#### E. Optional literature retrieval
-Represents policy-gated external retrieval for papers, benchmark docs, and domain references.
+#### E. Private research retrieval
+Represents policy-gated external retrieval for papers, benchmark docs, method cards, implementation references, and domain-specific references through redacted run signatures.
 
 ### Required artifacts
 
@@ -1934,9 +1949,13 @@ Represents policy-gated external retrieval for papers, benchmark docs, and domai
 - `domain_brief.json`
 - `task_brief.json`
 - `context_sources.json`
-- `knowledge_retrieval_trace.json`
 - `provenance_map.json`
-- `literature_notes.json` when external retrieval is enabled
+- `research_query_plan.json`
+- `research_source_inventory.json`
+- `research_brief.json`
+- `method_transfer_report.json`
+- `benchmark_reference_report.json`
+- `external_research_audit.json`
 
 ### Trust and precedence rules
 
@@ -1945,12 +1964,17 @@ Represents policy-gated external retrieval for papers, benchmark docs, and domai
 - literature is advisory unless the user explicitly says otherwise
 - prior-run memory is advisory
 - when sources conflict, the conflict must be surfaced explicitly
+- retrieved methods must become explicit transfer hypotheses, not silent route overrides
+- benchmark references must become explicit comparison plans, not automatic claims of parity
 
 ### Required behaviors
 
 - the system must be able to continue when no context is provided
 - the UI must let users provide context before or during a run
 - external retrieval must be opt-in and policy-gated
+- external research queries must default to redacted, rowless, generalized task/domain signatures
+- no raw rows, private identifiers, machine paths, or proprietary system names may leave the machine unless policy explicitly grants richer disclosure
+- every research-derived recommendation must say what was transferred: route idea, challenger idea, metric/split idea, benchmark reference, or data-collection suggestion
 - every grounded recommendation must cite whether it came from:
   - raw data evidence
   - user-provided context
@@ -2078,6 +2102,11 @@ Support:
 Relaytic may offer an optional minimum on-device LLM baseline for users who want lightweight semantic help.
 
 This baseline should be:
+
+- good enough to power a communicative assist layer that can explain current state, guide a human or agent through the workflow, and make the UI feel alive without becoming the authoritative control plane
+- optional rather than mandatory
+- local-first by default
+- cheap enough for regular laptop use
 
 - optional
 - replaceable
@@ -3249,8 +3278,13 @@ artifacts/run_<timestamp>/
   domain_brief.json
   task_brief.json
   context_sources.json
-  knowledge_retrieval_trace.json
   provenance_map.json
+  research_query_plan.json
+  research_source_inventory.json
+  research_brief.json
+  method_transfer_report.json
+  benchmark_reference_report.json
+  external_research_audit.json
   semantic_task_request.json
   semantic_task_results.json
   intelligence_mode.json

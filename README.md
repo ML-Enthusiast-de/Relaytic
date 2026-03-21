@@ -22,6 +22,10 @@ The repository already supports a working early product baseline:
 - lifecycle-governor judgment with explicit keep, recalibrate, retrain, promote, and rollback decisions
 - run memory and analog retrieval with visible analog provenance, route priors, challenger priors, and reflection-memory flushes
 - a shared local runtime gateway with append-only events, capability-scoped specialists, checkpoints, hook audit, and one coherent control path for CLI and MCP
+- structured semantic-task execution with capability-aware context assembly, document grounding, semantic debate/counterposition artifacts, and explicit uncertainty reporting
+- bounded autonomous follow-up loops with challenger queues, recalibration/retrain requests, loop budgets, and champion lineage tracking
+- privacy-safe external research retrieval from redacted run signatures with typed source inventory, method-transfer reports, benchmark-reference capture, and explicit external-research audit
+- communicative assist surfaces that explain what Relaytic is doing, let humans or external agents jump back to any bounded stage, and let Relaytic take over when the operator stops or is unsure
 - concise run summaries for humans and stable summary artifacts for agents
 - one-line bootstrap install plus post-install dependency verification
 - host-neutral MCP interoperability with checked-in wrappers for Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing connector guidance
@@ -30,7 +34,7 @@ The repository already supports a working early product baseline:
 - deterministic expert-prior reasoning for common structured-data archetypes such as manufacturing quality, fraud risk, anomaly monitoring, churn, demand, and pricing
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 
-The next load-bearing implementation step is Slice 09: structured semantic tasks, document grounding, and bounded intelligence amplification.
+The next load-bearing implementation step is Slice 11: benchmark parity, constrained superiority proof, and honest reference comparison.
 
 ## Design Principles
 
@@ -57,7 +61,7 @@ They get their working knowledge from:
 
 That means the default product contract is still deterministic, local-first, and auditable. Local LLMs can improve interpretation and summaries, but they are not required for the core run loop.
 
-Relaytic does not currently rely on hidden custom pretraining to make its specialists useful. The near-term path to stronger expertise is: better deterministic priors, better run memory, better reference-doc grounding, and optional local-LLM amplification for the semantically hard parts.
+Relaytic does not currently rely on hidden custom pretraining to make its specialists useful. The near-term path to stronger expertise is: better deterministic priors, better run memory, better reference-doc grounding, privacy-safe external research retrieval from redacted run signatures, stronger benchmark doctrine, and optional local-LLM amplification for the semantically hard parts.
 
 ## Reuse Mature OSS
 
@@ -185,7 +189,7 @@ The primary MVP surface is now a single end-to-end run command:
 relaytic run --data-path path/to/data.csv --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
 ```
 
-That command now carries the run through intake, investigation, cross-run memory retrieval, planning, execution, challenger pressure, ablation checks, audit, completion, lifecycle review, and summary materialization.
+That command now carries the run through intake, investigation, cross-run memory retrieval, planning, execution, challenger pressure, ablation checks, semantic debate, audit, completion, lifecycle review, bounded autonomous follow-up, and summary materialization.
 
 Then inspect or reuse the run:
 
@@ -194,9 +198,15 @@ relaytic show --run-dir artifacts/run_your_dataset_...
 relaytic runtime show --run-dir artifacts/run_your_dataset_...
 relaytic runtime events --run-dir artifacts/run_your_dataset_...
 relaytic memory show --run-dir artifacts/run_your_dataset_...
+relaytic intelligence show --run-dir artifacts/run_your_dataset_...
+relaytic research show --run-dir artifacts/run_your_dataset_...
+relaytic research sources --run-dir artifacts/run_your_dataset_...
+relaytic assist show --run-dir artifacts/run_your_dataset_...
+relaytic assist turn --run-dir artifacts/run_your_dataset_... --message "why did you choose this route?"
 relaytic status --run-dir artifacts/run_your_dataset_...
 relaytic evidence show --run-dir artifacts/run_your_dataset_...
 relaytic lifecycle show --run-dir artifacts/run_your_dataset_...
+relaytic autonomy show --run-dir artifacts/run_your_dataset_...
 relaytic predict --run-dir artifacts/run_your_dataset_... --data-path path/to/data.csv
 ```
 
@@ -211,12 +221,28 @@ relaytic memory retrieve --run-dir artifacts/run_demo --data-path path/to/data.c
 relaytic plan create --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic plan run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic evidence run --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic intelligence run --run-dir artifacts/run_demo
+relaytic research gather --run-dir artifacts/run_demo
 relaytic completion review --run-dir artifacts/run_demo
 relaytic lifecycle review --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic autonomy run --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic assist turn --run-dir artifacts/run_demo --message "go back to research"
 relaytic runtime show --run-dir artifacts/run_demo
 relaytic runtime events --run-dir artifacts/run_demo --limit 12
 relaytic memory show --run-dir artifacts/run_demo
+relaytic intelligence show --run-dir artifacts/run_demo
+relaytic research show --run-dir artifacts/run_demo
+relaytic autonomy show --run-dir artifacts/run_demo
 relaytic run-inference --run-dir artifacts/run_demo --data-path path/to/data.csv
+```
+
+For a more communicative demo-friendly surface, use:
+
+```bash
+relaytic assist show --run-dir artifacts/run_demo
+relaytic assist turn --run-dir artifacts/run_demo --message "connect claude or use a local llm"
+relaytic assist turn --run-dir artifacts/run_demo --message "i'm not sure, take over"
+relaytic assist chat --run-dir artifacts/run_demo
 ```
 
 That flow produces:
@@ -230,8 +256,10 @@ That flow produces:
 - evidence artifacts such as `experiment_registry.json`, `challenger_report.json`, `ablation_report.json`, `audit_report.json`, and `belief_update.json`
 - memory artifacts such as `memory_retrieval.json`, `analog_run_candidates.json`, `route_prior_context.json`, `challenger_prior_suggestions.json`, `reflection_memory.json`, and `memory_flush_report.json`
 - runtime artifacts such as `lab_event_stream.jsonl`, `hook_execution_log.json`, `run_checkpoint_manifest.json`, `capability_profiles.json`, `data_access_audit.json`, and `context_influence_report.json`
+- intelligence artifacts such as `intelligence_mode.json`, `semantic_task_results.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
 - completion artifacts such as `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
 - lifecycle artifacts such as `champion_vs_candidate.json`, `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json`
+- autonomy artifacts such as `autonomy_loop_state.json`, `autonomy_round_report.json`, `challenger_queue.json`, `branch_outcome_matrix.json`, `retrain_run_request.json`, `recalibration_run_request.json`, `champion_lineage.json`, and `loop_budget_report.json`
 - operator-facing reports such as `reports/technical_report.md` and `reports/decision_memo.md`
 - a machine-readable `run_summary.json`
 - a human-readable `reports/summary.md`
