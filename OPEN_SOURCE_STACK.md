@@ -35,6 +35,10 @@ Do not let them replace:
   Use for residual diagnostics, uncertainty checks, and classical sanity baselines.
 - `pandera`
   Use for dataframe schema validation around intake, execution, and agent-facing payloads.
+- `pyarrow`
+  Use for Parquet/Feather snapshots and partitioned dataset materialization.
+- `duckdb`
+  Use for local read-only lakehouse-style table/query materialization without shipping data out of the machine.
 - `PyOD`
   Use for anomaly challengers when the native challenger space needs broader detector families.
 - `Evidently`
@@ -89,6 +93,10 @@ That surface is meant for both humans and external agents.
 
 - `pandera`
   Wired into intake dataframe-contract validation and recorded in `intake_record.json`.
+- `pyarrow`
+  Wired into snapshot ingestion for Parquet/Feather and into local lakehouse materialization for partitioned Parquet directories.
+- `duckdb`
+  Wired into local source materialization for read-only `.duckdb`/`.db` table and query sources.
 - `mcp`
   Wired into the interoperability layer for local `stdio`/`streamable-http` serving, bundle validation, and live compatibility smoke checks.
 - `statsmodels`

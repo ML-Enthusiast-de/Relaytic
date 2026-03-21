@@ -163,6 +163,7 @@ def build_run_summary(
     )
     model_params = _read_json(root / "model_params.json")
     manifest = _read_json(root / "manifest.json")
+    data_copy_manifest = _read_json(root / "data_copy_manifest.json")
 
     run_brief = _bundle_item(mandate_bundle, "run_brief")
     task_brief = _bundle_item(context_bundle, "task_brief")
@@ -227,6 +228,15 @@ def build_run_summary(
         else _first_data_reference(builder_handoff)
         or ""
     )
+    latest_copy_paths = dict(data_copy_manifest.get("latest_by_purpose", {}))
+    primary_copy_path = _clean_text(latest_copy_paths.get("primary"))
+    inference_copy_path = _clean_text(latest_copy_paths.get("inference"))
+    primary_copy_record = _find_copy_record(
+        data_copy_manifest,
+        staged_path=primary_copy_path,
+        purpose="primary",
+    )
+    resolved_data_path = primary_copy_path or resolved_data_path
     selected_metrics = execution_summary.get("selected_metrics")
     if not isinstance(selected_metrics, dict):
         selected_metrics = {}
@@ -264,6 +274,15 @@ def build_run_summary(
         },
         "data": {
             "data_path": resolved_data_path,
+            "working_copy_path": primary_copy_path or resolved_data_path,
+            "latest_inference_copy_path": inference_copy_path,
+            "copy_enforced": bool(data_copy_manifest.get("copy_only", False)),
+            "immutable_working_copies": bool(data_copy_manifest.get("immutable_working_copies", False)),
+            "original_paths_persisted": bool(data_copy_manifest.get("original_paths_persisted", False)),
+            "staged_copy_count": len(data_copy_manifest.get("copies", [])) if isinstance(data_copy_manifest.get("copies"), list) else 0,
+            "source_format": _clean_text(_infer_data_format(resolved_data_path)),
+            "source_type": _clean_text(primary_copy_record.get("source_kind")) or _clean_text(data_origin.get("source_type")),
+            "materialized_input_format": _clean_text(primary_copy_record.get("materialized_format")),
             "row_count": int(dataset_profile.get("row_count", 0) or 0),
             "column_count": int(dataset_profile.get("column_count", 0) or 0),
             "data_mode": _clean_text(dataset_profile.get("data_mode")),
@@ -506,7 +525,12 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         f"- Rows: `{data.get('row_count', 0)}`",
         f"- Columns: `{data.get('column_count', 0)}`",
         f"- Data mode: `{data.get('data_mode') or 'unknown'}`",
+        f"- Format: `{data.get('source_format') or 'unknown'}`",
+        f"- Source type: `{data.get('source_type') or 'unknown'}`",
+        f"- Copy enforced: `{data.get('copy_enforced')}`",
     ]
+    if data.get("working_copy_path"):
+        lines.append(f"- Working copy: `{data.get('working_copy_path')}`")
     feature_columns = list(decision.get("feature_columns", []))
     if feature_columns:
         lines.append(f"- First-route features: `{', '.join(feature_columns)}`")
@@ -965,6 +989,37 @@ def _build_headline(summary: dict[str, Any]) -> str:
             )
         return f"Relaytic built `{model}` for `{target}` using the `{route}` route."
     return f"Relaytic prepared `{route}` for `{target}` but has not executed a model build yet."
+
+
+def _infer_data_format(path_text: str | None) -> str | None:
+    text = str(path_text or "").strip()
+    if not text:
+        return None
+    suffix = Path(text).suffix.lower().strip()
+    if not suffix:
+        return None
+    return suffix.lstrip(".")
+
+
+def _find_copy_record(
+    manifest: dict[str, Any],
+    *,
+    staged_path: str | None,
+    purpose: str,
+) -> dict[str, Any]:
+    copies = manifest.get("copies", [])
+    if not isinstance(copies, list):
+        return {}
+    normalized_path = str(staged_path or "").strip().replace("\\", "/")
+    for item in copies:
+        if not isinstance(item, dict):
+            continue
+        if normalized_path and str(item.get("staged_path", "")).strip().replace("\\", "/") == normalized_path:
+            return item
+    for item in reversed(copies):
+        if isinstance(item, dict) and str(item.get("purpose", "")).strip() == str(purpose).strip():
+            return item
+    return {}
 
 
 def _format_metric_block(metrics: dict[str, Any]) -> str:

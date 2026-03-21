@@ -23,6 +23,8 @@ The repository currently supports:
 - a first deterministic local data-to-model route via `relaytic plan run`
 - a first human-friendly and agent-friendly MVP shell via `relaytic run`, `relaytic show`, `relaytic predict`, and `relaytic evidence`
 - persisted `run_summary.json` plus `reports/summary.md` for concise run understanding
+- copy-only data staging so major run and inference paths operate on immutable working copies under the run directory instead of the original source file
+- explicit source inspection/materialization support for humans and agents via `relaytic source inspect` and `relaytic source materialize`
 - challenger, ablation, audit, leaderboard, and decision-memo evidence around the first Builder route
 - completion-governor judgment that fuses mandate, context, intake, investigation, planning, and evidence into a machine-actionable next step
 - visible run-state and blocking-layer artifacts via `relaytic status` and `relaytic completion review`
@@ -48,6 +50,9 @@ The repository currently supports:
 - wired integration adapters for Pandera intake validation, statsmodels residual diagnostics, imbalanced-learn rare-event challengers, and PyOD anomaly challengers with a default Windows runtime guard for the current unstable PyOD stack
 - adapter compatibility self-checks via `relaytic integrations self-check` so upgrades can be verified without guessing
 - current task-family support across the main path for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event detection
+- current public ingestion support for `.csv`, `.tsv`, `.xlsx`, `.xls`, `.parquet`, `.pq`, `.feather`, `.json`, `.jsonl`, and `.ndjson`
+- current local source-mode support for append-only stream files and local lakehouse-style sources through bounded materialization into immutable run-local snapshots
+- remote streaming, warehouse, and cloud lakehouse connectors remain future adapter work
 - public-dataset end-to-end regression, binary-classification, and multiclass-classification coverage using stable bundled open datasets in the test suite
 - optional official-UCI domain-dataset coverage for concrete strength, telecom churn, credit default, and predictive maintenance through an explicit opt-in network-backed test suite
 
@@ -291,3 +296,4 @@ After Slice 11, the next high-leverage frontier follow-ons should include:
 - Slice 10 feedback assimilation from operator interventions, runtime failures, and later-run evidence
 - deeper autonomy breadth beyond the first bounded second pass
 - richer memory and doc-grounding corpora once benchmark doctrine is in place
+- later Slice 15 remote connector adapters for Kafka-style streams, object-store Parquet, and warehouse reads, but only through read-only materialization into immutable run-local snapshots

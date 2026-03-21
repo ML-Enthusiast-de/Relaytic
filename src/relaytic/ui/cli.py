@@ -525,7 +525,7 @@ def build_parser() -> argparse.ArgumentParser:
         "run-agent1-analysis",
         help="Run deterministic Agent 1 analysis directly (no LLM call).",
     )
-    run_agent1.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    run_agent1.add_argument("--data-path", required=True, help="Structured data source path such as CSV, Parquet, JSONL, or Excel.")
     run_agent1.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
     run_agent1.add_argument("--header-row", type=int, default=None, help="Optional header row.")
     run_agent1.add_argument(
@@ -619,7 +619,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Run directory containing model_params.json and model state (e.g., artifacts/run_...).",
     )
-    run_inference.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    run_inference.add_argument("--data-path", required=True, help="Structured data source path such as CSV, Parquet, JSONL, a dataset directory, or a DuckDB file.")
     run_inference.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
     run_inference.add_argument("--header-row", type=int, default=None, help="Optional header row.")
     run_inference.add_argument(
@@ -633,6 +633,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional CSV delimiter override.",
     )
+    run_inference.add_argument("--source-type", choices=["auto", "snapshot", "stream", "lakehouse"], default="auto", help="How Relaytic should interpret the structured source.")
+    run_inference.add_argument("--source-table", default=None, help="Optional table name for local DuckDB or lakehouse-style sources.")
+    run_inference.add_argument("--sql-query", default=None, help="Optional read-only SQL query for local DuckDB sources.")
+    run_inference.add_argument("--stream-window-rows", type=int, default=5000, help="When --source-type=stream, materialize only the most recent N rows into the inference snapshot.")
+    run_inference.add_argument("--stream-format", choices=["auto", "csv", "tsv", "jsonl"], default="auto", help="Optional stream file format override.")
+    run_inference.add_argument("--materialized-format", choices=["auto", "parquet", "csv"], default="auto", help="Preferred run-local snapshot format for stream and lakehouse inference sources.")
     run_inference.add_argument(
         "--decision-threshold",
         type=float,
@@ -957,7 +963,7 @@ def build_parser() -> argparse.ArgumentParser:
         "run",
         help="Run the first Relaytic MVP flow end to end on a dataset.",
     )
-    run_surface.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    run_surface.add_argument("--data-path", required=True, help="Structured data source path such as CSV, Parquet, JSONL, a dataset directory, or a DuckDB file.")
     run_surface.add_argument("--run-dir", default=None, help="Optional run directory. Defaults to a generated path under `artifacts/`.")
     run_surface.add_argument("--config", default=None, help="Optional config/policy source.")
     run_surface.add_argument("--run-id", default=None, help="Optional manifest run id.")
@@ -978,6 +984,12 @@ def build_parser() -> argparse.ArgumentParser:
     run_surface.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
     run_surface.add_argument("--header-row", type=int, default=None, help="Optional header row.")
     run_surface.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
+    run_surface.add_argument("--source-type", choices=["auto", "snapshot", "stream", "lakehouse"], default="auto", help="How Relaytic should interpret the structured source.")
+    run_surface.add_argument("--source-table", default=None, help="Optional table name for local DuckDB or lakehouse-style sources.")
+    run_surface.add_argument("--sql-query", default=None, help="Optional read-only SQL query for local DuckDB sources.")
+    run_surface.add_argument("--stream-window-rows", type=int, default=5000, help="When --source-type=stream, materialize only the most recent N rows into the run snapshot.")
+    run_surface.add_argument("--stream-format", choices=["auto", "csv", "tsv", "jsonl"], default="auto", help="Optional stream file format override.")
+    run_surface.add_argument("--materialized-format", choices=["auto", "parquet", "csv"], default="auto", help="Preferred run-local snapshot format for stream and lakehouse sources.")
     run_surface.add_argument("--timestamp-column", default=None, help="Optional timestamp column override for investigation.")
     run_surface.add_argument("--overwrite", action="store_true", help="Allow overwriting existing intake, planning, and model artifacts.")
     run_surface.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
@@ -1005,11 +1017,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run inference through the accessible Relaytic prediction surface.",
     )
     predict_surface.add_argument("--run-dir", required=True, help="Run directory containing model artifacts.")
-    predict_surface.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    predict_surface.add_argument("--data-path", required=True, help="Structured data source path such as CSV, Parquet, JSONL, a dataset directory, or a DuckDB file.")
     predict_surface.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
     predict_surface.add_argument("--header-row", type=int, default=None, help="Optional header row.")
     predict_surface.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
     predict_surface.add_argument("--delimiter", default=None, help="Optional CSV delimiter override.")
+    predict_surface.add_argument("--source-type", choices=["auto", "snapshot", "stream", "lakehouse"], default="auto", help="How Relaytic should interpret the structured source.")
+    predict_surface.add_argument("--source-table", default=None, help="Optional table name for local DuckDB or lakehouse-style sources.")
+    predict_surface.add_argument("--sql-query", default=None, help="Optional read-only SQL query for local DuckDB sources.")
+    predict_surface.add_argument("--stream-window-rows", type=int, default=5000, help="When --source-type=stream, materialize only the most recent N rows into the inference snapshot.")
+    predict_surface.add_argument("--stream-format", choices=["auto", "csv", "tsv", "jsonl"], default="auto", help="Optional stream file format override.")
+    predict_surface.add_argument("--materialized-format", choices=["auto", "parquet", "csv"], default="auto", help="Preferred run-local snapshot format for stream and lakehouse inference sources.")
     predict_surface.add_argument(
         "--decision-threshold",
         type=float,
@@ -1022,6 +1040,51 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional output JSON path for persisted prediction payloads.",
     )
     predict_surface.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    source_surface = sub.add_parser(
+        "source",
+        help="Inspect or materialize structured sources into Relaytic's immutable run-local snapshot boundary.",
+    )
+    source_sub = source_surface.add_subparsers(dest="source_command", required=True)
+
+    source_inspect = source_sub.add_parser(
+        "inspect",
+        help="Inspect how Relaytic will interpret a local structured source.",
+    )
+    source_inspect.add_argument("--source-path", required=True, help="Structured source path such as CSV, Parquet, JSONL, a dataset directory, or a DuckDB file.")
+    source_inspect.add_argument("--source-type", choices=["auto", "snapshot", "stream", "lakehouse"], default="auto", help="How Relaytic should interpret the source.")
+    source_inspect.add_argument("--source-table", default=None, help="Optional table name for local DuckDB or lakehouse-style sources.")
+    source_inspect.add_argument("--sql-query", default=None, help="Optional read-only SQL query for local DuckDB sources.")
+    source_inspect.add_argument("--stream-window-rows", type=int, default=5000, help="Preview the planned bounded stream window size.")
+    source_inspect.add_argument("--stream-format", choices=["auto", "csv", "tsv", "jsonl"], default="auto", help="Optional stream file format override.")
+    source_inspect.add_argument("--materialized-format", choices=["auto", "parquet", "csv"], default="auto", help="Preferred run-local snapshot format when materialization is needed.")
+    source_inspect.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    source_materialize = source_sub.add_parser(
+        "materialize",
+        help="Materialize a local stream or lakehouse source into an immutable run-local snapshot.",
+    )
+    source_materialize.add_argument("--source-path", required=True, help="Structured source path such as CSV, Parquet, JSONL, a dataset directory, or a DuckDB file.")
+    source_materialize.add_argument("--run-dir", required=True, help="Run directory where the staged snapshot should be created.")
+    source_materialize.add_argument("--source-type", choices=["auto", "snapshot", "stream", "lakehouse"], default="auto", help="How Relaytic should interpret the source.")
+    source_materialize.add_argument("--source-table", default=None, help="Optional table name for local DuckDB or lakehouse-style sources.")
+    source_materialize.add_argument("--sql-query", default=None, help="Optional read-only SQL query for local DuckDB sources.")
+    source_materialize.add_argument("--stream-window-rows", type=int, default=5000, help="When --source-type=stream, materialize only the most recent N rows.")
+    source_materialize.add_argument("--stream-format", choices=["auto", "csv", "tsv", "jsonl"], default="auto", help="Optional stream file format override.")
+    source_materialize.add_argument("--materialized-format", choices=["auto", "parquet", "csv"], default="auto", help="Preferred run-local snapshot format when materialization is needed.")
+    source_materialize.add_argument("--purpose", choices=["primary", "evaluation", "inference"], default="primary", help="Why this snapshot is being materialized.")
+    source_materialize.add_argument("--alias", default=None, help="Optional stable snapshot alias.")
+    source_materialize.add_argument(
         "--format",
         choices=["human", "json", "both"],
         default="human",
@@ -1055,7 +1118,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     intake_interpret.add_argument("--actor-name", default=None, help="Optional actor display name.")
     intake_interpret.add_argument("--channel", default="cli", help="Intake channel label.")
-    intake_interpret.add_argument("--data-path", default=None, help="Optional CSV/XLSX dataset for schema alignment.")
+    intake_interpret.add_argument("--data-path", default=None, help="Optional structured dataset for schema alignment.")
     intake_interpret.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
     intake_interpret.add_argument("--header-row", type=int, default=None, help="Optional header row.")
     intake_interpret.add_argument("--data-start-row", type=int, default=None, help="Optional data start row.")
@@ -1094,7 +1157,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Refresh Slice 09A memory artifacts for the current run state.",
     )
     memory_retrieve.add_argument("--run-dir", required=True, help="Run directory for memory artifacts.")
-    memory_retrieve.add_argument("--data-path", default=None, help="Optional CSV/XLSX data file path when the run has not recorded one yet.")
+    memory_retrieve.add_argument("--data-path", default=None, help="Optional structured data source path when the run has not recorded one yet.")
     memory_retrieve.add_argument("--config", default=None, help="Optional config/policy source.")
     memory_retrieve.add_argument("--run-id", default=None, help="Optional manifest run id.")
     memory_retrieve.add_argument(
@@ -1340,7 +1403,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Write Slice 05 planning artifacts.",
     )
     plan_create.add_argument("--run-dir", required=True, help="Run directory for planning artifacts.")
-    plan_create.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    plan_create.add_argument("--data-path", required=True, help="Structured data source path such as CSV, Parquet, JSONL, or Excel.")
     plan_create.add_argument("--config", default=None, help="Optional config/policy source.")
     plan_create.add_argument("--run-id", default=None, help="Optional manifest run id.")
     plan_create.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
@@ -1355,7 +1418,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Write Slice 05 planning artifacts and execute the first deterministic Builder route.",
     )
     plan_run.add_argument("--run-dir", required=True, help="Run directory for planning and model artifacts.")
-    plan_run.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    plan_run.add_argument("--data-path", required=True, help="Structured data source path such as CSV, Parquet, JSONL, or Excel.")
     plan_run.add_argument("--config", default=None, help="Optional config/policy source.")
     plan_run.add_argument("--run-id", default=None, help="Optional manifest run id.")
     plan_run.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
@@ -1382,7 +1445,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Execute the Slice 06 evidence layer for an existing or freshly planned run.",
     )
     evidence_run.add_argument("--run-dir", required=True, help="Run directory for evidence artifacts.")
-    evidence_run.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    evidence_run.add_argument("--data-path", required=True, help="Structured data source path such as CSV, Parquet, JSONL, or Excel.")
     evidence_run.add_argument("--config", default=None, help="Optional config/policy source.")
     evidence_run.add_argument("--run-id", default=None, help="Optional manifest run id.")
     evidence_run.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
@@ -1485,7 +1548,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run the Slice 03 investigation layer and write specialist artifacts.",
     )
     investigate.add_argument("--run-dir", required=True, help="Run directory for investigation artifacts.")
-    investigate.add_argument("--data-path", required=True, help="CSV/XLSX data file path.")
+    investigate.add_argument("--data-path", required=True, help="Structured data source path such as CSV, Parquet, JSONL, Excel, or a local dataset directory.")
     investigate.add_argument("--config", default=None, help="Optional config/policy source.")
     investigate.add_argument("--run-id", default=None, help="Optional manifest run id.")
     investigate.add_argument("--sheet-name", default=None, help="Excel sheet name if needed.")
@@ -1709,6 +1772,12 @@ def main(argv: list[str] | None = None) -> int:
             payload = _run_access_flow(
                 run_dir=args.run_dir,
                 data_path=args.data_path,
+                source_type=args.source_type,
+                source_table=args.source_table,
+                sql_query=args.sql_query,
+                stream_window_rows=args.stream_window_rows,
+                stream_format=args.stream_format,
+                materialized_format=args.materialized_format,
                 config_path=args.config,
                 run_id=args.run_id,
                 text=args.text,
@@ -1751,6 +1820,12 @@ def main(argv: list[str] | None = None) -> int:
             prediction = run_inference_from_artifacts(
                 data_path=args.data_path,
                 run_dir=args.run_dir,
+                source_type=args.source_type,
+                source_table=args.source_table,
+                sql_query=args.sql_query,
+                stream_window_rows=args.stream_window_rows,
+                stream_format=args.stream_format,
+                materialized_format=args.materialized_format,
                 sheet_name=args.sheet_name,
                 header_row=args.header_row,
                 data_start_row=args.data_start_row,
@@ -1764,6 +1839,44 @@ def main(argv: list[str] | None = None) -> int:
         _emit_structured_surface_output(
             payload=prediction,
             human_text=_render_prediction_output(prediction),
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "source":
+        try:
+            if args.source_command == "inspect":
+                payload = _run_source_inspection(
+                    source_path=args.source_path,
+                    source_type=args.source_type,
+                    source_table=args.source_table,
+                    sql_query=args.sql_query,
+                    stream_window_rows=args.stream_window_rows,
+                    stream_format=args.stream_format,
+                    materialized_format=args.materialized_format,
+                )
+            elif args.source_command == "materialize":
+                payload = _materialize_source_surface(
+                    source_path=args.source_path,
+                    run_dir=args.run_dir,
+                    source_type=args.source_type,
+                    source_table=args.source_table,
+                    sql_query=args.sql_query,
+                    stream_window_rows=args.stream_window_rows,
+                    stream_format=args.stream_format,
+                    materialized_format=args.materialized_format,
+                    purpose=args.purpose,
+                    alias=args.alias,
+                )
+            else:
+                parser.error("Unsupported source subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
             output_format=args.format,
         )
         return 0
@@ -2345,6 +2458,12 @@ def main(argv: list[str] | None = None) -> int:
                 data_path=args.data_path,
                 checkpoint_id=args.checkpoint_id,
                 run_dir=args.run_dir,
+                source_type=args.source_type,
+                source_table=args.source_table,
+                sql_query=args.sql_query,
+                stream_window_rows=args.stream_window_rows,
+                stream_format=args.stream_format,
+                materialized_format=args.materialized_format,
                 sheet_name=args.sheet_name,
                 header_row=args.header_row,
                 data_start_row=args.data_start_row,
@@ -2464,10 +2583,62 @@ def _render_prediction_output(payload: dict[str, Any]) -> str:
     ) + "\n"
 
 
+def _render_source_inspection_output(payload: dict[str, Any]) -> str:
+    notes = [f"- {item}" for item in payload.get("notes", [])]
+    if not notes:
+        notes = ["- no additional notes"]
+    return "\n".join(
+        [
+            "# Relaytic Source Inspection",
+            "",
+            f"- Source path: `{payload.get('source_path', 'unknown')}`",
+            f"- Source type: `{payload.get('source_type', 'unknown')}`",
+            f"- Path kind: `{payload.get('path_kind', 'unknown')}`",
+            f"- Detected format: `{payload.get('detected_format', 'unknown')}`",
+            f"- Direct copy supported: `{payload.get('supports_direct_copy')}`",
+            f"- Recommended materialization: `{payload.get('recommended_materialization', 'unknown')}`",
+            f"- File count: `{payload.get('file_count', 0)}`",
+            "",
+            "## Notes",
+            *notes,
+        ]
+    ) + "\n"
+
+
+def _render_source_materialization_output(payload: dict[str, Any]) -> str:
+    notes = [f"- {item}" for item in payload.get("notes", [])]
+    if not notes:
+        notes = ["- no additional notes"]
+    row_count = payload.get("row_count")
+    column_count = payload.get("column_count")
+    return "\n".join(
+        [
+            "# Relaytic Source Materialization",
+            "",
+            f"- Source path: `{payload.get('source_path', 'unknown')}`",
+            f"- Source type: `{payload.get('source_type', 'unknown')}`",
+            f"- Detected format: `{payload.get('detected_format', 'unknown')}`",
+            f"- Staged path: `{payload.get('staged_path', 'unknown')}`",
+            f"- Materialized format: `{payload.get('materialized_format') or payload.get('detected_format', 'unknown')}`",
+            f"- Rows: `{row_count if row_count is not None else 'not_materialized'}`",
+            f"- Columns: `{column_count if column_count is not None else 'not_materialized'}`",
+            "",
+            "## Notes",
+            *notes,
+        ]
+    ) + "\n"
+
+
 def _run_access_flow(
     *,
     run_dir: str | None,
     data_path: str,
+    source_type: str,
+    source_table: str | None,
+    sql_query: str | None,
+    stream_window_rows: int,
+    stream_format: str,
+    materialized_format: str,
     config_path: str | None,
     run_id: str | None,
     text: str | None,
@@ -2483,6 +2654,17 @@ def _run_access_flow(
     labels: dict[str, str] | None,
 ) -> dict[str, Any]:
     root = Path(run_dir) if run_dir else _default_access_run_dir(data_path=data_path)
+    staged_primary_data_path = _stage_run_data_copy(
+        run_dir=root,
+        data_path=data_path,
+        purpose="primary",
+        source_type=source_type,
+        source_table=source_table,
+        sql_query=sql_query,
+        stream_window_rows=stream_window_rows,
+        stream_format=stream_format,
+        materialized_format=materialized_format,
+    ) or str(Path(data_path))
     runtime_surface = _runtime_surface_from_channel(channel)
     request_text, request_source = _resolve_access_request(
         run_dir=root,
@@ -2499,7 +2681,7 @@ def _run_access_flow(
             channel=channel,
             config_path=config_path,
             run_id=run_id,
-            data_path=data_path,
+            data_path=staged_primary_data_path,
             sheet_name=sheet_name,
             header_row=header_row,
             data_start_row=data_start_row,
@@ -2510,7 +2692,7 @@ def _run_access_flow(
         )
     memory_pre_payload = _run_memory_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_primary_data_path,
         config_path=config_path,
         run_id=run_id,
         labels=labels,
@@ -2520,7 +2702,7 @@ def _run_access_flow(
     )
     planning_payload = _run_planning_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_primary_data_path,
         config_path=config_path,
         run_id=run_id,
         sheet_name=sheet_name,
@@ -2535,7 +2717,7 @@ def _run_access_flow(
     )
     evidence_payload = _run_evidence_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_primary_data_path,
         config_path=config_path,
         run_id=run_id,
         sheet_name=sheet_name,
@@ -2550,7 +2732,7 @@ def _run_access_flow(
     )
     memory_post_evidence_payload = _run_memory_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_primary_data_path,
         config_path=config_path,
         run_id=run_id,
         labels=labels,
@@ -2587,7 +2769,7 @@ def _run_access_flow(
     )
     memory_post_completion_payload = _run_memory_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_primary_data_path,
         config_path=config_path,
         run_id=run_id,
         labels=labels,
@@ -2597,7 +2779,7 @@ def _run_access_flow(
     )
     lifecycle_payload = _run_lifecycle_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_primary_data_path,
         config_path=config_path,
         run_id=run_id,
         overwrite=overwrite,
@@ -2607,7 +2789,7 @@ def _run_access_flow(
     )
     autonomy_payload = _run_autonomy_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_primary_data_path,
         config_path=config_path,
         run_id=run_id,
         overwrite=overwrite,
@@ -2617,7 +2799,7 @@ def _run_access_flow(
     )
     memory_final_payload = _run_memory_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_primary_data_path,
         config_path=config_path,
         run_id=run_id,
         labels=labels,
@@ -2627,7 +2809,7 @@ def _run_access_flow(
     )
     summary_materialized = materialize_run_summary(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_primary_data_path,
         request_source=request_source,
         request_text=request_text,
     )
@@ -2641,7 +2823,7 @@ def _run_access_flow(
     surface_payload = {
         "status": "ok",
         "run_dir": str(root),
-        "data_path": str(Path(data_path)),
+        "data_path": staged_primary_data_path,
         "request_source": request_source,
         "intake_skipped": request_text is None,
         "manifest_path": str(manifest_path),
@@ -2666,6 +2848,72 @@ def _run_access_flow(
     return {
         "surface_payload": surface_payload,
         "human_output": summary_materialized["report_markdown"],
+    }
+
+
+def _run_source_inspection(
+    *,
+    source_path: str,
+    source_type: str,
+    source_table: str | None,
+    sql_query: str | None,
+    stream_window_rows: int,
+    stream_format: str,
+    materialized_format: str,
+) -> dict[str, Any]:
+    from relaytic.ingestion import build_source_spec, inspect_structured_source
+
+    spec = build_source_spec(
+        source_path=source_path,
+        source_type=source_type,
+        source_table=source_table,
+        sql_query=sql_query,
+        stream_window_rows=stream_window_rows,
+        stream_format=stream_format,
+        materialized_format=materialized_format,
+    )
+    inspection = inspect_structured_source(spec)
+    payload = inspection.to_dict()
+    return {
+        "surface_payload": payload,
+        "human_output": _render_source_inspection_output(payload),
+    }
+
+
+def _materialize_source_surface(
+    *,
+    source_path: str,
+    run_dir: str | Path,
+    source_type: str,
+    source_table: str | None,
+    sql_query: str | None,
+    stream_window_rows: int,
+    stream_format: str,
+    materialized_format: str,
+    purpose: str,
+    alias: str | None,
+) -> dict[str, Any]:
+    from relaytic.ingestion import build_source_spec, materialize_structured_source
+
+    spec = build_source_spec(
+        source_path=source_path,
+        source_type=source_type,
+        source_table=source_table,
+        sql_query=sql_query,
+        stream_window_rows=stream_window_rows,
+        stream_format=stream_format,
+        materialized_format=materialized_format,
+    )
+    materialized = materialize_structured_source(
+        spec=spec,
+        run_dir=run_dir,
+        purpose=purpose,
+        alias=alias,
+    )
+    payload = materialized.to_dict()
+    return {
+        "surface_payload": payload,
+        "human_output": _render_source_materialization_output(payload),
     }
 
 
@@ -3018,7 +3266,11 @@ def _run_assist_stage_pipeline(
     )
     labels: dict[str, str] | None = None
     executed: list[str] = []
-    resolved_data_path = data_path or _resolve_run_data_path(root)
+    resolved_data_path = _stage_run_data_copy(
+        run_dir=root,
+        data_path=data_path,
+        purpose="primary",
+    ) or _resolve_run_data_path(root)
     stage_order = [
         "foundation",
         "intake",
@@ -3239,7 +3491,11 @@ def _ensure_memory_present(run_dir: str | Path, data_path: str | None = None) ->
     bundle = _read_json_bundle(root, bundle="memory")
     if bundle:
         return bundle
-    resolved_data_path = data_path or _resolve_run_data_path(root)
+    resolved_data_path = _stage_run_data_copy(
+        run_dir=root,
+        data_path=data_path,
+        purpose="evaluation",
+    ) or _resolve_run_data_path(root)
     if not _read_json_bundle(root, bundle="investigation") and not resolved_data_path:
         return {}
     payload = _run_memory_phase(
@@ -3318,7 +3574,11 @@ def _ensure_lifecycle_present(run_dir: str | Path, data_path: str | None = None)
     completion_bundle = _ensure_completion_present(root)
     if not completion_bundle:
         return {}
-    resolved_data_path = data_path or _resolve_run_data_path(root)
+    resolved_data_path = _stage_run_data_copy(
+        run_dir=root,
+        data_path=data_path,
+        purpose="evaluation",
+    ) or _resolve_run_data_path(root)
     payload = _run_lifecycle_phase(
         run_dir=root,
         data_path=resolved_data_path,
@@ -3392,6 +3652,14 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
 
 def _resolve_run_data_path(run_dir: str | Path) -> str | None:
     root = Path(run_dir)
+    try:
+        from relaytic.ingestion import resolve_staged_data_path
+
+        staged_primary = resolve_staged_data_path(root, purpose="primary")
+        if staged_primary:
+            return staged_primary
+    except Exception:
+        pass
     existing_summary = read_run_summary(root)
     if isinstance(existing_summary, dict):
         data_path = str(dict(existing_summary.get("data", {})).get("data_path", "")).strip()
@@ -3407,11 +3675,69 @@ def _resolve_run_data_path(run_dir: str | Path) -> str | None:
     return None
 
 
+def _stage_run_data_copy(
+    *,
+    run_dir: str | Path,
+    data_path: str | None,
+    purpose: str,
+    source_type: str = "auto",
+    source_table: str | None = None,
+    sql_query: str | None = None,
+    stream_window_rows: int = 5000,
+    stream_format: str = "auto",
+    materialized_format: str = "auto",
+    delimiter: str | None = None,
+) -> str | None:
+    if not data_path:
+        return None
+    from relaytic.ingestion import build_source_spec, materialize_structured_source
+
+    root = Path(run_dir)
+    source_spec = build_source_spec(
+        source_path=data_path,
+        source_type=source_type,
+        source_table=source_table,
+        sql_query=sql_query,
+        stream_window_rows=stream_window_rows,
+        stream_format=stream_format,
+        materialized_format=materialized_format,
+        delimiter=delimiter,
+    )
+    materialized = materialize_structured_source(
+        spec=source_spec,
+        run_dir=root,
+        purpose=purpose,
+        alias=Path(data_path).stem,
+    )
+    return materialized.staged_path
+
+
 def _runtime_surface_from_channel(channel: str | None) -> str:
     text = str(channel or "").strip().lower()
     if "mcp" in text:
         return "mcp"
     return "cli"
+
+
+def _source_option_payload(
+    *,
+    source_type: str = "auto",
+    source_table: str | None = None,
+    sql_query: str | None = None,
+    stream_window_rows: int = 5000,
+    stream_format: str = "auto",
+    materialized_format: str = "auto",
+    delimiter: str | None = None,
+) -> dict[str, Any]:
+    return {
+        "source_type": source_type,
+        "source_table": source_table,
+        "sql_query": sql_query,
+        "stream_window_rows": int(stream_window_rows),
+        "stream_format": stream_format,
+        "materialized_format": materialized_format,
+        "delimiter": delimiter,
+    }
 
 
 def _runtime_stage_token(
@@ -3596,11 +3922,16 @@ def _run_intake_phase(
         run_id=run_id,
         labels=labels,
     )
+    staged_data_path = _stage_run_data_copy(
+        run_dir=root,
+        data_path=data_path,
+        purpose="primary",
+    )
     runtime_token = _runtime_stage_token(
         run_dir=root,
         policy=foundation_state["resolved"].policy,
         stage="intake",
-        data_path=data_path,
+        data_path=staged_data_path,
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
         input_artifacts=["lab_mandate.json", "work_preferences.json", "run_brief.json", "data_origin.json", "domain_brief.json", "task_brief.json"],
@@ -3615,7 +3946,7 @@ def _run_intake_phase(
             mandate_bundle=_read_json_bundle(root, bundle="mandate"),
             context_bundle=_read_json_bundle(root, bundle="context"),
             config_path=config_path,
-            data_path=data_path,
+            data_path=staged_data_path,
             sheet_name=sheet_name,
             header_row=header_row,
             data_start_row=data_start_row,
@@ -3708,18 +4039,23 @@ def _run_investigation_phase(
         run_id=run_id,
         labels=labels,
     )
+    staged_data_path = _stage_run_data_copy(
+        run_dir=root,
+        data_path=data_path,
+        purpose="primary",
+    ) or str(Path(data_path))
     runtime_token = _runtime_stage_token(
         run_dir=root,
         policy=foundation_state["resolved"].policy,
         stage="investigation",
-        data_path=data_path,
+        data_path=staged_data_path,
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
         input_artifacts=["task_brief.json", "domain_brief.json", "run_brief.json", "data_origin.json"],
     )
     try:
         bundle = run_investigation(
-            data_path=data_path,
+            data_path=staged_data_path,
             policy=foundation_state["resolved"].policy,
             mandate_bundle=_read_json_bundle(root, bundle="mandate"),
             context_bundle=_read_json_bundle(root, bundle="context"),
@@ -3801,9 +4137,14 @@ def _run_planning_phase(
         run_id=run_id,
         labels=labels,
     )
-    investigation_state = _ensure_investigation_present(
+    staged_data_path = _stage_run_data_copy(
         run_dir=root,
         data_path=data_path,
+        purpose="primary",
+    ) or str(Path(data_path))
+    investigation_state = _ensure_investigation_present(
+        run_dir=root,
+        data_path=staged_data_path,
         config_path=config_path,
         run_id=run_id,
         sheet_name=sheet_name,
@@ -3815,7 +4156,7 @@ def _run_planning_phase(
     )
     _run_memory_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_data_path,
         config_path=config_path,
         run_id=run_id,
         labels=labels,
@@ -3827,14 +4168,14 @@ def _run_planning_phase(
         run_dir=root,
         policy=foundation_state["resolved"].policy,
         stage="planning",
-        data_path=data_path,
+        data_path=staged_data_path,
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
         input_artifacts=["dataset_profile.json", "domain_memo.json", "focus_profile.json", "optimization_profile.json", "feature_strategy_profile.json", "route_prior_context.json"],
     )
     try:
         planning_bundle = run_planning(
-            data_path=data_path,
+            data_path=staged_data_path,
             policy=foundation_state["resolved"].policy,
             mandate_bundle=_read_json_bundle(root, bundle="mandate"),
             context_bundle=_read_json_bundle(root, bundle="context"),
@@ -3849,7 +4190,7 @@ def _run_planning_phase(
         if execute_route:
             execution = execute_planned_route(
                 run_dir=root,
-                data_path=data_path,
+                data_path=staged_data_path,
                 planning_bundle=planning_bundle,
                 sheet_name=sheet_name,
                 header_row=header_row,
@@ -3881,7 +4222,7 @@ def _run_planning_phase(
         payload = {
             "status": "ok",
             "run_dir": str(root),
-            "data_path": str(Path(data_path)),
+            "data_path": staged_data_path,
             "policy_resolved": str(foundation_state["policy_path"]),
             "paths": {key: str(value) for key, value in written.items()},
             "manifest_path": str(manifest_path),
@@ -3934,6 +4275,11 @@ def _run_evidence_phase(
     from relaytic.evidence import write_evidence_bundle
 
     root = Path(run_dir)
+    staged_data_path = _stage_run_data_copy(
+        run_dir=root,
+        data_path=data_path,
+        purpose="primary",
+    ) or str(Path(data_path))
     targets = _evidence_output_paths(root)
     _ensure_paths_absent(
         [
@@ -3961,7 +4307,7 @@ def _run_evidence_phase(
             selected_planning_state = {
                 "status": "ok",
                 "run_dir": str(root),
-                "data_path": str(Path(data_path)),
+                "data_path": staged_data_path,
                 "plan": {
                     "selected_route_id": existing_plan.get("selected_route_id"),
                     "selected_route_title": existing_plan.get("selected_route_title"),
@@ -3974,7 +4320,7 @@ def _run_evidence_phase(
     if selected_planning_state is None:
         planning_state = _run_planning_phase(
             run_dir=root,
-            data_path=data_path,
+            data_path=staged_data_path,
             config_path=config_path,
             run_id=run_id,
             sheet_name=sheet_name,
@@ -3997,7 +4343,7 @@ def _run_evidence_phase(
     )
     _run_memory_phase(
         run_dir=root,
-        data_path=data_path,
+        data_path=staged_data_path,
         config_path=config_path,
         run_id=run_id,
         labels=labels,
@@ -4009,7 +4355,7 @@ def _run_evidence_phase(
         run_dir=root,
         policy=foundation_state["resolved"].policy,
         stage="evidence",
-        data_path=data_path,
+        data_path=staged_data_path,
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
         input_artifacts=["plan.json", "memory_retrieval.json", "route_prior_context.json", "challenger_prior_suggestions.json", "model_params.json"],
@@ -4017,7 +4363,7 @@ def _run_evidence_phase(
     try:
         evidence_result = run_evidence_review(
             run_dir=root,
-            data_path=data_path,
+            data_path=staged_data_path,
             policy=foundation_state["resolved"].policy,
             mandate_bundle=_read_json_bundle(root, bundle="mandate"),
             context_bundle=_read_json_bundle(root, bundle="context"),
@@ -4050,11 +4396,11 @@ def _run_evidence_phase(
             output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
             summary="Relaytic challenged the current route, wrote audit artifacts, and updated the current belief state.",
         )
-        materialize_run_summary(run_dir=root, data_path=data_path)
+        materialize_run_summary(run_dir=root, data_path=staged_data_path)
         payload = {
             "status": "ok",
             "run_dir": str(root),
-            "data_path": str(Path(data_path)),
+            "data_path": staged_data_path,
             "manifest_path": str(manifest_path),
             "paths": {key: str(value) for key, value in written.items()},
             "evidence": {
@@ -4784,7 +5130,12 @@ def _show_lifecycle_surface(*, run_dir: str | Path, data_path: str | None = None
     lifecycle_bundle = _ensure_lifecycle_present(root, data_path=data_path)
     if not lifecycle_bundle:
         raise ValueError(f"No Slice 08 lifecycle artifacts found or materializable in {root}.")
-    summary_materialized = materialize_run_summary(run_dir=root, data_path=data_path or _resolve_run_data_path(root))
+    resolved_data_path = _stage_run_data_copy(
+        run_dir=root,
+        data_path=data_path,
+        purpose="evaluation",
+    ) or _resolve_run_data_path(root)
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=resolved_data_path)
     manifest_path = _refresh_lifecycle_manifest(root)
     promotion = dict(lifecycle_bundle.get("promotion_decision", {}))
     recalibration = dict(lifecycle_bundle.get("recalibration_decision", {}))
@@ -5013,6 +5364,11 @@ def _ensure_investigation_present(
     labels: dict[str, str] | None,
 ) -> dict[str, Any]:
     root = Path(run_dir)
+    staged_data_path = _stage_run_data_copy(
+        run_dir=root,
+        data_path=data_path,
+        purpose="primary",
+    ) or str(Path(data_path))
     targets = _investigation_output_paths(root)
     if not overwrite and all(path.exists() for path in targets.values()):
         return {"bundle": _read_json_bundle(root, bundle="investigation")}
@@ -5023,7 +5379,7 @@ def _ensure_investigation_present(
         labels=labels,
     )
     bundle = run_investigation(
-        data_path=data_path,
+        data_path=staged_data_path,
         policy=foundation_state["resolved"].policy,
         mandate_bundle=_read_json_bundle(root, bundle="mandate"),
         context_bundle=_read_json_bundle(root, bundle="context"),
@@ -6257,7 +6613,7 @@ def _run_agent_session(
     if agent == "analyst":
         default_dataset_path = _resolve_default_public_dataset_path()
         print(
-            "agent> I can chat, inspect CSV/XLSX data, run Agent 1 analysis, "
+            "agent> I can chat, inspect structured data, run Agent 1 analysis, "
             "save reports, and interpret the results."
         )
         print(
@@ -6285,19 +6641,19 @@ def _run_agent_session(
         )
         if default_dataset_path is not None:
             print(
-                "agent> Dataset choice: paste a CSV/XLSX path or type `default` "
+                "agent> Dataset choice: paste a structured dataset path such as CSV/Parquet/JSONL/Excel or type `default` "
                 "to run the built-in test dataset: "
                 f"`{_path_for_display(default_dataset_path)}`."
             )
         else:
             print(
-                "agent> Dataset choice: paste a CSV/XLSX path. "
+                "agent> Dataset choice: paste a structured dataset path such as CSV/Parquet/JSONL/Excel. "
                 "(`default` is unavailable because no public test dataset was found.)"
             )
     else:
         default_dataset_path = _resolve_default_public_dataset_path()
         print(
-            "agent> I can chat, load CSV/XLSX data, run direct modeler workflows, "
+            "agent> I can chat, load structured data, run direct modeler workflows, "
             "and explain the training outcome."
         )
         print(
@@ -6338,12 +6694,12 @@ def _run_agent_session(
         )
         if default_dataset_path is not None:
             print(
-                "agent> Dataset choice: paste a CSV/XLSX path, type `default`, "
+                "agent> Dataset choice: paste a structured dataset path such as CSV/Parquet/JSONL/Excel, type `default`, "
                 "or give a direct build request first and then provide the dataset."
             )
         else:
             print(
-                "agent> Dataset choice: paste a CSV/XLSX path, "
+                "agent> Dataset choice: paste a structured dataset path such as CSV/Parquet/JSONL/Excel, "
                 "or give a direct build request first and then provide the dataset."
             )
     session_messages: list[dict[str, str]] = []
@@ -6422,10 +6778,10 @@ def _run_agent_session(
                 default_dataset_path = _resolve_default_public_dataset_path()
                 print("agent> Commands: /help, /context, /reset, /exit.")
                 print(
-                    "agent> Load a dataset by pasting a CSV/XLSX path, "
+                    "agent> Load a dataset by pasting a structured dataset path such as CSV/Parquet/JSONL/Excel, "
                     "or type `default` to use the built-in public test dataset."
                     if default_dataset_path is not None
-                    else "agent> Load a dataset by pasting a CSV/XLSX path."
+                    else "agent> Load a dataset by pasting a structured dataset path such as CSV/Parquet/JSONL/Excel."
                 )
                 print(
                     "agent> Direct build syntax: "
@@ -6753,7 +7109,7 @@ def _analyst_stage_reprompt_message(
         if _extract_first_data_path(user_message) is not None:
             return ""
         return (
-            "To continue, paste a CSV/XLSX path or type `default` "
+            "To continue, paste a structured dataset path such as CSV/Parquet/JSONL/Excel or type `default` "
             "to run the built-in test dataset."
         )
     if agent == "modeler":
@@ -6763,7 +7119,7 @@ def _analyst_stage_reprompt_message(
             if _extract_first_data_path(user_message) is not None:
                 return ""
             return (
-                "To continue, paste a CSV/XLSX path or type `default` "
+                "To continue, paste a structured dataset path such as CSV/Parquet/JSONL/Excel or type `default` "
                 "so I can load data for the pending model request."
             )
         if stage == "modeler_dataset_ready":
@@ -6789,7 +7145,7 @@ def _run_analyst_autopilot_turn(
         if detected is None:
             response = (
                 "Default dataset is not available. "
-                "Please paste a CSV/XLSX path from your machine."
+                "Please paste a structured dataset path from your machine."
             )
             return {
                 "response": response,
@@ -7373,7 +7729,7 @@ def _run_modeler_autopilot_turn(
             session_context["pending_model_request"] = parsed_request
             session_context["workflow_stage"] = "awaiting_modeler_dataset_path"
             response = (
-                "I parsed your model request. To continue, paste a CSV/XLSX path "
+                "I parsed your model request. To continue, paste a structured dataset path "
                 "or type `default` so I can load the training dataset first."
             )
             print(f"agent> {response}")
@@ -7393,7 +7749,7 @@ def _run_modeler_autopilot_turn(
         if dataset is None:
             response = (
                 "Load a dataset first, then I can show available signal names. "
-                "Paste a CSV/XLSX path or type `default`."
+                "Paste a structured dataset path such as CSV/Parquet/JSONL/Excel or type `default`."
             )
             print(f"agent> {response}")
             return {
@@ -7414,7 +7770,7 @@ def _run_modeler_autopilot_turn(
         if detected is None:
             response = (
                 "Default dataset is not available. "
-                "Please paste a CSV/XLSX path from your machine."
+                "Please paste a structured dataset path from your machine."
             )
             print(f"agent> {response}")
             return {
@@ -7628,7 +7984,7 @@ def _execute_modeler_build_request(
 ) -> dict[str, Any]:
     dataset = _modeler_loaded_dataset(session_context)
     if dataset is None:
-        response = "No dataset is loaded. Paste a CSV/XLSX path or type `default` first."
+        response = "No dataset is loaded. Paste a structured dataset path such as CSV/Parquet/JSONL/Excel or type `default` first."
         print(f"agent> {response}")
         session_context["workflow_stage"] = "awaiting_modeler_dataset_path"
         return {
@@ -8080,7 +8436,7 @@ def _handle_modeler_inference_decision_turn(
     if lowered in {"y", "yes", "sure", "ok", "okay", "run"}:
         session_context["workflow_stage"] = "awaiting_inference_data_path"
         response = (
-            "Great. Paste a CSV/XLSX path for inference now. "
+            "Great. Paste a structured dataset path for inference now. "
             "You can also type `same` to reuse the currently loaded dataset, or `skip`."
         )
         print(f"agent> {response}")
@@ -8146,7 +8502,7 @@ def _handle_modeler_inference_data_path_turn(
     )
     if direct_path is None:
         reminder = (
-            "Paste a valid CSV/XLSX path for inference, type `same` to reuse the current dataset, or `skip`."
+            "Paste a valid structured dataset path for inference, type `same` to reuse the current dataset, or `skip`."
         )
         if _looks_like_small_talk(lowered) and chat_reply_only is not None:
             chat = chat_reply_only(user_message).strip()
@@ -10687,7 +11043,7 @@ def _casual_chat_response(user_message: str) -> str:
         )
     if "who are you" in normalized or "what can you do" in normalized:
         return (
-            "I am your local Relaytic analyst. I can ingest CSV/XLSX, validate headers/sheets, "
+            "I am your local Relaytic analyst. I can ingest structured snapshots such as CSV, Parquet, JSONL, and Excel, validate headers/sheets, "
             "run quality checks, stationarity checks, correlation analysis, and generate reports."
         )
     return (

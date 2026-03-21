@@ -70,9 +70,14 @@ Avoid introducing new references to:
 ### Slice 05A
 
 - introduced the canonical package boundary `src/relaytic/runs/`
+- introduced the canonical package boundary `src/relaytic/ingestion/staging.py`
+- expanded the canonical ingestion boundary with `src/relaytic/ingestion/sources.py`
 - introduced the public commands `relaytic run`, `relaytic show`, and `relaytic predict`
-- expanded the artifact boundary to include `run_summary.json` and `reports/summary.md`
+- introduced the public commands `relaytic source inspect` and `relaytic source materialize`
+- expanded the artifact boundary to include `run_summary.json`, `reports/summary.md`, `data_copy_manifest.json`, and staged `data_copies/`
 - standardized nested manifest artifact paths to POSIX-style relative paths for more stable cross-platform agent consumption
+- upgraded the MVP access shell so run and prediction paths operate on immutable staged copies without persisting original absolute source paths
+- expanded the supported local source boundary to include snapshot files, append-only stream files, local dataset directories, and local DuckDB sources through immutable materialization
 
 ### Slice 06
 

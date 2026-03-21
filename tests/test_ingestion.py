@@ -65,3 +65,39 @@ def test_infer_header_prefers_dense_signal_row_over_sparse_description_row() -> 
     inferred = _infer_header_and_data_start(preview, raw, confidence_threshold=0.70)
     assert inferred.header_row == 0
 
+
+def test_load_tabular_data_parquet_uses_schema_bearing_columns(tmp_path) -> None:
+    parquet_path = tmp_path / "signals.parquet"
+    frame = pd.DataFrame(
+        {
+            "sensor_a": [1.0, 2.0, 3.0],
+            "sensor_b": [4.0, 5.0, 6.0],
+            "failure_flag": [0, 1, 0],
+        }
+    )
+    frame.to_parquet(parquet_path, index=False)
+
+    loaded = load_tabular_data(str(parquet_path))
+    assert loaded.file_type == "parquet"
+    assert loaded.frame.shape == (3, 3)
+    assert loaded.inferred_header.confidence == 1.0
+    assert list(loaded.frame.columns) == ["sensor_a", "sensor_b", "failure_flag"]
+
+
+def test_load_tabular_data_jsonl_uses_schema_bearing_columns(tmp_path) -> None:
+    jsonl_path = tmp_path / "signals.jsonl"
+    frame = pd.DataFrame(
+        {
+            "sensor_a": [1.0, 2.0, 3.0],
+            "sensor_b": [4.0, 5.0, 6.0],
+            "failure_flag": [0, 1, 0],
+        }
+    )
+    frame.to_json(jsonl_path, orient="records", lines=True)
+
+    loaded = load_tabular_data(str(jsonl_path))
+    assert loaded.file_type == "jsonl"
+    assert loaded.frame.shape == (3, 3)
+    assert loaded.inferred_header.confidence == 1.0
+    assert list(loaded.frame.columns) == ["sensor_a", "sensor_b", "failure_flag"]
+

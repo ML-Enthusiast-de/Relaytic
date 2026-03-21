@@ -70,6 +70,7 @@ Relaytic should borrow strong runtime ideas from modern agent systems only where
 Required translation rules:
 
 - artifacts on local disk remain the canonical source of truth; any memory index, semantic cache, or retrieval structure is derived and disposable
+- major run and inference flows must operate on immutable staged copies inside the run directory rather than the original source file
 - semantic helpers and optional LLM paths are rowless by default; they should receive schema summaries, bounded evidence bundles, redacted notes, and sampled diagnostics unless policy explicitly grants richer access
 - every specialist should have an explicit capability profile covering read scope, write scope, network allowance, and semantic-tool allowance
 - side-effecting specialist work should be scoped to the current run directory unless the operator explicitly enables a broader boundary
@@ -77,6 +78,7 @@ Required translation rules:
 - hook points must be deterministic, local-first, and inspectable; read-only is the default and write-capable hooks require explicit policy
 - append-only event traces should become the coordination spine for long runs, memory flushes, retries, and later UI/MCP synchronization
 - no slice may introduce a remote-first memory, embedding, or orchestration dependency as the default path
+- remote streaming, warehouse, lakehouse, and datalake connectors may arrive later only as explicit adapter tracks; the current public MVP supports local snapshot files plus bounded local stream/lakehouse materialization
 
 ## High-leverage external routines to consider
 
@@ -966,6 +968,7 @@ Goal:
 - operator onboarding
 - doctor/backup/restore
 - ecosystem integrations
+- remote connector adapters behind the same copy-only boundary
 - polished demos
 - README polish
 
@@ -984,12 +987,16 @@ Required behavior:
 - demos must prove substance, not only CLI cosmetics
 - onboarding, backup, restore, doctor, and integrations should make Relaytic survivable for real operator use
 - optional ecosystem exports should be made operable here only after their upstream slices are proven, especially registry export, observability export, and later feature-serving alignment
+- remote connector adapters must never become direct modeling surfaces; they must materialize bounded immutable run-local snapshots before Relaytic touches the data
+- remote connector adapters must stay read-only against the upstream system and must never mutate or write back to the source
+- connector examples worth considering here are Kafka-style consumers, object-store Parquet readers, and warehouse query adapters, but all must preserve the local-first audit and copy-only contract
 
 Minimum proof:
 
 - one clean new-user path from install to judged run
 - one external-agent path that uses the JSON surfaces only
 - one recovery path that proves backup/restore or doctor behavior
+- one remote-source demo where Relaytic reads through a connector, materializes a bounded local snapshot, records explicit provenance, and still avoids persisting original absolute source paths
 
 ## First four slices to build before anything fancy
 

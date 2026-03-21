@@ -84,6 +84,7 @@ def _normalize_policy_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], 
 
 def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     privacy_cfg = dict(config.get("privacy", {}))
+    data_cfg = dict(config.get("data", {}))
     runtime_cfg = dict(config.get("runtime", {}))
     modeling_cfg = dict(config.get("modeling", {}))
     checkpoints_cfg = dict(modeling_cfg.get("checkpoints", {}))
@@ -106,6 +107,17 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "local_only": bool(privacy_cfg.get("local_only", True)),
             "api_calls_allowed": bool(privacy_cfg.get("api_calls_allowed", False)),
             "telemetry_allowed": bool(privacy_cfg.get("telemetry_allowed", False)),
+        },
+        "data_handling": {
+            "copy_inputs_to_run_dir": bool(data_cfg.get("copy_inputs_to_run_dir", True)),
+            "immutable_working_copies": bool(data_cfg.get("immutable_working_copies", True)),
+            "never_modify_source_data": bool(data_cfg.get("never_modify_source_data", True)),
+            "persist_original_paths": bool(data_cfg.get("persist_original_paths", False)),
+            "allow_streaming_sources": bool(data_cfg.get("allow_streaming_sources", True)),
+            "allow_lakehouse_connectors": bool(data_cfg.get("allow_lakehouse_connectors", True)),
+            "default_stream_window_rows": int(data_cfg.get("default_stream_window_rows", 5000) or 5000),
+            "default_materialized_format": str(data_cfg.get("default_materialized_format", "parquet") or "parquet"),
+            "allowed_extensions": [str(item).strip() for item in data_cfg.get("allowed_extensions", []) if str(item).strip()],
         },
         "autonomy": {
             "execution_mode": str(autonomy_cfg.get("execution_mode", "guided")),

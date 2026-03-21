@@ -1,4 +1,4 @@
-"""Tabular ingestion utilities for CSV/XLSX with header inference support."""
+"""Structured snapshot ingestion utilities with header inference support."""
 
 from __future__ import annotations
 
@@ -10,7 +10,18 @@ from typing import Optional
 import pandas as pd
 
 
-SUPPORTED_TABULAR_EXTENSIONS = {".csv", ".xlsx", ".xls"}
+SUPPORTED_TABULAR_EXTENSIONS = {
+    ".csv",
+    ".tsv",
+    ".xlsx",
+    ".xls",
+    ".parquet",
+    ".pq",
+    ".feather",
+    ".json",
+    ".jsonl",
+    ".ndjson",
+}
 
 
 class IngestionError(RuntimeError):
@@ -77,7 +88,7 @@ def load_tabular_data(
     confidence_threshold: float = 0.70,
     preview_rows: int = 40,
 ) -> IngestionResult:
-    """Load CSV/XLSX data and infer header/data start when needed.
+    """Load structured snapshot data and infer header/data start when needed.
 
     If confidence is low, `needs_user_confirmation` is set to True so Agent 1 can ask.
     """
@@ -110,14 +121,51 @@ def load_tabular_data(
         return IngestionResult(
             frame=frame,
             source_path=file_path,
-            file_type="xlsx",
+            file_type=ext.lstrip("."),
             selected_sheet=selected_sheet_name,
             available_sheets=sheets,
             inferred_header=inferred,
             delimiter=None,
         )
 
-    csv_delimiter = delimiter or _detect_csv_delimiter(file_path)
+    if ext in {".parquet", ".pq"}:
+        frame = pd.read_parquet(file_path)
+        return IngestionResult(
+            frame=_normalize_schema_bearing_frame(frame),
+            source_path=file_path,
+            file_type="parquet",
+            selected_sheet=None,
+            available_sheets=[],
+            inferred_header=_schema_bearing_inference(reason="Parquet columns are schema-bearing."),
+            delimiter=None,
+        )
+
+    if ext == ".feather":
+        frame = pd.read_feather(file_path)
+        return IngestionResult(
+            frame=_normalize_schema_bearing_frame(frame),
+            source_path=file_path,
+            file_type="feather",
+            selected_sheet=None,
+            available_sheets=[],
+            inferred_header=_schema_bearing_inference(reason="Feather columns are schema-bearing."),
+            delimiter=None,
+        )
+
+    if ext in {".json", ".jsonl", ".ndjson"}:
+        lines = ext in {".jsonl", ".ndjson"}
+        frame = pd.read_json(file_path, lines=lines)
+        return IngestionResult(
+            frame=_normalize_schema_bearing_frame(frame),
+            source_path=file_path,
+            file_type="jsonl" if lines else "json",
+            selected_sheet=None,
+            available_sheets=[],
+            inferred_header=_schema_bearing_inference(reason="JSON columns are schema-bearing."),
+            delimiter=None,
+        )
+
+    csv_delimiter = delimiter or ("\t" if ext == ".tsv" else _detect_csv_delimiter(file_path))
     preview = pd.read_csv(
         file_path,
         sep=csv_delimiter,
@@ -138,12 +186,32 @@ def load_tabular_data(
     return IngestionResult(
         frame=frame,
         source_path=file_path,
-        file_type="csv",
+        file_type="tsv" if ext == ".tsv" else "csv",
         selected_sheet=None,
         available_sheets=[],
         inferred_header=inferred,
         delimiter=csv_delimiter,
     )
+
+
+def _schema_bearing_inference(*, reason: str) -> HeaderInference:
+    return HeaderInference(
+        header_row=0,
+        data_start_row=1,
+        confidence=1.0,
+        candidate_rows=[0],
+        needs_user_confirmation=False,
+        reason=reason,
+    )
+
+
+def _normalize_schema_bearing_frame(frame: pd.DataFrame) -> pd.DataFrame:
+    normalized = frame.copy()
+    normalized.columns = _make_unique_columns(normalized.columns.tolist())
+    normalized = normalized.dropna(how="all").reset_index(drop=True)
+    for column in normalized.columns:
+        normalized[column] = _coerce_numeric_when_mostly_numeric(normalized[column])
+    return normalized
 
 
 def _resolve_sheet_selection(

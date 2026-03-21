@@ -70,6 +70,7 @@ The current slices must preserve these names:
 
 - `manifest.json`
 - `policy_resolved.yaml`
+- `data_copy_manifest.json`
 - `lab_mandate.json`
 - `work_preferences.json`
 - `run_brief.json`
@@ -163,6 +164,44 @@ When `relaytic plan run` executes the Builder handoff, the run directory must al
 - `model_state.json` or `<selected_model>_state.json`
 - `checkpoints/ckpt_*.json`
 
+When staged dataset copies exist, the run directory must also contain:
+
+- `data_copies/`
+
+## Data Handling Contract
+
+Current public ingestion formats are:
+
+- `.csv`
+- `.tsv`
+- `.xlsx`
+- `.xls`
+- `.parquet`
+- `.pq`
+- `.feather`
+- `.json`
+- `.jsonl`
+- `.ndjson`
+
+Current public local source modes are:
+
+- snapshot files in the formats above
+- append-only local stream files materialized into bounded run-local snapshots
+- local lakehouse-style sources materialized into bounded run-local snapshots
+
+The current public MVP must stage immutable working copies under `data_copies/` before major run and inference work.
+
+Required behavior:
+
+- `relaytic run` must operate on a staged primary copy rather than the original source file
+- `relaytic predict` must operate on a staged inference copy rather than the original source file
+- `relaytic source materialize` must create an immutable run-local snapshot rather than mutating the source
+- Relaytic must not write back to the original source file during normal run or inference flows
+- `data_copy_manifest.json` must record purpose, staged path, and integrity metadata for staged copies
+- `data_copy_manifest.json` must not persist original absolute source paths
+
+Remote streaming, warehouse, cloud lakehouse, and datalake connectors remain future adapter surfaces and are not part of the current guaranteed public contract.
+
 ## CLI Contract
 
 The public CLI command is `relaytic`.
@@ -201,6 +240,8 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
+- `relaytic source inspect`
+- `relaytic source materialize`
 - `relaytic doctor`
 - `relaytic interoperability show`
 - `relaytic interoperability self-check`

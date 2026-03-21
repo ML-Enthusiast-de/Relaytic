@@ -50,6 +50,7 @@ Relaytic/
     relaytic/
       artifacts/
       context/
+      ingestion/
       intake/
       investigation/
       mandate/
@@ -85,6 +86,8 @@ Relaytic/
 - `src/relaytic/` is the canonical product package
 - `src/relaytic/mandate/` owns mandate foundation objects and writers
 - `src/relaytic/context/` owns context foundation objects and writers
+- `src/relaytic/ingestion/` owns snapshot-file loading and immutable data-copy staging
+- `src/relaytic/ingestion/sources.py` owns local source inspection plus stream/lakehouse materialization into immutable run-local snapshots
 - `src/relaytic/intake/` owns intake translation and interpretation artifacts
 - `src/relaytic/investigation/` owns investigation specialists and focus artifacts
 - `src/relaytic/planning/` owns Strategist planning, Builder handoff, and planning artifact storage

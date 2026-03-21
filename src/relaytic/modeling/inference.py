@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from relaytic.core.json_utils import write_json
-from relaytic.ingestion.csv_loader import load_tabular_data
+from relaytic.ingestion import build_source_spec, load_tabular_data, materialize_structured_source
 from .baselines import IncrementalLinearSurrogate
 from .checkpoints import ModelCheckpointStore
 from .classifiers import (
@@ -54,6 +54,12 @@ def run_inference_from_artifacts(
     data_path: str,
     checkpoint_id: str | None = None,
     run_dir: str | None = None,
+    source_type: str = "auto",
+    source_table: str | None = None,
+    sql_query: str | None = None,
+    stream_window_rows: int = 5000,
+    stream_format: str = "auto",
+    materialized_format: str = "auto",
     sheet_name: str | int | None = None,
     header_row: int | None = None,
     data_start_row: int | None = None,
@@ -63,6 +69,24 @@ def run_inference_from_artifacts(
 ) -> dict[str, Any]:
     """Run inference from a persisted checkpoint or run directory."""
     resolved = _resolve_artifacts(checkpoint_id=checkpoint_id, run_dir=run_dir)
+    requested_data_path = str(Path(data_path))
+    source_spec = build_source_spec(
+        source_path=requested_data_path,
+        source_type=source_type,
+        source_table=source_table,
+        sql_query=sql_query,
+        stream_window_rows=stream_window_rows,
+        stream_format=stream_format,
+        materialized_format=materialized_format,
+        delimiter=delimiter,
+    )
+    materialized = materialize_structured_source(
+        spec=source_spec,
+        run_dir=resolved["run_dir"],
+        purpose="inference",
+        alias=Path(requested_data_path).stem,
+    )
+    staged_data_path = materialized.staged_path
     model_params = _load_model_params(resolved["model_params_path"])
     model = _load_model_from_state(
         state_path=resolved["model_state_path"],
@@ -70,7 +94,7 @@ def run_inference_from_artifacts(
     )
 
     loaded = load_tabular_data(
-        data_path,
+        staged_data_path,
         sheet_name=sheet_name,
         header_row=header_row,
         data_start_row=data_start_row,
@@ -178,7 +202,7 @@ def run_inference_from_artifacts(
         task_type=task_type,
     )
     report_path, predictions_path = _resolve_output_paths(
-        data_path=data_path,
+        data_path=requested_data_path,
         output_path=output_path,
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -190,7 +214,11 @@ def run_inference_from_artifacts(
         "run_dir": resolved["run_dir"],
         "model_name": resolved["model_name"],
         "task_type": task_type,
-        "data_path": str(Path(data_path)),
+        "data_path": staged_data_path,
+        "requested_data_path": requested_data_path,
+        "copy_enforced": True,
+        "source_type": materialized.source_type,
+        "materialized_input_format": materialized.materialized_format or materialized.detected_format,
         "target_column": target_column,
         "feature_columns": feature_columns,
         "rows_input": int(len(frame)),

@@ -8,10 +8,25 @@ privacy:
 
 data:
   private_dir: data/private
+  copy_inputs_to_run_dir: true
+  immutable_working_copies: true
+  never_modify_source_data: true
+  persist_original_paths: false
+  allow_streaming_sources: true
+  allow_lakehouse_connectors: true
+  default_stream_window_rows: 5000
+  default_materialized_format: parquet
   allowed_extensions:
     - .csv
+    - .tsv
     - .xlsx
     - .xls
+    - .parquet
+    - .pq
+    - .feather
+    - .json
+    - .jsonl
+    - .ndjson
 
 ingestion:
   infer_header: true

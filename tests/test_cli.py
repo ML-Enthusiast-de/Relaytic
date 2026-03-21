@@ -1299,7 +1299,7 @@ def test_cli_run_agent_session_awaiting_dataset_stage_reprompts_after_chat(
     output = capsys.readouterr().out
     assert "Hello! How can I assist you today?" in output
     assert "Could you clarify what you mean by path?" in output
-    assert "To continue, paste a CSV/XLSX path or type `default`" in output
+    assert "To continue, paste a structured dataset path such as CSV/Parquet/JSONL/Excel or type `default`" in output
 
 
 def test_cli_run_agent_session_provider_connection_error_is_friendly(monkeypatch, capsys) -> None:

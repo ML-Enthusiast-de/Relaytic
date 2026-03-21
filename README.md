@@ -33,6 +33,7 @@ The repository already supports a working early product baseline:
 - optional local-LLM advisory paths that remain non-required
 - deterministic expert-prior reasoning for common structured-data archetypes such as manufacturing quality, fraud risk, anomaly monitoring, churn, demand, and pricing
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
+- copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
 The next load-bearing implementation step is Slice 11: benchmark parity, constrained superiority proof, and honest reference comparison.
 
@@ -44,6 +45,53 @@ The next load-bearing implementation step is Slice 11: benchmark parity, constra
 - artifact-rich and auditable
 - specialist-driven rather than single-planner
 - security-conscious by default
+
+## Current Data Formats
+
+Relaytic's current public ingestion contract is file-snapshot based.
+
+Supported input formats today:
+
+- `.csv`
+- `.tsv`
+- `.xlsx`
+- `.xls`
+- `.parquet`
+- `.pq`
+- `.feather`
+- `.json`
+- `.jsonl`
+- `.ndjson`
+
+Current native local source modes:
+
+- snapshot files in the formats above
+- append-only local stream files materialized into bounded micro-batch snapshots
+  Supported stream file formats: `.csv`, `.tsv`, `.jsonl`, `.ndjson`
+- local lakehouse-style sources materialized into bounded run-local snapshots
+  Supported lakehouse sources: partitioned dataset directories and local DuckDB files
+
+What is still not a first-class public ingestion surface:
+
+- remote Kafka or message-bus consumers
+- remote warehouse connectors
+- remote cloud lakehouse tables
+
+Relaytic stays local-first: even stream and lakehouse sources are first materialized into an immutable run-local snapshot before modeling.
+
+## Data Safety
+
+Relaytic should operate on copies of input data, not the original source files.
+
+Current behavior:
+
+- `relaytic run` stages immutable working copies under `data_copies/` inside the run directory
+- `relaytic predict` stages separate inference copies under the same run directory
+- `relaytic source inspect` explains how Relaytic will treat a source before touching it
+- `relaytic source materialize` lets humans and agents explicitly stage a stream or lakehouse source into a run-local snapshot
+- `data_copy_manifest.json` records staged-copy provenance, purpose, and hashes
+- original absolute source paths are not persisted in the staged-data manifest
+- Relaytic does not write back to the original dataset path during normal run or inference flows
 
 ## How The Agents Know Things
 
@@ -190,6 +238,15 @@ relaytic run --data-path path/to/data.csv --text "Do everything on your own. Pre
 ```
 
 That command now carries the run through intake, investigation, cross-run memory retrieval, planning, execution, challenger pressure, ablation checks, semantic debate, audit, completion, lifecycle review, bounded autonomous follow-up, and summary materialization.
+
+You can also inspect or stage richer local sources first:
+
+```bash
+relaytic source inspect --source-path path/to/data.parquet
+relaytic source inspect --source-path path/to/append_only_events.jsonl --source-type stream
+relaytic source inspect --source-path path/to/local_lakehouse --source-type lakehouse
+relaytic source materialize --source-path path/to/local_lakehouse --source-type lakehouse --run-dir artifacts/run_demo
+```
 
 Then inspect or reuse the run:
 

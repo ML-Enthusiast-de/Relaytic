@@ -53,6 +53,7 @@ def _write_fraud_dataset(path: Path, *, count: int = 18) -> Path:
 def test_cli_run_executes_end_to_end_and_writes_access_artifacts(tmp_path: Path, capsys) -> None:
     run_dir = tmp_path / "run_access"
     data_path = _write_dataset(tmp_path / "run_access.csv")
+    original_bytes = data_path.read_bytes()
 
     assert main(
         [
@@ -74,6 +75,9 @@ def test_cli_run_executes_end_to_end_and_writes_access_artifacts(tmp_path: Path,
 
     payload = json.loads(capsys.readouterr().out)
     manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8"))
+    data_copy_manifest = json.loads((run_dir / "data_copy_manifest.json").read_text(encoding="utf-8"))
+    primary_copy_relative = data_copy_manifest["latest_by_purpose"]["primary"]
+    primary_copy_path = run_dir / primary_copy_relative
 
     assert payload["status"] == "ok"
     assert payload["run_summary"]["decision"]["selected_model_family"]
@@ -82,11 +86,21 @@ def test_cli_run_executes_end_to_end_and_writes_access_artifacts(tmp_path: Path,
     assert payload["run_summary"]["request"]["source"] == "inline_text"
     assert payload["run_summary"]["evidence"]["provisional_recommendation"]
     assert payload["run_summary"]["runtime"]["current_stage"] == "autonomy"
+    assert payload["run_summary"]["data"]["copy_enforced"] is True
+    assert payload["run_summary"]["data"]["original_paths_persisted"] is False
+    assert primary_copy_path.exists()
+    assert primary_copy_path.read_bytes() == original_bytes
+    assert data_path.read_bytes() == original_bytes
+    assert primary_copy_path.resolve() != data_path.resolve()
     assert (run_dir / "run_summary.json").exists()
     assert (run_dir / "reports" / "summary.md").exists()
     assert (run_dir / "reports" / "decision_memo.md").exists()
     assert manifest["run_id"] == "access-alpha"
     assert manifest["labels"]["stage"] == "access"
+    assert data_copy_manifest["copy_only"] is True
+    assert data_copy_manifest["immutable_working_copies"] is True
+    assert data_copy_manifest["original_paths_persisted"] is False
+    assert any(item["path"] == "data_copy_manifest.json" and item["required"] is True for item in manifest["entries"])
     assert any(item["path"] == "run_summary.json" and item["required"] is True for item in manifest["entries"])
     assert any(item["path"] == "reports/summary.md" and item["required"] is True for item in manifest["entries"])
     assert any(item["path"] == "leaderboard.csv" and item["required"] is True for item in manifest["entries"])
@@ -149,9 +163,13 @@ def test_cli_predict_surface_runs_inference_from_run_dir(tmp_path: Path, capsys)
         ]
     ) == 0
     payload = json.loads(capsys.readouterr().out)
+    data_copy_manifest = json.loads((run_dir / "data_copy_manifest.json").read_text(encoding="utf-8"))
     assert payload["status"] == "ok"
     assert payload["prediction_count"] == 15
     assert payload["model_name"]
+    assert payload["copy_enforced"] is True
+    assert "inference" in data_copy_manifest["latest_by_purpose"]
+    assert (run_dir / data_copy_manifest["latest_by_purpose"]["inference"]).exists()
 
 
 def test_cli_show_bootstraps_summary_for_existing_plan_run_dirs(tmp_path: Path, capsys) -> None:

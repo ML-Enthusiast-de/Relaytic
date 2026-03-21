@@ -82,12 +82,14 @@ def build_manifest(
     resolved_policy_source = str(Path(policy_source)) if policy_source is not None else None
 
     manifest_entries = list(entries or [])
+    manifest_entries = _append_data_copy_entries(root=root, entries=manifest_entries)
     manifest_path = root / "manifest.json"
     manifest_entries = [
         item for item in manifest_entries if item.path != "manifest.json"
     ] + [
         artifact_entry(manifest_path, run_dir=root, kind="manifest", required=True)
     ]
+    manifest_entries = _dedupe_entries(manifest_entries)
 
     return ArtifactManifest(
         schema_version=MANIFEST_SCHEMA_VERSION,
@@ -152,3 +154,49 @@ def _resolve_entry_path(path: Path, *, run_dir: str | Path | None) -> Path:
     if path.is_absolute() or run_dir is None:
         return path
     return Path(run_dir) / path
+
+
+def _append_data_copy_entries(*, root: Path, entries: list[ManifestEntry]) -> list[ManifestEntry]:
+    merged = list(entries)
+    manifest_path = root / "data_copy_manifest.json"
+    if manifest_path.exists():
+        merged.append(
+            artifact_entry(
+                manifest_path,
+                run_dir=root,
+                kind="data_copy",
+                required=True,
+            )
+        )
+    copies_dir = root / "data_copies"
+    if copies_dir.exists():
+        merged.append(
+            artifact_entry(
+                copies_dir,
+                run_dir=root,
+                kind="data_copy_dir",
+                required=True,
+            )
+        )
+        for path in sorted(copies_dir.rglob("*")):
+            if path.is_file():
+                merged.append(
+                    artifact_entry(
+                        path,
+                        run_dir=root,
+                        kind="data_copy",
+                        required=True,
+                    )
+                )
+    return merged
+
+
+def _dedupe_entries(entries: list[ManifestEntry]) -> list[ManifestEntry]:
+    deduped: list[ManifestEntry] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped.append(entry)
+    return deduped

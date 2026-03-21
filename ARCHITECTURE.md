@@ -33,6 +33,33 @@ Relaytic is organized as a staged artifact pipeline.
 12. Interoperability and host adapters
    Relaytic exposes the same MVP and slice-level surfaces through a host-neutral MCP server plus thin host wrappers for common agent ecosystems.
 
+## Current Data Ingestion Boundary
+
+Relaytic's current public ingestion surface is snapshot-file based.
+
+Supported public input formats:
+
+- `.csv`
+- `.tsv`
+- `.xlsx`
+- `.xls`
+- `.parquet`
+- `.pq`
+- `.feather`
+- `.json`
+- `.jsonl`
+- `.ndjson`
+
+Supported local source modes:
+
+- snapshot files in the formats above
+- append-only local stream files materialized into bounded micro-batch snapshots
+- local lakehouse-style sources materialized into bounded run-local snapshots
+
+The current MVP does not yet expose remote streaming, warehouse, or cloud lakehouse connectors. Those remain future adapter tracks.
+
+For safety, Relaytic stages immutable working copies inside the run directory before major run and inference operations. The source of truth for execution is therefore the staged copy under `data_copies/`, not the original file path.
+
 ## Core System Principles
 
 - Deterministic floor: the system must remain useful without any LLM.
@@ -125,6 +152,7 @@ Relaytic already standardizes several load-bearing artifacts:
 
 - `manifest.json`
 - `policy_resolved.yaml`
+- `data_copy_manifest.json`
 - `lab_mandate.json`
 - `work_preferences.json`
 - `run_brief.json`
@@ -215,6 +243,10 @@ Relaytic already standardizes several load-bearing artifacts:
 - `champion_lineage.json`
 - `loop_budget_report.json`
 
+When staged copies exist, the run directory also contains:
+
+- `data_copies/`
+
 ## Current CLI Baseline
 
 The public CLI command is `relaytic`.
@@ -253,6 +285,8 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
+- `relaytic source inspect`
+- `relaytic source materialize`
 - `relaytic doctor`
 - `relaytic interoperability show`
 - `relaytic interoperability self-check`
