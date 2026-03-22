@@ -226,6 +226,16 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "crossref_endpoint": str(research_cfg.get("crossref_endpoint", "https://api.crossref.org/works")).strip()
             or "https://api.crossref.org/works",
         },
+        "benchmark": {
+            "enabled": bool(config.get("benchmark", {}).get("enabled", True)),
+            "require_same_split_contract": bool(config.get("benchmark", {}).get("require_same_split_contract", True)),
+            "require_same_metric_contract": bool(config.get("benchmark", {}).get("require_same_metric_contract", True)),
+            "use_optional_flaml_reference": bool(config.get("benchmark", {}).get("use_optional_flaml_reference", False)),
+            "allow_time_series_references": bool(config.get("benchmark", {}).get("allow_time_series_references", True)),
+            "max_reference_models": int(config.get("benchmark", {}).get("max_reference_models", 3) or 3),
+            "near_parity_absolute_delta": float(config.get("benchmark", {}).get("near_parity_absolute_delta", 0.03) or 0.03),
+            "near_parity_relative_delta": float(config.get("benchmark", {}).get("near_parity_relative_delta", 0.08) or 0.08),
+        },
         "runtime": {
             "gateway_enabled": bool(runtime_cfg.get("gateway_enabled", True)),
             "read_only_hooks_enabled": bool(runtime_cfg.get("read_only_hooks_enabled", True)),

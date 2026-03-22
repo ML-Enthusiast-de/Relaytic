@@ -35,6 +35,8 @@ class ClassificationMetrics:
     roc_auc: float | None = None
     pr_auc: float | None = None
     positive_rate: float | None = None
+    brier_score: float | None = None
+    expected_calibration_error: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
@@ -143,6 +145,12 @@ def classification_metrics(
         roc_auc = _binary_roc_auc(y_true=y_true_bin, y_score=positive_scores)
         pr_auc = _binary_pr_auc(y_true=y_true_bin, y_score=positive_scores)
         positive_rate = float(np.mean(y_true_bin))
+        brier_score = float(np.mean(np.square(positive_scores - y_true_bin)))
+        expected_calibration_error = _expected_calibration_error(
+            true_idx=true_idx,
+            pred_idx=pred_idx,
+            probabilities=normalized,
+        )
         return ClassificationMetrics(
             accuracy=accuracy,
             precision=precision,
@@ -153,6 +161,8 @@ def classification_metrics(
             roc_auc=roc_auc,
             pr_auc=pr_auc,
             positive_rate=positive_rate,
+            brier_score=brier_score,
+            expected_calibration_error=expected_calibration_error,
         )
 
     precision, recall, f1 = _macro_prf(
@@ -160,6 +170,8 @@ def classification_metrics(
         pred_idx=pred_idx,
         n_classes=len(labels),
     )
+    one_hot = np.zeros_like(normalized)
+    one_hot[np.arange(true_idx.size), true_idx] = 1.0
     return ClassificationMetrics(
         accuracy=accuracy,
         precision=precision,
@@ -167,6 +179,12 @@ def classification_metrics(
         f1=f1,
         log_loss=log_loss,
         n_samples=int(raw_true.size),
+        brier_score=float(np.mean(np.sum(np.square(normalized - one_hot), axis=1))),
+        expected_calibration_error=_expected_calibration_error(
+            true_idx=true_idx,
+            pred_idx=pred_idx,
+            probabilities=normalized,
+        ),
     )
 
 
@@ -243,3 +261,33 @@ def _macro_prf(*, true_idx: np.ndarray, pred_idx: np.ndarray, n_classes: int) ->
         float(np.mean(recalls)) if recalls else 0.0,
         float(np.mean(f1s)) if f1s else 0.0,
     )
+
+
+def _expected_calibration_error(
+    *,
+    true_idx: np.ndarray,
+    pred_idx: np.ndarray,
+    probabilities: np.ndarray,
+    n_bins: int = 10,
+) -> float:
+    if true_idx.size == 0:
+        return 0.0
+    confidences = np.max(probabilities, axis=1)
+    correctness = (pred_idx == true_idx).astype(float)
+    edges = np.linspace(0.0, 1.0, max(2, int(n_bins)) + 1)
+    error = 0.0
+    total = float(true_idx.size)
+    for index in range(len(edges) - 1):
+        lower = float(edges[index])
+        upper = float(edges[index + 1])
+        if index == len(edges) - 2:
+            mask = (confidences >= lower) & (confidences <= upper)
+        else:
+            mask = (confidences >= lower) & (confidences < upper)
+        count = int(np.sum(mask))
+        if count == 0:
+            continue
+        bucket_conf = float(np.mean(confidences[mask]))
+        bucket_acc = float(np.mean(correctness[mask]))
+        error += (count / total) * abs(bucket_acc - bucket_conf)
+    return float(error)

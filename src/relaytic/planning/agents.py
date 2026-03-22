@@ -732,7 +732,7 @@ def _select_feature_columns(
     numeric_candidates = _dedupe_strings(
         _string_list(dataset_profile.get("numeric_columns")) + _string_list(dataset_profile.get("binary_like_columns"))
     )
-    scores: list[tuple[float, str]] = []
+    numeric_scores: list[tuple[float, str]] = []
     for column in numeric_candidates:
         if column not in frame.columns or column in hard_excluded:
             continue
@@ -748,13 +748,38 @@ def _select_feature_columns(
             score -= 0.3
         if any(token in column.lower() for token in ("id", "key", "uuid", "guid")):
             score -= 0.15
-        scores.append((score, column))
-    scores.sort(key=lambda item: (-item[0], item[1]))
+        numeric_scores.append((score, column))
+    numeric_scores.sort(key=lambda item: (-item[0], item[1]))
     feature_budget = min(
         controls.max_primary_features,
-        max(4, min(len(scores), max(4, int(len(frame) // 5) if len(frame) else 4))),
+        max(4, min(len(numeric_scores), max(4, int(len(frame) // 5) if len(frame) else 4))),
     )
-    selected = [column for _, column in scores[:feature_budget]]
+    selected = [column for _, column in numeric_scores[:feature_budget]]
+    categorical_budget = max(0, min(3, controls.max_primary_features - len(selected)))
+    categorical_candidates = _dedupe_strings(_string_list(dataset_profile.get("categorical_columns")))
+    categorical_scores: list[tuple[float, str, int]] = []
+    for column in categorical_candidates:
+        if column not in frame.columns or column in hard_excluded or column in selected:
+            continue
+        missing_fraction = float(dict(dataset_profile.get("missing_fraction_by_column", {})).get(column, 0.0) or 0.0)
+        cardinality = int(frame[column].nunique(dropna=False))
+        if cardinality <= 1:
+            continue
+        score = 0.85 - min(0.70, missing_fraction)
+        if 2 <= cardinality <= 8:
+            score += 0.20
+        elif cardinality <= 16:
+            score += 0.05
+        else:
+            score -= 0.25
+        if column in soft_warning_columns:
+            score -= 0.20
+        if any(token in column.lower() for token in ("id", "key", "uuid", "guid")):
+            score -= 0.15
+        categorical_scores.append((score, column, cardinality))
+    categorical_scores.sort(key=lambda item: (-item[0], item[1]))
+    if categorical_budget > 0:
+        selected.extend([column for _, column, _ in categorical_scores[:categorical_budget]])
     if not selected:
         fallback_scores: list[tuple[float, str]] = []
         for column in numeric_candidates:
@@ -769,6 +794,8 @@ def _select_feature_columns(
             fallback_scores.append((fallback_score, column))
         fallback_scores.sort(key=lambda item: (-item[0], item[1]))
         selected = [column for _, column in fallback_scores[: max(1, min(controls.max_primary_features, len(fallback_scores)))]]
+        if not selected and categorical_scores:
+            selected = [column for _, column, _ in categorical_scores[: max(1, min(3, len(categorical_scores)))]]
     if not selected:
         raise ValueError("Slice 05 planning could not identify usable feature columns after deterministic fallback.")
 
@@ -791,10 +818,10 @@ def _select_feature_columns(
                 {
                     "column": column,
                     "risk_type": "heuristic_warning",
-                    "reason": "Retained despite heuristic risk because it remained one of the strongest usable numeric features.",
+                    "reason": "Retained despite heuristic risk because it remained one of the strongest usable first-route features.",
                 }
             )
-    for _, column in scores[feature_budget:]:
+    for _, column in numeric_scores[feature_budget:]:
         if column not in selected:
             drop_reasons.append(
                 {
@@ -802,12 +829,22 @@ def _select_feature_columns(
                     "reason": "deferred_to_keep_the_first_route_compact_and_auditable",
                 }
             )
-    for column in _string_list(dataset_profile.get("categorical_columns")):
-        if column != target_column and column in frame.columns:
+    selected_categoricals = {
+        column for _, column, _ in categorical_scores if column in selected
+    }
+    for _, column, cardinality in categorical_scores:
+        if column in selected_categoricals:
+            continue
+        if column in frame.columns and column != target_column:
+            reason = (
+                "deferred_due_to_high_categorical_cardinality_for_the_first_route"
+                if cardinality > 16
+                else "deferred_to_keep_the_first_route_compact_after_categorical_screening"
+            )
             drop_reasons.append(
                 {
                     "column": column,
-                    "reason": "current_builder_route_is_numeric_first; categorical expansion remains a follow-up experiment",
+                    "reason": reason,
                 }
             )
     return selected, drop_reasons, feature_risk_flags

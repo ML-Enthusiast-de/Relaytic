@@ -328,6 +328,35 @@ def relaytic_show_research(*, run_dir: str) -> dict[str, Any]:
     return cli._show_research_surface(run_dir=run_dir)
 
 
+def relaytic_run_benchmark(
+    *,
+    run_dir: str,
+    data_path: str | None = None,
+    config_path: str | None = None,
+    run_id: str | None = None,
+    overwrite: bool = False,
+    labels: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Execute the Slice 11 benchmark parity layer for an existing run."""
+    cli = _cli()
+    return cli._run_benchmark_phase(
+        run_dir=run_dir,
+        data_path=data_path,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_run_benchmark",
+    )
+
+
+def relaytic_show_benchmark(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 11 benchmark surface for a run."""
+    cli = _cli()
+    return cli._show_benchmark_surface(run_dir=run_dir)
+
+
 def relaytic_show_assist(*, run_dir: str, config_path: str | None = None) -> dict[str, Any]:
     """Render the current Slice 09E communicative assist surface for a run."""
     cli = _cli()
@@ -430,6 +459,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_get_status",
             "relaytic_show_intelligence",
             "relaytic_show_research",
+            "relaytic_show_benchmark",
             "relaytic_show_assist",
             "relaytic_show_lifecycle",
             "relaytic_show_autonomy",
@@ -444,6 +474,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_run_evidence_review",
             "relaytic_run_intelligence",
             "relaytic_gather_research",
+            "relaytic_run_benchmark",
             "relaytic_assist_turn",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
@@ -524,6 +555,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             handler=relaytic_show_research,
         ),
         InteropToolSpec(
+            name="relaytic_show_benchmark",
+            title="Show Relaytic Benchmark",
+            description="Render the current Slice 11 benchmark parity and same-contract reference comparison surface for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_benchmark,
+        ),
+        InteropToolSpec(
             name="relaytic_show_assist",
             title="Show Relaytic Assist",
             description="Render the current Slice 09E communicative assist state, guidance, and connection options for a Relaytic run.",
@@ -586,6 +625,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_gather_research,
+        ),
+        InteropToolSpec(
+            name="relaytic_run_benchmark",
+            title="Run Benchmark Review",
+            description="Execute the Slice 11 benchmark parity layer for an existing Relaytic run.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_run_benchmark,
         ),
         InteropToolSpec(
             name="relaytic_assist_turn",

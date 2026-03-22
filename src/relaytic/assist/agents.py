@@ -47,6 +47,10 @@ STAGE_ALIASES = {
     "papers": "research",
     "literature": "research",
     "sota": "research",
+    "benchmark": "benchmark",
+    "baseline": "benchmark",
+    "parity": "benchmark",
+    "reference": "benchmark",
     "completion": "completion",
     "status": "completion",
     "lifecycle": "lifecycle",
@@ -190,8 +194,8 @@ def plan_assist_turn(
                 requested_stage=None,
                 response_message=(
                     "Relaytic can jump back to `intake`, `investigation`, `memory`, `planning`, `evidence`, "
-                    "`intelligence`, `research`, `completion`, `lifecycle`, or `autonomy`. "
-                    "Say for example `go back to research`."
+                    "`intelligence`, `research`, `benchmark`, `completion`, `lifecycle`, or `autonomy`. "
+                    "Say for example `go back to benchmark`."
                 ),
             )
         return AssistTurnPlan(
@@ -316,13 +320,15 @@ def _build_general_explanation(*, run_summary: dict[str, Any]) -> str:
     completion = dict(run_summary.get("completion", {}))
     lifecycle = dict(run_summary.get("lifecycle", {}))
     research = dict(run_summary.get("research", {}))
+    benchmark = dict(run_summary.get("benchmark", {}))
     return (
         f"Relaytic is currently at `{stage}`. "
         f"The active model family is `{model}` with primary metric `{metric}`. "
         f"Completion currently points to `{_clean_text(completion.get('action')) or 'none'}`, "
         f"lifecycle currently points to `{_lifecycle_rollup(lifecycle)}`, "
         f"and the next recommended action is `{_clean_text(next_step.get('recommended_action')) or 'none'}`. "
-        f"Research follow-up is `{_clean_text(research.get('recommended_followup_action')) or 'none'}`."
+        f"Research follow-up is `{_clean_text(research.get('recommended_followup_action')) or 'none'}` "
+        f"and benchmark parity is `{_clean_text(benchmark.get('parity_status')) or 'unknown'}`."
     )
 
 
@@ -334,6 +340,14 @@ def _build_stage_explanation(*, stage: str, run_summary: dict[str, Any]) -> str:
             f"{int(research.get('source_count', 0) or 0)} retrieved sources, "
             f"{int(research.get('accepted_transfer_count', 0) or 0)} accepted transfer candidates, and "
             f"follow-up `{_clean_text(research.get('recommended_followup_action')) or 'none'}`."
+        )
+    if stage == "benchmark":
+        benchmark = dict(run_summary.get("benchmark", {}))
+        return (
+            f"Benchmark currently has parity status `{_clean_text(benchmark.get('parity_status')) or 'unknown'}` with "
+            f"{int(benchmark.get('reference_count', 0) or 0)} reference approach(es), "
+            f"comparison metric `{_clean_text(benchmark.get('comparison_metric')) or 'unknown'}`, and "
+            f"recommended action `{_clean_text(benchmark.get('recommended_action')) or 'none'}`."
         )
     if stage == "intelligence":
         intelligence = dict(run_summary.get("intelligence", {}))

@@ -241,6 +241,7 @@ class SemanticDebateReport:
     proposer_position: dict[str, Any]
     counterposition: dict[str, Any]
     verifier_verdict: dict[str, Any]
+    domain_interpretation: dict[str, Any]
     recommended_followup_action: str
     confidence: str
     summary: str

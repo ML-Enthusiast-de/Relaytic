@@ -194,6 +194,24 @@ def render_research_review_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_research_review_markdown(*args, **kwargs)
 
 
+def run_benchmark_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.benchmark import run_benchmark_review as _run_benchmark_review
+
+    return _run_benchmark_review(*args, **kwargs)
+
+
+def read_benchmark_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.benchmark import read_benchmark_bundle as _read_benchmark_bundle
+
+    return _read_benchmark_bundle(*args, **kwargs)
+
+
+def render_benchmark_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.benchmark import render_benchmark_review_markdown as _render_benchmark_review_markdown
+
+    return _render_benchmark_review_markdown(*args, **kwargs)
+
+
 def build_assist_bundle(*args: Any, **kwargs: Any) -> Any:
     from relaytic.assist import build_assist_bundle as _build_assist_bundle
 
@@ -1271,6 +1289,41 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    benchmark_surface = sub.add_parser(
+        "benchmark",
+        help="Run or inspect Slice 11 benchmark parity and reference comparison artifacts.",
+    )
+    benchmark_sub = benchmark_surface.add_subparsers(dest="benchmark_command", required=True)
+
+    benchmark_run = benchmark_sub.add_parser(
+        "run",
+        help="Execute Slice 11 same-contract benchmark parity review for an existing run.",
+    )
+    benchmark_run.add_argument("--run-dir", required=True, help="Run directory for benchmark artifacts.")
+    benchmark_run.add_argument("--data-path", default=None, help="Optional dataset override; defaults to the run dataset when discoverable.")
+    benchmark_run.add_argument("--config", default=None, help="Optional config/policy source.")
+    benchmark_run.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    benchmark_run.add_argument("--overwrite", action="store_true", help="Allow overwriting existing benchmark artifacts.")
+    benchmark_run.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    benchmark_run.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    benchmark_show = benchmark_sub.add_parser(
+        "show",
+        help="Render the current Slice 11 benchmark artifacts for a run.",
+    )
+    benchmark_show.add_argument("--run-dir", required=True, help="Run directory containing benchmark artifacts.")
+    benchmark_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     autonomy_surface = sub.add_parser(
         "autonomy",
         help="Run or inspect Slice 09C bounded autonomous follow-up loops.",
@@ -2127,6 +2180,42 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
+    if args.command == "benchmark":
+        if args.benchmark_command == "show":
+            try:
+                payload = _show_benchmark_surface(run_dir=args.run_dir)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.benchmark_command != "run":
+            parser.error("Unsupported benchmark subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_benchmark_phase(
+                run_dir=args.run_dir,
+                data_path=args.data_path,
+                config_path=args.config,
+                run_id=args.run_id,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
     if args.command == "assist":
         if args.assist_command == "show":
             try:
@@ -2758,6 +2847,16 @@ def _run_access_flow(
         runtime_surface=runtime_surface,
         runtime_command="relaytic run",
     )
+    benchmark_payload = _run_benchmark_phase(
+        run_dir=root,
+        data_path=staged_primary_data_path,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=labels,
+        runtime_surface=runtime_surface,
+        runtime_command="relaytic run",
+    )
     completion_payload = _run_completion_phase(
         run_dir=root,
         config_path=config_path,
@@ -2841,6 +2940,7 @@ def _run_access_flow(
     surface_payload["evidence"] = evidence_payload["surface_payload"].get("evidence", {})
     surface_payload["intelligence"] = intelligence_payload["surface_payload"].get("intelligence", {})
     surface_payload["research"] = research_payload["surface_payload"].get("research", {})
+    surface_payload["benchmark"] = benchmark_payload["surface_payload"].get("benchmark", {})
     surface_payload["completion"] = completion_payload["surface_payload"].get("completion", {})
     surface_payload["memory"] = memory_final_payload["surface_payload"].get("memory", {})
     surface_payload["lifecycle"] = lifecycle_payload["surface_payload"].get("lifecycle", {})
@@ -3229,6 +3329,7 @@ def _next_takeover_stage(*, run_dir: str | Path, run_summary: dict[str, Any]) ->
         ("evidence", root / "audit_report.json"),
         ("intelligence", root / "semantic_debate_report.json"),
         ("research", root / "research_brief.json"),
+        ("benchmark", root / "benchmark_parity_report.json"),
         ("completion", root / "completion_decision.json"),
         ("lifecycle", root / "champion_vs_candidate.json"),
         ("autonomy", root / "autonomy_loop_state.json"),
@@ -3280,6 +3381,7 @@ def _run_assist_stage_pipeline(
         "evidence",
         "intelligence",
         "research",
+        "benchmark",
         "completion",
         "lifecycle",
         "autonomy",
@@ -3403,6 +3505,19 @@ def _run_assist_stage_pipeline(
         if stage == "research":
             _run_research_phase(
                 run_dir=root,
+                config_path=config_path,
+                run_id=None,
+                overwrite=True,
+                labels=labels,
+                runtime_surface="cli",
+                runtime_command="relaytic assist turn",
+            )
+            executed.append(stage)
+            continue
+        if stage == "benchmark":
+            _run_benchmark_phase(
+                run_dir=root,
+                data_path=resolved_data_path,
                 config_path=config_path,
                 run_id=None,
                 overwrite=True,
@@ -3627,6 +3742,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.research import read_research_bundle
 
         return read_research_bundle(run_dir)
+    if bundle == "benchmark":
+        from relaytic.benchmark import read_benchmark_bundle
+
+        return read_benchmark_bundle(run_dir)
     if bundle == "runtime":
         from relaytic.runtime import read_runtime_bundle
 
@@ -4651,6 +4770,8 @@ def _show_intelligence_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "backend_status": mode.get("backend_status"),
                 "recommended_followup_action": debate.get("recommended_followup_action"),
                 "confidence": debate.get("confidence"),
+                "domain_archetype": dict(debate.get("domain_interpretation", {})).get("domain_archetype"),
+                "modeling_bias": dict(debate.get("domain_interpretation", {})).get("modeling_bias"),
             },
             "bundle": bundle,
         },
@@ -4798,6 +4919,137 @@ def _show_research_surface(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _run_benchmark_phase(
+    *,
+    run_dir: str | Path,
+    data_path: str | None,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+) -> dict[str, Any]:
+    from relaytic.benchmark import write_benchmark_bundle
+
+    root = Path(run_dir)
+    targets = _benchmark_output_paths(root)
+    if not overwrite and all(path.exists() for path in targets.values()):
+        return _show_benchmark_surface(run_dir=root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    planning_bundle = _read_json_bundle(root, bundle="planning")
+    plan = dict(planning_bundle.get("plan", {}))
+    if not plan or not dict(plan.get("execution_summary", {})):
+        raise ValueError(f"Slice 11 benchmark requires executed planning artifacts in {root}.")
+    resolved_data_path = data_path or _resolve_run_data_path(root)
+    if not resolved_data_path:
+        raise ValueError(f"Slice 11 benchmark requires a resolvable dataset path in {root}.")
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=foundation_state["resolved"].policy,
+        stage="benchmark",
+        data_path=resolved_data_path,
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "plan.json",
+            "model_params.json",
+            "task_brief.json",
+            "run_brief.json",
+        ],
+    )
+    try:
+        benchmark_result = run_benchmark_review(
+            run_dir=root,
+            data_path=resolved_data_path,
+            policy=foundation_state["resolved"].policy,
+            planning_bundle=planning_bundle,
+            mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+            context_bundle=_read_json_bundle(root, bundle="context"),
+        )
+        written = write_benchmark_bundle(root, bundle=benchmark_result.bundle)
+        manifest_path = _refresh_benchmark_manifest(
+            root,
+            run_id=run_id,
+            policy_source=foundation_state["policy_path"],
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic compared the selected route against same-contract strong reference approaches and recorded honest parity artifacts.",
+        )
+        materialize_run_summary(run_dir=root, data_path=resolved_data_path)
+        parity = benchmark_result.bundle.benchmark_parity_report
+        gap = benchmark_result.bundle.benchmark_gap_report
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "benchmark": {
+                    "parity_status": parity.parity_status,
+                    "recommended_action": parity.recommended_action,
+                    "comparison_metric": parity.comparison_metric,
+                    "winning_family": parity.winning_family,
+                    "reference_count": parity.reference_count,
+                    "test_gap": gap.test_gap,
+                    "near_parity": gap.near_parity,
+                },
+                "bundle": benchmark_result.bundle.to_dict(),
+            },
+            "human_output": benchmark_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="benchmark")
+    if not bundle:
+        raise ValueError(f"No Slice 11 benchmark artifacts found in {root}.")
+    materialize_run_summary(run_dir=root)
+    manifest_path = _refresh_benchmark_manifest(root)
+    parity = dict(bundle.get("benchmark_parity_report", {}))
+    gap = dict(bundle.get("benchmark_gap_report", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "benchmark": {
+                "parity_status": parity.get("parity_status"),
+                "recommended_action": parity.get("recommended_action"),
+                "comparison_metric": parity.get("comparison_metric"),
+                "winning_family": parity.get("winning_family"),
+                "reference_count": int(parity.get("reference_count", 0) or 0),
+                "test_gap": gap.get("test_gap"),
+                "near_parity": gap.get("near_parity"),
+            },
+            "bundle": bundle,
+        },
+        "human_output": render_benchmark_review_markdown(bundle),
+    }
+
+
 def _render_research_sources_markdown(inventory: dict[str, Any]) -> str:
     sources = list(inventory.get("sources", []))
     lines = [
@@ -4905,6 +5157,16 @@ def _run_completion_phase(
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
     )
+    _run_benchmark_phase(
+        run_dir=root,
+        data_path=_resolve_run_data_path(root),
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=labels,
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+    )
     runtime_token = _runtime_stage_token(
         run_dir=root,
         policy=foundation_state["resolved"].policy,
@@ -4919,6 +5181,8 @@ def _run_completion_phase(
             "memory_retrieval.json",
             "research_brief.json",
             "method_transfer_report.json",
+            "benchmark_parity_report.json",
+            "benchmark_gap_report.json",
             "run_summary.json",
         ],
     )
@@ -4934,6 +5198,7 @@ def _run_completion_phase(
             evidence_bundle=evidence_bundle,
             memory_bundle=_read_json_bundle(root, bundle="memory"),
             research_bundle=_read_json_bundle(root, bundle="research"),
+            benchmark_bundle=_read_json_bundle(root, bundle="benchmark"),
             intelligence_bundle=_read_json_bundle(root, bundle="intelligence"),
             config_path=config_path,
         )
@@ -5229,13 +5494,6 @@ def _run_autonomy_phase(
             research_bundle=_read_json_bundle(root, bundle="research"),
             intelligence_bundle=_read_json_bundle(root, bundle="intelligence"),
         )
-        written = write_autonomy_bundle(root, bundle=autonomy_result.bundle)
-        manifest_path = _refresh_autonomy_manifest(
-            root,
-            run_id=run_id,
-            policy_source=foundation_state["policy_path"],
-            labels=labels,
-        )
         if autonomy_result.promotion_applied:
             _run_memory_phase(
                 run_dir=root,
@@ -5290,6 +5548,13 @@ def _run_autonomy_phase(
                 runtime_surface=runtime_surface,
                 runtime_command=runtime_command,
             )
+        written = write_autonomy_bundle(root, bundle=autonomy_result.bundle)
+        manifest_path = _refresh_autonomy_manifest(
+            root,
+            run_id=run_id,
+            policy_source=foundation_state["policy_path"],
+            labels=labels,
+        )
         record_runtime_stage_completion(
             run_dir=root,
             policy=foundation_state["resolved"].policy,
@@ -5668,6 +5933,14 @@ def _research_output_paths(run_dir: Path) -> dict[str, Path]:
         "method_transfer_report": run_dir / "method_transfer_report.json",
         "benchmark_reference_report": run_dir / "benchmark_reference_report.json",
         "external_research_audit": run_dir / "external_research_audit.json",
+    }
+
+
+def _benchmark_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "reference_approach_matrix": run_dir / "reference_approach_matrix.json",
+        "benchmark_gap_report": run_dir / "benchmark_gap_report.json",
+        "benchmark_parity_report": run_dir / "benchmark_parity_report.json",
     }
 
 
@@ -6150,7 +6423,7 @@ def _refresh_completion_manifest(
     labels: dict[str, str] | None = None,
 ) -> Path:
     root = Path(run_dir)
-    _refresh_research_manifest(
+    _refresh_benchmark_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,
@@ -6345,6 +6618,57 @@ def _refresh_research_manifest(
     for path in _research_output_paths(root).values():
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="research", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_benchmark_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_research_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _benchmark_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="benchmark", required=True))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:

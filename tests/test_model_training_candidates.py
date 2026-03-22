@@ -426,3 +426,47 @@ def test_train_surrogate_candidates_supports_boosted_tree_classifier(
     analysis = payload["professional_analysis"]
     assert isinstance(analysis.get("high_error_regions"), list)
 
+
+def test_train_surrogate_candidates_executes_categorical_features_missingness_and_calibration(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    csv_path = tmp_path / "categorical_missing_classification.csv"
+    rows = ["amount,velocity,device_type,region_code,fraud_flag"]
+    device_cycle = ["mobile", "desktop", "tablet", ""]
+    region_cycle = ["north", "south", "west", "east"]
+    for idx in range(220):
+        amount = 0.1 + ((idx % 17) / 20.0)
+        velocity = "" if idx % 11 == 0 else f"{0.05 + ((idx % 9) / 10.0):.4f}"
+        device = device_cycle[idx % len(device_cycle)]
+        region = region_cycle[idx % len(region_cycle)]
+        fraud = 1 if ((amount > 0.65 and device in {"mobile", "tablet"}) or region == "west" or idx % 19 == 0) else 0
+        rows.append(f"{amount:.4f},{velocity},{device},{region},{fraud}")
+    csv_path.write_text("\n".join(rows), encoding="utf-8")
+
+    registry = build_default_registry()
+    result = registry.execute(
+        "train_surrogate_candidates",
+        {
+            "data_path": str(csv_path),
+            "target_column": "fraud_flag",
+            "feature_columns": ["amount", "velocity", "device_type", "region_code"],
+            "requested_model_family": "auto",
+            "run_id": "categorical_missing_classification_run",
+        },
+    )
+    assert result.status == "ok"
+    payload = result.output
+    summary = dict(payload["preprocessing"].get("feature_engineering_summary", {}))
+
+    assert summary["categorical_raw_feature_count"] >= 2
+    assert summary["missing_indicator_count"] >= 1
+    assert summary["interaction_count"] >= 1
+    assert summary["engineered_feature_count"] >= 3
+    assert any(column.startswith("cat__") for column in payload["model_feature_columns"])
+    assert any(column.startswith("miss__") for column in payload["model_feature_columns"])
+    assert any("__x__" in column for column in payload["model_feature_columns"])
+    assert "brier_score" in payload["selected_metrics"]["test"]
+    assert "expected_calibration_error" in payload["selected_metrics"]["test"]
+    assert payload["selected_hyperparameters"]["selected_variant_id"]
+

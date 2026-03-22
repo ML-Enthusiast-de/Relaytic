@@ -4,9 +4,9 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 09E
-- next recommended slice: 11, reference parity and constrained superiority proof
-- next adaptive follow-on after 11: 10, feedback assimilation from operator and runtime evidence
+- completed slices: 00 through 11
+- next recommended slice: 10, feedback assimilation from operator and runtime evidence
+- next adaptive follow-on after 10: 12, dojo mode and guarded self-improvement
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 
@@ -21,6 +21,9 @@ The repository currently supports:
 - investigation artifacts from Scout, Scientist, and Focus Council
 - Strategist planning artifacts with a real Builder handoff
 - a first deterministic local data-to-model route via `relaytic plan run`
+- richer first-route preprocessing with bounded categorical handling, missingness indicators, executed interaction features, and reusable preprocessing state at inference time
+- broader bounded candidate search within the current Builder family set instead of one fixed-parameter training route
+- calibrated classification outputs and uncertainty-bearing prediction summaries for the current regression and classification path
 - a first human-friendly and agent-friendly MVP shell via `relaytic run`, `relaytic show`, `relaytic predict`, and `relaytic evidence`
 - persisted `run_summary.json` plus `reports/summary.md` for concise run understanding
 - copy-only data staging so major run and inference paths operate on immutable working copies under the run directory instead of the original source file
@@ -37,7 +40,9 @@ The repository currently supports:
 - bounded autonomous second-pass execution with challenger queues, recalibration/retrain requests, loop budgeting, and champion lineage updates
 - visible autonomy support inside `relaytic run`, `relaytic show`, explicit `relaytic autonomy` surfaces, the runtime event stream, and the MCP contract
 - privacy-safe external research retrieval from redacted run signatures with typed source inventory, method-transfer distillation, benchmark-reference capture, and explicit no-raw-row audit
+- benchmark parity review against explicit reference approaches under the same split and metric contract
 - visible research support inside completion, autonomy, `relaytic run`, `relaytic show`, explicit `relaytic research` surfaces, and the MCP contract
+- visible benchmark support inside completion, `relaytic run`, `relaytic show`, explicit `relaytic benchmark` surfaces, assist, runtime, and the MCP contract
 - communicative assist surfaces via `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat` so humans and agents can ask for explanations, request stage navigation, or let Relaytic take over safely
 - connection guidance that can recommend deterministic local-only use, lightweight local LLM setup, or local host connections for Claude, Codex/OpenAI, OpenClaw, and ChatGPT connector paths without making any of them mandatory
 - one-line bootstrap via `python scripts/install_relaytic.py` plus install-health verification via `relaytic doctor`
@@ -235,6 +240,16 @@ The repository currently supports:
 - upgraded the MCP contract so external agents can use the same communicative assist surface non-interactively
 - added targeted Slice 09E CLI and interoperability tests
 
+### Slice 11
+
+- added `src/relaytic/benchmark/` with typed reference-comparison controls, parity/gap artifacts, and storage helpers
+- added `relaytic benchmark run` and `relaytic benchmark show`
+- added `reference_approach_matrix.json`, `benchmark_gap_report.json`, and `benchmark_parity_report.json`
+- upgraded the Builder path with richer categorical handling, missingness-aware executed features, bounded interaction features, calibration, and reusable preprocessing state
+- upgraded inference so staged prediction runs can reuse preprocessing, expose calibration-aware classification outputs, and surface uncertainty-bearing summaries
+- upgraded completion, runtime, assist, `relaytic run`, `relaytic show`, and the MCP contract so benchmark posture is visible instead of hidden in ad hoc evaluation notes
+- added targeted Slice 11 CLI, modeling, inference, and public-dataset tests
+
 ### Cross-Cutting Hardening
 
 - added `src/relaytic/integrations/` as the canonical optional-library discovery boundary
@@ -264,7 +279,7 @@ The repository is not yet at the final product state. The main remaining gaps ar
 - the current challenger layer is broader and now loop-capable, but it is still not a full challenger field or large search program
 - autonomous second-pass behavior is real, but its budgeted loop set is still intentionally narrow rather than deeply adaptive
 - run memory is now real, but longer-horizon feedback learning and richer analog indexing are still pending
-- benchmark-separated proof of strength under constrained/operator-heavy settings is still pending
+- benchmark parity is now real, but broader constrained-superiority coverage and optional stronger reference stacks are still pending
 - privacy-safe external research retrieval is now real, but it is still limited to bounded source adapters and shallow transfer logic rather than a mature domain-research stack
 - communicative assist is now real, but it is still deterministic-first and intentionally bounded rather than a rich multi-agent conversational shell
 - reference-doc grounding is now real but still shallow compared with a mature domain corpus strategy
@@ -272,28 +287,23 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-Slices 09D and 09E have landed with:
+Slice 11 has landed on top of Slices 09D and 09E with:
 
 - one redacted research-query planner that derives safe external queries from current-run artifacts
 - one source-tiered research inventory for papers and benchmark-oriented references through bounded adapters
 - one method-transfer report that converts retrieved knowledge into route, challenger, or evaluation hypotheses rather than hidden advisory text
-- one benchmark-reference report that strengthens Slice 11 setup before parity claims begin
+- one benchmark-reference report that strengthens benchmark design without becoming the source of truth
 - one explicit external-research audit proving no raw rows or private identifiers were exported by default
 - one research-to-autonomy bridge that records research-driven recalibration and challenger signals in bounded follow-up behavior
 - one communicative assist layer that explains current state, lets humans or agents jump back to any bounded stage, and can safely take over from uncertainty or hesitation
 - one integrated local-versus-host connection guide that keeps the local-first security character explicit while making optional semantic assist easier to adopt
-
-Next, Slice 11 should land with:
-
-- one benchmark harness that compares Relaytic against strong reference approaches under the same split, metric, and operator-constraint contract
-- one proof track for constrained superiority rather than only raw-score comparison
-- one honest separation between deterministic, local-LLM, and bounded-autonomy modes in benchmark output
-- one visible uncertainty/calibration track where optional adapters like MAPIE can strengthen evaluation without becoming the source of truth
-- one benchmark/report surface that humans and external agents can consume without reading the full artifact tree first
+- one benchmark harness that compares Relaytic against explicit reference approaches under the same split and metric contract
+- one honest parity/gap surface that humans and external agents can consume without reading the full artifact tree first
+- one richer first-route modeling layer with categorical handling, executed features, calibration, and uncertainty-bearing inference summaries
 
 After Slice 11, the next high-leverage frontier follow-ons should include:
 
 - Slice 10 feedback assimilation from operator interventions, runtime failures, and later-run evidence
 - deeper autonomy breadth beyond the first bounded second pass
-- richer memory and doc-grounding corpora once benchmark doctrine is in place
+- richer memory and doc-grounding corpora now that benchmark doctrine is in place
 - later Slice 15 remote connector adapters for Kafka-style streams, object-store Parquet, and warehouse reads, but only through read-only materialization into immutable run-local snapshots

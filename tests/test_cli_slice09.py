@@ -37,6 +37,7 @@ def test_cli_intelligence_surfaces_materialize_for_public_binary_run(tmp_path: P
         "semantic_local_llm",
     }
     assert payload["run_summary"]["intelligence"]["recommended_followup_action"] is not None
+    assert payload["run_summary"]["intelligence"]["domain_archetype"] is not None
 
     for filename in (
         "intelligence_mode.json",
@@ -63,6 +64,7 @@ def test_cli_intelligence_surfaces_materialize_for_public_binary_run(tmp_path: P
         "semantic_local_llm",
     }
     assert intelligence_payload["bundle"]["semantic_debate_report"]["status"] == "ok"
+    assert intelligence_payload["bundle"]["semantic_debate_report"]["domain_interpretation"]["domain_archetype"] is not None
     assert intelligence_payload["bundle"]["semantic_access_audit"]["row_level_access_granted"] is False
 
     assert main(["show", "--run-dir", str(run_dir), "--format", "json"]) == 0

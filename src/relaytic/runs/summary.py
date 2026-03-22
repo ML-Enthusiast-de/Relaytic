@@ -131,6 +131,14 @@ def build_run_summary(
             "external_research_audit": "external_research_audit.json",
         },
     )
+    benchmark_bundle = _read_bundle(
+        root,
+        {
+            "reference_approach_matrix": "reference_approach_matrix.json",
+            "benchmark_gap_report": "benchmark_gap_report.json",
+            "benchmark_parity_report": "benchmark_parity_report.json",
+        },
+    )
     runtime_bundle = _read_bundle(
         root,
         {
@@ -200,6 +208,9 @@ def build_run_summary(
     method_transfer_report = _bundle_item(research_bundle, "method_transfer_report")
     benchmark_reference_report = _bundle_item(research_bundle, "benchmark_reference_report")
     external_research_audit = _bundle_item(research_bundle, "external_research_audit")
+    reference_approach_matrix = _bundle_item(benchmark_bundle, "reference_approach_matrix")
+    benchmark_gap_report = _bundle_item(benchmark_bundle, "benchmark_gap_report")
+    benchmark_parity_report = _bundle_item(benchmark_bundle, "benchmark_parity_report")
     hook_execution_log = _bundle_item(runtime_bundle, "hook_execution_log")
     run_checkpoint_manifest = _bundle_item(runtime_bundle, "run_checkpoint_manifest")
     capability_profiles = _bundle_item(runtime_bundle, "capability_profiles")
@@ -261,6 +272,7 @@ def build_run_summary(
             evidence_bundle=evidence_bundle,
             intelligence_bundle=intelligence_bundle,
             research_bundle=research_bundle,
+            benchmark_bundle=benchmark_bundle,
             completion_bundle=completion_bundle,
             lifecycle_bundle=lifecycle_bundle,
             autonomy_bundle=autonomy_bundle,
@@ -372,6 +384,8 @@ def build_run_summary(
             "backend_status": _clean_text(intelligence_mode.get("backend_status")),
             "recommended_followup_action": _clean_text(semantic_debate_report.get("recommended_followup_action")),
             "debate_confidence": _clean_text(semantic_debate_report.get("confidence")),
+            "domain_archetype": _clean_text(dict(semantic_debate_report.get("domain_interpretation") or {}).get("domain_archetype")),
+            "modeling_bias": _clean_text(dict(semantic_debate_report.get("domain_interpretation") or {}).get("modeling_bias")),
             "uncertainty_band": _clean_text(semantic_uncertainty_report.get("confidence_band")),
             "escalation_required": bool(intelligence_escalation.get("escalation_required", False)),
         },
@@ -391,6 +405,18 @@ def build_run_summary(
             "rejected_transfer_count": len(method_transfer_report.get("rejected_candidates", [])),
             "benchmark_reference_count": int(benchmark_reference_report.get("reference_count", 0) or 0),
             "network_allowed": external_research_audit.get("network_allowed"),
+        },
+        "benchmark": {
+            "status": _clean_text(benchmark_parity_report.get("status")) or _clean_text(reference_approach_matrix.get("status")),
+            "parity_status": _clean_text(benchmark_parity_report.get("parity_status")),
+            "recommended_action": _clean_text(benchmark_parity_report.get("recommended_action")),
+            "comparison_metric": _clean_text(benchmark_parity_report.get("comparison_metric")) or _clean_text(reference_approach_matrix.get("comparison_metric")),
+            "reference_count": int(benchmark_parity_report.get("reference_count", 0) or 0),
+            "winning_family": _clean_text(benchmark_parity_report.get("winning_family")),
+            "relaytic_family": _clean_text(benchmark_parity_report.get("relaytic_family")) or _clean_text(benchmark_gap_report.get("relaytic_family")),
+            "test_gap": benchmark_gap_report.get("test_gap"),
+            "validation_gap": benchmark_gap_report.get("validation_gap"),
+            "near_parity": benchmark_gap_report.get("near_parity"),
         },
         "runtime": {
             "current_stage": _resolve_runtime_stage(
@@ -478,6 +504,8 @@ def build_run_summary(
             "research_brief_path": _path_if_exists(root / "research_brief.json"),
             "method_transfer_report_path": _path_if_exists(root / "method_transfer_report.json"),
             "external_research_audit_path": _path_if_exists(root / "external_research_audit.json"),
+            "benchmark_parity_report_path": _path_if_exists(root / "benchmark_parity_report.json"),
+            "benchmark_gap_report_path": _path_if_exists(root / "benchmark_gap_report.json"),
             "event_stream_path": _path_if_exists(root / "lab_event_stream.jsonl"),
             "capability_profiles_path": _path_if_exists(root / "capability_profiles.json"),
         },
@@ -497,6 +525,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     memory = dict(summary.get("memory", {}))
     intelligence = dict(summary.get("intelligence", {}))
     research = dict(summary.get("research", {}))
+    benchmark = dict(summary.get("benchmark", {}))
     runtime = dict(summary.get("runtime", {}))
     lifecycle = dict(summary.get("lifecycle", {}))
     autonomy = dict(summary.get("autonomy", {}))
@@ -612,6 +641,8 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Backend status: `{intelligence.get('backend_status') or 'unknown'}`",
                 f"- Semantic follow-up: `{intelligence.get('recommended_followup_action') or 'none'}`",
                 f"- Debate confidence: `{intelligence.get('debate_confidence') or 'unknown'}`",
+                f"- Domain archetype: `{intelligence.get('domain_archetype') or 'unknown'}`",
+                f"- Modeling bias: `{intelligence.get('modeling_bias') or 'unknown'}`",
                 f"- Uncertainty band: `{intelligence.get('uncertainty_band') or 'unknown'}`",
             ]
         )
@@ -629,6 +660,21 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Confidence: `{research.get('confidence') or 'unknown'}`",
                 f"- Accepted transfers: `{research.get('accepted_transfer_count', 0)}`",
                 f"- Benchmark references: `{research.get('benchmark_reference_count', 0)}`",
+            ]
+        )
+    if benchmark and any(value is not None for value in benchmark.values()):
+        lines.extend(
+            [
+                "",
+                "## Benchmark",
+                f"- Status: `{benchmark.get('status') or 'unknown'}`",
+                f"- Parity status: `{benchmark.get('parity_status') or 'unknown'}`",
+                f"- Recommended action: `{benchmark.get('recommended_action') or 'none'}`",
+                f"- Comparison metric: `{benchmark.get('comparison_metric') or 'unknown'}`",
+                f"- Reference count: `{benchmark.get('reference_count', 0)}`",
+                f"- Winning family: `{benchmark.get('winning_family') or 'unknown'}`",
+                f"- Test gap: `{benchmark.get('test_gap')}`",
+                f"- Near parity: `{benchmark.get('near_parity')}`",
             ]
         )
     if lifecycle and any(value is not None for value in lifecycle.values()):
@@ -807,6 +853,7 @@ def _resolve_stage(
     evidence_bundle: dict[str, Any],
     intelligence_bundle: dict[str, Any],
     research_bundle: dict[str, Any],
+    benchmark_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
     autonomy_bundle: dict[str, Any],
@@ -818,6 +865,8 @@ def _resolve_stage(
     if completion_bundle:
         run_state = _bundle_item(completion_bundle, "run_state")
         return str(run_state.get("current_stage", "")).strip() or "completion_reviewed"
+    if benchmark_bundle:
+        return "benchmark_reviewed"
     if research_bundle:
         return "research_reviewed"
     if intelligence_bundle:
@@ -836,12 +885,21 @@ def _resolve_stage(
 
 
 def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: str) -> str | None:
-    if latest_stage and latest_stage != "memory":
-        return latest_stage
-    if (root / "autonomy_loop_state.json").exists():
+    if any(
+        (root / filename).exists()
+        for filename in (
+            "autonomy_loop_state.json",
+            "autonomy_round_report.json",
+            "branch_outcome_matrix.json",
+            "champion_lineage.json",
+            "loop_budget_report.json",
+        )
+    ):
         return "autonomy"
     if (root / "promotion_decision.json").exists():
         return "lifecycle"
+    if (root / "benchmark_parity_report.json").exists():
+        return "benchmark"
     if (root / "research_brief.json").exists():
         return "research"
     if (root / "semantic_debate_report.json").exists():
@@ -856,6 +914,8 @@ def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: s
         return "investigation"
     if (root / "intake_record.json").exists():
         return "intake"
+    if latest_stage and latest_stage != "memory":
+        return latest_stage
     if latest_stage:
         return latest_stage
     if last_event_stage:

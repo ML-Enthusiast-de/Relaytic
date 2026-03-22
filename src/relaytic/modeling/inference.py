@@ -14,6 +14,7 @@ import pandas as pd
 
 from relaytic.core.json_utils import write_json
 from relaytic.ingestion import build_source_spec, load_tabular_data, materialize_structured_source
+from .calibration import apply_binary_platt_calibrator, apply_regression_residual_interval
 from .baselines import IncrementalLinearSurrogate
 from .checkpoints import ModelCheckpointStore
 from .classifiers import (
@@ -22,6 +23,7 @@ from .classifiers import (
     LogisticClassificationSurrogate,
 )
 from .evaluation import classification_metrics, regression_metrics
+from .feature_pipeline import prepare_inference_feature_frame
 from .normalization import MinMaxNormalizer
 from .training import (
     BaggedTreeEnsembleSurrogate,
@@ -106,13 +108,12 @@ def run_inference_from_artifacts(
     _require_columns(frame=frame, columns=feature_columns)
 
     preprocessing_info = _extract_preprocessing_info(model_params=model_params)
-    prepared = _prepare_inference_frame(
-        frame=frame,
-        feature_columns=feature_columns,
-        missing_data_strategy=preprocessing_info["missing_data_strategy"],
-        fill_values=preprocessing_info["fill_values"],
-    )
+    prepared = _prepare_inference_frame(frame=frame, target_column=target_column, preprocessing_info=preprocessing_info)
     prepared_frame = prepared["frame"]
+    raw_prepared_frame = prepared["raw_frame"]
+    model_feature_columns = [str(item) for item in prepared["model_feature_columns"] if str(item).strip()]
+    calibration = dict(preprocessing_info.get("calibration", {}))
+    regression_uncertainty = dict(preprocessing_info.get("uncertainty", {}))
 
     normalizer = _load_normalizer(model_params=model_params)
     if normalizer is not None:
@@ -131,6 +132,12 @@ def run_inference_from_artifacts(
         predict_frame=predict_frame,
         model_name=resolved["model_name"],
     )
+    if probabilities is not None:
+        probabilities = apply_binary_platt_calibrator(
+            probabilities=probabilities,
+            class_labels=class_labels,
+            calibrator=calibration,
+        )
     if predictions_raw.size == 0:
         raise ValueError("Inference produced no predictions after preprocessing.")
 
@@ -143,7 +150,7 @@ def run_inference_from_artifacts(
 
     source_rows = aligned_source["__source_row"].to_numpy(dtype=int)
     aligned_raw = (
-        prepared_frame.set_index("__source_row")
+        raw_prepared_frame.set_index("__source_row")
         .loc[source_rows]
         .reset_index()
     )
@@ -179,10 +186,15 @@ def run_inference_from_artifacts(
             predictions = np.asarray(predictions_raw)
     else:
         predictions = np.asarray(predictions_raw)
+    prediction_interval = (
+        apply_regression_residual_interval(predictions=predictions, interval=regression_uncertainty)
+        if not is_classification
+        else None
+    )
 
     diagnostics = _compute_shift_diagnostics(
-        aligned_frame=aligned_raw,
-        feature_columns=feature_columns,
+        aligned_frame=aligned_source,
+        feature_columns=model_feature_columns,
         normalizer=normalizer,
     )
     recommendations = _build_recommendations(
@@ -194,13 +206,25 @@ def run_inference_from_artifacts(
 
     prediction_frame = _build_prediction_frame(
         source_rows=source_rows,
-        predictions=predictions,
+        predictions=prediction_interval["prediction"] if prediction_interval is not None else predictions,
         probabilities=probabilities,
         class_labels=class_labels,
         threshold_used=threshold_used,
         target_column=target_column,
         task_type=task_type,
+        prediction_interval=prediction_interval,
     )
+    if lag_warmup_rows > 0:
+        unavailable_rows = prepared_frame["__source_row"].head(lag_warmup_rows).to_numpy(dtype=int)
+        prediction_frame = _prepend_unavailable_prediction_rows(
+            prediction_frame=prediction_frame,
+            unavailable_source_rows=unavailable_rows,
+            is_classification=is_classification,
+            class_labels=class_labels,
+            target_column=target_column,
+            threshold_used=threshold_used,
+            has_interval=prediction_interval is not None,
+        )
     report_path, predictions_path = _resolve_output_paths(
         data_path=requested_data_path,
         output_path=output_path,
@@ -221,10 +245,12 @@ def run_inference_from_artifacts(
         "materialized_input_format": materialized.materialized_format or materialized.detected_format,
         "target_column": target_column,
         "feature_columns": feature_columns,
+        "model_feature_columns": model_feature_columns,
         "rows_input": int(len(frame)),
         "rows_after_preprocessing": int(len(prepared_frame)),
         "dropped_rows_missing_features": int(prepared["dropped_rows"]),
-        "prediction_count": int(len(predictions)),
+        "prediction_count": int(len(prediction_frame)),
+        "predictions_available_count": int(len(predictions)),
         "lag_warmup_rows": int(lag_warmup_rows),
         "normalization": {
             "enabled": bool(normalizer is not None),
@@ -232,6 +258,8 @@ def run_inference_from_artifacts(
             "target_denormalized": denormalized,
         },
         "decision_threshold_used": threshold_used,
+        "calibration": calibration,
+        "uncertainty": regression_uncertainty if not is_classification else _classification_uncertainty_summary(probabilities),
         "evaluation": eval_payload,
         "ood_summary": diagnostics["ood_summary"],
         "drift_summary": diagnostics["drift_summary"],
@@ -308,48 +336,63 @@ def _extract_preprocessing_info(*, model_params: dict[str, Any]) -> dict[str, An
     preprocessing = extra.get("preprocessing")
     if not isinstance(preprocessing, dict):
         preprocessing = {}
-    requested = str(preprocessing.get("missing_data_strategy_requested", "keep")).strip() or "keep"
-    fill_values = preprocessing.get("fill_values")
-    if not isinstance(fill_values, dict):
-        fill_values = {}
     return {
-        "missing_data_strategy": requested,
-        "fill_values": {str(k): float(v) for k, v in fill_values.items() if _is_number(v)},
+        "preprocessing": preprocessing,
+        "calibration": dict(extra.get("calibration", {})) if isinstance(extra.get("calibration"), dict) else {},
+        "uncertainty": dict(extra.get("uncertainty", {})) if isinstance(extra.get("uncertainty"), dict) else {},
     }
 
 
 def _prepare_inference_frame(
     *,
     frame: pd.DataFrame,
-    feature_columns: list[str],
-    missing_data_strategy: str,
-    fill_values: dict[str, float],
+    target_column: str,
+    preprocessing_info: dict[str, Any],
 ) -> dict[str, Any]:
+    preprocessing = dict(preprocessing_info.get("preprocessing", {}))
+    if preprocessing.get("raw_feature_columns") and preprocessing.get("model_feature_columns"):
+        return prepare_inference_feature_frame(
+            frame=frame,
+            target_column=target_column,
+            preprocessing=preprocessing,
+        )
+
+    raw_feature_columns = [str(item) for item in preprocessing.get("raw_feature_columns", []) if str(item).strip()]
+    if not raw_feature_columns:
+        raw_feature_columns = [str(column) for column in frame.columns if str(column).strip() != target_column]
     working = frame.copy()
     working["__source_row"] = np.arange(len(working), dtype=int)
-    for col in feature_columns:
+    for col in raw_feature_columns:
         working[col] = pd.to_numeric(working[col], errors="coerce")
 
-    strategy = missing_data_strategy.lower().strip()
-    if strategy == "fill_median":
-        for col in feature_columns:
+    requested = str(preprocessing.get("missing_data_strategy_requested", "keep")).strip().lower() or "keep"
+    fill_values = preprocessing.get("fill_values")
+    if not isinstance(fill_values, dict):
+        fill_values = {}
+    if requested in {"fill_median", "median"}:
+        for col in raw_feature_columns:
             median = working[col].median(skipna=True)
             if pd.notna(median):
                 working[col] = working[col].fillna(float(median))
-    elif strategy == "fill_constant":
-        for col in feature_columns:
-            if col in fill_values:
+    elif requested in {"fill_constant", "constant"}:
+        for col in raw_feature_columns:
+            if col in fill_values and _is_number(fill_values[col]):
                 working[col] = working[col].fillna(float(fill_values[col]))
             else:
                 working[col] = working[col].fillna(0.0)
 
     before = int(len(working))
-    mask = working[feature_columns].notna().all(axis=1)
+    mask = working[raw_feature_columns].notna().all(axis=1)
     working = working.loc[mask].reset_index(drop=True)
     dropped_rows = before - int(len(working))
     if working.empty:
         raise ValueError("No usable rows left for inference after missing-data handling.")
-    return {"frame": working, "dropped_rows": dropped_rows}
+    return {
+        "frame": working,
+        "raw_frame": working.copy(),
+        "model_feature_columns": list(raw_feature_columns),
+        "dropped_rows": dropped_rows,
+    }
 
 
 def _load_normalizer(*, model_params: dict[str, Any]) -> MinMaxNormalizer | None:
@@ -776,10 +819,14 @@ def _build_prediction_frame(
     threshold_used: float | None,
     target_column: str,
     task_type: str,
+    prediction_interval: dict[str, np.ndarray] | None = None,
 ) -> pd.DataFrame:
     frame = pd.DataFrame({"source_row": source_rows.astype(int)})
     if probabilities is None:
         frame["prediction"] = np.asarray(predictions, dtype=float)
+        if prediction_interval is not None:
+            frame["prediction_lower_90"] = np.asarray(prediction_interval["lower"], dtype=float)
+            frame["prediction_upper_90"] = np.asarray(prediction_interval["upper"], dtype=float)
         return frame
     positive_label = _resolve_positive_label(
         y_true=[],
@@ -796,10 +843,47 @@ def _build_prediction_frame(
     for idx, label in enumerate(class_labels):
         safe_label = re.sub(r"[^A-Za-z0-9_]+", "_", label).strip("_") or f"class_{idx}"
         frame[f"probability_{safe_label}"] = probabilities[:, idx]
+    frame["confidence_max"] = np.max(probabilities, axis=1)
     frame["target_column"] = target_column
     if threshold_used is not None:
         frame["decision_threshold_used"] = float(threshold_used)
     return frame
+
+
+def _prepend_unavailable_prediction_rows(
+    *,
+    prediction_frame: pd.DataFrame,
+    unavailable_source_rows: np.ndarray,
+    is_classification: bool,
+    class_labels: list[str],
+    target_column: str,
+    threshold_used: float | None,
+    has_interval: bool,
+) -> pd.DataFrame:
+    if unavailable_source_rows.size == 0:
+        return prediction_frame
+    warmup = pd.DataFrame({"source_row": unavailable_source_rows.astype(int)})
+    warmup["prediction_available"] = False
+    warmup["unavailable_reason"] = "lag_warmup_context_insufficient"
+    if is_classification:
+        warmup["predicted_label"] = None
+        for idx, label in enumerate(class_labels):
+            safe_label = re.sub(r"[^A-Za-z0-9_]+", "_", label).strip("_") or f"class_{idx}"
+            warmup[f"probability_{safe_label}"] = np.nan
+        warmup["confidence_max"] = np.nan
+        warmup["target_column"] = target_column
+        if threshold_used is not None:
+            warmup["decision_threshold_used"] = float(threshold_used)
+    else:
+        warmup["prediction"] = np.nan
+        if has_interval:
+            warmup["prediction_lower_90"] = np.nan
+            warmup["prediction_upper_90"] = np.nan
+    available = prediction_frame.copy()
+    available["prediction_available"] = True
+    available["unavailable_reason"] = ""
+    combined = pd.concat([warmup, available], ignore_index=True, sort=False)
+    return combined.sort_values("source_row").reset_index(drop=True)
 
 
 def _extract_task_type(*, model_params: dict[str, Any]) -> str:
@@ -853,4 +937,19 @@ def _safe_float(value: Any) -> float:
     except (TypeError, ValueError):
         return float("nan")
     return number if math.isfinite(number) else float("nan")
+
+
+def _classification_uncertainty_summary(probabilities: np.ndarray | None) -> dict[str, Any]:
+    if probabilities is None:
+        return {}
+    proba = np.asarray(probabilities, dtype=float)
+    if proba.size == 0:
+        return {}
+    max_conf = np.max(proba, axis=1)
+    return {
+        "status": "ok",
+        "kind": "classification",
+        "mean_max_confidence": float(np.mean(max_conf)),
+        "low_confidence_fraction": float(np.mean(max_conf < 0.60)),
+    }
 

@@ -199,8 +199,9 @@ def run_intelligence_review(
                 {"task": "proposer", "status": "ok", "result": debate_payload["proposer_position"]},
                 {"task": "counterposition", "status": "ok", "result": debate_payload["counterposition"]},
                 {"task": "verifier", "status": "ok", "result": debate_payload["verifier_verdict"]},
+                {"task": "domain_interpreter", "status": "ok", "result": debate_payload["domain_interpretation"]},
             ],
-            summary="Relaytic completed the proposer, counterposition, and verifier semantic tasks.",
+            summary="Relaytic completed the proposer, counterposition, verifier, and domain-interpreter semantic tasks.",
             trace=trace,
         ),
         intelligence_escalation=IntelligenceEscalationArtifact(
@@ -255,6 +256,7 @@ def run_intelligence_review(
             proposer_position=debate_payload["proposer_position"],
             counterposition=debate_payload["counterposition"],
             verifier_verdict=debate_payload["verifier_verdict"],
+            domain_interpretation=debate_payload["domain_interpretation"],
             recommended_followup_action=str(debate_payload["recommended_followup_action"]),
             confidence=str(debate_payload["confidence"]),
             summary=str(debate_payload["summary"]),
@@ -306,12 +308,23 @@ def render_intelligence_review_markdown(bundle: IntelligenceBundle | dict[str, A
     proposer = dict(debate.get("proposer_position") or {})
     counter = dict(debate.get("counterposition") or {})
     verifier = dict(debate.get("verifier_verdict") or {})
+    domain_interpretation = dict(debate.get("domain_interpretation") or {})
     if proposer:
         lines.extend(["", "## Proposer", f"- {proposer.get('summary') or 'No proposer summary recorded.'}"])
     if counter:
         lines.extend(["", "## Counterposition", f"- {counter.get('summary') or 'No counterposition summary recorded.'}"])
     if verifier:
         lines.extend(["", "## Verifier", f"- {verifier.get('summary') or 'No verifier summary recorded.'}"])
+    if domain_interpretation:
+        lines.extend(
+            [
+                "",
+                "## Domain Interpretation",
+                f"- Archetype: `{domain_interpretation.get('domain_archetype') or 'unknown'}`",
+                f"- Operational context: `{domain_interpretation.get('operational_context') or 'unknown'}`",
+                f"- Modeling bias: `{domain_interpretation.get('modeling_bias') or 'unknown'}`",
+            ]
+        )
     if counterpositions:
         lines.extend(["", "## Candidate Follow-Ups"])
         for item in counterpositions[:4]:
@@ -412,6 +425,7 @@ def _semantic_task_request(
             {"task": "proposer", "goal": "Argue for the strongest bounded next move from current evidence."},
             {"task": "counterposition", "goal": "Argue for the strongest rival next move or stopping reason."},
             {"task": "verifier", "goal": "Fuse proposer and counterposition into a machine-actionable recommendation."},
+            {"task": "domain_interpreter", "goal": "Infer the most plausible domain framing, deployment context, and modeling caveats from artifact summaries."},
         ],
         "context_digest": {
             "context_block_count": len(context_blocks),
@@ -436,6 +450,7 @@ def _run_semantic_tasks(
         evidence_bundle=evidence_bundle,
         completion_bundle=completion_bundle,
         lifecycle_bundle=lifecycle_bundle,
+        context_blocks=context_blocks,
         grounding_points=grounding_points,
     )
     if discovery.status != "available" or discovery.advisor is None:
@@ -451,7 +466,7 @@ def _run_semantic_tasks(
     prompt = (
         "You are Relaytic's bounded semantic deliberation layer. Use only the provided artifact summaries. "
         "Never assume raw-row access. Return JSON with keys proposer_position, counterposition, verifier_verdict, "
-        "recommended_followup_action, confidence, counterpositions, unresolved_items, reason_codes, "
+        "domain_interpretation, recommended_followup_action, confidence, counterpositions, unresolved_items, reason_codes, "
         "escalation_recommended, recommended_path, escalation_summary, summary."
     )
     payload = {
@@ -486,6 +501,7 @@ def _run_semantic_tasks(
         "proposer_position": _dict_or_fallback(result.payload.get("proposer_position"), fallback["debate"]["proposer_position"]),
         "counterposition": _dict_or_fallback(result.payload.get("counterposition"), fallback["debate"]["counterposition"]),
         "verifier_verdict": _dict_or_fallback(result.payload.get("verifier_verdict"), fallback["debate"]["verifier_verdict"]),
+        "domain_interpretation": _dict_or_fallback(result.payload.get("domain_interpretation"), fallback["debate"]["domain_interpretation"]),
         "recommended_followup_action": _clean_text(result.payload.get("recommended_followup_action"))
         or fallback["debate"]["recommended_followup_action"],
         "confidence": _clean_text(result.payload.get("confidence")) or fallback["debate"]["confidence"],
@@ -518,6 +534,7 @@ def _deterministic_semantic_debate(
     evidence_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
+    context_blocks: list[dict[str, Any]],
     grounding_points: list[dict[str, Any]],
 ) -> dict[str, Any]:
     audit = _bundle_item(evidence_bundle, "audit_report")
@@ -565,6 +582,12 @@ def _deterministic_semantic_debate(
     elif unresolved:
         confidence = "low"
 
+    domain_interpretation = _derive_domain_interpretation(
+        context_blocks=context_blocks,
+        grounding_points=grounding_points,
+        recommended_action=recommended_action,
+    )
+
     proposer = {
         "action": recommended_action,
         "summary": (
@@ -594,6 +617,7 @@ def _deterministic_semantic_debate(
             "proposer_position": proposer,
             "counterposition": counter,
             "verifier_verdict": verifier,
+            "domain_interpretation": domain_interpretation,
             "recommended_followup_action": recommended_action,
             "confidence": confidence,
             "summary": f"Relaytic's semantic debate currently prefers `{recommended_action}`.",
@@ -611,6 +635,62 @@ def _deterministic_semantic_debate(
             {"action": recommended_action, "priority": 1, "summary": proposer["summary"]},
             {"action": counter_action, "priority": 2, "summary": counter["summary"]},
         ],
+    }
+
+
+def _derive_domain_interpretation(
+    *,
+    context_blocks: list[dict[str, Any]],
+    grounding_points: list[dict[str, Any]],
+    recommended_action: str,
+) -> dict[str, Any]:
+    corpus = " ".join(
+        [
+            str(item.get("title", ""))
+            + " "
+            + str(item.get("summary", ""))
+            for item in context_blocks
+        ]
+        + [str(item.get("evidence", "")) for item in grounding_points]
+    ).lower()
+    domain_archetype = "generic_tabular"
+    operational_context = "general_prediction"
+    modeling_bias = "balanced_supervised_baseline"
+    if any(token in corpus for token in ("fraud", "chargeback", "default", "credit risk", "risk score")):
+        domain_archetype = "fraud_risk"
+        operational_context = "rare_event_decisioning"
+        modeling_bias = "precision_recall_calibration"
+    elif any(token in corpus for token in ("maintenance", "machine failure", "downtime", "sensor", "predictive maintenance")):
+        domain_archetype = "predictive_maintenance"
+        operational_context = "rare_event_monitoring"
+        modeling_bias = "time_aware_recall_with_calibration"
+    elif any(token in corpus for token in ("churn", "retention", "customer")):
+        domain_archetype = "customer_churn"
+        operational_context = "retention_scoring"
+        modeling_bias = "ranking_and_threshold_tuning"
+    elif any(token in corpus for token in ("diagnosis", "medical", "patient", "clinical", "disease")):
+        domain_archetype = "health_risk"
+        operational_context = "decision_support"
+        modeling_bias = "calibrated_conservative_classification"
+    elif any(token in corpus for token in ("quality", "defect", "scrap", "yield", "manufacturing")):
+        domain_archetype = "manufacturing_quality"
+        operational_context = "process_quality_prediction"
+        modeling_bias = "stability_and_leakage_control"
+    elif any(token in corpus for token in ("price", "demand", "forecast", "sales")):
+        domain_archetype = "commercial_forecasting"
+        operational_context = "numeric_target_optimization"
+        modeling_bias = "regression_with_uncertainty"
+    if recommended_action == "run_recalibration_pass":
+        modeling_bias = "calibration_repair_priority"
+    elif recommended_action == "run_retrain_pass":
+        modeling_bias = "route_refresh_priority"
+    elif recommended_action == "expand_challenger_portfolio":
+        modeling_bias = "widen_search_pressure"
+    return {
+        "domain_archetype": domain_archetype,
+        "operational_context": operational_context,
+        "modeling_bias": modeling_bias,
+        "summary": f"Relaytic interprets this run as `{domain_archetype}` in `{operational_context}` mode with `{modeling_bias}` bias.",
     }
 
 

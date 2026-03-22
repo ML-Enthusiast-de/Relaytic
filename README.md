@@ -16,7 +16,9 @@ The repository already supports a working early product baseline:
 - optional clarification queues with explicit fallback assumptions
 - investigation specialists that profile datasets and resolve early modeling focus
 - Strategist planning artifacts with a concrete Builder handoff
-- a first deterministic local route from data to model inside one Relaytic run directory
+- a deterministic local route from data to model inside one Relaytic run directory with richer categorical handling, executed missingness-aware feature engineering, bounded interaction features, and split-safe preprocessing reuse at inference time
+- broader bounded candidate search within the current Builder family set instead of a single fixed-parameter route
+- calibrated classification outputs and uncertainty-bearing regression/classification summaries in inference artifacts
 - challenger, ablation, audit, and decision-memo evidence around the first built route
 - completion-governor judgment with visible run state and machine-actionable next actions
 - lifecycle-governor judgment with explicit keep, recalibrate, retrain, promote, and rollback decisions
@@ -25,6 +27,7 @@ The repository already supports a working early product baseline:
 - structured semantic-task execution with capability-aware context assembly, document grounding, semantic debate/counterposition artifacts, and explicit uncertainty reporting
 - bounded autonomous follow-up loops with challenger queues, recalibration/retrain requests, loop budgets, and champion lineage tracking
 - privacy-safe external research retrieval from redacted run signatures with typed source inventory, method-transfer reports, benchmark-reference capture, and explicit external-research audit
+- benchmark parity and gap reporting against explicit reference approaches under the same split and metric contract
 - communicative assist surfaces that explain what Relaytic is doing, let humans or external agents jump back to any bounded stage, and let Relaytic take over when the operator stops or is unsure
 - concise run summaries for humans and stable summary artifacts for agents
 - one-line bootstrap install plus post-install dependency verification
@@ -35,7 +38,7 @@ The repository already supports a working early product baseline:
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-The next load-bearing implementation step is Slice 11: benchmark parity, constrained superiority proof, and honest reference comparison.
+The next load-bearing implementation step is Slice 10: feedback assimilation from operator interventions, runtime failures, and later-run evidence.
 
 ## Design Principles
 
@@ -172,6 +175,7 @@ relaytic interoperability show
 relaytic interoperability self-check --live
 relaytic runtime show --run-dir path/to/existing_run
 relaytic memory show --run-dir path/to/existing_run
+relaytic benchmark show --run-dir path/to/existing_run
 ```
 
 Run the repository leak scan before commits:
@@ -237,7 +241,7 @@ The primary MVP surface is now a single end-to-end run command:
 relaytic run --data-path path/to/data.csv --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
 ```
 
-That command now carries the run through intake, investigation, cross-run memory retrieval, planning, execution, challenger pressure, ablation checks, semantic debate, audit, completion, lifecycle review, bounded autonomous follow-up, and summary materialization.
+That command now carries the run through intake, investigation, cross-run memory retrieval, planning, execution, challenger pressure, ablation checks, semantic debate, audit, privacy-safe research retrieval, benchmark comparison, completion, lifecycle review, bounded autonomous follow-up, and summary materialization.
 
 You can also inspect or stage richer local sources first:
 
@@ -258,6 +262,7 @@ relaytic memory show --run-dir artifacts/run_your_dataset_...
 relaytic intelligence show --run-dir artifacts/run_your_dataset_...
 relaytic research show --run-dir artifacts/run_your_dataset_...
 relaytic research sources --run-dir artifacts/run_your_dataset_...
+relaytic benchmark show --run-dir artifacts/run_your_dataset_...
 relaytic assist show --run-dir artifacts/run_your_dataset_...
 relaytic assist turn --run-dir artifacts/run_your_dataset_... --message "why did you choose this route?"
 relaytic status --run-dir artifacts/run_your_dataset_...
@@ -280,6 +285,7 @@ relaytic plan run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic evidence run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic intelligence run --run-dir artifacts/run_demo
 relaytic research gather --run-dir artifacts/run_demo
+relaytic benchmark run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic completion review --run-dir artifacts/run_demo
 relaytic lifecycle review --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic autonomy run --run-dir artifacts/run_demo --data-path path/to/data.csv
@@ -289,6 +295,7 @@ relaytic runtime events --run-dir artifacts/run_demo --limit 12
 relaytic memory show --run-dir artifacts/run_demo
 relaytic intelligence show --run-dir artifacts/run_demo
 relaytic research show --run-dir artifacts/run_demo
+relaytic benchmark show --run-dir artifacts/run_demo
 relaytic autonomy show --run-dir artifacts/run_demo
 relaytic run-inference --run-dir artifacts/run_demo --data-path path/to/data.csv
 ```
@@ -314,6 +321,7 @@ That flow produces:
 - memory artifacts such as `memory_retrieval.json`, `analog_run_candidates.json`, `route_prior_context.json`, `challenger_prior_suggestions.json`, `reflection_memory.json`, and `memory_flush_report.json`
 - runtime artifacts such as `lab_event_stream.jsonl`, `hook_execution_log.json`, `run_checkpoint_manifest.json`, `capability_profiles.json`, `data_access_audit.json`, and `context_influence_report.json`
 - intelligence artifacts such as `intelligence_mode.json`, `semantic_task_results.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
+- benchmark artifacts such as `reference_approach_matrix.json`, `benchmark_gap_report.json`, and `benchmark_parity_report.json`
 - completion artifacts such as `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
 - lifecycle artifacts such as `champion_vs_candidate.json`, `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json`
 - autonomy artifacts such as `autonomy_loop_state.json`, `autonomy_round_report.json`, `challenger_queue.json`, `branch_outcome_matrix.json`, `retrain_run_request.json`, `recalibration_run_request.json`, `champion_lineage.json`, and `loop_budget_report.json`

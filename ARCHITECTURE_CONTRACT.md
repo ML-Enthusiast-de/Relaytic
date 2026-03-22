@@ -28,6 +28,7 @@ Current package rule:
 - `src/relaytic/runtime/` owns Slice 09B local gateway, append-only event stream, hook dispatch, checkpoints, and capability-profile enforcement
 - `src/relaytic/intelligence/` owns Slice 09 structured semantic tasks, semantic debate/verifier flows, backend discovery, and document-grounding orchestration
 - `src/relaytic/autonomy/` owns Slice 09C bounded autonomy loops, executable lifecycle follow-up, challenger queues, and champion-lineage management
+- `src/relaytic/benchmark/` owns Slice 11 reference-approach comparison, parity-gap reporting, and benchmark artifact persistence
 - `src/relaytic/assist/` owns Slice 09E communicative assistance, stage-navigation planning, optional takeover coordination, and connection-guide persistence
 - `src/relaytic/interoperability/` owns Slice 08A host-neutral MCP serving, host-bundle generation, and interoperability self-checks
 - `src/relaytic/integrations/` owns optional third-party capability discovery and adapter-scoped inventory surfaces
@@ -63,6 +64,8 @@ These files are required and must stay current:
 - `docs/build_slices/phase_09b.md`
 - `docs/build_slices/phase_09c.md`
 - `docs/build_slices/phase_09d.md`
+- `docs/build_slices/phase_09e.md`
+- `docs/build_slices/phase_11.md`
 
 ## Artifact Contract
 
@@ -154,6 +157,13 @@ The current slices must preserve these names:
 - `method_transfer_report.json`
 - `benchmark_reference_report.json`
 - `external_research_audit.json`
+- `reference_approach_matrix.json`
+- `benchmark_gap_report.json`
+- `benchmark_parity_report.json`
+- `assist_mode.json`
+- `assist_session_state.json`
+- `assistant_connection_guide.json`
+- `assist_turn_log.jsonl`
 - `context_assembly_report.json`
 - `doc_grounding_report.json`
 
@@ -235,6 +245,14 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic runtime events`
 - `relaytic intelligence run`
 - `relaytic intelligence show`
+- `relaytic research gather`
+- `relaytic research show`
+- `relaytic research sources`
+- `relaytic benchmark run`
+- `relaytic benchmark show`
+- `relaytic assist show`
+- `relaytic assist turn`
+- `relaytic assist chat`
 - `relaytic autonomy run`
 - `relaytic autonomy show`
 - `relaytic run`
@@ -359,6 +377,17 @@ Minimum guaranteed surfaces at this stage:
 - connection guidance must explain both lightweight local options and local host-connection options without implying any public exposure is required
 - assist stage navigation must refresh downstream artifacts so the run remains coherent after a jump-back request
 - every assist turn that changes state must be persisted in an explicit turn log rather than disappearing as ephemeral chat
+
+## Slice 11 Benchmark Contract
+
+- benchmark parity work must live behind one canonical `relaytic benchmark` surface rather than being scattered across reports only
+- the public surface centers on `relaytic benchmark run` and `relaytic benchmark show`
+- benchmark comparison must use the same split contract and primary-metric contract as the evaluated Relaytic route unless policy explicitly records a justified deviation
+- the benchmark layer must persist a reference matrix, a gap report, and a parity report as explicit artifacts rather than hidden score tables
+- benchmark output must distinguish ordinary parity, near parity, clear underperformance, and constrained/operator-aware advantage rather than collapsing all outcomes into pass/fail
+- benchmark output must explain whether the observed gap is more attributable to route quality, challenger breadth, recalibration/calibration policy, uncertainty handling, or loop policy
+- benchmark review must remain honest when a strong reference stack is unavailable; it may degrade to available deterministic references instead of inventing unsupported superiority claims
+- optional stronger baselines such as FLAML or MAPIE-backed uncertainty comparisons may appear behind adapters, but deterministic scikit-learn reference comparisons remain the baseline floor
 
 ## Slice 09A Memory Contract
 

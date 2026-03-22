@@ -176,9 +176,9 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 09E
-- next execution target: Slice 11
-- next proof follow-on after Slice 11: Slice 10
+- implemented baseline: Slice 00 through Slice 11
+- next execution target: Slice 10
+- next proof follow-on after Slice 10: Slice 12
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -829,6 +829,9 @@ Innovation hook:
 
 ## Slice 11 - Benchmark parity and reference approaches
 
+Status:
+- implemented in the current baseline
+
 Goal:
 - benchmark doctrine
 - reference-approach comparison
@@ -839,7 +842,6 @@ Required outputs:
 - `benchmark_gap_report.json`
 - `reference_approach_matrix.json`
 - `benchmark_parity_report.json`
-- `gold_standard_comparison.json`
 
 Required behavior:
 - benchmark results must separate deterministic-floor Relaytic, local-LLM-amplified Relaytic, bounded-loop Relaytic, and dojo-improved Relaytic

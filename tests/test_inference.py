@@ -46,6 +46,8 @@ def test_inference_from_checkpoint_supports_regression_and_shift_diagnostics(
     assert payload["prediction_count"] > 0
     assert payload["evaluation"]["available"] is True
     assert "r2" in payload["evaluation"]["metrics"]
+    assert payload["uncertainty"]["status"] == "ok"
+    assert payload["predictions_preview"][0]["prediction_lower_90"] <= payload["predictions_preview"][0]["prediction_upper_90"]
     assert payload["ood_summary"]["overall_ood_fraction"] > 0.0
     assert Path(payload["report_path"]).is_file()
     assert Path(payload["predictions_path"]).is_file()
@@ -95,5 +97,7 @@ def test_inference_from_run_dir_supports_classification_threshold_override(
     assert payload["decision_threshold_used"] == 0.35
     assert payload["evaluation"]["available"] is True
     assert "f1" in payload["evaluation"]["metrics"]
+    assert payload["uncertainty"]["status"] == "ok"
+    assert "low_confidence_fraction" in payload["uncertainty"]
     assert payload["predictions_preview"]
 

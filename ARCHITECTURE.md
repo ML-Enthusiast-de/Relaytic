@@ -15,22 +15,24 @@ Relaytic is organized as a staged artifact pipeline.
 3. Investigation
    Specialist agents inspect the dataset, generate grounded hypotheses, and resolve the initial modeling focus.
 4. Planning and execution
-   Strategist turns investigation outputs into a concrete Builder handoff, and the first deterministic route executes into the same Relaytic run directory.
+   Strategist turns investigation outputs into a concrete Builder handoff, and the current Builder route executes with split-safe preprocessing, bounded categorical handling, missingness-aware features, bounded interaction features, calibration hooks, and reusable inference-time transforms inside the same Relaytic run directory.
 5. Evidence pressure
    Challenger, ablation, and audit specialists treat the first built route as a provisional champion, then write leaderboard, report, and belief-update artifacts for humans and external agents.
 6. Cross-run memory
    Relaytic retrieves prior analog runs from local artifacts, derives route and challenger priors, and flushes reflection memory back to disk without making memory silently authoritative.
 7. Semantically grounded deliberation
    Intelligence specialists assemble capability-aware context, ground semantic work in local documents and artifacts, and emit counterposition/verifier outputs rather than one opaque semantic guess.
-8. Completion governor
+8. Research and benchmark parity
+   Research specialists retrieve redacted external method knowledge, and the benchmark layer compares Relaytic against explicit reference approaches under the same split and metric contract so the run can be judged against something real.
+9. Completion governor
    Completion specialists fuse the full artifact graph into a visible run state, mandate-evidence review, blocking-layer diagnosis, and machine-actionable next action.
-9. Lifecycle
+10. Lifecycle
    Lifecycle specialists compare the current champion, challenger evidence, completion state, and fresh-data behavior to decide whether to keep, recalibrate, retrain, promote, or roll back.
-10. Bounded autonomy
+11. Bounded autonomy
    Autonomy specialists can execute one budgeted follow-up round such as challenger expansion, recalibration, retraining, or re-plan follow-up while keeping lineage, branch outcomes, and stop rules visible.
-11. Runtime gateway
+12. Runtime gateway
    The local runtime owns append-only event emission, checkpoints, hook audit, and capability-scoped specialist visibility so CLI and MCP share one control plane.
-12. Interoperability and host adapters
+13. Interoperability and host adapters
    Relaytic exposes the same MVP and slice-level surfaces through a host-neutral MCP server plus thin host wrappers for common agent ecosystems.
 
 ## Current Data Ingestion Boundary
@@ -143,8 +145,9 @@ The repository currently implements the following product layers:
 - Slice 09C: bounded autonomous second-pass execution with challenger queues, executable recalibration/retrain requests, loop budgets, and champion lineage
 - Slice 09D: privacy-safe external research retrieval with redacted query planning, typed source inventory, method-transfer distillation, benchmark-reference capture, and explicit no-leak audit
 - Slice 09E: communicative assist surfaces with deterministic explanation, stage navigation, bounded takeover, optional local semantic lift, and host-connection guidance
+- Slice 11: benchmark parity, explicit reference-approach comparison, and parity-gap reporting under the same split and metric contract
 
-The next planned layer is Slice 11: benchmark parity, constrained superiority proof, and honest reference comparison.
+The next planned layer is Slice 10: feedback assimilation from operator interventions, runtime failures, and later-run evidence.
 
 ## Current Artifact Baseline
 
@@ -213,6 +216,9 @@ Relaytic already standardizes several load-bearing artifacts:
 - `method_transfer_report.json`
 - `benchmark_reference_report.json`
 - `external_research_audit.json`
+- `reference_approach_matrix.json`
+- `benchmark_gap_report.json`
+- `benchmark_parity_report.json`
 - `assist_mode.json`
 - `assist_session_state.json`
 - `assistant_connection_guide.json`
@@ -277,6 +283,11 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic runtime events`
 - `relaytic intelligence run`
 - `relaytic intelligence show`
+- `relaytic research gather`
+- `relaytic research show`
+- `relaytic research sources`
+- `relaytic benchmark run`
+- `relaytic benchmark show`
 - `relaytic assist show`
 - `relaytic assist turn`
 - `relaytic assist chat`

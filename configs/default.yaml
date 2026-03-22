@@ -123,6 +123,16 @@ research:
   semantic_scholar_endpoint: https://api.semanticscholar.org/graph/v1/paper/search
   crossref_endpoint: https://api.crossref.org/works
 
+benchmark:
+  enabled: true
+  require_same_split_contract: true
+  require_same_metric_contract: true
+  use_optional_flaml_reference: false
+  allow_time_series_references: true
+  max_reference_models: 3
+  near_parity_absolute_delta: 0.03
+  near_parity_relative_delta: 0.08
+
 prompts:
   analyst_system_path: ""
   modeler_system_path: ""

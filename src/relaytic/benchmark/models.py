@@ -1,0 +1,158 @@
+"""Typed artifact models for Slice 11 benchmark parity work."""
+
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass, field
+from typing import Any
+
+
+BENCHMARK_CONTROLS_SCHEMA_VERSION = "relaytic.benchmark_controls.v1"
+REFERENCE_APPROACH_MATRIX_SCHEMA_VERSION = "relaytic.reference_approach_matrix.v1"
+BENCHMARK_GAP_REPORT_SCHEMA_VERSION = "relaytic.benchmark_gap_report.v1"
+BENCHMARK_PARITY_REPORT_SCHEMA_VERSION = "relaytic.benchmark_parity_report.v1"
+
+
+@dataclass(frozen=True)
+class BenchmarkControls:
+    schema_version: str = BENCHMARK_CONTROLS_SCHEMA_VERSION
+    enabled: bool = True
+    require_same_split_contract: bool = True
+    require_same_metric_contract: bool = True
+    use_optional_flaml_reference: bool = False
+    allow_time_series_references: bool = True
+    max_reference_models: int = 3
+    near_parity_absolute_delta: float = 0.03
+    near_parity_relative_delta: float = 0.08
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class BenchmarkTrace:
+    agent: str
+    operating_mode: str
+    llm_used: bool
+    llm_status: str
+    deterministic_evidence: list[str] = field(default_factory=list)
+    advisory_notes: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class ReferenceApproachMatrix:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    task_type: str
+    data_mode: str
+    primary_metric: str
+    comparison_metric: str
+    metric_direction: str
+    relaytic_reference: dict[str, Any]
+    references: list[dict[str, Any]]
+    winning_reference_family: str | None
+    same_contract_guarantees: list[str]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BenchmarkGapReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    comparison_metric: str
+    metric_direction: str
+    relaytic_family: str | None
+    best_reference_family: str | None
+    relaytic_rank: int | None
+    total_compared_routes: int
+    validation_gap: float | None
+    test_gap: float | None
+    validation_relative_gap: float | None
+    test_relative_gap: float | None
+    relaytic_beats_best_reference: bool
+    near_parity: bool
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BenchmarkParityReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    benchmark_expected: bool
+    parity_status: str
+    comparison_metric: str
+    recommended_action: str
+    winning_family: str | None
+    relaytic_family: str | None
+    reference_count: int
+    strong_reference_available: bool
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BenchmarkBundle:
+    reference_approach_matrix: ReferenceApproachMatrix
+    benchmark_gap_report: BenchmarkGapReport
+    benchmark_parity_report: BenchmarkParityReport
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "reference_approach_matrix": self.reference_approach_matrix.to_dict(),
+            "benchmark_gap_report": self.benchmark_gap_report.to_dict(),
+            "benchmark_parity_report": self.benchmark_parity_report.to_dict(),
+        }
+
+
+def build_benchmark_controls_from_policy(policy: dict[str, Any]) -> BenchmarkControls:
+    benchmark_cfg = dict(policy.get("benchmark", {}))
+    try:
+        max_reference_models = int(benchmark_cfg.get("max_reference_models", 3) or 3)
+    except (TypeError, ValueError):
+        max_reference_models = 3
+    try:
+        near_abs = float(benchmark_cfg.get("near_parity_absolute_delta", 0.03) or 0.03)
+    except (TypeError, ValueError):
+        near_abs = 0.03
+    try:
+        near_rel = float(benchmark_cfg.get("near_parity_relative_delta", 0.08) or 0.08)
+    except (TypeError, ValueError):
+        near_rel = 0.08
+    return BenchmarkControls(
+        enabled=bool(benchmark_cfg.get("enabled", True)),
+        require_same_split_contract=bool(benchmark_cfg.get("require_same_split_contract", True)),
+        require_same_metric_contract=bool(benchmark_cfg.get("require_same_metric_contract", True)),
+        use_optional_flaml_reference=bool(benchmark_cfg.get("use_optional_flaml_reference", False)),
+        allow_time_series_references=bool(benchmark_cfg.get("allow_time_series_references", True)),
+        max_reference_models=max(2, min(6, max_reference_models)),
+        near_parity_absolute_delta=max(0.0, min(0.25, near_abs)),
+        near_parity_relative_delta=max(0.0, min(0.5, near_rel)),
+    )

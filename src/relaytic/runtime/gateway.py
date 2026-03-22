@@ -61,9 +61,28 @@ _STAGE_PLAN: dict[str, dict[str, Any]] = {
             "completion_decision.json",
         ],
     },
+    "research": {
+        "specialists": ["research_librarian"],
+        "input_artifacts": [
+            "run_brief.json",
+            "task_brief.json",
+            "dataset_profile.json",
+            "plan.json",
+            "semantic_debate_report.json",
+        ],
+    },
+    "benchmark": {
+        "specialists": ["benchmark_referee"],
+        "input_artifacts": [
+            "plan.json",
+            "model_params.json",
+            "task_brief.json",
+            "run_brief.json",
+        ],
+    },
     "completion": {
         "specialists": ["completion_governor"],
-        "input_artifacts": ["audit_report.json", "belief_update.json", "route_prior_context.json", "memory_retrieval.json", "run_summary.json"],
+        "input_artifacts": ["audit_report.json", "belief_update.json", "route_prior_context.json", "memory_retrieval.json", "benchmark_parity_report.json", "run_summary.json"],
     },
     "lifecycle": {
         "specialists": ["lifecycle_governor"],
@@ -766,10 +785,23 @@ def _existing_artifact_paths(root: Path) -> list[str]:
 
 
 def _infer_existing_stage(root: Path) -> str:
-    if (root / "autonomy_loop_state.json").exists():
+    if any(
+        (root / filename).exists()
+        for filename in (
+            "autonomy_loop_state.json",
+            "autonomy_round_report.json",
+            "branch_outcome_matrix.json",
+            "champion_lineage.json",
+            "loop_budget_report.json",
+        )
+    ):
         return "autonomy_reviewed"
     if (root / "promotion_decision.json").exists():
         return "lifecycle_reviewed"
+    if (root / "benchmark_parity_report.json").exists():
+        return "benchmark_reviewed"
+    if (root / "research_brief.json").exists():
+        return "research_reviewed"
     if (root / "semantic_debate_report.json").exists():
         return "intelligence_reviewed"
     if (root / "completion_decision.json").exists():
@@ -787,12 +819,14 @@ def _infer_existing_stage(root: Path) -> str:
 
 def _resolve_runtime_stage_label(root: Path, *, latest_stage: str, last_event_stage: str) -> str:
     inferred = _infer_existing_stage(root)
-    if latest_stage and latest_stage != "memory":
-        return latest_stage
     if inferred == "autonomy_reviewed":
         return "autonomy"
     if inferred == "lifecycle_reviewed":
         return "lifecycle"
+    if inferred == "benchmark_reviewed":
+        return "benchmark"
+    if inferred == "research_reviewed":
+        return "research"
     if inferred == "intelligence_reviewed":
         return "intelligence"
     if inferred == "completion_reviewed":
@@ -805,6 +839,8 @@ def _resolve_runtime_stage_label(root: Path, *, latest_stage: str, last_event_st
         return "investigation"
     if inferred == "intake_interpreted":
         return "intake"
+    if latest_stage and latest_stage != "memory":
+        return latest_stage
     if latest_stage:
         return latest_stage
     if last_event_stage:

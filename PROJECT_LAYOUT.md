@@ -55,13 +55,17 @@ Relaytic/
       investigation/
       mandate/
       evidence/
+      benchmark/
       completion/
       lifecycle/
       intelligence/
       memory/
       autonomy/
+      research/
+      assist/
       interoperability/
       integrations/
+      modeling/
       planning/
       policies/
       runs/
@@ -91,7 +95,10 @@ Relaytic/
 - `src/relaytic/intake/` owns intake translation and interpretation artifacts
 - `src/relaytic/investigation/` owns investigation specialists and focus artifacts
 - `src/relaytic/planning/` owns Strategist planning, Builder handoff, and planning artifact storage
+- `src/relaytic/modeling/feature_pipeline.py` owns split-safe categorical handling, missingness indicators, bounded interaction features, and reusable preprocessing state
+- `src/relaytic/modeling/calibration.py` owns bounded calibration and uncertainty helpers for the current Builder route
 - `src/relaytic/evidence/` owns challenger, ablation, audit, leaderboard, and decision-memo artifacts
+- `src/relaytic/benchmark/` owns reference-approach comparison, parity-gap reporting, and benchmark artifact storage
 - `src/relaytic/completion/` owns the completion-governor layer, run-state artifacts, and status synthesis
 - `src/relaytic/lifecycle/` owns champion/candidate comparison, recalibration, retraining, promotion, and rollback artifacts
 - `src/relaytic/intelligence/` owns semantic-task execution, backend discovery, capability-aware context assembly, document grounding, counterposition packs, and semantic uncertainty artifacts
@@ -120,6 +127,7 @@ Relaytic/
 
 - `src/relaytic/research/` owns Slice 09D redacted external research retrieval, method-transfer distillation, benchmark-reference harvesting, and research-audit persistence
 - `src/relaytic/assist/` owns Slice 09E communicative assistance, stage-navigation planning, takeover coordination, and connection-guide persistence
+- `src/relaytic/benchmark/` owns Slice 11 reference comparison, parity-gap reporting, and benchmark artifact persistence
 
 ## Naming Rule
 

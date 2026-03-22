@@ -266,10 +266,12 @@ def _choose_action(
     research_action = _clean_text(research_brief.get("recommended_followup_action"))
     semantic_action = _clean_text(semantic_debate.get("recommended_followup_action"))
     completion_action = _clean_text(completion.get("action"))
-    if _clean_text(lifecycle_retrain.get("action")) == "retrain":
-        return "run_retrain_pass"
+    if semantic_action == "run_recalibration_pass" or research_action == "run_recalibration_pass":
+        return "run_recalibration_pass"
     if _clean_text(lifecycle_recal.get("action")) == "recalibrate":
         return "run_recalibration_pass"
+    if _clean_text(lifecycle_retrain.get("action")) == "retrain":
+        return "run_retrain_pass"
     if semantic_action in {"run_retrain_pass", "run_recalibration_pass", "expand_challenger_portfolio", "collect_more_data", "benchmark_needed"}:
         if semantic_action == "collect_more_data" and local_data_candidates:
             return "run_retrain_pass"

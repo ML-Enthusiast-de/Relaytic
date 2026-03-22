@@ -276,12 +276,14 @@ class CompletionJudgeAgent:
         evidence_bundle: dict[str, Any],
         memory_bundle: dict[str, Any] | None,
         research_bundle: dict[str, Any] | None,
+        benchmark_bundle: dict[str, Any] | None,
         intelligence_bundle: dict[str, Any] | None,
         state_frame: _StateFrame,
         mandate_review: dict[str, Any],
     ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], CompletionTrace]:
         memory_bundle = memory_bundle or {}
         research_bundle = research_bundle or {}
+        benchmark_bundle = benchmark_bundle or {}
         intelligence_bundle = intelligence_bundle or {}
         run_brief = _bundle_item(mandate_bundle, "run_brief")
         task_brief = _bundle_item(context_bundle, "task_brief")
@@ -294,6 +296,8 @@ class CompletionJudgeAgent:
         belief_update = _bundle_item(evidence_bundle, "belief_update")
         research_brief = _bundle_item(research_bundle, "research_brief")
         method_transfer_report = _bundle_item(research_bundle, "method_transfer_report")
+        benchmark_gap_report = _bundle_item(benchmark_bundle, "benchmark_gap_report")
+        benchmark_parity_report = _bundle_item(benchmark_bundle, "benchmark_parity_report")
         semantic_debate = _bundle_item(intelligence_bundle, "semantic_debate_report")
         semantic_uncertainty = _bundle_item(intelligence_bundle, "semantic_uncertainty_report")
         intelligence_escalation = _bundle_item(intelligence_bundle, "intelligence_escalation")
@@ -323,12 +327,18 @@ class CompletionJudgeAgent:
             if str(item.get("interpretation", "")).strip().startswith("Load-bearing")
         )
         benchmark_expected = _benchmark_expected(run_brief=run_brief, task_brief=task_brief)
-        benchmark_present = any((Path(run_dir) / name).exists() for name in [
-            "benchmark_gap_report.json",
-            "reference_approach_matrix.json",
-            "benchmark_parity_report.json",
-            "gold_standard_comparison.json",
-        ])
+        benchmark_present = bool(benchmark_gap_report or benchmark_parity_report) or any(
+            (Path(run_dir) / name).exists()
+            for name in [
+                "benchmark_gap_report.json",
+                "reference_approach_matrix.json",
+                "benchmark_parity_report.json",
+                "gold_standard_comparison.json",
+            ]
+        )
+        benchmark_followup = str(benchmark_parity_report.get("recommended_action", "")).strip()
+        benchmark_parity_status = str(benchmark_parity_report.get("parity_status", "")).strip()
+        benchmark_below_reference = benchmark_parity_status == "below_reference"
         memory_retrieval = _bundle_item(memory_bundle, "memory_retrieval")
         route_prior_context = _bundle_item(memory_bundle, "route_prior_context")
         challenger_prior = _bundle_item(memory_bundle, "challenger_prior_suggestions")
@@ -359,6 +369,8 @@ class CompletionJudgeAgent:
             )
             or semantic_followup == "expand_challenger_portfolio"
             or research_followup == "expand_challenger_portfolio"
+            or benchmark_followup == "expand_challenger_portfolio"
+            or benchmark_below_reference
             or any(
                 str(item.get("candidate_kind", "")).strip() == "challenger_family"
                 for item in method_transfer_report.get("accepted_candidates", [])
@@ -430,6 +442,10 @@ class CompletionJudgeAgent:
             blocking_layer = "evidence_insufficiency"
             action = "recalibration_candidate"
             reason_codes.append("research_calibration_signal")
+        elif benchmark_followup == "expand_challenger_portfolio" or benchmark_below_reference:
+            blocking_layer = "route_narrowness"
+            action = "continue_experimentation"
+            reason_codes.append("below_reference")
         elif provisional_recommendation == "continue_experimentation" or belief_action == "continue_experimentation":
             blocking_layer = "route_narrowness" if route_narrowness else "evidence_insufficiency"
             action = "continue_experimentation"
@@ -456,6 +472,8 @@ class CompletionJudgeAgent:
             reason_codes.append(f"semantic_followup_{semantic_followup}")
         if research_followup:
             reason_codes.append(f"research_followup_{research_followup}")
+        if benchmark_followup:
+            reason_codes.append(f"benchmark_followup_{benchmark_followup}")
         if method_transfer_report.get("accepted_candidates"):
             reason_codes.append("research_transfer_available")
         if load_bearing_count >= 2:
@@ -566,6 +584,7 @@ def run_completion_review(
     evidence_bundle: dict[str, Any],
     memory_bundle: dict[str, Any] | None = None,
     research_bundle: dict[str, Any] | None = None,
+    benchmark_bundle: dict[str, Any] | None = None,
     intelligence_bundle: dict[str, Any] | None = None,
     config_path: str | None = None,
 ) -> CompletionRunResult:
@@ -606,6 +625,7 @@ def run_completion_review(
         evidence_bundle=evidence_bundle,
         memory_bundle=memory_bundle,
         research_bundle=research_bundle,
+        benchmark_bundle=benchmark_bundle,
         intelligence_bundle=intelligence_bundle,
         state_frame=state_frame,
         mandate_review=mandate_payload,

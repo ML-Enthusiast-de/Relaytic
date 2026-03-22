@@ -167,6 +167,15 @@ Avoid introducing new references to:
 - introduced public commands `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat`
 - wired communicative assist into the CLI and MCP service surfaces without changing the deterministic core or widening the legacy compatibility boundary
 
+### Slice 11
+
+- introduced the canonical package boundary `src/relaytic/benchmark/`
+- introduced the canonical modeling boundaries `src/relaytic/modeling/feature_pipeline.py` and `src/relaytic/modeling/calibration.py`
+- introduced artifact boundaries for `reference_approach_matrix.json`, `benchmark_gap_report.json`, and `benchmark_parity_report.json`
+- introduced public commands `relaytic benchmark run` and `relaytic benchmark show`
+- upgraded the Builder/runtime boundary so first-route execution now persists richer preprocessing, bounded categorical handling, executed feature transforms, calibration state, and uncertainty-bearing inference outputs without widening the legacy compatibility boundary
+- wired benchmark artifacts into completion, run summary, assist, runtime, and MCP surfaces without turning benchmark tooling into a separate source of truth
+
 ## Removal Criteria
 
 The remaining compatibility layer can be removed when all of the following are true:
