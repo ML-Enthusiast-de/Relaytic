@@ -5,8 +5,9 @@ This document tracks the operational state of the repository. It is an implement
 ## Current Baseline
 
 - completed slices: 00 through 11
-- next recommended slice: 10, feedback assimilation from operator and runtime evidence
-- next adaptive follow-on after 10: 12, dojo mode and guarded self-improvement
+- next recommended slice: 10, feedback assimilation and outcome learning from operator, runtime, and downstream evidence
+- next leverage follow-on after 10: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
+- next adaptive follow-on after 10A: 12, dojo mode and guarded self-improvement
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 
@@ -61,6 +62,17 @@ The repository currently supports:
 - remote streaming, warehouse, and cloud lakehouse connectors remain future adapter work
 - public-dataset end-to-end regression, binary-classification, and multiclass-classification coverage using stable bundled open datasets in the test suite
 - optional official-UCI domain-dataset coverage for concrete strength, telecom churn, credit default, and predictive maintenance through an explicit opt-in network-backed test suite
+
+## Planned High-Leverage Follow-Ons
+
+The most important not-yet-implemented shifts after the current baseline are:
+
+- validated feedback and outcome learning that can update route, policy, and decision heuristics reversibly
+- decision-system world modeling so Relaytic can reason about action cost, abstention, review load, and whether more data is better than more search
+- method compilation that turns research, memory, and operator context into executable challenger, feature, split, and benchmark templates
+- richer local data-fabric reasoning around source graphs, join candidates, entity histories, and acquisition plans
+- mission-control surfaces that expose branch DAG, confidence, and change attribution to both humans and external agents
+- an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family
 
 ## Implemented Slices
 

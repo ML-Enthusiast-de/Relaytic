@@ -38,6 +38,15 @@ Current canonical boundaries:
 
 - `src/relaytic/research/` owns Slice 09D redacted external research retrieval, source inventory, method-transfer distillation, benchmark-reference harvesting, and research-audit persistence
 
+Reserved future boundaries:
+
+- `src/relaytic/feedback/` should own Slice 10 validated feedback, outcome learning, and reversible effect reporting
+- `src/relaytic/decision/` should own Slice 10A decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
+- `src/relaytic/compiler/` should own Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
+- `src/relaytic/data_fabric/` should own Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/mission_control/` should own Slice 15 mission-control state, branch DAG, confidence map, and change-attribution surfaces
+- `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
 
 ## Control Documents
@@ -65,7 +74,11 @@ These files are required and must stay current:
 - `docs/build_slices/phase_09c.md`
 - `docs/build_slices/phase_09d.md`
 - `docs/build_slices/phase_09e.md`
+- `docs/build_slices/phase_09f.md`
+- `docs/build_slices/phase_10.md`
+- `docs/build_slices/phase_10a.md`
 - `docs/build_slices/phase_11.md`
+- `docs/build_slices/phase_16.md`
 
 ## Artifact Contract
 
@@ -170,6 +183,33 @@ The current slices must preserve these names:
 - `assist_turn_log.jsonl`
 - `context_assembly_report.json`
 - `doc_grounding_report.json`
+
+Reserved future artifact names:
+
+- `feedback_casebook.json`
+- `outcome_observation_report.json`
+- `decision_policy_update_suggestions.json`
+- `decision_world_model.json`
+- `intervention_policy_report.json`
+- `decision_usefulness_report.json`
+- `value_of_more_data_report.json`
+- `data_acquisition_plan.json`
+- `source_graph.json`
+- `join_candidate_report.json`
+- `method_compiler_report.json`
+- `compiled_challenger_templates.json`
+- `compiled_feature_hypotheses.json`
+- `compiled_benchmark_protocol.json`
+- `mission_control_state.json`
+- `branch_dag.json`
+- `confidence_map.json`
+- `change_attribution_report.json`
+- `representation_engine_profile.json`
+- `latent_state_report.json`
+- `embedding_index_report.json`
+- `representation_transfer_report.json`
+- `representation_ood_report.json`
+- `jepa_pretraining_report.json`
 
 When `relaytic plan run` executes the Builder handoff, the run directory must also contain:
 
@@ -423,6 +463,9 @@ Minimum guaranteed surfaces at this stage:
 - every specialist must declare a capability profile covering artifact read scope, artifact write scope, raw-row access, semantic access, and external-adapter access
 - semantic helpers and optional LLM-backed specialists must consume rowless summaries by default unless policy explicitly grants richer context
 - the runtime must be able to checkpoint and flush state before retry, compaction, or final completion/lifecycle transitions
+- future mission-control surfaces must consume the same runtime and artifact graph rather than building a separate UI-only state model
+- future decision-world-model logic must stay advisory to planning, autonomy, completion, and lifecycle and must not silently replace deterministic metrics, calibration math, or artifact persistence
+- future method-compilation logic must emit explicit compiled artifacts instead of hidden prompt context or silent route rewrites
 
 ## Security Contract
 

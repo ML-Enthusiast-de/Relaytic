@@ -182,6 +182,44 @@ Avoid introducing new references to:
 - upgraded the Builder/runtime boundary so first-route execution now persists richer preprocessing, bounded categorical handling, executed feature transforms, calibration state, and uncertainty-bearing inference outputs without widening the legacy compatibility boundary
 - wired benchmark artifacts into completion, run summary, assist, runtime, and MCP surfaces without turning benchmark tooling into a separate source of truth
 
+## Reserved Future Boundaries
+
+The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
+
+- `src/relaytic/feedback/` for Slice 10 validated feedback, outcome learning, and reversible effect reporting
+- `src/relaytic/decision/` for Slice 10A decision-world models, intervention policy, value-of-more-data reasoning, and decision-usefulness synthesis
+- `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
+- `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/mission_control/` for Slice 15 branch DAG, confidence map, change attribution, and later professional operator surfaces
+- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+
+Reserved future artifact names:
+
+- `feedback_casebook.json`
+- `outcome_observation_report.json`
+- `decision_policy_update_suggestions.json`
+- `decision_world_model.json`
+- `intervention_policy_report.json`
+- `decision_usefulness_report.json`
+- `value_of_more_data_report.json`
+- `data_acquisition_plan.json`
+- `source_graph.json`
+- `join_candidate_report.json`
+- `method_compiler_report.json`
+- `compiled_challenger_templates.json`
+- `compiled_feature_hypotheses.json`
+- `compiled_benchmark_protocol.json`
+- `mission_control_state.json`
+- `branch_dag.json`
+- `confidence_map.json`
+- `change_attribution_report.json`
+- `representation_engine_profile.json`
+- `latent_state_report.json`
+- `embedding_index_report.json`
+- `representation_transfer_report.json`
+- `representation_ood_report.json`
+- `jepa_pretraining_report.json`
+
 ## Removal Criteria
 
 The remaining compatibility layer can be removed when all of the following are true:

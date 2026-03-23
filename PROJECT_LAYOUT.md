@@ -129,6 +129,15 @@ Relaytic/
 - `src/relaytic/assist/` owns Slice 09E communicative assistance, stage-navigation planning, takeover coordination, and connection-guide persistence
 - `src/relaytic/benchmark/` owns Slice 11 reference comparison, parity-gap reporting, and benchmark artifact persistence
 
+Reserved future boundaries:
+
+- `src/relaytic/feedback/` should own validated feedback, outcome learning, and reversible effect reporting
+- `src/relaytic/decision/` should own decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
+- `src/relaytic/compiler/` should own method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
+- `src/relaytic/data_fabric/` should own source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/mission_control/` should own branch DAG, confidence map, change attribution, and later professional operator surfaces
+- `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+
 ## Naming Rule
 
 All new public-facing work must use `Relaytic`, `relaytic`, and `relaytic`. Legacy names should appear only when documenting an explicit compatibility boundary.

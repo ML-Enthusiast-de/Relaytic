@@ -157,15 +157,17 @@ For the repository as it exists today, the next major leverage points are not "m
 
 They are:
 
-- a real completion governor that fuses the full artifact graph into explicit next-step judgment
-- memory-guided analog retrieval that improves route choice and challenger design
-- semantically grounded expert deliberation that can generate counterpositions, verifier findings, and doc-grounded challenger or retraining ideas
-- bounded autonomous second-pass loops that can actually execute challenger expansion, recalibration, retraining, or re-planning
-- champion lineage and small challenger portfolios rather than one narrow challenger branch
-- privacy-safe research retrieval that can turn external methods and benchmark references into explicit local hypotheses without exporting user knowledge
-- benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, and lifecycle constraints actually matter
+- a **decision-system world model** that understands what action follows prediction, what errors cost, which cases should defer to humans, and whether more search is actually worth it
+- a **method compiler** that turns papers, benchmark references, memory, and operator notes into executable challenger templates, feature hypotheses, split/evaluation adjustments, and data-collection suggestions
+- a **richer search controller** that chooses broader challenger ecology, HPO depth, calibration breadth, and abstention policy under explicit budgets rather than fixed narrow search
+- **outcome learning**, not just run learning, so Relaytic improves from interventions taken, overrides, downstream results, and false-positive/false-negative consequences
+- a **richer data-understanding fabric** that can reason about nearby sources, join candidates, entity histories, and what additional data would reduce uncertainty most
+- a **mission-control surface** that shows branch structure, confidence map, what changed because of memory, intelligence, research, or feedback, and what Relaytic would do next
+- benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, lifecycle constraints, and decision usefulness actually matter
 
 These are the places where the project most needs to become stronger if it wants to look like the next big thing rather than a well-structured research product.
+
+One additional long-range opportunity is a **representation engine** for large unlabeled local corpora, event histories, and time-aware streams. JEPA-style latent predictive models are promising here because they could strengthen analog retrieval, anomaly precursors, temporal state understanding, and data-acquisition reasoning without becoming the authority path for metrics, calibration, or lifecycle decisions.
 
 ## 1. Product definition
 
@@ -575,6 +577,7 @@ Relaytic should define explicit slots for:
 - **focus engine slot**
 - **context engine slot**
 - **memory engine slot**
+- **representation engine slot**
 - **candidate-generation slot**
 - **registry backend slot**
 - **intelligence backend slot**
@@ -1047,6 +1050,10 @@ Supported sources may include:
 - external-agent review
 - benchmark review
 - post-deployment outcome review
+- intervention outcome review
+- abstention/defer outcome review
+- human-review queue outcome review
+- action-cost review
 
 ### Validation rules
 
@@ -1058,6 +1065,8 @@ Relaytic should validate feedback by checking:
 - whether the feedback is run-specific or reusable
 - whether the feedback conflicts with mandate or policy
 - whether the feedback improves later outcomes on similar cases
+- whether the feedback concerns route quality, decision policy, data quality, or missing-data needs
+- whether the claimed improvement survives comparison against downstream outcomes rather than only offline opinion
 
 ### Possible updates from validated feedback
 
@@ -1067,6 +1076,9 @@ Validated feedback may update:
 - feature-strategy priors
 - route-selection priors
 - challenger heuristics
+- decision-policy priors
+- abstention/defer heuristics
+- data-collection priorities
 - report templates
 - lifecycle heuristics
 - benchmark expectations for similar data regimes
@@ -1078,6 +1090,9 @@ Validated feedback may update:
 - `feedback_effect_report.json`
 - `policy_update_suggestions.json`
 - `route_prior_updates.json`
+- `feedback_casebook.json`
+- `outcome_observation_report.json`
+- `decision_policy_update_suggestions.json`
 
 ### Safety rule
 
@@ -1381,6 +1396,24 @@ src/relaytic/
     transfer.py
     benchmark_refs.py
     audit.py
+  decision/
+    world_model.py
+    action_policy.py
+    usefulness.py
+    value_of_more_data.py
+    abstention_policy.py
+  compiler/
+    method_compiler.py
+    challenger_templates.py
+    feature_hypotheses.py
+    split_eval_templates.py
+    benchmark_protocols.py
+  data_fabric/
+    source_graph.py
+    join_candidates.py
+    entity_history.py
+    acquisition_plan.py
+    point_in_time_contracts.py
   features/
     tabular_basic.py
     tabular_interactions.py
@@ -1470,6 +1503,12 @@ src/relaytic/
     evidence_bundles.py
     run_state.py
     stage_timeline.py
+  mission_control/
+    branch_dag.py
+    confidence_map.py
+    change_attribution.py
+    operator_panels.py
+    agent_views.py
   artifacts/
     manifests.py
     model_card.py
@@ -3012,6 +3051,36 @@ The completion decision must say which layer is currently blocking progress, if 
 
 ---
 
+## 21B. Decision-system world model and action economics
+
+Relaytic should not stop at "which model scored best."
+
+It should model the downstream decision environment that the prediction is meant to serve.
+
+### Core questions
+
+- what action follows a positive, negative, or uncertain prediction
+- what false positives, false negatives, abstentions, and delays cost
+- whether human review exists and what queue or latency limits it has
+- whether the best next move is more search, more data, recalibration, retraining, or a different operational policy
+- whether the current label or target is only a proxy for the real decision objective
+
+### Required behavior
+
+- when explicit action economics are missing, Relaytic should infer a provisional decision regime and mark the uncertainty explicitly
+- offline score improvements must not be treated as automatically valuable if they do not improve the downstream decision regime
+- abstention, defer, and queue-aware choices must be treated as first-class decision outputs where relevant
+- decision-policy reasoning must remain auditable and must not silently replace deterministic metric, calibration, or lifecycle mechanics
+
+### Required artifacts
+
+- `decision_world_model.json`
+- `intervention_policy_report.json`
+- `decision_usefulness_report.json`
+- `value_of_more_data_report.json`
+
+---
+
 ## 22. Uncertainty, calibration, and abstention
 
 ### New artifacts
@@ -3195,12 +3264,18 @@ Instead:
 - table mode must support scheduled retraining from stable snapshots
 - stream mode must support monitoring-first workflows
 - stream inputs must be able to materialize bounded training snapshots for later retraining cycles
+- the data layer should maintain a local source graph so Relaytic can reason about nearby snapshots, tables, event histories, and join candidates without mutating upstream systems
+- Relaytic should be able to say when a missing signal is more likely to be solved by pulling or collecting additional local data than by widening search on the current snapshot
+- entity-history and point-in-time reasoning should become explicit future inputs to route selection, challenger design, and decision usefulness
 
 ### Required artifacts
 
 - `ingestion_mode.json`
 - `data_source_contract.json`
 - `training_snapshot_manifest.json`
+- `source_graph.json`
+- `join_candidate_report.json`
+- `data_acquisition_plan.json`
 
 ---
 
@@ -3256,6 +3331,38 @@ In dojo mode, Relaytic may try to improve:
 ### Why this matters
 
 Relaytic should be able to become better over time, not only by retraining models on new data, but by improving how it thinks and searches.
+
+---
+
+## 24C. Mission control and change attribution
+
+Relaytic should expose a professional mission-control surface over its artifact graph and runtime state.
+
+This is not cosmetic UI work.
+It is the operator and agent surface for understanding why the lab took the path it took.
+
+### Mission-control questions
+
+- which branches were explored and why
+- what changed because memory was available
+- what changed because semantic intelligence was enabled
+- what changed because research retrieval was enabled
+- what changed because feedback or outcomes altered priors
+- which current uncertainty blocks progress most
+- which next experiment is expected to pay off per unit effort
+
+### Required behavior
+
+- mission control must consume the same canonical runtime and artifact state as CLI, MCP, and reports
+- branch structure and confidence views must remain inspectable and exportable for external agents
+- change attribution must stay explicit instead of collapsing all improvements into a generic "Relaytic got smarter" story
+
+### Required artifacts
+
+- `mission_control_state.json`
+- `branch_dag.json`
+- `confidence_map.json`
+- `change_attribution_report.json`
 
 ---
 
@@ -3320,8 +3427,22 @@ artifacts/run_<timestamp>/
   feedback_intake.json
   feedback_validation.json
   feedback_effect_report.json
+  feedback_casebook.json
+  outcome_observation_report.json
+  decision_policy_update_suggestions.json
   policy_update_suggestions.json
   route_prior_updates.json
+  decision_world_model.json
+  intervention_policy_report.json
+  decision_usefulness_report.json
+  value_of_more_data_report.json
+  source_graph.json
+  join_candidate_report.json
+  data_acquisition_plan.json
+  method_compiler_report.json
+  compiled_challenger_templates.json
+  compiled_feature_hypotheses.json
+  compiled_benchmark_protocol.json
   plan.json
   alternatives.json
   hypotheses.json
@@ -3366,6 +3487,10 @@ artifacts/run_<timestamp>/
   promotion_decision.json
   rollback_decision.json
   champion_vs_candidate.json
+  mission_control_state.json
+  branch_dag.json
+  confidence_map.json
+  change_attribution_report.json
   dojo_session.json
   dojo_hypotheses.json
   dojo_results.json

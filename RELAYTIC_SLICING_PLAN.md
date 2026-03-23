@@ -105,6 +105,9 @@ These are not mandatory core dependencies. They are pre-approved optional adapte
 - **Feast**
   use later for point-in-time feature retrieval and feature-serving alignment
   strongest fit: late lifecycle/serving work after Slice 08 and Slice 15
+- **JEPA-family representation engines**
+  use later for latent predictive representation learning over large unlabeled local tables, event histories, and streams
+  strongest fit: late-stage research work after Slice 15, especially a future Slice 16 representation-engine track
 
 Adapter rule:
 
@@ -140,6 +143,15 @@ From Slice 05 onward, Relaytic should keep these cross-cutting proof tracks aliv
 
 If a later slice adds "smartness" without strengthening at least one of those proof tracks, it is not sharp enough.
 
+- **outcome-learning path**
+  once Slice 10 lands, one case where validated intervention or post-deployment outcome evidence changes a later policy or route recommendation with visible rollback support
+- **decision-lab path**
+  once Slice 10A lands, one case where Relaytic chooses between more search, more data, recalibration, retraining, abstention, or operator review because it modeled the downstream decision environment explicitly
+- **method-compiler path**
+  once Slice 10A lands, one case where research, memory, or operator notes compile into an executable challenger, feature, split, or benchmark template rather than only a report
+- **mission-control path**
+  once Slice 15 lands, one case where a human or external agent can see branch structure, confidence, and change attribution without reading the entire artifact tree
+
 ## Preferred post-MVP execution order
 
 Stable slice numbering stays the same, but the preferred execution order after Slice 07 is:
@@ -155,10 +167,12 @@ Stable slice numbering stays the same, but the preferred execution order after S
 9. Slice 09E
 10. Slice 11
 11. Slice 10
-12. Slice 12
-13. Slice 13
-14. Slice 14
-15. Slice 15
+12. Slice 10A
+13. Slice 12
+14. Slice 13
+15. Slice 14
+16. Slice 15
+17. Slice 16
 
 Why:
 
@@ -173,12 +187,16 @@ Why:
 - Slice 09E gives Relaytic a communicative control surface so humans and external agents can ask for explanations, jump back to any bounded stage, or let Relaytic take over safely
 - Slice 11 gives honest proof before feedback or dojo behavior expands too far
 - Slice 10 becomes safer after memory and benchmark doctrine exist
+- Slice 10A is the category-shift slice that turns Relaytic from a governed model/evaluation engine into a decision-and-discovery engine with compiled methods and data-acquisition reasoning
+- Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
 
 - implemented baseline: Slice 00 through Slice 11
 - next execution target: Slice 10
-- next proof follow-on after Slice 10: Slice 12
+- next proof follow-on after Slice 10: Slice 10A
+- next adaptive follow-on after Slice 10A: Slice 12
+- late optional representation follow-on after Slice 15: Slice 16
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -830,18 +848,42 @@ Innovation hook:
 
 - this is the slice where Relaytic stops saying “LLMs are optional” as philosophy only and starts proving exactly how bounded semantic intelligence is routed, constrained, and measured
 
-## Slice 10 - Feedback assimilation
+## Slice 10 - Feedback assimilation, outcome learning, and reversible policy shaping
 
 Goal:
 - feedback intake
 - validation
+- outcome learning
 - policy/prior update suggestions
 - reversible feedback memory
+
+Load-bearing improvement:
+
+- Relaytic should stop learning only from run-internal artifacts and begin learning from what humans, operators, and downstream outcomes say actually happened after the run
+
+Human surface:
+
+- operators should be able to record whether Relaytic's target, route, threshold, abstention posture, lifecycle judgment, or report usefulness was right in practice
+
+Agent surface:
+
+- external agents should be able to submit feedback and outcome packets non-interactively, inspect whether Relaytic trusted them, and see what future-default suggestions changed
+
+Intelligence source:
+
+- validated human feedback, validated external-agent feedback, benchmark review, runtime failure evidence, and post-decision outcome observations
+
+Fallback rule:
+
+- if no validated feedback or outcome evidence exists, Relaytic should continue using current run memory, benchmark doctrine, and deterministic priors without hidden behavior drift
 
 Required outputs:
 - `feedback_intake.json`
 - `feedback_validation.json`
 - `feedback_effect_report.json`
+- `feedback_casebook.json`
+- `outcome_observation_report.json`
+- `decision_policy_update_suggestions.json`
 - `policy_update_suggestions.json`
 - `route_prior_updates.json`
 
@@ -852,24 +894,97 @@ Required behavior:
 - accepted feedback must remain reversible, attributable, and benchmark-aware
 - no feedback-derived change should become a default promotion path without surviving the benchmark doctrine from Slice 11
 - feedback must not silently change autonomous loop policy, challenger breadth, or retrain triggers without an explicit effect report and rollback path
+- feedback must distinguish route-quality feedback, decision-policy feedback, data-quality feedback, and post-deployment outcome evidence instead of collapsing them into one bucket
+- accepted feedback may suggest changes to thresholds, abstention/defer posture, review policy, and data-acquisition priorities, but those suggestions must remain explicit and attributable
+- post-decision outcomes should be able to contradict an apparently strong offline route and force a later policy or route update suggestion
 
 First implementation moves:
 
 1. Add feedback intake, validation, and trust-scoring primitives.
-2. Separate accepted feedback memory from passive run memory.
-3. Generate route-prior and policy-update suggestions rather than mutating live behavior directly.
-4. Add adversarial feedback tests and rollback tests.
-5. Gate feedback promotions behind explicit effect reports.
+2. Add explicit outcome-observation records for intervention results, operator overrides, abstention outcomes, and later labels.
+3. Separate accepted feedback memory from passive run memory and from observed outcome memory.
+4. Generate route-prior, policy-update, and decision-policy suggestions rather than mutating live behavior directly.
+5. Add adversarial feedback tests, misleading outcome tests, and rollback tests.
+6. Gate feedback promotions behind explicit effect reports.
 
 Minimum proof:
 
 - one accepted feedback case that improves a later decision path
 - one rejected or downgraded feedback case that avoids polluting priors
 - one rollback of a feedback-derived prior update
+- one case where downstream outcome evidence changes a later policy or route recommendation
 
 Innovation hook:
 
-- Relaytic should learn from humans and external agents without becoming fragile or manipulable
+- Relaytic should learn from what happened after the prediction, not just from what the system believed during the run
+
+## Slice 10A - Decision lab, method compiler, and data-acquisition reasoning
+
+Goal:
+- decision-system world modeling
+- method compilation
+- data-fabric reasoning
+- value-of-more-data and value-of-more-search judgment
+
+Load-bearing improvement:
+
+- Relaytic should stop behaving like a system that only asks "which model wins?" and start behaving like a system that can ask "which action policy, which additional data, and which next experiment most improves the real downstream decision?"
+
+Human surface:
+
+- humans should be able to inspect the assumed decision regime, action costs, defer/review options, data-acquisition suggestions, and compiled method-transfer ideas behind Relaytic's next-step judgment
+
+Agent surface:
+
+- external agents should be able to consume a machine-readable decision world model, compiled challenger templates, compiled feature/data hypotheses, and value-of-more-data reasoning without parsing prose
+
+Intelligence source:
+
+- current artifacts, benchmark results, validated feedback, run memory, privacy-safe research retrieval, runtime evidence, and bounded semantic synthesis
+
+Fallback rule:
+
+- if action economics, nearby sources, or method references are missing, Relaytic should emit a provisional world model with explicit uncertainty and fall back to current benchmark/memory/planning behavior rather than inventing hidden certainty
+
+Required outputs:
+- `decision_world_model.json`
+- `intervention_policy_report.json`
+- `decision_usefulness_report.json`
+- `value_of_more_data_report.json`
+- `data_acquisition_plan.json`
+- `source_graph.json`
+- `join_candidate_report.json`
+- `method_compiler_report.json`
+- `compiled_challenger_templates.json`
+- `compiled_feature_hypotheses.json`
+- `compiled_benchmark_protocol.json`
+
+Required behavior:
+- Relaytic must model downstream action, false-positive and false-negative cost, review/defer options, delay, and operator-load constraints when enough evidence exists
+- when decision economics are under-specified, Relaytic must emit a provisional world model and explicit uncertainty rather than pretending raw score is the only objective
+- research, memory, and operator notes must be able to compile into executable challenger templates, feature hypotheses, split/evaluation changes, or benchmark-protocol updates instead of stopping at summaries
+- Relaytic must be able to say when more data is more valuable than more search and what local data would reduce uncertainty most
+- multi-source reasoning must stay local-first and copy-only; any additional data pull must still materialize into bounded immutable run-local snapshots
+- compiled methods must remain proposals until planning, autonomy, evidence, and benchmark paths test them against local evidence
+
+First implementation moves:
+
+1. Add a decision-world-model layer that fuses mandate, completion, lifecycle, benchmark, feedback, runtime, and outcome evidence.
+2. Add a method compiler that turns research, memory, and operator context into challenger, feature, split, and benchmark templates.
+3. Add a source-graph and join-candidate layer over local snapshots, staged copies, and permitted source contracts.
+4. Add value-of-more-data and value-of-more-search reasoning that completion and autonomy can consume directly.
+5. Wire compiled outputs into planning, autonomy, lifecycle, assist, and benchmark surfaces.
+
+Minimum proof:
+
+- one case where modeled action economics changes threshold, abstention, review, or next-step judgment
+- one case where compiled research or memory changes challenger or feature design through an explicit executable template
+- one case where Relaytic recommends additional local data or a join candidate instead of wider search on the current snapshot
+- one case where Relaytic records uncertainty because the downstream decision environment is under-specified
+
+Innovation hook:
+
+- this is the slice where Relaytic becomes a decision-and-discovery engine rather than only a governed model-and-evaluation engine
 
 ## Slice 11 - Benchmark parity and reference approaches
 
@@ -924,6 +1039,26 @@ Goal:
 - method self-improvement
 - experimental architecture proposals
 
+Load-bearing improvement:
+
+- Relaytic should improve not only route priors but also decision-world-model heuristics, method-compiler behavior, search-control policy, and data-acquisition reasoning under hard validation gates
+
+Human surface:
+
+- humans should be able to see which proposed self-improvements target route search, decision usefulness, data acquisition, or method compilation and why they were promoted or rejected
+
+Agent surface:
+
+- external agents should be able to consume dojo proposals, validation outcomes, and promotion/rollback state as explicit artifacts
+
+Intelligence source:
+
+- benchmark gaps, validated feedback, outcome evidence, prior failure cases, gold decision cases, and quarantined experimental proposals
+
+Fallback rule:
+
+- if dojo validation data or benchmark proof is unavailable, the current incumbent behavior remains authoritative and dojo outputs stay quarantined
+
 Required outputs:
 - `dojo_session.json`
 - `dojo_hypotheses.json`
@@ -934,7 +1069,7 @@ Required outputs:
 Required behavior:
 - dojo outputs must remain quarantined until they beat the incumbent on benchmark and golden-case validation
 - no dojo promotion may become default behavior without an explicit promotion artifact
-- dojo must improve strategies, priors, challenger design, and route search before it is allowed to touch deeper architecture proposals
+- dojo must improve strategies, priors, challenger design, route search, decision-world-model heuristics, and method-compilation logic before it is allowed to touch deeper architecture proposals
 - every dojo promotion must preserve rollback, provenance, and benchmark comparability
 
 First implementation moves:
@@ -955,15 +1090,38 @@ Innovation hook:
 
 - Relaytic should self-improve like a lab, not mutate like an unstable agent demo
 
-## Slice 13 - Accelerated and distributed local execution
+## Slice 13 - Search controller, accelerated execution, and distributed local experimentation
 
 Goal:
+- search-controller policy
 - execution-profile detection
 - device-aware planning
 - CPU/GPU/local-cluster profile choice
 - checkpointable distributed-plan baseline
 
+Load-bearing improvement:
+
+- Relaytic should be able to run wider challenger fields, deeper HPO, calibration branches, and uncertainty/abstention experiments under one explicit search controller instead of only static narrow search choices
+
+Human surface:
+
+- humans should be able to inspect why Relaytic widened or pruned search, which device profile it chose, and which branches were considered too expensive or too low value
+
+Agent surface:
+
+- external agents should be able to consume one search-controller plan, execution strategy, checkpoint state, and scheduler map without inferring hidden orchestration decisions
+
+Intelligence source:
+
+- budget-aware search policy, benchmark gaps, completion/autonomy value signals, hardware detection, and optional distributed execution adapters
+
+Fallback rule:
+
+- when acceleration or distributed execution is unavailable, Relaytic must still run the same search logic in a narrower local profile rather than changing the source of truth or losing replayability
+
 Required outputs:
+- `search_controller_plan.json`
+- `portfolio_search_trace.json`
 - `execution_backend_profile.json`
 - `device_allocation.json`
 - `distributed_run_plan.json`
@@ -976,39 +1134,69 @@ Required behavior:
 - execution acceleration must preserve provenance, checkpointing, and replayability
 - device-aware planning must change *how* Relaytic executes, not silently change *what* it believes
 - distributed execution must remain resumable and safe for long local runs
+- search expansion must remain budgeted and justified by expected decision value, not only by abstract score-chasing
+- the search controller must be able to prune low-value branches early and widen high-value branches explicitly
+- broader route families, calibration variants, uncertainty wraps, and abstention policies should be eligible branches where their value is justified
 
 Minimum proof:
 
 - one same-plan run that succeeds across two execution profiles
 - one interrupted distributed run that resumes from checkpoint
 - one agent-consumable execution strategy report
+- one case where the search controller rejects a low-value branch and expands a higher-value branch with explicit justification
 
-## Slice 14 - Physics-aware exploration constraints
+## Slice 14 - Real-world feasibility, domain constraints, and action boundaries
 
 Goal:
 - physical-system detection hooks
+- regulatory and operational constraint hooks
 - feasible-region reporting
 - extrapolation risk labeling
-- physically bounded proposal generation
+- physically and operationally bounded proposal generation
+
+Load-bearing improvement:
+
+- Relaytic should be able to reason about whether a promising route or action is actually allowable, operable, and decision-useful under real domain constraints rather than treating feasibility as a post-hoc warning
+
+Human surface:
+
+- humans should be able to inspect which physical, regulatory, queue, compliance, or action-boundary constraints changed Relaytic's recommendation
+
+Agent surface:
+
+- external agents should be able to consume explicit feasibility and action-boundary artifacts without reading narrative reports
+
+Intelligence source:
+
+- domain constraints, runtime evidence, decision-world models, source contracts, and optional domain-specific reference knowledge
+
+Fallback rule:
+
+- when explicit domain constraints are missing, Relaytic should emit an under-specified feasibility posture and avoid overclaiming deployability
 
 Required outputs:
 - `trajectory_constraint_report.json`
 - `feasible_region_map.json`
 - `extrapolation_risk_report.json`
+- `decision_constraint_report.json`
+- `action_boundary_report.json`
 
 Required behavior:
 
-- physical or feasibility constraints must be explicit inputs to proposal generation, not cosmetic warnings after the fact
-- Relaytic must distinguish "promising", "unproven", and "physically implausible" proposals
+- physical, regulatory, and operational constraints must be explicit inputs to proposal generation, not cosmetic warnings after the fact
+- Relaytic must distinguish "promising", "unproven", "physically implausible", "operationally infeasible", and "policy-constrained" proposals
+- action-boundary reasoning must integrate with abstention, review, rollback, and data-acquisition suggestions rather than living in a separate report
 
 Minimum proof:
 
 - one domain case where physically implausible proposals are suppressed
 - one case where feasibility constraints materially alter route or recommendation output
+- one case where operational or compliance constraints alter the decision policy or recommended next action
 
-## Slice 15 - Packaging, integrations, demos, polish
+## Slice 15 - Mission control, packaging, integrations, demos, polish
 
 Goal:
+- mission-control surfaces
 - package extras
 - Docker path
 - operator onboarding
@@ -1018,7 +1206,31 @@ Goal:
 - polished demos
 - README polish
 
+Load-bearing improvement:
+
+- Relaytic should expose a professional mission-control surface that lets humans and external agents navigate branch history, confidence, and change attribution while the packaging and integration layer makes that surface survivable for real-world use
+
+Human surface:
+
+- operators should be able to open one coherent mission-control view showing current stage, branch DAG, confidence map, change attribution, recommended next actions, and environment health
+
+Agent surface:
+
+- external agents should be able to query the same mission-control state, branch structure, and change attribution through stable JSON-first surfaces and MCP tools
+
+Intelligence source:
+
+- canonical runtime events, artifact graph, benchmark outcomes, feedback/outcome memory, and later ecosystem exports
+
+Fallback rule:
+
+- if richer UI or ecosystem integrations are unavailable, Relaytic must still expose the same mission-control truth through CLI, MCP, and artifact files without degrading inspectability
+
 Required outputs:
+- `mission_control_state.json`
+- `branch_dag.json`
+- `confidence_map.json`
+- `change_attribution_report.json`
 - one golden demo
 - one Focus Council demo
 - one completion/status demo
@@ -1031,6 +1243,7 @@ Required behavior:
 
 - polish must not erase inspectability or the specialist architecture
 - demos must prove substance, not only CLI cosmetics
+- mission control must explain what changed because of memory, semantic intelligence, research, feedback, outcomes, and autonomous loops instead of flattening everything into one opaque story
 - onboarding, backup, restore, doctor, and integrations should make Relaytic survivable for real operator use
 - optional ecosystem exports should be made operable here only after their upstream slices are proven, especially registry export, observability export, and later feature-serving alignment
 - remote connector adapters must never become direct modeling surfaces; they must materialize bounded immutable run-local snapshots before Relaytic touches the data
@@ -1042,7 +1255,71 @@ Minimum proof:
 - one clean new-user path from install to judged run
 - one external-agent path that uses the JSON surfaces only
 - one recovery path that proves backup/restore or doctor behavior
+- one mission-control path that shows branch structure, confidence, and change attribution for a non-trivial autonomous run
 - one remote-source demo where Relaytic reads through a connector, materializes a bounded local snapshot, records explicit provenance, and still avoids persisting original absolute source paths
+
+## Slice 16 - Representation engines, JEPA-style latent world models, and unlabeled local corpora
+
+Goal:
+- optional representation-engine slot
+- JEPA-style latent predictive modeling
+- unlabeled local corpora support
+- temporal/entity-state embeddings for retrieval and anomaly support
+
+Load-bearing improvement:
+
+- Relaytic should be able to learn useful latent predictive structure from large unlabeled local data sources, especially streams, event histories, and time-aware entity trajectories, and use those representations to improve retrieval, anomaly/OOD signals, challenger design, and data-acquisition reasoning
+
+Human surface:
+
+- humans should be able to inspect when a representation engine was used, what corpora it was trained on, what downstream gains it provided, and where it was intentionally not trusted
+
+Agent surface:
+
+- external agents should be able to consume representation-engine profiles, latent-state summaries, and embedding-derived evidence through stable artifacts without treating them as hidden truth
+
+Intelligence source:
+
+- self-supervised latent predictive learning over local unlabeled data, with JEPA-family methods as one likely backend family
+
+Fallback rule:
+
+- if no representation engine is configured or validated, Relaytic must continue using deterministic features, current memory, current search, and current benchmark logic without behavioral drift
+
+Required outputs:
+- `representation_engine_profile.json`
+- `latent_state_report.json`
+- `embedding_index_report.json`
+- `representation_transfer_report.json`
+- `representation_ood_report.json`
+- `jepa_pretraining_report.json`
+
+Required behavior:
+
+- representation learning must remain optional and must never become the authority path for metrics, calibration, budgets, stop rules, or lifecycle mechanics
+- representation engines must be local-first and operate on staged or explicitly permitted local corpora, never on hidden remote data by default
+- JEPA-style engines should be evaluated first where they are most plausible: time-aware structured data, event streams, entity histories, anomaly precursors, and analog retrieval
+- representation-derived improvements must be benchmarked separately from the deterministic floor and from semantic-intelligence gains
+- learned embeddings may influence retrieval, anomaly detection, challenger templates, or data-acquisition suggestions, but they must do so through explicit artifacts and ablations
+
+First implementation moves:
+
+1. Add an explicit `representation engine slot` with a no-engine deterministic fallback.
+2. Add one bounded local latent-state adapter path for time-aware or event-history data.
+3. Use learned representations first for analog retrieval, anomaly/OOD support, and challenger priors rather than for opaque end-to-end replacement of the Builder path.
+4. Add benchmark strata that compare deterministic Relaytic against representation-augmented Relaytic on the same data contract.
+5. Keep all representation influence visible in summary, mission-control, and benchmark artifacts.
+
+Minimum proof:
+
+- one case where representation-augmented retrieval materially improves analog relevance or challenger design
+- one case where a latent predictive model improves anomaly or OOD support on a time-aware dataset
+- one case where JEPA-style pretraining does not help and Relaytic reports that honestly
+- one benchmark report separating deterministic-floor, representation-augmented, local-LLM, and bounded-loop modes
+
+Innovation hook:
+
+- this is the long-range slice where Relaytic can start absorbing frontier self-supervised world-model ideas without abandoning its deterministic judgment core
 
 ## First four slices to build before anything fancy
 

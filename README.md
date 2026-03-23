@@ -39,7 +39,16 @@ The repository already supports a working early product baseline:
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-The next load-bearing implementation step is Slice 10: feedback assimilation from operator interventions, runtime failures, and later-run evidence.
+The next load-bearing implementation step is Slice 10: feedback assimilation and outcome learning from operator interventions, runtime failures, and later-run evidence. The immediate frontier follow-on after that is Slice 10A, where Relaytic starts modeling downstream decision systems, compiling method ideas into executable experiments, and reasoning about what additional local data is worth pulling.
+
+The next frontier upgrades are:
+
+- reversible feedback and outcome learning that can change future route and decision-policy priors
+- decision-world modeling that distinguishes better score from better downstream action
+- method compilation that turns research, memory, and operator context into executable challenger and feature plans
+- local data-fabric reasoning that can suggest joins, entity histories, and additional local data before wasting search budget
+- mission-control surfaces that show branch structure, confidence, and change attribution to humans and external agents
+- an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive models as one promising backend family
 
 ## Design Principles
 
@@ -113,7 +122,7 @@ They get their working knowledge from:
 
 That means the default product contract is still deterministic, local-first, and auditable. Local LLMs can improve interpretation and summaries, but they are not required for the core run loop.
 
-Relaytic does not currently rely on hidden custom pretraining to make its specialists useful. The near-term path to stronger expertise is: better deterministic priors, better run memory, better reference-doc grounding, privacy-safe external research retrieval from redacted run signatures, stronger benchmark doctrine, and optional local-LLM amplification for the semantically hard parts.
+Relaytic does not currently rely on hidden custom pretraining to make its specialists useful. The near-term path to stronger expertise is: better deterministic priors, better run memory, better reference-doc grounding, privacy-safe external research retrieval from redacted run signatures, stronger benchmark doctrine, validated feedback and outcome learning, explicit decision-world modeling, method compilation, richer data-fabric reasoning, and optional local-LLM amplification for the semantically hard parts.
 
 ## Reuse Mature OSS
 
