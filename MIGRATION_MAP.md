@@ -167,6 +167,12 @@ Avoid introducing new references to:
 - introduced public commands `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat`
 - wired communicative assist into the CLI and MCP service surfaces without changing the deterministic core or widening the legacy compatibility boundary
 
+### Slice 09F
+
+- extended the existing intelligence boundary with routed-intelligence helpers at `src/relaytic/intelligence/modes.py`, `src/relaytic/intelligence/local_baseline.py`, and `src/relaytic/intelligence/routing.py`
+- introduced artifact boundaries for `llm_routing_plan.json`, `local_llm_profile.json`, `verifier_report.json`, and `semantic_proof_report.json`
+- upgraded the existing public commands `relaytic intelligence run` and `relaytic intelligence show` so routed mode, local profile, verifier posture, and semantic proof are visible without creating a separate compatibility surface
+
 ### Slice 11
 
 - introduced the canonical package boundary `src/relaytic/benchmark/`

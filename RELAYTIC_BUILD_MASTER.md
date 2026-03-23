@@ -74,6 +74,7 @@ Start with:
 9C. autonomous experimentation, executable lifecycle loops, and challenger portfolio expansion
 9D. private research retrieval and method transfer
 9E. communicative assist, guided navigation, and bounded takeover
+9F. routed intelligence profiles, capability matrices, and semantic proof
 10. feedback assimilation
 11. benchmark parity and reference approaches
 12. dojo mode and guarded self-improvement
@@ -94,12 +95,13 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 7. Slice 09C
 8. Slice 09D
 9. Slice 09E
-10. Slice 11
-11. Slice 10
-12. Slice 12
-13. Slice 13
-14. Slice 14
-15. Slice 15
+10. Slice 09F
+11. Slice 11
+12. Slice 10
+13. Slice 12
+14. Slice 13
+15. Slice 14
+16. Slice 15
 
 Reason:
 
@@ -112,12 +114,13 @@ Reason:
 - Slice 09C turns judged recommendations into bounded autonomous second-pass execution and real challenger breadth
 - Slice 09D lets Relaytic import method and benchmark knowledge through redacted external research while preserving the local-first security boundary
 - Slice 09E makes Relaytic communicative and steerable for humans and agents without demoting the artifact graph into a chat shell
+- Slice 09F makes the LLM layer explicit, routed, hardware-aware, and provable instead of merely available
 - Slice 11 gives honest proof before feedback and dojo expansion
 
 Current repo state:
 
-- implemented through Slice 09E
-- next execution target: Slice 11
+- implemented through Slice 11, with Slice 09F routed-intelligence hardening now landed as well
+- next execution target: Slice 10
 
 ## MVP boundary
 

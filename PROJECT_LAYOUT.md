@@ -101,7 +101,7 @@ Relaytic/
 - `src/relaytic/benchmark/` owns reference-approach comparison, parity-gap reporting, and benchmark artifact storage
 - `src/relaytic/completion/` owns the completion-governor layer, run-state artifacts, and status synthesis
 - `src/relaytic/lifecycle/` owns champion/candidate comparison, recalibration, retraining, promotion, and rollback artifacts
-- `src/relaytic/intelligence/` owns semantic-task execution, backend discovery, capability-aware context assembly, document grounding, counterposition packs, and semantic uncertainty artifacts
+- `src/relaytic/intelligence/` owns semantic-task execution, backend discovery, routed intelligence profiles, capability-aware context assembly, document grounding, counterposition packs, verifier/proof artifacts, and semantic uncertainty artifacts
 - `src/relaytic/memory/` owns analog retrieval, route priors, challenger priors, reflection memory, and memory artifact persistence
 - `src/relaytic/autonomy/` owns bounded second-pass execution, challenger queues, branch outcomes, loop budgets, retrain/recalibration requests, and champion lineage
 - `src/relaytic/interoperability/` owns MCP serving, host-bundle generation, and interoperability self-checks

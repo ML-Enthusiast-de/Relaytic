@@ -44,6 +44,7 @@ The repository currently supports:
 - visible research support inside completion, autonomy, `relaytic run`, `relaytic show`, explicit `relaytic research` surfaces, and the MCP contract
 - visible benchmark support inside completion, `relaytic run`, `relaytic show`, explicit `relaytic benchmark` surfaces, assist, runtime, and the MCP contract
 - communicative assist surfaces via `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat` so humans and agents can ask for explanations, request stage navigation, or let Relaytic take over safely
+- routed intelligence profiles, explicit local semantic baseline selection, backend capability matrices, verifier-specific artifacts, and semantic-proof reporting so the optional LLM layer is visible and measurable rather than implicit
 - connection guidance that can recommend deterministic local-only use, lightweight local LLM setup, or local host connections for Claude, Codex/OpenAI, OpenClaw, and ChatGPT connector paths without making any of them mandatory
 - one-line bootstrap via `python scripts/install_relaytic.py` plus install-health verification via `relaytic doctor`
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
@@ -240,6 +241,14 @@ The repository currently supports:
 - upgraded the MCP contract so external agents can use the same communicative assist surface non-interactively
 - added targeted Slice 09E CLI and interoperability tests
 
+### Slice 09F
+
+- extended `src/relaytic/intelligence/` with canonical mode utilities, routed intelligence planning, and explicit local baseline profile resolution
+- added `llm_routing_plan.json`, `local_llm_profile.json`, `verifier_report.json`, and `semantic_proof_report.json`
+- upgraded `relaytic intelligence show`, `relaytic show`, and run-summary generation so routed mode, recommended mode, selected local profile, and semantic gain are visible to both humans and external agents
+- turned legacy intelligence-mode labels into one canonical routing contract without making the semantic layer mandatory
+- added targeted routed-intelligence unit tests plus expanded Slice 09 CLI coverage
+
 ### Slice 11
 
 - added `src/relaytic/benchmark/` with typed reference-comparison controls, parity/gap artifacts, and storage helpers
@@ -283,7 +292,7 @@ The repository is not yet at the final product state. The main remaining gaps ar
 - privacy-safe external research retrieval is now real, but it is still limited to bounded source adapters and shallow transfer logic rather than a mature domain-research stack
 - communicative assist is now real, but it is still deterministic-first and intentionally bounded rather than a rich multi-agent conversational shell
 - reference-doc grounding is now real but still shallow compared with a mature domain corpus strategy
-- internal specialist discussion is now materially stronger, but still not equivalent to rich domain-specific expert systems or large benchmarked semantic stacks
+- internal specialist discussion is now materially stronger and the routed semantic layer is now explicit, but it is still not equivalent to rich domain-specific expert systems or large benchmarked semantic stacks
 
 ## Immediate Next Work
 
@@ -301,7 +310,7 @@ Slice 11 has landed on top of Slices 09D and 09E with:
 - one honest parity/gap surface that humans and external agents can consume without reading the full artifact tree first
 - one richer first-route modeling layer with categorical handling, executed features, calibration, and uncertainty-bearing inference summaries
 
-After Slice 11, the next high-leverage frontier follow-ons should include:
+After Slice 09F and Slice 11, the next high-leverage frontier follow-ons should include:
 
 - Slice 10 feedback assimilation from operator interventions, runtime failures, and later-run evidence
 - deeper autonomy breadth beyond the first bounded second pass

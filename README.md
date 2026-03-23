@@ -25,6 +25,7 @@ The repository already supports a working early product baseline:
 - run memory and analog retrieval with visible analog provenance, route priors, challenger priors, and reflection-memory flushes
 - a shared local runtime gateway with append-only events, capability-scoped specialists, checkpoints, hook audit, and one coherent control path for CLI and MCP
 - structured semantic-task execution with capability-aware context assembly, document grounding, semantic debate/counterposition artifacts, and explicit uncertainty reporting
+- routed semantic intelligence with explicit mode selection, local-profile resolution, verifier artifacts, and measurable semantic-proof reporting
 - bounded autonomous follow-up loops with challenger queues, recalibration/retrain requests, loop budgets, and champion lineage tracking
 - privacy-safe external research retrieval from redacted run signatures with typed source inventory, method-transfer reports, benchmark-reference capture, and explicit external-research audit
 - benchmark parity and gap reporting against explicit reference approaches under the same split and metric contract
@@ -320,7 +321,7 @@ That flow produces:
 - evidence artifacts such as `experiment_registry.json`, `challenger_report.json`, `ablation_report.json`, `audit_report.json`, and `belief_update.json`
 - memory artifacts such as `memory_retrieval.json`, `analog_run_candidates.json`, `route_prior_context.json`, `challenger_prior_suggestions.json`, `reflection_memory.json`, and `memory_flush_report.json`
 - runtime artifacts such as `lab_event_stream.jsonl`, `hook_execution_log.json`, `run_checkpoint_manifest.json`, `capability_profiles.json`, `data_access_audit.json`, and `context_influence_report.json`
-- intelligence artifacts such as `intelligence_mode.json`, `semantic_task_results.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
+- intelligence artifacts such as `intelligence_mode.json`, `llm_routing_plan.json`, `local_llm_profile.json`, `verifier_report.json`, `semantic_proof_report.json`, `semantic_task_results.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
 - benchmark artifacts such as `reference_approach_matrix.json`, `benchmark_gap_report.json`, and `benchmark_parity_report.json`
 - completion artifacts such as `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
 - lifecycle artifacts such as `champion_vs_candidate.json`, `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json`

@@ -113,11 +113,15 @@ def build_run_summary(
         root,
         {
             "intelligence_mode": "intelligence_mode.json",
+            "llm_routing_plan": "llm_routing_plan.json",
+            "local_llm_profile": "local_llm_profile.json",
             "llm_backend_discovery": "llm_backend_discovery.json",
+            "verifier_report": "verifier_report.json",
             "semantic_debate_report": "semantic_debate_report.json",
             "semantic_counterposition_pack": "semantic_counterposition_pack.json",
             "semantic_uncertainty_report": "semantic_uncertainty_report.json",
             "intelligence_escalation": "intelligence_escalation.json",
+            "semantic_proof_report": "semantic_proof_report.json",
         },
     )
     research_bundle = _read_bundle(
@@ -199,9 +203,12 @@ def build_run_summary(
     reflection_memory = _bundle_item(memory_bundle, "reflection_memory")
     memory_flush_report = _bundle_item(memory_bundle, "memory_flush_report")
     intelligence_mode = _bundle_item(intelligence_bundle, "intelligence_mode")
+    llm_routing_plan = _bundle_item(intelligence_bundle, "llm_routing_plan")
+    local_llm_profile = _bundle_item(intelligence_bundle, "local_llm_profile")
     semantic_debate_report = _bundle_item(intelligence_bundle, "semantic_debate_report")
     semantic_uncertainty_report = _bundle_item(intelligence_bundle, "semantic_uncertainty_report")
     intelligence_escalation = _bundle_item(intelligence_bundle, "intelligence_escalation")
+    semantic_proof_report = _bundle_item(intelligence_bundle, "semantic_proof_report")
     research_query_plan = _bundle_item(research_bundle, "research_query_plan")
     research_source_inventory = _bundle_item(research_bundle, "research_source_inventory")
     research_brief = _bundle_item(research_bundle, "research_brief")
@@ -379,8 +386,11 @@ def build_run_summary(
             ),
         },
         "intelligence": {
-            "configured_mode": _clean_text(intelligence_mode.get("configured_mode")),
-            "effective_mode": _clean_text(intelligence_mode.get("effective_mode")),
+            "configured_mode": _clean_literal_text(intelligence_mode.get("configured_mode")),
+            "effective_mode": _clean_literal_text(intelligence_mode.get("effective_mode")),
+            "routed_mode": _clean_literal_text(llm_routing_plan.get("selected_mode")),
+            "recommended_mode": _clean_literal_text(llm_routing_plan.get("recommended_mode")),
+            "local_profile": _clean_literal_text(local_llm_profile.get("profile_name")),
             "backend_status": _clean_text(intelligence_mode.get("backend_status")),
             "recommended_followup_action": _clean_text(semantic_debate_report.get("recommended_followup_action")),
             "debate_confidence": _clean_text(semantic_debate_report.get("confidence")),
@@ -388,6 +398,7 @@ def build_run_summary(
             "modeling_bias": _clean_text(dict(semantic_debate_report.get("domain_interpretation") or {}).get("modeling_bias")),
             "uncertainty_band": _clean_text(semantic_uncertainty_report.get("confidence_band")),
             "escalation_required": bool(intelligence_escalation.get("escalation_required", False)),
+            "semantic_gain_detected": bool(semantic_proof_report.get("measurable_gain_detected", False)),
         },
         "research": {
             "status": _clean_text(research_source_inventory.get("status")) or _clean_text(research_query_plan.get("status")),
@@ -638,12 +649,16 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 "",
                 "## Intelligence",
                 f"- Effective mode: `{intelligence.get('effective_mode') or 'unknown'}`",
+                f"- Routed mode: `{intelligence.get('routed_mode') or 'unknown'}`",
+                f"- Recommended mode: `{intelligence.get('recommended_mode') or 'unknown'}`",
+                f"- Local profile: `{intelligence.get('local_profile') or 'unknown'}`",
                 f"- Backend status: `{intelligence.get('backend_status') or 'unknown'}`",
                 f"- Semantic follow-up: `{intelligence.get('recommended_followup_action') or 'none'}`",
                 f"- Debate confidence: `{intelligence.get('debate_confidence') or 'unknown'}`",
                 f"- Domain archetype: `{intelligence.get('domain_archetype') or 'unknown'}`",
                 f"- Modeling bias: `{intelligence.get('modeling_bias') or 'unknown'}`",
                 f"- Uncertainty band: `{intelligence.get('uncertainty_band') or 'unknown'}`",
+                f"- Semantic gain detected: `{intelligence.get('semantic_gain_detected')}`",
             ]
         )
         if intelligence.get("escalation_required") is not None:
@@ -829,6 +844,13 @@ def _clean_text(value: Any) -> str | None:
     if text.lower() in {"none", "null"}:
         return None
     return text
+
+
+def _clean_literal_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
 
 
 def _bundle_item(bundle: dict[str, Any], key: str) -> dict[str, Any]:

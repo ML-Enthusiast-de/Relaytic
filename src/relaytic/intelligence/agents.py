@@ -8,20 +8,25 @@ from pathlib import Path
 from typing import Any
 
 from .backends import AdvisoryResult, discover_backend
+from .local_baseline import build_local_llm_profile_artifact
 from .models import (
     CONTEXT_ASSEMBLY_REPORT_SCHEMA_VERSION,
     DOC_GROUNDING_REPORT_SCHEMA_VERSION,
     INTELLIGENCE_ESCALATION_SCHEMA_VERSION,
     INTELLIGENCE_MODE_SCHEMA_VERSION,
+    LLM_ROUTING_PLAN_SCHEMA_VERSION,
     LLM_BACKEND_DISCOVERY_SCHEMA_VERSION,
     LLM_HEALTH_CHECK_SCHEMA_VERSION,
+    LOCAL_LLM_PROFILE_SCHEMA_VERSION,
     LLM_UPGRADE_SUGGESTIONS_SCHEMA_VERSION,
     SEMANTIC_ACCESS_AUDIT_SCHEMA_VERSION,
     SEMANTIC_COUNTERPOSITION_PACK_SCHEMA_VERSION,
     SEMANTIC_DEBATE_REPORT_SCHEMA_VERSION,
+    SEMANTIC_PROOF_REPORT_SCHEMA_VERSION,
     SEMANTIC_TASK_REQUEST_SCHEMA_VERSION,
     SEMANTIC_TASK_RESULTS_SCHEMA_VERSION,
     SEMANTIC_UNCERTAINTY_REPORT_SCHEMA_VERSION,
+    VERIFIER_REPORT_SCHEMA_VERSION,
     ContextAssemblyReport,
     DocGroundingReport,
     IntelligenceBundle,
@@ -29,16 +34,25 @@ from .models import (
     IntelligenceEscalationArtifact,
     IntelligenceModeArtifact,
     IntelligenceTrace,
+    LLMRoutingPlanArtifact,
     LLMBackendDiscoveryArtifact,
     LLMHealthCheckArtifact,
     LLMUpgradeSuggestionsArtifact,
+    LocalLLMProfileArtifact,
     SemanticAccessAudit,
     SemanticCounterpositionPack,
     SemanticDebateReport,
+    SemanticProofReport,
     SemanticTaskRequestArtifact,
     SemanticTaskResultsArtifact,
     SemanticUncertaintyReport,
+    VerifierReportArtifact,
     build_intelligence_controls_from_policy,
+)
+from .routing import (
+    build_llm_routing_plan_artifact,
+    build_semantic_proof_report_artifact,
+    build_verifier_report_artifact,
 )
 
 
@@ -73,7 +87,6 @@ def run_intelligence_review(
     completion_bundle = completion_bundle or {}
     lifecycle_bundle = lifecycle_bundle or {}
 
-    discovery = discover_backend(controls=controls, config_path=config_path)
     context_blocks, source_artifacts = _assemble_context_blocks(
         controls=controls,
         mandate_bundle=mandate_bundle,
@@ -86,6 +99,21 @@ def run_intelligence_review(
         completion_bundle=completion_bundle,
         lifecycle_bundle=lifecycle_bundle,
     )
+    trace = IntelligenceTrace(
+        agent="semantic_debate_agent",
+        operating_mode="structured_semantic_tasks",
+        llm_used=False,
+        llm_status="pending",
+        deterministic_evidence=[
+            "artifact_context_assembly",
+            "doc_grounding_contract",
+            "structured_proposer_counter_verifier",
+            "rowless_semantic_default",
+        ],
+        advisory_notes=[],
+    )
+    generated_at = _utc_now()
+    discovery = discover_backend(controls=controls, config_path=config_path)
     doc_sources, grounding_points = _build_doc_grounding(
         root=root,
         mandate_bundle=mandate_bundle,
@@ -102,7 +130,16 @@ def run_intelligence_review(
         source_artifacts=source_artifacts,
         grounding_points=grounding_points,
     )
-    debate_payload, uncertainty_payload, counterpositions, provider_status, llm_used, llm_notes, latency_ms = _run_semantic_tasks(
+    (
+        debate_payload,
+        uncertainty_payload,
+        counterpositions,
+        provider_status,
+        llm_used,
+        llm_notes,
+        latency_ms,
+        deterministic_baseline,
+    ) = _run_semantic_tasks(
         discovery=discovery,
         task_request=task_request,
         context_blocks=context_blocks,
@@ -125,8 +162,39 @@ def run_intelligence_review(
         ],
         advisory_notes=list(llm_notes),
     )
-    generated_at = _utc_now()
     discovery_payload = discovery.to_dict()
+    local_profile_artifact = build_local_llm_profile_artifact(
+        controls=controls,
+        config_path=config_path,
+        generated_at=generated_at,
+        trace=trace,
+    )
+    routing_plan_artifact = build_llm_routing_plan_artifact(
+        controls=controls,
+        discovery=discovery,
+        local_profile=local_profile_artifact,
+        context_blocks=context_blocks,
+        grounding_points=grounding_points,
+        generated_at=generated_at,
+        trace=trace,
+    )
+    verifier_report_artifact = build_verifier_report_artifact(
+        controls=controls,
+        debate_payload=debate_payload,
+        baseline_debate=deterministic_baseline,
+        llm_used=llm_used,
+        provider_status=provider_status,
+        generated_at=generated_at,
+        trace=trace,
+    )
+    semantic_proof_artifact = build_semantic_proof_report_artifact(
+        controls=controls,
+        debate_payload=debate_payload,
+        baseline_debate=deterministic_baseline,
+        llm_used=llm_used,
+        generated_at=generated_at,
+        trace=trace,
+    )
 
     bundle = IntelligenceBundle(
         intelligence_mode=IntelligenceModeArtifact(
@@ -141,6 +209,8 @@ def run_intelligence_review(
             summary=_mode_summary(controls=controls, provider_status=provider_status, llm_used=llm_used),
             trace=trace,
         ),
+        llm_routing_plan=routing_plan_artifact,
+        local_llm_profile=local_profile_artifact,
         llm_backend_discovery=LLMBackendDiscoveryArtifact(
             schema_version=LLM_BACKEND_DISCOVERY_SCHEMA_VERSION,
             generated_at=generated_at,
@@ -215,6 +285,7 @@ def run_intelligence_review(
             summary=str(uncertainty_payload["escalation_summary"]),
             trace=trace,
         ),
+        verifier_report=verifier_report_artifact,
         context_assembly_report=ContextAssemblyReport(
             schema_version=CONTEXT_ASSEMBLY_REPORT_SCHEMA_VERSION,
             generated_at=generated_at,
@@ -282,6 +353,7 @@ def run_intelligence_review(
             summary=str(uncertainty_payload["summary"]),
             trace=trace,
         ),
+        semantic_proof_report=semantic_proof_artifact,
     )
     return IntelligenceRunResult(bundle=bundle, review_markdown=render_intelligence_review_markdown(bundle.to_dict()))
 
@@ -294,16 +366,23 @@ def render_intelligence_review_markdown(bundle: IntelligenceBundle | dict[str, A
     uncertainty = dict(payload.get("semantic_uncertainty_report", {}))
     discovery = dict(payload.get("llm_backend_discovery", {}))
     mode = dict(payload.get("intelligence_mode", {}))
+    routing = dict(payload.get("llm_routing_plan", {}))
+    profile = dict(payload.get("local_llm_profile", {}))
+    proof = dict(payload.get("semantic_proof_report", {}))
     counterpositions = list(dict(payload.get("semantic_counterposition_pack", {})).get("positions", []))
     lines = [
         "# Relaytic Intelligence Review",
         "",
         f"- Configured mode: `{mode.get('configured_mode') or 'unknown'}`",
         f"- Effective mode: `{mode.get('effective_mode') or 'unknown'}`",
+        f"- Routed mode: `{routing.get('selected_mode') or 'unknown'}`",
+        f"- Recommended mode: `{routing.get('recommended_mode') or 'unknown'}`",
+        f"- Local profile: `{profile.get('profile_name') or 'none'}`",
         f"- Backend status: `{discovery.get('status') or 'unknown'}`",
         f"- Recommended follow-up: `{debate.get('recommended_followup_action') or 'unknown'}`",
         f"- Debate confidence: `{debate.get('confidence') or 'unknown'}`",
         f"- Uncertainty band: `{uncertainty.get('confidence_band') or 'unknown'}`",
+        f"- Semantic gain detected: `{proof.get('measurable_gain_detected')}`",
     ]
     proposer = dict(debate.get("proposer_position") or {})
     counter = dict(debate.get("counterposition") or {})
@@ -445,7 +524,7 @@ def _run_semantic_tasks(
     evidence_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]], str, bool, list[str], float | None]:
+) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]], str, bool, list[str], float | None, dict[str, Any]]:
     fallback = _deterministic_semantic_debate(
         evidence_bundle=evidence_bundle,
         completion_bundle=completion_bundle,
@@ -462,6 +541,7 @@ def _run_semantic_tasks(
             False,
             list(discovery.notes),
             None,
+            fallback["debate"],
         )
     prompt = (
         "You are Relaytic's bounded semantic deliberation layer. Use only the provided artifact summaries. "
@@ -496,6 +576,7 @@ def _run_semantic_tasks(
             False,
             list(discovery.notes) + list(result.notes),
             result.latency_ms,
+            fallback["debate"],
         )
     debate = {
         "proposer_position": _dict_or_fallback(result.payload.get("proposer_position"), fallback["debate"]["proposer_position"]),
@@ -526,7 +607,7 @@ def _run_semantic_tasks(
         "escalation_summary": _clean_text(result.payload.get("escalation_summary"))
         or "Relaytic did not require a higher-cost semantic escalation for this round.",
     }
-    return debate, uncertainty, counterpositions, "ok", True, list(discovery.notes) + list(result.notes), result.latency_ms
+    return debate, uncertainty, counterpositions, "ok", True, list(discovery.notes) + list(result.notes), result.latency_ms, fallback["debate"]
 
 
 def _deterministic_semantic_debate(

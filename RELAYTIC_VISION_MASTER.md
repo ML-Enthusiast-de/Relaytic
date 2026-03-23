@@ -2210,6 +2210,7 @@ The system should store reflective lessons from:
 - `local_llm_profile.json`
 - `debate_trace.json`
 - `verifier_report.json`
+- `semantic_proof_report.json`
 - `reflection_memory.json`
 
 ### Required behavior
@@ -2217,8 +2218,12 @@ The system should store reflective lessons from:
 - if no capable LLM is available, Relaytic must continue with the deterministic floor
 - if a strong LLM is available, Relaytic should use it at the most semantically valuable phases rather than everywhere
 - available local hardware may influence which intelligence mode is recommended
+- Relaytic must always be able to state the canonical requested mode, recommended mode, and selected routed mode even when legacy labels or older config values were used internally
+- one explicit local baseline profile should be resolved when local semantic help is configured or recommended
+- backend discovery should expose a bounded capability matrix relevant to schema-constrained semantic work
 - the chosen intelligence mode must be visible in UI, CLI, API, and artifacts
 - LLM outputs must never bypass deterministic safety, policy, or budget checks
+- semantic amplification should leave an explicit proof artifact showing whether it changed bounded semantic outputs relative to a deterministic semantic baseline
 
 ---
 

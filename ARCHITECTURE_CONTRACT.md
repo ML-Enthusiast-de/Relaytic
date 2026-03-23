@@ -26,7 +26,7 @@ Current package rule:
 - `src/relaytic/lifecycle/` owns Slice 08 lifecycle-governor logic and artifact persistence
 - `src/relaytic/memory/` owns Slice 09A analog retrieval, route priors, challenger priors, reflection memory, and memory artifact persistence
 - `src/relaytic/runtime/` owns Slice 09B local gateway, append-only event stream, hook dispatch, checkpoints, and capability-profile enforcement
-- `src/relaytic/intelligence/` owns Slice 09 structured semantic tasks, semantic debate/verifier flows, backend discovery, and document-grounding orchestration
+- `src/relaytic/intelligence/` owns Slice 09 and Slice 09F structured semantic tasks, semantic debate/verifier flows, backend discovery, routed intelligence profiles, and document-grounding orchestration
 - `src/relaytic/autonomy/` owns Slice 09C bounded autonomy loops, executable lifecycle follow-up, challenger queues, and champion-lineage management
 - `src/relaytic/benchmark/` owns Slice 11 reference-approach comparison, parity-gap reporting, and benchmark artifact persistence
 - `src/relaytic/assist/` owns Slice 09E communicative assistance, stage-navigation planning, optional takeover coordination, and connection-guide persistence
@@ -121,15 +121,19 @@ The current slices must preserve these names:
 - `promotion_decision.json`
 - `rollback_decision.json`
 - `intelligence_mode.json`
+- `llm_routing_plan.json`
+- `local_llm_profile.json`
 - `llm_backend_discovery.json`
 - `llm_health_check.json`
 - `llm_upgrade_suggestions.json`
 - `semantic_task_request.json`
 - `semantic_task_results.json`
 - `intelligence_escalation.json`
+- `verifier_report.json`
 - `semantic_debate_report.json`
 - `semantic_counterposition_pack.json`
 - `semantic_uncertainty_report.json`
+- `semantic_proof_report.json`
 - `memory_retrieval.json`
 - `analog_run_candidates.json`
 - `route_prior_context.json`
@@ -377,6 +381,16 @@ Minimum guaranteed surfaces at this stage:
 - connection guidance must explain both lightweight local options and local host-connection options without implying any public exposure is required
 - assist stage navigation must refresh downstream artifacts so the run remains coherent after a jump-back request
 - every assist turn that changes state must be persisted in an explicit turn log rather than disappearing as ephemeral chat
+
+## Slice 09F Routed Intelligence Contract
+
+- Relaytic must expose the canonical semantic modes `none`, `local_min`, `assist`, `amplify`, and `max_reasoning` through explicit routing artifacts rather than leaving mode interpretation implicit
+- routed intelligence must remain policy-bound, deterministic-safe, and local-first by default even when stronger semantic backends are available
+- one local profile selection artifact must explain which baseline or stronger local profile was chosen or recommended and why
+- backend discovery must expose a bounded capability matrix relevant to schema-constrained semantic work
+- verifier output must be written as its own artifact so downstream layers can inspect verifier deltas without reparsing broader debate packets
+- semantic amplification must emit a proof artifact that compares routed semantic outputs against a deterministic semantic baseline and states whether measurable bounded gain occurred
+- `relaytic intelligence show`, `relaytic show`, and the MCP intelligence surface must all expose routed mode, recommended mode, selected local profile, and semantic proof posture consistently
 
 ## Slice 11 Benchmark Contract
 

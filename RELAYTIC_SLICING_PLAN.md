@@ -786,6 +786,50 @@ Minimum proof:
 - one case where a user or agent says “take over” and Relaytic executes the next safe step
 - one case where assist exposes local LLM and host-connection guidance without requiring either path
 
+## Slice 09F - Routed intelligence profiles, capability matrices, and semantic proof
+
+Status:
+- implemented in the current baseline
+- shipped package boundary: `src/relaytic/intelligence/`
+- shipped artifacts: `llm_routing_plan.json`, `local_llm_profile.json`, `verifier_report.json`, and `semantic_proof_report.json`
+
+Goal:
+- first-class intelligence routing
+- hardware-aware local baseline profile selection
+- explicit backend capability matrices
+- semantic proof instead of hand-wavy “agent intelligence”
+- visible user and agent guidance for why Relaytic chose one semantic path
+
+Required behavior:
+- Relaytic must route semantic work through explicit canonical modes: `none`, `local_min`, `assist`, `amplify`, and `max_reasoning`
+- routing must remain policy-bound, local-first by default, and compatible with the deterministic floor
+- legacy or implementation-specific mode labels may exist internally, but Relaytic must always be able to explain the canonical requested, recommended, and selected mode
+- Relaytic must resolve one local baseline profile explicitly when local semantic help is configured or recommended
+- backend discovery must expose a capability matrix for JSON mode, context window, endpoint scope, and other bounded semantic-task-relevant capabilities
+- verifier output must be written as its own artifact rather than remaining embedded only inside a broader debate packet
+- semantic amplification must emit an explicit proof artifact showing whether it changed any bounded semantic outputs relative to the deterministic semantic baseline
+- humans and external agents must be able to inspect routed mode, recommended mode, selected local profile, and semantic gain through the same CLI/MCP contract
+
+First implementation moves:
+
+1. Add canonical mode utilities and routing helpers under `src/relaytic/intelligence/`.
+2. Add local baseline profile resolution over the existing runtime-policy profile stack.
+3. Add explicit routing, verifier, and semantic-proof artifacts to the intelligence bundle and manifest.
+4. Upgrade `relaytic intelligence show`, `relaytic show`, and the assist/runtime surfaces so routed semantic posture is visible.
+5. Add targeted tests for legacy-mode normalization, profile routing, verifier deltas, and semantic-proof reporting.
+
+Minimum proof:
+
+- one case where a legacy configured mode is normalized into the canonical routing contract
+- one case where a minimum local profile is resolved explicitly and surfaced to the user
+- one case where the verifier artifact records a change relative to the deterministic semantic baseline
+- one case where semantic amplification leaves a measurable proof artifact instead of an implicit “LLM used” flag
+- one case where the run summary and intelligence surface expose the same routed mode and selected profile
+
+Innovation hook:
+
+- this is the slice where Relaytic stops saying “LLMs are optional” as philosophy only and starts proving exactly how bounded semantic intelligence is routed, constrained, and measured
+
 ## Slice 10 - Feedback assimilation
 
 Goal:

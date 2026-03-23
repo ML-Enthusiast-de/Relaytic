@@ -153,6 +153,11 @@ def test_cli_intelligence_run_uses_local_llm_when_enabled(tmp_path: Path, capsys
 
     assert payload["status"] == "ok"
     assert payload["intelligence"]["effective_mode"] == "semantic_local_llm"
+    assert payload["intelligence"]["routed_mode"] is not None
+    assert payload["intelligence"]["local_profile"] is not None
     assert payload["bundle"]["llm_health_check"]["status"] == "ok"
+    assert payload["bundle"]["llm_routing_plan"]["status"] == "routed"
+    assert payload["bundle"]["local_llm_profile"]["profile_name"] == "small_cpu"
     assert payload["bundle"]["semantic_debate_report"]["recommended_followup_action"] == "expand_challenger_portfolio"
+    assert payload["bundle"]["verifier_report"]["changed_from_deterministic_baseline"] is True
     assert _IntelligenceLLMHandler.last_request is not None

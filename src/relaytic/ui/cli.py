@@ -4721,6 +4721,9 @@ def _run_intelligence_phase(
         materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
         debate = intelligence_result.bundle.semantic_debate_report
         mode = intelligence_result.bundle.intelligence_mode
+        routing = intelligence_result.bundle.llm_routing_plan
+        profile = intelligence_result.bundle.local_llm_profile
+        proof = intelligence_result.bundle.semantic_proof_report
         return {
             "surface_payload": {
                 "status": "ok",
@@ -4730,9 +4733,13 @@ def _run_intelligence_phase(
                 "intelligence": {
                     "configured_mode": mode.configured_mode,
                     "effective_mode": mode.effective_mode,
+                    "routed_mode": routing.selected_mode,
+                    "recommended_mode": routing.recommended_mode,
+                    "local_profile": profile.profile_name,
                     "backend_status": mode.backend_status,
                     "recommended_followup_action": debate.recommended_followup_action,
                     "confidence": debate.confidence,
+                    "semantic_gain_detected": proof.measurable_gain_detected,
                 },
                 "bundle": intelligence_result.bundle.to_dict(),
             },
@@ -4758,7 +4765,10 @@ def _show_intelligence_surface(*, run_dir: str | Path) -> dict[str, Any]:
     materialize_run_summary(run_dir=root)
     manifest_path = _refresh_intelligence_manifest(root)
     mode = dict(bundle.get("intelligence_mode", {}))
+    routing = dict(bundle.get("llm_routing_plan", {}))
+    profile = dict(bundle.get("local_llm_profile", {}))
     debate = dict(bundle.get("semantic_debate_report", {}))
+    proof = dict(bundle.get("semantic_proof_report", {}))
     return {
         "surface_payload": {
             "status": "ok",
@@ -4767,11 +4777,15 @@ def _show_intelligence_surface(*, run_dir: str | Path) -> dict[str, Any]:
             "intelligence": {
                 "configured_mode": mode.get("configured_mode"),
                 "effective_mode": mode.get("effective_mode"),
+                "routed_mode": routing.get("selected_mode"),
+                "recommended_mode": routing.get("recommended_mode"),
+                "local_profile": profile.get("profile_name"),
                 "backend_status": mode.get("backend_status"),
                 "recommended_followup_action": debate.get("recommended_followup_action"),
                 "confidence": debate.get("confidence"),
                 "domain_archetype": dict(debate.get("domain_interpretation", {})).get("domain_archetype"),
                 "modeling_bias": dict(debate.get("domain_interpretation", {})).get("modeling_bias"),
+                "semantic_gain_detected": proof.get("measurable_gain_detected"),
             },
             "bundle": bundle,
         },
@@ -5910,18 +5924,22 @@ def _memory_output_paths(run_dir: Path) -> dict[str, Path]:
 def _intelligence_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "intelligence_mode": run_dir / "intelligence_mode.json",
+        "llm_routing_plan": run_dir / "llm_routing_plan.json",
+        "local_llm_profile": run_dir / "local_llm_profile.json",
         "llm_backend_discovery": run_dir / "llm_backend_discovery.json",
         "llm_health_check": run_dir / "llm_health_check.json",
         "llm_upgrade_suggestions": run_dir / "llm_upgrade_suggestions.json",
         "semantic_task_request": run_dir / "semantic_task_request.json",
         "semantic_task_results": run_dir / "semantic_task_results.json",
         "intelligence_escalation": run_dir / "intelligence_escalation.json",
+        "verifier_report": run_dir / "verifier_report.json",
         "context_assembly_report": run_dir / "context_assembly_report.json",
         "doc_grounding_report": run_dir / "doc_grounding_report.json",
         "semantic_access_audit": run_dir / "semantic_access_audit.json",
         "semantic_debate_report": run_dir / "semantic_debate_report.json",
         "semantic_counterposition_pack": run_dir / "semantic_counterposition_pack.json",
         "semantic_uncertainty_report": run_dir / "semantic_uncertainty_report.json",
+        "semantic_proof_report": run_dir / "semantic_proof_report.json",
     }
 
 

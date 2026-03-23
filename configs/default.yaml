@@ -95,8 +95,14 @@ intelligence:
   intelligence_mode: deterministic
   prefer_local_llm: true
   allow_frontier_llm: false
+  allow_max_reasoning: false
+  minimum_local_llm_enabled: false
+  minimum_local_llm_profile: none
   enable_backend_discovery: true
   allow_upgrade_suggestions: true
+  allow_mode_routing: true
+  hardware_aware_routing: true
+  enable_semantic_proof: true
   require_schema_constrained_actions: true
   require_verifier_for_high_impact_decisions: true
 

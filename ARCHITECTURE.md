@@ -21,7 +21,7 @@ Relaytic is organized as a staged artifact pipeline.
 6. Cross-run memory
    Relaytic retrieves prior analog runs from local artifacts, derives route and challenger priors, and flushes reflection memory back to disk without making memory silently authoritative.
 7. Semantically grounded deliberation
-   Intelligence specialists assemble capability-aware context, ground semantic work in local documents and artifacts, and emit counterposition/verifier outputs rather than one opaque semantic guess.
+   Intelligence specialists assemble capability-aware context, route bounded semantic work through explicit modes and local profiles, ground semantic work in local documents and artifacts, and emit counterposition/verifier outputs plus semantic-proof reports rather than one opaque semantic guess.
 8. Research and benchmark parity
    Research specialists retrieve redacted external method knowledge, and the benchmark layer compares Relaytic against explicit reference approaches under the same split and metric contract so the run can be judged against something real.
 9. Completion governor
@@ -142,6 +142,7 @@ The repository currently implements the following product layers:
 - Slice 09A: run memory and analog retrieval with route priors, challenger priors, reflection memory, and pre-close memory flush artifacts
 - Slice 09B: local runtime gateway with append-only event traces, capability profiles, hook audit, and shared CLI/MCP run-state coordination
 - Slice 09: structured semantic tasks, document grounding, semantic debate/counterposition artifacts, and bounded intelligence amplification
+- Slice 09F: routed intelligence profiles, backend capability matrices, verifier-specific artifacts, and semantic-proof reporting
 - Slice 09C: bounded autonomous second-pass execution with challenger queues, executable recalibration/retrain requests, loop budgets, and champion lineage
 - Slice 09D: privacy-safe external research retrieval with redacted query planning, typed source inventory, method-transfer distillation, benchmark-reference capture, and explicit no-leak audit
 - Slice 09E: communicative assist surfaces with deterministic explanation, stage navigation, bounded takeover, optional local semantic lift, and host-connection guidance
@@ -198,18 +199,22 @@ Relaytic already standardizes several load-bearing artifacts:
 - `reflection_memory.json`
 - `memory_flush_report.json`
 - `intelligence_mode.json`
+- `llm_routing_plan.json`
+- `local_llm_profile.json`
 - `llm_backend_discovery.json`
 - `llm_health_check.json`
 - `llm_upgrade_suggestions.json`
 - `semantic_task_request.json`
 - `semantic_task_results.json`
 - `intelligence_escalation.json`
+- `verifier_report.json`
 - `context_assembly_report.json`
 - `doc_grounding_report.json`
 - `semantic_access_audit.json`
 - `semantic_debate_report.json`
 - `semantic_counterposition_pack.json`
 - `semantic_uncertainty_report.json`
+- `semantic_proof_report.json`
 - `research_query_plan.json`
 - `research_source_inventory.json`
 - `research_brief.json`
