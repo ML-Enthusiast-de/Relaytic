@@ -40,10 +40,13 @@ The repository already supports a working early product baseline:
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slice 10 is now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; and keep rollback-ready casebook state instead of silently drifting. The next load-bearing implementation step is Slice 10A, where Relaytic starts modeling downstream decision systems, compiling method ideas into executable experiments, and reasoning about what additional local data is worth pulling.
+Slice 10 is now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; and keep rollback-ready casebook state instead of silently drifting. The next load-bearing implementation step is Slice 10B, where Relaytic makes quality gates, budget posture, and operator/lab profile overlays explicit before the deeper decision-lab work in Slice 10A.
 
 The next frontier upgrades are:
 
+- explicit quality contracts that tell humans and external agents what Relaytic currently means by "good enough"
+- explicit budget contracts and budget-consumption reporting that make runtime/search/autonomy limits visible instead of implicit
+- bounded operator/lab profiles that shape review posture, benchmark appetite, explanation style, and budget posture without personalizing truth-bearing logic
 - decision-world modeling that distinguishes better score from better downstream action
 - method compilation that turns research, memory, and operator context into executable challenger and feature plans
 - local data-fabric reasoning that can suggest joins, entity histories, and additional local data before wasting search budget

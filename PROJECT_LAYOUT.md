@@ -104,6 +104,9 @@ Relaytic/
 - `src/relaytic/intelligence/` owns semantic-task execution, backend discovery, routed intelligence profiles, capability-aware context assembly, document grounding, counterposition packs, verifier/proof artifacts, and semantic uncertainty artifacts
 - `src/relaytic/memory/` owns analog retrieval, route priors, challenger priors, reflection memory, and memory artifact persistence
 - `src/relaytic/autonomy/` owns bounded second-pass execution, challenger queues, branch outcomes, loop budgets, retrain/recalibration requests, and champion lineage
+- `src/relaytic/research/` owns redacted external research retrieval, method-transfer distillation, benchmark-reference harvesting, and research-audit persistence
+- `src/relaytic/feedback/` owns validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook artifacts
+- `src/relaytic/assist/` owns communicative assistance, stage navigation, bounded takeover, and connection-guide persistence
 - `src/relaytic/interoperability/` owns MCP serving, host-bundle generation, and interoperability self-checks
 - `src/relaytic/integrations/` owns optional-library discovery, compatibility self-checks, and adapter-scoped capability inventory
 - `src/relaytic/runs/` owns MVP-access summaries, run reports, and top-level run presentation helpers
@@ -128,10 +131,11 @@ Relaytic/
 - `src/relaytic/research/` owns Slice 09D redacted external research retrieval, method-transfer distillation, benchmark-reference harvesting, and research-audit persistence
 - `src/relaytic/assist/` owns Slice 09E communicative assistance, stage-navigation planning, takeover coordination, and connection-guide persistence
 - `src/relaytic/benchmark/` owns Slice 11 reference comparison, parity-gap reporting, and benchmark artifact persistence
+- `src/relaytic/feedback/` owns Slice 10 validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook artifacts
 
 Reserved future boundaries:
 
-- `src/relaytic/feedback/` should own validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook artifacts
+- `src/relaytic/profiles/` should own Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
 - `src/relaytic/decision/` should own decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` should own source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning

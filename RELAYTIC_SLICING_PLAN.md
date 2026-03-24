@@ -167,12 +167,13 @@ Stable slice numbering stays the same, but the preferred execution order after S
 9. Slice 09E
 10. Slice 11
 11. Slice 10
-12. Slice 10A
-13. Slice 12
-14. Slice 13
-15. Slice 14
-16. Slice 15
-17. Slice 16
+12. Slice 10B
+13. Slice 10A
+14. Slice 12
+15. Slice 13
+16. Slice 14
+17. Slice 15
+18. Slice 16
 
 Why:
 
@@ -187,13 +188,15 @@ Why:
 - Slice 09E gives Relaytic a communicative control surface so humans and external agents can ask for explanations, jump back to any bounded stage, or let Relaytic take over safely
 - Slice 11 gives honest proof before feedback or dojo behavior expands too far
 - Slice 10 becomes safer after memory and benchmark doctrine exist
+- Slice 10B makes quality gates, budget posture, and operating-profile assumptions explicit before deeper decision-world modeling and broader search begin leaning on them
 - Slice 10A is the category-shift slice that turns Relaytic from a governed model/evaluation engine into a decision-and-discovery engine with compiled methods and data-acquisition reasoning
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 11, plus Slice 10 feedback assimilation and outcome learning
-- next execution target: Slice 10A
+- implemented baseline: Slice 00 through Slice 11, including Slice 10 feedback assimilation and outcome learning
+- next execution target: Slice 10B
+- next category-shift follow-on after Slice 10B: Slice 10A
 - next proof follow-on after Slice 10A: Slice 12
 - next adaptive follow-on after Slice 12: Slice 13
 - late optional representation follow-on after Slice 15: Slice 16
@@ -918,6 +921,78 @@ Innovation hook:
 
 - Relaytic should learn from what happened after the prediction, not just from what the system believed during the run
 
+## Slice 10B - Quality contracts, visible budgets, and operator/lab profiles
+
+Goal:
+- explicit good-enough contracts
+- explicit budget contracts
+- visible budget consumption
+- bounded operator and lab profiles
+
+Load-bearing improvement:
+
+- Relaytic should stop relying on scattered hidden defaults for "good enough" and "how far to search" and instead write one inspectable quality/budget contract that humans and external agents can see before, during, and after the run.
+
+Human surface:
+
+- humans should be able to inspect and, when policy allows, override accepted quality gates, benchmark appetite, review posture, search/autonomy/runtime budget, and profile overlays from one coherent surface instead of inferring them from multiple artifacts
+
+Agent surface:
+
+- external agents should be able to consume one machine-readable quality contract, one machine-readable budget contract, and one bounded operator/lab profile surface rather than reverse-engineering Relaytic defaults from scattered summaries
+
+Intelligence source:
+
+- task type, domain archetype, current policy defaults, resolved hardware profile, benchmark posture, feedback casebook, mandate, work preferences, and current runtime/autonomy evidence
+
+Fallback rule:
+
+- if no explicit quality or budget inputs are provided, Relaytic must derive default contracts from task type, local hardware assumptions, and policy defaults, write them explicitly, and continue autonomously instead of keeping those defaults implicit
+
+Required outputs:
+- `quality_contract.json`
+- `quality_gate_report.json`
+- `budget_contract.json`
+- `budget_consumption_report.json`
+- `operator_profile.json`
+- `lab_operating_profile.json`
+
+Required behavior:
+- Relaytic must materialize one explicit "good enough" contract covering task-appropriate metric gates, benchmark expectations, calibration/review posture, and current stop/continue semantics
+- Relaytic must materialize one explicit budget contract covering runtime, autonomy loops, branch count, search posture, and hardware/execution assumptions
+- the UI, CLI summaries, assist layer, and MCP surfaces must expose both contracts and current consumption state consistently
+- operator and lab profiles may shape review strictness, benchmark appetite, explanation style, and budget posture, but they must not silently override deterministic metrics, model outcomes, or artifact truth
+- if no operator/lab profile is provided, Relaytic must still run by deriving defaults from `lab_mandate.json`, `work_preferences.json`, task evidence, and local hardware assumptions
+- completion, lifecycle, autonomy, benchmark, and later search-control logic must consume these contracts instead of inventing private defaults phase by phase
+- budget reporting must distinguish configured limits from consumed resources and from merely assumed limits
+
+First implementation moves:
+
+1. Add explicit contract builders for quality gates and budgets over the current policy/task/hardware defaults.
+2. Add one bounded operator-profile and one lab-operating-profile layer that can safely overlay review posture, benchmark appetite, and budget posture without touching deterministic truth.
+3. Surface quality/budget contracts through `relaytic show`, `relaytic runtime show`, `relaytic autonomy show`, `relaytic assist show`, and MCP summaries.
+4. Add run-scope override support so humans and agents can define quality/budget inputs without editing the repo-wide defaults.
+5. Make completion, lifecycle, autonomy, and benchmark surfaces explain decisions in terms of the explicit contracts they consumed.
+6. Prepare Slice 10A and Slice 13 to read these contracts instead of scattering their own hidden assumptions.
+
+Minimum proof:
+
+- one no-input run where Relaytic writes task-derived quality and budget contracts explicitly before major execution
+- one case where a bounded operator or lab profile changes review posture or budget posture without changing deterministic artifact truth
+- one surface where configured budget, consumed budget, and remaining budget are visible together
+- one case where Relaytic explains continue/recalibrate/retrain/stop in terms of the explicit quality gate report rather than only prose
+- one case where an external agent can read the same quality/budget/profile contract through JSON or MCP without scraping markdown
+
+Innovation hook:
+
+- this is the slice that turns Relaytic from "smart but partly implicit" into a serious lab instrument with visible standards, visible limits, and visible operating posture
+
+Profile discipline:
+
+- prefer lab-scoped and operator-scoped profiles over hidden per-user personalization
+- profile overlays may tune explanation depth, benchmark appetite, review strictness, abstain/review preference, and budget posture
+- profile overlays must not silently force model-family choices, falsify metrics, or bypass the deterministic floor
+
 ## Slice 10A - Decision lab, method compiler, and data-acquisition reasoning
 
 Goal:
@@ -960,6 +1035,7 @@ Required outputs:
 - `compiled_benchmark_protocol.json`
 
 Required behavior:
+- Slice 10A must consume the explicit quality and budget contracts from Slice 10B rather than inventing new hidden defaults for search or stopping behavior
 - Relaytic must model downstream action, false-positive and false-negative cost, review/defer options, delay, and operator-load constraints when enough evidence exists
 - when decision economics are under-specified, Relaytic must emit a provisional world model and explicit uncertainty rather than pretending raw score is the only objective
 - research, memory, and operator notes must be able to compile into executable challenger templates, feature hypotheses, split/evaluation changes, or benchmark-protocol updates instead of stopping at summaries
@@ -1132,6 +1208,7 @@ Required outputs:
 Required behavior:
 
 - execution acceleration must preserve provenance, checkpointing, and replayability
+- Slice 13 must consume the explicit quality and budget contracts from Slice 10B instead of inventing separate hidden search limits
 - device-aware planning must change *how* Relaytic executes, not silently change *what* it believes
 - distributed execution must remain resumable and safe for long local runs
 - search expansion must remain budgeted and justified by expected decision value, not only by abstract score-chasing

@@ -2135,6 +2135,32 @@ Support:
   - intended for the most semantically difficult phases
   - still subject to hard budgets and deterministic verification
 
+### Quality and budget contracts
+
+Relaytic should not keep "good enough" and "worth the search" as hidden defaults.
+
+It should materialize:
+
+- one explicit quality contract
+  - task-appropriate metric gates
+  - benchmark appetite
+  - review or abstain posture
+  - calibration and uncertainty expectations
+  - current stop/continue semantics
+
+- one explicit budget contract
+  - runtime budget
+  - search and challenger budget
+  - autonomy-loop budget
+  - hardware and execution assumptions
+  - configured versus derived limits
+
+- bounded operator and lab profiles
+  - may shape review strictness, benchmark appetite, explanation style, and budget posture
+  - must not silently override deterministic metrics, model outcomes, or artifact truth
+
+If no explicit inputs are given, Relaytic should derive these contracts from task evidence, local hardware assumptions, mandate/work preferences, and policy defaults, write them explicitly, and continue.
+
 
 ### Minimum local LLM baseline
 
@@ -3858,6 +3884,9 @@ Before the first autonomous/guided run, the UI must present a setup flow where t
 - the UI must explain deterministic floor vs LLM-amplified ceiling
 - the UI must explain what the minimum local LLM baseline does and does not do
 - the UI must show when strong-LLM reasoning is active and on which phases
+- the UI must show the current good-enough contract, including active metric gates, benchmark posture, review posture, and why Relaytic believes the run passed or failed it
+- the UI must show configured budget, consumed budget, and remaining budget for runtime, autonomy, and search-related work, plus whether the current limits came from operator input, lab profile, or derived hardware defaults
+- the UI must distinguish lab-operating profiles from operator profiles and explain that those overlays shape posture rather than artifact truth
 - the UI must explain how to set up a local LLM backend
 - the UI must surface detected local backends and upgrade suggestions when available
 - the UI must explain what the Focus Council is doing and which objectives are currently prioritized
@@ -4966,15 +4995,18 @@ Main goals:
 21. Standardize artifacts and reports.
 22. Add a unified CLI:
    mandate, context, investigate, hypothesize, plan, experiment, challenge, ablate, audit, retrain, promote, rollback, report, serve, replay, tool-server.
-20. Add a real local API and a local MCP/tool server.
-21. Add a local Streamlit operator UI.
-22. The UI must show mandate options initially, require the user to configure them before the first guided/autonomous run, and let the user edit them later.
-23. The UI must also show optional context inputs initially, explain that they are optional, and let the user edit them later.
-24. The UI must show intelligence modes when capable LLMs are available and explain deterministic floor vs LLM-amplified ceiling.
-25. The UI must show session vs daemon mode, detected hardware assumptions when limits are absent, and explain how live data feeds monitoring vs retraining.
-26. Add benchmark harness and ablations.
-27. Rewrite README to match the new architecture.
-28. Add Python-package-first distribution with:
+23. Add a real local API and a local MCP/tool server.
+24. Add a local Streamlit operator UI.
+25. The UI must show mandate options initially, require the user to configure them before the first guided/autonomous run, and let the user edit them later.
+26. The UI must also show optional context inputs initially, explain that they are optional, and let the user edit them later.
+27. The UI must show intelligence modes when capable LLMs are available and explain deterministic floor vs LLM-amplified ceiling.
+28. The UI must show session vs daemon mode, detected hardware assumptions when limits are absent, and explain how live data feeds monitoring vs retraining.
+29. The UI must show the current good-enough contract and why Relaytic believes the run passed or failed it.
+30. The UI must show configured versus consumed search, runtime, and autonomy budget, plus whether current limits came from user input, lab profile, or hardware-derived defaults.
+31. The UI must distinguish lab-operating profiles from operator profiles and state that those overlays shape posture rather than deterministic truth.
+32. Add benchmark harness and ablations.
+33. Rewrite README to match the new architecture.
+34. Add Python-package-first distribution with:
    - pyproject-based packaging
    - console entry points
    - optional extras

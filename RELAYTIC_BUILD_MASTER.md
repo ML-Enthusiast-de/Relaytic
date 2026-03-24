@@ -76,6 +76,7 @@ Start with:
 9E. communicative assist, guided navigation, and bounded takeover
 9F. routed intelligence profiles, capability matrices, and semantic proof
 10. feedback assimilation
+10B. quality contracts, visible budgets, and operator/lab profiles
 10A. decision lab, method compiler, and data-acquisition reasoning
 11. benchmark parity and reference approaches
 12. dojo mode and guarded self-improvement
@@ -100,12 +101,13 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 10. Slice 09F
 11. Slice 11
 12. Slice 10
-13. Slice 10A
-14. Slice 12
-15. Slice 13
-16. Slice 14
-17. Slice 15
-18. Slice 16
+13. Slice 10B
+14. Slice 10A
+15. Slice 12
+16. Slice 13
+17. Slice 14
+18. Slice 15
+19. Slice 16
 
 Reason:
 
@@ -121,13 +123,15 @@ Reason:
 - Slice 09F makes the LLM layer explicit, routed, hardware-aware, and provable instead of merely available
 - Slice 11 gives honest proof before feedback and dojo expansion
 - Slice 10 lets Relaytic learn from what happened after predictions, not just from what happened inside one run
+- Slice 10B makes quality gates, budget posture, and profile overlays explicit before decision-world modeling and broader search depend on them
 - Slice 10A is the category-shift slice where Relaytic begins modeling the downstream decision system, compiling methods into executable experiments, and reasoning about what additional data is worth pulling
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:
 
-- implemented through Slice 11, with Slice 09F routed-intelligence hardening and Slice 10 feedback assimilation now landed as well
-- next execution target: Slice 10A
+- implemented through Slice 11, with Slice 09F routed-intelligence hardening and Slice 10 feedback assimilation now landed
+- next execution target: Slice 10B
+- next category-shift follow-on after Slice 10B: Slice 10A
 - next proof follow-on after Slice 10A: Slice 12
 
 ## MVP boundary
@@ -172,6 +176,8 @@ before the MVP is undeniable.
 If the goal is to turn the current implementation into something that looks genuinely novel rather than merely well-structured, the next leverage points are:
 
 - a decision-world model that understands action cost, review/defer options, and whether more search is actually the right next move
+- explicit quality and budget contracts that tell humans and external agents what Relaytic currently means by "good enough" and "worth the search"
+- bounded operator/lab profiles that shape review posture and budget posture without personalizing truth-bearing logic
 - a method compiler that turns research, memory, and operator context into executable challenger and feature templates
 - outcome learning rather than run-only learning
 - richer data-fabric reasoning that can suggest joins, entity histories, or additional data before wasting search budget
@@ -180,7 +186,7 @@ If the goal is to turn the current implementation into something that looks genu
 - an optional representation engine that can learn from large unlabeled local corpora and improve retrieval, anomaly support, and temporal state understanding without replacing deterministic adjudication
 
 Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.
-Slices 10 and 10A are the next category-shift unlocks that can turn Relaytic from a governed inference lab into a genuine decision-and-discovery system.
+Slices 10, 10B, and 10A are the next category-shift unlocks that can turn Relaytic from a governed inference lab into a genuine decision-and-discovery system.
 Slice 16 is a long-range optional frontier bet, not a prerequisite for the core lab thesis.
 
 ## Source of truth precedence

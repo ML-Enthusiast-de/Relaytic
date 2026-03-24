@@ -39,6 +39,7 @@ This is where Relaytic stops acting like a system that only chooses and judges m
 ## Required Behavior
 
 - decision-world modeling must remain explicit, inspectable, and uncertainty-aware
+- Slice 10A should consume the explicit quality and budget contracts from Slice 10B rather than inventing hidden search or stop defaults
 - compiled methods must remain proposals until local evidence tests them
 - source-graph and join reasoning must stay local-first and copy-only
 - Relaytic must be able to say when more data is more valuable than more search

@@ -182,11 +182,18 @@ Avoid introducing new references to:
 - upgraded the Builder/runtime boundary so first-route execution now persists richer preprocessing, bounded categorical handling, executed feature transforms, calibration state, and uncertainty-bearing inference outputs without widening the legacy compatibility boundary
 - wired benchmark artifacts into completion, run summary, assist, runtime, and MCP surfaces without turning benchmark tooling into a separate source of truth
 
+### Slice 10
+
+- introduced the canonical package boundary `src/relaytic/feedback/`
+- introduced artifact boundaries for `feedback_intake.json`, `feedback_validation.json`, `feedback_effect_report.json`, `feedback_casebook.json`, `outcome_observation_report.json`, `decision_policy_update_suggestions.json`, `policy_update_suggestions.json`, and `route_prior_updates.json`
+- introduced public commands `relaytic feedback add`, `relaytic feedback review`, `relaytic feedback show`, and `relaytic feedback rollback`
+- wired feedback artifacts into memory and run-summary surfaces so accepted route-prior updates remain explicit rather than hidden state drift
+
 ## Reserved Future Boundaries
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
-- `src/relaytic/feedback/` for Slice 10 validated feedback, outcome learning, reversible effect reporting, rollback handling, and casebook artifacts
+- `src/relaytic/profiles/` for Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
 - `src/relaytic/decision/` for Slice 10A decision-world models, intervention policy, value-of-more-data reasoning, and decision-usefulness synthesis
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
@@ -195,9 +202,12 @@ The following boundaries are reserved for the next frontier slices so later impl
 
 Reserved future artifact names:
 
-- `feedback_casebook.json`
-- `outcome_observation_report.json`
-- `decision_policy_update_suggestions.json`
+- `quality_contract.json`
+- `quality_gate_report.json`
+- `budget_contract.json`
+- `budget_consumption_report.json`
+- `operator_profile.json`
+- `lab_operating_profile.json`
 - `decision_world_model.json`
 - `intervention_policy_report.json`
 - `decision_usefulness_report.json`

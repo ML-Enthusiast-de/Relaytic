@@ -37,10 +37,11 @@ Current package rule:
 Current canonical boundaries:
 
 - `src/relaytic/research/` owns Slice 09D redacted external research retrieval, source inventory, method-transfer distillation, benchmark-reference harvesting, and research-audit persistence
+- `src/relaytic/feedback/` owns Slice 10 validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook state
 
 Reserved future boundaries:
 
-- `src/relaytic/feedback/` owns Slice 10 validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook state
+- `src/relaytic/profiles/` should own Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
 - `src/relaytic/decision/` should own Slice 10A decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` should own Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
@@ -76,6 +77,7 @@ These files are required and must stay current:
 - `docs/build_slices/phase_09e.md`
 - `docs/build_slices/phase_09f.md`
 - `docs/build_slices/phase_10.md`
+- `docs/build_slices/phase_10b.md`
 - `docs/build_slices/phase_10a.md`
 - `docs/build_slices/phase_11.md`
 - `docs/build_slices/phase_16.md`
@@ -174,6 +176,14 @@ The current slices must preserve these names:
 - `method_transfer_report.json`
 - `benchmark_reference_report.json`
 - `external_research_audit.json`
+- `feedback_intake.json`
+- `feedback_validation.json`
+- `feedback_effect_report.json`
+- `feedback_casebook.json`
+- `outcome_observation_report.json`
+- `decision_policy_update_suggestions.json`
+- `policy_update_suggestions.json`
+- `route_prior_updates.json`
 - `reference_approach_matrix.json`
 - `benchmark_gap_report.json`
 - `benchmark_parity_report.json`
@@ -186,9 +196,12 @@ The current slices must preserve these names:
 
 Reserved future artifact names:
 
-- `feedback_casebook.json`
-- `outcome_observation_report.json`
-- `decision_policy_update_suggestions.json`
+- `quality_contract.json`
+- `quality_gate_report.json`
+- `budget_contract.json`
+- `budget_consumption_report.json`
+- `operator_profile.json`
+- `lab_operating_profile.json`
 - `decision_world_model.json`
 - `intervention_policy_report.json`
 - `decision_usefulness_report.json`
@@ -466,6 +479,14 @@ Minimum guaranteed surfaces at this stage:
 - future mission-control surfaces must consume the same runtime and artifact graph rather than building a separate UI-only state model
 - future decision-world-model logic must stay advisory to planning, autonomy, completion, and lifecycle and must not silently replace deterministic metrics, calibration math, or artifact persistence
 - future method-compilation logic must emit explicit compiled artifacts instead of hidden prompt context or silent route rewrites
+
+## Slice 10B Quality/Budget/Profile Contract
+
+- Relaytic must materialize one explicit quality contract and one explicit budget contract when run-scope inputs are absent instead of leaving those defaults implicit
+- operator and lab profile overlays may shape review posture, benchmark appetite, explanation style, abstain/review preference, and budget posture, but they must not silently override deterministic metrics, model outcomes, or artifact truth
+- quality/budget/profile surfaces must be visible through CLI, MCP, assist, and summary outputs instead of living only in config files
+- quality-gate reporting must explain why Relaytic continued, recalibrated, retrained, asked for more data, or stopped in terms of the explicit contract it consumed
+- later decision-world-model and search-controller slices must consume these contracts rather than inventing hidden thresholds or limits phase by phase
 
 ## Security Contract
 

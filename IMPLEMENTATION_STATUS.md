@@ -4,8 +4,9 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 11, plus Slice 10 feedback assimilation and outcome learning
-- next recommended slice: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
+- completed slices: 00 through 11, including Slice 10 feedback assimilation and outcome learning
+- next recommended slice: 10B, quality contracts, visible budgets, and operator/lab profiles
+- next category-shift follow-on after 10B: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
 - next leverage follow-on after 10A: 12, dojo mode and guarded self-improvement
 - next scale-and-search follow-on after 12: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
@@ -69,7 +70,9 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
-- validated feedback and outcome learning that can update route, policy, and decision heuristics reversibly
+- explicit quality contracts so Relaytic writes and shows what "good enough" means instead of scattering thresholds across hidden defaults
+- explicit budget contracts and budget-consumption reporting so humans and external agents can see configured limits, consumed budget, and remaining headroom
+- bounded operator/lab profiles that shape review posture, benchmark appetite, explanation style, and budget posture without personalizing truth-bearing logic
 - decision-system world modeling so Relaytic can reason about action cost, abstention, review load, and whether more data is better than more search
 - method compilation that turns research, memory, and operator context into executable challenger, feature, split, and benchmark templates
 - richer local data-fabric reasoning around source graphs, join candidates, entity histories, and acquisition plans
