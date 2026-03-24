@@ -194,9 +194,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 11, including Slice 10 feedback assimilation and outcome learning
-- next execution target: Slice 10B
-- next category-shift follow-on after Slice 10B: Slice 10A
+- implemented baseline: Slice 00 through Slice 11, including Slice 10 feedback assimilation/outcome learning and Slice 10B explicit quality-budget-profile contracts
+- next execution target: Slice 10A
 - next proof follow-on after Slice 10A: Slice 12
 - next adaptive follow-on after Slice 12: Slice 13
 - late optional representation follow-on after Slice 15: Slice 16

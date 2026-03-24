@@ -147,8 +147,10 @@ The repository currently implements the following product layers:
 - Slice 09D: privacy-safe external research retrieval with redacted query planning, typed source inventory, method-transfer distillation, benchmark-reference capture, and explicit no-leak audit
 - Slice 09E: communicative assist surfaces with deterministic explanation, stage navigation, bounded takeover, optional local semantic lift, and host-connection guidance
 - Slice 11: benchmark parity, explicit reference-approach comparison, and parity-gap reporting under the same split and metric contract
+- Slice 10: feedback assimilation with validated intake, reversible effect reporting, rollback-ready casebook state, and later-run route-prior influence
+- Slice 10B: explicit quality contracts, quality-gate reports, visible budget contracts, budget-consumption reporting, and bounded operator/lab profile overlays via `relaytic profiles`
 
-The next planned layer is Slice 10: feedback assimilation from operator interventions, runtime failures, and later-run evidence.
+The next planned layer is Slice 10A: decision-world modeling, method compilation, and data-acquisition reasoning.
 
 ## Current Artifact Baseline
 
@@ -224,6 +226,12 @@ Relaytic already standardizes several load-bearing artifacts:
 - `reference_approach_matrix.json`
 - `benchmark_gap_report.json`
 - `benchmark_parity_report.json`
+- `quality_contract.json`
+- `quality_gate_report.json`
+- `budget_contract.json`
+- `budget_consumption_report.json`
+- `operator_profile.json`
+- `lab_operating_profile.json`
 - `assist_mode.json`
 - `assist_session_state.json`
 - `assistant_connection_guide.json`
@@ -293,6 +301,8 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic research sources`
 - `relaytic benchmark run`
 - `relaytic benchmark show`
+- `relaytic profiles review`
+- `relaytic profiles show`
 - `relaytic assist show`
 - `relaytic assist turn`
 - `relaytic assist chat`

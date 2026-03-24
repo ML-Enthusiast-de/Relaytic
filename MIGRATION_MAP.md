@@ -189,11 +189,23 @@ Avoid introducing new references to:
 - introduced public commands `relaytic feedback add`, `relaytic feedback review`, `relaytic feedback show`, and `relaytic feedback rollback`
 - wired feedback artifacts into memory and run-summary surfaces so accepted route-prior updates remain explicit rather than hidden state drift
 
+## Current Newly-Shipped Boundaries
+
+- `src/relaytic/profiles/` for Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
+
+Shipped artifact names:
+
+- `quality_contract.json`
+- `quality_gate_report.json`
+- `budget_contract.json`
+- `budget_consumption_report.json`
+- `operator_profile.json`
+- `lab_operating_profile.json`
+
 ## Reserved Future Boundaries
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
-- `src/relaytic/profiles/` for Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
 - `src/relaytic/decision/` for Slice 10A decision-world models, intervention policy, value-of-more-data reasoning, and decision-usefulness synthesis
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
@@ -202,12 +214,6 @@ The following boundaries are reserved for the next frontier slices so later impl
 
 Reserved future artifact names:
 
-- `quality_contract.json`
-- `quality_gate_report.json`
-- `budget_contract.json`
-- `budget_consumption_report.json`
-- `operator_profile.json`
-- `lab_operating_profile.json`
 - `decision_world_model.json`
 - `intervention_policy_report.json`
 - `decision_usefulness_report.json`

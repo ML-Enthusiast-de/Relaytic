@@ -4,9 +4,8 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 11, including Slice 10 feedback assimilation and outcome learning
-- next recommended slice: 10B, quality contracts, visible budgets, and operator/lab profiles
-- next category-shift follow-on after 10B: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
+- completed slices: 00 through 11, including Slice 10 feedback assimilation/outcome learning and Slice 10B explicit quality-budget-profile contracts
+- next recommended slice: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
 - next leverage follow-on after 10A: 12, dojo mode and guarded self-improvement
 - next scale-and-search follow-on after 12: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
@@ -45,6 +44,7 @@ The repository currently supports:
 - benchmark parity review against explicit reference approaches under the same split and metric contract
 - feedback assimilation with explicit intake, validation, reversible effect reports, route-prior updates, decision-policy suggestions, and rollback-ready casebook artifacts
 - later-run planning influence from accepted feedback through memory-scanned route-prior updates
+- explicit quality contracts, quality-gate reports, budget contracts, budget-consumption reporting, and bounded operator/lab profiles via `relaytic profiles`
 - visible research support inside completion, autonomy, `relaytic run`, `relaytic show`, explicit `relaytic research` surfaces, and the MCP contract
 - visible benchmark support inside completion, `relaytic run`, `relaytic show`, explicit `relaytic benchmark` surfaces, assist, runtime, and the MCP contract
 - communicative assist surfaces via `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat` so humans and agents can ask for explanations, request stage navigation, or let Relaytic take over safely
@@ -70,9 +70,6 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
-- explicit quality contracts so Relaytic writes and shows what "good enough" means instead of scattering thresholds across hidden defaults
-- explicit budget contracts and budget-consumption reporting so humans and external agents can see configured limits, consumed budget, and remaining headroom
-- bounded operator/lab profiles that shape review posture, benchmark appetite, explanation style, and budget posture without personalizing truth-bearing logic
 - decision-system world modeling so Relaytic can reason about action cost, abstention, review load, and whether more data is better than more search
 - method compilation that turns research, memory, and operator context into executable challenger, feature, split, and benchmark templates
 - richer local data-fabric reasoning around source graphs, join candidates, entity histories, and acquisition plans

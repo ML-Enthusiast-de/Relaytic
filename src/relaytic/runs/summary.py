@@ -156,6 +156,17 @@ def build_run_summary(
             "route_prior_updates": "route_prior_updates.json",
         },
     )
+    profiles_bundle = _read_bundle(
+        root,
+        {
+            "quality_contract": "quality_contract.json",
+            "quality_gate_report": "quality_gate_report.json",
+            "budget_contract": "budget_contract.json",
+            "budget_consumption_report": "budget_consumption_report.json",
+            "operator_profile": "operator_profile.json",
+            "lab_operating_profile": "lab_operating_profile.json",
+        },
+    )
     runtime_bundle = _read_bundle(
         root,
         {
@@ -239,6 +250,12 @@ def build_run_summary(
     decision_policy_update_suggestions = _bundle_item(feedback_bundle, "decision_policy_update_suggestions")
     policy_update_suggestions = _bundle_item(feedback_bundle, "policy_update_suggestions")
     route_prior_updates = _bundle_item(feedback_bundle, "route_prior_updates")
+    quality_contract = _bundle_item(profiles_bundle, "quality_contract")
+    quality_gate_report = _bundle_item(profiles_bundle, "quality_gate_report")
+    budget_contract = _bundle_item(profiles_bundle, "budget_contract")
+    budget_consumption_report = _bundle_item(profiles_bundle, "budget_consumption_report")
+    operator_profile = _bundle_item(profiles_bundle, "operator_profile")
+    lab_operating_profile = _bundle_item(profiles_bundle, "lab_operating_profile")
     hook_execution_log = _bundle_item(runtime_bundle, "hook_execution_log")
     run_checkpoint_manifest = _bundle_item(runtime_bundle, "run_checkpoint_manifest")
     capability_profiles = _bundle_item(runtime_bundle, "capability_profiles")
@@ -301,6 +318,7 @@ def build_run_summary(
             intelligence_bundle=intelligence_bundle,
             research_bundle=research_bundle,
             benchmark_bundle=benchmark_bundle,
+            profiles_bundle=profiles_bundle,
             feedback_bundle=feedback_bundle,
             completion_bundle=completion_bundle,
             lifecycle_bundle=lifecycle_bundle,
@@ -470,6 +488,40 @@ def build_run_summary(
             if isinstance(feedback_casebook.get("accepted_cases"), list)
             else 0,
         },
+        "contracts": {
+            "quality_contract_status": _clean_text(quality_contract.get("status")),
+            "quality_gate_status": _clean_text(quality_gate_report.get("gate_status")) or _clean_text(quality_gate_report.get("status")),
+            "quality_recommended_action": _clean_text(quality_gate_report.get("recommended_action")),
+            "quality_state": _clean_text(quality_gate_report.get("quality_state")),
+            "primary_metric": _clean_text(quality_contract.get("primary_metric")),
+            "acceptance_criteria": dict(quality_contract.get("acceptance_criteria") or {}),
+            "benchmark_required": quality_contract.get("benchmark_required"),
+            "minimum_readiness_level": _clean_text(quality_contract.get("minimum_readiness_level")),
+            "budget_posture": _clean_text(budget_contract.get("budget_posture")),
+            "search_budget_posture": _clean_text(budget_contract.get("search_budget_posture")),
+            "max_wall_clock_minutes": budget_contract.get("max_wall_clock_minutes"),
+            "observed_elapsed_minutes": budget_consumption_report.get("observed_elapsed_minutes"),
+            "max_trials": budget_contract.get("max_trials"),
+            "estimated_trials_consumed": budget_consumption_report.get("estimated_trials_consumed"),
+            "remaining_trials": budget_consumption_report.get("remaining_trials"),
+            "max_branches_per_round": budget_contract.get("max_branches_per_round"),
+            "used_branches": budget_consumption_report.get("used_branches"),
+            "remaining_branch_budget": budget_consumption_report.get("remaining_branch_budget"),
+            "budget_health": _clean_text(budget_consumption_report.get("budget_health")),
+        },
+        "profiles": {
+            "operator_profile_name": _clean_text(operator_profile.get("profile_name")),
+            "operator_review_strictness": _clean_text(operator_profile.get("review_strictness")),
+            "operator_benchmark_appetite": _clean_text(operator_profile.get("benchmark_appetite")),
+            "operator_budget_posture": _clean_text(operator_profile.get("budget_posture")),
+            "operator_explanation_style": _clean_text(operator_profile.get("explanation_style")),
+            "lab_profile_name": _clean_text(lab_operating_profile.get("profile_name")),
+            "lab_review_strictness": _clean_text(lab_operating_profile.get("review_strictness")),
+            "lab_risk_posture": _clean_text(lab_operating_profile.get("risk_posture")),
+            "lab_budget_posture": _clean_text(lab_operating_profile.get("budget_posture")),
+            "local_truth_required": lab_operating_profile.get("local_truth_required"),
+            "remote_intelligence_allowed": lab_operating_profile.get("remote_intelligence_allowed"),
+        },
         "runtime": {
             "current_stage": _resolve_runtime_stage(
                 root,
@@ -568,6 +620,10 @@ def build_run_summary(
             "benchmark_gap_report_path": _path_if_exists(root / "benchmark_gap_report.json"),
             "feedback_effect_report_path": _path_if_exists(root / "feedback_effect_report.json"),
             "feedback_casebook_path": _path_if_exists(root / "feedback_casebook.json"),
+            "quality_contract_path": _path_if_exists(root / "quality_contract.json"),
+            "quality_gate_report_path": _path_if_exists(root / "quality_gate_report.json"),
+            "budget_contract_path": _path_if_exists(root / "budget_contract.json"),
+            "budget_consumption_report_path": _path_if_exists(root / "budget_consumption_report.json"),
             "event_stream_path": _path_if_exists(root / "lab_event_stream.jsonl"),
             "capability_profiles_path": _path_if_exists(root / "capability_profiles.json"),
         },
@@ -589,6 +645,8 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     research = dict(summary.get("research", {}))
     benchmark = dict(summary.get("benchmark", {}))
     feedback = dict(summary.get("feedback", {}))
+    contracts = dict(summary.get("contracts", {}))
+    profiles = dict(summary.get("profiles", {}))
     runtime = dict(summary.get("runtime", {}))
     lifecycle = dict(summary.get("lifecycle", {}))
     autonomy = dict(summary.get("autonomy", {}))
@@ -760,6 +818,40 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         )
         if feedback.get("primary_recommended_action"):
             lines.append(f"- Primary feedback action: `{feedback.get('primary_recommended_action')}`")
+    if contracts and any(value not in (None, 0, False, "", []) for value in contracts.values()):
+        criteria = dict(contracts.get("acceptance_criteria", {}))
+        criteria_text = ", ".join(f"{key}>={float(value):.2f}" for key, value in criteria.items()) if criteria else "none"
+        lines.extend(
+            [
+                "",
+                "## Contracts",
+                f"- Quality gate: `{contracts.get('quality_gate_status') or 'unknown'}`",
+                f"- Quality action: `{contracts.get('quality_recommended_action') or 'none'}`",
+                f"- Quality state: `{contracts.get('quality_state') or 'unknown'}`",
+                f"- Acceptance criteria: `{criteria_text}`",
+                f"- Benchmark required: `{contracts.get('benchmark_required')}`",
+                f"- Readiness floor: `{contracts.get('minimum_readiness_level') or 'unknown'}`",
+                f"- Budget health: `{contracts.get('budget_health') or 'unknown'}`",
+                f"- Elapsed minutes: `{contracts.get('observed_elapsed_minutes')}` / `{contracts.get('max_wall_clock_minutes')}`",
+                f"- Estimated trials: `{contracts.get('estimated_trials_consumed')}` / `{contracts.get('max_trials')}`",
+                f"- Branches: `{contracts.get('used_branches')}` / `{contracts.get('max_branches_per_round')}`",
+            ]
+        )
+    if profiles and any(value not in (None, 0, False, "", []) for value in profiles.values()):
+        lines.extend(
+            [
+                "",
+                "## Profiles",
+                f"- Operator profile: `{profiles.get('operator_profile_name') or 'unknown'}`",
+                f"- Operator strictness: `{profiles.get('operator_review_strictness') or 'unknown'}`",
+                f"- Operator benchmark appetite: `{profiles.get('operator_benchmark_appetite') or 'unknown'}`",
+                f"- Operator explanation style: `{profiles.get('operator_explanation_style') or 'unknown'}`",
+                f"- Lab profile: `{profiles.get('lab_profile_name') or 'unknown'}`",
+                f"- Lab risk posture: `{profiles.get('lab_risk_posture') or 'unknown'}`",
+                f"- Local truth required: `{profiles.get('local_truth_required')}`",
+                f"- Remote intelligence allowed: `{profiles.get('remote_intelligence_allowed')}`",
+            ]
+        )
     if lifecycle and any(value is not None for value in lifecycle.values()):
         lines.extend(
             [
@@ -944,6 +1036,7 @@ def _resolve_stage(
     intelligence_bundle: dict[str, Any],
     research_bundle: dict[str, Any],
     benchmark_bundle: dict[str, Any],
+    profiles_bundle: dict[str, Any],
     feedback_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
@@ -958,6 +1051,8 @@ def _resolve_stage(
     if completion_bundle:
         run_state = _bundle_item(completion_bundle, "run_state")
         return str(run_state.get("current_stage", "")).strip() or "completion_reviewed"
+    if profiles_bundle:
+        return "profiles_reviewed"
     if benchmark_bundle:
         return "benchmark_reviewed"
     if research_bundle:
@@ -993,14 +1088,16 @@ def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: s
         return "autonomy"
     if (root / "promotion_decision.json").exists():
         return "lifecycle"
+    if (root / "completion_decision.json").exists():
+        return "completion"
+    if (root / "quality_gate_report.json").exists():
+        return "profiles"
     if (root / "benchmark_parity_report.json").exists():
         return "benchmark"
     if (root / "research_brief.json").exists():
         return "research"
     if (root / "semantic_debate_report.json").exists():
         return "intelligence"
-    if (root / "completion_decision.json").exists():
-        return "completion"
     if (root / "audit_report.json").exists():
         return "evidence"
     if (root / "plan.json").exists():

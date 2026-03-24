@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 Intended package boundary:
 
@@ -16,6 +16,13 @@ Intended artifacts:
 - `budget_consumption_report.json`
 - `operator_profile.json`
 - `lab_operating_profile.json`
+
+Primary public surfaces:
+
+- `relaytic profiles review`
+- `relaytic profiles show`
+- `relaytic show`
+- `relaytic assist show`
 
 ## Intent
 
@@ -46,6 +53,16 @@ Slice 10B is acceptable only if:
 3. one surface shows configured budget, consumed budget, and remaining budget together
 4. one report explains continue, recalibrate, retrain, or stop in terms of the explicit quality contract
 5. one external-agent path consumes the same contracts through JSON or MCP without scraping prose
+
+## Verification
+
+Implemented with targeted coverage for:
+
+- task-derived default quality contracts
+- operator-profile overlays that change posture without changing deterministic artifact truth
+- lab-profile overlays that tighten benchmark/review posture
+- budget-consumption reporting
+- CLI and host-facing visibility through `relaytic show`, `relaytic profiles show`, assist surfaces, and the MCP-facing run-summary path
 
 ## Required Verification
 

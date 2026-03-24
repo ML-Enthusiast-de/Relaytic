@@ -38,10 +38,10 @@ Current canonical boundaries:
 
 - `src/relaytic/research/` owns Slice 09D redacted external research retrieval, source inventory, method-transfer distillation, benchmark-reference harvesting, and research-audit persistence
 - `src/relaytic/feedback/` owns Slice 10 validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook state
+- `src/relaytic/profiles/` owns Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
 
 Reserved future boundaries:
 
-- `src/relaytic/profiles/` should own Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
 - `src/relaytic/decision/` should own Slice 10A decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` should own Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning

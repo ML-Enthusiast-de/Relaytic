@@ -129,9 +129,8 @@ Reason:
 
 Current repo state:
 
-- implemented through Slice 11, with Slice 09F routed-intelligence hardening and Slice 10 feedback assimilation now landed
-- next execution target: Slice 10B
-- next category-shift follow-on after Slice 10B: Slice 10A
+- implemented through Slice 11, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, and Slice 10B explicit quality/budget/profile contracts now landed
+- next execution target: Slice 10A
 - next proof follow-on after Slice 10A: Slice 12
 
 ## MVP boundary

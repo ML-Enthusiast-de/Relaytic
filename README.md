@@ -40,13 +40,10 @@ The repository already supports a working early product baseline:
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slice 10 is now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; and keep rollback-ready casebook state instead of silently drifting. The next load-bearing implementation step is Slice 10B, where Relaytic makes quality gates, budget posture, and operator/lab profile overlays explicit before the deeper decision-lab work in Slice 10A.
+Slices 10 and 10B are now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; keep rollback-ready casebook state; and make quality gates, budget posture, and operator/lab profile overlays explicit before the deeper decision-lab work in Slice 10A. The next load-bearing implementation step is now Slice 10A.
 
 The next frontier upgrades are:
 
-- explicit quality contracts that tell humans and external agents what Relaytic currently means by "good enough"
-- explicit budget contracts and budget-consumption reporting that make runtime/search/autonomy limits visible instead of implicit
-- bounded operator/lab profiles that shape review posture, benchmark appetite, explanation style, and budget posture without personalizing truth-bearing logic
 - decision-world modeling that distinguishes better score from better downstream action
 - method compilation that turns research, memory, and operator context into executable challenger and feature plans
 - local data-fabric reasoning that can suggest joins, entity histories, and additional local data before wasting search budget
@@ -276,6 +273,7 @@ relaytic intelligence show --run-dir artifacts/run_your_dataset_...
 relaytic research show --run-dir artifacts/run_your_dataset_...
 relaytic research sources --run-dir artifacts/run_your_dataset_...
 relaytic benchmark show --run-dir artifacts/run_your_dataset_...
+relaytic profiles show --run-dir artifacts/run_your_dataset_...
 relaytic assist show --run-dir artifacts/run_your_dataset_...
 relaytic assist turn --run-dir artifacts/run_your_dataset_... --message "why did you choose this route?"
 relaytic status --run-dir artifacts/run_your_dataset_...
@@ -299,6 +297,7 @@ relaytic evidence run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic intelligence run --run-dir artifacts/run_demo
 relaytic research gather --run-dir artifacts/run_demo
 relaytic benchmark run --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic profiles review --run-dir artifacts/run_demo
 relaytic completion review --run-dir artifacts/run_demo
 relaytic lifecycle review --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic autonomy run --run-dir artifacts/run_demo --data-path path/to/data.csv
@@ -309,6 +308,7 @@ relaytic memory show --run-dir artifacts/run_demo
 relaytic intelligence show --run-dir artifacts/run_demo
 relaytic research show --run-dir artifacts/run_demo
 relaytic benchmark show --run-dir artifacts/run_demo
+relaytic profiles show --run-dir artifacts/run_demo
 relaytic autonomy show --run-dir artifacts/run_demo
 relaytic run-inference --run-dir artifacts/run_demo --data-path path/to/data.csv
 ```
@@ -335,6 +335,7 @@ That flow produces:
 - runtime artifacts such as `lab_event_stream.jsonl`, `hook_execution_log.json`, `run_checkpoint_manifest.json`, `capability_profiles.json`, `data_access_audit.json`, and `context_influence_report.json`
 - intelligence artifacts such as `intelligence_mode.json`, `llm_routing_plan.json`, `local_llm_profile.json`, `verifier_report.json`, `semantic_proof_report.json`, `semantic_task_results.json`, `context_assembly_report.json`, `doc_grounding_report.json`, `semantic_debate_report.json`, `semantic_counterposition_pack.json`, and `semantic_uncertainty_report.json`
 - benchmark artifacts such as `reference_approach_matrix.json`, `benchmark_gap_report.json`, and `benchmark_parity_report.json`
+- profile and contract artifacts such as `quality_contract.json`, `quality_gate_report.json`, `budget_contract.json`, `budget_consumption_report.json`, `operator_profile.json`, and `lab_operating_profile.json`
 - completion artifacts such as `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
 - lifecycle artifacts such as `champion_vs_candidate.json`, `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json`
 - autonomy artifacts such as `autonomy_loop_state.json`, `autonomy_round_report.json`, `challenger_queue.json`, `branch_outcome_matrix.json`, `retrain_run_request.json`, `recalibration_run_request.json`, `champion_lineage.json`, and `loop_budget_report.json`

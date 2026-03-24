@@ -313,14 +313,18 @@ def _looks_like_explanation_request(normalized: str) -> bool:
 
 
 def _build_general_explanation(*, run_summary: dict[str, Any]) -> str:
-    model = _clean_text(dict(run_summary.get("model", {})).get("selected_model_family")) or "none"
-    metric = _clean_text(dict(run_summary.get("model", {})).get("primary_metric")) or "unknown"
+    decision = dict(run_summary.get("decision", {}))
+    contracts = dict(run_summary.get("contracts", {}))
+    model = _clean_text(decision.get("selected_model_family")) or "none"
+    metric = _clean_text(decision.get("primary_metric")) or "unknown"
     stage = _clean_text(run_summary.get("stage_completed")) or "unknown"
     next_step = dict(run_summary.get("next_step", {}))
     completion = dict(run_summary.get("completion", {}))
     lifecycle = dict(run_summary.get("lifecycle", {}))
     research = dict(run_summary.get("research", {}))
     benchmark = dict(run_summary.get("benchmark", {}))
+    quality_gate = _clean_text(contracts.get("quality_gate_status")) or "unknown"
+    budget_health = _clean_text(contracts.get("budget_health")) or "unknown"
     return (
         f"Relaytic is currently at `{stage}`. "
         f"The active model family is `{model}` with primary metric `{metric}`. "
@@ -328,7 +332,8 @@ def _build_general_explanation(*, run_summary: dict[str, Any]) -> str:
         f"lifecycle currently points to `{_lifecycle_rollup(lifecycle)}`, "
         f"and the next recommended action is `{_clean_text(next_step.get('recommended_action')) or 'none'}`. "
         f"Research follow-up is `{_clean_text(research.get('recommended_followup_action')) or 'none'}` "
-        f"and benchmark parity is `{_clean_text(benchmark.get('parity_status')) or 'unknown'}`."
+        f"benchmark parity is `{_clean_text(benchmark.get('parity_status')) or 'unknown'}`, "
+        f"quality gate is `{quality_gate}`, and budget health is `{budget_health}`."
     )
 
 
@@ -354,6 +359,16 @@ def _build_stage_explanation(*, stage: str, run_summary: dict[str, Any]) -> str:
         return (
             f"Intelligence currently has backend status `{_clean_text(intelligence.get('backend_status')) or 'unknown'}` and "
             f"recommended follow-up `{_clean_text(intelligence.get('recommended_followup_action')) or 'none'}`."
+        )
+    if stage == "profiles":
+        contracts = dict(run_summary.get("contracts", {}))
+        profiles = dict(run_summary.get("profiles", {}))
+        return (
+            f"Profiles currently report quality gate `{_clean_text(contracts.get('quality_gate_status')) or 'unknown'}`, "
+            f"recommended action `{_clean_text(contracts.get('quality_recommended_action')) or 'none'}`, "
+            f"budget health `{_clean_text(contracts.get('budget_health')) or 'unknown'}`, "
+            f"operator profile `{_clean_text(profiles.get('operator_profile_name')) or 'unknown'}`, and "
+            f"lab profile `{_clean_text(profiles.get('lab_profile_name')) or 'unknown'}`."
         )
     if stage == "autonomy":
         autonomy = dict(run_summary.get("autonomy", {}))

@@ -153,6 +153,15 @@ feedback:
   allow_decision_policy_update_suggestions: true
   max_casebook_entries: 50
 
+profiles:
+  enabled: true
+  allow_operator_profile_overlays: true
+  allow_lab_profile_overlays: true
+  allow_assumption_defaults: true
+  require_visible_quality_gates: true
+  require_visible_budget_consumption: true
+  quality_review_mode: explicit_contracts
+
 prompts:
   analyst_system_path: ""
   modeler_system_path: ""

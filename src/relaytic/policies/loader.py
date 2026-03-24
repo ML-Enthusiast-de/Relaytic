@@ -93,6 +93,7 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     intelligence_cfg = dict(config.get("intelligence", {}))
     research_cfg = dict(config.get("research", {}))
     feedback_cfg = dict(config.get("feedback", {}))
+    profiles_cfg = dict(config.get("profiles", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
     contact_email = research_cfg.get("contact_email", "")
     if contact_email is None:
@@ -252,6 +253,15 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
                 feedback_cfg.get("allow_decision_policy_update_suggestions", True)
             ),
             "max_casebook_entries": int(feedback_cfg.get("max_casebook_entries", 50) or 50),
+        },
+        "profiles": {
+            "enabled": bool(profiles_cfg.get("enabled", True)),
+            "allow_operator_profile_overlays": bool(profiles_cfg.get("allow_operator_profile_overlays", True)),
+            "allow_lab_profile_overlays": bool(profiles_cfg.get("allow_lab_profile_overlays", True)),
+            "allow_assumption_defaults": bool(profiles_cfg.get("allow_assumption_defaults", True)),
+            "require_visible_quality_gates": bool(profiles_cfg.get("require_visible_quality_gates", True)),
+            "require_visible_budget_consumption": bool(profiles_cfg.get("require_visible_budget_consumption", True)),
+            "quality_review_mode": str(profiles_cfg.get("quality_review_mode", "explicit_contracts") or "explicit_contracts"),
         },
         "runtime": {
             "gateway_enabled": bool(runtime_cfg.get("gateway_enabled", True)),

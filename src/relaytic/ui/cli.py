@@ -242,6 +242,24 @@ def render_feedback_review_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_feedback_review_markdown(*args, **kwargs)
 
 
+def run_profiles_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.profiles import run_profiles_review as _run_profiles_review
+
+    return _run_profiles_review(*args, **kwargs)
+
+
+def read_profiles_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.profiles import read_profiles_bundle as _read_profiles_bundle
+
+    return _read_profiles_bundle(*args, **kwargs)
+
+
+def render_profiles_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.profiles import render_profiles_review_markdown as _render_profiles_review_markdown
+
+    return _render_profiles_review_markdown(*args, **kwargs)
+
+
 def build_assist_bundle(*args: Any, **kwargs: Any) -> Any:
     from relaytic.assist import build_assist_bundle as _build_assist_bundle
 
@@ -1441,6 +1459,39 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    profiles_surface = sub.add_parser(
+        "profiles",
+        help="Run or inspect Slice 10B quality contracts, budget contracts, and operator/lab profiles.",
+    )
+    profiles_sub = profiles_surface.add_subparsers(dest="profiles_command", required=True)
+
+    profiles_review = profiles_sub.add_parser(
+        "review",
+        help="Recompute Slice 10B contracts and budget-consumption artifacts for an existing run.",
+    )
+    profiles_review.add_argument("--run-dir", required=True, help="Run directory for Slice 10B artifacts.")
+    profiles_review.add_argument("--config", default=None, help="Optional config/policy source.")
+    profiles_review.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    profiles_review.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    profiles_review.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    profiles_show = profiles_sub.add_parser(
+        "show",
+        help="Render the current Slice 10B quality and budget contract artifacts for a run.",
+    )
+    profiles_show.add_argument("--run-dir", required=True, help="Run directory containing Slice 10B artifacts.")
+    profiles_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     autonomy_surface = sub.add_parser(
         "autonomy",
         help="Run or inspect Slice 09C bounded autonomous follow-up loops.",
@@ -2221,6 +2272,40 @@ def main(argv: list[str] | None = None) -> int:
         try:
             labels = _parse_key_value_pairs(args.label)
             payload = _run_feedback_phase(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "profiles":
+        if args.profiles_command == "show":
+            try:
+                payload = _show_profiles_surface(run_dir=args.run_dir)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.profiles_command != "review":
+            parser.error("Unsupported profiles subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_profiles_phase(
                 run_dir=args.run_dir,
                 config_path=args.config,
                 run_id=args.run_id,
@@ -3017,6 +3102,20 @@ def _run_access_flow(
             runtime_surface=runtime_surface,
             runtime_command="relaytic run",
         )
+    investigation_payload = _run_investigation_phase(
+        run_dir=root,
+        data_path=staged_primary_data_path,
+        config_path=config_path,
+        run_id=run_id,
+        sheet_name=sheet_name,
+        header_row=header_row,
+        data_start_row=data_start_row,
+        timestamp_column=timestamp_column,
+        overwrite=overwrite,
+        labels=labels,
+        runtime_surface=runtime_surface,
+        runtime_command="relaytic run",
+    )
     memory_pre_payload = _run_memory_phase(
         run_dir=root,
         data_path=staged_primary_data_path,
@@ -3024,6 +3123,14 @@ def _run_access_flow(
         run_id=run_id,
         labels=labels,
         search_roots=None,
+        runtime_surface=runtime_surface,
+        runtime_command="relaytic run",
+    )
+    profiles_pre_execution_payload = _run_profiles_phase(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
         runtime_surface=runtime_surface,
         runtime_command="relaytic run",
     )
@@ -3095,6 +3202,14 @@ def _run_access_flow(
         runtime_surface=runtime_surface,
         runtime_command="relaytic run",
     )
+    profiles_pre_completion_payload = _run_profiles_phase(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+        runtime_surface=runtime_surface,
+        runtime_command="relaytic run",
+    )
     completion_payload = _run_completion_phase(
         run_dir=root,
         config_path=config_path,
@@ -3130,6 +3245,14 @@ def _run_access_flow(
         config_path=config_path,
         run_id=run_id,
         overwrite=overwrite,
+        labels=labels,
+        runtime_surface=runtime_surface,
+        runtime_command="relaytic run",
+    )
+    profiles_final_payload = _run_profiles_phase(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
         labels=labels,
         runtime_surface=runtime_surface,
         runtime_command="relaytic run",
@@ -3173,12 +3296,17 @@ def _run_access_flow(
             "autonomy_mode": intake_payload.get("autonomy_mode", {}),
             "assumptions": intake_payload.get("assumptions", []),
         }
+    surface_payload["investigation"] = {
+        "focus_profile": investigation_payload.get("focus_profile", {}),
+        "optimization_profile": investigation_payload.get("optimization_profile", {}),
+    }
     surface_payload["plan"] = planning_payload.get("plan", {})
     surface_payload["training_result"] = planning_payload.get("training_result", {})
     surface_payload["evidence"] = evidence_payload["surface_payload"].get("evidence", {})
     surface_payload["intelligence"] = intelligence_payload["surface_payload"].get("intelligence", {})
     surface_payload["research"] = research_payload["surface_payload"].get("research", {})
     surface_payload["benchmark"] = benchmark_payload["surface_payload"].get("benchmark", {})
+    surface_payload["profiles"] = profiles_final_payload["surface_payload"].get("profiles", {})
     surface_payload["completion"] = completion_payload["surface_payload"].get("completion", {})
     surface_payload["memory"] = memory_final_payload["surface_payload"].get("memory", {})
     surface_payload["lifecycle"] = lifecycle_payload["surface_payload"].get("lifecycle", {})
@@ -3988,6 +4116,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.feedback import read_feedback_bundle
 
         return read_feedback_bundle(run_dir)
+    if bundle == "profiles":
+        from relaytic.profiles import read_profiles_bundle
+
+        return read_profiles_bundle(run_dir)
     if bundle == "runtime":
         from relaytic.runtime import read_runtime_bundle
 
@@ -5430,6 +5562,137 @@ def _show_feedback_surface(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _run_profiles_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    labels: dict[str, str] | None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+) -> dict[str, Any]:
+    from relaytic.profiles import write_profiles_bundle
+
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=foundation_state["resolved"].policy,
+        stage="profiles",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "work_preferences.json",
+            "lab_mandate.json",
+            "task_brief.json",
+            "focus_profile.json",
+            "optimization_profile.json",
+            "plan.json",
+            "audit_report.json",
+            "benchmark_parity_report.json",
+            "loop_budget_report.json",
+        ],
+    )
+    try:
+        profiles_result = run_profiles_review(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            intake_bundle=_read_json_bundle(root, bundle="intake"),
+            investigation_bundle=_read_json_bundle(root, bundle="investigation"),
+            planning_bundle=_read_json_bundle(root, bundle="planning"),
+            evidence_bundle=_read_json_bundle(root, bundle="evidence"),
+            benchmark_bundle=_read_json_bundle(root, bundle="benchmark"),
+            completion_bundle=_read_json_bundle(root, bundle="completion"),
+            lifecycle_bundle=_read_json_bundle(root, bundle="lifecycle"),
+            autonomy_bundle=_read_json_bundle(root, bundle="autonomy"),
+        )
+        written = write_profiles_bundle(root, bundle=profiles_result.bundle)
+        manifest_path = _refresh_profiles_manifest(
+            root,
+            run_id=run_id,
+            policy_source=foundation_state["policy_path"],
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic materialized explicit quality and budget contracts, tracked configured versus consumed budget, and derived operator/lab posture without changing artifact truth.",
+        )
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        quality_gate = profiles_result.bundle.quality_gate_report
+        budget = profiles_result.bundle.budget_consumption_report
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "profiles": {
+                    "quality_gate_status": quality_gate.gate_status,
+                    "recommended_action": quality_gate.recommended_action,
+                    "budget_health": budget.budget_health,
+                    "observed_elapsed_minutes": budget.observed_elapsed_minutes,
+                    "estimated_trials_consumed": budget.estimated_trials_consumed,
+                    "remaining_trials": budget.remaining_trials,
+                },
+                "bundle": profiles_result.bundle.to_dict(),
+            },
+            "human_output": profiles_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_profiles_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="profiles")
+    if not bundle:
+        raise ValueError(f"No Slice 10B profile artifacts found in {root}.")
+    materialize_run_summary(run_dir=root)
+    manifest_path = _refresh_profiles_manifest(root)
+    quality_gate = dict(bundle.get("quality_gate_report", {}))
+    budget = dict(bundle.get("budget_consumption_report", {}))
+    operator_profile = dict(bundle.get("operator_profile", {}))
+    lab_profile = dict(bundle.get("lab_operating_profile", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "profiles": {
+                "quality_gate_status": quality_gate.get("gate_status"),
+                "recommended_action": quality_gate.get("recommended_action"),
+                "budget_health": budget.get("budget_health"),
+                "observed_elapsed_minutes": budget.get("observed_elapsed_minutes"),
+                "estimated_trials_consumed": budget.get("estimated_trials_consumed"),
+                "remaining_trials": budget.get("remaining_trials"),
+                "operator_profile_name": operator_profile.get("profile_name"),
+                "lab_profile_name": lab_profile.get("profile_name"),
+            },
+            "bundle": bundle,
+        },
+        "human_output": render_profiles_review_markdown(bundle),
+    }
+
+
 def _render_research_sources_markdown(inventory: dict[str, Any]) -> str:
     sources = list(inventory.get("sources", []))
     lines = [
@@ -6341,6 +6604,17 @@ def _feedback_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _profiles_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "quality_contract": run_dir / "quality_contract.json",
+        "quality_gate_report": run_dir / "quality_gate_report.json",
+        "budget_contract": run_dir / "budget_contract.json",
+        "budget_consumption_report": run_dir / "budget_consumption_report.json",
+        "operator_profile": run_dir / "operator_profile.json",
+        "lab_operating_profile": run_dir / "lab_operating_profile.json",
+    }
+
+
 def _evidence_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "experiment_registry": run_dir / "experiment_registry.json",
@@ -6820,7 +7094,7 @@ def _refresh_completion_manifest(
     labels: dict[str, str] | None = None,
 ) -> Path:
     root = Path(run_dir)
-    _refresh_benchmark_manifest(
+    _refresh_profiles_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,
@@ -6855,6 +7129,57 @@ def _refresh_completion_manifest(
         path = root / filename
         if path.exists():
             entries.append(artifact_entry(filename, run_dir=root, kind="status", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_profiles_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_benchmark_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _profiles_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="profile", required=True))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:
