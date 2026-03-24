@@ -186,7 +186,7 @@ Avoid introducing new references to:
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
-- `src/relaytic/feedback/` for Slice 10 validated feedback, outcome learning, and reversible effect reporting
+- `src/relaytic/feedback/` for Slice 10 validated feedback, outcome learning, reversible effect reporting, rollback handling, and casebook artifacts
 - `src/relaytic/decision/` for Slice 10A decision-world models, intervention policy, value-of-more-data reasoning, and decision-usefulness synthesis
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning

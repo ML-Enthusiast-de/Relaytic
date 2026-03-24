@@ -29,6 +29,7 @@ The repository already supports a working early product baseline:
 - bounded autonomous follow-up loops with challenger queues, recalibration/retrain requests, loop budgets, and champion lineage tracking
 - privacy-safe external research retrieval from redacted run signatures with typed source inventory, method-transfer reports, benchmark-reference capture, and explicit external-research audit
 - benchmark parity and gap reporting against explicit reference approaches under the same split and metric contract
+- validated feedback and outcome learning with explicit intake, trust scoring, reversible effect reports, route-prior updates, and rollback-ready casebook artifacts
 - communicative assist surfaces that explain what Relaytic is doing, let humans or external agents jump back to any bounded stage, and let Relaytic take over when the operator stops or is unsure
 - concise run summaries for humans and stable summary artifacts for agents
 - one-line bootstrap install plus post-install dependency verification
@@ -39,11 +40,10 @@ The repository already supports a working early product baseline:
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-The next load-bearing implementation step is Slice 10: feedback assimilation and outcome learning from operator interventions, runtime failures, and later-run evidence. The immediate frontier follow-on after that is Slice 10A, where Relaytic starts modeling downstream decision systems, compiling method ideas into executable experiments, and reasoning about what additional local data is worth pulling.
+Slice 10 is now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; and keep rollback-ready casebook state instead of silently drifting. The next load-bearing implementation step is Slice 10A, where Relaytic starts modeling downstream decision systems, compiling method ideas into executable experiments, and reasoning about what additional local data is worth pulling.
 
 The next frontier upgrades are:
 
-- reversible feedback and outcome learning that can change future route and decision-policy priors
 - decision-world modeling that distinguishes better score from better downstream action
 - method compilation that turns research, memory, and operator context into executable challenger and feature plans
 - local data-fabric reasoning that can suggest joins, entity histories, and additional local data before wasting search budget

@@ -212,6 +212,36 @@ def render_benchmark_review_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_benchmark_review_markdown(*args, **kwargs)
 
 
+def run_feedback_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.feedback import run_feedback_review as _run_feedback_review
+
+    return _run_feedback_review(*args, **kwargs)
+
+
+def append_feedback_entries(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.feedback import append_feedback_entries as _append_feedback_entries
+
+    return _append_feedback_entries(*args, **kwargs)
+
+
+def rollback_feedback_entry(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.feedback import rollback_feedback_entry as _rollback_feedback_entry
+
+    return _rollback_feedback_entry(*args, **kwargs)
+
+
+def read_feedback_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.feedback import read_feedback_bundle as _read_feedback_bundle
+
+    return _read_feedback_bundle(*args, **kwargs)
+
+
+def render_feedback_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.feedback import render_feedback_review_markdown as _render_feedback_review_markdown
+
+    return _render_feedback_review_markdown(*args, **kwargs)
+
+
 def build_assist_bundle(*args: Any, **kwargs: Any) -> Any:
     from relaytic.assist import build_assist_bundle as _build_assist_bundle
 
@@ -1324,6 +1354,93 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    feedback_surface = sub.add_parser(
+        "feedback",
+        help="Record, review, rollback, or inspect Slice 10 feedback and downstream outcome artifacts.",
+    )
+    feedback_sub = feedback_surface.add_subparsers(dest="feedback_command", required=True)
+
+    feedback_add = feedback_sub.add_parser(
+        "add",
+        help="Append one human, agent, runtime, benchmark, or outcome packet and refresh Slice 10 artifacts.",
+    )
+    feedback_add.add_argument("--run-dir", required=True, help="Run directory for feedback artifacts.")
+    feedback_add.add_argument("--config", default=None, help="Optional config/policy source.")
+    feedback_add.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    feedback_add.add_argument("--input-file", default=None, help="Optional JSON file containing one feedback dict or a list of feedback dicts.")
+    feedback_add.add_argument("--feedback-id", default=None, help="Optional explicit feedback id when adding one inline packet.")
+    feedback_add.add_argument(
+        "--source-type",
+        choices=["human", "external_agent", "runtime_failure", "benchmark_review", "outcome_observation"],
+        default="human",
+        help="Source type for inline feedback entry creation.",
+    )
+    feedback_add.add_argument(
+        "--feedback-type",
+        choices=["route_quality", "decision_policy", "data_quality", "outcome_evidence"],
+        default="decision_policy",
+        help="Feedback type for inline feedback entry creation.",
+    )
+    feedback_add.add_argument("--message", default="", help="Inline feedback message or rationale.")
+    feedback_add.add_argument("--actor-name", default=None, help="Optional human or agent name.")
+    feedback_add.add_argument("--suggested-route-family", default=None, help="Optional suggested model family.")
+    feedback_add.add_argument("--suggested-action", default=None, help="Optional suggested decision-policy or follow-up action.")
+    feedback_add.add_argument("--observed-outcome", default=None, help="Optional observed outcome, e.g. false_positive or false_negative.")
+    feedback_add.add_argument("--evidence-level", choices=["weak", "medium", "strong"], default=None, help="Optional evidence strength override.")
+    feedback_add.add_argument("--metric-name", default=None, help="Optional metric name attached to the feedback.")
+    feedback_add.add_argument("--metric-value", default=None, help="Optional metric value attached to the feedback.")
+    feedback_add.add_argument("--source-artifact", action="append", default=[], help="Optional cited artifact path. May be provided multiple times.")
+    feedback_add.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    feedback_add.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    feedback_review = feedback_sub.add_parser(
+        "review",
+        help="Recompute Slice 10 feedback validation and reversible effect artifacts for an existing run.",
+    )
+    feedback_review.add_argument("--run-dir", required=True, help="Run directory for feedback artifacts.")
+    feedback_review.add_argument("--config", default=None, help="Optional config/policy source.")
+    feedback_review.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    feedback_review.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    feedback_review.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    feedback_show = feedback_sub.add_parser(
+        "show",
+        help="Render the current Slice 10 feedback artifacts for a run.",
+    )
+    feedback_show.add_argument("--run-dir", required=True, help="Run directory containing feedback artifacts.")
+    feedback_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    feedback_rollback = feedback_sub.add_parser(
+        "rollback",
+        help="Mark one feedback packet as reverted and refresh Slice 10 artifacts.",
+    )
+    feedback_rollback.add_argument("--run-dir", required=True, help="Run directory for feedback artifacts.")
+    feedback_rollback.add_argument("--feedback-id", required=True, help="Feedback id to revert.")
+    feedback_rollback.add_argument("--config", default=None, help="Optional config/policy source.")
+    feedback_rollback.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    feedback_rollback.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    feedback_rollback.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     autonomy_surface = sub.add_parser(
         "autonomy",
         help="Run or inspect Slice 09C bounded autonomous follow-up loops.",
@@ -2024,6 +2141,101 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
+    if args.command == "feedback":
+        if args.feedback_command == "show":
+            try:
+                payload = _show_feedback_surface(run_dir=args.run_dir)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.feedback_command == "add":
+            try:
+                labels = _parse_key_value_pairs(args.label)
+                entries = _load_feedback_entries_from_args(args)
+                foundation_state = _ensure_run_foundation_present(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    labels=labels,
+                )
+                intake_payload = append_feedback_entries(
+                    args.run_dir,
+                    entries=entries,
+                    policy=foundation_state["resolved"].policy,
+                )
+                payload = _run_feedback_phase(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    labels=labels,
+                )
+                payload["surface_payload"]["feedback"]["added_count"] = len(entries)
+                payload["surface_payload"]["feedback"]["total_recorded_count"] = len(intake_payload.get("entries", []))
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.feedback_command == "rollback":
+            try:
+                labels = _parse_key_value_pairs(args.label)
+                foundation_state = _ensure_run_foundation_present(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    labels=labels,
+                )
+                rollback_feedback_entry(
+                    args.run_dir,
+                    feedback_id=args.feedback_id,
+                    policy=foundation_state["resolved"].policy,
+                )
+                payload = _run_feedback_phase(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    labels=labels,
+                )
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.feedback_command != "review":
+            parser.error("Unsupported feedback subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_feedback_phase(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
     if args.command == "runtime":
         if args.runtime_command == "show":
             try:
@@ -2591,6 +2803,32 @@ def _parse_key_value_pairs(raw_pairs: list[str]) -> dict[str, str]:
             raise ValueError(f"Expected non-empty label key, got: {raw!r}")
         labels[normalized_key] = value.strip()
     return labels
+
+
+def _load_feedback_entries_from_args(args: argparse.Namespace) -> list[dict[str, Any]]:
+    if getattr(args, "input_file", None):
+        payload = json.loads(Path(args.input_file).read_text(encoding="utf-8"))
+        if isinstance(payload, list):
+            return [dict(item) for item in payload if isinstance(item, dict)]
+        if isinstance(payload, dict):
+            return [dict(payload)]
+        raise ValueError("Feedback input file must contain one JSON object or a list of JSON objects.")
+    return [
+        {
+            "feedback_id": getattr(args, "feedback_id", None),
+            "source_type": getattr(args, "source_type", "human"),
+            "feedback_type": getattr(args, "feedback_type", "decision_policy"),
+            "message": getattr(args, "message", ""),
+            "actor_name": getattr(args, "actor_name", None),
+            "suggested_route_family": getattr(args, "suggested_route_family", None),
+            "suggested_action": getattr(args, "suggested_action", None),
+            "observed_outcome": getattr(args, "observed_outcome", None),
+            "evidence_level": getattr(args, "evidence_level", None),
+            "metric_name": getattr(args, "metric_name", None),
+            "metric_value": getattr(args, "metric_value", None),
+            "source_artifacts": list(getattr(args, "source_artifact", [])),
+        }
+    ]
 
 
 def _resolve_intake_text(*, text: str | None, text_file: str | None) -> str:
@@ -3746,6 +3984,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.benchmark import read_benchmark_bundle
 
         return read_benchmark_bundle(run_dir)
+    if bundle == "feedback":
+        from relaytic.feedback import read_feedback_bundle
+
+        return read_feedback_bundle(run_dir)
     if bundle == "runtime":
         from relaytic.runtime import read_runtime_bundle
 
@@ -5064,6 +5306,130 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _run_feedback_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    labels: dict[str, str] | None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+) -> dict[str, Any]:
+    from relaytic.feedback import write_feedback_bundle
+
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=foundation_state["resolved"].policy,
+        stage="feedback",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "feedback_intake.json",
+            "benchmark_parity_report.json",
+            "promotion_decision.json",
+            "autonomy_loop_state.json",
+            "run_summary.json",
+        ],
+    )
+    try:
+        feedback_result = run_feedback_review(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            planning_bundle=_read_json_bundle(root, bundle="planning"),
+            evidence_bundle=_read_json_bundle(root, bundle="evidence"),
+            completion_bundle=_read_json_bundle(root, bundle="completion"),
+            lifecycle_bundle=_read_json_bundle(root, bundle="lifecycle"),
+            autonomy_bundle=_read_json_bundle(root, bundle="autonomy"),
+            benchmark_bundle=_read_json_bundle(root, bundle="benchmark"),
+            memory_bundle=_read_json_bundle(root, bundle="memory"),
+        )
+        written = write_feedback_bundle(root, bundle=feedback_result.bundle)
+        manifest_path = _refresh_feedback_manifest(
+            root,
+            run_id=run_id,
+            policy_source=foundation_state["policy_path"],
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic validated feedback and downstream outcomes, wrote explicit effect reports, and preserved rollback-ready casebook state.",
+        )
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        effect = feedback_result.bundle.feedback_effect_report
+        validation = feedback_result.bundle.feedback_validation
+        route_updates = feedback_result.bundle.route_prior_updates
+        decision_updates = feedback_result.bundle.decision_policy_update_suggestions
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "feedback": {
+                    "accepted_count": validation.accepted_count,
+                    "rejected_count": validation.rejected_count,
+                    "reverted_count": validation.reverted_count,
+                    "route_prior_update_count": len(route_updates.updates),
+                    "decision_policy_suggestion_count": len(decision_updates.suggestions),
+                    "primary_recommended_action": effect.primary_recommended_action,
+                },
+                "bundle": feedback_result.bundle.to_dict(),
+            },
+            "human_output": feedback_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_feedback_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="feedback")
+    if not bundle:
+        raise ValueError(f"No Slice 10 feedback artifacts found in {root}.")
+    materialize_run_summary(run_dir=root)
+    manifest_path = _refresh_feedback_manifest(root)
+    validation = dict(bundle.get("feedback_validation", {}))
+    effect = dict(bundle.get("feedback_effect_report", {}))
+    route_updates = dict(bundle.get("route_prior_updates", {}))
+    decision_updates = dict(bundle.get("decision_policy_update_suggestions", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "feedback": {
+                "accepted_count": int(validation.get("accepted_count", 0) or 0),
+                "rejected_count": int(validation.get("rejected_count", 0) or 0),
+                "reverted_count": int(validation.get("reverted_count", 0) or 0),
+                "route_prior_update_count": len(route_updates.get("updates", [])),
+                "decision_policy_suggestion_count": len(decision_updates.get("suggestions", [])),
+                "primary_recommended_action": effect.get("primary_recommended_action"),
+            },
+            "bundle": bundle,
+        },
+        "human_output": render_feedback_review_markdown(bundle),
+    }
+
+
 def _render_research_sources_markdown(inventory: dict[str, Any]) -> str:
     sources = list(inventory.get("sources", []))
     lines = [
@@ -5962,6 +6328,19 @@ def _benchmark_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _feedback_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "feedback_intake": run_dir / "feedback_intake.json",
+        "feedback_validation": run_dir / "feedback_validation.json",
+        "feedback_effect_report": run_dir / "feedback_effect_report.json",
+        "feedback_casebook": run_dir / "feedback_casebook.json",
+        "outcome_observation_report": run_dir / "outcome_observation_report.json",
+        "decision_policy_update_suggestions": run_dir / "decision_policy_update_suggestions.json",
+        "policy_update_suggestions": run_dir / "policy_update_suggestions.json",
+        "route_prior_updates": run_dir / "route_prior_updates.json",
+    }
+
+
 def _evidence_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "experiment_registry": run_dir / "experiment_registry.json",
@@ -6703,6 +7082,57 @@ def _refresh_benchmark_manifest(
     )
 
 
+def _refresh_feedback_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_autonomy_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _feedback_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="feedback", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
 def _refresh_autonomy_manifest(
     run_dir: str | Path,
     *,
@@ -6769,7 +7199,7 @@ def _refresh_access_manifest(
     training_result: dict[str, Any] | None = None,
 ) -> Path:
     root = Path(run_dir)
-    _refresh_autonomy_manifest(
+    _refresh_feedback_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,

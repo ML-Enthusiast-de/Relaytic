@@ -143,6 +143,19 @@ def build_run_summary(
             "benchmark_parity_report": "benchmark_parity_report.json",
         },
     )
+    feedback_bundle = _read_bundle(
+        root,
+        {
+            "feedback_intake": "feedback_intake.json",
+            "feedback_validation": "feedback_validation.json",
+            "feedback_effect_report": "feedback_effect_report.json",
+            "feedback_casebook": "feedback_casebook.json",
+            "outcome_observation_report": "outcome_observation_report.json",
+            "decision_policy_update_suggestions": "decision_policy_update_suggestions.json",
+            "policy_update_suggestions": "policy_update_suggestions.json",
+            "route_prior_updates": "route_prior_updates.json",
+        },
+    )
     runtime_bundle = _read_bundle(
         root,
         {
@@ -218,6 +231,14 @@ def build_run_summary(
     reference_approach_matrix = _bundle_item(benchmark_bundle, "reference_approach_matrix")
     benchmark_gap_report = _bundle_item(benchmark_bundle, "benchmark_gap_report")
     benchmark_parity_report = _bundle_item(benchmark_bundle, "benchmark_parity_report")
+    feedback_intake = _bundle_item(feedback_bundle, "feedback_intake")
+    feedback_validation = _bundle_item(feedback_bundle, "feedback_validation")
+    feedback_effect_report = _bundle_item(feedback_bundle, "feedback_effect_report")
+    feedback_casebook = _bundle_item(feedback_bundle, "feedback_casebook")
+    outcome_observation_report = _bundle_item(feedback_bundle, "outcome_observation_report")
+    decision_policy_update_suggestions = _bundle_item(feedback_bundle, "decision_policy_update_suggestions")
+    policy_update_suggestions = _bundle_item(feedback_bundle, "policy_update_suggestions")
+    route_prior_updates = _bundle_item(feedback_bundle, "route_prior_updates")
     hook_execution_log = _bundle_item(runtime_bundle, "hook_execution_log")
     run_checkpoint_manifest = _bundle_item(runtime_bundle, "run_checkpoint_manifest")
     capability_profiles = _bundle_item(runtime_bundle, "capability_profiles")
@@ -280,6 +301,7 @@ def build_run_summary(
             intelligence_bundle=intelligence_bundle,
             research_bundle=research_bundle,
             benchmark_bundle=benchmark_bundle,
+            feedback_bundle=feedback_bundle,
             completion_bundle=completion_bundle,
             lifecycle_bundle=lifecycle_bundle,
             autonomy_bundle=autonomy_bundle,
@@ -429,6 +451,25 @@ def build_run_summary(
             "validation_gap": benchmark_gap_report.get("validation_gap"),
             "near_parity": benchmark_gap_report.get("near_parity"),
         },
+        "feedback": {
+            "status": _clean_text(feedback_effect_report.get("status")) or _clean_text(feedback_validation.get("status")) or _clean_text(feedback_intake.get("status")),
+            "accepted_count": int(feedback_validation.get("accepted_count", 0) or 0),
+            "rejected_count": int(feedback_validation.get("rejected_count", 0) or 0),
+            "reverted_count": int(feedback_validation.get("reverted_count", 0) or 0),
+            "route_prior_update_count": len(route_prior_updates.get("updates", [])) if isinstance(route_prior_updates.get("updates"), list) else 0,
+            "decision_policy_suggestion_count": len(decision_policy_update_suggestions.get("suggestions", []))
+            if isinstance(decision_policy_update_suggestions.get("suggestions"), list)
+            else 0,
+            "policy_suggestion_count": len(policy_update_suggestions.get("suggestions", []))
+            if isinstance(policy_update_suggestions.get("suggestions"), list)
+            else 0,
+            "primary_recommended_action": _clean_text(feedback_effect_report.get("primary_recommended_action"))
+            or _clean_text(decision_policy_update_suggestions.get("primary_recommended_action")),
+            "outcome_contradiction_count": int(outcome_observation_report.get("contradiction_count", 0) or 0),
+            "casebook_accepted_count": len(feedback_casebook.get("accepted_cases", []))
+            if isinstance(feedback_casebook.get("accepted_cases"), list)
+            else 0,
+        },
         "runtime": {
             "current_stage": _resolve_runtime_stage(
                 root,
@@ -493,11 +534,19 @@ def build_run_summary(
             "recommended_experiment_id": _clean_text(marginal_value.get("recommended_experiment_id")),
             "estimated_value_band": _clean_text(marginal_value.get("estimated_value_band")),
             "rationale": _clean_text(
+                feedback_effect_report.get("summary", "")
+                or decision_policy_update_suggestions.get("summary", "")
+                or route_prior_updates.get("summary", "")
+                or policy_update_suggestions.get("summary", "")
+                or outcome_observation_report.get("summary", "")
+                or
                 completion_decision.get("summary", "")
                 or belief_update.get("summary", "")
                 or marginal_value.get("rationale", "")
             ),
-            "recommended_action": _lifecycle_primary_action(lifecycle_bundle)
+            "recommended_action": _clean_text(feedback_effect_report.get("primary_recommended_action"))
+            or _clean_text(decision_policy_update_suggestions.get("primary_recommended_action"))
+            or _lifecycle_primary_action(lifecycle_bundle)
             or _clean_text(completion_decision.get("action"))
             or _clean_text(belief_update.get("recommended_action")),
         },
@@ -517,6 +566,8 @@ def build_run_summary(
             "external_research_audit_path": _path_if_exists(root / "external_research_audit.json"),
             "benchmark_parity_report_path": _path_if_exists(root / "benchmark_parity_report.json"),
             "benchmark_gap_report_path": _path_if_exists(root / "benchmark_gap_report.json"),
+            "feedback_effect_report_path": _path_if_exists(root / "feedback_effect_report.json"),
+            "feedback_casebook_path": _path_if_exists(root / "feedback_casebook.json"),
             "event_stream_path": _path_if_exists(root / "lab_event_stream.jsonl"),
             "capability_profiles_path": _path_if_exists(root / "capability_profiles.json"),
         },
@@ -537,6 +588,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     intelligence = dict(summary.get("intelligence", {}))
     research = dict(summary.get("research", {}))
     benchmark = dict(summary.get("benchmark", {}))
+    feedback = dict(summary.get("feedback", {}))
     runtime = dict(summary.get("runtime", {}))
     lifecycle = dict(summary.get("lifecycle", {}))
     autonomy = dict(summary.get("autonomy", {}))
@@ -692,6 +744,22 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Near parity: `{benchmark.get('near_parity')}`",
             ]
         )
+    if feedback and any(value not in (None, 0, False, "", []) for value in feedback.values()):
+        lines.extend(
+            [
+                "",
+                "## Feedback",
+                f"- Status: `{feedback.get('status') or 'unknown'}`",
+                f"- Accepted feedback: `{feedback.get('accepted_count', 0)}`",
+                f"- Rejected feedback: `{feedback.get('rejected_count', 0)}`",
+                f"- Reverted feedback: `{feedback.get('reverted_count', 0)}`",
+                f"- Route prior updates: `{feedback.get('route_prior_update_count', 0)}`",
+                f"- Decision-policy suggestions: `{feedback.get('decision_policy_suggestion_count', 0)}`",
+                f"- Outcome contradictions: `{feedback.get('outcome_contradiction_count', 0)}`",
+            ]
+        )
+        if feedback.get("primary_recommended_action"):
+            lines.append(f"- Primary feedback action: `{feedback.get('primary_recommended_action')}`")
     if lifecycle and any(value is not None for value in lifecycle.values()):
         lines.extend(
             [
@@ -876,10 +944,13 @@ def _resolve_stage(
     intelligence_bundle: dict[str, Any],
     research_bundle: dict[str, Any],
     benchmark_bundle: dict[str, Any],
+    feedback_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
     autonomy_bundle: dict[str, Any],
 ) -> str:
+    if any(isinstance(value, dict) and value for value in feedback_bundle.values()):
+        return "feedback_reviewed"
     if autonomy_bundle:
         return "autonomy_reviewed"
     if lifecycle_bundle:
@@ -907,6 +978,8 @@ def _resolve_stage(
 
 
 def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: str) -> str | None:
+    if (root / "feedback_effect_report.json").exists():
+        return "feedback"
     if any(
         (root / filename).exists()
         for filename in (

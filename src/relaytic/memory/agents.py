@@ -453,6 +453,9 @@ def _discover_candidate_runs(*, current_run_dir: Path, search_roots: list[Path])
                     "summary": summary,
                     "challenger_report": _read_json(run_dir / "challenger_report.json"),
                     "reflection_memory": _read_json(run_dir / "reflection_memory.json"),
+                    "route_prior_updates": _read_json(run_dir / "route_prior_updates.json"),
+                    "decision_policy_update_suggestions": _read_json(run_dir / "decision_policy_update_suggestions.json"),
+                    "feedback_casebook": _read_json(run_dir / "feedback_casebook.json"),
                 }
             )
     return candidates
@@ -559,6 +562,9 @@ def _score_candidate(*, current: dict[str, Any], candidate: dict[str, Any]) -> d
         },
         "challenger_report": dict(candidate.get("challenger_report") or {}),
         "reflection_memory": dict(candidate.get("reflection_memory") or {}),
+        "route_prior_updates": dict(candidate.get("route_prior_updates") or {}),
+        "decision_policy_update_suggestions": dict(candidate.get("decision_policy_update_suggestions") or {}),
+        "feedback_casebook": dict(candidate.get("feedback_casebook") or {}),
     }
 
 
@@ -597,6 +603,9 @@ def _select_analog_candidates(*, scored_candidates: list[dict[str, Any]], contro
                 "provenance": dict(item.get("provenance", {})),
                 "reflection_excerpt": _optional_str(dict(item.get("reflection_memory", {})).get("summary")),
                 "challenger_report": dict(item.get("challenger_report") or {}),
+                "route_prior_updates": dict(item.get("route_prior_updates") or {}),
+                "decision_policy_update_suggestions": dict(item.get("decision_policy_update_suggestions") or {}),
+                "feedback_casebook": dict(item.get("feedback_casebook") or {}),
             }
         )
     return out
@@ -620,6 +629,14 @@ def _build_route_prior_context(
             continue
         family_scores[family] = family_scores.get(family, 0.0) + _memory_outcome_weight(item)
         analog_ids.append(str(item.get("run_id", "")))
+        for update in dict(item.get("route_prior_updates") or {}).get("updates", []):
+            update_family = _optional_str(dict(update).get("model_family"))
+            if not update_family:
+                continue
+            bias = _optional_float(dict(update).get("bias"))
+            if bias is None:
+                continue
+            family_scores[update_family] = family_scores.get(update_family, 0.0) + round(float(bias) * 2.0, 4)
     adjusted = _apply_family_bias(baseline_candidate_order=baseline_candidate_order, family_scores=family_scores)
     changed = adjusted != baseline_candidate_order
     status = "memory_influenced" if changed else ("retrieved_without_change" if analog_candidates else ("disabled" if not controls.enabled else "no_credible_analogs"))

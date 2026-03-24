@@ -131,7 +131,7 @@ Relaytic/
 
 Reserved future boundaries:
 
-- `src/relaytic/feedback/` should own validated feedback, outcome learning, and reversible effect reporting
+- `src/relaytic/feedback/` should own validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook artifacts
 - `src/relaytic/decision/` should own decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` should own source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning

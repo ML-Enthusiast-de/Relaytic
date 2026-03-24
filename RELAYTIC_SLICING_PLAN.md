@@ -192,10 +192,10 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 11
-- next execution target: Slice 10
-- next proof follow-on after Slice 10: Slice 10A
-- next adaptive follow-on after Slice 10A: Slice 12
+- implemented baseline: Slice 00 through Slice 11, plus Slice 10 feedback assimilation and outcome learning
+- next execution target: Slice 10A
+- next proof follow-on after Slice 10A: Slice 12
+- next adaptive follow-on after Slice 12: Slice 13
 - late optional representation follow-on after Slice 15: Slice 16
 
 ## Slice 00 - Normalization and contract freeze

@@ -2,13 +2,13 @@
 
 ## Status
 
-Planned.
+Implemented.
 
-Intended package boundary:
+Shipped package boundary:
 
 - `src/relaytic/feedback/`
 
-Intended artifacts:
+Shipped artifacts:
 
 - `feedback_intake.json`
 - `feedback_validation.json`
@@ -56,3 +56,14 @@ Slice 10 should not be considered complete without targeted tests that cover at 
 - one outcome-observation path
 - one adversarial or low-quality feedback rejection path
 - one rollback or prior-removal path
+
+## Implementation Notes
+
+The current implementation ships:
+
+- `relaytic feedback add`
+- `relaytic feedback review`
+- `relaytic feedback show`
+- `relaytic feedback rollback`
+
+It also feeds accepted route-prior updates into later memory retrieval so validated feedback can change future planning order with explicit provenance instead of hidden drift.

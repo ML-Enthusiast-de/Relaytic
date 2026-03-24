@@ -4,10 +4,10 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 11
-- next recommended slice: 10, feedback assimilation and outcome learning from operator, runtime, and downstream evidence
-- next leverage follow-on after 10: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
-- next adaptive follow-on after 10A: 12, dojo mode and guarded self-improvement
+- completed slices: 00 through 11, plus Slice 10 feedback assimilation and outcome learning
+- next recommended slice: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
+- next leverage follow-on after 10A: 12, dojo mode and guarded self-improvement
+- next scale-and-search follow-on after 12: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 
@@ -42,6 +42,8 @@ The repository currently supports:
 - visible autonomy support inside `relaytic run`, `relaytic show`, explicit `relaytic autonomy` surfaces, the runtime event stream, and the MCP contract
 - privacy-safe external research retrieval from redacted run signatures with typed source inventory, method-transfer distillation, benchmark-reference capture, and explicit no-raw-row audit
 - benchmark parity review against explicit reference approaches under the same split and metric contract
+- feedback assimilation with explicit intake, validation, reversible effect reports, route-prior updates, decision-policy suggestions, and rollback-ready casebook artifacts
+- later-run planning influence from accepted feedback through memory-scanned route-prior updates
 - visible research support inside completion, autonomy, `relaytic run`, `relaytic show`, explicit `relaytic research` surfaces, and the MCP contract
 - visible benchmark support inside completion, `relaytic run`, `relaytic show`, explicit `relaytic benchmark` surfaces, assist, runtime, and the MCP contract
 - communicative assist surfaces via `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat` so humans and agents can ask for explanations, request stage navigation, or let Relaytic take over safely

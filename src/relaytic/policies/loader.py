@@ -92,6 +92,7 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     communication_cfg = dict(config.get("communication", {}))
     intelligence_cfg = dict(config.get("intelligence", {}))
     research_cfg = dict(config.get("research", {}))
+    feedback_cfg = dict(config.get("feedback", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
     contact_email = research_cfg.get("contact_email", "")
     if contact_email is None:
@@ -235,6 +236,22 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "max_reference_models": int(config.get("benchmark", {}).get("max_reference_models", 3) or 3),
             "near_parity_absolute_delta": float(config.get("benchmark", {}).get("near_parity_absolute_delta", 0.03) or 0.03),
             "near_parity_relative_delta": float(config.get("benchmark", {}).get("near_parity_relative_delta", 0.08) or 0.08),
+        },
+        "feedback": {
+            "enabled": bool(feedback_cfg.get("enabled", True)),
+            "accept_human_feedback": bool(feedback_cfg.get("accept_human_feedback", True)),
+            "accept_external_agent_feedback": bool(feedback_cfg.get("accept_external_agent_feedback", True)),
+            "accept_runtime_failure_feedback": bool(feedback_cfg.get("accept_runtime_failure_feedback", True)),
+            "accept_benchmark_review_feedback": bool(feedback_cfg.get("accept_benchmark_review_feedback", True)),
+            "accept_outcome_observations": bool(feedback_cfg.get("accept_outcome_observations", True)),
+            "min_acceptance_score": float(feedback_cfg.get("min_acceptance_score", 0.68) or 0.68),
+            "downgrade_threshold": float(feedback_cfg.get("downgrade_threshold", 0.40) or 0.40),
+            "allow_route_prior_updates": bool(feedback_cfg.get("allow_route_prior_updates", True)),
+            "allow_policy_update_suggestions": bool(feedback_cfg.get("allow_policy_update_suggestions", True)),
+            "allow_decision_policy_update_suggestions": bool(
+                feedback_cfg.get("allow_decision_policy_update_suggestions", True)
+            ),
+            "max_casebook_entries": int(feedback_cfg.get("max_casebook_entries", 50) or 50),
         },
         "runtime": {
             "gateway_enabled": bool(runtime_cfg.get("gateway_enabled", True)),

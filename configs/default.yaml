@@ -139,6 +139,20 @@ benchmark:
   near_parity_absolute_delta: 0.03
   near_parity_relative_delta: 0.08
 
+feedback:
+  enabled: true
+  accept_human_feedback: true
+  accept_external_agent_feedback: true
+  accept_runtime_failure_feedback: true
+  accept_benchmark_review_feedback: true
+  accept_outcome_observations: true
+  min_acceptance_score: 0.68
+  downgrade_threshold: 0.40
+  allow_route_prior_updates: true
+  allow_policy_update_suggestions: true
+  allow_decision_policy_update_suggestions: true
+  max_casebook_entries: 50
+
 prompts:
   analyst_system_path: ""
   modeler_system_path: ""
