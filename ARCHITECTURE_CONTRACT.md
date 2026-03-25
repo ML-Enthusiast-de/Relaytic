@@ -42,6 +42,8 @@ Current canonical boundaries:
 
 Reserved future boundaries:
 
+- `src/relaytic/control/` should own Slice 10C intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, and control-ledger persistence
+- Slice 11A should extend `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` before introducing any separate greenfield package for incumbent-challenge support
 - `src/relaytic/decision/` should own Slice 10A decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` should own Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
@@ -78,8 +80,10 @@ These files are required and must stay current:
 - `docs/build_slices/phase_09f.md`
 - `docs/build_slices/phase_10.md`
 - `docs/build_slices/phase_10b.md`
+- `docs/build_slices/phase_10c.md`
 - `docs/build_slices/phase_10a.md`
 - `docs/build_slices/phase_11.md`
+- `docs/build_slices/phase_11a.md`
 - `docs/build_slices/phase_16.md`
 
 ## Artifact Contract
@@ -184,6 +188,12 @@ The current slices must preserve these names:
 - `decision_policy_update_suggestions.json`
 - `policy_update_suggestions.json`
 - `route_prior_updates.json`
+- `quality_contract.json`
+- `quality_gate_report.json`
+- `budget_contract.json`
+- `budget_consumption_report.json`
+- `operator_profile.json`
+- `lab_operating_profile.json`
 - `reference_approach_matrix.json`
 - `benchmark_gap_report.json`
 - `benchmark_parity_report.json`
@@ -196,12 +206,17 @@ The current slices must preserve these names:
 
 Reserved future artifact names:
 
-- `quality_contract.json`
-- `quality_gate_report.json`
-- `budget_contract.json`
-- `budget_consumption_report.json`
-- `operator_profile.json`
-- `lab_operating_profile.json`
+- `intervention_request.json`
+- `intervention_contract.json`
+- `control_challenge_report.json`
+- `override_decision.json`
+- `intervention_ledger.json`
+- `recovery_checkpoint.json`
+- `control_injection_audit.json`
+- `causal_memory_index.json`
+- `intervention_memory_log.json`
+- `outcome_memory_graph.json`
+- `method_memory_index.json`
 - `decision_world_model.json`
 - `intervention_policy_report.json`
 - `decision_usefulness_report.json`
@@ -213,10 +228,15 @@ Reserved future artifact names:
 - `compiled_challenger_templates.json`
 - `compiled_feature_hypotheses.json`
 - `compiled_benchmark_protocol.json`
+- `external_challenger_manifest.json`
+- `external_challenger_evaluation.json`
+- `incumbent_parity_report.json`
+- `beat_target_contract.json`
 - `mission_control_state.json`
 - `branch_dag.json`
 - `confidence_map.json`
 - `change_attribution_report.json`
+- `review_queue_state.json`
 - `representation_engine_profile.json`
 - `latent_state_report.json`
 - `embedding_index_report.json`

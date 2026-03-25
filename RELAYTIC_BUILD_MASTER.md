@@ -77,8 +77,10 @@ Start with:
 9F. routed intelligence profiles, capability matrices, and semantic proof
 10. feedback assimilation
 10B. quality contracts, visible budgets, and operator/lab profiles
+10C. behavioral contracts, skeptical steering, and causal memory
 10A. decision lab, method compiler, and data-acquisition reasoning
 11. benchmark parity and reference approaches
+11A. imported incumbents and bring-your-own challenger baselines
 12. dojo mode and guarded self-improvement
 13. search controller, accelerated execution, and distributed local experimentation
 14. real-world feasibility, domain constraints, and action boundaries
@@ -102,12 +104,14 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 11. Slice 11
 12. Slice 10
 13. Slice 10B
-14. Slice 10A
-15. Slice 12
-16. Slice 13
-17. Slice 14
-18. Slice 15
-19. Slice 16
+14. Slice 10C
+15. Slice 10A
+16. Slice 11A
+17. Slice 12
+18. Slice 13
+19. Slice 14
+20. Slice 15
+21. Slice 16
 
 Reason:
 
@@ -124,14 +128,18 @@ Reason:
 - Slice 11 gives honest proof before feedback and dojo expansion
 - Slice 10 lets Relaytic learn from what happened after predictions, not just from what happened inside one run
 - Slice 10B makes quality gates, budget posture, and profile overlays explicit before decision-world modeling and broader search depend on them
+- Slice 10C should now come next because Relaytic needs skeptical intervention handling, recovery checkpoints, causal memory, and control-injection resistance before it expands decision authority again
 - Slice 10A is the category-shift slice where Relaytic begins modeling the downstream decision system, compiling methods into executable experiments, and reasoning about what additional data is worth pulling
+- Slice 11A makes Relaytic much easier to adopt and demo because it can take a real incumbent model from the operator and try to beat it honestly under the same contract
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:
 
 - implemented through Slice 11, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, and Slice 10B explicit quality/budget/profile contracts now landed
-- next execution target: Slice 10A
-- next proof follow-on after Slice 10A: Slice 12
+- next execution target: Slice 10C
+- next decision-lab follow-on after Slice 10C: Slice 10A
+- next proof follow-on after Slice 10A: Slice 11A
+- next adaptive follow-on after Slice 11A: Slice 12
 
 ## MVP boundary
 
@@ -177,15 +185,18 @@ If the goal is to turn the current implementation into something that looks genu
 - a decision-world model that understands action cost, review/defer options, and whether more search is actually the right next move
 - explicit quality and budget contracts that tell humans and external agents what Relaytic currently means by "good enough" and "worth the search"
 - bounded operator/lab profiles that shape review posture and budget posture without personalizing truth-bearing logic
+- behavioral contracts that let humans and external agents steer Relaytic without turning Relaytic into a compliant shell
+- causal memory that preserves interventions, method outcomes, and downstream consequences rather than only analog similarity
 - a method compiler that turns research, memory, and operator context into executable challenger and feature templates
+- imported-incumbent challenge paths so Relaytic can beat real existing systems instead of only abstract baselines
 - outcome learning rather than run-only learning
 - richer data-fabric reasoning that can suggest joins, entity histories, or additional data before wasting search budget
 - a stronger search controller that widens or prunes branches based on expected decision value under budget
-- a mission-control surface that makes branch structure, confidence, and change attribution legible to humans and agents
+- a mission-control surface that makes branch structure, confidence, intervention history, incumbent-versus-Relaytic state, and change attribution legible to humans and agents
 - an optional representation engine that can learn from large unlabeled local corpora and improve retrieval, anomaly support, and temporal state understanding without replacing deterministic adjudication
 
 Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.
-Slices 10, 10B, and 10A are the next category-shift unlocks that can turn Relaytic from a governed inference lab into a genuine decision-and-discovery system.
+Slices 10, 10B, 10C, 10A, and 11A are the next category-shift unlocks that can turn Relaytic from a governed inference lab into a genuine decision-and-discovery system with skeptical steering and real incumbent pressure.
 Slice 16 is a long-range optional frontier bet, not a prerequisite for the core lab thesis.
 
 ## Source of truth precedence

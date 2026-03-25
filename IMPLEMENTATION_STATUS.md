@@ -5,8 +5,10 @@ This document tracks the operational state of the repository. It is an implement
 ## Current Baseline
 
 - completed slices: 00 through 11, including Slice 10 feedback assimilation/outcome learning and Slice 10B explicit quality-budget-profile contracts
-- next recommended slice: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
-- next leverage follow-on after 10A: 12, dojo mode and guarded self-improvement
+- next recommended slice: 10C, behavioral contracts, skeptical steering, and causal memory
+- next leverage follow-on after 10C: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
+- next proof follow-on after 10A: 11A, imported incumbents and bring-your-own challenger baselines
+- next adaptive follow-on after 11A: 12, dojo mode and guarded self-improvement
 - next scale-and-search follow-on after 12: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -70,8 +72,11 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
+- behavioral contracts so humans and external agents can steer Relaytic without being treated as unquestionable authorities
+- causal memory that preserves intervention history, method outcomes, and downstream consequences instead of relying only on analog similarity
 - decision-system world modeling so Relaytic can reason about action cost, abstention, review load, and whether more data is better than more search
 - method compilation that turns research, memory, and operator context into executable challenger, feature, split, and benchmark templates
+- imported-incumbent challenge paths so Relaytic can evaluate and try to beat existing models, prediction sets, scorecards, or rulesets under the same contract
 - richer local data-fabric reasoning around source graphs, join candidates, entity histories, and acquisition plans
 - mission-control surfaces that expose branch DAG, confidence, and change attribution to both humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family

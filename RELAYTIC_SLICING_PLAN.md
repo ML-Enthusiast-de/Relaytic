@@ -145,10 +145,16 @@ If a later slice adds "smartness" without strengthening at least one of those pr
 
 - **outcome-learning path**
   once Slice 10 lands, one case where validated intervention or post-deployment outcome evidence changes a later policy or route recommendation with visible rollback support
+- **control-contract path**
+  once Slice 10C lands, one case where a human or external agent asks Relaytic to change course, Relaytic challenges the request, accepts/modifies/rejects it explicitly, and writes a replayable override decision instead of silently complying
+- **causal-memory path**
+  once Slice 10C lands, one case where intervention history, outcome history, or prior method outcomes materially change Relaytic's skepticism, next-step judgment, or takeover behavior beyond analog similarity alone
 - **decision-lab path**
   once Slice 10A lands, one case where Relaytic chooses between more search, more data, recalibration, retraining, abstention, or operator review because it modeled the downstream decision environment explicitly
 - **method-compiler path**
   once Slice 10A lands, one case where research, memory, or operator notes compile into an executable challenger, feature, split, or benchmark template rather than only a report
+- **incumbent-challenge path**
+  once Slice 11A lands, one case where a user or external agent imports an existing model, prediction set, scorecard, or ruleset as the incumbent and Relaytic honestly reports whether it can beat it under the same local split and metric contract
 - **mission-control path**
   once Slice 15 lands, one case where a human or external agent can see branch structure, confidence, and change attribution without reading the entire artifact tree
 
@@ -168,12 +174,14 @@ Stable slice numbering stays the same, but the preferred execution order after S
 10. Slice 11
 11. Slice 10
 12. Slice 10B
-13. Slice 10A
-14. Slice 12
-15. Slice 13
-16. Slice 14
-17. Slice 15
-18. Slice 16
+13. Slice 10C
+14. Slice 10A
+15. Slice 11A
+16. Slice 12
+17. Slice 13
+18. Slice 14
+19. Slice 15
+20. Slice 16
 
 Why:
 
@@ -189,15 +197,19 @@ Why:
 - Slice 11 gives honest proof before feedback or dojo behavior expands too far
 - Slice 10 becomes safer after memory and benchmark doctrine exist
 - Slice 10B makes quality gates, budget posture, and operating-profile assumptions explicit before deeper decision-world modeling and broader search begin leaning on them
+- Slice 10C should now come before Slice 10A because Relaytic needs skeptical steering, intervention contracts, causal memory, and control-injection defenses before it expands decision authority again
 - Slice 10A is the category-shift slice that turns Relaytic from a governed model/evaluation engine into a decision-and-discovery engine with compiled methods and data-acquisition reasoning
+- Slice 11A turns Relaytic's benchmark and challenger story into something much more real for operators and recruiters by letting users attach an incumbent model and forcing Relaytic to beat it honestly
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
 
 - implemented baseline: Slice 00 through Slice 11, including Slice 10 feedback assimilation/outcome learning and Slice 10B explicit quality-budget-profile contracts
-- next execution target: Slice 10A
-- next proof follow-on after Slice 10A: Slice 12
-- next adaptive follow-on after Slice 12: Slice 13
+- next execution target: Slice 10C
+- next decision-lab follow-on after Slice 10C: Slice 10A
+- next proof follow-on after Slice 10A: Slice 11A
+- next adaptive follow-on after Slice 11A: Slice 12
+- next scale-and-search follow-on after Slice 12: Slice 13
 - late optional representation follow-on after Slice 15: Slice 16
 
 ## Slice 00 - Normalization and contract freeze
@@ -972,7 +984,7 @@ First implementation moves:
 3. Surface quality/budget contracts through `relaytic show`, `relaytic runtime show`, `relaytic autonomy show`, `relaytic assist show`, and MCP summaries.
 4. Add run-scope override support so humans and agents can define quality/budget inputs without editing the repo-wide defaults.
 5. Make completion, lifecycle, autonomy, and benchmark surfaces explain decisions in terms of the explicit contracts they consumed.
-6. Prepare Slice 10A and Slice 13 to read these contracts instead of scattering their own hidden assumptions.
+6. Prepare Slice 10C, Slice 10A, and Slice 13 to read these contracts instead of scattering their own hidden assumptions.
 
 Minimum proof:
 
@@ -991,6 +1003,78 @@ Profile discipline:
 - prefer lab-scoped and operator-scoped profiles over hidden per-user personalization
 - profile overlays may tune explanation depth, benchmark appetite, review strictness, abstain/review preference, and budget posture
 - profile overlays must not silently force model-family choices, falsify metrics, or bypass the deterministic floor
+
+## Slice 10C - Behavioral contracts, skeptical steering, and causal memory
+
+Goal:
+- intervention contracts
+- skeptical human/agent steering
+- control-injection defense
+- recovery checkpoints
+- causal, intervention, outcome, and method memory
+
+Load-bearing improvement:
+
+- Relaytic should stop treating human or external-agent steering as either blind authority or free-form chat. It should treat every material steering action as an intervention request that can be challenged, accepted, modified, deferred, rejected, checkpointed, and remembered causally.
+
+Human surface:
+
+- humans should be able to step in at any bounded point, ask Relaytic to revisit or override something, and see a clear accept/modify/reject explanation plus the recovery checkpoint and downstream consequences
+
+Agent surface:
+
+- external agents should be able to submit machine-readable intervention requests, inspect challenge/override outcomes, read intervention memory, and query why Relaytic did or did not comply without scraping prose
+
+Intelligence source:
+
+- explicit instruction hierarchy, policy and mandate rules, runtime capability profiles, validated feedback, outcome evidence, causal memory, bounded semantic critique, and deterministic recovery logic
+
+Fallback rule:
+
+- if causal memory or richer semantic critique is unavailable, Relaytic should still challenge interventions with deterministic instruction hierarchy, policy, and artifact evidence rather than silently trusting the request
+
+Required outputs:
+- `intervention_request.json`
+- `intervention_contract.json`
+- `control_challenge_report.json`
+- `override_decision.json`
+- `intervention_ledger.json`
+- `recovery_checkpoint.json`
+- `control_injection_audit.json`
+- `causal_memory_index.json`
+- `intervention_memory_log.json`
+- `outcome_memory_graph.json`
+- `method_memory_index.json`
+
+Required behavior:
+- every truth-bearing human or external-agent request must be classified as navigation, clarification, proposal, override, or policy-bypass attempt before Relaytic acts on it
+- navigation and explanation requests should remain easy; truth-bearing override requests must trigger challenge-before-comply behavior
+- Relaytic must use a stable authority hierarchy for intervention handling rather than treating all user, agent, tool, and web instructions as equal
+- Relaytic must be able to accept, accept-with-modification, defer pending evidence, or reject an intervention request explicitly
+- any accepted override that can materially change later artifacts must checkpoint recoverable pre-override state first
+- Relaytic must remember which interventions later proved helpful, harmful, or neutral and use that memory to improve skepticism and next-step judgment
+- assist, research, interoperability, and autonomy surfaces must audit control-injection attempts instead of only trusting current-turn intent classification
+- causal memory must preserve objective links between assumptions, interventions, actions, outcomes, and corrections rather than relying only on similarity retrieval
+
+First implementation moves:
+
+1. Add a control-contract layer that normalizes human and external-agent interventions into typed requests.
+2. Add deterministic instruction-hierarchy and policy checks before modeling-changing requests are accepted.
+3. Add recovery checkpoints and override decisions so Relaytic can safely roll back accepted steering.
+4. Extend memory with causal, intervention, outcome, and method indexes that link what happened to what worked.
+5. Add adversarial tests for policy-bypass language, tool/output injection, and over-trusting external-agent requests.
+6. Wire control decisions into assist, runtime, feedback, memory, and interoperability surfaces.
+
+Minimum proof:
+
+- one case where a user asks Relaytic to rerun or go back and Relaytic accepts safely with an explicit checkpoint
+- one case where a user or external agent asks Relaytic to skip a required safeguard and Relaytic rejects it with a challenge report
+- one case where a prior harmful override increases skepticism on a later similar request through causal memory
+- one case where a trusted but under-specified request is accepted only with modification or explicit uncertainty
+
+Innovation hook:
+
+- this is the slice that turns Relaytic from a steerable lab into a skeptical collaborator that can be directed without becoming compliant theater
 
 ## Slice 10A - Decision lab, method compiler, and data-acquisition reasoning
 
@@ -1035,6 +1119,7 @@ Required outputs:
 
 Required behavior:
 - Slice 10A must consume the explicit quality and budget contracts from Slice 10B rather than inventing new hidden defaults for search or stopping behavior
+- Slice 10A must also consume intervention contracts, override decisions, and causal memory from Slice 10C so downstream decision-world modeling reflects how the lab is actually being steered
 - Relaytic must model downstream action, false-positive and false-negative cost, review/defer options, delay, and operator-load constraints when enough evidence exists
 - when decision economics are under-specified, Relaytic must emit a provisional world model and explicit uncertainty rather than pretending raw score is the only objective
 - research, memory, and operator notes must be able to compile into executable challenger templates, feature hypotheses, split/evaluation changes, or benchmark-protocol updates instead of stopping at summaries
@@ -1106,6 +1191,67 @@ Innovation hook:
 
 - this is the slice that turns architectural ambition into externally credible proof
 
+## Slice 11A - Imported incumbents and bring-your-own challenger baselines
+
+Goal:
+- imported incumbent evaluation
+- bring-your-own-model challenge tracks
+- beat-target contracts
+- honest incumbent parity reporting
+
+Load-bearing improvement:
+
+- Relaytic should be able to treat an existing user or enterprise model as the incumbent to beat instead of assuming the current Relaytic run or a generic baseline is the only meaningful comparison target
+
+Human surface:
+
+- humans should be able to attach an incumbent model, scored prediction file, scorecard, or ruleset, inspect how Relaytic evaluated it locally, and see whether Relaytic truly beat it under the same contract
+
+Agent surface:
+
+- external agents should be able to register an incumbent challenger manifest, request reevaluation under current contracts, and consume parity/beat-target outcomes as stable artifacts
+
+Intelligence source:
+
+- local dataset evidence, explicit incumbent manifests, benchmark contracts, quality/budget contracts, decision-world models, and challenger science
+
+Fallback rule:
+
+- if the incumbent cannot be executed locally, Relaytic should fall back to prediction-file or metric-audit comparison mode and reduce its claims explicitly rather than pretending full parity
+
+Required outputs:
+- `external_challenger_manifest.json`
+- `external_challenger_evaluation.json`
+- `incumbent_parity_report.json`
+- `beat_target_contract.json`
+
+Required behavior:
+- Relaytic must support at least three incumbent forms: local serialized model or adapter, scored prediction file, and explicit ruleset/scorecard wrapper
+- imported incumbents must be evaluated under the same local split, metric, threshold, calibration, and decision contract where possible
+- Relaytic must never blindly trust incumbent metrics supplied by the operator when local reevaluation is possible
+- incumbent challenge results must be visible to evidence, benchmark, lifecycle, assist, and mission-control surfaces
+- if the user says "beat this model," that should become an explicit contract rather than a vague note in the run brief
+- Relaytic must be able to lose honestly and explain why the incumbent remained stronger
+
+First implementation moves:
+
+1. Add an incumbent manifest schema covering model bundle, prediction-only, and ruleset/scorecard modes.
+2. Add local reevaluation and reduced-claim fallback paths for incumbents that cannot be executed directly.
+3. Wire imported incumbent comparison into evidence, benchmark, lifecycle, and assist surfaces.
+4. Add a beat-target contract so search and autonomy can optimize against an explicit incumbent instead of generic parity language.
+5. Add public demo cases where Relaytic wins and loses honestly against imported incumbents.
+
+Minimum proof:
+
+- one case where Relaytic reevaluates a local incumbent model under the same split and metrics
+- one case where Relaytic falls back to prediction-only incumbent comparison with reduced claims
+- one case where Relaytic beats the incumbent and explains why
+- one case where Relaytic fails to beat the incumbent and emits an honest next-step recommendation
+
+Innovation hook:
+
+- this is the slice that makes Relaytic look like a real adoption path inside serious labs and companies rather than a greenfield-only system
+
 ## Slice 12 - Dojo mode and guarded self-improvement
 
 Goal:
@@ -1145,6 +1291,7 @@ Required behavior:
 - dojo outputs must remain quarantined until they beat the incumbent on benchmark and golden-case validation
 - no dojo promotion may become default behavior without an explicit promotion artifact
 - dojo must improve strategies, priors, challenger design, route search, decision-world-model heuristics, and method-compilation logic before it is allowed to touch deeper architecture proposals
+- dojo must not weaken intervention contracts, override skepticism, or control-injection defenses without explicit regression evidence that those guarantees still hold
 - every dojo promotion must preserve rollback, provenance, and benchmark comparability
 
 First implementation moves:
@@ -1208,11 +1355,12 @@ Required behavior:
 
 - execution acceleration must preserve provenance, checkpointing, and replayability
 - Slice 13 must consume the explicit quality and budget contracts from Slice 10B instead of inventing separate hidden search limits
+- Slice 13 must consume real runtime/control accounting and any beat-target contract from Slice 11A rather than relying only on estimated search effort or abstract parity goals
 - device-aware planning must change *how* Relaytic executes, not silently change *what* it believes
 - distributed execution must remain resumable and safe for long local runs
 - search expansion must remain budgeted and justified by expected decision value, not only by abstract score-chasing
 - the search controller must be able to prune low-value branches early and widen high-value branches explicitly
-- broader route families, calibration variants, uncertainty wraps, and abstention policies should be eligible branches where their value is justified
+- broader route families, calibration variants, uncertainty wraps, abstention policies, and imported-incumbent beat-target branches should be eligible where their value is justified
 
 Minimum proof:
 
@@ -1307,6 +1455,7 @@ Required outputs:
 - `branch_dag.json`
 - `confidence_map.json`
 - `change_attribution_report.json`
+- `review_queue_state.json`
 - one golden demo
 - one Focus Council demo
 - one completion/status demo
@@ -1318,6 +1467,7 @@ Required outputs:
 Required behavior:
 
 - polish must not erase inspectability or the specialist architecture
+- mission control should expose intervention history, accepted/rejected overrides, active review queue items, causal-memory highlights, and incumbent-versus-Relaytic comparison state rather than only stage and branch cosmetics
 - demos must prove substance, not only CLI cosmetics
 - mission control must explain what changed because of memory, semantic intelligence, research, feedback, outcomes, and autonomous loops instead of flattening everything into one opaque story
 - onboarding, backup, restore, doctor, and integrations should make Relaytic survivable for real operator use

@@ -136,9 +136,11 @@ Relaytic/
 
 Reserved future boundaries:
 
+- `src/relaytic/control/` should own intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, and control-ledger persistence
 - `src/relaytic/decision/` should own decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` should own source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` are expected to absorb future imported-incumbent challenge support rather than introducing a separate greenfield package by default
 - `src/relaytic/mission_control/` should own branch DAG, confidence map, change attribution, and later professional operator surfaces
 - `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 

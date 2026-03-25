@@ -206,6 +206,8 @@ Shipped artifact names:
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
+- `src/relaytic/control/` for Slice 10C intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, and control-ledger persistence
+- Slice 11A should extend `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` before introducing any separate greenfield package for incumbent-challenge support
 - `src/relaytic/decision/` for Slice 10A decision-world models, intervention policy, value-of-more-data reasoning, and decision-usefulness synthesis
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
@@ -214,6 +216,17 @@ The following boundaries are reserved for the next frontier slices so later impl
 
 Reserved future artifact names:
 
+- `intervention_request.json`
+- `intervention_contract.json`
+- `control_challenge_report.json`
+- `override_decision.json`
+- `intervention_ledger.json`
+- `recovery_checkpoint.json`
+- `control_injection_audit.json`
+- `causal_memory_index.json`
+- `intervention_memory_log.json`
+- `outcome_memory_graph.json`
+- `method_memory_index.json`
 - `decision_world_model.json`
 - `intervention_policy_report.json`
 - `decision_usefulness_report.json`
@@ -225,10 +238,15 @@ Reserved future artifact names:
 - `compiled_challenger_templates.json`
 - `compiled_feature_hypotheses.json`
 - `compiled_benchmark_protocol.json`
+- `external_challenger_manifest.json`
+- `external_challenger_evaluation.json`
+- `incumbent_parity_report.json`
+- `beat_target_contract.json`
 - `mission_control_state.json`
 - `branch_dag.json`
 - `confidence_map.json`
 - `change_attribution_report.json`
+- `review_queue_state.json`
 - `representation_engine_profile.json`
 - `latent_state_report.json`
 - `embedding_index_report.json`

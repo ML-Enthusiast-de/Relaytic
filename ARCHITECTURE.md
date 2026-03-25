@@ -150,7 +150,7 @@ The repository currently implements the following product layers:
 - Slice 10: feedback assimilation with validated intake, reversible effect reporting, rollback-ready casebook state, and later-run route-prior influence
 - Slice 10B: explicit quality contracts, quality-gate reports, visible budget contracts, budget-consumption reporting, and bounded operator/lab profile overlays via `relaytic profiles`
 
-The next planned layer is Slice 10A: decision-world modeling, method compilation, and data-acquisition reasoning.
+The next planned layer is Slice 10C: behavioral contracts, skeptical steering, and causal memory. After that, Slice 10A adds decision-world modeling, method compilation, and data-acquisition reasoning.
 
 ## Current Artifact Baseline
 

@@ -41,7 +41,7 @@ This slice is successful only if Relaytic can:
 - quality and budget contracts must be explicit, persisted, and inspectable
 - operator and lab profiles may shape review strictness, benchmark appetite, explanation style, abstain/review preference, and budget posture
 - operator and lab profiles must not silently override deterministic metrics, model outcomes, or artifact truth
-- completion, lifecycle, autonomy, benchmark, and later search-control logic should consume the same contracts rather than inventing their own hidden defaults
+- completion, lifecycle, autonomy, benchmark, later control-contract logic, and later search-control logic should consume the same contracts rather than inventing their own hidden defaults
 - the same contract view must be visible through CLI, MCP, assist, and summary surfaces
 
 ## Acceptance Criteria

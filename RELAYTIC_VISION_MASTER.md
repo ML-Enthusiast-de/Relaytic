@@ -34,6 +34,7 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - treats “local” broadly: personal computer, workstation, local server, local instance, or local cluster under the user’s control
 - can be steered when the user wants control
 - can act autonomously when the user prefers delegation
+- treats every meaningful human or external-agent steering action as an inspectable intervention request that can be challenged, accepted, modified, deferred, rejected, checkpointed, and remembered rather than blindly obeyed
 - can run as a bounded session or as an explicit long-running daemon/service when the user wants continuous operation
 - uses a coordinated team of specialist agents rather than a single planner
 - investigates unknown datasets before committing to modeling assumptions
@@ -56,6 +57,7 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - versions datasets, features, models, policies, mandates, and reports
 - produces reproducible artifacts, reports, traces, and deployable outputs
 - learns from prior runs and uses memory to improve future planning
+- preserves more than analog memory: intervention memory, outcome memory, method memory, and causal links between assumptions, actions, and later results
 - exposes itself as a reusable tool surface for other agents
 - remains deterministic, testable, auditable, and policy-governed
 - treats external tools and systems pragmatically: use what is best for each purpose, integrate strong existing systems where useful, and keep challenging every apparent winner for a better outcome
@@ -74,6 +76,7 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - includes an explicit completion-decision layer so agents and operators can tell whether the system should stop, continue, recalibrate, retrain, promote, roll back, or collect more data
 - makes current workflow stage visible in the UI and agent/tool surfaces so humans and external agents always know what step Relaytic is at
 - can ingest validated user or agent feedback and use it to improve policy, route preferences, feature strategy, and lifecycle heuristics for similar future data
+- can accept a user-supplied incumbent model, prediction set, scorecard, or ruleset as the current challenger target and try to beat it honestly under the same contract
 - is benchmarked against strong reference datasets and strong standard approaches for each supported route and must reach that level without hardcoding solutions
 - includes a guarded dojo mode where Relaytic can self-improve its strategies, search spaces, priors, and even propose new model architectures when strong data and strong reference systems are available
 - uses whatever permissible local hardware it can access to execute as fast and efficiently as possible, from CPU laptops to local GPU workstations to local clusters
@@ -157,12 +160,15 @@ For the repository as it exists today, the next major leverage points are not "m
 
 They are:
 
+- **behavioral contracts** that let humans and external agents steer Relaytic without turning Relaytic into a compliant shell
+- **causal multi-layer memory** that preserves interventions, method outcomes, downstream consequences, and why previous guidance proved right or wrong
 - a **decision-system world model** that understands what action follows prediction, what errors cost, which cases should defer to humans, and whether more search is actually worth it
 - a **method compiler** that turns papers, benchmark references, memory, and operator notes into executable challenger templates, feature hypotheses, split/evaluation adjustments, and data-collection suggestions
+- **imported incumbent challenge tracks** so Relaytic can beat real existing models instead of only generic baselines
 - a **richer search controller** that chooses broader challenger ecology, HPO depth, calibration breadth, and abstention policy under explicit budgets rather than fixed narrow search
 - **outcome learning**, not just run learning, so Relaytic improves from interventions taken, overrides, downstream results, and false-positive/false-negative consequences
 - a **richer data-understanding fabric** that can reason about nearby sources, join candidates, entity histories, and what additional data would reduce uncertainty most
-- a **mission-control surface** that shows branch structure, confidence map, what changed because of memory, intelligence, research, or feedback, and what Relaytic would do next
+- a **mission-control surface** that shows branch structure, confidence map, intervention history, incumbent-versus-Relaytic state, what changed because of memory, intelligence, research, or feedback, and what Relaytic would do next
 - benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, lifecycle constraints, and decision usefulness actually matter
 
 These are the places where the project most needs to become stronger if it wants to look like the next big thing rather than a well-structured research product.
