@@ -229,13 +229,17 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/decision/` for Slice 10A decision-world models, intervention policy, value-of-more-data reasoning, and decision-usefulness synthesis
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
-- `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, and bounded pulse-run persistence
-- `src/relaytic/mission_control/` for Slice 15 branch DAG, confidence map, change attribution, and later professional operator surfaces
+- `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
+- `src/relaytic/tracing/` for Slice 12B canonical trace schemas, specialist/tool/intervention/branch traces, and replay/query surfaces
+- `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs
+- `src/relaytic/mission_control/` for Slice 15 branch DAG, confidence map, trace exploration, review-queue state, change attribution, and later professional operator surfaces
 - `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Reserved future artifact names:
 
 - `decision_world_model.json`
+- `controller_policy.json`
+- `handoff_controller_report.json`
 - `intervention_policy_report.json`
 - `decision_usefulness_report.json`
 - `value_of_more_data_report.json`
@@ -257,11 +261,27 @@ Reserved future artifact names:
 - `innovation_watch_report.json`
 - `challenge_watchlist.json`
 - `pulse_checkpoint.json`
+- `memory_compaction_plan.json`
+- `memory_compaction_report.json`
+- `memory_pinning_index.json`
+- `trace_model.json`
+- `trace_span_log.jsonl`
+- `specialist_trace_index.json`
+- `tool_trace_log.jsonl`
+- `intervention_trace_log.jsonl`
+- `branch_trace_graph.json`
+- `agent_eval_matrix.json`
+- `security_eval_report.json`
+- `red_team_report.json`
+- `hpo_campaign_report.json`
+- `search_decision_ledger.json`
 - `mission_control_state.json`
 - `branch_dag.json`
 - `confidence_map.json`
 - `change_attribution_report.json`
 - `review_queue_state.json`
+- `trace_explorer_state.json`
+- `branch_replay_index.json`
 - `representation_engine_profile.json`
 - `latent_state_report.json`
 - `embedding_index_report.json`

@@ -157,6 +157,10 @@ If a later slice adds "smartness" without strengthening at least one of those pr
   once Slice 11A lands, one case where a user or external agent imports an existing model, prediction set, scorecard, or ruleset as the incumbent and Relaytic honestly reports whether it can beat it under the same local split and metric contract
 - **pulse path**
   once Slice 12A lands, one case where Relaytic wakes on a bounded schedule, notices something worth attention, writes explicit recommendations or watchlists, and either safely skips or queues one bounded follow-up without silently mutating core behavior
+- **trace path**
+  once Slice 12B lands, one case where a human or external agent can replay one run across specialist turns, tool calls, interventions, and branch decisions from one trace model instead of stitching multiple logs together
+- **agent-security path**
+  once Slice 12B lands, one case where Relaytic deliberately withstands or rejects a control-injection, tool-misuse, or unsafe branch-expansion request and records the defense or failure mode in an explicit evaluation artifact
 - **mission-control path**
   once Slice 15 lands, one case where a human or external agent can see branch structure, confidence, and change attribution without reading the entire artifact tree
 
@@ -181,10 +185,11 @@ Stable slice numbering stays the same, but the preferred execution order after S
 15. Slice 11A
 16. Slice 12
 17. Slice 12A
-18. Slice 13
-19. Slice 14
-20. Slice 15
-21. Slice 16
+18. Slice 12B
+19. Slice 13
+20. Slice 14
+21. Slice 15
+22. Slice 16
 
 Why:
 
@@ -204,6 +209,7 @@ Why:
 - Slice 10A is the category-shift slice that turns Relaytic from a governed model/evaluation engine into a decision-and-discovery engine with compiled methods and data-acquisition reasoning
 - Slice 11A turns Relaytic's benchmark and challenger story into something much more real for operators and recruiters by letting users attach an incumbent model and forcing Relaytic to beat it honestly
 - Slice 12A should come after dojo because periodic awareness, innovation watching, and bounded background follow-up are much safer once self-improvement stays quarantined and promotion rules already exist
+- Slice 12B should come before Slice 13 and Slice 15 because wider search and polished mission-control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
@@ -213,7 +219,8 @@ Why:
 - next proof follow-on after Slice 10A: Slice 11A
 - next adaptive follow-on after Slice 11A: Slice 12
 - next pulse follow-on after Slice 12: Slice 12A
-- next scale-and-search follow-on after Slice 12A: Slice 13
+- next trace-and-safety follow-on after Slice 12A: Slice 12B
+- next scale-and-search follow-on after Slice 12B: Slice 13
 - late optional representation follow-on after Slice 15: Slice 16
 
 ## Slice 00 - Normalization and contract freeze
@@ -1093,7 +1100,7 @@ Goal:
 
 Load-bearing improvement:
 
-- Relaytic should stop behaving like a system that only asks "which model wins?" and start behaving like a system that can ask "which action policy, which additional data, and which next experiment most improves the real downstream decision?"
+- Relaytic should stop behaving like a system that only asks "which model wins?" and start behaving like a system that can ask "which action policy, which additional data, which controller choice, and which next experiment most improves the real downstream decision?"
 
 Human surface:
 
@@ -1101,7 +1108,7 @@ Human surface:
 
 Agent surface:
 
-- external agents should be able to consume a machine-readable decision world model, compiled challenger templates, compiled feature/data hypotheses, and value-of-more-data reasoning without parsing prose
+- external agents should be able to consume a machine-readable decision world model, controller policy, handoff-controller report, compiled challenger templates, compiled feature/data hypotheses, and value-of-more-data reasoning without parsing prose
 
 Intelligence source:
 
@@ -1113,6 +1120,8 @@ Fallback rule:
 
 Required outputs:
 - `decision_world_model.json`
+- `controller_policy.json`
+- `handoff_controller_report.json`
 - `intervention_policy_report.json`
 - `decision_usefulness_report.json`
 - `value_of_more_data_report.json`
@@ -1127,6 +1136,7 @@ Required outputs:
 Required behavior:
 - Slice 10A must consume the explicit quality and budget contracts from Slice 10B rather than inventing new hidden defaults for search or stopping behavior
 - Slice 10A must also consume intervention contracts, override decisions, and causal memory from Slice 10C so downstream decision-world modeling reflects how the lab is actually being steered
+- Slice 10A must make dynamic controller logic explicit: who should act next, how much branch depth is justified, when to ask for review, and when to keep work local to one specialist must be written as artifacts rather than inferred from code flow
 - Relaytic must model downstream action, false-positive and false-negative cost, review/defer options, delay, and operator-load constraints when enough evidence exists
 - when decision economics are under-specified, Relaytic must emit a provisional world model and explicit uncertainty rather than pretending raw score is the only objective
 - research, memory, and operator notes must be able to compile into executable challenger templates, feature hypotheses, split/evaluation changes, or benchmark-protocol updates instead of stopping at summaries
@@ -1140,7 +1150,8 @@ First implementation moves:
 2. Add a method compiler that turns research, memory, and operator context into challenger, feature, split, and benchmark templates.
 3. Add a source-graph and join-candidate layer over local snapshots, staged copies, and permitted source contracts.
 4. Add value-of-more-data and value-of-more-search reasoning that completion and autonomy can consume directly.
-5. Wire compiled outputs into planning, autonomy, lifecycle, assist, and benchmark surfaces.
+5. Add a controller-policy layer that can change handoff depth, reviewer involvement, and branch pressure under explicit reasoning.
+6. Wire compiled outputs into planning, autonomy, lifecycle, assist, and benchmark surfaces.
 
 Minimum proof:
 
@@ -1148,6 +1159,7 @@ Minimum proof:
 - one case where compiled research or memory changes challenger or feature design through an explicit executable template
 - one case where Relaytic recommends additional local data or a join candidate instead of wider search on the current snapshot
 - one case where Relaytic records uncertainty because the downstream decision environment is under-specified
+- one case where Relaytic changes branch depth, reviewer involvement, or the next acting specialist because the controller logic said it mattered
 
 Innovation hook:
 
@@ -1326,11 +1338,12 @@ Goal:
 - bounded periodic awareness
 - innovation watch
 - challenge watchlists
+- long-term memory maintenance
 - safe background maintenance and queueing
 
 Load-bearing improvement:
 
-- Relaytic should be able to wake up on a bounded schedule, inspect its local artifact universe, detect stale runs, benchmark debt, new relevant methods, data freshness issues, or memory-maintenance needs, and either recommend or queue safe bounded follow-up without silently drifting its core behavior
+- Relaytic should be able to wake up on a bounded schedule, inspect its local artifact universe, detect stale runs, benchmark debt, new relevant methods, data freshness issues, or memory-maintenance needs, perform explicit memory retention and compaction work, and either recommend or queue safe bounded follow-up without silently drifting its core behavior
 
 Human surface:
 
@@ -1356,6 +1369,9 @@ Required outputs:
 - `innovation_watch_report.json`
 - `challenge_watchlist.json`
 - `pulse_checkpoint.json`
+- `memory_compaction_plan.json`
+- `memory_compaction_report.json`
+- `memory_pinning_index.json`
 
 Required behavior:
 
@@ -1363,6 +1379,7 @@ Required behavior:
 - pulse should distinguish observe-only, propose-only, and bounded-execute modes
 - pulse must not silently mutate defaults, promote dojo outputs, or rewrite core contracts
 - pulse may safely trigger only bounded low-risk work by default, such as memory compaction/flush, benchmark refresh recommendation, research gather recommendation, challenge queue refresh, or stale-run review queueing
+- memory maintenance must upgrade Relaytic from analog retrieval toward a long-term memory stack by applying retention, compaction, pinning, and replay rules to episodic, intervention, outcome, and method memory artifacts
 - heavier actions should require either existing autonomy/control contracts or remain as explicit recommendations
 - innovation watch must stay rowless and redacted by default for any external retrieval
 - pulse runs must leave explicit skip reasons when nothing useful was done, so the system does not look alive through empty churn
@@ -1383,10 +1400,66 @@ Minimum proof:
 - one case where pulse notices stale or weak state and writes a challenge watchlist without taking unsafe action
 - one case where pulse queues one bounded low-risk follow-up through explicit policy
 - one case where innovation watch surfaces a new method or benchmark lead through redacted retrieval without leaking private data
+- one case where pulse compacts or pins memory in a way that changes later retrieval quality or avoids forgetting a previously harmful intervention
 
 Innovation hook:
 
 - this is the slice that makes Relaytic feel like a living lab without turning it into an unsupervised drift engine
+
+## Slice 12B - First-class tracing, agent evaluation, and runtime security harnesses
+
+Goal:
+- one canonical trace model
+- replayable specialist/tool/intervention/branch traces
+- agent-behavior evaluation
+- runtime security harnesses
+- adversarial control and tool-safety testing
+
+Load-bearing improvement:
+
+- Relaytic should be able to explain, replay, compare, and test complex agentic behavior from one trace substrate instead of scattered logs, while continuously evaluating whether the runtime resists unsafe steering, tool misuse, and branch-controller errors
+
+Human surface:
+
+- humans should be able to inspect one trace timeline across specialists, tools, interventions, and branches, plus visible security/evaluation summaries that explain where Relaytic held the line or failed
+
+Agent surface:
+
+- external agents should be able to consume trace spans, branch graphs, evaluation matrices, and security-harness results through stable JSON-first surfaces rather than scraping logs
+
+Intelligence source:
+
+- runtime events, control artifacts, autonomy lineage, benchmark outcomes, replayable tool traces, adversarial prompts, and policy-aware evaluation harnesses
+
+Fallback rule:
+
+- if richer trace sinks or external observability adapters are unavailable, Relaytic must still write the same canonical local trace and evaluation artifacts on disk
+
+Required outputs:
+- `trace_model.json`
+- `trace_span_log.jsonl`
+- `specialist_trace_index.json`
+- `tool_trace_log.jsonl`
+- `intervention_trace_log.jsonl`
+- `branch_trace_graph.json`
+- `agent_eval_matrix.json`
+- `security_eval_report.json`
+- `red_team_report.json`
+
+Required behavior:
+
+- Slice 12B must treat runtime traces as a first-class local source of truth for replay and comparison rather than a debug side channel
+- trace spans must cover specialist execution, tool calls, intervention handling, branch expansion, retries, and final decisions under one stable schema
+- evaluation harnesses must cover at least control injection, tool misuse, unsafe branch expansion, and skeptical-override regression
+- security/eval results must be consumable by later dojo, search-controller, and mission-control slices without hand translation
+- any optional observability adapter must remain secondary to the canonical local trace artifacts
+
+Minimum proof:
+
+- one run replayed end to end from the canonical trace artifacts
+- one adversarial steering case that is rejected and captured in the security-eval report
+- one tool-misuse or unsafe-branch case that fails safely and is recorded in the eval matrix
+- one case where later mission-control or search logic can read the trace graph directly
 
 ## Slice 13 - Search controller, accelerated execution, and distributed local experimentation
 
@@ -1399,7 +1472,7 @@ Goal:
 
 Load-bearing improvement:
 
-- Relaytic should be able to run wider challenger fields, deeper HPO, calibration branches, and uncertainty/abstention experiments under one explicit search controller instead of only static narrow search choices
+- Relaytic should be able to run wider challenger fields, deeper HPO, calibration branches, uncertainty/abstention experiments, and dynamic controller-adjusted branch depth under one explicit search controller instead of only static narrow search choices
 
 Human surface:
 
@@ -1407,7 +1480,7 @@ Human surface:
 
 Agent surface:
 
-- external agents should be able to consume one search-controller plan, execution strategy, checkpoint state, and scheduler map without inferring hidden orchestration decisions
+- external agents should be able to consume one search-controller plan, execution strategy, checkpoint state, scheduler map, HPO campaign report, and branch-pruning rationale without inferring hidden orchestration decisions
 
 Intelligence source:
 
@@ -1420,6 +1493,8 @@ Fallback rule:
 Required outputs:
 - `search_controller_plan.json`
 - `portfolio_search_trace.json`
+- `hpo_campaign_report.json`
+- `search_decision_ledger.json`
 - `execution_backend_profile.json`
 - `device_allocation.json`
 - `distributed_run_plan.json`
@@ -1432,11 +1507,12 @@ Required behavior:
 - execution acceleration must preserve provenance, checkpointing, and replayability
 - Slice 13 must consume the explicit quality and budget contracts from Slice 10B instead of inventing separate hidden search limits
 - Slice 13 must consume real runtime/control accounting and any beat-target contract from Slice 11A rather than relying only on estimated search effort or abstract parity goals
+- Slice 13 should consume the canonical trace/eval artifacts from Slice 12B so branch expansion, pruning, and controller changes can be justified by replayable evidence rather than implicit heuristics
 - device-aware planning must change *how* Relaytic executes, not silently change *what* it believes
 - distributed execution must remain resumable and safe for long local runs
 - search expansion must remain budgeted and justified by expected decision value, not only by abstract score-chasing
 - the search controller must be able to prune low-value branches early and widen high-value branches explicitly
-- broader route families, calibration variants, uncertainty wraps, abstention policies, and imported-incumbent beat-target branches should be eligible where their value is justified
+- broader route families, calibration variants, uncertainty wraps, abstention policies, imported-incumbent beat-target branches, and deeper HPO campaigns should be eligible where their value is justified
 
 Minimum proof:
 
@@ -1444,6 +1520,7 @@ Minimum proof:
 - one interrupted distributed run that resumes from checkpoint
 - one agent-consumable execution strategy report
 - one case where the search controller rejects a low-value branch and expands a higher-value branch with explicit justification
+- one case where the search controller widens or cuts HPO effort because the decision contract, beat-target pressure, or trace evidence says more search is or is not worth it
 
 ## Slice 14 - Real-world feasibility, domain constraints, and action boundaries
 
@@ -1508,15 +1585,15 @@ Goal:
 
 Load-bearing improvement:
 
-- Relaytic should expose a professional mission-control surface that lets humans and external agents navigate branch history, confidence, and change attribution while the packaging and integration layer makes that surface survivable for real-world use
+- Relaytic should expose a professional mission-control surface that lets humans and external agents navigate branch history, confidence, traces, interventions, and change attribution while the packaging and integration layer makes that surface survivable for real-world use
 
 Human surface:
 
-- operators should be able to open one coherent mission-control view showing current stage, branch DAG, confidence map, change attribution, recommended next actions, and environment health
+- operators should be able to open one coherent mission-control view showing current stage, branch DAG, confidence map, trace timeline, intervention history, recommended next actions, and environment health
 
 Agent surface:
 
-- external agents should be able to query the same mission-control state, branch structure, and change attribution through stable JSON-first surfaces and MCP tools
+- external agents should be able to query the same mission-control state, branch structure, trace explorer state, and change attribution through stable JSON-first surfaces and MCP tools
 
 Intelligence source:
 
@@ -1532,12 +1609,27 @@ Required outputs:
 - `confidence_map.json`
 - `change_attribution_report.json`
 - `review_queue_state.json`
+- `trace_explorer_state.json`
+- `branch_replay_index.json`
 - one golden demo
 - one Focus Council demo
 - one completion/status demo
 - one feedback-learning demo
 - one benchmark-parity demo
 - one dojo demo
+
+Required behavior:
+
+- Slice 15 must consume the canonical trace model from Slice 12B rather than inventing a separate UI-only activity history
+- mission control must make branch, tool, intervention, and confidence state legible without requiring humans or external agents to read raw artifact trees
+- CLI, MCP, and any richer UI shell must expose the same mission-control truth with only presentation differences
+- the packaged demos must include at least one skeptical-control case, one incumbent challenge case, and one trace-backed branch comparison
+
+Minimum proof:
+
+- one mission-control view that replays why Relaytic changed course across at least two branches
+- one agent-consumable mission-control export that shows current stage, branch state, and recommended next action without missing trace context
+- one packaged demo where humans can see what changed because of memory, research, feedback, and intervention handling from the same surface
 - one accelerated execution demo
 
 Required behavior:

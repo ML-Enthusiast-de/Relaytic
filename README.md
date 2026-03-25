@@ -45,11 +45,15 @@ Slices 10, 10B, and 10C are now implemented: Relaytic can ingest human, external
 The next frontier upgrades are:
 
 - decision-world modeling that distinguishes better score from better downstream action
+- explicit controller logic that decides who should act next, how deep to branch, and when review or escalation is worth it
 - method compilation that turns research, memory, and operator context into executable challenger and feature plans
 - imported-incumbent challenge paths so Relaytic can evaluate and try to beat existing models, prediction sets, scorecards, or rulesets under the same contract
 - a lab pulse that can periodically inspect local state, watch for new relevant methods or benchmark debt, and queue bounded safe follow-up without silent drift
+- richer long-term memory with retention, compaction, pinning, and replay rules so specialists do not repeatedly forget the same lesson
+- a first-class trace model plus agent/security harnesses so Relaytic can replay specialist/tool/intervention behavior and prove its control layer is actually robust
 - local data-fabric reasoning that can suggest joins, entity histories, and additional local data before wasting search budget
-- mission-control surfaces that show branch structure, confidence, and change attribution to humans and external agents
+- a stronger search/HPO controller that widens, prunes, and allocates effort under explicit value and budget contracts
+- mission-control surfaces that show branch structure, confidence, trace history, and change attribution to humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive models as one promising backend family
 
 ## Design Principles

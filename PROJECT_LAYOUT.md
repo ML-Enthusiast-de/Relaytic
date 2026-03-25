@@ -140,9 +140,11 @@ Reserved future boundaries:
 - `src/relaytic/decision/` should own decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` should own source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
-- `src/relaytic/pulse/` should own periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, and bounded pulse-run persistence
+- `src/relaytic/pulse/` should own periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
+- `src/relaytic/tracing/` should own canonical trace schemas, specialist/tool/intervention/branch trace persistence, and replay/query surfaces
+- `src/relaytic/evals/` should own agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs
 - `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` are expected to absorb future imported-incumbent challenge support rather than introducing a separate greenfield package by default
-- `src/relaytic/mission_control/` should own branch DAG, confidence map, change attribution, and later professional operator surfaces
+- `src/relaytic/mission_control/` should own branch DAG, confidence map, trace exploration, change attribution, and later professional operator surfaces
 - `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 ## Naming Rule

@@ -83,6 +83,7 @@ Start with:
 11A. imported incumbents and bring-your-own challenger baselines
 12. dojo mode and guarded self-improvement
 12A. lab pulse, periodic awareness, and bounded proactive follow-up
+12B. first-class tracing, agent evaluation, and runtime security harnesses
 13. search controller, accelerated execution, and distributed local experimentation
 14. real-world feasibility, domain constraints, and action boundaries
 15. mission control, packaging, integrations, demos, and polish
@@ -110,10 +111,11 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 16. Slice 11A
 17. Slice 12
 18. Slice 12A
-19. Slice 13
-20. Slice 14
-21. Slice 15
-22. Slice 16
+19. Slice 12B
+20. Slice 13
+21. Slice 14
+22. Slice 15
+23. Slice 16
 
 Reason:
 
@@ -134,6 +136,7 @@ Reason:
 - Slice 10A is the category-shift slice where Relaytic begins modeling the downstream decision system, compiling methods into executable experiments, and reasoning about what additional data is worth pulling
 - Slice 11A makes Relaytic much easier to adopt and demo because it can take a real incumbent model from the operator and try to beat it honestly under the same contract
 - Slice 12A should come after dojo because periodic awareness and bounded background follow-up are much safer once self-improvement already has quarantine and promotion rules
+- Slice 12B should come before Slice 13 and Slice 15 because Relaytic needs one canonical trace substrate plus explicit agent/security evaluation before wider search and mission-control claims become credible
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:
@@ -143,7 +146,8 @@ Current repo state:
 - next proof follow-on after Slice 10A: Slice 11A
 - next adaptive follow-on after Slice 11A: Slice 12
 - next pulse follow-on after Slice 12: Slice 12A
-- next scale-and-search follow-on after Slice 12A: Slice 13
+- next trace-and-safety follow-on after Slice 12A: Slice 12B
+- next scale-and-search follow-on after Slice 12B: Slice 13
 
 ## MVP boundary
 
@@ -193,11 +197,14 @@ If the goal is to turn the current implementation into something that looks genu
 - causal memory that preserves interventions, method outcomes, and downstream consequences rather than only analog similarity
 - a method compiler that turns research, memory, and operator context into executable challenger and feature templates
 - imported-incumbent challenge paths so Relaytic can beat real existing systems instead of only abstract baselines
+- a first-class trace model across specialists, tools, interventions, and branches so Relaytic can replay and compare complex multi-stage behavior from one runtime truth
+- runtime agent/security harnesses that test control injection, tool misuse, branch-controller safety, and skeptical override behavior before broader autonomy becomes default
 - a lab pulse that can periodically inspect local state, benchmark debt, research freshness, and memory health, then queue bounded safe follow-up without unsupervised drift
 - outcome learning rather than run-only learning
+- a richer long-term memory stack with retention, compaction, pinning, and replay rules so later specialists inherit durable lessons instead of analog hints alone
 - richer data-fabric reasoning that can suggest joins, entity histories, or additional data before wasting search budget
-- a stronger search controller that widens or prunes branches based on expected decision value under budget
-- a mission-control surface that makes branch structure, confidence, intervention history, incumbent-versus-Relaytic state, and change attribution legible to humans and agents
+- a stronger search controller that widens or prunes branches, changes handoff depth, and allocates HPO effort based on expected decision value under budget
+- a mission-control surface that makes branch structure, confidence, intervention history, traces, incumbent-versus-Relaytic state, and change attribution legible to humans and agents
 - an optional representation engine that can learn from large unlabeled local corpora and improve retrieval, anomaly support, and temporal state understanding without replacing deterministic adjudication
 
 Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.

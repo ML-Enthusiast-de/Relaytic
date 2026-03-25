@@ -9,7 +9,8 @@ This document tracks the operational state of the repository. It is an implement
 - next leverage follow-on after 10A: 11A, imported incumbents and bring-your-own challenger baselines
 - next proof follow-on after 11A: 12, dojo mode and guarded self-improvement
 - next adaptive follow-on after 12: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
-- next scale-and-search follow-on after 12A: 13, search controller, accelerated execution, and distributed local experimentation
+- next trace-and-safety follow-on after 12A: 12B, first-class tracing, agent evaluation, and runtime security harnesses
+- next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 
@@ -80,7 +81,11 @@ The most important not-yet-implemented shifts after the current baseline are:
 - method compilation that turns research, memory, and operator context into executable challenger, feature, split, and benchmark templates
 - imported-incumbent challenge paths so Relaytic can evaluate and try to beat existing models, prediction sets, scorecards, or rulesets under the same contract
 - a lab pulse that can periodically inspect local state, watch for new relevant methods or benchmark debt, and queue bounded safe follow-up without silent drift
+- a first-class trace model across specialists, tools, interventions, and branches so Relaytic can replay and compare multi-stage behavior from one runtime truth
+- runtime evaluator and security harnesses that test skeptical control, tool safety, branch-controller safety, and adversarial steering before broader autonomy is trusted
+- richer long-term memory with retention, compaction, pinning, and replay rules so durable lessons survive beyond analog similarity
 - richer local data-fabric reasoning around source graphs, join candidates, entity histories, and acquisition plans
+- stronger dynamic controller logic that decides who should act next, how deep to branch, and when review is worth it under explicit contracts
 - mission-control surfaces that expose branch DAG, confidence, and change attribution to both humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family
 

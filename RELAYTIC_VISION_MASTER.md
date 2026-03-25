@@ -163,11 +163,15 @@ They are:
 
 - **behavioral contracts** that let humans and external agents steer Relaytic without turning Relaytic into a compliant shell
 - **causal multi-layer memory** that preserves interventions, method outcomes, downstream consequences, and why previous guidance proved right or wrong
+- a **first-class trace model** that records specialist turns, tool calls, intervention handling, branch expansion, and later decisions as one replayable execution truth rather than scattered logs
+- **dynamic controller logic** that can change handoff depth, branch width, reviewer involvement, and challenge pressure based on observed uncertainty, budget, and downstream decision value
 - a **decision-system world model** that understands what action follows prediction, what errors cost, which cases should defer to humans, and whether more search is actually worth it
 - a **method compiler** that turns papers, benchmark references, memory, and operator notes into executable challenger templates, feature hypotheses, split/evaluation adjustments, and data-collection suggestions
 - **imported incumbent challenge tracks** so Relaytic can beat real existing models instead of only generic baselines
 - a **richer search controller** that chooses broader challenger ecology, HPO depth, calibration breadth, and abstention policy under explicit budgets rather than fixed narrow search
 - **outcome learning**, not just run learning, so Relaytic improves from interventions taken, overrides, downstream results, and false-positive/false-negative consequences
+- a **richer long-term memory stack** with episodic, intervention, outcome, and method memory plus explicit retention, compaction, pinning, and replay rules so specialists do not keep relearning the same lesson
+- **agent evaluator and security harnesses** that continuously test override skepticism, tool-safety boundaries, branch-controller behavior, and prompt/result injection resistance rather than assuming the runtime is safe because it is local
 - a **lab pulse** that can periodically inspect runtime state, benchmark debt, research freshness, and memory health, then queue bounded safe follow-up without unsupervised drift
 - a **richer data-understanding fabric** that can reason about nearby sources, join candidates, entity histories, and what additional data would reduce uncertainty most
 - a **mission-control surface** that shows branch structure, confidence map, intervention history, incumbent-versus-Relaytic state, what changed because of memory, intelligence, research, or feedback, and what Relaytic would do next
