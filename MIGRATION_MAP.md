@@ -189,9 +189,17 @@ Avoid introducing new references to:
 - introduced public commands `relaytic feedback add`, `relaytic feedback review`, `relaytic feedback show`, and `relaytic feedback rollback`
 - wired feedback artifacts into memory and run-summary surfaces so accepted route-prior updates remain explicit rather than hidden state drift
 
+### Slice 10C
+
+- introduced the canonical package boundary `src/relaytic/control/`
+- introduced artifact boundaries for `intervention_request.json`, `intervention_contract.json`, `control_challenge_report.json`, `override_decision.json`, `intervention_ledger.json`, `recovery_checkpoint.json`, `control_injection_audit.json`, `causal_memory_index.json`, `intervention_memory_log.json`, `outcome_memory_graph.json`, and `method_memory_index.json`
+- introduced public commands `relaytic control review` and `relaytic control show`
+- upgraded assist and MCP surfaces so steering requests are normalized, challenged, checkpointed, and replayable instead of being treated as blind authority
+
 ## Current Newly-Shipped Boundaries
 
 - `src/relaytic/profiles/` for Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
+- `src/relaytic/control/` for Slice 10C intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, and control-ledger persistence
 
 Shipped artifact names:
 
@@ -201,22 +209,6 @@ Shipped artifact names:
 - `budget_consumption_report.json`
 - `operator_profile.json`
 - `lab_operating_profile.json`
-
-## Reserved Future Boundaries
-
-The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
-
-- `src/relaytic/control/` for Slice 10C intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, and control-ledger persistence
-- Slice 11A should extend `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` before introducing any separate greenfield package for incumbent-challenge support
-- `src/relaytic/decision/` for Slice 10A decision-world models, intervention policy, value-of-more-data reasoning, and decision-usefulness synthesis
-- `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
-- `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
-- `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, and bounded pulse-run persistence
-- `src/relaytic/mission_control/` for Slice 15 branch DAG, confidence map, change attribution, and later professional operator surfaces
-- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
-
-Reserved future artifact names:
-
 - `intervention_request.json`
 - `intervention_contract.json`
 - `control_challenge_report.json`
@@ -228,6 +220,21 @@ Reserved future artifact names:
 - `intervention_memory_log.json`
 - `outcome_memory_graph.json`
 - `method_memory_index.json`
+
+## Reserved Future Boundaries
+
+The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
+
+- Slice 11A should extend `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` before introducing any separate greenfield package for incumbent-challenge support
+- `src/relaytic/decision/` for Slice 10A decision-world models, intervention policy, value-of-more-data reasoning, and decision-usefulness synthesis
+- `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
+- `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, and bounded pulse-run persistence
+- `src/relaytic/mission_control/` for Slice 15 branch DAG, confidence map, change attribution, and later professional operator surfaces
+- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+
+Reserved future artifact names:
+
 - `decision_world_model.json`
 - `intervention_policy_report.json`
 - `decision_usefulness_report.json`

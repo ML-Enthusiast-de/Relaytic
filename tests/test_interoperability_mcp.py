@@ -78,6 +78,22 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         assert runtime_payload["surface_payload"]["runtime"]["event_count"] >= 10
                         assert runtime_payload["surface_payload"]["runtime"]["last_surface"] == "mcp"
 
+                        assist_result = await session.call_tool(
+                            "relaytic_assist_turn",
+                            {"run_dir": str(run_dir), "message": "take over"},
+                        )
+                        assist_payload = _structured_payload(assist_result)
+                        assert assist_payload["surface_payload"]["status"] == "ok"
+                        assert assist_payload["surface_payload"]["control"]["decision"] in {"accept_with_modification", "defer"}
+
+                        control_result = await session.call_tool(
+                            "relaytic_show_control",
+                            {"run_dir": str(run_dir)},
+                        )
+                        control_payload = _structured_payload(control_result)
+                        assert control_payload["surface_payload"]["status"] == "ok"
+                        assert control_payload["surface_payload"]["control"]["decision"] is not None
+
                         autonomy_result = await session.call_tool(
                             "relaytic_show_autonomy",
                             {"run_dir": str(run_dir)},

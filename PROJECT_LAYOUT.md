@@ -133,10 +133,10 @@ Relaytic/
 - `src/relaytic/benchmark/` owns Slice 11 reference comparison, parity-gap reporting, and benchmark artifact persistence
 - `src/relaytic/feedback/` owns Slice 10 validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook artifacts
 - `src/relaytic/profiles/` owns Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
+- `src/relaytic/control/` owns Slice 10C intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, and control-ledger persistence
 
 Reserved future boundaries:
 
-- `src/relaytic/control/` should own intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, and control-ledger persistence
 - `src/relaytic/decision/` should own decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` should own source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning

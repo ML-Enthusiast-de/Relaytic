@@ -130,7 +130,7 @@ Reason:
 - Slice 11 gives honest proof before feedback and dojo expansion
 - Slice 10 lets Relaytic learn from what happened after predictions, not just from what happened inside one run
 - Slice 10B makes quality gates, budget posture, and profile overlays explicit before decision-world modeling and broader search depend on them
-- Slice 10C should now come next because Relaytic needs skeptical intervention handling, recovery checkpoints, causal memory, and control-injection resistance before it expands decision authority again
+- Slice 10C now lands the skeptical intervention layer, so Relaytic can expand decision authority next without becoming a compliant shell
 - Slice 10A is the category-shift slice where Relaytic begins modeling the downstream decision system, compiling methods into executable experiments, and reasoning about what additional data is worth pulling
 - Slice 11A makes Relaytic much easier to adopt and demo because it can take a real incumbent model from the operator and try to beat it honestly under the same contract
 - Slice 12A should come after dojo because periodic awareness and bounded background follow-up are much safer once self-improvement already has quarantine and promotion rules
@@ -138,9 +138,8 @@ Reason:
 
 Current repo state:
 
-- implemented through Slice 11, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, and Slice 10B explicit quality/budget/profile contracts now landed
-- next execution target: Slice 10C
-- next decision-lab follow-on after Slice 10C: Slice 10A
+- implemented through Slice 11, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, and Slice 10C skeptical behavioral control now landed
+- next execution target: Slice 10A
 - next proof follow-on after Slice 10A: Slice 11A
 - next adaptive follow-on after Slice 11A: Slice 12
 - next pulse follow-on after Slice 12: Slice 12A

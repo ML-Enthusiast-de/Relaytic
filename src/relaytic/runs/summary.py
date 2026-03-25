@@ -167,6 +167,22 @@ def build_run_summary(
             "lab_operating_profile": "lab_operating_profile.json",
         },
     )
+    control_bundle = _read_bundle(
+        root,
+        {
+            "intervention_request": "intervention_request.json",
+            "intervention_contract": "intervention_contract.json",
+            "control_challenge_report": "control_challenge_report.json",
+            "override_decision": "override_decision.json",
+            "intervention_ledger": "intervention_ledger.json",
+            "recovery_checkpoint": "recovery_checkpoint.json",
+            "control_injection_audit": "control_injection_audit.json",
+            "causal_memory_index": "causal_memory_index.json",
+            "intervention_memory_log": "intervention_memory_log.json",
+            "outcome_memory_graph": "outcome_memory_graph.json",
+            "method_memory_index": "method_memory_index.json",
+        },
+    )
     runtime_bundle = _read_bundle(
         root,
         {
@@ -202,6 +218,7 @@ def build_run_summary(
     data_copy_manifest = _read_json(root / "data_copy_manifest.json")
 
     run_brief = _bundle_item(mandate_bundle, "run_brief")
+    data_origin = _bundle_item(context_bundle, "data_origin")
     task_brief = _bundle_item(context_bundle, "task_brief")
     domain_brief = _bundle_item(context_bundle, "domain_brief")
     autonomy_mode = _bundle_item(intake_bundle, "autonomy_mode")
@@ -256,6 +273,13 @@ def build_run_summary(
     budget_consumption_report = _bundle_item(profiles_bundle, "budget_consumption_report")
     operator_profile = _bundle_item(profiles_bundle, "operator_profile")
     lab_operating_profile = _bundle_item(profiles_bundle, "lab_operating_profile")
+    intervention_request = _bundle_item(control_bundle, "intervention_request")
+    control_challenge_report = _bundle_item(control_bundle, "control_challenge_report")
+    override_decision = _bundle_item(control_bundle, "override_decision")
+    intervention_ledger = _bundle_item(control_bundle, "intervention_ledger")
+    recovery_checkpoint = _bundle_item(control_bundle, "recovery_checkpoint")
+    control_injection_audit = _bundle_item(control_bundle, "control_injection_audit")
+    causal_memory_index = _bundle_item(control_bundle, "causal_memory_index")
     hook_execution_log = _bundle_item(runtime_bundle, "hook_execution_log")
     run_checkpoint_manifest = _bundle_item(runtime_bundle, "run_checkpoint_manifest")
     capability_profiles = _bundle_item(runtime_bundle, "capability_profiles")
@@ -320,6 +344,7 @@ def build_run_summary(
             benchmark_bundle=benchmark_bundle,
             profiles_bundle=profiles_bundle,
             feedback_bundle=feedback_bundle,
+            control_bundle=control_bundle,
             completion_bundle=completion_bundle,
             lifecycle_bundle=lifecycle_bundle,
             autonomy_bundle=autonomy_bundle,
@@ -522,6 +547,21 @@ def build_run_summary(
             "local_truth_required": lab_operating_profile.get("local_truth_required"),
             "remote_intelligence_allowed": lab_operating_profile.get("remote_intelligence_allowed"),
         },
+        "control": {
+            "request_classification": _clean_text(intervention_request.get("request_classification")),
+            "requested_action_kind": _clean_text(intervention_request.get("requested_action_kind")),
+            "decision": _clean_text(override_decision.get("decision")),
+            "approved_action_kind": _clean_text(override_decision.get("approved_action_kind")),
+            "approved_stage": _clean_text(override_decision.get("approved_stage")),
+            "challenge_level": _clean_text(control_challenge_report.get("challenge_level")),
+            "skepticism_level": _clean_text(control_challenge_report.get("skepticism_level")),
+            "similar_harmful_override_count": int(control_challenge_report.get("similar_harmful_override_count", 0) or 0),
+            "suspicious_count": int(control_injection_audit.get("suspicious_count", 0) or 0),
+            "rejected_count": int(control_injection_audit.get("rejected_count", 0) or 0),
+            "checkpoint_id": _clean_text(recovery_checkpoint.get("checkpoint_id")),
+            "ledger_entry_count": int(intervention_ledger.get("entry_count", 0) or 0),
+            "prior_run_count": int(causal_memory_index.get("prior_run_count", 0) or 0),
+        },
         "runtime": {
             "current_stage": _resolve_runtime_stage(
                 root,
@@ -624,6 +664,9 @@ def build_run_summary(
             "quality_gate_report_path": _path_if_exists(root / "quality_gate_report.json"),
             "budget_contract_path": _path_if_exists(root / "budget_contract.json"),
             "budget_consumption_report_path": _path_if_exists(root / "budget_consumption_report.json"),
+            "override_decision_path": _path_if_exists(root / "override_decision.json"),
+            "control_challenge_report_path": _path_if_exists(root / "control_challenge_report.json"),
+            "intervention_memory_log_path": _path_if_exists(root / "intervention_memory_log.json"),
             "event_stream_path": _path_if_exists(root / "lab_event_stream.jsonl"),
             "capability_profiles_path": _path_if_exists(root / "capability_profiles.json"),
         },
@@ -647,6 +690,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     feedback = dict(summary.get("feedback", {}))
     contracts = dict(summary.get("contracts", {}))
     profiles = dict(summary.get("profiles", {}))
+    control = dict(summary.get("control", {}))
     runtime = dict(summary.get("runtime", {}))
     lifecycle = dict(summary.get("lifecycle", {}))
     autonomy = dict(summary.get("autonomy", {}))
@@ -852,6 +896,25 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Remote intelligence allowed: `{profiles.get('remote_intelligence_allowed')}`",
             ]
         )
+    if control and any(value not in (None, 0, False, "", []) for value in control.values()):
+        lines.extend(
+            [
+                "",
+                "## Control",
+                "",
+                f"- Request classification: `{control.get('request_classification') or 'unknown'}`",
+                f"- Requested action: `{control.get('requested_action_kind') or 'none'}`",
+                f"- Decision: `{control.get('decision') or 'unknown'}`",
+                f"- Approved action: `{control.get('approved_action_kind') or 'none'}`",
+                f"- Approved stage: `{control.get('approved_stage') or 'none'}`",
+                f"- Challenge level: `{control.get('challenge_level') or 'unknown'}`",
+                f"- Skepticism level: `{control.get('skepticism_level') or 'unknown'}`",
+                f"- Similar harmful overrides: `{control.get('similar_harmful_override_count', 0)}`",
+                f"- Suspicious requests: `{control.get('suspicious_count', 0)}`",
+            ]
+        )
+        if control.get("checkpoint_id"):
+            lines.append(f"- Recovery checkpoint: `{control.get('checkpoint_id')}`")
     if lifecycle and any(value is not None for value in lifecycle.values()):
         lines.extend(
             [
@@ -1038,12 +1101,15 @@ def _resolve_stage(
     benchmark_bundle: dict[str, Any],
     profiles_bundle: dict[str, Any],
     feedback_bundle: dict[str, Any],
+    control_bundle: dict[str, Any],
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
     autonomy_bundle: dict[str, Any],
 ) -> str:
     if any(isinstance(value, dict) and value for value in feedback_bundle.values()):
         return "feedback_reviewed"
+    if any(isinstance(value, dict) and value for value in control_bundle.values()):
+        return "control_reviewed"
     if autonomy_bundle:
         return "autonomy_reviewed"
     if lifecycle_bundle:
@@ -1075,6 +1141,8 @@ def _resolve_stage(
 def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: str) -> str | None:
     if (root / "feedback_effect_report.json").exists():
         return "feedback"
+    if latest_stage == "control" or last_event_stage == "control":
+        return "control"
     if any(
         (root / filename).exists()
         for filename in (
@@ -1090,6 +1158,8 @@ def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: s
         return "lifecycle"
     if (root / "completion_decision.json").exists():
         return "completion"
+    if (root / "override_decision.json").exists():
+        return "control"
     if (root / "quality_gate_report.json").exists():
         return "profiles"
     if (root / "benchmark_parity_report.json").exists():

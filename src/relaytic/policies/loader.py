@@ -94,6 +94,7 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     research_cfg = dict(config.get("research", {}))
     feedback_cfg = dict(config.get("feedback", {}))
     profiles_cfg = dict(config.get("profiles", {}))
+    control_cfg = dict(config.get("control", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
     contact_email = research_cfg.get("contact_email", "")
     if contact_email is None:
@@ -262,6 +263,18 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "require_visible_quality_gates": bool(profiles_cfg.get("require_visible_quality_gates", True)),
             "require_visible_budget_consumption": bool(profiles_cfg.get("require_visible_budget_consumption", True)),
             "quality_review_mode": str(profiles_cfg.get("quality_review_mode", "explicit_contracts") or "explicit_contracts"),
+        },
+        "control": {
+            "enabled": bool(control_cfg.get("enabled", True)),
+            "allow_navigation_without_challenge": bool(control_cfg.get("allow_navigation_without_challenge", True)),
+            "challenge_material_requests": bool(control_cfg.get("challenge_material_requests", True)),
+            "checkpoint_before_override": bool(control_cfg.get("checkpoint_before_override", True)),
+            "reject_policy_bypass": bool(control_cfg.get("reject_policy_bypass", True)),
+            "skeptical_takeover_enabled": bool(control_cfg.get("skeptical_takeover_enabled", True)),
+            "causal_memory_enabled": bool(control_cfg.get("causal_memory_enabled", True)),
+            "cross_run_memory_enabled": bool(control_cfg.get("cross_run_memory_enabled", True)),
+            "max_prior_runs": int(control_cfg.get("max_prior_runs", 12) or 12),
+            "max_ledger_entries": int(control_cfg.get("max_ledger_entries", 40) or 40),
         },
         "runtime": {
             "gateway_enabled": bool(runtime_cfg.get("gateway_enabled", True)),

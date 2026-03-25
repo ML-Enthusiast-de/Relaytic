@@ -39,10 +39,10 @@ Current canonical boundaries:
 - `src/relaytic/research/` owns Slice 09D redacted external research retrieval, source inventory, method-transfer distillation, benchmark-reference harvesting, and research-audit persistence
 - `src/relaytic/feedback/` owns Slice 10 validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook state
 - `src/relaytic/profiles/` owns Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
+- `src/relaytic/control/` owns Slice 10C intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, control-ledger persistence, and causal steering-memory artifacts
 
 Reserved future boundaries:
 
-- `src/relaytic/control/` should own Slice 10C intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, and control-ledger persistence
 - Slice 11A should extend `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` before introducing any separate greenfield package for incumbent-challenge support
 - `src/relaytic/decision/` should own Slice 10A decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
@@ -196,6 +196,17 @@ The current slices must preserve these names:
 - `budget_consumption_report.json`
 - `operator_profile.json`
 - `lab_operating_profile.json`
+- `intervention_request.json`
+- `intervention_contract.json`
+- `control_challenge_report.json`
+- `override_decision.json`
+- `intervention_ledger.json`
+- `recovery_checkpoint.json`
+- `control_injection_audit.json`
+- `causal_memory_index.json`
+- `intervention_memory_log.json`
+- `outcome_memory_graph.json`
+- `method_memory_index.json`
 - `reference_approach_matrix.json`
 - `benchmark_gap_report.json`
 - `benchmark_parity_report.json`
@@ -208,17 +219,6 @@ The current slices must preserve these names:
 
 Reserved future artifact names:
 
-- `intervention_request.json`
-- `intervention_contract.json`
-- `control_challenge_report.json`
-- `override_decision.json`
-- `intervention_ledger.json`
-- `recovery_checkpoint.json`
-- `control_injection_audit.json`
-- `causal_memory_index.json`
-- `intervention_memory_log.json`
-- `outcome_memory_graph.json`
-- `method_memory_index.json`
 - `decision_world_model.json`
 - `intervention_policy_report.json`
 - `decision_usefulness_report.json`

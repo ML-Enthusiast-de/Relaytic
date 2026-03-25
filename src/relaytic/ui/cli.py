@@ -260,6 +260,24 @@ def render_profiles_review_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_profiles_review_markdown(*args, **kwargs)
 
 
+def run_control_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.control import run_control_review as _run_control_review
+
+    return _run_control_review(*args, **kwargs)
+
+
+def read_control_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.control import read_control_bundle as _read_control_bundle
+
+    return _read_control_bundle(*args, **kwargs)
+
+
+def render_control_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.control import render_control_review_markdown as _render_control_review_markdown
+
+    return _render_control_review_markdown(*args, **kwargs)
+
+
 def build_assist_bundle(*args: Any, **kwargs: Any) -> Any:
     from relaytic.assist import build_assist_bundle as _build_assist_bundle
 
@@ -1492,6 +1510,42 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    control_surface = sub.add_parser(
+        "control",
+        help="Run or inspect Slice 10C behavioral control contracts, override decisions, and causal steering memory.",
+    )
+    control_sub = control_surface.add_subparsers(dest="control_command", required=True)
+
+    control_review = control_sub.add_parser(
+        "review",
+        help="Review one intervention request against Relaytic's skeptical control contract without scraping prose.",
+    )
+    control_review.add_argument("--run-dir", required=True, help="Run directory for Slice 10C control artifacts.")
+    control_review.add_argument("--message", required=True, help="Human or agent request to review.")
+    control_review.add_argument("--config", default=None, help="Optional config/policy source.")
+    control_review.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    control_review.add_argument("--actor-type", default="user", help="Actor type, e.g. user, operator, or agent.")
+    control_review.add_argument("--actor-name", default=None, help="Optional actor name for the intervention request.")
+    control_review.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    control_review.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    control_show = control_sub.add_parser(
+        "show",
+        help="Render the current Slice 10C control artifacts for a run.",
+    )
+    control_show.add_argument("--run-dir", required=True, help="Run directory containing Slice 10C control artifacts.")
+    control_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     autonomy_surface = sub.add_parser(
         "autonomy",
         help="Run or inspect Slice 09C bounded autonomous follow-up loops.",
@@ -2310,6 +2364,60 @@ def main(argv: list[str] | None = None) -> int:
                 config_path=args.config,
                 run_id=args.run_id,
                 labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "control":
+        if args.control_command == "show":
+            try:
+                payload = _show_control_surface(run_dir=args.run_dir)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.control_command != "review":
+            parser.error("Unsupported control subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            assist_payload = _materialize_assist_surface(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                last_user_intent=None,
+                last_requested_stage=None,
+                last_action_kind=None,
+                increment_turn_count=False,
+            )
+            plan = plan_assist_turn(
+                message=args.message,
+                run_summary=dict(assist_payload["run_summary"]),
+                assist_bundle=dict(assist_payload["bundle"]),
+            )
+            payload = _run_control_phase(
+                run_dir=args.run_dir,
+                message=args.message,
+                action_kind=plan.action_kind,
+                requested_stage=plan.requested_stage,
+                config_path=args.config,
+                run_id=args.run_id,
+                labels=labels,
+                actor_type=args.actor_type,
+                actor_name=args.actor_name,
+                runtime_surface="cli",
+                runtime_command="relaytic control review",
             )
         except ValueError as exc:
             parser.error(str(exc))
@@ -3445,6 +3553,10 @@ def _run_assist_turn(
     message: str,
     config_path: str | None,
     data_path: str | None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+    actor_type: str = "user",
+    actor_name: str | None = None,
 ) -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
@@ -3465,22 +3577,44 @@ def _run_assist_turn(
         run_summary=run_summary,
         assist_bundle=bundle,
     )
+    control_payload = _run_control_phase(
+        run_dir=root,
+        message=message,
+        action_kind=plan.action_kind,
+        requested_stage=plan.requested_stage,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+        actor_type=actor_type,
+        actor_name=actor_name,
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command or "relaytic assist turn",
+    )
+    control_summary = dict(control_payload["surface_payload"].get("control", {}))
+    control_bundle = dict(control_payload["surface_payload"].get("bundle", {}))
+    control_decision = str(control_summary.get("decision", "")).strip() or "accept"
+    approved_action_kind = str(control_summary.get("approved_action_kind", "")).strip() or plan.action_kind
+    approved_stage_text = str(control_summary.get("approved_stage", "")).strip()
+    approved_stage = approved_stage_text or (plan.requested_stage if control_decision in {"accept", "accept_with_modification"} else None)
     executed_stages: list[str] = []
-    action_message = str(plan.response_message)
-    if plan.action_kind == "rerun_stage" and plan.requested_stage:
+    if control_decision in {"reject", "defer"}:
+        action_message = str(dict(control_bundle.get("override_decision", {})).get("summary") or plan.response_message)
+    else:
+        action_message = str(plan.response_message)
+    if control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "rerun_stage" and approved_stage:
         executed_stages = _run_assist_stage_pipeline(
             run_dir=root,
-            start_stage=plan.requested_stage,
+            start_stage=approved_stage,
             config_path=config_path,
             data_path=data_path,
             overwrite=True,
         )
         action_message = (
-            f"Relaytic reran `{plan.requested_stage}` and refreshed downstream stages: "
+            f"Relaytic reran `{approved_stage}` and refreshed downstream stages: "
             + ", ".join(executed_stages)
             + "."
         )
-    elif plan.action_kind == "take_over":
+    elif control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "take_over":
         start_stage = _next_takeover_stage(run_dir=root, run_summary=run_summary)
         if start_stage is None:
             action_message = (
@@ -3505,8 +3639,8 @@ def _run_assist_turn(
         run_dir=root,
         config_path=config_path,
         last_user_intent=plan.intent.intent_type,
-        last_requested_stage=plan.requested_stage,
-        last_action_kind=plan.action_kind,
+        last_requested_stage=approved_stage,
+        last_action_kind=approved_action_kind,
         increment_turn_count=True,
     )
     stage_after = str(refreshed["run_summary"].get("stage_completed", "")).strip() or "unknown"
@@ -3515,7 +3649,11 @@ def _run_assist_turn(
         "message": str(message),
         "intent_type": plan.intent.intent_type,
         "requested_stage": plan.requested_stage,
-        "action_kind": plan.action_kind,
+        "requested_action_kind": plan.action_kind,
+        "action_kind": approved_action_kind,
+        "control_decision": control_decision,
+        "checkpoint_id": control_summary.get("checkpoint_id"),
+        "skepticism_level": control_summary.get("skepticism_level"),
         "stage_before": stage_before,
         "stage_after": stage_after,
         "executed_stages": executed_stages,
@@ -3525,7 +3663,7 @@ def _run_assist_turn(
     from relaytic.assist import append_assist_turn_log
 
     log_path = append_assist_turn_log(root, entry=log_entry)
-    _refresh_assist_manifest(root)
+    _refresh_control_manifest(root)
     return {
         "surface_payload": {
             "status": "ok",
@@ -3533,6 +3671,8 @@ def _run_assist_turn(
             "manifest_path": str(refreshed["manifest_path"]),
             "assist": refreshed["bundle"],
             "run_summary": refreshed["run_summary"],
+            "control": control_summary,
+            "control_bundle": control_bundle,
             "turn": log_entry,
             "log_path": str(log_path),
         },
@@ -4120,6 +4260,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.profiles import read_profiles_bundle
 
         return read_profiles_bundle(run_dir)
+    if bundle == "control":
+        from relaytic.control import read_control_bundle
+
+        return read_control_bundle(run_dir)
     if bundle == "runtime":
         from relaytic.runtime import read_runtime_bundle
 
@@ -5693,6 +5837,144 @@ def _show_profiles_surface(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _run_control_phase(
+    *,
+    run_dir: str | Path,
+    message: str,
+    action_kind: str,
+    requested_stage: str | None,
+    config_path: str | None,
+    run_id: str | None,
+    labels: dict[str, str] | None,
+    actor_type: str = "user",
+    actor_name: str | None = None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+) -> dict[str, Any]:
+    from relaytic.control import write_control_bundle
+
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    current_summary = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    stage_before = str(current_summary.get("stage_completed", "")).strip() or "unknown"
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=foundation_state["resolved"].policy,
+        stage="control",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "run_summary.json",
+            "assist_mode.json",
+            "assist_session_state.json",
+            "feedback_casebook.json",
+            "route_prior_updates.json",
+            "benchmark_parity_report.json",
+        ],
+    )
+    try:
+        control_result = run_control_review(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            message=message,
+            action_kind=action_kind,
+            requested_stage=requested_stage,
+            stage_before=stage_before,
+            run_summary=current_summary,
+            source_surface=runtime_surface,
+            source_command=runtime_command,
+            actor_type=actor_type,
+            actor_name=actor_name,
+        )
+        written = write_control_bundle(root, bundle=control_result.bundle)
+        manifest_path = _refresh_control_manifest(
+            root,
+            run_id=run_id,
+            policy_source=foundation_state["policy_path"],
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic normalized one steering request, challenged material changes skeptically, preserved a replayable override decision, and refreshed causal steering memory.",
+        )
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        decision = control_result.bundle.override_decision
+        challenge = control_result.bundle.control_challenge_report
+        audit = control_result.bundle.control_injection_audit
+        checkpoint = control_result.bundle.recovery_checkpoint
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "control": {
+                    "decision": decision.decision,
+                    "approved_action_kind": decision.approved_action_kind,
+                    "approved_stage": decision.approved_stage,
+                    "challenge_level": challenge.challenge_level,
+                    "skepticism_level": challenge.skepticism_level,
+                    "similar_harmful_override_count": challenge.similar_harmful_override_count,
+                    "checkpoint_id": checkpoint.checkpoint_id,
+                    "suspicious_count": audit.suspicious_count,
+                },
+                "bundle": control_result.bundle.to_dict(),
+            },
+            "human_output": control_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_control_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="control")
+    if not bundle:
+        raise ValueError(f"No Slice 10C control artifacts found in {root}.")
+    materialize_run_summary(run_dir=root)
+    manifest_path = _refresh_control_manifest(root)
+    decision = dict(bundle.get("override_decision", {}))
+    challenge = dict(bundle.get("control_challenge_report", {}))
+    audit = dict(bundle.get("control_injection_audit", {}))
+    checkpoint = dict(bundle.get("recovery_checkpoint", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "control": {
+                "decision": decision.get("decision"),
+                "approved_action_kind": decision.get("approved_action_kind"),
+                "approved_stage": decision.get("approved_stage"),
+                "challenge_level": challenge.get("challenge_level"),
+                "skepticism_level": challenge.get("skepticism_level"),
+                "similar_harmful_override_count": challenge.get("similar_harmful_override_count"),
+                "checkpoint_id": checkpoint.get("checkpoint_id"),
+                "suspicious_count": audit.get("suspicious_count"),
+            },
+            "bundle": bundle,
+        },
+        "human_output": render_control_review_markdown(bundle),
+    }
+
+
 def _render_research_sources_markdown(inventory: dict[str, Any]) -> str:
     sources = list(inventory.get("sources", []))
     lines = [
@@ -6612,6 +6894,22 @@ def _profiles_output_paths(run_dir: Path) -> dict[str, Path]:
         "budget_consumption_report": run_dir / "budget_consumption_report.json",
         "operator_profile": run_dir / "operator_profile.json",
         "lab_operating_profile": run_dir / "lab_operating_profile.json",
+    }
+
+
+def _control_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "intervention_request": run_dir / "intervention_request.json",
+        "intervention_contract": run_dir / "intervention_contract.json",
+        "control_challenge_report": run_dir / "control_challenge_report.json",
+        "override_decision": run_dir / "override_decision.json",
+        "intervention_ledger": run_dir / "intervention_ledger.json",
+        "recovery_checkpoint": run_dir / "recovery_checkpoint.json",
+        "control_injection_audit": run_dir / "control_injection_audit.json",
+        "causal_memory_index": run_dir / "causal_memory_index.json",
+        "intervention_memory_log": run_dir / "intervention_memory_log.json",
+        "outcome_memory_graph": run_dir / "outcome_memory_graph.json",
+        "method_memory_index": run_dir / "method_memory_index.json",
     }
 
 
@@ -7567,6 +7865,9 @@ def _refresh_access_manifest(
                 required=True,
             )
         )
+    for path in _control_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="control", required=True))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:
@@ -7625,6 +7926,57 @@ def _refresh_assist_manifest(
                     required=key != "assist_turn_log",
                 )
             )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_control_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_assist_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _control_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="control", required=True))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:

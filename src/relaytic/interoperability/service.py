@@ -74,6 +74,12 @@ def relaytic_show_runtime(*, run_dir: str, limit: int = 20) -> dict[str, Any]:
     return cli._show_runtime_surface(run_dir=run_dir, limit=max(1, int(limit)))
 
 
+def relaytic_show_control(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 10C control surface for a Relaytic run."""
+    cli = _cli()
+    return cli._show_control_surface(run_dir=run_dir)
+
+
 def relaytic_get_status(*, run_dir: str) -> dict[str, Any]:
     """Render the completion-governor status for a Relaytic run."""
     cli = _cli()
@@ -377,6 +383,9 @@ def relaytic_assist_turn(
         message=message,
         config_path=config_path,
         data_path=data_path,
+        runtime_surface="mcp",
+        runtime_command="relaytic_assist_turn",
+        actor_type="agent",
     )
 
 
@@ -456,6 +465,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_server_info",
             "relaytic_show_run",
             "relaytic_show_runtime",
+            "relaytic_show_control",
             "relaytic_get_status",
             "relaytic_show_intelligence",
             "relaytic_show_research",
@@ -529,6 +539,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_runtime,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_control",
+            title="Show Relaytic Control",
+            description="Render the current Slice 10C behavioral control contract, override decision, and causal steering memory for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_control,
         ),
         InteropToolSpec(
             name="relaytic_get_status",

@@ -4,12 +4,11 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 11, including Slice 10 feedback assimilation/outcome learning and Slice 10B explicit quality-budget-profile contracts
-- next recommended slice: 10C, behavioral contracts, skeptical steering, and causal memory
-- next leverage follow-on after 10C: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
-- next proof follow-on after 10A: 11A, imported incumbents and bring-your-own challenger baselines
-- next adaptive follow-on after 11A: 12, dojo mode and guarded self-improvement
-- next pulse follow-on after 12: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
+- completed slices: 00 through 11, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, and Slice 10C behavioral control contracts with skeptical steering and causal intervention memory
+- next recommended slice: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
+- next leverage follow-on after 10A: 11A, imported incumbents and bring-your-own challenger baselines
+- next proof follow-on after 11A: 12, dojo mode and guarded self-improvement
+- next adaptive follow-on after 12: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
 - next scale-and-search follow-on after 12A: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -48,6 +47,10 @@ The repository currently supports:
 - feedback assimilation with explicit intake, validation, reversible effect reports, route-prior updates, decision-policy suggestions, and rollback-ready casebook artifacts
 - later-run planning influence from accepted feedback through memory-scanned route-prior updates
 - explicit quality contracts, quality-gate reports, budget contracts, budget-consumption reporting, and bounded operator/lab profiles via `relaytic profiles`
+- skeptical behavioral control contracts via `relaytic control review` and `relaytic control show`, with typed intervention requests, explicit override decisions, replayable checkpoints, and causal steering memory
+- assist turns that always challenge material steering requests before rerunning or taking over instead of silently complying
+- cross-run intervention memory that can make later takeover and override behavior more skeptical when similar earlier requests proved harmful
+- MCP-visible control inspection through `relaytic_show_control` and structured assist-turn control payloads
 - visible research support inside completion, autonomy, `relaytic run`, `relaytic show`, explicit `relaytic research` surfaces, and the MCP contract
 - visible benchmark support inside completion, `relaytic run`, `relaytic show`, explicit `relaytic benchmark` surfaces, assist, runtime, and the MCP contract
 - communicative assist surfaces via `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat` so humans and agents can ask for explanations, request stage navigation, or let Relaytic take over safely
@@ -73,8 +76,6 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
-- behavioral contracts so humans and external agents can steer Relaytic without being treated as unquestionable authorities
-- causal memory that preserves intervention history, method outcomes, and downstream consequences instead of relying only on analog similarity
 - decision-system world modeling so Relaytic can reason about action cost, abstention, review load, and whether more data is better than more search
 - method compilation that turns research, memory, and operator context into executable challenger, feature, split, and benchmark templates
 - imported-incumbent challenge paths so Relaytic can evaluate and try to beat existing models, prediction sets, scorecards, or rulesets under the same contract
@@ -258,6 +259,15 @@ The most important not-yet-implemented shifts after the current baseline are:
 - added `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat`
 - added `assist_mode.json`, `assist_session_state.json`, `assistant_connection_guide.json`, and `assist_turn_log.jsonl`
 - implemented deterministic explanation, stage navigation, and bounded takeover over the current Relaytic artifact graph instead of a hidden chat-only shell
+
+### Slice 10C
+
+- added `src/relaytic/control/` with typed intervention contracts, skeptical challenge reports, override decisions, recovery checkpoints, control-injection audit, intervention ledgers, and causal steering-memory artifacts
+- added `relaytic control review` and `relaytic control show`
+- added `intervention_request.json`, `intervention_contract.json`, `control_challenge_report.json`, `override_decision.json`, `intervention_ledger.json`, `recovery_checkpoint.json`, `control_injection_audit.json`, `causal_memory_index.json`, `intervention_memory_log.json`, `outcome_memory_graph.json`, and `method_memory_index.json`
+- upgraded `relaytic assist turn` so navigation stays easy, but takeover and other truth-bearing steering requests are challenged, checkpointed, accepted-with-modification, deferred, or rejected explicitly
+- upgraded run summaries and MCP inspection so humans and external agents can see control posture and replayable override state without scraping prose
+- added targeted Slice 10C agent, CLI, assist-regression, access-surface, and MCP tests
 - integrated lightweight local-LLM guidance and local host-connection guidance without making semantic assist mandatory
 - upgraded the MCP contract so external agents can use the same communicative assist surface non-interactively
 - added targeted Slice 09E CLI and interoperability tests

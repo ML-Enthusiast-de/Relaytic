@@ -162,6 +162,18 @@ profiles:
   require_visible_budget_consumption: true
   quality_review_mode: explicit_contracts
 
+control:
+  enabled: true
+  allow_navigation_without_challenge: true
+  challenge_material_requests: true
+  checkpoint_before_override: true
+  reject_policy_bypass: true
+  skeptical_takeover_enabled: true
+  causal_memory_enabled: true
+  cross_run_memory_enabled: true
+  max_prior_runs: 12
+  max_ledger_entries: 40
+
 prompts:
   analyst_system_path: ""
   modeler_system_path: ""

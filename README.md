@@ -40,12 +40,10 @@ The repository already supports a working early product baseline:
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10 and 10B are now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; keep rollback-ready casebook state; and make quality gates, budget posture, and operator/lab profile overlays explicit. The next load-bearing implementation step is now Slice 10C: behavioral contracts, skeptical steering, and causal memory, followed by Slice 10A decision-world modeling.
+Slices 10, 10B, and 10C are now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; make quality gates and budget posture explicit; and challenge human or external-agent steering through typed intervention contracts, override decisions, replayable checkpoints, and causal steering memory. The next load-bearing implementation step is now Slice 10A: decision-world modeling and method compilation.
 
 The next frontier upgrades are:
 
-- behavioral contracts so humans and external agents can steer Relaytic without being treated as unquestionable authorities
-- causal memory that preserves intervention history, method outcomes, and downstream consequences instead of only analog similarity
 - decision-world modeling that distinguishes better score from better downstream action
 - method compilation that turns research, memory, and operator context into executable challenger and feature plans
 - imported-incumbent challenge paths so Relaytic can evaluate and try to beat existing models, prediction sets, scorecards, or rulesets under the same contract

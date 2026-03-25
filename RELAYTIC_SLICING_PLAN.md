@@ -208,9 +208,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 11, including Slice 10 feedback assimilation/outcome learning and Slice 10B explicit quality-budget-profile contracts
-- next execution target: Slice 10C
-- next decision-lab follow-on after Slice 10C: Slice 10A
+- implemented baseline: Slice 00 through Slice 11, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, and Slice 10C skeptical behavioral control contracts
+- next execution target: Slice 10A
 - next proof follow-on after Slice 10A: Slice 11A
 - next adaptive follow-on after Slice 11A: Slice 12
 - next pulse follow-on after Slice 12: Slice 12A
@@ -1010,6 +1009,9 @@ Profile discipline:
 - profile overlays must not silently force model-family choices, falsify metrics, or bypass the deterministic floor
 
 ## Slice 10C - Behavioral contracts, skeptical steering, and causal memory
+
+Status:
+- implemented
 
 Goal:
 - intervention contracts

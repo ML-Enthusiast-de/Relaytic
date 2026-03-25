@@ -2,16 +2,23 @@
 
 ## Status
 
-Planned.
+Implemented.
 
-Intended package boundaries:
+Implemented package boundaries:
+
+- `src/relaytic/control/`
+- `src/relaytic/assist/` (control-aware navigation and override handling)
+- `src/relaytic/interoperability/` (shared control inspection and assist/MCP parity)
+- `src/relaytic/runtime/` (control-stage events and recovery-checkpoint visibility)
+
+Additional touched boundaries:
 
 - `src/relaytic/control/`
 - `src/relaytic/memory/` (extension for causal/intervention/outcome/method memory)
 - `src/relaytic/assist/` (control-aware navigation and override handling)
 - `src/relaytic/runtime/` (recovery checkpoints and control-ledger wiring)
 
-Intended artifacts:
+Implemented artifacts:
 
 - `intervention_request.json`
 - `intervention_contract.json`
