@@ -36,6 +36,7 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - can act autonomously when the user prefers delegation
 - treats every meaningful human or external-agent steering action as an inspectable intervention request that can be challenged, accepted, modified, deferred, rejected, checkpointed, and remembered rather than blindly obeyed
 - can run as a bounded session or as an explicit long-running daemon/service when the user wants continuous operation
+- can optionally run a bounded periodic lab pulse that inspects local state, watches for relevant innovations or stale evidence, and queues safe follow-up without silently changing core behavior
 - uses a coordinated team of specialist agents rather than a single planner
 - investigates unknown datasets before committing to modeling assumptions
 - supports multiple modeling routes, not just one narrow pipeline
@@ -167,6 +168,7 @@ They are:
 - **imported incumbent challenge tracks** so Relaytic can beat real existing models instead of only generic baselines
 - a **richer search controller** that chooses broader challenger ecology, HPO depth, calibration breadth, and abstention policy under explicit budgets rather than fixed narrow search
 - **outcome learning**, not just run learning, so Relaytic improves from interventions taken, overrides, downstream results, and false-positive/false-negative consequences
+- a **lab pulse** that can periodically inspect runtime state, benchmark debt, research freshness, and memory health, then queue bounded safe follow-up without unsupervised drift
 - a **richer data-understanding fabric** that can reason about nearby sources, join candidates, entity histories, and what additional data would reduce uncertainty most
 - a **mission-control surface** that shows branch structure, confidence map, intervention history, incumbent-versus-Relaytic state, what changed because of memory, intelligence, research, or feedback, and what Relaytic would do next
 - benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, lifecycle constraints, and decision usefulness actually matter

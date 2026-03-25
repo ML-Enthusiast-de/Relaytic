@@ -155,6 +155,8 @@ If a later slice adds "smartness" without strengthening at least one of those pr
   once Slice 10A lands, one case where research, memory, or operator notes compile into an executable challenger, feature, split, or benchmark template rather than only a report
 - **incumbent-challenge path**
   once Slice 11A lands, one case where a user or external agent imports an existing model, prediction set, scorecard, or ruleset as the incumbent and Relaytic honestly reports whether it can beat it under the same local split and metric contract
+- **pulse path**
+  once Slice 12A lands, one case where Relaytic wakes on a bounded schedule, notices something worth attention, writes explicit recommendations or watchlists, and either safely skips or queues one bounded follow-up without silently mutating core behavior
 - **mission-control path**
   once Slice 15 lands, one case where a human or external agent can see branch structure, confidence, and change attribution without reading the entire artifact tree
 
@@ -178,10 +180,11 @@ Stable slice numbering stays the same, but the preferred execution order after S
 14. Slice 10A
 15. Slice 11A
 16. Slice 12
-17. Slice 13
-18. Slice 14
-19. Slice 15
-20. Slice 16
+17. Slice 12A
+18. Slice 13
+19. Slice 14
+20. Slice 15
+21. Slice 16
 
 Why:
 
@@ -200,6 +203,7 @@ Why:
 - Slice 10C should now come before Slice 10A because Relaytic needs skeptical steering, intervention contracts, causal memory, and control-injection defenses before it expands decision authority again
 - Slice 10A is the category-shift slice that turns Relaytic from a governed model/evaluation engine into a decision-and-discovery engine with compiled methods and data-acquisition reasoning
 - Slice 11A turns Relaytic's benchmark and challenger story into something much more real for operators and recruiters by letting users attach an incumbent model and forcing Relaytic to beat it honestly
+- Slice 12A should come after dojo because periodic awareness, innovation watching, and bounded background follow-up are much safer once self-improvement stays quarantined and promotion rules already exist
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
@@ -209,7 +213,8 @@ Why:
 - next decision-lab follow-on after Slice 10C: Slice 10A
 - next proof follow-on after Slice 10A: Slice 11A
 - next adaptive follow-on after Slice 11A: Slice 12
-- next scale-and-search follow-on after Slice 12: Slice 13
+- next pulse follow-on after Slice 12: Slice 12A
+- next scale-and-search follow-on after Slice 12A: Slice 13
 - late optional representation follow-on after Slice 15: Slice 16
 
 ## Slice 00 - Normalization and contract freeze
@@ -1311,6 +1316,75 @@ Minimum proof:
 Innovation hook:
 
 - Relaytic should self-improve like a lab, not mutate like an unstable agent demo
+
+## Slice 12A - Lab Pulse, periodic awareness, and bounded proactive follow-up
+
+Goal:
+- scheduled lab pulse
+- bounded periodic awareness
+- innovation watch
+- challenge watchlists
+- safe background maintenance and queueing
+
+Load-bearing improvement:
+
+- Relaytic should be able to wake up on a bounded schedule, inspect its local artifact universe, detect stale runs, benchmark debt, new relevant methods, data freshness issues, or memory-maintenance needs, and either recommend or queue safe bounded follow-up without silently drifting its core behavior
+
+Human surface:
+
+- humans should be able to inspect the pulse schedule, pulse reasons, skipped versus executed pulse runs, innovation-watch findings, queued follow-ups, and why Relaytic did or did not act
+
+Agent surface:
+
+- external agents should be able to read pulse recommendations, watchlists, skip reasons, and queued follow-up actions as stable artifacts and optionally trigger the same pulse manually
+
+Intelligence source:
+
+- runtime state, stage/event history, benchmark gaps, research memory, causal memory, dojo proposals, local source freshness, and policy-gated redacted innovation retrieval
+
+Fallback rule:
+
+- if a richer pulse input is unavailable, Relaytic should record that it skipped or reduced the pulse rather than inventing urgency or silently doing nothing
+
+Required outputs:
+- `pulse_schedule.json`
+- `pulse_run_report.json`
+- `pulse_skip_report.json`
+- `pulse_recommendations.json`
+- `innovation_watch_report.json`
+- `challenge_watchlist.json`
+- `pulse_checkpoint.json`
+
+Required behavior:
+
+- the pulse must be policy-gated, explicitly scheduled, and stoppable
+- pulse should distinguish observe-only, propose-only, and bounded-execute modes
+- pulse must not silently mutate defaults, promote dojo outputs, or rewrite core contracts
+- pulse may safely trigger only bounded low-risk work by default, such as memory compaction/flush, benchmark refresh recommendation, research gather recommendation, challenge queue refresh, or stale-run review queueing
+- heavier actions should require either existing autonomy/control contracts or remain as explicit recommendations
+- innovation watch must stay rowless and redacted by default for any external retrieval
+- pulse runs must leave explicit skip reasons when nothing useful was done, so the system does not look alive through empty churn
+- mission-control and assist surfaces should later expose pulse history and next queued pulse actions directly
+
+First implementation moves:
+
+1. Add a pulse scheduler and pulse-run ledger over the local runtime/event system.
+2. Add policy controls for disabled, observe-only, propose-only, and bounded-execute pulse modes.
+3. Add innovation-watch gathering over research memory, benchmark gaps, and redacted external method retrieval.
+4. Add challenge watchlists for stale champions, unclosed benchmark gaps, and untested incumbent beat-targets.
+5. Add memory-maintenance and queue-refresh actions as the first bounded pulse actions.
+6. Add skip-report and throttle logic so pulse avoids busy-loop theater.
+
+Minimum proof:
+
+- one case where pulse wakes, finds nothing worth doing, and records an explicit skip report
+- one case where pulse notices stale or weak state and writes a challenge watchlist without taking unsafe action
+- one case where pulse queues one bounded low-risk follow-up through explicit policy
+- one case where innovation watch surfaces a new method or benchmark lead through redacted retrieval without leaking private data
+
+Innovation hook:
+
+- this is the slice that makes Relaytic feel like a living lab without turning it into an unsupervised drift engine
 
 ## Slice 13 - Search controller, accelerated execution, and distributed local experimentation
 

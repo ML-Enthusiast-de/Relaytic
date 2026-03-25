@@ -82,6 +82,7 @@ Start with:
 11. benchmark parity and reference approaches
 11A. imported incumbents and bring-your-own challenger baselines
 12. dojo mode and guarded self-improvement
+12A. lab pulse, periodic awareness, and bounded proactive follow-up
 13. search controller, accelerated execution, and distributed local experimentation
 14. real-world feasibility, domain constraints, and action boundaries
 15. mission control, packaging, integrations, demos, and polish
@@ -108,10 +109,11 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 15. Slice 10A
 16. Slice 11A
 17. Slice 12
-18. Slice 13
-19. Slice 14
-20. Slice 15
-21. Slice 16
+18. Slice 12A
+19. Slice 13
+20. Slice 14
+21. Slice 15
+22. Slice 16
 
 Reason:
 
@@ -131,6 +133,7 @@ Reason:
 - Slice 10C should now come next because Relaytic needs skeptical intervention handling, recovery checkpoints, causal memory, and control-injection resistance before it expands decision authority again
 - Slice 10A is the category-shift slice where Relaytic begins modeling the downstream decision system, compiling methods into executable experiments, and reasoning about what additional data is worth pulling
 - Slice 11A makes Relaytic much easier to adopt and demo because it can take a real incumbent model from the operator and try to beat it honestly under the same contract
+- Slice 12A should come after dojo because periodic awareness and bounded background follow-up are much safer once self-improvement already has quarantine and promotion rules
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:
@@ -140,6 +143,8 @@ Current repo state:
 - next decision-lab follow-on after Slice 10C: Slice 10A
 - next proof follow-on after Slice 10A: Slice 11A
 - next adaptive follow-on after Slice 11A: Slice 12
+- next pulse follow-on after Slice 12: Slice 12A
+- next scale-and-search follow-on after Slice 12A: Slice 13
 
 ## MVP boundary
 
@@ -189,6 +194,7 @@ If the goal is to turn the current implementation into something that looks genu
 - causal memory that preserves interventions, method outcomes, and downstream consequences rather than only analog similarity
 - a method compiler that turns research, memory, and operator context into executable challenger and feature templates
 - imported-incumbent challenge paths so Relaytic can beat real existing systems instead of only abstract baselines
+- a lab pulse that can periodically inspect local state, benchmark debt, research freshness, and memory health, then queue bounded safe follow-up without unsupervised drift
 - outcome learning rather than run-only learning
 - richer data-fabric reasoning that can suggest joins, entity histories, or additional data before wasting search budget
 - a stronger search controller that widens or prunes branches based on expected decision value under budget

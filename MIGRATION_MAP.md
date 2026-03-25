@@ -211,6 +211,7 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/decision/` for Slice 10A decision-world models, intervention policy, value-of-more-data reasoning, and decision-usefulness synthesis
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, and bounded pulse-run persistence
 - `src/relaytic/mission_control/` for Slice 15 branch DAG, confidence map, change attribution, and later professional operator surfaces
 - `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
@@ -242,6 +243,13 @@ Reserved future artifact names:
 - `external_challenger_evaluation.json`
 - `incumbent_parity_report.json`
 - `beat_target_contract.json`
+- `pulse_schedule.json`
+- `pulse_run_report.json`
+- `pulse_skip_report.json`
+- `pulse_recommendations.json`
+- `innovation_watch_report.json`
+- `challenge_watchlist.json`
+- `pulse_checkpoint.json`
 - `mission_control_state.json`
 - `branch_dag.json`
 - `confidence_map.json`

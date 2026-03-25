@@ -47,6 +47,7 @@ Reserved future boundaries:
 - `src/relaytic/decision/` should own Slice 10A decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` should own Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` should own Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/pulse/` should own Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, and bounded pulse-run persistence
 - `src/relaytic/mission_control/` should own Slice 15 mission-control state, branch DAG, confidence map, and change-attribution surfaces
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
@@ -84,6 +85,7 @@ These files are required and must stay current:
 - `docs/build_slices/phase_10a.md`
 - `docs/build_slices/phase_11.md`
 - `docs/build_slices/phase_11a.md`
+- `docs/build_slices/phase_12a.md`
 - `docs/build_slices/phase_16.md`
 
 ## Artifact Contract
@@ -232,6 +234,13 @@ Reserved future artifact names:
 - `external_challenger_evaluation.json`
 - `incumbent_parity_report.json`
 - `beat_target_contract.json`
+- `pulse_schedule.json`
+- `pulse_run_report.json`
+- `pulse_skip_report.json`
+- `pulse_recommendations.json`
+- `innovation_watch_report.json`
+- `challenge_watchlist.json`
+- `pulse_checkpoint.json`
 - `mission_control_state.json`
 - `branch_dag.json`
 - `confidence_map.json`

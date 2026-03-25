@@ -49,6 +49,7 @@ The next frontier upgrades are:
 - decision-world modeling that distinguishes better score from better downstream action
 - method compilation that turns research, memory, and operator context into executable challenger and feature plans
 - imported-incumbent challenge paths so Relaytic can evaluate and try to beat existing models, prediction sets, scorecards, or rulesets under the same contract
+- a lab pulse that can periodically inspect local state, watch for new relevant methods or benchmark debt, and queue bounded safe follow-up without silent drift
 - local data-fabric reasoning that can suggest joins, entity histories, and additional local data before wasting search budget
 - mission-control surfaces that show branch structure, confidence, and change attribution to humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive models as one promising backend family
