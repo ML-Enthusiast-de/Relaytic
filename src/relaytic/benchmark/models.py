@@ -10,6 +10,10 @@ BENCHMARK_CONTROLS_SCHEMA_VERSION = "relaytic.benchmark_controls.v1"
 REFERENCE_APPROACH_MATRIX_SCHEMA_VERSION = "relaytic.reference_approach_matrix.v1"
 BENCHMARK_GAP_REPORT_SCHEMA_VERSION = "relaytic.benchmark_gap_report.v1"
 BENCHMARK_PARITY_REPORT_SCHEMA_VERSION = "relaytic.benchmark_parity_report.v1"
+EXTERNAL_CHALLENGER_MANIFEST_SCHEMA_VERSION = "relaytic.external_challenger_manifest.v1"
+EXTERNAL_CHALLENGER_EVALUATION_SCHEMA_VERSION = "relaytic.external_challenger_evaluation.v1"
+INCUMBENT_PARITY_REPORT_SCHEMA_VERSION = "relaytic.incumbent_parity_report.v1"
+BEAT_TARGET_CONTRACT_SCHEMA_VERSION = "relaytic.beat_target_contract.v1"
 
 
 @dataclass(frozen=True)
@@ -108,6 +112,113 @@ class BenchmarkParityReport:
     relaytic_family: str | None
     reference_count: int
     strong_reference_available: bool
+    incumbent_present: bool
+    incumbent_name: str | None
+    beat_target_state: str | None
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ExternalChallengerManifest:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    incumbent_name: str | None
+    incumbent_kind: str | None
+    adapter_family: str | None
+    source_path: str | None
+    executable_locally: bool
+    reduced_claim: bool
+    same_contract_possible: bool
+    evaluation_scope: str
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ExternalChallengerEvaluation:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    incumbent_name: str | None
+    incumbent_kind: str | None
+    evaluation_mode: str
+    comparison_metric: str | None
+    metric_direction: str | None
+    reevaluated_locally: bool
+    reduced_claim: bool
+    evaluation_scope: str
+    train_metric: dict[str, Any]
+    validation_metric: dict[str, Any]
+    test_metric: dict[str, Any]
+    decision_threshold: float | None
+    reason_codes: list[str]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class IncumbentParityReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    incumbent_present: bool
+    incumbent_name: str | None
+    incumbent_kind: str | None
+    parity_status: str
+    comparison_metric: str | None
+    recommended_action: str
+    relaytic_beats_incumbent: bool
+    incumbent_stronger: bool
+    reduced_claim: bool
+    test_gap: float | None
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BeatTargetContract:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    target_name: str | None
+    target_kind: str
+    comparison_metric: str | None
+    metric_direction: str | None
+    target_metric_value: float | None
+    relaytic_metric_value: float | None
+    contract_state: str
+    recommended_action: str
+    reduced_claim: bool
     summary: str
     trace: BenchmarkTrace
 
@@ -123,12 +234,20 @@ class BenchmarkBundle:
     reference_approach_matrix: ReferenceApproachMatrix
     benchmark_gap_report: BenchmarkGapReport
     benchmark_parity_report: BenchmarkParityReport
+    external_challenger_manifest: ExternalChallengerManifest
+    external_challenger_evaluation: ExternalChallengerEvaluation
+    incumbent_parity_report: IncumbentParityReport
+    beat_target_contract: BeatTargetContract
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "reference_approach_matrix": self.reference_approach_matrix.to_dict(),
             "benchmark_gap_report": self.benchmark_gap_report.to_dict(),
             "benchmark_parity_report": self.benchmark_parity_report.to_dict(),
+            "external_challenger_manifest": self.external_challenger_manifest.to_dict(),
+            "external_challenger_evaluation": self.external_challenger_evaluation.to_dict(),
+            "incumbent_parity_report": self.incumbent_parity_report.to_dict(),
+            "beat_target_contract": self.beat_target_contract.to_dict(),
         }
 
 

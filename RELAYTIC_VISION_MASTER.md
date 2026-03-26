@@ -3378,6 +3378,7 @@ Relaytic should expose a professional mission-control surface over its artifact 
 
 This is not cosmetic UI work.
 It is the operator and agent surface for understanding why the lab took the path it took.
+The thin version of this should arrive early as the first real control center, and later slices should deepen it rather than restarting the UI story from scratch.
 
 ### Mission-control questions
 
@@ -3392,6 +3393,7 @@ It is the operator and agent surface for understanding why the lab took the path
 ### Required behavior
 
 - mission control must consume the same canonical runtime and artifact state as CLI, MCP, and reports
+- the first usable mission-control/control-center surface should ship before later dojo/search/polish slices and then be extended by those later slices whenever operator-visible behavior changes
 - branch structure and confidence views must remain inspectable and exportable for external agents
 - change attribution must stay explicit instead of collapsing all improvements into a generic "Relaytic got smarter" story
 
@@ -4514,6 +4516,7 @@ The README must also contain a line close to:
 ## 38A. Distribution, packaging, and adoption strategy
 
 Relaytic must be easy to install, easy to try, and easy to integrate.
+That means install and first-launch UX should be treated as a core product surface, not deferred until the final polish slice.
 
 ### Primary distribution strategy
 
@@ -4628,6 +4631,7 @@ Relaytic should ship through:
 ### Acceptance criteria
 
 - a user can install Relaytic from Python packaging without Docker
+- a user can install Relaytic, verify the environment, and reach one coherent local control-center launch path without repository archaeology
 - a user can run Relaytic through Docker without setting up Python locally
 - extras keep the base install lightweight
 - packaging choices do not make heavy optional dependencies mandatory

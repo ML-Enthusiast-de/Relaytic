@@ -24,15 +24,17 @@ Relaytic is organized as a staged artifact pipeline.
    Intelligence specialists assemble capability-aware context, route bounded semantic work through explicit modes and local profiles, ground semantic work in local documents and artifacts, and emit counterposition/verifier outputs plus semantic-proof reports rather than one opaque semantic guess.
 8. Research and benchmark parity
    Research specialists retrieve redacted external method knowledge, and the benchmark layer compares Relaytic against explicit reference approaches under the same split and metric contract so the run can be judged against something real.
-9. Completion governor
+9. Decision lab
+   Decision specialists build an explicit downstream decision-world model, estimate whether more search or more local data is more valuable, derive controller posture, inspect nearby local sources and join candidates, and compile executable challenger, feature, and benchmark ideas before the final governor path commits to a next move.
+10. Completion governor
    Completion specialists fuse the full artifact graph into a visible run state, mandate-evidence review, blocking-layer diagnosis, and machine-actionable next action.
-10. Lifecycle
+11. Lifecycle
    Lifecycle specialists compare the current champion, challenger evidence, completion state, and fresh-data behavior to decide whether to keep, recalibrate, retrain, promote, or roll back.
-11. Bounded autonomy
+12. Bounded autonomy
    Autonomy specialists can execute one budgeted follow-up round such as challenger expansion, recalibration, retraining, or re-plan follow-up while keeping lineage, branch outcomes, and stop rules visible.
-12. Runtime gateway
+13. Runtime gateway
    The local runtime owns append-only event emission, checkpoints, hook audit, and capability-scoped specialist visibility so CLI and MCP share one control plane.
-13. Interoperability and host adapters
+14. Interoperability and host adapters
    Relaytic exposes the same MVP and slice-level surfaces through a host-neutral MCP server plus thin host wrappers for common agent ecosystems.
 
 ## Current Data Ingestion Boundary
@@ -149,8 +151,10 @@ The repository currently implements the following product layers:
 - Slice 11: benchmark parity, explicit reference-approach comparison, and parity-gap reporting under the same split and metric contract
 - Slice 10: feedback assimilation with validated intake, reversible effect reporting, rollback-ready casebook state, and later-run route-prior influence
 - Slice 10B: explicit quality contracts, quality-gate reports, visible budget contracts, budget-consumption reporting, and bounded operator/lab profile overlays via `relaytic profiles`
+- Slice 10C: behavioral contracts, skeptical steering, causal steering memory, and replayable override checkpoints
+- Slice 10A: decision-world modeling, controller-policy writing, value-of-more-data reasoning, local source-graph and join-candidate analysis, and executable method compilation via `relaytic decision`
 
-The next planned layer is Slice 10C: behavioral contracts, skeptical steering, and causal memory. After that, Slice 10A adds decision-world modeling, method compilation, and data-acquisition reasoning.
+The next planned layer is Slice 12: dojo mode and guarded self-improvement.
 
 ## Current Artifact Baseline
 
@@ -221,6 +225,19 @@ Relaytic already standardizes several load-bearing artifacts:
 - `research_source_inventory.json`
 - `research_brief.json`
 - `method_transfer_report.json`
+- `decision_world_model.json`
+- `controller_policy.json`
+- `handoff_controller_report.json`
+- `intervention_policy_report.json`
+- `decision_usefulness_report.json`
+- `value_of_more_data_report.json`
+- `data_acquisition_plan.json`
+- `source_graph.json`
+- `join_candidate_report.json`
+- `method_compiler_report.json`
+- `compiled_challenger_templates.json`
+- `compiled_feature_hypotheses.json`
+- `compiled_benchmark_protocol.json`
 - `benchmark_reference_report.json`
 - `external_research_audit.json`
 - `reference_approach_matrix.json`

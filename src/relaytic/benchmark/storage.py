@@ -15,6 +15,10 @@ BENCHMARK_FILENAMES = {
     "reference_approach_matrix": "reference_approach_matrix.json",
     "benchmark_gap_report": "benchmark_gap_report.json",
     "benchmark_parity_report": "benchmark_parity_report.json",
+    "external_challenger_manifest": "external_challenger_manifest.json",
+    "external_challenger_evaluation": "external_challenger_evaluation.json",
+    "incumbent_parity_report": "incumbent_parity_report.json",
+    "beat_target_contract": "beat_target_contract.json",
 }
 
 

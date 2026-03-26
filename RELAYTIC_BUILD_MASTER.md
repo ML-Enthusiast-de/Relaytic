@@ -81,12 +81,13 @@ Start with:
 10A. decision lab, method compiler, and data-acquisition reasoning
 11. benchmark parity and reference approaches
 11A. imported incumbents and bring-your-own challenger baselines
+11B. mission control MVP, onboarding, and one-command install
 12. dojo mode and guarded self-improvement
 12A. lab pulse, periodic awareness, and bounded proactive follow-up
 12B. first-class tracing, agent evaluation, and runtime security harnesses
 13. search controller, accelerated execution, and distributed local experimentation
 14. real-world feasibility, domain constraints, and action boundaries
-15. mission control, packaging, integrations, demos, and polish
+15. mission-control expansion, packaging, integrations, demos, and polish
 16. representation engines, JEPA-style latent world models, and unlabeled local corpora
 
 ## Preferred post-MVP execution order
@@ -109,13 +110,14 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 14. Slice 10C
 15. Slice 10A
 16. Slice 11A
-17. Slice 12
-18. Slice 12A
-19. Slice 12B
-20. Slice 13
-21. Slice 14
-22. Slice 15
-23. Slice 16
+17. Slice 11B
+18. Slice 12
+19. Slice 12A
+20. Slice 12B
+21. Slice 13
+22. Slice 14
+23. Slice 15
+24. Slice 16
 
 Reason:
 
@@ -133,21 +135,22 @@ Reason:
 - Slice 10 lets Relaytic learn from what happened after predictions, not just from what happened inside one run
 - Slice 10B makes quality gates, budget posture, and profile overlays explicit before decision-world modeling and broader search depend on them
 - Slice 10C now lands the skeptical intervention layer, so Relaytic can expand decision authority next without becoming a compliant shell
-- Slice 10A is the category-shift slice where Relaytic begins modeling the downstream decision system, compiling methods into executable experiments, and reasoning about what additional data is worth pulling
+- Slice 10A is now implemented and gives Relaytic an explicit decision lab, controller-policy layer, data-acquisition reasoning, and method compilation instead of leaving downstream action logic implicit
 - Slice 11A makes Relaytic much easier to adopt and demo because it can take a real incumbent model from the operator and try to beat it honestly under the same contract
+- Slice 11B should now come before Slice 12 because Relaytic needs a thin but real operator cockpit and a low-friction install/onboarding path before dojo and later frontier slices are worth showing publicly
 - Slice 12A should come after dojo because periodic awareness and bounded background follow-up are much safer once self-improvement already has quarantine and promotion rules
-- Slice 12B should come before Slice 13 and Slice 15 because Relaytic needs one canonical trace substrate plus explicit agent/security evaluation before wider search and mission-control claims become credible
+- Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because Relaytic needs one canonical trace substrate plus explicit agent/security evaluation before wider search and full trace-explorer claims become credible
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:
 
-- implemented through Slice 11, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, and Slice 10C skeptical behavioral control now landed
-- next execution target: Slice 10A
-- next proof follow-on after Slice 10A: Slice 11A
-- next adaptive follow-on after Slice 11A: Slice 12
+- implemented through Slice 11A, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, and Slice 11A imported-incumbent challenge support now landed
+- next execution target: Slice 11B
+- next self-improvement follow-on after Slice 11B: Slice 12
 - next pulse follow-on after Slice 12: Slice 12A
 - next trace-and-safety follow-on after Slice 12A: Slice 12B
 - next scale-and-search follow-on after Slice 12B: Slice 13
+- after Slice 11B lands, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control and onboarding surfaces rather than leaving the UI stale until late polish
 
 ## MVP boundary
 
@@ -208,7 +211,7 @@ If the goal is to turn the current implementation into something that looks genu
 - an optional representation engine that can learn from large unlabeled local corpora and improve retrieval, anomaly support, and temporal state understanding without replacing deterministic adjudication
 
 Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.
-Slices 10, 10B, 10C, 10A, and 11A are the next category-shift unlocks that can turn Relaytic from a governed inference lab into a genuine decision-and-discovery system with skeptical steering and real incumbent pressure.
+Slices 10, 10B, 10C, and 10A are the current category-shift unlocks that turned Relaytic from a governed inference lab into a more explicit decision-and-discovery system with skeptical steering. Slice 11A added real incumbent pressure, and Slice 11B is the next adoption unlock because it turns that system into something humans and external agents can launch, steer, and demo from one coherent control surface.
 Slice 16 is a long-range optional frontier bet, not a prerequisite for the core lab thesis.
 
 ## Source of truth precedence

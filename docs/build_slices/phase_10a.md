@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 Intended package boundaries:
 
@@ -25,6 +25,16 @@ Intended artifacts:
 - `compiled_challenger_templates.json`
 - `compiled_feature_hypotheses.json`
 - `compiled_benchmark_protocol.json`
+
+Public commands:
+
+- `relaytic decision review`
+- `relaytic decision show`
+
+MCP-visible surfaces:
+
+- `relaytic_review_decision`
+- `relaytic_show_decision`
 
 ## Intent
 
@@ -83,6 +93,22 @@ Slice 10A is acceptable only if:
 3. one case shows Relaytic preferring additional local data or a join candidate over broader search
 4. one case records explicit uncertainty because the decision environment is under-specified
 5. one case shows Relaytic changing branch depth, reviewer involvement, or the next acting specialist because the controller logic said it mattered
+
+## Implementation Notes
+
+Slice 10A is now implemented as:
+
+- `src/relaytic/decision/` for decision-world modeling, controller policy, handoff/intervention policy synthesis, and decision-usefulness reporting
+- `src/relaytic/compiler/` for compiled challenger templates, compiled feature hypotheses, and compiled benchmark-protocol changes
+- `src/relaytic/data_fabric/` for nearby local-source discovery, source-graph writing, join-candidate analysis, and acquisition planning
+
+The current shipped flow is:
+
+1. read the run's planning, research, memory, control, benchmark, profile, and autonomy context
+2. write a provisional but explicit decision world model
+3. inspect nearby local staged data and derive join or acquisition options without leaving the local boundary
+4. compile executable challenger, feature, and benchmark ideas from current artifacts rather than leaving method transfer as narrative only
+5. write controller and usefulness artifacts that can change the visible next-step recommendation in `relaytic show` and autonomy follow-up
 
 ## Required Verification
 

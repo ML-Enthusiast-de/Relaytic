@@ -69,6 +69,14 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                             is not None
                         )
 
+                        benchmark_result = await session.call_tool(
+                            "relaytic_show_benchmark",
+                            {"run_dir": str(run_dir)},
+                        )
+                        benchmark_payload = _structured_payload(benchmark_result)
+                        assert benchmark_payload["surface_payload"]["status"] == "ok"
+                        assert "incumbent_present" in benchmark_payload["surface_payload"]["benchmark"]
+
                         runtime_result = await session.call_tool(
                             "relaytic_show_runtime",
                             {"run_dir": str(run_dir), "limit": 12},
@@ -93,6 +101,14 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         control_payload = _structured_payload(control_result)
                         assert control_payload["surface_payload"]["status"] == "ok"
                         assert control_payload["surface_payload"]["control"]["decision"] is not None
+
+                        decision_result = await session.call_tool(
+                            "relaytic_show_decision",
+                            {"run_dir": str(run_dir)},
+                        )
+                        decision_payload = _structured_payload(decision_result)
+                        assert decision_payload["surface_payload"]["status"] == "ok"
+                        assert decision_payload["surface_payload"]["decision_lab"]["selected_next_action"] is not None
 
                         autonomy_result = await session.call_tool(
                             "relaytic_show_autonomy",

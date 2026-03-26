@@ -57,6 +57,8 @@ def run_autonomy_loop(
     lifecycle_bundle: dict[str, Any],
     research_bundle: dict[str, Any] | None = None,
     intelligence_bundle: dict[str, Any] | None = None,
+    decision_bundle: dict[str, Any] | None = None,
+    benchmark_bundle: dict[str, Any] | None = None,
 ) -> AutonomyRunResult:
     """Execute one bounded second-pass loop for the current Relaytic run."""
 
@@ -64,6 +66,8 @@ def run_autonomy_loop(
     root = Path(run_dir)
     research_bundle = research_bundle or {}
     intelligence_bundle = intelligence_bundle or {}
+    decision_bundle = decision_bundle or {}
+    benchmark_bundle = benchmark_bundle or {}
     trace = AutonomyTrace(
         agent="autonomy_controller",
         operating_mode="bounded_followup_loop",
@@ -84,6 +88,8 @@ def run_autonomy_loop(
     method_transfer = _bundle_item(research_bundle, "method_transfer_report")
     semantic_debate = _bundle_item(intelligence_bundle, "semantic_debate_report")
     uncertainty = _bundle_item(intelligence_bundle, "semantic_uncertainty_report")
+    decision_value = _bundle_item(decision_bundle, "value_of_more_data_report")
+    beat_target = _bundle_item(benchmark_bundle, "beat_target_contract")
     local_data_candidates = _find_local_data_candidates(
         data_path=data_path,
         target_column=_clean_text(current_plan.get("target_column")),
@@ -96,6 +102,8 @@ def run_autonomy_loop(
         research_brief=research_brief,
         semantic_debate=semantic_debate,
         uncertainty=uncertainty,
+        decision_value=decision_value,
+        beat_target=beat_target,
         local_data_candidates=local_data_candidates,
     )
     queue = _build_branch_queue(
@@ -105,6 +113,7 @@ def run_autonomy_loop(
         execution_summary=execution_summary,
         research_bundle=research_bundle,
         semantic_debate=semantic_debate,
+        decision_bundle=decision_bundle,
         local_data_candidates=local_data_candidates,
         data_path=data_path,
     )
@@ -256,6 +265,8 @@ def _choose_action(
     research_brief: dict[str, Any],
     semantic_debate: dict[str, Any],
     uncertainty: dict[str, Any],
+    decision_value: dict[str, Any],
+    beat_target: dict[str, Any],
     local_data_candidates: list[dict[str, Any]],
 ) -> str:
     if not controls.enabled or not controls.allow_auto_run:
@@ -266,12 +277,29 @@ def _choose_action(
     research_action = _clean_text(research_brief.get("recommended_followup_action"))
     semantic_action = _clean_text(semantic_debate.get("recommended_followup_action"))
     completion_action = _clean_text(completion.get("action"))
-    if semantic_action == "run_recalibration_pass" or research_action == "run_recalibration_pass":
-        return "run_recalibration_pass"
+    decision_strategy = _clean_text(decision_value.get("selected_strategy"))
+    beat_target_state = _clean_text(beat_target.get("contract_state"))
+    beat_target_action = _clean_text(beat_target.get("recommended_action"))
     if _clean_text(lifecycle_recal.get("action")) == "recalibrate":
         return "run_recalibration_pass"
     if _clean_text(lifecycle_retrain.get("action")) == "retrain":
         return "run_retrain_pass"
+    if beat_target_state == "unmet" and beat_target_action in {
+        "expand_challenger_portfolio",
+        "run_recalibration_pass",
+        "run_retrain_pass",
+    }:
+        return beat_target_action
+    if decision_strategy == "additional_local_data" and (
+        local_data_candidates or _clean_text(decision_value.get("recommended_data_path"))
+    ):
+        return "run_retrain_pass"
+    if decision_strategy == "broader_search":
+        return "expand_challenger_portfolio"
+    if decision_strategy == "operator_review":
+        return "hold_current_route"
+    if semantic_action == "run_recalibration_pass" or research_action == "run_recalibration_pass":
+        return "run_recalibration_pass"
     if semantic_action in {"run_retrain_pass", "run_recalibration_pass", "expand_challenger_portfolio", "collect_more_data", "benchmark_needed"}:
         if semantic_action == "collect_more_data" and local_data_candidates:
             return "run_retrain_pass"
@@ -299,6 +327,7 @@ def _build_branch_queue(
     execution_summary: dict[str, Any],
     research_bundle: dict[str, Any],
     semantic_debate: dict[str, Any],
+    decision_bundle: dict[str, Any],
     local_data_candidates: list[dict[str, Any]],
     data_path: str,
 ) -> list[dict[str, Any]]:
@@ -309,6 +338,8 @@ def _build_branch_queue(
     verifier = dict(semantic_debate.get("verifier_verdict") or {})
     if isinstance(verifier.get("preferred_model_family"), str):
         preferred_family = _clean_text(verifier.get("preferred_model_family"))
+    compiled_templates = _bundle_item(decision_bundle, "compiled_challenger_templates")
+    value_of_more_data = _bundle_item(decision_bundle, "value_of_more_data_report")
     method_transfer = _bundle_item(research_bundle, "method_transfer_report")
     research_families = [
         _clean_text(item.get("value"))
@@ -339,7 +370,11 @@ def _build_branch_queue(
             }
         )
     elif selected_action == "run_retrain_pass":
-        retrain_data_path = local_data_candidates[0]["data_path"] if local_data_candidates else base_data_path
+        retrain_data_path = (
+            _clean_text(value_of_more_data.get("recommended_data_path"))
+            or (local_data_candidates[0]["data_path"] if local_data_candidates else None)
+            or base_data_path
+        )
         queue.append(
             {
                 "branch_id": "round01_retrain",
@@ -369,7 +404,12 @@ def _build_branch_queue(
                     }
                 )
     elif selected_action == "expand_challenger_portfolio":
-        ordered = [item for item in research_families + [preferred_family] + candidates if item and item != current_family]
+        compiled_families = [
+            _clean_text(item.get("requested_model_family"))
+            for item in compiled_templates.get("templates", [])
+            if isinstance(item, dict)
+        ]
+        ordered = [item for item in compiled_families + research_families + [preferred_family] + candidates if item and item != current_family]
         seen: set[str] = set()
         for family in ordered:
             if family in seen:

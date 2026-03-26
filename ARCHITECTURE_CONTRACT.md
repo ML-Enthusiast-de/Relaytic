@@ -40,17 +40,17 @@ Current canonical boundaries:
 - `src/relaytic/feedback/` owns Slice 10 validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook state
 - `src/relaytic/profiles/` owns Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
 - `src/relaytic/control/` owns Slice 10C intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, control-ledger persistence, and causal steering-memory artifacts
+- `src/relaytic/decision/` owns Slice 10A decision-world models, intervention policy, decision usefulness, controller-policy writing, and value-of-more-data reasoning
+- `src/relaytic/compiler/` owns Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
+- `src/relaytic/data_fabric/` owns Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` now also own Slice 11A imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts
 
 Reserved future boundaries:
 
-- Slice 11A should extend `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` before introducing any separate greenfield package for incumbent-challenge support
-- `src/relaytic/decision/` should own Slice 10A decision-world models, intervention policy, decision usefulness, and value-of-more-data reasoning
-- `src/relaytic/compiler/` should own Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
-- `src/relaytic/data_fabric/` should own Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/mission_control/` should own Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, and later Slice 15 branch DAG, confidence map, trace exploration, and change-attribution surfaces
 - `src/relaytic/pulse/` should own Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
 - `src/relaytic/tracing/` should own Slice 12B canonical trace schemas, specialist/tool/intervention/branch span persistence, and replay/query surfaces
 - `src/relaytic/evals/` should own Slice 12B agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs
-- `src/relaytic/mission_control/` should own Slice 15 mission-control state, branch DAG, confidence map, trace exploration, review-queue state, and change-attribution surfaces
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
@@ -87,6 +87,7 @@ These files are required and must stay current:
 - `docs/build_slices/phase_10a.md`
 - `docs/build_slices/phase_11.md`
 - `docs/build_slices/phase_11a.md`
+- `docs/build_slices/phase_11b.md`
 - `docs/build_slices/phase_12.md`
 - `docs/build_slices/phase_12a.md`
 - `docs/build_slices/phase_12b.md`
@@ -217,15 +218,6 @@ The current slices must preserve these names:
 - `reference_approach_matrix.json`
 - `benchmark_gap_report.json`
 - `benchmark_parity_report.json`
-- `assist_mode.json`
-- `assist_session_state.json`
-- `assistant_connection_guide.json`
-- `assist_turn_log.jsonl`
-- `context_assembly_report.json`
-- `doc_grounding_report.json`
-
-Reserved future artifact names:
-
 - `decision_world_model.json`
 - `controller_policy.json`
 - `handoff_controller_report.json`
@@ -239,10 +231,23 @@ Reserved future artifact names:
 - `compiled_challenger_templates.json`
 - `compiled_feature_hypotheses.json`
 - `compiled_benchmark_protocol.json`
-- `external_challenger_manifest.json`
-- `external_challenger_evaluation.json`
-- `incumbent_parity_report.json`
-- `beat_target_contract.json`
+- `assist_mode.json`
+- `assist_session_state.json`
+- `assistant_connection_guide.json`
+- `assist_turn_log.jsonl`
+- `context_assembly_report.json`
+- `doc_grounding_report.json`
+
+Reserved future artifact names:
+
+- `mission_control_state.json`
+- `review_queue_state.json`
+- `control_center_layout.json`
+- `onboarding_status.json`
+- `install_experience_report.json`
+- `launch_manifest.json`
+- `demo_session_manifest.json`
+- `ui_preferences.json`
 - `pulse_schedule.json`
 - `pulse_run_report.json`
 - `pulse_skip_report.json`
@@ -264,11 +269,9 @@ Reserved future artifact names:
 - `red_team_report.json`
 - `hpo_campaign_report.json`
 - `search_decision_ledger.json`
-- `mission_control_state.json`
 - `branch_dag.json`
 - `confidence_map.json`
 - `change_attribution_report.json`
-- `review_queue_state.json`
 - `trace_explorer_state.json`
 - `branch_replay_index.json`
 - `representation_engine_profile.json`

@@ -80,6 +80,19 @@ _STAGE_PLAN: dict[str, dict[str, Any]] = {
             "run_brief.json",
         ],
     },
+    "decision": {
+        "specialists": ["decision_lab"],
+        "input_artifacts": [
+            "benchmark_parity_report.json",
+            "quality_contract.json",
+            "quality_gate_report.json",
+            "override_decision.json",
+            "route_prior_context.json",
+            "research_brief.json",
+            "semantic_debate_report.json",
+            "plan.json",
+        ],
+    },
     "completion": {
         "specialists": ["completion_governor"],
         "input_artifacts": ["audit_report.json", "belief_update.json", "route_prior_context.json", "memory_retrieval.json", "benchmark_parity_report.json", "run_summary.json"],
@@ -800,6 +813,8 @@ def _infer_existing_stage(root: Path) -> str:
         return "lifecycle_reviewed"
     if (root / "benchmark_parity_report.json").exists():
         return "benchmark_reviewed"
+    if (root / "decision_world_model.json").exists():
+        return "decision_reviewed"
     if (root / "research_brief.json").exists():
         return "research_reviewed"
     if (root / "semantic_debate_report.json").exists():
@@ -825,6 +840,8 @@ def _resolve_runtime_stage_label(root: Path, *, latest_stage: str, last_event_st
         return "lifecycle"
     if inferred == "benchmark_reviewed":
         return "benchmark"
+    if inferred == "decision_reviewed":
+        return "decision"
     if inferred == "research_reviewed":
         return "research"
     if inferred == "intelligence_reviewed":

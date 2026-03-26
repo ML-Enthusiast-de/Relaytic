@@ -141,6 +141,28 @@ def build_run_summary(
             "reference_approach_matrix": "reference_approach_matrix.json",
             "benchmark_gap_report": "benchmark_gap_report.json",
             "benchmark_parity_report": "benchmark_parity_report.json",
+            "external_challenger_manifest": "external_challenger_manifest.json",
+            "external_challenger_evaluation": "external_challenger_evaluation.json",
+            "incumbent_parity_report": "incumbent_parity_report.json",
+            "beat_target_contract": "beat_target_contract.json",
+        },
+    )
+    decision_bundle = _read_bundle(
+        root,
+        {
+            "decision_world_model": "decision_world_model.json",
+            "controller_policy": "controller_policy.json",
+            "handoff_controller_report": "handoff_controller_report.json",
+            "intervention_policy_report": "intervention_policy_report.json",
+            "decision_usefulness_report": "decision_usefulness_report.json",
+            "value_of_more_data_report": "value_of_more_data_report.json",
+            "data_acquisition_plan": "data_acquisition_plan.json",
+            "source_graph": "source_graph.json",
+            "join_candidate_report": "join_candidate_report.json",
+            "method_compiler_report": "method_compiler_report.json",
+            "compiled_challenger_templates": "compiled_challenger_templates.json",
+            "compiled_feature_hypotheses": "compiled_feature_hypotheses.json",
+            "compiled_benchmark_protocol": "compiled_benchmark_protocol.json",
         },
     )
     feedback_bundle = _read_bundle(
@@ -259,6 +281,22 @@ def build_run_summary(
     reference_approach_matrix = _bundle_item(benchmark_bundle, "reference_approach_matrix")
     benchmark_gap_report = _bundle_item(benchmark_bundle, "benchmark_gap_report")
     benchmark_parity_report = _bundle_item(benchmark_bundle, "benchmark_parity_report")
+    external_challenger_manifest = _bundle_item(benchmark_bundle, "external_challenger_manifest")
+    external_challenger_evaluation = _bundle_item(benchmark_bundle, "external_challenger_evaluation")
+    incumbent_parity_report = _bundle_item(benchmark_bundle, "incumbent_parity_report")
+    beat_target_contract = _bundle_item(benchmark_bundle, "beat_target_contract")
+    decision_world_model = _bundle_item(decision_bundle, "decision_world_model")
+    controller_policy = _bundle_item(decision_bundle, "controller_policy")
+    handoff_controller_report = _bundle_item(decision_bundle, "handoff_controller_report")
+    decision_usefulness_report = _bundle_item(decision_bundle, "decision_usefulness_report")
+    value_of_more_data_report = _bundle_item(decision_bundle, "value_of_more_data_report")
+    data_acquisition_plan = _bundle_item(decision_bundle, "data_acquisition_plan")
+    source_graph = _bundle_item(decision_bundle, "source_graph")
+    join_candidate_report = _bundle_item(decision_bundle, "join_candidate_report")
+    method_compiler_report = _bundle_item(decision_bundle, "method_compiler_report")
+    compiled_challenger_templates = _bundle_item(decision_bundle, "compiled_challenger_templates")
+    compiled_feature_hypotheses = _bundle_item(decision_bundle, "compiled_feature_hypotheses")
+    compiled_benchmark_protocol = _bundle_item(decision_bundle, "compiled_benchmark_protocol")
     feedback_intake = _bundle_item(feedback_bundle, "feedback_intake")
     feedback_validation = _bundle_item(feedback_bundle, "feedback_validation")
     feedback_effect_report = _bundle_item(feedback_bundle, "feedback_effect_report")
@@ -342,6 +380,7 @@ def build_run_summary(
             intelligence_bundle=intelligence_bundle,
             research_bundle=research_bundle,
             benchmark_bundle=benchmark_bundle,
+            decision_bundle=decision_bundle,
             profiles_bundle=profiles_bundle,
             feedback_bundle=feedback_bundle,
             control_bundle=control_bundle,
@@ -493,6 +532,43 @@ def build_run_summary(
             "test_gap": benchmark_gap_report.get("test_gap"),
             "validation_gap": benchmark_gap_report.get("validation_gap"),
             "near_parity": benchmark_gap_report.get("near_parity"),
+            "incumbent_present": benchmark_parity_report.get("incumbent_present"),
+            "incumbent_name": _clean_text(benchmark_parity_report.get("incumbent_name"))
+            or _clean_text(incumbent_parity_report.get("incumbent_name"))
+            or _clean_text(external_challenger_manifest.get("incumbent_name")),
+            "incumbent_kind": _clean_text(incumbent_parity_report.get("incumbent_kind"))
+            or _clean_text(external_challenger_manifest.get("incumbent_kind")),
+            "incumbent_parity_status": _clean_text(incumbent_parity_report.get("parity_status")),
+            "beat_target_state": _clean_text(beat_target_contract.get("contract_state"))
+            or _clean_text(benchmark_parity_report.get("beat_target_state")),
+            "relaytic_beats_incumbent": incumbent_parity_report.get("relaytic_beats_incumbent"),
+            "incumbent_stronger": incumbent_parity_report.get("incumbent_stronger"),
+            "incumbent_test_gap": incumbent_parity_report.get("test_gap"),
+            "incumbent_reduced_claim": incumbent_parity_report.get("reduced_claim"),
+            "incumbent_evaluation_mode": _clean_text(external_challenger_evaluation.get("evaluation_mode")),
+        },
+        "decision_lab": {
+            "status": _clean_text(decision_world_model.get("status")),
+            "action_regime": _clean_text(decision_world_model.get("action_regime")),
+            "threshold_posture": _clean_text(decision_world_model.get("threshold_posture")),
+            "under_specified": decision_world_model.get("under_specified"),
+            "next_actor": _clean_text(controller_policy.get("next_actor")),
+            "selected_next_action": _clean_text(controller_policy.get("selected_next_action")),
+            "controller_mode": _clean_text(controller_policy.get("controller_mode")),
+            "review_required": controller_policy.get("review_required"),
+            "selected_strategy": _clean_text(value_of_more_data_report.get("selected_strategy")),
+            "recommended_data_path": _clean_text(value_of_more_data_report.get("recommended_data_path"))
+            or _clean_text(data_acquisition_plan.get("recommended_data_path")),
+            "recommended_source_id": _clean_text(data_acquisition_plan.get("recommended_source_id")),
+            "join_candidate_count": int(join_candidate_report.get("candidate_count", 0) or 0),
+            "source_count": int(source_graph.get("source_count", 0) or 0),
+            "compiled_challenger_count": int(method_compiler_report.get("compiled_challenger_count", 0) or 0),
+            "compiled_feature_count": int(method_compiler_report.get("compiled_feature_count", 0) or 0),
+            "compiled_benchmark_change_count": int(method_compiler_report.get("compiled_benchmark_change_count", 0) or 0),
+            "changed_next_action": decision_usefulness_report.get("changed_next_action"),
+            "changed_controller_path": decision_usefulness_report.get("changed_controller_path"),
+            "baseline_action": _clean_text(handoff_controller_report.get("baseline_action")),
+            "primary_decision_question": _clean_text(decision_world_model.get("primary_decision_question")),
         },
         "feedback": {
             "status": _clean_text(feedback_effect_report.get("status")) or _clean_text(feedback_validation.get("status")) or _clean_text(feedback_intake.get("status")),
@@ -627,6 +703,8 @@ def build_run_summary(
             "estimated_value_band": _clean_text(marginal_value.get("estimated_value_band")),
             "rationale": _clean_text(
                 feedback_effect_report.get("summary", "")
+                or decision_usefulness_report.get("summary", "")
+                or value_of_more_data_report.get("summary", "")
                 or decision_policy_update_suggestions.get("summary", "")
                 or route_prior_updates.get("summary", "")
                 or policy_update_suggestions.get("summary", "")
@@ -638,6 +716,11 @@ def build_run_summary(
             ),
             "recommended_action": _clean_text(feedback_effect_report.get("primary_recommended_action"))
             or _clean_text(decision_policy_update_suggestions.get("primary_recommended_action"))
+            or (
+                _clean_text(controller_policy.get("selected_next_action"))
+                if _clean_text(value_of_more_data_report.get("selected_strategy")) not in {None, "hold_current_course"}
+                else None
+            )
             or _lifecycle_primary_action(lifecycle_bundle)
             or _clean_text(completion_decision.get("action"))
             or _clean_text(belief_update.get("recommended_action")),
@@ -658,6 +741,16 @@ def build_run_summary(
             "external_research_audit_path": _path_if_exists(root / "external_research_audit.json"),
             "benchmark_parity_report_path": _path_if_exists(root / "benchmark_parity_report.json"),
             "benchmark_gap_report_path": _path_if_exists(root / "benchmark_gap_report.json"),
+            "external_challenger_manifest_path": _path_if_exists(root / "external_challenger_manifest.json"),
+            "external_challenger_evaluation_path": _path_if_exists(root / "external_challenger_evaluation.json"),
+            "incumbent_parity_report_path": _path_if_exists(root / "incumbent_parity_report.json"),
+            "beat_target_contract_path": _path_if_exists(root / "beat_target_contract.json"),
+            "decision_world_model_path": _path_if_exists(root / "decision_world_model.json"),
+            "controller_policy_path": _path_if_exists(root / "controller_policy.json"),
+            "value_of_more_data_report_path": _path_if_exists(root / "value_of_more_data_report.json"),
+            "method_compiler_report_path": _path_if_exists(root / "method_compiler_report.json"),
+            "source_graph_path": _path_if_exists(root / "source_graph.json"),
+            "join_candidate_report_path": _path_if_exists(root / "join_candidate_report.json"),
             "feedback_effect_report_path": _path_if_exists(root / "feedback_effect_report.json"),
             "feedback_casebook_path": _path_if_exists(root / "feedback_casebook.json"),
             "quality_contract_path": _path_if_exists(root / "quality_contract.json"),
@@ -687,6 +780,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     intelligence = dict(summary.get("intelligence", {}))
     research = dict(summary.get("research", {}))
     benchmark = dict(summary.get("benchmark", {}))
+    decision_lab = dict(summary.get("decision_lab", {}))
     feedback = dict(summary.get("feedback", {}))
     contracts = dict(summary.get("contracts", {}))
     profiles = dict(summary.get("profiles", {}))
@@ -844,8 +938,30 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Winning family: `{benchmark.get('winning_family') or 'unknown'}`",
                 f"- Test gap: `{benchmark.get('test_gap')}`",
                 f"- Near parity: `{benchmark.get('near_parity')}`",
+                f"- Incumbent: `{benchmark.get('incumbent_name') or 'none'}`",
+                f"- Incumbent parity: `{benchmark.get('incumbent_parity_status') or 'unknown'}`",
+                f"- Beat-target state: `{benchmark.get('beat_target_state') or 'unknown'}`",
             ]
         )
+    if decision_lab and any(value is not None for value in decision_lab.values()):
+        lines.extend(
+            [
+                "",
+                "## Decision Lab",
+                f"- Action regime: `{decision_lab.get('action_regime') or 'unknown'}`",
+                f"- Threshold posture: `{decision_lab.get('threshold_posture') or 'unknown'}`",
+                f"- Under-specified: `{decision_lab.get('under_specified')}`",
+                f"- Selected strategy: `{decision_lab.get('selected_strategy') or 'unknown'}`",
+                f"- Next actor: `{decision_lab.get('next_actor') or 'unknown'}`",
+                f"- Selected next action: `{decision_lab.get('selected_next_action') or 'unknown'}`",
+                f"- Review required: `{decision_lab.get('review_required')}`",
+                f"- Join candidates: `{decision_lab.get('join_candidate_count', 0)}`",
+                f"- Compiled challengers: `{decision_lab.get('compiled_challenger_count', 0)}`",
+                f"- Changed controller path: `{decision_lab.get('changed_controller_path')}`",
+            ]
+        )
+        if decision_lab.get("recommended_source_id"):
+            lines.append(f"- Recommended local source: `{decision_lab.get('recommended_source_id')}`")
     if feedback and any(value not in (None, 0, False, "", []) for value in feedback.values()):
         lines.extend(
             [
@@ -1099,6 +1215,7 @@ def _resolve_stage(
     intelligence_bundle: dict[str, Any],
     research_bundle: dict[str, Any],
     benchmark_bundle: dict[str, Any],
+    decision_bundle: dict[str, Any],
     profiles_bundle: dict[str, Any],
     feedback_bundle: dict[str, Any],
     control_bundle: dict[str, Any],
@@ -1117,6 +1234,8 @@ def _resolve_stage(
     if completion_bundle:
         run_state = _bundle_item(completion_bundle, "run_state")
         return str(run_state.get("current_stage", "")).strip() or "completion_reviewed"
+    if decision_bundle:
+        return "decision_reviewed"
     if profiles_bundle:
         return "profiles_reviewed"
     if benchmark_bundle:
@@ -1164,6 +1283,8 @@ def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: s
         return "profiles"
     if (root / "benchmark_parity_report.json").exists():
         return "benchmark"
+    if (root / "decision_world_model.json").exists():
+        return "decision"
     if (root / "research_brief.json").exists():
         return "research"
     if (root / "semantic_debate_report.json").exists():

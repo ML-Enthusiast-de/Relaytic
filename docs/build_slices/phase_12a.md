@@ -63,7 +63,7 @@ This slice is successful only if Relaytic can:
 - heavier actions must remain recommendations unless existing autonomy/control policy explicitly allows them
 - innovation-watch behavior must stay rowless and redacted for any external retrieval
 - pulse should use the runtime/event system rather than inventing a parallel scheduler truth
-- later mission-control and assist surfaces should be able to expose pulse history directly
+- the mission-control surface introduced in Slice 11B and later assist surfaces should expose pulse history directly rather than leaving pulse state as a side artifact
 
 ## Proof Obligation
 

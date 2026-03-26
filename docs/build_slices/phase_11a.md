@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 Intended package boundaries:
 
@@ -17,6 +17,12 @@ Intended artifacts:
 - `external_challenger_evaluation.json`
 - `incumbent_parity_report.json`
 - `beat_target_contract.json`
+
+Public surface:
+
+- `relaytic benchmark run --run-dir <run_dir> --incumbent-path <path> --incumbent-kind <model|predictions|ruleset>`
+- `relaytic benchmark show --run-dir <run_dir>`
+- MCP: `relaytic_run_benchmark` and `relaytic_show_benchmark`
 
 ## Intent
 
@@ -42,6 +48,13 @@ This slice is successful only if Relaytic can:
 - beat-target contracts must be visible to evidence, benchmark, lifecycle, assist, and later mission-control surfaces
 - Relaytic must be able to lose honestly and emit a next-step recommendation when the incumbent remains stronger
 
+Current implementation notes
+
+- locally executable incumbents can be replayed from serialized model bundles or ruleset/scorecard JSON
+- prediction-file incumbents fall back to reduced-claim comparison when only partial scope is available
+- benchmark summaries, run summaries, and MCP benchmark surfaces now expose incumbent presence, incumbent parity, and beat-target state explicitly
+- autonomy consumes `beat_target_contract.json` so incumbent pressure can change selected follow-up behavior
+
 ## Acceptance Criteria
 
 Slice 11A is acceptable only if:
@@ -62,3 +75,13 @@ Slice 11A should not be considered complete without targeted tests that cover at
 - one win-against-incumbent case
 - one loss-against-incumbent case
 - one lifecycle or benchmark visibility-parity case
+
+Current verification completed:
+
+- local model incumbent reevaluation
+- local ruleset/scorecard incumbent reevaluation
+- prediction-file replay with reduced claims
+- one case where Relaytic beats the incumbent
+- one case where Relaytic loses honestly to the incumbent
+- autonomy consuming an explicit unmet beat-target contract
+- MCP benchmark surface parity coverage

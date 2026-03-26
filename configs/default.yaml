@@ -174,6 +174,17 @@ control:
   max_prior_runs: 12
   max_ledger_entries: 40
 
+decision:
+  enabled: true
+  allow_provisional_world_model: true
+  allow_local_source_graph: true
+  same_directory_only: true
+  max_nearby_sources: 6
+  max_join_candidates: 5
+  max_compiled_templates: 6
+  default_operator_review_capacity: medium
+  controller_review_threshold: conditional_pass
+
 prompts:
   analyst_system_path: ""
   modeler_system_path: ""

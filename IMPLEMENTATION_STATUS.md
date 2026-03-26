@@ -4,11 +4,10 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 11, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, and Slice 10C behavioral control contracts with skeptical steering and causal intervention memory
-- next recommended slice: 10A, decision-lab world modeling, method compilation, and data-acquisition reasoning
-- next leverage follow-on after 10A: 11A, imported incumbents and bring-your-own challenger baselines
-- next proof follow-on after 11A: 12, dojo mode and guarded self-improvement
-- next adaptive follow-on after 12: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
+- completed slices: 00 through 11A, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, and Slice 10C behavioral control contracts with skeptical steering and causal intervention memory
+- next recommended slice: 11B, mission control MVP, onboarding, and one-command install
+- next self-improvement follow-on after 11B: 12, dojo mode and guarded self-improvement
+- next pulse follow-on after 12: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
 - next trace-and-safety follow-on after 12A: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
@@ -52,12 +51,18 @@ The repository currently supports:
 - assist turns that always challenge material steering requests before rerunning or taking over instead of silently complying
 - cross-run intervention memory that can make later takeover and override behavior more skeptical when similar earlier requests proved harmful
 - MCP-visible control inspection through `relaytic_show_control` and structured assist-turn control payloads
+- explicit decision-lab review via `relaytic decision review` and `relaytic decision show`, with machine-readable decision-world models, controller policies, intervention-policy reports, value-of-more-data reasoning, source-graph/join-candidate analysis, and compiled challenger/feature/benchmark templates
+- decision-lab outputs that now influence `relaytic run`, `relaytic show`, autonomy follow-up, runtime stage inference, and MCP-visible next-step reasoning instead of remaining a side report
+- local data-fabric reasoning that can prefer nearby staged data or join candidates over broader search when the current run is under-specified
+- method compilation that turns research, memory, and operator context into executable challenger families, compiled feature hypotheses, and benchmark-protocol change proposals
 - visible research support inside completion, autonomy, `relaytic run`, `relaytic show`, explicit `relaytic research` surfaces, and the MCP contract
 - visible benchmark support inside completion, `relaytic run`, `relaytic show`, explicit `relaytic benchmark` surfaces, assist, runtime, and the MCP contract
+- imported incumbent challenge support through `relaytic benchmark run --incumbent-path ...`, including local model replay, ruleset/scorecard execution, prediction-file fallback with reduced claims, explicit incumbent parity reports, and beat-target contracts that autonomy can consume
 - communicative assist surfaces via `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat` so humans and agents can ask for explanations, request stage navigation, or let Relaytic take over safely
 - routed intelligence profiles, explicit local semantic baseline selection, backend capability matrices, verifier-specific artifacts, and semantic-proof reporting so the optional LLM layer is visible and measurable rather than implicit
 - connection guidance that can recommend deterministic local-only use, lightweight local LLM setup, or local host connections for Claude, Codex/OpenAI, OpenClaw, and ChatGPT connector paths without making any of them mandatory
 - one-line bootstrap via `python scripts/install_relaytic.py` plus install-health verification via `relaytic doctor`
+- the next planned product step is to turn that install path and the current artifact stack into one coherent local control-center experience rather than leaving operator UX as a shell-only surface
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement
@@ -79,7 +84,6 @@ The most important not-yet-implemented shifts after the current baseline are:
 
 - decision-system world modeling so Relaytic can reason about action cost, abstention, review load, and whether more data is better than more search
 - method compilation that turns research, memory, and operator context into executable challenger, feature, split, and benchmark templates
-- imported-incumbent challenge paths so Relaytic can evaluate and try to beat existing models, prediction sets, scorecards, or rulesets under the same contract
 - a lab pulse that can periodically inspect local state, watch for new relevant methods or benchmark debt, and queue bounded safe follow-up without silent drift
 - a first-class trace model across specialists, tools, interventions, and branches so Relaytic can replay and compare multi-stage behavior from one runtime truth
 - runtime evaluator and security harnesses that test skeptical control, tool safety, branch-controller safety, and adversarial steering before broader autonomy is trusted

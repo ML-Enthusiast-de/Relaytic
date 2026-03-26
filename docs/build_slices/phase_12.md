@@ -57,6 +57,7 @@ The slice is successful only if Relaytic can:
 - dojo must improve strategies, priors, challenger design, route search, decision-world-model heuristics, and method-compilation logic before it is allowed to touch deeper architecture proposals
 - dojo must not weaken intervention contracts, override skepticism, trace integrity, or agent-security guarantees without explicit regression evidence
 - every dojo promotion must preserve rollback, provenance, and benchmark comparability
+- dojo proposals, promotions, rejections, and rollbacks must extend the mission-control surface introduced in Slice 11B instead of remaining CLI-only state
 
 ## Proof Obligation
 

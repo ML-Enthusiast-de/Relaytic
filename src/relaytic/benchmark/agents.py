@@ -16,15 +16,24 @@ from relaytic.modeling.feature_pipeline import prepare_split_safe_feature_frames
 from relaytic.modeling.normalization import MinMaxNormalizer
 from relaytic.modeling.splitters import build_train_validation_test_split
 
+from .incumbents import evaluate_incumbent
 from .models import (
     BENCHMARK_GAP_REPORT_SCHEMA_VERSION,
     BENCHMARK_PARITY_REPORT_SCHEMA_VERSION,
+    BEAT_TARGET_CONTRACT_SCHEMA_VERSION,
+    EXTERNAL_CHALLENGER_EVALUATION_SCHEMA_VERSION,
+    EXTERNAL_CHALLENGER_MANIFEST_SCHEMA_VERSION,
+    INCUMBENT_PARITY_REPORT_SCHEMA_VERSION,
     REFERENCE_APPROACH_MATRIX_SCHEMA_VERSION,
     BenchmarkBundle,
     BenchmarkControls,
     BenchmarkGapReport,
     BenchmarkParityReport,
     BenchmarkTrace,
+    BeatTargetContract,
+    ExternalChallengerEvaluation,
+    ExternalChallengerManifest,
+    IncumbentParityReport,
     ReferenceApproachMatrix,
     build_benchmark_controls_from_policy,
 )
@@ -44,6 +53,9 @@ def run_benchmark_review(
     planning_bundle: dict[str, Any],
     mandate_bundle: dict[str, Any] | None = None,
     context_bundle: dict[str, Any] | None = None,
+    incumbent_path: str | None = None,
+    incumbent_kind: str | None = None,
+    incumbent_name: str | None = None,
 ) -> BenchmarkRunResult:
     controls = build_benchmark_controls_from_policy(policy)
     plan = _bundle_item(planning_bundle, "plan")
@@ -51,7 +63,7 @@ def run_benchmark_review(
     task_brief = _bundle_item(context_bundle or {}, "task_brief")
     trace = BenchmarkTrace(
         agent="benchmark_referee",
-        operating_mode="same_contract_reference_parity",
+        operating_mode="same_contract_reference_and_incumbent_parity",
         llm_used=False,
         llm_status="not_requested",
         deterministic_evidence=[
@@ -59,6 +71,7 @@ def run_benchmark_review(
             "same_metric_contract",
             "same_feature_pipeline_contract",
             "public_reference_models",
+            "explicit_incumbent_contract",
         ],
     )
     generated_at = _utc_now()
@@ -216,6 +229,26 @@ def run_benchmark_review(
         reference_count=len(reference_rows),
         benchmark_expected=benchmark_expected,
     )
+    incumbent_outputs = evaluate_incumbent(
+        incumbent_path=incumbent_path,
+        incumbent_kind=incumbent_kind,
+        incumbent_name=incumbent_name,
+        controls=controls,
+        generated_at=generated_at,
+        trace=trace,
+        task_type=task_profile.task_type,
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        threshold_policy=_clean_text(builder_handoff.get("threshold_policy")) or "auto",
+        split_frames=split_frames,
+        prepared_frames=prepared_frames,
+        feature_columns=model_feature_columns,
+        target_column=target_column,
+        relaytic_reference=relaytic_reference,
+    )
+    parity_status = incumbent_outputs["benchmark_parity_status_override"] or parity_status
+    recommended_action = incumbent_outputs["benchmark_recommended_action_override"] or recommended_action
+    parity_summary = incumbent_outputs["benchmark_summary_override"] or parity_summary
 
     matrix = ReferenceApproachMatrix(
         schema_version=REFERENCE_APPROACH_MATRIX_SCHEMA_VERSION,
@@ -275,6 +308,9 @@ def run_benchmark_review(
         relaytic_family=_clean_text(relaytic_reference.get("model_family")),
         reference_count=len(reference_rows),
         strong_reference_available=bool(reference_rows),
+        incumbent_present=bool(incumbent_outputs["incumbent_present"]),
+        incumbent_name=incumbent_outputs["incumbent_name"],
+        beat_target_state=incumbent_outputs["beat_target_state"],
         summary=parity_summary,
         trace=trace,
     )
@@ -282,6 +318,10 @@ def run_benchmark_review(
         reference_approach_matrix=matrix,
         benchmark_gap_report=gap_report,
         benchmark_parity_report=parity_report,
+        external_challenger_manifest=incumbent_outputs["manifest"],
+        external_challenger_evaluation=incumbent_outputs["evaluation"],
+        incumbent_parity_report=incumbent_outputs["parity"],
+        beat_target_contract=incumbent_outputs["beat_target"],
     )
     return BenchmarkRunResult(bundle=bundle, review_markdown=render_benchmark_review_markdown(bundle.to_dict()))
 
@@ -291,6 +331,8 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
     matrix = dict(payload.get("reference_approach_matrix", {}))
     gap = dict(payload.get("benchmark_gap_report", {}))
     parity = dict(payload.get("benchmark_parity_report", {}))
+    incumbent = dict(payload.get("incumbent_parity_report", {}))
+    beat_target = dict(payload.get("beat_target_contract", {}))
     lines = [
         "# Relaytic Benchmark Review",
         "",
@@ -302,6 +344,15 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
         f"- Winning family: `{parity.get('winning_family') or gap.get('best_reference_family') or 'unknown'}`",
         f"- Reference count: `{parity.get('reference_count', 0)}`",
     ]
+    if incumbent:
+        lines.extend(
+            [
+                f"- Incumbent present: `{incumbent.get('incumbent_present')}`",
+                f"- Incumbent name: `{incumbent.get('incumbent_name') or 'none'}`",
+                f"- Incumbent parity: `{incumbent.get('parity_status') or 'unknown'}`",
+                f"- Beat-target state: `{beat_target.get('contract_state') or parity.get('beat_target_state') or 'unknown'}`",
+            ]
+        )
     if gap:
         lines.extend(
             [
@@ -311,6 +362,18 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
                 f"- Test gap: `{gap.get('test_gap')}`",
                 f"- Near parity: `{gap.get('near_parity')}`",
                 f"- Relaytic beats best reference: `{gap.get('relaytic_beats_best_reference')}`",
+            ]
+        )
+    if incumbent:
+        lines.extend(
+            [
+                "",
+                "## Incumbent",
+                f"- Recommended action: `{incumbent.get('recommended_action') or beat_target.get('recommended_action') or 'unknown'}`",
+                f"- Relaytic beats incumbent: `{incumbent.get('relaytic_beats_incumbent')}`",
+                f"- Incumbent stronger: `{incumbent.get('incumbent_stronger')}`",
+                f"- Reduced claim: `{incumbent.get('reduced_claim')}`",
+                f"- Test gap: `{incumbent.get('test_gap')}`",
             ]
         )
     references = list(matrix.get("references", []))
@@ -923,10 +986,86 @@ def _unavailable_bundle(
         summary=summary,
         trace=trace,
     )
+    incumbent_manifest = ExternalChallengerManifest(
+        schema_version=EXTERNAL_CHALLENGER_MANIFEST_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_configured",
+        incumbent_name=None,
+        incumbent_kind=None,
+        adapter_family=None,
+        source_path=None,
+        executable_locally=False,
+        reduced_claim=False,
+        same_contract_possible=False,
+        evaluation_scope="none",
+        summary="Relaytic did not receive an imported incumbent for this benchmark bundle.",
+        trace=trace,
+    )
+    incumbent_evaluation = ExternalChallengerEvaluation(
+        schema_version=EXTERNAL_CHALLENGER_EVALUATION_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_configured",
+        incumbent_name=None,
+        incumbent_kind=None,
+        evaluation_mode="none",
+        comparison_metric="unknown",
+        metric_direction="higher_is_better",
+        reevaluated_locally=False,
+        reduced_claim=False,
+        evaluation_scope="none",
+        train_metric={},
+        validation_metric={},
+        test_metric={},
+        decision_threshold=None,
+        reason_codes=["no_incumbent_configured"],
+        summary="Relaytic did not evaluate an imported incumbent for this benchmark bundle.",
+        trace=trace,
+    )
+    incumbent_parity = IncumbentParityReport(
+        schema_version=INCUMBENT_PARITY_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_configured",
+        incumbent_present=False,
+        incumbent_name=None,
+        incumbent_kind=None,
+        parity_status="no_incumbent",
+        comparison_metric="unknown",
+        recommended_action=recommendation,
+        relaytic_beats_incumbent=False,
+        incumbent_stronger=False,
+        reduced_claim=False,
+        test_gap=None,
+        summary="Relaytic has no imported incumbent for this benchmark bundle.",
+        trace=trace,
+    )
+    beat_target = BeatTargetContract(
+        schema_version=BEAT_TARGET_CONTRACT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_configured",
+        target_name=None,
+        target_kind="none",
+        comparison_metric="unknown",
+        metric_direction="higher_is_better",
+        target_metric_value=None,
+        relaytic_metric_value=None,
+        contract_state="not_configured",
+        recommended_action=recommendation,
+        reduced_claim=False,
+        summary="Relaytic did not receive an explicit incumbent beat-target for this benchmark bundle.",
+        trace=trace,
+    )
     return BenchmarkBundle(
         reference_approach_matrix=matrix,
         benchmark_gap_report=gap_report,
         benchmark_parity_report=parity_report,
+        external_challenger_manifest=incumbent_manifest,
+        external_challenger_evaluation=incumbent_evaluation,
+        incumbent_parity_report=incumbent_parity,
+        beat_target_contract=beat_target,
     )
 
 

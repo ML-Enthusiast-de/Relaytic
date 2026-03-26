@@ -95,6 +95,7 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     feedback_cfg = dict(config.get("feedback", {}))
     profiles_cfg = dict(config.get("profiles", {}))
     control_cfg = dict(config.get("control", {}))
+    decision_cfg = dict(config.get("decision", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
     contact_email = research_cfg.get("contact_email", "")
     if contact_email is None:
@@ -275,6 +276,21 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "cross_run_memory_enabled": bool(control_cfg.get("cross_run_memory_enabled", True)),
             "max_prior_runs": int(control_cfg.get("max_prior_runs", 12) or 12),
             "max_ledger_entries": int(control_cfg.get("max_ledger_entries", 40) or 40),
+        },
+        "decision": {
+            "enabled": bool(decision_cfg.get("enabled", True)),
+            "allow_provisional_world_model": bool(decision_cfg.get("allow_provisional_world_model", True)),
+            "allow_local_source_graph": bool(decision_cfg.get("allow_local_source_graph", True)),
+            "same_directory_only": bool(decision_cfg.get("same_directory_only", True)),
+            "max_nearby_sources": int(decision_cfg.get("max_nearby_sources", 6) or 6),
+            "max_join_candidates": int(decision_cfg.get("max_join_candidates", 5) or 5),
+            "max_compiled_templates": int(decision_cfg.get("max_compiled_templates", 6) or 6),
+            "default_operator_review_capacity": str(
+                decision_cfg.get("default_operator_review_capacity", "medium") or "medium"
+            ),
+            "controller_review_threshold": str(
+                decision_cfg.get("controller_review_threshold", "conditional_pass") or "conditional_pass"
+            ),
         },
         "runtime": {
             "gateway_enabled": bool(runtime_cfg.get("gateway_enabled", True)),

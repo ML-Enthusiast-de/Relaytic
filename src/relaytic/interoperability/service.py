@@ -342,8 +342,11 @@ def relaytic_run_benchmark(
     run_id: str | None = None,
     overwrite: bool = False,
     labels: dict[str, str] | None = None,
+    incumbent_path: str | None = None,
+    incumbent_kind: str | None = None,
+    incumbent_name: str | None = None,
 ) -> dict[str, Any]:
-    """Execute the Slice 11 benchmark parity layer for an existing run."""
+    """Execute the Slice 11/11A benchmark parity and incumbent-challenge layer for an existing run."""
     cli = _cli()
     return cli._run_benchmark_phase(
         run_dir=run_dir,
@@ -352,15 +355,45 @@ def relaytic_run_benchmark(
         run_id=run_id,
         overwrite=overwrite,
         labels=_normalize_labels(labels),
+        incumbent_path=incumbent_path,
+        incumbent_kind=incumbent_kind,
+        incumbent_name=incumbent_name,
         runtime_surface="mcp",
         runtime_command="relaytic_run_benchmark",
     )
 
 
 def relaytic_show_benchmark(*, run_dir: str) -> dict[str, Any]:
-    """Render the current Slice 11 benchmark surface for a run."""
+    """Render the current Slice 11/11A benchmark and incumbent-challenge surface for a run."""
     cli = _cli()
     return cli._show_benchmark_surface(run_dir=run_dir)
+
+
+def relaytic_review_decision(
+    *,
+    run_dir: str,
+    config_path: str | None = None,
+    run_id: str | None = None,
+    overwrite: bool = False,
+    labels: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Execute the Slice 10A decision-lab layer for an existing run."""
+    cli = _cli()
+    return cli._run_decision_phase(
+        run_dir=run_dir,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_review_decision",
+    )
+
+
+def relaytic_show_decision(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 10A decision-lab surface for a run."""
+    cli = _cli()
+    return cli._show_decision_surface(run_dir=run_dir)
 
 
 def relaytic_show_assist(*, run_dir: str, config_path: str | None = None) -> dict[str, Any]:
@@ -470,6 +503,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_intelligence",
             "relaytic_show_research",
             "relaytic_show_benchmark",
+            "relaytic_show_decision",
             "relaytic_show_assist",
             "relaytic_show_lifecycle",
             "relaytic_show_autonomy",
@@ -485,6 +519,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_run_intelligence",
             "relaytic_gather_research",
             "relaytic_run_benchmark",
+            "relaytic_review_decision",
             "relaytic_assist_turn",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
@@ -575,10 +610,18 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
         InteropToolSpec(
             name="relaytic_show_benchmark",
             title="Show Relaytic Benchmark",
-            description="Render the current Slice 11 benchmark parity and same-contract reference comparison surface for a Relaytic run.",
+            description="Render the current Slice 11/11A benchmark parity, reference comparison, and incumbent-challenge surface for a Relaytic run.",
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_benchmark,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_decision",
+            title="Show Relaytic Decision Lab",
+            description="Render the current Slice 10A decision-world model, controller policy, and local data-fabric surface for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_decision,
         ),
         InteropToolSpec(
             name="relaytic_show_assist",
@@ -647,10 +690,18 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
         InteropToolSpec(
             name="relaytic_run_benchmark",
             title="Run Benchmark Review",
-            description="Execute the Slice 11 benchmark parity layer for an existing Relaytic run.",
+            description="Execute the Slice 11/11A benchmark parity and incumbent-challenge layer for an existing Relaytic run.",
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_run_benchmark,
+        ),
+        InteropToolSpec(
+            name="relaytic_review_decision",
+            title="Review Decision Lab",
+            description="Execute the Slice 10A decision-world model, controller logic, and method-compilation layer for an existing Relaytic run.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_review_decision,
         ),
         InteropToolSpec(
             name="relaytic_assist_turn",

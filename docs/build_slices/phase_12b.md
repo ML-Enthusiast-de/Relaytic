@@ -57,6 +57,7 @@ The slice is successful only if Relaytic can:
 - the canonical local trace must remain the source of truth even if optional observability adapters are enabled
 - evaluation harnesses must cover at least control injection, tool misuse, unsafe branch expansion, and skeptical-override regression
 - security/eval results must be consumable by later dojo, search-controller, and mission-control slices without narrative-only interpretation
+- the canonical trace must become the activity substrate for the existing mission-control surface rather than sitting beside a separate UI-only history
 - failures must be recorded honestly; the slice must not hide failed defenses behind aggregate pass rates
 
 ## Proof Obligation

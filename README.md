@@ -29,7 +29,9 @@ The repository already supports a working early product baseline:
 - bounded autonomous follow-up loops with challenger queues, recalibration/retrain requests, loop budgets, and champion lineage tracking
 - privacy-safe external research retrieval from redacted run signatures with typed source inventory, method-transfer reports, benchmark-reference capture, and explicit external-research audit
 - benchmark parity and gap reporting against explicit reference approaches under the same split and metric contract
+- imported incumbent challenge support so Relaytic can reevaluate a local model, ruleset/scorecard, or prediction file and issue an honest beat-target contract instead of only generic parity language
 - validated feedback and outcome learning with explicit intake, trust scoring, reversible effect reports, route-prior updates, and rollback-ready casebook artifacts
+- decision-lab review with explicit decision-world models, controller policies, value-of-more-data reasoning, local source-graph/join analysis, and compiled challenger/feature/benchmark templates
 - communicative assist surfaces that explain what Relaytic is doing, let humans or external agents jump back to any bounded stage, and let Relaytic take over when the operator stops or is unsure
 - concise run summaries for humans and stable summary artifacts for agents
 - one-line bootstrap install plus post-install dependency verification
@@ -40,20 +42,15 @@ The repository already supports a working early product baseline:
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10, 10B, and 10C are now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; make quality gates and budget posture explicit; and challenge human or external-agent steering through typed intervention contracts, override decisions, replayable checkpoints, and causal steering memory. The next load-bearing implementation step is now Slice 10A: decision-world modeling and method compilation.
+Slices 10, 10B, 10C, 10A, and 11A are now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; make quality gates and budget posture explicit; challenge human or external-agent steering through typed intervention contracts, override decisions, replayable checkpoints, and causal steering memory; turn the resulting run state into a visible decision-world model with controller policy, value-of-more-data reasoning, source-graph/join analysis, and compiled challenger or feature hypotheses; and then pressure the run against imported incumbent models, rulesets, and prediction files under the same local contract. The next load-bearing implementation step is now Slice 11B: a thin mission-control UI, easier install/onboarding, and one coherent operator control-center surface. Every later slice is expected to extend that same surface rather than treating UI as a separate late-polish lane.
 
 The next frontier upgrades are:
 
-- decision-world modeling that distinguishes better score from better downstream action
-- explicit controller logic that decides who should act next, how deep to branch, and when review or escalation is worth it
-- method compilation that turns research, memory, and operator context into executable challenger and feature plans
-- imported-incumbent challenge paths so Relaytic can evaluate and try to beat existing models, prediction sets, scorecards, or rulesets under the same contract
 - a lab pulse that can periodically inspect local state, watch for new relevant methods or benchmark debt, and queue bounded safe follow-up without silent drift
 - richer long-term memory with retention, compaction, pinning, and replay rules so specialists do not repeatedly forget the same lesson
 - a first-class trace model plus agent/security harnesses so Relaytic can replay specialist/tool/intervention behavior and prove its control layer is actually robust
-- local data-fabric reasoning that can suggest joins, entity histories, and additional local data before wasting search budget
 - a stronger search/HPO controller that widens, prunes, and allocates effort under explicit value and budget contracts
-- mission-control surfaces that show branch structure, confidence, trace history, and change attribution to humans and external agents
+- a first real control-center UI and install/onboarding path, followed by deeper mission-control surfaces that show branch structure, confidence, trace history, and change attribution to humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive models as one promising backend family
 
 ## Design Principles
@@ -192,6 +189,7 @@ relaytic interoperability self-check --live
 relaytic runtime show --run-dir path/to/existing_run
 relaytic memory show --run-dir path/to/existing_run
 relaytic benchmark show --run-dir path/to/existing_run
+relaytic decision show --run-dir path/to/existing_run
 ```
 
 Run the repository leak scan before commits:
@@ -259,6 +257,13 @@ relaytic run --data-path path/to/data.csv --text "Do everything on your own. Pre
 
 That command now carries the run through intake, investigation, cross-run memory retrieval, planning, execution, challenger pressure, ablation checks, semantic debate, audit, privacy-safe research retrieval, benchmark comparison, completion, lifecycle review, bounded autonomous follow-up, and summary materialization.
 
+The current one-run lab surface also includes explicit decision review:
+
+```bash
+relaytic decision review --run-dir path/to/existing_run
+relaytic decision show --run-dir path/to/existing_run
+```
+
 You can also inspect or stage richer local sources first:
 
 ```bash
@@ -303,6 +308,7 @@ relaytic evidence run --run-dir artifacts/run_demo --data-path path/to/data.csv
 relaytic intelligence run --run-dir artifacts/run_demo
 relaytic research gather --run-dir artifacts/run_demo
 relaytic benchmark run --run-dir artifacts/run_demo --data-path path/to/data.csv
+relaytic benchmark run --run-dir artifacts/run_demo --data-path path/to/data.csv --incumbent-path path/to/legacy_model.pkl --incumbent-kind model --incumbent-name legacy_model
 relaytic profiles review --run-dir artifacts/run_demo
 relaytic completion review --run-dir artifacts/run_demo
 relaytic lifecycle review --run-dir artifacts/run_demo --data-path path/to/data.csv
