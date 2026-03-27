@@ -150,7 +150,7 @@ Relaytic/
 
 Reserved future boundaries:
 
-- `src/relaytic/mission_control/` should own the first mission-control MVP, onboarding/install-health state, launch metadata, review-queue state, and later professional operator surfaces
+- `src/relaytic/mission_control/` owns the first mission-control MVP, onboarding/install-health state, launch metadata, review-queue state, static control-center rendering, and later professional operator surfaces
 - `src/relaytic/pulse/` should own periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
 - `src/relaytic/tracing/` should own canonical trace schemas, specialist/tool/intervention/branch trace persistence, and replay/query surfaces
 - `src/relaytic/evals/` should own agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs

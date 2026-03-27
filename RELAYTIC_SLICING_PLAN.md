@@ -211,22 +211,21 @@ Why:
 - Slice 10C should now come before Slice 10A because Relaytic needs skeptical steering, intervention contracts, causal memory, and control-injection defenses before it expands decision authority again
 - Slice 10A is the category-shift slice that turns Relaytic from a governed model/evaluation engine into a decision-and-discovery engine with compiled methods and data-acquisition reasoning
 - Slice 11A turns Relaytic's benchmark and challenger story into something much more real for operators and recruiters by letting users attach an incumbent model and forcing Relaytic to beat it honestly
-- Slice 11B should now come before Slice 12 because Relaytic needs a real operator-facing control center and a low-friction install/onboarding path before dojo and later frontier slices are worth demoing broadly
+- Slice 11B is now implemented and gives Relaytic a real operator-facing control center plus a low-friction install/onboarding path before dojo and later frontier slices expand the lab
 - Slice 12A should come after dojo because periodic awareness, innovation watching, and bounded background follow-up are much safer once self-improvement stays quarantined and promotion rules already exist
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because wider search and full trace-backed mission control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 11A, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, and Slice 11A imported-incumbent beat-target support
-- next execution target: Slice 11B
-- next self-improvement follow-on after Slice 11B: Slice 12
+- implemented baseline: Slice 00 through Slice 11B, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, and Slice 11B mission-control/onboarding/install surfaces
+- next execution target: Slice 12
 - next pulse follow-on after Slice 12: Slice 12A
 - next trace-and-safety follow-on after Slice 12A: Slice 12B
 - next scale-and-search follow-on after Slice 12B: Slice 13
 - later mission-control expansion after Slice 14: Slice 15
 - late optional representation follow-on after Slice 15: Slice 16
-- after Slice 11B lands, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control and onboarding surfaces instead of treating UI as a separate late-polish track
+- after Slice 11B, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control and onboarding surfaces instead of treating UI as a separate late-polish track
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -1285,7 +1284,7 @@ Innovation hook:
 ## Slice 11B - Mission control MVP, onboarding, and one-command install
 
 Status:
-- planned
+- implemented
 
 Goal:
 - first real local control center
@@ -1335,10 +1334,10 @@ Required behavior:
 
 First implementation moves:
 
-1. Introduce `src/relaytic/mission_control/` as the canonical package for mission-control state, operator cards, onboarding state, and launch metadata.
-2. Add a localhost control-center surface that reuses current runtime, summary, benchmark, decision, assist, and control artifacts instead of recalculating them.
-3. Upgrade `scripts/install_relaytic.py`, packaging metadata, and `relaytic doctor` wiring so a fresh user can install, verify, and launch the control center from one obvious path.
-4. Add explicit install-health, onboarding, launch, and review-queue artifacts so CLI, MCP, and UI can all render the same operator truth.
+1. Introduce `src/relaytic/mission_control/` as the canonical package for mission-control state, operator cards, onboarding state, launch metadata, and static control-center rendering.
+2. Add `relaytic mission-control show` and `relaytic mission-control launch` so the same operator truth is available through CLI, artifact files, and MCP-accessible inspection.
+3. Upgrade `scripts/install_relaytic.py`, packaging metadata, and doctor wiring so a fresh user can verify the environment and optionally land in the control center from one obvious path.
+4. Add explicit install-health, onboarding, launch, review-queue, demo-session, and UI-preference artifacts so CLI, MCP, and UI render the same operator truth.
 5. Ensure later slice docs and future code consume the same mission-control package instead of adding parallel UI shells.
 
 Minimum proof:

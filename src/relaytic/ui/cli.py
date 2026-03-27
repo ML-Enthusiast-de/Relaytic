@@ -7,6 +7,7 @@ import json
 import re
 import shutil
 import sys
+import webbrowser
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -258,6 +259,24 @@ def render_profiles_review_markdown(*args: Any, **kwargs: Any) -> Any:
     from relaytic.profiles import render_profiles_review_markdown as _render_profiles_review_markdown
 
     return _render_profiles_review_markdown(*args, **kwargs)
+
+
+def run_mission_control_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.mission_control import run_mission_control_review as _run_mission_control_review
+
+    return _run_mission_control_review(*args, **kwargs)
+
+
+def read_mission_control_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.mission_control import read_mission_control_bundle as _read_mission_control_bundle
+
+    return _read_mission_control_bundle(*args, **kwargs)
+
+
+def render_mission_control_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.mission_control import render_mission_control_markdown as _render_mission_control_markdown
+
+    return _render_mission_control_markdown(*args, **kwargs)
 
 
 def run_control_review(*args: Any, **kwargs: Any) -> Any:
@@ -1709,6 +1728,57 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    mission_control = sub.add_parser(
+        "mission-control",
+        help="Launch or inspect the Slice 11B local control-center and onboarding surface.",
+    )
+    mission_control_sub = mission_control.add_subparsers(dest="mission_control_command", required=True)
+
+    mission_control_show = mission_control_sub.add_parser(
+        "show",
+        help="Materialize and render the current mission-control state as CLI/MCP-friendly output.",
+    )
+    mission_control_show.add_argument("--run-dir", default=None, help="Optional run directory to render inside mission control.")
+    mission_control_show.add_argument("--output-dir", default=None, help="Optional state directory for onboarding-only mission control output.")
+    mission_control_show.add_argument("--config", default=None, help="Optional config/policy source.")
+    mission_control_show.add_argument(
+        "--expected-profile",
+        choices=["core", "full"],
+        default="full",
+        help="Doctor profile mission control should reflect.",
+    )
+    mission_control_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    mission_control_launch = mission_control_sub.add_parser(
+        "launch",
+        help="Write the local mission-control HTML report and optionally open it in the browser.",
+    )
+    mission_control_launch.add_argument("--run-dir", default=None, help="Optional run directory to render inside mission control.")
+    mission_control_launch.add_argument("--output-dir", default=None, help="Optional state directory for onboarding-only mission control output.")
+    mission_control_launch.add_argument("--config", default=None, help="Optional config/policy source.")
+    mission_control_launch.add_argument(
+        "--expected-profile",
+        choices=["core", "full"],
+        default="full",
+        help="Doctor profile mission control should reflect.",
+    )
+    mission_control_launch.add_argument(
+        "--no-browser",
+        action="store_true",
+        help="Do not open the generated static mission-control report in the default browser.",
+    )
+    mission_control_launch.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     plan = sub.add_parser(
         "plan",
         help="Create Slice 05 planning artifacts and execute the first deterministic route.",
@@ -1893,6 +1963,35 @@ def main(argv: list[str] | None = None) -> int:
             output_format=args.format,
         )
         return 1 if str(payload.get("status", "")).strip() == "error" else 0
+
+    if args.command == "mission-control":
+        if args.mission_control_command == "show":
+            payload = _show_mission_control_surface(
+                run_dir=args.run_dir,
+                output_dir=args.output_dir,
+                config_path=args.config,
+                expected_profile=args.expected_profile,
+            )
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.mission_control_command == "launch":
+            payload = _launch_mission_control_surface(
+                run_dir=args.run_dir,
+                output_dir=args.output_dir,
+                config_path=args.config,
+                expected_profile=args.expected_profile,
+                open_browser=not args.no_browser,
+            )
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
 
     if args.command == "integrations":
         if args.integrations_command == "show":
@@ -3850,6 +3949,148 @@ def _show_runtime_events(*, run_dir: str | Path, limit: int = 20) -> dict[str, A
     }
 
 
+def _show_mission_control_surface(
+    *,
+    run_dir: str | None,
+    output_dir: str | None,
+    config_path: str | None,
+    expected_profile: str,
+) -> dict[str, Any]:
+    from relaytic.mission_control import write_mission_control_bundle
+
+    state_root = _resolve_mission_control_root(run_dir=run_dir, output_dir=output_dir)
+    policy = _load_mission_control_policy(run_dir=run_dir, config_path=config_path)
+    review = run_mission_control_review(
+        root_dir=state_root,
+        run_dir=run_dir,
+        expected_profile=expected_profile,
+        policy=policy,
+        browser_requested=False,
+        browser_opened=False,
+    )
+    written = write_mission_control_bundle(
+        state_root,
+        bundle=review.bundle,
+        html_report=review.html_report,
+    )
+    manifest_path = _refresh_mission_control_manifest(state_root)
+    bundle = review.bundle.to_dict()
+    state = dict(bundle.get("mission_control_state", {}))
+    queue = dict(bundle.get("review_queue_state", {}))
+    onboarding = dict(bundle.get("onboarding_status", {}))
+    launch = dict(bundle.get("launch_manifest", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(run_dir) if run_dir is not None else None,
+            "state_dir": str(state_root),
+            "manifest_path": str(manifest_path),
+            "paths": {key: str(value) for key, value in written.items()},
+            "mission_control": {
+                "current_stage": state.get("current_stage"),
+                "recommended_action": state.get("recommended_action"),
+                "review_required": state.get("review_required"),
+                "card_count": state.get("card_count"),
+                "review_queue_pending_count": queue.get("pending_count"),
+                "launch_ready": onboarding.get("launch_ready"),
+                "doctor_status": onboarding.get("doctor_status"),
+                "html_report_path": launch.get("html_report_path"),
+            },
+            "bundle": bundle,
+        },
+        "human_output": review.review_markdown,
+    }
+
+
+def _launch_mission_control_surface(
+    *,
+    run_dir: str | None,
+    output_dir: str | None,
+    config_path: str | None,
+    expected_profile: str,
+    open_browser: bool,
+) -> dict[str, Any]:
+    from relaytic.mission_control import write_mission_control_artifact, write_mission_control_bundle
+
+    state_root = _resolve_mission_control_root(run_dir=run_dir, output_dir=output_dir)
+    policy = _load_mission_control_policy(run_dir=run_dir, config_path=config_path)
+    review = run_mission_control_review(
+        root_dir=state_root,
+        run_dir=run_dir,
+        expected_profile=expected_profile,
+        policy=policy,
+        browser_requested=open_browser,
+        browser_opened=False,
+    )
+    written = write_mission_control_bundle(
+        state_root,
+        bundle=review.bundle,
+        html_report=review.html_report,
+    )
+    report_path = written["mission_control_report"]
+    browser_opened = False
+    if open_browser:
+        try:
+            browser_opened = bool(webbrowser.open(report_path.resolve().as_uri()))
+        except Exception:
+            browser_opened = False
+    bundle = review.bundle.to_dict()
+    launch_payload = dict(bundle.get("launch_manifest", {}))
+    launch_payload["browser_requested"] = open_browser
+    launch_payload["browser_opened"] = browser_opened
+    write_mission_control_artifact(state_root, key="launch_manifest", payload=launch_payload)
+    bundle["launch_manifest"] = launch_payload
+    manifest_path = _refresh_mission_control_manifest(state_root)
+    state = dict(bundle.get("mission_control_state", {}))
+    queue = dict(bundle.get("review_queue_state", {}))
+    onboarding = dict(bundle.get("onboarding_status", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(run_dir) if run_dir is not None else None,
+            "state_dir": str(state_root),
+            "manifest_path": str(manifest_path),
+            "paths": {**{key: str(value) for key, value in written.items()}, "launch_manifest": str(state_root / "launch_manifest.json")},
+            "mission_control": {
+                "current_stage": state.get("current_stage"),
+                "recommended_action": state.get("recommended_action"),
+                "review_required": state.get("review_required"),
+                "card_count": state.get("card_count"),
+                "review_queue_pending_count": queue.get("pending_count"),
+                "launch_ready": onboarding.get("launch_ready"),
+                "doctor_status": onboarding.get("doctor_status"),
+                "html_report_path": launch_payload.get("html_report_path"),
+                "browser_requested": launch_payload.get("browser_requested"),
+                "browser_opened": launch_payload.get("browser_opened"),
+            },
+            "bundle": bundle,
+        },
+        "human_output": review.review_markdown,
+    }
+
+
+def _resolve_mission_control_root(*, run_dir: str | None, output_dir: str | None) -> Path:
+    if run_dir:
+        return Path(run_dir)
+    if output_dir:
+        return Path(output_dir)
+    return Path("artifacts") / "mission_control_onboarding"
+
+
+def _load_mission_control_policy(*, run_dir: str | None, config_path: str | None) -> dict[str, Any]:
+    if run_dir:
+        resolved_path = Path(run_dir) / "policy_resolved.yaml"
+        if resolved_path.exists():
+            try:
+                return load_policy(resolved_path).policy
+            except Exception:
+                pass
+    try:
+        return load_policy(config_path).policy
+    except Exception:
+        return {}
+
+
 def _materialize_assist_surface(
     *,
     run_dir: str | Path,
@@ -4082,6 +4323,10 @@ def _run_assist_stage_pipeline(
                 data_path=resolved_data_path,
                 config_path=config_path,
                 run_id=None,
+                sheet_name=None,
+                header_row=None,
+                data_start_row=None,
+                timestamp_column=None,
                 overwrite=True,
                 labels=labels,
                 runtime_surface="cli",
@@ -4114,6 +4359,7 @@ def _run_assist_stage_pipeline(
             executed.append(stage)
             continue
         if stage == "benchmark":
+            incumbent_config = _resolve_existing_incumbent_config(root)
             _run_benchmark_phase(
                 run_dir=root,
                 data_path=resolved_data_path,
@@ -4121,6 +4367,9 @@ def _run_assist_stage_pipeline(
                 run_id=None,
                 overwrite=True,
                 labels=labels,
+                incumbent_path=incumbent_config.get("incumbent_path"),
+                incumbent_kind=incumbent_config.get("incumbent_kind"),
+                incumbent_name=incumbent_config.get("incumbent_name"),
                 runtime_surface="cli",
                 runtime_command="relaytic assist turn",
             )
@@ -4411,6 +4660,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.assist import read_assist_bundle
 
         return read_assist_bundle(run_dir)
+    if bundle == "mission_control":
+        from relaytic.mission_control import read_mission_control_bundle
+
+        return read_mission_control_bundle(run_dir)
     raise ValueError(f"Unsupported bundle '{bundle}'.")
 
 
@@ -6384,6 +6637,7 @@ def _run_completion_phase(
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
     )
+    incumbent_config = _resolve_existing_incumbent_config(root)
     _run_benchmark_phase(
         run_dir=root,
         data_path=_resolve_run_data_path(root),
@@ -6391,6 +6645,9 @@ def _run_completion_phase(
         run_id=run_id,
         overwrite=overwrite,
         labels=labels,
+        incumbent_path=incumbent_config.get("incumbent_path"),
+        incumbent_kind=incumbent_config.get("incumbent_kind"),
+        incumbent_name=incumbent_config.get("incumbent_name"),
         runtime_surface=runtime_surface,
         runtime_command=runtime_command,
     )
@@ -7321,6 +7578,35 @@ def _assist_output_paths(run_dir: Path) -> dict[str, Path]:
         "assist_session_state": run_dir / "assist_session_state.json",
         "assistant_connection_guide": run_dir / "assistant_connection_guide.json",
         "assist_turn_log": run_dir / "assist_turn_log.jsonl",
+    }
+
+
+def _mission_control_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "mission_control_state": run_dir / "mission_control_state.json",
+        "review_queue_state": run_dir / "review_queue_state.json",
+        "control_center_layout": run_dir / "control_center_layout.json",
+        "onboarding_status": run_dir / "onboarding_status.json",
+        "install_experience_report": run_dir / "install_experience_report.json",
+        "launch_manifest": run_dir / "launch_manifest.json",
+        "demo_session_manifest": run_dir / "demo_session_manifest.json",
+        "ui_preferences": run_dir / "ui_preferences.json",
+        "mission_control_report": run_dir / "reports" / "mission_control.html",
+    }
+
+
+def _resolve_existing_incumbent_config(run_dir: Path) -> dict[str, str | None]:
+    bundle = _read_json_bundle(run_dir, bundle="benchmark")
+    if not bundle:
+        return {}
+    manifest = dict(bundle.get("external_challenger_manifest", {}))
+    source_path = str(manifest.get("source_path", "")).strip()
+    if not source_path or not bool(manifest.get("executable_locally")):
+        return {}
+    return {
+        "incumbent_path": source_path,
+        "incumbent_kind": str(manifest.get("incumbent_kind", "")).strip() or None,
+        "incumbent_name": str(manifest.get("incumbent_name", "")).strip() or None,
     }
 
 
@@ -8393,6 +8679,67 @@ def _refresh_control_manifest(
     return write_manifest(
         run_dir=root,
         run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_mission_control_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    if (root / "run_summary.json").exists():
+        _refresh_control_manifest(
+            root,
+            run_id=run_id,
+            policy_source=policy_source,
+            labels=labels,
+        )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for key, path in _mission_control_output_paths(root).items():
+        if not path.exists():
+            continue
+        relative_path = path.relative_to(root)
+        entries.append(
+            artifact_entry(
+                relative_path.as_posix(),
+                run_dir=root,
+                kind="mission_control",
+                required=key != "mission_control_report",
+            )
+        )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
         policy_source=policy_source or existing.get("policy_source"),
         labels=merged_labels,
         entries=deduped_entries,

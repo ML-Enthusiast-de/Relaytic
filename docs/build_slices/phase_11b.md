@@ -2,9 +2,9 @@
 
 ## Status
 
-Planned.
+Implemented.
 
-Intended package boundaries:
+Shipped package boundaries:
 
 - `src/relaytic/mission_control/`
 - extend `src/relaytic/ui/`
@@ -12,7 +12,7 @@ Intended package boundaries:
 - extend `src/relaytic/interoperability/`
 - extend `scripts/`
 
-Intended artifacts:
+Shipped artifacts:
 
 - `mission_control_state.json`
 - `review_queue_state.json`
@@ -22,6 +22,7 @@ Intended artifacts:
 - `launch_manifest.json`
 - `demo_session_manifest.json`
 - `ui_preferences.json`
+- `reports/mission_control.html`
 
 ## Intent
 
@@ -89,3 +90,13 @@ Slice 11B should not be considered complete without targeted tests that cover at
 - one incumbent/benchmark card case
 - one assist/control interaction case
 - one CLI/MCP/UI parity case
+
+## Shipped Surface
+
+The implemented surface now includes:
+
+- `relaytic mission-control show`
+- `relaytic mission-control launch`
+- `python scripts/install_relaytic.py --launch-control-center`
+- MCP-visible inspection through `relaytic_show_mission_control`
+- shared persisted artifacts for onboarding state, review queue, launch metadata, demo-session state, and a static local HTML report

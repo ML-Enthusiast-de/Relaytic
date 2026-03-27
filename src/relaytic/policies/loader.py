@@ -96,6 +96,7 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     profiles_cfg = dict(config.get("profiles", {}))
     control_cfg = dict(config.get("control", {}))
     decision_cfg = dict(config.get("decision", {}))
+    mission_control_cfg = dict(config.get("mission_control", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
     contact_email = research_cfg.get("contact_email", "")
     if contact_email is None:
@@ -291,6 +292,17 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "controller_review_threshold": str(
                 decision_cfg.get("controller_review_threshold", "conditional_pass") or "conditional_pass"
             ),
+        },
+        "mission_control": {
+            "enabled": bool(mission_control_cfg.get("enabled", True)),
+            "allow_onboarding_without_run": bool(mission_control_cfg.get("allow_onboarding_without_run", True)),
+            "allow_browser_launch": bool(mission_control_cfg.get("allow_browser_launch", True)),
+            "prefer_static_html": bool(mission_control_cfg.get("prefer_static_html", True)),
+            "require_shared_truth": bool(mission_control_cfg.get("require_shared_truth", True)),
+            "expose_agent_surface": bool(mission_control_cfg.get("expose_agent_surface", True)),
+            "default_expected_profile": str(mission_control_cfg.get("default_expected_profile", "full") or "full"),
+            "default_theme": str(mission_control_cfg.get("default_theme", "signal") or "signal"),
+            "auto_open_browser": bool(mission_control_cfg.get("auto_open_browser", True)),
         },
         "runtime": {
             "gateway_enabled": bool(runtime_cfg.get("gateway_enabled", True)),

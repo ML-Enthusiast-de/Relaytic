@@ -48,6 +48,7 @@ from relaytic.interoperability.service import (
     relaytic_show_decision,
     relaytic_show_intelligence,
     relaytic_show_lifecycle,
+    relaytic_show_mission_control,
     relaytic_show_run,
     relaytic_show_runtime,
 )
@@ -88,6 +89,7 @@ __all__ = [
     "relaytic_show_decision",
     "relaytic_show_intelligence",
     "relaytic_show_lifecycle",
+    "relaytic_show_mission_control",
     "relaytic_show_run",
     "relaytic_show_runtime",
     "render_interoperability_inventory_markdown",

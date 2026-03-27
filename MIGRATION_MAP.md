@@ -189,6 +189,14 @@ Avoid introducing new references to:
 - extended the public command `relaytic benchmark run` so operators and external agents can attach incumbent models, prediction files, or rulesets directly
 - extended autonomy and run-summary surfaces so explicit beat-target contracts can change follow-up behavior instead of staying benchmark-only metadata
 
+### Slice 11B
+
+- introduced the canonical package boundary `src/relaytic/mission_control/`
+- introduced artifact boundaries for `mission_control_state.json`, `review_queue_state.json`, `control_center_layout.json`, `onboarding_status.json`, `install_experience_report.json`, `launch_manifest.json`, `demo_session_manifest.json`, `ui_preferences.json`, and `reports/mission_control.html`
+- introduced public commands `relaytic mission-control show` and `relaytic mission-control launch`
+- upgraded `scripts/install_relaytic.py` so install verification and local control-center launch can share one documented onboarding path instead of splitting environment health and operator entry into separate flows
+- introduced MCP-visible mission-control inspection through `relaytic_show_mission_control`
+
 ### Slice 10
 
 - introduced the canonical package boundary `src/relaytic/feedback/`
@@ -219,6 +227,7 @@ Avoid introducing new references to:
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/benchmark/` for Slice 11A imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts on top of Slice 11 reference comparisons
+- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, and static control-center rendering
 
 Shipped artifact names:
 
@@ -256,18 +265,6 @@ Shipped artifact names:
 - `external_challenger_evaluation.json`
 - `incumbent_parity_report.json`
 - `beat_target_contract.json`
-
-## Reserved Future Boundaries
-
-The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
-
-- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, and later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces
-- `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
-- `src/relaytic/tracing/` for Slice 12B canonical trace schemas, specialist/tool/intervention/branch traces, and replay/query surfaces
-- `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs
-- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
-
-Reserved future artifact names:
 - `mission_control_state.json`
 - `review_queue_state.json`
 - `control_center_layout.json`
@@ -276,6 +273,19 @@ Reserved future artifact names:
 - `launch_manifest.json`
 - `demo_session_manifest.json`
 - `ui_preferences.json`
+- `reports/mission_control.html`
+
+## Reserved Future Boundaries
+
+The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
+
+- `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
+- `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
+- `src/relaytic/tracing/` for Slice 12B canonical trace schemas, specialist/tool/intervention/branch traces, and replay/query surfaces
+- `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs
+- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+
+Reserved future artifact names:
 - `pulse_schedule.json`
 - `pulse_run_report.json`
 - `pulse_skip_report.json`

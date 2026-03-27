@@ -115,6 +115,17 @@ communication:
   allow_host_connection_guidance: true
   max_turn_history: 20
 
+mission_control:
+  enabled: true
+  allow_onboarding_without_run: true
+  allow_browser_launch: true
+  prefer_static_html: true
+  require_shared_truth: true
+  expose_agent_surface: true
+  default_expected_profile: full
+  default_theme: signal
+  auto_open_browser: true
+
 research:
   enabled: false
   require_redaction_default: true

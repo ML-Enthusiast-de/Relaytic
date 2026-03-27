@@ -55,6 +55,10 @@ integrations = [
 interop = [
   "mcp>=1.26,<2",
 ]
+serve = [
+  "mcp>=1.26,<2",
+]
+ui = []
 stats = [
   "scipy>=1.11",
 ]

@@ -4,9 +4,8 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 11A, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, and Slice 10C behavioral control contracts with skeptical steering and causal intervention memory
-- next recommended slice: 11B, mission control MVP, onboarding, and one-command install
-- next self-improvement follow-on after 11B: 12, dojo mode and guarded self-improvement
+- completed slices: 00 through 11B, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, and Slice 10C behavioral control contracts with skeptical steering and causal intervention memory
+- next recommended slice: 12, dojo mode and guarded self-improvement
 - next pulse follow-on after 12: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
 - next trace-and-safety follow-on after 12A: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
@@ -62,7 +61,8 @@ The repository currently supports:
 - routed intelligence profiles, explicit local semantic baseline selection, backend capability matrices, verifier-specific artifacts, and semantic-proof reporting so the optional LLM layer is visible and measurable rather than implicit
 - connection guidance that can recommend deterministic local-only use, lightweight local LLM setup, or local host connections for Claude, Codex/OpenAI, OpenClaw, and ChatGPT connector paths without making any of them mandatory
 - one-line bootstrap via `python scripts/install_relaytic.py` plus install-health verification via `relaytic doctor`
-- the next planned product step is to turn that install path and the current artifact stack into one coherent local control-center experience rather than leaving operator UX as a shell-only surface
+- a thin but real mission-control surface via `relaytic mission-control show` and `relaytic mission-control launch`, with shared local truth for onboarding, review queue, operator cards, launch metadata, and demo-session state
+- install-launch coupling so `python scripts/install_relaytic.py --launch-control-center` can verify the environment and land a user in the same local control-center flow without inventing a separate onboarding truth
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement

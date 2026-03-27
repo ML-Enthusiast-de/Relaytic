@@ -80,6 +80,17 @@ def relaytic_show_control(*, run_dir: str) -> dict[str, Any]:
     return cli._show_control_surface(run_dir=run_dir)
 
 
+def relaytic_show_mission_control(*, run_dir: str | None = None, expected_profile: str = "full") -> dict[str, Any]:
+    """Render the current Slice 11B mission-control surface for a Relaytic run or onboarding state."""
+    cli = _cli()
+    return cli._show_mission_control_surface(
+        run_dir=run_dir,
+        output_dir=None,
+        config_path=None,
+        expected_profile=expected_profile,
+    )
+
+
 def relaytic_get_status(*, run_dir: str) -> dict[str, Any]:
     """Render the completion-governor status for a Relaytic run."""
     cli = _cli()
@@ -499,6 +510,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_run",
             "relaytic_show_runtime",
             "relaytic_show_control",
+            "relaytic_show_mission_control",
             "relaytic_get_status",
             "relaytic_show_intelligence",
             "relaytic_show_research",
@@ -582,6 +594,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_control,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_mission_control",
+            title="Show Relaytic Mission Control",
+            description="Render the current Slice 11B operator control-center state, onboarding posture, and launch metadata for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_mission_control,
         ),
         InteropToolSpec(
             name="relaytic_get_status",

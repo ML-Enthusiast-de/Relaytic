@@ -47,7 +47,7 @@ Current canonical boundaries:
 
 Reserved future boundaries:
 
-- `src/relaytic/mission_control/` should own Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, and later Slice 15 branch DAG, confidence map, trace exploration, and change-attribution surfaces
+- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, static control-center rendering, and later Slice 15 branch DAG, confidence map, trace exploration, and change-attribution surfaces
 - `src/relaytic/pulse/` should own Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
 - `src/relaytic/tracing/` should own Slice 12B canonical trace schemas, specialist/tool/intervention/branch span persistence, and replay/query surfaces
 - `src/relaytic/evals/` should own Slice 12B agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs
@@ -238,7 +238,7 @@ The current slices must preserve these names:
 - `context_assembly_report.json`
 - `doc_grounding_report.json`
 
-Reserved future artifact names:
+Current mission-control artifact names:
 
 - `mission_control_state.json`
 - `review_queue_state.json`
@@ -248,6 +248,9 @@ Reserved future artifact names:
 - `launch_manifest.json`
 - `demo_session_manifest.json`
 - `ui_preferences.json`
+- `reports/mission_control.html`
+
+Reserved future artifact names:
 - `pulse_schedule.json`
 - `pulse_run_report.json`
 - `pulse_skip_report.json`
