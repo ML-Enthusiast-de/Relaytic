@@ -44,10 +44,11 @@ Current canonical boundaries:
 - `src/relaytic/compiler/` owns Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` owns Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` now also own Slice 11A imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts
+- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding plus live terminal mission-control chat surfaces, and later Slice 15 branch DAG, confidence map, trace exploration, and change-attribution surfaces
+- `src/relaytic/dojo/` owns Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback state, and architecture-proposal quarantine
 
 Reserved future boundaries:
 
-- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, static control-center rendering, and later Slice 15 branch DAG, confidence map, trace exploration, and change-attribution surfaces
 - `src/relaytic/pulse/` should own Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
 - `src/relaytic/tracing/` should own Slice 12B canonical trace schemas, specialist/tool/intervention/branch span persistence, and replay/query surfaces
 - `src/relaytic/evals/` should own Slice 12B agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs
@@ -88,6 +89,7 @@ These files are required and must stay current:
 - `docs/build_slices/phase_11.md`
 - `docs/build_slices/phase_11a.md`
 - `docs/build_slices/phase_11b.md`
+- `docs/build_slices/phase_11c.md`
 - `docs/build_slices/phase_12.md`
 - `docs/build_slices/phase_12a.md`
 - `docs/build_slices/phase_12b.md`
@@ -218,6 +220,10 @@ The current slices must preserve these names:
 - `reference_approach_matrix.json`
 - `benchmark_gap_report.json`
 - `benchmark_parity_report.json`
+- `external_challenger_manifest.json`
+- `external_challenger_evaluation.json`
+- `incumbent_parity_report.json`
+- `beat_target_contract.json`
 - `decision_world_model.json`
 - `controller_policy.json`
 - `handoff_controller_report.json`
@@ -243,12 +249,25 @@ Current mission-control artifact names:
 - `mission_control_state.json`
 - `review_queue_state.json`
 - `control_center_layout.json`
+- `mode_overview.json`
+- `capability_manifest.json`
+- `action_affordances.json`
+- `stage_navigator.json`
+- `question_starters.json`
 - `onboarding_status.json`
 - `install_experience_report.json`
 - `launch_manifest.json`
 - `demo_session_manifest.json`
 - `ui_preferences.json`
 - `reports/mission_control.html`
+
+Current dojo artifact names:
+
+- `dojo_session.json`
+- `dojo_hypotheses.json`
+- `dojo_results.json`
+- `dojo_promotions.json`
+- `architecture_proposals.json`
 
 Reserved future artifact names:
 - `pulse_schedule.json`

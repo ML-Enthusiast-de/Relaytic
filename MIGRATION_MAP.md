@@ -197,6 +197,21 @@ Avoid introducing new references to:
 - upgraded `scripts/install_relaytic.py` so install verification and local control-center launch can share one documented onboarding path instead of splitting environment health and operator entry into separate flows
 - introduced MCP-visible mission-control inspection through `relaytic_show_mission_control`
 
+### Slice 11C
+
+- extended the existing `src/relaytic/mission_control/` and `src/relaytic/assist/` boundaries instead of creating a separate UI-shell package
+- introduced artifact boundaries for `mode_overview.json`, `capability_manifest.json`, `action_affordances.json`, `stage_navigator.json`, and `question_starters.json`
+- upgraded the existing public commands `relaytic mission-control show`, `relaytic mission-control launch`, `relaytic assist show`, and `relaytic assist turn` so mission-control clarity is available through shared artifacts instead of UI-only state
+- upgraded CLI and MCP mission-control quick payloads so next actor, current mode, capability counts, action counts, question counts, and stage-navigation scope remain visible without decoding the full bundle
+
+### Slice 12
+
+- introduced the canonical package boundary `src/relaytic/dojo/`
+- introduced artifact boundaries for `dojo_session.json`, `dojo_hypotheses.json`, `dojo_results.json`, `dojo_promotions.json`, and `architecture_proposals.json`
+- introduced public commands `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`
+- introduced MCP-visible dojo inspection and review through `relaytic_show_dojo` and `relaytic_review_dojo`
+- upgraded run-summary and mission-control surfaces so dojo proposal state, validation outcomes, promotion counts, and rollback state remain visible instead of becoming CLI-only side state
+
 ### Slice 10
 
 - introduced the canonical package boundary `src/relaytic/feedback/`
@@ -227,7 +242,8 @@ Avoid introducing new references to:
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/benchmark/` for Slice 11A imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts on top of Slice 11 reference comparisons
-- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, and static control-center rendering
+- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, static control-center rendering, and Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions
+- `src/relaytic/dojo/` for Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and architecture-proposal quarantine
 
 Shipped artifact names:
 
@@ -268,12 +284,22 @@ Shipped artifact names:
 - `mission_control_state.json`
 - `review_queue_state.json`
 - `control_center_layout.json`
+- `mode_overview.json`
+- `capability_manifest.json`
+- `action_affordances.json`
+- `stage_navigator.json`
+- `question_starters.json`
 - `onboarding_status.json`
 - `install_experience_report.json`
 - `launch_manifest.json`
 - `demo_session_manifest.json`
 - `ui_preferences.json`
 - `reports/mission_control.html`
+- `dojo_session.json`
+- `dojo_hypotheses.json`
+- `dojo_results.json`
+- `dojo_promotions.json`
+- `architecture_proposals.json`
 
 ## Reserved Future Boundaries
 

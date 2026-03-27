@@ -126,6 +126,16 @@ mission_control:
   default_theme: signal
   auto_open_browser: true
 
+dojo:
+  enabled: true
+  allow_method_self_improvement: true
+  allow_architecture_proposals: true
+  require_quarantine_before_promotion: true
+  require_benchmark_gate: true
+  require_quality_proxy_gate: true
+  require_control_security_gate: true
+  max_active_promotions: 3
+
 research:
   enabled: false
   require_redaction_default: true

@@ -8,20 +8,30 @@ from html import escape
 from pathlib import Path
 from typing import Any
 
-from relaytic.assist.storage import read_assist_bundle
+from relaytic.assist import build_assist_bundle
+from relaytic.assist.storage import read_assist_bundle, write_assist_bundle
+from relaytic.intelligence import build_intelligence_controls_from_policy
+from relaytic.intelligence.backends import discover_backend
 from relaytic.interoperability.self_check import build_interoperability_inventory
 from relaytic.runs.summary import materialize_run_summary, read_run_summary
 from relaytic.ui.doctor import build_doctor_report
 
 from .models import (
+    ACTION_AFFORDANCES_SCHEMA_VERSION,
+    CAPABILITY_MANIFEST_SCHEMA_VERSION,
     CONTROL_CENTER_LAYOUT_SCHEMA_VERSION,
     DEMO_SESSION_MANIFEST_SCHEMA_VERSION,
     INSTALL_EXPERIENCE_REPORT_SCHEMA_VERSION,
     LAUNCH_MANIFEST_SCHEMA_VERSION,
+    MODE_OVERVIEW_SCHEMA_VERSION,
     MISSION_CONTROL_STATE_SCHEMA_VERSION,
     ONBOARDING_STATUS_SCHEMA_VERSION,
+    QUESTION_STARTERS_SCHEMA_VERSION,
     REVIEW_QUEUE_STATE_SCHEMA_VERSION,
+    STAGE_NAVIGATOR_SCHEMA_VERSION,
     UI_PREFERENCES_SCHEMA_VERSION,
+    ActionAffordances,
+    CapabilityManifest,
     ControlCenterLayout,
     DemoSessionManifest,
     InstallExperienceReport,
@@ -30,8 +40,11 @@ from .models import (
     MissionControlControls,
     MissionControlState,
     MissionControlTrace,
+    ModeOverview,
     OnboardingStatus,
+    QuestionStarters,
     ReviewQueueState,
+    StageNavigator,
     UIPreferences,
     build_mission_control_controls_from_policy,
 )
@@ -60,7 +73,6 @@ def run_mission_control_review(
     normalized_profile = _normalize_expected_profile(expected_profile, controls=controls)
     doctor_report = build_doctor_report(expected_profile=normalized_profile)
     interoperability_inventory = build_interoperability_inventory()
-    assist_bundle = read_assist_bundle(resolved_run_dir) if resolved_run_dir else {}
     summary_payload: dict[str, Any] = {}
     summary_paths: dict[str, str | None] = {"summary_path": None, "report_path": None}
     if resolved_run_dir is not None and resolved_run_dir.exists():
@@ -72,6 +84,12 @@ def run_mission_control_review(
         }
     elif resolved_run_dir is not None:
         summary_payload = read_run_summary(resolved_run_dir)
+    assist_bundle = _materialize_mission_control_assist_bundle(
+        run_dir=resolved_run_dir,
+        policy=policy or {},
+        summary_payload=summary_payload,
+        interoperability_inventory=interoperability_inventory,
+    )
     trace = _trace(
         note="mission-control state derived from canonical run summary, doctor, interoperability inventory, and assist guidance"
     )
@@ -88,6 +106,39 @@ def run_mission_control_review(
         assist_bundle=assist_bundle,
         review_queue=review_queue,
     )
+    mode_overview = _build_mode_overview(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        assist_bundle=assist_bundle,
+    )
+    capability_manifest = _build_capability_manifest(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        assist_bundle=assist_bundle,
+        interoperability_inventory=interoperability_inventory,
+        doctor_report=doctor_report,
+    )
+    action_affordances = _build_action_affordances(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        assist_bundle=assist_bundle,
+        review_queue=review_queue,
+    )
+    stage_navigator = _build_stage_navigator(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        assist_bundle=assist_bundle,
+    )
+    question_starters = _build_question_starters(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        assist_bundle=assist_bundle,
+    )
     mission_control_state = MissionControlState(
         schema_version=MISSION_CONTROL_STATE_SCHEMA_VERSION,
         generated_at=_utc_now(),
@@ -101,10 +152,14 @@ def run_mission_control_review(
         or "onboarding",
         recommended_action=_clean_text(dict(summary_payload.get("next_step", {})).get("recommended_action"))
         or ("fix_environment" if doctor_report.get("status") == "error" else "launch_or_run"),
+        next_actor=_clean_text(dict(summary_payload.get("decision_lab", {})).get("next_actor")) or "operator",
         review_required=bool(dict(summary_payload.get("decision_lab", {})).get("review_required"))
         or review_queue.blocking_count > 0,
         card_count=len(cards),
         review_queue_pending_count=review_queue.pending_count,
+        capability_count=capability_manifest.capability_count,
+        action_count=action_affordances.action_count,
+        question_count=question_starters.question_count,
         cards=cards,
         summary=_mission_control_summary(summary_payload=summary_payload, doctor_report=doctor_report),
         trace=trace,
@@ -116,6 +171,7 @@ def run_mission_control_review(
         expected_profile=normalized_profile,
         doctor_report=doctor_report,
         interoperability_inventory=interoperability_inventory,
+        summary_payload=summary_payload,
         run_dir=resolved_run_dir,
         root_dir=root,
     )
@@ -159,6 +215,11 @@ def run_mission_control_review(
         mission_control_state=mission_control_state,
         review_queue_state=review_queue,
         control_center_layout=layout,
+        mode_overview=mode_overview,
+        capability_manifest=capability_manifest,
+        action_affordances=action_affordances,
+        stage_navigator=stage_navigator,
+        question_starters=question_starters,
         onboarding_status=onboarding,
         install_experience_report=install,
         launch_manifest=launch_manifest,
@@ -176,22 +237,57 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
     payload = bundle.to_dict() if isinstance(bundle, MissionControlBundle) else dict(bundle)
     state = dict(payload.get("mission_control_state", {}))
     review_queue = dict(payload.get("review_queue_state", {}))
+    modes = dict(payload.get("mode_overview", {}))
+    capabilities = dict(payload.get("capability_manifest", {}))
+    affordances = dict(payload.get("action_affordances", {}))
+    navigator = dict(payload.get("stage_navigator", {}))
+    questions = dict(payload.get("question_starters", {}))
     onboarding = dict(payload.get("onboarding_status", {}))
     launch = dict(payload.get("launch_manifest", {}))
     cards = [dict(item) for item in state.get("cards", []) if isinstance(item, dict)]
+    current_requirements = [str(item).strip() for item in onboarding.get("current_requirements", []) if str(item).strip()]
+    first_steps = [str(item).strip() for item in onboarding.get("first_steps", []) if str(item).strip()]
+    interaction_modes = [dict(item) for item in onboarding.get("interaction_modes", []) if isinstance(item, dict)]
     lines = [
         "# Relaytic Mission Control",
         "",
         f"- Status: `{state.get('status') or 'unknown'}`",
         f"- Current stage: `{state.get('current_stage') or 'onboarding'}`",
         f"- Recommended action: `{state.get('recommended_action') or 'none'}`",
+        f"- Next actor: `{state.get('next_actor') or 'operator'}`",
         f"- Review queue: `{review_queue.get('pending_count', 0)}` pending / `{review_queue.get('blocking_count', 0)}` blocking",
+        f"- Capability count: `{state.get('capability_count', 0)}`",
+        f"- Action count: `{state.get('action_count', 0)}`",
+        f"- Question starters: `{state.get('question_count', 0)}`",
         f"- Launch ready: `{onboarding.get('launch_ready')}`",
         f"- Doctor status: `{onboarding.get('doctor_status') or 'unknown'}`",
         f"- HTML report: `{launch.get('html_report_path') or 'not written'}`",
         "",
-        "## Cards",
+        "## What Relaytic Is",
+        str(onboarding.get("what_relaytic_is") or "Relaytic is a local-first structured-data lab."),
+        "",
     ]
+    if current_requirements:
+        lines.extend(["## What Relaytic Needs Right Now"])
+        lines.extend(f"- {item}" for item in current_requirements[:4])
+        lines.append("")
+    if first_steps:
+        lines.extend(["## First Steps"])
+        lines.extend(f"- {item}" for item in first_steps[:4])
+        lines.append("")
+    if interaction_modes:
+        lines.extend(["## How To Interact"])
+        for item in interaction_modes[:4]:
+            command = str(item.get("command", "")).strip()
+            detail = str(item.get("detail", "")).strip()
+            line = f"- `{item.get('name', 'Mode')}`: {detail}"
+            if command:
+                line += f" Use `{command}`."
+            lines.append(line)
+        lines.append("")
+    lines.extend([
+        "## Cards",
+    ])
     for item in cards[:8]:
         title = str(item.get("title", "Card")).strip() or "Card"
         lines.append(f"- `{title}`: {str(item.get('value', 'n/a')).strip() or 'n/a'}")
@@ -206,6 +302,84 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
                 f"- `{item.get('source', 'unknown')}` `{item.get('severity', 'info')}`: "
                 f"{str(item.get('title', 'Queued item')).strip()}"
             )
+    if modes:
+        lines.extend(
+            [
+                "",
+                "## Modes",
+                f"- Autonomy mode: `{modes.get('autonomy_mode') or 'unknown'}`",
+                f"- Intelligence mode: `{modes.get('intelligence_effective_mode') or 'unknown'}`",
+                f"- Routed intelligence: `{modes.get('intelligence_routed_mode') or 'unknown'}`",
+                f"- Local profile: `{modes.get('local_profile') or 'unknown'}`",
+                f"- Takeover available: `{modes.get('takeover_available')}`",
+                f"- Skeptical control active: `{modes.get('skeptical_control_active')}`",
+            ]
+        )
+    capability_items = [dict(item) for item in capabilities.get("capabilities", []) if isinstance(item, dict)]
+    if capability_items:
+        lines.extend(["", "## Capabilities"])
+        for item in capability_items[:8]:
+            lines.append(
+                f"- `{item.get('name', 'capability')}` `{item.get('status', 'unknown')}`: "
+                f"{str(item.get('detail', '')).strip()}"
+            )
+        blocked = [
+            item
+            for item in capability_items
+            if str(dict(item).get("status", "")).strip().lower() not in {"enabled", "ready", "ok"}
+        ]
+        if blocked:
+            lines.extend(["", "## Why Some Capabilities Need Setup"])
+            for item in blocked[:8]:
+                reason = str(item.get("status_reason", "")).strip()
+                hint = str(item.get("activation_hint", "")).strip()
+                lines.append(f"- `{item.get('name', 'capability')}`: {reason or 'Needs additional setup or run context.'}")
+                if hint:
+                    lines.append(f"  Next: {hint}")
+    action_items = [dict(item) for item in affordances.get("actions", []) if isinstance(item, dict)]
+    if action_items:
+        lines.extend(["", "## You Can Do Now"])
+        for item in action_items[:8]:
+            line = (
+                f"- `{item.get('title', 'action')}` "
+                f"[challenge `{item.get('challenge_level', 'low')}`]: "
+                f"{str(item.get('detail', '')).strip()}"
+            )
+            command_hint = str(item.get("command_hint", "")).strip()
+            if command_hint:
+                line += f" Use `{command_hint}`."
+            lines.append(line)
+    stages = [dict(item) for item in navigator.get("available_stages", []) if isinstance(item, dict)]
+    if stages:
+        lines.extend(
+            [
+                "",
+                "## Stage Navigation",
+                f"- Navigation scope: `{navigator.get('navigation_scope') or 'unknown'}`",
+                f"- Jump to any point: `{navigator.get('can_jump_to_any_point')}`",
+            ]
+        )
+        for item in stages[:12]:
+            lines.append(
+                f"- `{item.get('stage', 'unknown')}`: {str(item.get('detail', '')).strip()}"
+            )
+    starter_items = [dict(item) for item in questions.get("starters", []) if isinstance(item, dict)]
+    if starter_items:
+        lines.extend(["", "## Ask Relaytic"])
+        for item in starter_items[:8]:
+            lines.append(
+                f"- `{item.get('question', 'question')}`: {str(item.get('detail', '')).strip()}"
+            )
+    live_chat_command = str(onboarding.get("live_chat_command", "")).strip()
+    if live_chat_command:
+        lines.extend(
+            [
+                "",
+                "## Live Terminal Chat",
+                "- Mission control is a dashboard, not a chat session.",
+                f"- To ask questions in the terminal, run `{live_chat_command}`.",
+            ]
+        )
     commands = [str(item).strip() for item in onboarding.get("recommended_commands", []) if str(item).strip()]
     if commands:
         lines.extend(["", "## Commands"])
@@ -218,6 +392,11 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
     state = dict(payload.get("mission_control_state", {}))
     review_queue = dict(payload.get("review_queue_state", {}))
     layout = dict(payload.get("control_center_layout", {}))
+    modes = dict(payload.get("mode_overview", {}))
+    capabilities = dict(payload.get("capability_manifest", {}))
+    affordances = dict(payload.get("action_affordances", {}))
+    navigator = dict(payload.get("stage_navigator", {}))
+    questions = dict(payload.get("question_starters", {}))
     onboarding = dict(payload.get("onboarding_status", {}))
     install = dict(payload.get("install_experience_report", {}))
     launch = dict(payload.get("launch_manifest", {}))
@@ -225,7 +404,25 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
     cards = [dict(item) for item in state.get("cards", []) if isinstance(item, dict)]
     review_items = [dict(item) for item in review_queue.get("items", []) if isinstance(item, dict)]
     commands = [str(item).strip() for item in onboarding.get("recommended_commands", []) if str(item).strip()]
+    current_requirements = [str(item).strip() for item in onboarding.get("current_requirements", []) if str(item).strip()]
+    first_steps = [str(item).strip() for item in onboarding.get("first_steps", []) if str(item).strip()]
+    interaction_modes = [dict(item) for item in onboarding.get("interaction_modes", []) if isinstance(item, dict)]
     panels = [dict(item) for item in layout.get("panels", []) if isinstance(item, dict)]
+    capability_items = [dict(item) for item in capabilities.get("capabilities", []) if isinstance(item, dict)]
+    blocked_capability_items = [
+        item
+        for item in capability_items
+        if str(dict(item).get("status", "")).strip().lower() not in {"enabled", "ready", "ok"}
+    ]
+    action_items = [dict(item) for item in affordances.get("actions", []) if isinstance(item, dict)]
+    stage_items = [dict(item) for item in navigator.get("available_stages", []) if isinstance(item, dict)]
+    question_items = [dict(item) for item in questions.get("starters", []) if isinstance(item, dict)]
+    hero_body = (
+        str(onboarding.get("what_relaytic_is") or "")
+        if bool(onboarding.get("needs_data"))
+        else str(state.get("headline") or "Relaytic mission control is ready.")
+    )
+    live_chat_command = str(onboarding.get("live_chat_command") or "relaytic mission-control chat").strip()
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -269,6 +466,15 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
     .hero h1 {{ margin: 0 0 10px; font-size: clamp(2rem, 4vw, 3.3rem); letter-spacing: -0.04em; }}
     .hero p {{ margin: 0; color: rgba(246,251,251,0.84); max-width: 820px; line-height: 1.5; }}
     .hero-meta {{ margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; }}
+    .hero-actions {{ margin-top: 18px; display: flex; flex-wrap: wrap; gap: 12px; }}
+    .hero-actions code {{
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.14);
+      color: #f6fbfb;
+      border: 1px solid rgba(255,255,255,0.18);
+    }}
     .pill {{
       display: inline-flex;
       align-items: center;
@@ -291,6 +497,13 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
     .card .detail, .panel p, .panel li {{ color: var(--muted); line-height: 1.5; }}
     .panels {{ display: grid; gap: 18px; grid-template-columns: 1.25fr 0.95fr; }}
     .stack {{ display: grid; gap: 18px; }}
+    .note {{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(0,95,115,0.08);
+      color: var(--ink);
+    }}
     ul {{ margin: 0; padding-left: 18px; }}
     .queue-item {{
       padding: 12px 14px;
@@ -324,21 +537,53 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
   <div class="shell">
     <section class="hero">
       <h1>Relaytic Mission Control</h1>
-      <p>{escape(str(state.get("headline") or "Relaytic mission control is ready."))}</p>
+      <p>{escape(hero_body)}</p>
       <div class="hero-meta">
         <span class="pill">Stage: {escape(str(state.get("current_stage") or "onboarding"))}</span>
         <span class="pill">Action: {escape(str(state.get("recommended_action") or "none"))}</span>
+        <span class="pill">Next actor: {escape(str(state.get("next_actor") or "operator"))}</span>
         <span class="pill">Queue: {escape(str(review_queue.get("pending_count", 0)))} pending</span>
         <span class="pill">Doctor: {escape(str(onboarding.get("doctor_status") or "unknown"))}</span>
+        <span class="pill">Intelligence: {escape(str(modes.get("intelligence_effective_mode") or "unknown"))}</span>
         <span class="pill">Demo ready: {escape(str(demo.get("demo_ready")))}</span>
+      </div>
+      <div class="hero-actions">
+        <code>{escape(live_chat_command)}</code>
+        <code>{escape(str(install.get("launch_command") or "relaytic mission-control launch"))}</code>
       </div>
     </section>
     <section class="grid">{_render_card_grid(cards)}</section>
     <section class="panels">
       <div class="stack">
         <article class="panel">
+          <h2>What Relaytic Needs</h2>
+          <ul>{_render_string_items(current_requirements or ["Relaytic can explain itself immediately, but it needs data plus a goal before deeper run capabilities activate."])}</ul>
+        </article>
+        <article class="panel">
+          <h2>First Steps</h2>
+          <ul>{_render_string_items(first_steps or ["Start with a dataset and a short goal, then open mission control again on the resulting run."])}</ul>
+          <div class="note">Mission control is a dashboard. For natural-language questions in the terminal, use <code>{escape(live_chat_command)}</code>.</div>
+        </article>
+        <article class="panel">
+          <h2>How To Interact</h2>
+          <ul>{_render_interaction_mode_items(interaction_modes)}</ul>
+        </article>
+        <article class="panel">
           <h2>Review Queue</h2>
           {_render_queue(review_items)}
+        </article>
+        <article class="panel">
+          <h2>Capabilities</h2>
+          <ul>{_render_capability_items(capability_items)}</ul>
+        </article>
+        <article class="panel">
+          <h2>Why Capabilities Need Setup</h2>
+          <ul>{_render_capability_setup_items(blocked_capability_items)}</ul>
+        </article>
+        <article class="panel">
+          <h2>Stage Navigator</h2>
+          <p>{escape(str(navigator.get("summary") or "Relaytic exposes bounded stage navigation."))}</p>
+          <ul>{_render_stage_items(stage_items)}</ul>
         </article>
         <article class="panel">
           <h2>Launch + Install</h2>
@@ -351,6 +596,24 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
         </article>
       </div>
       <div class="stack">
+        <article class="panel">
+          <h2>Modes</h2>
+          <div class="meta-list">
+            <div class="meta-row"><span class="label">Autonomy</span><span class="value-compact">{escape(str(modes.get("autonomy_mode") or "unknown"))}</span></div>
+            <div class="meta-row"><span class="label">Intelligence</span><span class="value-compact">{escape(str(modes.get("intelligence_effective_mode") or "unknown"))}</span></div>
+            <div class="meta-row"><span class="label">Routed</span><span class="value-compact">{escape(str(modes.get("intelligence_routed_mode") or "unknown"))}</span></div>
+            <div class="meta-row"><span class="label">Takeover</span><span class="value-compact">{escape(str(modes.get("takeover_available")))}</span></div>
+            <div class="meta-row"><span class="label">Skeptical control</span><span class="value-compact">{escape(str(modes.get("skeptical_control_active")))}</span></div>
+          </div>
+        </article>
+        <article class="panel">
+          <h2>You Can Do Now</h2>
+          <ul>{_render_action_items(action_items)}</ul>
+        </article>
+        <article class="panel">
+          <h2>Ask Relaytic</h2>
+          <ul>{_render_question_items(question_items)}</ul>
+        </article>
         <article class="panel">
           <h2>Onboarding</h2>
           <ul>{_render_string_items(commands or ["Relaytic is ready to install, verify, and launch from one surface."])}</ul>
@@ -417,6 +680,88 @@ def _render_panel_items(items: list[dict[str, Any]]) -> str:
     return "".join(rendered)
 
 
+def _render_capability_items(items: list[dict[str, Any]]) -> str:
+    if not items:
+        return "<li>No capability summary is available yet.</li>"
+    rendered: list[str] = []
+    for item in items[:10]:
+        name = escape(str(item.get("name", "capability")).strip() or "capability")
+        status = escape(str(item.get("status", "unknown")).strip() or "unknown")
+        detail = escape(str(item.get("detail", "")).strip() or "No detail available.")
+        reason = escape(str(item.get("status_reason", "")).strip())
+        hint = escape(str(item.get("activation_hint", "")).strip())
+        extra = ""
+        if reason:
+            extra += f"<div class=\"detail\">Why: {reason}</div>"
+        if hint:
+            extra += f"<div class=\"detail\">Next: {hint}</div>"
+        rendered.append(f"<li><strong>{name}</strong> [{status}]: {detail}{extra}</li>")
+    return "".join(rendered)
+
+
+def _render_capability_setup_items(items: list[dict[str, Any]]) -> str:
+    if not items:
+        return "<li>Nothing important is blocked right now. Current capabilities are ready.</li>"
+    rendered: list[str] = []
+    for item in items[:10]:
+        name = escape(str(item.get("name", "capability")).strip() or "capability")
+        status = escape(str(item.get("status", "unknown")).strip() or "unknown")
+        reason = escape(str(item.get("status_reason", "")).strip() or "Needs additional setup or run context.")
+        hint = escape(str(item.get("activation_hint", "")).strip())
+        suffix = f" Next: {hint}" if hint else ""
+        rendered.append(f"<li><strong>{name}</strong> [{status}]: {reason}{suffix}</li>")
+    return "".join(rendered)
+
+
+def _render_action_items(items: list[dict[str, Any]]) -> str:
+    if not items:
+        return "<li>No action affordances are available yet.</li>"
+    rendered: list[str] = []
+    for item in items[:10]:
+        title = escape(str(item.get("title", "action")).strip() or "action")
+        detail = escape(str(item.get("detail", "")).strip() or "No detail available.")
+        challenge = escape(str(item.get("challenge_level", "low")).strip() or "low")
+        command_hint = escape(str(item.get("command_hint", "")).strip())
+        suffix = f" Use <code>{command_hint}</code>." if command_hint else ""
+        rendered.append(f"<li><strong>{title}</strong> [challenge {challenge}]: {detail}{suffix}</li>")
+    return "".join(rendered)
+
+
+def _render_stage_items(items: list[dict[str, Any]]) -> str:
+    if not items:
+        return "<li>No bounded stage reruns are available yet.</li>"
+    rendered: list[str] = []
+    for item in items[:14]:
+        stage = escape(str(item.get("stage", "unknown")).strip() or "unknown")
+        detail = escape(str(item.get("detail", "")).strip() or "No detail available.")
+        rendered.append(f"<li><strong>{stage}</strong>: {detail}</li>")
+    return "".join(rendered)
+
+
+def _render_question_items(items: list[dict[str, Any]]) -> str:
+    if not items:
+        return "<li>No starter questions are available yet.</li>"
+    rendered: list[str] = []
+    for item in items[:10]:
+        question = escape(str(item.get("question", "question")).strip() or "question")
+        detail = escape(str(item.get("detail", "")).strip() or "No detail available.")
+        rendered.append(f"<li><code>{question}</code>: {detail}</li>")
+    return "".join(rendered)
+
+
+def _render_interaction_mode_items(items: list[dict[str, Any]]) -> str:
+    if not items:
+        return "<li>Mission control can be opened in the browser or used through the terminal.</li>"
+    rendered: list[str] = []
+    for item in items[:8]:
+        name = escape(str(item.get("name", "Mode")).strip() or "Mode")
+        detail = escape(str(item.get("detail", "")).strip() or "No detail available.")
+        command = escape(str(item.get("command", "")).strip())
+        suffix = f" Use <code>{command}</code>." if command else ""
+        rendered.append(f"<li><strong>{name}</strong>: {detail}{suffix}</li>")
+    return "".join(rendered)
+
+
 def _build_review_queue_state(
     *,
     controls: MissionControlControls,
@@ -428,6 +773,7 @@ def _build_review_queue_state(
     contracts = dict(summary_payload.get("contracts", {}))
     benchmark = dict(summary_payload.get("benchmark", {}))
     decision_lab = dict(summary_payload.get("decision_lab", {}))
+    dojo = dict(summary_payload.get("dojo", {}))
     control = dict(summary_payload.get("control", {}))
     next_step = dict(summary_payload.get("next_step", {}))
 
@@ -472,6 +818,26 @@ def _build_review_queue_state(
                 "title": "Decision world model requests review",
                 "detail": f"Decision strategy is `{decision_lab.get('selected_strategy') or 'unknown'}`.",
                 "recommended_action": _clean_text(decision_lab.get("selected_next_action")) or "operator_review",
+            }
+        )
+    if int(dojo.get("active_promotion_count", 0) or 0) > 0:
+        items.append(
+            {
+                "source": "dojo",
+                "severity": "info",
+                "title": "Quarantined dojo promotions are available",
+                "detail": f"Relaytic has `{dojo.get('active_promotion_count', 0)}` guarded promotions under quarantine.",
+                "recommended_action": "review_dojo",
+            }
+        )
+    if _clean_text(dojo.get("control_security_state")) == "fail":
+        items.append(
+            {
+                "source": "dojo",
+                "severity": "medium",
+                "title": "Dojo promotions are blocked by control-security evidence",
+                "detail": "Recent skeptical-control evidence is preventing self-improvement promotions.",
+                "recommended_action": "review_control",
             }
         )
     if _clean_text(control.get("decision")) in {"accept_with_modification", "defer", "reject"}:
@@ -522,9 +888,57 @@ def _build_cards(
     assist_bundle: dict[str, Any],
     review_queue: ReviewQueueState,
 ) -> list[dict[str, Any]]:
+    if _is_onboarding_state(summary_payload):
+        host_summary = dict(interoperability_inventory.get("host_summary", {}))
+        discoverable_hosts = ", ".join(host_summary.get("discoverable_now", [])) or "none"
+        return [
+            {
+                "card_id": "what_is_relaytic",
+                "title": "What Relaytic Is",
+                "value": "Local inference lab",
+                "detail": "Relaytic is a local-first structured-data research lab. It needs data plus a goal before the deeper modeling and review layers become meaningful.",
+                "severity": "normal",
+            },
+            {
+                "card_id": "what_it_needs",
+                "title": "What It Needs",
+                "value": "data + objective",
+                "detail": "Point Relaytic to a dataset or local source and tell it what you want to predict, explain, or evaluate.",
+                "severity": "normal",
+            },
+            {
+                "card_id": "fastest_start",
+                "title": "Fastest Start",
+                "value": "relaytic run",
+                "detail": f"Use `{_example_run_command(run_dir=None)}` to create the first governed run.",
+                "severity": "normal",
+            },
+            {
+                "card_id": "terminal_chat",
+                "title": "Live Terminal Chat",
+                "value": "mission-control chat",
+                "detail": "Mission control is a dashboard, not a chat. Use `relaytic mission-control chat` to ask questions in the terminal.",
+                "severity": "normal",
+            },
+            {
+                "card_id": "host_readiness",
+                "title": "Host Readiness",
+                "value": discoverable_hosts,
+                "detail": "Relaytic can already be called locally by the discoverable hosts above; others need activation or remote connector setup.",
+                "severity": "normal",
+            },
+            {
+                "card_id": "environment",
+                "title": "Environment",
+                "value": _clean_text(doctor_report.get("status")) or "unknown",
+                "detail": "Doctor verifies the local install before you start a run or connect a host.",
+                "severity": "medium" if _clean_text(doctor_report.get("status")) == "error" else "normal",
+            },
+        ]
     decision = dict(summary_payload.get("decision", {}))
     benchmark = dict(summary_payload.get("benchmark", {}))
     decision_lab = dict(summary_payload.get("decision_lab", {}))
+    dojo = dict(summary_payload.get("dojo", {}))
     contracts = dict(summary_payload.get("contracts", {}))
     runtime = dict(summary_payload.get("runtime", {}))
     next_step = dict(summary_payload.get("next_step", {}))
@@ -568,12 +982,29 @@ def _build_cards(
             "severity": "medium" if bool(decision_lab.get("review_required")) else "normal",
         },
         {
+            "card_id": "dojo",
+            "title": "Dojo",
+            "value": _clean_text(dojo.get("status")) or "not_reviewed",
+            "detail": f"Promotions `{dojo.get('active_promotion_count', 0)}` | rejected `{dojo.get('rejected_count', 0)}` | benchmark `{dojo.get('benchmark_state') or 'unknown'}`",
+            "severity": "medium" if _clean_text(dojo.get("control_security_state")) == "fail" else "normal",
+        },
+        {
             "card_id": "assist_control",
             "title": "Assist + Control",
             "value": _clean_text(assist_session.get("next_recommended_action"))
             or _clean_text(dict(summary_payload.get("next_step", {})).get("recommended_action"))
             or "ready",
             "detail": f"Interactive assist `{assist_mode.get('enabled')}` | takeover `{assist_session.get('takeover_available')}`",
+            "severity": "normal",
+        },
+        {
+            "card_id": "modes",
+            "title": "Modes",
+            "value": _clean_text(dict(summary_payload.get("intelligence", {})).get("effective_mode")) or "deterministic",
+            "detail": (
+                f"Autonomy `{dict(summary_payload.get('intent', {})).get('autonomy_mode') or 'unknown'}`"
+                f" | next actor `{dict(summary_payload.get('decision_lab', {})).get('next_actor') or 'operator'}`"
+            ),
             "severity": "normal",
         },
         {
@@ -598,6 +1029,524 @@ def _build_cards(
     return cards
 
 
+def _build_mode_overview(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+    assist_bundle: dict[str, Any],
+) -> ModeOverview:
+    intelligence = dict(summary_payload.get("intelligence", {}))
+    intent = dict(summary_payload.get("intent", {}))
+    decision_lab = dict(summary_payload.get("decision_lab", {}))
+    assist_state = dict(assist_bundle.get("assist_session_state", {}))
+    control = dict(summary_payload.get("control", {}))
+    current_stage = _clean_text(summary_payload.get("stage_completed")) or "onboarding"
+    next_actor = _clean_text(decision_lab.get("next_actor")) or "operator"
+    return ModeOverview(
+        schema_version=MODE_OVERVIEW_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok",
+        current_stage=current_stage,
+        next_actor=next_actor,
+        autonomy_mode=_clean_text(intent.get("autonomy_mode")) or ("guided_onboarding" if _is_onboarding_state(summary_payload) else None),
+        intelligence_effective_mode=_clean_text(intelligence.get("effective_mode")) or "deterministic",
+        intelligence_routed_mode=_clean_text(intelligence.get("routed_mode")) or "deterministic",
+        local_profile=_clean_text(intelligence.get("local_profile")) or "not_selected",
+        takeover_available=bool(assist_state.get("takeover_available", False)),
+        skeptical_control_active=bool(control) or True,
+        summary=(
+            f"Relaytic is at `{current_stage}` with next actor `{next_actor}`, "
+            f"intelligence mode `{_clean_text(intelligence.get('effective_mode')) or 'deterministic'}`, "
+            f"and takeover `{assist_state.get('takeover_available')}`."
+        ),
+        trace=trace,
+    )
+
+
+def _build_capability_manifest(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+    assist_bundle: dict[str, Any],
+    interoperability_inventory: dict[str, Any],
+    doctor_report: dict[str, Any],
+) -> CapabilityManifest:
+    assist_mode = dict(assist_bundle.get("assist_mode", {}))
+    assist_state = dict(assist_bundle.get("assist_session_state", {}))
+    guide = dict(assist_bundle.get("assistant_connection_guide", {}))
+    benchmark = dict(summary_payload.get("benchmark", {}))
+    profiles = dict(summary_payload.get("profiles", {}))
+    runtime = dict(summary_payload.get("runtime", {}))
+    data = dict(summary_payload.get("data", {}))
+    host_summary = dict(interoperability_inventory.get("host_summary", {}))
+    onboarding = _is_onboarding_state(summary_payload)
+    semantic_backend_status = _clean_text(assist_mode.get("semantic_backend_status")) or "unknown"
+    discoverable_hosts = ", ".join(host_summary.get("discoverable_now", [])) or "none"
+    capabilities = [
+        {
+            "capability_id": "ask_bounded_questions",
+            "name": "Ask Bounded Questions",
+            "status": "enabled" if assist_mode.get("enabled") else "disabled",
+            "detail": (
+                "Relaytic can answer onboarding questions right now."
+                if onboarding
+                else "Relaytic can explain current state, route choice, benchmark posture, decision posture, and control posture."
+            ),
+            "status_reason": (
+                "No run is loaded yet, so answers are about setup and capabilities rather than model-state details."
+                if onboarding
+                else "Run context is available, so Relaytic can answer stateful questions about the current lab run."
+            ),
+            "activation_hint": (
+                f"Start a run with `{_example_run_command(run_dir=None)}` for run-specific explanations."
+                if onboarding
+                else f"Use `{_assist_turn_command(summary_payload, 'what can you do?')}` or `relaytic mission-control chat --run-dir {_display_run_dir(summary_payload)}`."
+            ),
+        },
+        {
+            "capability_id": "bounded_stage_navigation",
+            "name": "Bounded Stage Navigation",
+            "status": "enabled" if assist_state.get("available_stage_targets") else "needs_run_context",
+            "detail": "Relaytic supports bounded stage reruns, not arbitrary checkpoint time travel.",
+            "status_reason": (
+                "Stage reruns only appear after a run exists, because Relaytic needs artifacts to know what can be replayed safely."
+                if not assist_state.get("available_stage_targets")
+                else "Relaytic can currently rerun named stages and refresh downstream artifacts from there."
+            ),
+            "activation_hint": (
+                f"Create a run first with `{_example_run_command(run_dir=None)}`."
+                if not assist_state.get("available_stage_targets")
+                else f"Use `{_assist_turn_command(summary_payload, 'go back to planning')}`."
+            ),
+        },
+        {
+            "capability_id": "safe_takeover",
+            "name": "Safe Takeover",
+            "status": "enabled" if assist_state.get("takeover_available") else "needs_run_context",
+            "detail": "Relaytic can continue from the next safe bounded stage when the operator stops or is unsure.",
+            "status_reason": (
+                "Takeover only becomes meaningful after Relaytic has a current run state to continue."
+                if not assist_state.get("takeover_available")
+                else "Relaytic can take over safely because there is enough run state to continue from a bounded point."
+            ),
+            "activation_hint": (
+                f"Create a run first with `{_example_run_command(run_dir=None)}`."
+                if not assist_state.get("takeover_available")
+                else "Use `{}`.".format(_assist_turn_command(summary_payload, "i'm not sure, take over"))
+            ),
+        },
+        {
+            "capability_id": "skeptical_steering",
+            "name": "Skeptical Steering",
+            "status": "enabled",
+            "detail": "Truth-bearing override requests are challenged instead of blindly obeyed.",
+            "status_reason": "This protection stays on by default so Relaytic does not become a compliant shell.",
+            "activation_hint": "You can still steer Relaytic, but it will explain accept, modify, defer, or reject decisions explicitly.",
+        },
+        {
+            "capability_id": "imported_incumbent_challenge",
+            "name": "Imported Incumbent Challenge",
+            "status": (
+                "needs_run_context"
+                if onboarding
+                else ("ready_for_incumbent" if not benchmark.get("incumbent_present") else "enabled")
+            ),
+            "detail": (
+                f"Incumbent parity is `{benchmark.get('incumbent_parity_status') or 'not_configured'}` "
+                f"with beat-target `{benchmark.get('beat_target_state') or 'not_configured'}`."
+            ),
+            "status_reason": (
+                "Relaytic needs a run before it can compare itself to an incumbent under the same split and metric contract."
+                if onboarding
+                else (
+                    "No incumbent is attached yet, but the run is ready for one."
+                    if not benchmark.get("incumbent_present")
+                    else "An incumbent is attached and Relaytic is already tracking parity or beat-target posture."
+                )
+            ),
+            "activation_hint": (
+                f"Start a run first with `{_example_run_command(run_dir=None)}`."
+                if onboarding
+                else f"Use `relaytic benchmark run --run-dir {_display_run_dir(summary_payload)} --data-path <data_path> --incumbent-path <path> --incumbent-kind model`."
+            ),
+        },
+        {
+            "capability_id": "host_connections",
+            "name": "Host Connections",
+            "status": "enabled" if host_summary else "unknown",
+            "detail": (
+                f"Discoverable now: `{discoverable_hosts}`; "
+                f"needs activation: `{', '.join(host_summary.get('requires_activation', [])) or 'none'}`."
+            ),
+            "status_reason": "Host wrappers are separate from Relaytic's core truth layer, so some hosts are immediately discoverable while others need explicit activation or remote connector setup.",
+            "activation_hint": "Run `relaytic interoperability show` to see exact host-specific next steps.",
+        },
+        {
+            "capability_id": "local_semantic_assist",
+            "name": "Local Semantic Assist",
+            "status": semantic_backend_status,
+            "detail": f"Recommended connection path is `{guide.get('recommended_path') or 'unknown'}`.",
+            "status_reason": (
+                "No local semantic backend is configured yet."
+                if semantic_backend_status in {"unknown", "unavailable", "error"}
+                else "A semantic backend is available for richer optional phrasing."
+            ),
+            "activation_hint": (
+                "Use `relaytic setup-local-llm --provider ollama --install-provider` or `relaytic setup-local-llm --provider llama_cpp` if you want optional local semantic help."
+                if semantic_backend_status in {"unknown", "unavailable", "error"}
+                else "Local semantic help is optional; Relaytic still works without it."
+            ),
+        },
+        {
+            "capability_id": "local_first_data_handling",
+            "name": "Local-First Data Handling",
+            "status": "enabled" if data.get("copy_enforced") else "needs_data",
+            "detail": (
+                f"Copy-only working data `{data.get('copy_enforced')}`; "
+                f"rowless semantic default `{runtime.get('semantic_rowless_default')}`; "
+                f"remote intelligence allowed `{profiles.get('remote_intelligence_allowed')}`."
+            ),
+            "status_reason": (
+                "This becomes concrete after Relaytic stages a working copy for a run."
+                if not data.get("copy_enforced")
+                else "Relaytic is already operating on staged copies instead of the original source."
+            ),
+            "activation_hint": (
+                f"Point Relaytic to data with `{_example_run_command(run_dir=None)}` or inspect a source with `relaytic source inspect --source-path <path>`."
+                if not data.get("copy_enforced")
+                else "Current data handling is already local-first and copy-only."
+            ),
+        },
+        {
+            "capability_id": "environment_health",
+            "name": "Environment Health",
+            "status": _clean_text(doctor_report.get("status")) or "unknown",
+            "detail": "Doctor verifies the install profile and interoperable surfaces before launch.",
+            "status_reason": "This is the fastest check for whether the local install is ready before you start a run or connect a host.",
+            "activation_hint": f"Run `relaytic doctor --expected-profile {_clean_text(controls.default_expected_profile) or 'full'} --format json` any time you want to verify the local setup.",
+        },
+    ]
+    return CapabilityManifest(
+        schema_version=CAPABILITY_MANIFEST_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok",
+        capability_count=len(capabilities),
+        capabilities=capabilities,
+        host_summary=host_summary,
+        summary="Relaytic exposes what it can do locally, what needs activation, and where it will challenge the operator.",
+        trace=trace,
+    )
+
+
+def _build_action_affordances(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+    assist_bundle: dict[str, Any],
+    review_queue: ReviewQueueState,
+) -> ActionAffordances:
+    run_dir = _clean_text(summary_payload.get("run_dir")) or "<run_dir>"
+    assist_state = dict(assist_bundle.get("assist_session_state", {}))
+    next_step = dict(summary_payload.get("next_step", {}))
+    benchmark = dict(summary_payload.get("benchmark", {}))
+    if _is_onboarding_state(summary_payload):
+        actions = [
+            {
+                "action_id": "start_with_data",
+                "title": "Start With Data",
+                "challenge_level": "low",
+                "detail": "Point Relaytic to a dataset and tell it the goal so it can create the first governed run.",
+                "command_hint": _example_run_command(run_dir=None),
+            },
+            {
+                "action_id": "inspect_source",
+                "title": "Inspect A Data Source",
+                "challenge_level": "low",
+                "detail": "Check how Relaytic will treat a file, stream snapshot, or local source before you run anything.",
+                "command_hint": "relaytic source inspect --source-path <path>",
+            },
+            {
+                "action_id": "open_terminal_chat",
+                "title": "Talk In Terminal",
+                "challenge_level": "low",
+                "detail": "Open a live terminal conversation where you can ask what Relaytic is, what it needs, and how to start.",
+                "command_hint": "relaytic mission-control chat",
+            },
+            {
+                "action_id": "review_hosts",
+                "title": "Review Host Connections",
+                "challenge_level": "low",
+                "detail": "See which hosts can already call Relaytic locally and which still need activation.",
+                "command_hint": "relaytic interoperability show",
+            },
+        ]
+        return ActionAffordances(
+            schema_version=ACTION_AFFORDANCES_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ok",
+            action_count=len(actions),
+            actions=actions,
+            summary="Relaytic makes the setup and first-run path explicit so new users do not have to infer the workflow.",
+            trace=trace,
+        )
+    actions: list[dict[str, Any]] = [
+        {
+            "action_id": "ask_question",
+            "title": "Ask Why",
+            "challenge_level": "low",
+            "detail": "Ask Relaytic to explain the current state, route choice, benchmark status, or next step.",
+            "command_hint": f"relaytic assist turn --run-dir {run_dir} --message \"why did you choose this route?\"",
+        },
+        {
+            "action_id": "show_capabilities",
+            "title": "Show Capabilities",
+            "challenge_level": "low",
+            "detail": "Ask Relaytic what it can do now, what it expects from you, and how to steer it safely.",
+            "command_hint": f"relaytic assist turn --run-dir {run_dir} --message \"what can you do?\"",
+        },
+    ]
+    available_stages = [str(item).strip() for item in assist_state.get("available_stage_targets", []) if str(item).strip()]
+    if available_stages:
+        suggested_stage = "benchmark" if "benchmark" in available_stages else available_stages[0]
+        actions.append(
+            {
+                "action_id": "rerun_stage",
+                "title": "Go Back To A Stage",
+                "challenge_level": "low",
+                "detail": "Rerun one bounded stage and refresh downstream artifacts from there.",
+                "command_hint": f"relaytic assist turn --run-dir {run_dir} --message \"go back to {suggested_stage}\"",
+            }
+        )
+    if assist_state.get("takeover_available"):
+        actions.append(
+            {
+                "action_id": "take_over",
+                "title": "Let Relaytic Continue",
+                "challenge_level": "moderate",
+                "detail": "Relaytic will pick the next safe bounded step and continue, but still challenge unsafe overrides.",
+                "command_hint": f"relaytic assist turn --run-dir {run_dir} --message \"i'm not sure, take over\"",
+            }
+        )
+    if review_queue.items:
+        top_item = dict(review_queue.items[0])
+        actions.append(
+            {
+                "action_id": "review_queue",
+                "title": "Review The Top Queue Item",
+                "challenge_level": "low",
+                "detail": str(top_item.get("detail", "")).strip() or "Relaytic has a visible review item queued.",
+                "command_hint": f"relaytic {str(top_item.get('recommended_action', 'show')).replace('_', ' ')}",
+            }
+        )
+    if not benchmark.get("incumbent_present"):
+        actions.append(
+            {
+                "action_id": "attach_incumbent",
+                "title": "Attach An Incumbent",
+                "challenge_level": "low",
+                "detail": "Import a real incumbent model, ruleset, or prediction file so Relaytic can try to beat it honestly.",
+                "command_hint": f"relaytic benchmark run --run-dir {run_dir} --data-path <data_path> --incumbent-path <path> --incumbent-kind model",
+            }
+        )
+    if _clean_text(next_step.get("recommended_action")):
+        actions.append(
+            {
+                "action_id": "inspect_next_action",
+                "title": "Inspect The Next Action",
+                "challenge_level": "low",
+                "detail": str(next_step.get("rationale", "")).strip() or "Relaytic has a bounded next action ready.",
+                "command_hint": f"relaytic show --run-dir {run_dir} --format json",
+            }
+        )
+    return ActionAffordances(
+        schema_version=ACTION_AFFORDANCES_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok",
+        action_count=len(actions),
+        actions=actions[:8],
+        summary="Relaytic makes the next safe actions explicit so humans and agents do not have to guess how to interact.",
+        trace=trace,
+    )
+
+
+def _build_stage_navigator(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+    assist_bundle: dict[str, Any],
+) -> StageNavigator:
+    assist_state = dict(assist_bundle.get("assist_session_state", {}))
+    current_stage = _clean_text(summary_payload.get("stage_completed")) or "onboarding"
+    stages = [str(item).strip() for item in assist_state.get("available_stage_targets", []) if str(item).strip()]
+    details = {
+        "intake": "Rebuild intake interpretation and refresh all downstream reasoning.",
+        "investigation": "Re-profile the dataset and refresh focus, planning, and later stages.",
+        "memory": "Refresh analog retrieval and downstream route/challenger priors.",
+        "planning": "Rebuild the plan and rerun downstream build/evidence/governors.",
+        "evidence": "Rerun challenger, ablation, and audit without discarding earlier intake and planning.",
+        "intelligence": "Refresh semantic debate, verifier output, and later governors.",
+        "research": "Refresh redacted research retrieval and downstream autonomy/completion effects.",
+        "benchmark": "Refresh reference or incumbent comparison and later follow-up logic.",
+        "completion": "Recompute completion state from the current artifacts.",
+        "lifecycle": "Recompute lifecycle posture from the current completion/evidence state.",
+        "autonomy": "Rerun the bounded follow-up loop from the current governed state.",
+    }
+    available_stages = [
+        {
+            "stage": stage,
+            "active": stage == current_stage,
+            "reruns_downstream": True,
+            "detail": details.get(stage, "Relaytic can rerun this bounded stage and refresh downstream artifacts."),
+        }
+        for stage in stages
+    ]
+    return StageNavigator(
+        schema_version=STAGE_NAVIGATOR_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok",
+        current_stage=current_stage,
+        can_rerun_stage=bool(available_stages),
+        can_jump_to_any_point=False,
+        navigation_scope="bounded_stage_rerun",
+        available_stages=available_stages,
+        summary=(
+            "Relaytic will expose bounded stage reruns after a run exists."
+            if _is_onboarding_state(summary_payload)
+            else "Relaytic currently supports bounded stage reruns rather than arbitrary checkpoint time travel."
+        ),
+        trace=trace,
+    )
+
+
+def _build_question_starters(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+    assist_bundle: dict[str, Any],
+) -> QuestionStarters:
+    assist_state = dict(assist_bundle.get("assist_session_state", {}))
+    benchmark = dict(summary_payload.get("benchmark", {}))
+    decision_lab = dict(summary_payload.get("decision_lab", {}))
+    control = dict(summary_payload.get("control", {}))
+    if _is_onboarding_state(summary_payload):
+        questions = [
+            {
+                "category": "intro",
+                "question": "what is relaytic?",
+                "detail": "Explains what Relaytic is and what it is for.",
+            },
+            {
+                "category": "start",
+                "question": "how do i start?",
+                "detail": "Explains the first steps and the fastest run command.",
+            },
+            {
+                "category": "data",
+                "question": "what data formats do you support?",
+                "detail": "Explains supported snapshot and local source formats.",
+            },
+            {
+                "category": "capabilities",
+                "question": "why are some capabilities disabled?",
+                "detail": "Explains which capabilities need a run, local backend, or host activation.",
+            },
+            {
+                "category": "chat",
+                "question": "what can you do?",
+                "detail": "Explains current capabilities, limits, and safe steering options.",
+            },
+            {
+                "category": "hosts",
+                "question": "how do i use this with claude, codex, or openclaw?",
+                "detail": "Explains local host integration paths and activation steps.",
+            },
+        ]
+        return QuestionStarters(
+            schema_version=QUESTION_STARTERS_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ok",
+            question_count=len(questions),
+            starters=questions,
+            summary="Relaytic exposes onboarding-first starter questions so the lab is understandable before any run exists.",
+            trace=trace,
+        )
+    questions = [
+        {
+            "category": "explain",
+            "question": "why did you choose this route?",
+            "detail": "Explains the current route, metric, and next-step reasoning.",
+        },
+        {
+            "category": "capabilities",
+            "question": "what can you do?",
+            "detail": "Explains current capabilities, limits, and safe steering options.",
+        },
+    ]
+    if benchmark.get("incumbent_present"):
+        questions.append(
+            {
+                "category": "benchmark",
+                "question": "why did you or didn't you beat the incumbent?",
+                "detail": "Explains incumbent parity, beat-target state, and the benchmark gap.",
+            }
+        )
+    if decision_lab.get("review_required"):
+        questions.append(
+            {
+                "category": "decision",
+                "question": "why does the decision lab want review?",
+                "detail": "Explains the selected strategy, next actor, and why Relaytic asked for review.",
+            }
+        )
+    if control.get("decision"):
+        questions.append(
+            {
+                "category": "control",
+                "question": "why was my steering request challenged?",
+                "detail": "Explains skeptical control, challenge level, and approved scope.",
+            }
+        )
+    stages = [str(item).strip() for item in assist_state.get("available_stage_targets", []) if str(item).strip()]
+    if stages:
+        target = "research" if "research" in stages else stages[0]
+        questions.append(
+            {
+                "category": "navigation",
+                "question": f"go back to {target}",
+                "detail": "Reruns one bounded stage and refreshes downstream artifacts from there.",
+            }
+        )
+    if assist_state.get("takeover_available"):
+        questions.append(
+            {
+                "category": "takeover",
+                "question": "i'm not sure, take over",
+                "detail": "Lets Relaytic continue from the next safe bounded step.",
+            }
+        )
+    return QuestionStarters(
+        schema_version=QUESTION_STARTERS_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok",
+        question_count=len(questions),
+        starters=questions[:8],
+        summary="Relaytic exposes starter questions so users and external agents know how to interact without guessing the shell vocabulary.",
+        trace=trace,
+    )
+
+
 def _build_control_center_layout(
     *,
     controls: MissionControlControls,
@@ -605,7 +1554,17 @@ def _build_control_center_layout(
 ) -> ControlCenterLayout:
     panels = [
         {"panel_id": "hero", "title": "Run headline, current stage, and launch posture"},
+        {"panel_id": "welcome", "title": "What Relaytic is and what it needs before a run exists"},
+        {"panel_id": "first_steps", "title": "Fastest path from onboarding into the first governed run"},
+        {"panel_id": "interaction_modes", "title": "Dashboard, terminal chat, workflow, and host integration paths"},
         {"panel_id": "cards", "title": "Operator cards for model, budget, benchmark, decision, and control"},
+        {"panel_id": "modes", "title": "Autonomy, intelligence, takeover, and skeptical-control posture"},
+        {"panel_id": "capabilities", "title": "What Relaytic can do locally right now and what needs activation"},
+        {"panel_id": "capability_reasons", "title": "Why a capability is unavailable and what activates it"},
+        {"panel_id": "actions", "title": "What a human or external agent can do next without guessing"},
+        {"panel_id": "stage_navigator", "title": "Bounded stage reruns with explicit scope and limitations"},
+        {"panel_id": "questions", "title": "Starter questions that make the lab feel immediately explorable"},
+        {"panel_id": "dojo", "title": "Guarded self-improvement, promotions, and rollback state"},
         {"panel_id": "review_queue", "title": "Queued blocking and follow-up items"},
         {"panel_id": "onboarding", "title": "Install, doctor, and host-readiness guidance"},
         {"panel_id": "layout", "title": "Panel ownership and expansion path for later slices"},
@@ -618,7 +1577,7 @@ def _build_control_center_layout(
         layout_name="mission_control_mvp",
         default_focus_panel="cards",
         panels=panels,
-        summary="Relaytic exposes one thin mission-control layout that reuses the current artifact truth and leaves later slices room to extend the same surface.",
+        summary="Relaytic exposes one thin mission-control layout that reuses current artifact truth while making modes, capabilities, actions, stage navigation, questions, and dojo state explicit.",
         trace=trace,
     )
 
@@ -630,6 +1589,7 @@ def _build_onboarding_status(
     expected_profile: str,
     doctor_report: dict[str, Any],
     interoperability_inventory: dict[str, Any],
+    summary_payload: dict[str, Any],
     run_dir: Path | None,
     root_dir: Path,
 ) -> OnboardingStatus:
@@ -637,10 +1597,75 @@ def _build_onboarding_status(
     host_summary = dict(interoperability_inventory.get("host_summary", {}))
     install_verified = doctor_status in {"ok", "warn"}
     launch_ready = install_verified and bool(doctor_report.get("package", {}).get("installed"))
+    onboarding = _is_onboarding_state(summary_payload)
+    live_chat_command = (
+        f"relaytic mission-control chat --run-dir {run_dir}"
+        if run_dir is not None
+        else "relaytic mission-control chat"
+    )
+    interaction_modes = [
+        {
+            "mode_id": "control_center",
+            "name": "Mission Control",
+            "kind": "dashboard",
+            "detail": "Use this to inspect current state, next steps, contracts, benchmark posture, and launch status.",
+            "command": (f"relaytic mission-control launch --run-dir {run_dir}" if run_dir is not None else f"relaytic mission-control launch --output-dir {root_dir}"),
+        },
+        {
+            "mode_id": "terminal_chat",
+            "name": "Mission Control Chat",
+            "kind": "interactive_terminal",
+            "detail": "Use this when you want to type natural-language questions in the terminal.",
+            "command": live_chat_command,
+        },
+        {
+            "mode_id": "one_shot_run",
+            "name": "Create A Run",
+            "kind": "workflow",
+            "detail": "Use this when you have a dataset and want Relaytic to build and review a run end to end.",
+            "command": _example_run_command(run_dir=None),
+        },
+        {
+            "mode_id": "host_mode",
+            "name": "Agent Host",
+            "kind": "integration",
+            "detail": "Use this after local setup if you want Claude, Codex, OpenClaw, or another host to call Relaytic.",
+            "command": "relaytic interoperability show",
+        },
+    ]
+    current_requirements = (
+        [
+            "A dataset path or local source path.",
+            "A short goal in plain language, for example what you want to predict or evaluate.",
+        ]
+        if onboarding
+        else [
+            "You already have a run context.",
+            "You can now inspect, question, rerun bounded stages, attach an incumbent, or let Relaytic continue safely.",
+        ]
+    )
+    first_steps = (
+        [
+            "Point Relaytic to data with `relaytic run --run-dir artifacts\\demo --data-path <data.csv> --text \"Describe the goal here.\"`.",
+            "If you want to inspect a source first, run `relaytic source inspect --source-path <path>`.",
+            "Use `relaytic mission-control chat` for terminal questions or `relaytic mission-control launch` for the browser control center.",
+        ]
+        if onboarding
+        else [
+            f"Use `{_assist_turn_command(summary_payload, 'what can you do?')}` for an explanation of the current run posture.",
+            f"Use `{_assist_turn_command(summary_payload, 'go back to planning')}` if you want to rerun a bounded stage.",
+            "Use `{}` if you want Relaytic to continue safely.".format(
+                _assist_turn_command(summary_payload, "i'm not sure, take over")
+            ),
+        ]
+    )
     commands = [
         f"python scripts/install_relaytic.py --profile {expected_profile} --launch-control-center",
         f"relaytic doctor --expected-profile {expected_profile} --format json",
         (f"relaytic mission-control launch --run-dir {run_dir}" if run_dir is not None else f"relaytic mission-control launch --output-dir {root_dir}"),
+        live_chat_command,
+        (f"relaytic assist show --run-dir {run_dir}" if run_dir is not None else "relaytic assist show --run-dir <run_dir>"),
+        (f"relaytic assist turn --run-dir {run_dir} --message \"what can you do?\"" if run_dir is not None else "relaytic assist turn --run-dir <run_dir> --message \"what can you do?\""),
     ]
     return OnboardingStatus(
         schema_version=ONBOARDING_STATUS_SCHEMA_VERSION,
@@ -652,9 +1677,20 @@ def _build_onboarding_status(
         launch_ready=launch_ready,
         package_installed=bool(doctor_report.get("package", {}).get("installed")),
         doctor_status=doctor_status,
+        what_relaytic_is="Relaytic is a local-first structured-data research lab. It needs data plus a goal, then it builds, challenges, judges, and explains a governed run.",
+        needs_data=onboarding,
+        current_requirements=current_requirements,
+        first_steps=first_steps,
+        interaction_modes=interaction_modes,
+        live_chat_ready=True,
+        live_chat_command=live_chat_command,
         host_summary=host_summary,
         recommended_commands=commands,
-        summary="Relaytic install and launch posture is visible from one surface and remains host-neutral.",
+        summary=(
+            "Relaytic is in onboarding mode and needs data plus a goal before deeper run capabilities activate."
+            if onboarding
+            else "Relaytic has a run context, so mission control, assist, and bounded stage reruns are now meaningful."
+        ),
         trace=trace,
     )
 
@@ -730,11 +1766,49 @@ def _build_ui_preferences(
         status="defaulted",
         theme=controls.default_theme,
         density="comfortable",
-        default_panels=["cards", "review_queue", "onboarding"],
+        default_panels=["cards", "capabilities", "actions", "review_queue", "onboarding"],
         auto_open_browser=controls.auto_open_browser,
-        summary="Relaytic defaults to one comfortable local mission-control layout and can keep extending the same surface in later slices.",
+        summary="Relaytic defaults to one comfortable local mission-control layout with explicit modes, capabilities, actions, and stage navigation.",
         trace=trace,
     )
+
+
+def _materialize_mission_control_assist_bundle(
+    *,
+    run_dir: Path | None,
+    policy: dict[str, Any],
+    summary_payload: dict[str, Any],
+    interoperability_inventory: dict[str, Any],
+) -> dict[str, Any]:
+    existing = read_assist_bundle(run_dir) if run_dir is not None else {}
+    session_state = dict(existing.get("assist_session_state", {}))
+    if session_state.get("available_stage_targets") and session_state.get("available_actions"):
+        return existing
+    backend_discovery_payload: dict[str, Any]
+    try:
+        backend_discovery = discover_backend(
+            controls=build_intelligence_controls_from_policy(policy),
+            config_path=None,
+        )
+        backend_discovery_payload = backend_discovery.to_dict()
+    except Exception as exc:
+        backend_discovery_payload = {
+            "status": "error",
+            "notes": [str(exc)],
+        }
+    bundle = build_assist_bundle(
+        policy=policy,
+        run_summary=summary_payload,
+        backend_discovery=backend_discovery_payload,
+        interoperability_inventory=interoperability_inventory,
+        last_user_intent=_clean_text(session_state.get("last_user_intent")),
+        last_requested_stage=_clean_text(session_state.get("last_requested_stage")),
+        last_action_kind=_clean_text(session_state.get("last_action_kind")),
+        turn_count=int(session_state.get("turn_count", 0) or 0),
+    )
+    if run_dir is not None:
+        write_assist_bundle(run_dir, bundle=bundle)
+    return bundle.to_dict()
 
 
 def _mission_control_summary(*, summary_payload: dict[str, Any], doctor_report: dict[str, Any]) -> str:
@@ -746,6 +1820,40 @@ def _mission_control_summary(*, summary_payload: dict[str, Any], doctor_report: 
 def _normalize_expected_profile(value: str | None, *, controls: MissionControlControls) -> str:
     normalized = str(value or controls.default_expected_profile).strip().lower() or controls.default_expected_profile
     return normalized if normalized in {"core", "full"} else controls.default_expected_profile
+
+
+def _is_onboarding_state(summary_payload: dict[str, Any]) -> bool:
+    if not summary_payload:
+        return True
+    stage = _clean_text(summary_payload.get("stage_completed")) or _clean_text(dict(summary_payload.get("runtime", {})).get("current_stage"))
+    if stage in {None, "onboarding", "foundation"}:
+        decision = dict(summary_payload.get("decision", {}))
+        data = dict(summary_payload.get("data", {}))
+        if not decision and not data:
+            return True
+    if not _clean_text(summary_payload.get("run_dir")):
+        decision = dict(summary_payload.get("decision", {}))
+        next_step = dict(summary_payload.get("next_step", {}))
+        if not decision and not next_step:
+            return True
+    return False
+
+
+def _example_run_command(run_dir: str | None) -> str:
+    target_run_dir = _clean_text(run_dir) or r"artifacts\demo"
+    return f'relaytic run --run-dir {target_run_dir} --data-path <data.csv> --text "Describe the goal here."'
+
+
+def _display_run_dir(summary_payload: dict[str, Any]) -> str:
+    return _clean_text(summary_payload.get("run_dir")) or "<run_dir>"
+
+
+def _assist_turn_command(summary_payload: dict[str, Any], message: str) -> str:
+    run_dir = _clean_text(summary_payload.get("run_dir"))
+    escaped = message.replace('"', '\\"')
+    if run_dir:
+        return f'relaytic assist turn --run-dir {run_dir} --message "{escaped}"'
+    return "relaytic mission-control chat"
 
 
 def _clean_text(value: Any) -> str | None:

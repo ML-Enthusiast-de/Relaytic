@@ -73,6 +73,9 @@ class AssistSessionStateArtifact:
     last_requested_stage: str | None
     last_action_kind: str | None
     turn_count: int
+    available_actions: list[str]
+    available_stage_targets: list[str]
+    suggested_questions: list[str]
     summary: str
     trace: AssistTrace
 

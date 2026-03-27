@@ -36,7 +36,10 @@ The repository already supports a working early product baseline:
 - concise run summaries for humans and stable summary artifacts for agents
 - one-line bootstrap install plus post-install dependency verification
 - a thin mission-control surface via `relaytic mission-control show` and `relaytic mission-control launch`, backed by shared run-summary, control, benchmark, decision, onboarding, and launch artifacts
+- a clearer mission-control and assist surface that always exposes current modes, capabilities, safe next actions, bounded stage reruns, and starter questions instead of requiring users or external agents to guess the interaction model
+- guided onboarding and live terminal mission-control chat through `relaytic mission-control chat` and `relaytic mission-control launch --interactive`, with explicit explanations of what Relaytic is, what it needs first, why capabilities need setup, and how the dashboard differs from terminal chat
 - optional install-to-launch onboarding through `python scripts/install_relaytic.py --launch-control-center`
+- guarded dojo review through `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`, with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, and mission-control visibility
 - host-neutral MCP interoperability with checked-in wrappers for Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing connector guidance
 - explicit host activation/discovery state so Relaytic can say which tools can call it immediately and which still need connector registration
 - optional local-LLM advisory paths that remain non-required
@@ -44,7 +47,7 @@ The repository already supports a working early product baseline:
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10, 10B, 10C, 10A, 11A, and 11B are now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; make quality gates and budget posture explicit; challenge human or external-agent steering through typed intervention contracts, override decisions, replayable checkpoints, and causal steering memory; turn the resulting run state into a visible decision-world model with controller policy, value-of-more-data reasoning, source-graph/join analysis, and compiled challenger or feature hypotheses; pressure the run against imported incumbent models, rulesets, and prediction files under the same local contract; and surface the current operator truth through one thin mission-control layer plus a one-command install-and-launch path. Every later slice is expected to extend that same surface rather than treating UI as a separate late-polish lane.
+Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, and 12 are now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; make quality gates and budget posture explicit; challenge human or external-agent steering through typed intervention contracts, override decisions, replayable checkpoints, and causal steering memory; turn the resulting run state into a visible decision-world model with controller policy, value-of-more-data reasoning, source-graph/join analysis, and compiled challenger or feature hypotheses; pressure the run against imported incumbent models, rulesets, and prediction files under the same local contract; surface the current operator truth through one thin mission-control layer plus a one-command install-and-launch path; make that surface legible through explicit modes, capabilities, action affordances, bounded stage navigation, starter questions, guided onboarding, and live terminal chat; and run guarded dojo review with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, and rollback-ready state. Every later slice is expected to extend that same surface rather than treating UI as a separate late-polish lane.
 
 The next frontier upgrades are:
 
@@ -52,7 +55,7 @@ The next frontier upgrades are:
 - richer long-term memory with retention, compaction, pinning, and replay rules so specialists do not repeatedly forget the same lesson
 - a first-class trace model plus agent/security harnesses so Relaytic can replay specialist/tool/intervention behavior and prove its control layer is actually robust
 - a stronger search/HPO controller that widens, prunes, and allocates effort under explicit value and budget contracts
-- deeper mission-control surfaces that build on the shipped 11B control center to show branch structure, confidence, trace history, and change attribution to humans and external agents
+- deeper mission-control surfaces that build on the shipped 11B and 11C control-center foundation to show branch structure, confidence, trace history, and change attribution to humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive models as one promising backend family
 
 ## Design Principles
@@ -192,6 +195,7 @@ relaytic runtime show --run-dir path/to/existing_run
 relaytic memory show --run-dir path/to/existing_run
 relaytic benchmark show --run-dir path/to/existing_run
 relaytic decision show --run-dir path/to/existing_run
+relaytic dojo show --run-dir path/to/existing_run
 ```
 
 Run the repository leak scan before commits:
@@ -264,6 +268,14 @@ The current one-run lab surface also includes explicit decision review:
 ```bash
 relaytic decision review --run-dir path/to/existing_run
 relaytic decision show --run-dir path/to/existing_run
+relaytic dojo review --run-dir path/to/existing_run
+relaytic dojo show --run-dir path/to/existing_run
+```
+
+Roll back one promoted dojo proposal explicitly:
+
+```bash
+relaytic dojo rollback --run-dir path/to/existing_run --proposal-id dojo_proposal_0001
 ```
 
 You can also inspect or stage richer local sources first:

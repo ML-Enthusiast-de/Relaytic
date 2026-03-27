@@ -156,7 +156,7 @@ If a later slice adds "smartness" without strengthening at least one of those pr
 - **incumbent-challenge path**
   once Slice 11A lands, one case where a user or external agent imports an existing model, prediction set, scorecard, or ruleset as the incumbent and Relaytic honestly reports whether it can beat it under the same local split and metric contract
 - **control-center path**
-  once Slice 11B lands, one case where a new user can install Relaytic, launch one local control center, inspect run status, quality/budget posture, decision state, incumbent parity, and safe assist/control actions from one coherent surface instead of stitching together multiple commands
+  once Slice 11C lands, one case where a new user can install Relaytic, launch one local control center, inspect run status, quality/budget posture, decision state, incumbent parity, current modes, capabilities, safe assist/control actions, and bounded stage reruns from one coherent surface instead of stitching together multiple commands
 - **pulse path**
   once Slice 12A lands, one case where Relaytic wakes on a bounded schedule, notices something worth attention, writes explicit recommendations or watchlists, and either safely skips or queues one bounded follow-up without silently mutating core behavior
 - **trace path**
@@ -186,13 +186,15 @@ Stable slice numbering stays the same, but the preferred execution order after S
 14. Slice 10A
 15. Slice 11A
 16. Slice 11B
-17. Slice 12
-18. Slice 12A
-19. Slice 12B
-20. Slice 13
-21. Slice 14
-22. Slice 15
-23. Slice 16
+17. Slice 11C
+18. Slice 11D
+19. Slice 12
+20. Slice 12A
+21. Slice 12B
+22. Slice 13
+23. Slice 14
+24. Slice 15
+25. Slice 16
 
 Why:
 
@@ -212,20 +214,22 @@ Why:
 - Slice 10A is the category-shift slice that turns Relaytic from a governed model/evaluation engine into a decision-and-discovery engine with compiled methods and data-acquisition reasoning
 - Slice 11A turns Relaytic's benchmark and challenger story into something much more real for operators and recruiters by letting users attach an incumbent model and forcing Relaytic to beat it honestly
 - Slice 11B is now implemented and gives Relaytic a real operator-facing control center plus a low-friction install/onboarding path before dojo and later frontier slices expand the lab
+- Slice 11C is now implemented and makes that control center legible on first contact by surfacing modes, capabilities, safe next actions, bounded stage reruns, and starter questions even before a user has discovered the assist surface manually
+- Slice 11D is now implemented and makes first contact far less confusing by adding guided onboarding, real terminal mission-control chat, explicit capability reasons, and a clearer dashboard-versus-chat split
 - Slice 12A should come after dojo because periodic awareness, innovation watching, and bounded background follow-up are much safer once self-improvement stays quarantined and promotion rules already exist
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because wider search and full trace-backed mission control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 11B, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, and Slice 11B mission-control/onboarding/install surfaces
-- next execution target: Slice 12
-- next pulse follow-on after Slice 12: Slice 12A
+- implemented baseline: Slice 00 through Slice 12, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, and Slice 12 guarded dojo review
+- next execution target: Slice 12A
+- next pulse follow-on: Slice 12A
 - next trace-and-safety follow-on after Slice 12A: Slice 12B
 - next scale-and-search follow-on after Slice 12B: Slice 13
 - later mission-control expansion after Slice 14: Slice 15
 - late optional representation follow-on after Slice 15: Slice 16
-- after Slice 11B, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control and onboarding surfaces instead of treating UI as a separate late-polish track
+- after Slice 12, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control, onboarding, and dojo-visibility surfaces instead of treating UI as a separate late-polish track
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -1351,7 +1355,77 @@ Innovation hook:
 
 - this is the slice that turns Relaytic from an impressive CLI-first lab into something people can actually show, evaluate, and adopt without hiding the rigor under raw artifacts
 
+## Slice 11C - Mission-control clarity, capabilities, and guided stage navigation
+
+Status:
+- implemented
+
+Goal:
+- explicit mode visibility
+- explicit capability visibility
+- explicit action affordances
+- bounded stage navigation clarity
+- starter-question visibility
+- first-contact UX legibility for humans and external agents
+
+Load-bearing improvement:
+
+- Relaytic should make its control model legible on first contact so humans and external agents can immediately see what mode it is in, what it can do, what they can do next, what stage reruns are allowed, and what remains deliberately bounded, without guessing the shell vocabulary or reading raw artifacts
+
+Human surface:
+
+- humans should be able to open mission control or assist on a fresh run and immediately understand the current stage, current modes, next actor, current capabilities, safe next actions, bounded stage reruns, starter questions, and the fact that Relaytic challenges truth-bearing steering instead of obeying it blindly
+
+Agent surface:
+
+- external agents should be able to consume the same mode overview, capability manifest, action-affordance state, stage navigator, and starter-question state through stable JSON-first and MCP-accessible surfaces rather than reconstructing the interaction model from prose or prior turns
+
+Intelligence source:
+
+- shared run summary, assist controls, host inventory, backend discovery, benchmark/incumbent posture, decision-lab posture, skeptical-control posture, and doctor/install-health state
+
+Fallback rule:
+
+- if richer UI rendering or optional assist artifacts are missing, Relaytic must materialize the same clarity surface deterministically from the current canonical run state instead of hiding capabilities or assuming the operator already knows the workflow
+
+Required outputs:
+- `mode_overview.json`
+- `capability_manifest.json`
+- `action_affordances.json`
+- `stage_navigator.json`
+- `question_starters.json`
+
+Required behavior:
+- mission control must expose current autonomy mode, intelligence mode, routed mode, local profile, takeover availability, skeptical-control posture, and next actor as first-class state instead of leaving them implicit across other artifacts
+- mission control and assist must expose what Relaytic can do now, what a human or external agent can do now, and what stage reruns are currently available without requiring a prior assist interaction
+- stage navigation must be explicit that it is bounded stage rerun, not arbitrary checkpoint time travel
+- starter questions must be visible so first-time users and external agents know how to ask for explanation, capabilities, incumbent reasoning, challenged-steering rationale, stage reruns, and safe takeover
+- quick CLI and MCP mission-control surfaces must expose the high-signal counts and mode fields needed by external agents without forcing them to decode the full mission-control bundle first
+- the clarity layer must remain thin and derived from the canonical run truth; it must not invent a separate UI-only interaction state machine
+
+First implementation moves:
+
+1. Extend `src/relaytic/mission_control/` with typed mode-overview, capability-manifest, action-affordance, stage-navigator, and starter-question artifacts.
+2. Extend `src/relaytic/assist/` so assist state always carries available actions, stage targets, and suggested questions.
+3. Make `relaytic mission-control show`, `relaytic mission-control launch`, `relaytic assist show`, and `relaytic assist turn` surface the same clarity state.
+4. Materialize assist-derived clarity artifacts automatically from mission control when a fresh run has not yet touched the assist surface.
+5. Keep the same clarity state visible through CLI, static HTML, and MCP-accessible mission-control inspection.
+
+Minimum proof:
+
+- one fresh-run case where mission control exposes modes, capabilities, actions, navigation scope, and starter questions even before `assist show` is called
+- one assist case where `what can you do?` produces an explicit capabilities answer that mentions bounded questions, bounded stage reruns, safe takeover, and skeptical steering
+- one CLI/MCP parity case where the quick mission-control surface exposes next actor, capability counts, question counts, and navigation scope consistently
+- one bounded-navigation case where the operator can see that Relaytic supports rerunning named stages but not arbitrary checkpoint time travel
+
+Innovation hook:
+
+- this is the slice that turns the control center from a strong operator dashboard into something that feels immediately understandable, steerable, and demo-ready for first-time humans and external agents
+
 ## Slice 12 - Dojo mode and guarded self-improvement
+
+Status:
+- implemented
 
 Goal:
 - explicit dojo mode
@@ -1365,11 +1439,11 @@ Load-bearing improvement:
 
 Human surface:
 
-- humans should be able to see which proposed self-improvements target route search, decision usefulness, data acquisition, or method compilation and why they were promoted or rejected
+- humans should be able to inspect dojo review state through `relaytic dojo review`, `relaytic dojo show`, mission-control cards, and run summaries, and see which proposed self-improvements target route search, decision usefulness, data acquisition, or method compilation and why they were promoted, rejected, quarantined, or rolled back
 
 Agent surface:
 
-- external agents should be able to consume dojo proposals, validation outcomes, and promotion/rollback state as explicit artifacts
+- external agents should be able to consume dojo proposals, validation outcomes, promotion/rollback state, and architecture-proposal quarantine through explicit artifacts plus JSON-first/MCP-accessible dojo surfaces
 
 Intelligence source:
 
@@ -1377,7 +1451,7 @@ Intelligence source:
 
 Fallback rule:
 
-- if dojo validation data or benchmark proof is unavailable, the current incumbent behavior remains authoritative and dojo outputs stay quarantined
+- if dojo validation data or benchmark proof is unavailable, the current incumbent behavior remains authoritative, dojo outputs stay quarantined, and no authoritative runtime defaults are mutated silently
 
 Required outputs:
 - `dojo_session.json`
@@ -1387,12 +1461,14 @@ Required outputs:
 - `architecture_proposals.json`
 
 Required behavior:
-- dojo outputs must remain quarantined until they beat the incumbent on benchmark and golden-case validation
+- dojo outputs must remain quarantined until they beat the incumbent on benchmark validation and pass the visible quality-gate proxy used by the current implementation
 - no dojo promotion may become default behavior without an explicit promotion artifact
 - dojo must improve strategies, priors, challenger design, route search, decision-world-model heuristics, and method-compilation logic before it is allowed to touch deeper architecture proposals
 - dojo must not weaken intervention contracts, override skepticism, or control-injection defenses without explicit regression evidence that those guarantees still hold
 - every dojo promotion must preserve rollback, provenance, and benchmark comparability
-- dojo proposals, promotions, rejections, and rollbacks must extend the mission-control surface introduced in Slice 11B instead of remaining CLI-only state
+- dojo proposals, promotions, rejections, and rollbacks must extend the mission-control surface introduced in Slice 11B and clarified in Slice 11C instead of remaining CLI-only state
+- early architecture proposals must remain explicitly quarantined and non-authoritative even when method-level proposals are promotable
+- dojo review and rollback must be available through stable CLI surfaces before later pulse, trace, or search slices build on them
 
 First implementation moves:
 
@@ -1407,6 +1483,7 @@ Minimum proof:
 - one dojo proposal that is rejected with clear reasons
 - one dojo proposal that is promoted only after beating the incumbent on required validations
 - one rollback of a previously promoted dojo artifact
+- one architecture proposal that remains quarantined instead of being promoted by the early dojo path
 
 Innovation hook:
 
@@ -1589,7 +1666,7 @@ Required behavior:
 - Slice 13 must consume the explicit quality and budget contracts from Slice 10B instead of inventing separate hidden search limits
 - Slice 13 must consume real runtime/control accounting and any beat-target contract from Slice 11A rather than relying only on estimated search effort or abstract parity goals
 - Slice 13 should consume the canonical trace/eval artifacts from Slice 12B so branch expansion, pruning, and controller changes can be justified by replayable evidence rather than implicit heuristics
-- search widening, pruning, HPO allocation, and device/backend choices must extend the mission-control surface introduced in Slice 11B so humans and external agents can see why search did or did not go deeper
+- search widening, pruning, HPO allocation, and device/backend choices must extend the mission-control surface introduced in Slice 11B and clarified in Slice 11C so humans and external agents can see why search did or did not go deeper
 - device-aware planning must change *how* Relaytic executes, not silently change *what* it believes
 - distributed execution must remain resumable and safe for long local runs
 - search expansion must remain budgeted and justified by expected decision value, not only by abstract score-chasing
@@ -1645,7 +1722,7 @@ Required behavior:
 - physical, regulatory, and operational constraints must be explicit inputs to proposal generation, not cosmetic warnings after the fact
 - Relaytic must distinguish "promising", "unproven", "physically implausible", "operationally infeasible", and "policy-constrained" proposals
 - action-boundary reasoning must integrate with abstention, review, rollback, and data-acquisition suggestions rather than living in a separate report
-- feasibility and action-boundary changes must extend the mission-control surface introduced in Slice 11B so operator-facing recommendations stay legible as constraints sharpen
+- feasibility and action-boundary changes must extend the mission-control surface introduced in Slice 11B and clarified in Slice 11C so operator-facing recommendations stay legible as constraints sharpen
 
 Minimum proof:
 
@@ -1704,7 +1781,7 @@ Required outputs:
 Required behavior:
 
 - Slice 15 must consume the canonical trace model from Slice 12B rather than inventing a separate UI-only activity history
-- Slice 15 must build on the mission-control MVP from Slice 11B rather than replacing it with a separate UI stack
+- Slice 15 must build on the mission-control MVP from Slices 11B and 11C rather than replacing it with a separate UI stack
 - mission control must make branch, tool, intervention, and confidence state legible without requiring humans or external agents to read raw artifact trees
 - CLI, MCP, and any richer UI shell must expose the same mission-control truth with only presentation differences
 - the packaged demos must include at least one skeptical-control case, one incumbent challenge case, and one trace-backed branch comparison

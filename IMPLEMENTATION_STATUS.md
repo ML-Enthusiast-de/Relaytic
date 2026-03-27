@@ -4,9 +4,8 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 11B, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, and Slice 10C behavioral control contracts with skeptical steering and causal intervention memory
-- next recommended slice: 12, dojo mode and guarded self-improvement
-- next pulse follow-on after 12: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
+- completed slices: 00 through 12, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, and Slice 10C behavioral control contracts with skeptical steering and causal intervention memory
+- next recommended slice: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
 - next trace-and-safety follow-on after 12A: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
@@ -63,6 +62,7 @@ The repository currently supports:
 - one-line bootstrap via `python scripts/install_relaytic.py` plus install-health verification via `relaytic doctor`
 - a thin but real mission-control surface via `relaytic mission-control show` and `relaytic mission-control launch`, with shared local truth for onboarding, review queue, operator cards, launch metadata, and demo-session state
 - install-launch coupling so `python scripts/install_relaytic.py --launch-control-center` can verify the environment and land a user in the same local control-center flow without inventing a separate onboarding truth
+- explicit dojo review via `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`, with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, and mission-control visibility
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement
@@ -82,14 +82,12 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
-- decision-system world modeling so Relaytic can reason about action cost, abstention, review load, and whether more data is better than more search
-- method compilation that turns research, memory, and operator context into executable challenger, feature, split, and benchmark templates
 - a lab pulse that can periodically inspect local state, watch for new relevant methods or benchmark debt, and queue bounded safe follow-up without silent drift
 - a first-class trace model across specialists, tools, interventions, and branches so Relaytic can replay and compare multi-stage behavior from one runtime truth
 - runtime evaluator and security harnesses that test skeptical control, tool safety, branch-controller safety, and adversarial steering before broader autonomy is trusted
 - richer long-term memory with retention, compaction, pinning, and replay rules so durable lessons survive beyond analog similarity
-- richer local data-fabric reasoning around source graphs, join candidates, entity histories, and acquisition plans
 - stronger dynamic controller logic that decides who should act next, how deep to branch, and when review is worth it under explicit contracts
+- stronger search/HPO/controller logic that widens, prunes, and allocates effort under explicit value and budget contracts
 - mission-control surfaces that expose branch DAG, confidence, and change attribution to both humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family
 
@@ -299,6 +297,48 @@ The most important not-yet-implemented shifts after the current baseline are:
 - upgraded completion, runtime, assist, `relaytic run`, `relaytic show`, and the MCP contract so benchmark posture is visible instead of hidden in ad hoc evaluation notes
 - added targeted Slice 11 CLI, modeling, inference, and public-dataset tests
 
+### Slice 11A
+
+- extended `src/relaytic/benchmark/` with imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts
+- extended `relaytic benchmark run` so operators and external agents can attach local models, prediction files, rulesets, or scorecards directly
+- added `external_challenger_manifest.json`, `external_challenger_evaluation.json`, `incumbent_parity_report.json`, and `beat_target_contract.json`
+- upgraded autonomy, run summaries, and MCP surfaces so explicit beat-target posture can change follow-up behavior instead of remaining benchmark-only metadata
+- added targeted Slice 11A CLI and interoperability tests
+
+### Slice 11B
+
+- added `src/relaytic/mission_control/` with mission-control state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, and control-center rendering helpers
+- added `relaytic mission-control show` and `relaytic mission-control launch`
+- added `mission_control_state.json`, `review_queue_state.json`, `control_center_layout.json`, `onboarding_status.json`, `install_experience_report.json`, `launch_manifest.json`, `demo_session_manifest.json`, `ui_preferences.json`, and `reports/mission_control.html`
+- upgraded `scripts/install_relaytic.py` so install verification and local control-center launch share one documented onboarding path instead of separate setup surfaces
+- added targeted Slice 11B CLI, interoperability, and doctor-adjacent verification
+
+### Slice 11C
+
+- extended `src/relaytic/mission_control/` and `src/relaytic/assist/` so a fresh mission-control surface now materializes explicit mode, capability, action-affordance, stage-navigation, and starter-question state instead of assuming assist artifacts already exist
+- added `mode_overview.json`, `capability_manifest.json`, `action_affordances.json`, `stage_navigator.json`, and `question_starters.json`
+- upgraded `relaytic mission-control show`, `relaytic mission-control launch`, `relaytic assist show`, and `relaytic assist turn` so humans and external agents can immediately see what Relaytic can do, how to steer it safely, what stages can be rerun, and that navigation is bounded rather than arbitrary checkpoint time travel
+- upgraded the quick CLI/MCP mission-control payload so current mode, next actor, capability counts, action counts, question counts, and stage-navigation scope are visible without unpacking the full bundle
+- added targeted Slice 11C mission-control, assist, and interoperability verification
+
+### Slice 11D
+
+- extended `src/relaytic/mission_control/` and `src/relaytic/ui/cli.py` so onboarding now explicitly explains what Relaytic is, what it needs first, how the dashboard differs from terminal chat, and why capabilities need setup instead of dumping a passive status board on first contact
+- added `relaytic mission-control chat` plus `relaytic mission-control launch --interactive` so users and external agents can ask setup and capability questions directly from the terminal instead of discovering the assist vocabulary by accident
+- upgraded mission-control HTML and markdown rendering with first steps, interaction modes, capability reasons, activation hints, and clearer live-chat entrypoints
+- upgraded `relaytic assist chat` with clearer startup guidance plus `/capabilities`, `/stages`, `/next`, and `/takeover` shortcuts while keeping the existing bounded stage and skeptical-control contract intact
+- added targeted Slice 11D CLI verification for onboarding, interactive launch, mission-control chat, and assist-chat clarity
+
+### Slice 12
+
+- added `src/relaytic/dojo/` with typed guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and storage helpers
+- added `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`
+- added `dojo_session.json`, `dojo_hypotheses.json`, `dojo_results.json`, `dojo_promotions.json`, and `architecture_proposals.json`
+- implemented deterministic guarded self-improvement against benchmark, visible quality-proxy, and skeptical-control gates
+- kept early architecture proposals quarantined and non-authoritative even when method-level proposals are promotable
+- extended run summary, mission-control, and MCP/service surfaces so dojo posture is visible instead of CLI-only side state
+- added targeted Slice 12 agent, CLI, mission-control, interoperability, and doctor-adjacent verification
+
 ### Cross-Cutting Hardening
 
 - added `src/relaytic/integrations/` as the canonical optional-library discovery boundary
@@ -336,23 +376,10 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-Slice 11 has landed on top of Slices 09D and 09E with:
+With Slice 11D and Slice 12 now landed, the next high-leverage frontier follow-ons are:
 
-- one redacted research-query planner that derives safe external queries from current-run artifacts
-- one source-tiered research inventory for papers and benchmark-oriented references through bounded adapters
-- one method-transfer report that converts retrieved knowledge into route, challenger, or evaluation hypotheses rather than hidden advisory text
-- one benchmark-reference report that strengthens benchmark design without becoming the source of truth
-- one explicit external-research audit proving no raw rows or private identifiers were exported by default
-- one research-to-autonomy bridge that records research-driven recalibration and challenger signals in bounded follow-up behavior
-- one communicative assist layer that explains current state, lets humans or agents jump back to any bounded stage, and can safely take over from uncertainty or hesitation
-- one integrated local-versus-host connection guide that keeps the local-first security character explicit while making optional semantic assist easier to adopt
-- one benchmark harness that compares Relaytic against explicit reference approaches under the same split and metric contract
-- one honest parity/gap surface that humans and external agents can consume without reading the full artifact tree first
-- one richer first-route modeling layer with categorical handling, executed features, calibration, and uncertainty-bearing inference summaries
-
-After Slice 09F and Slice 11, the next high-leverage frontier follow-ons should include:
-
-- Slice 10 feedback assimilation from operator interventions, runtime failures, and later-run evidence
-- deeper autonomy breadth beyond the first bounded second pass
-- richer memory and doc-grounding corpora now that benchmark doctrine is in place
+- Slice 12A lab pulse, periodic awareness, and bounded proactive follow-up
+- Slice 12B first-class tracing, agent evaluation, and runtime security harnesses
+- Slice 13 search-controller depth, accelerated execution, and distributed local experimentation under explicit value and budget contracts
+- richer long-term memory compaction, pinning, and replay rules that build on the shipped causal and dojo ledgers
 - later Slice 15 remote connector adapters for Kafka-style streams, object-store Parquet, and warehouse reads, but only through read-only materialization into immutable run-local snapshots

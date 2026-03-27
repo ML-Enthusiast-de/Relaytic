@@ -97,6 +97,7 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     control_cfg = dict(config.get("control", {}))
     decision_cfg = dict(config.get("decision", {}))
     mission_control_cfg = dict(config.get("mission_control", {}))
+    dojo_cfg = dict(config.get("dojo", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
     contact_email = research_cfg.get("contact_email", "")
     if contact_email is None:
@@ -340,10 +341,14 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "stage_visibility_enabled": True,
         },
         "dojo": {
-            "enabled": False,
-            "allow_method_self_improvement": True,
-            "allow_architecture_proposals": True,
-            "require_quarantine_before_promotion": True,
+            "enabled": bool(dojo_cfg.get("enabled", True)),
+            "allow_method_self_improvement": bool(dojo_cfg.get("allow_method_self_improvement", True)),
+            "allow_architecture_proposals": bool(dojo_cfg.get("allow_architecture_proposals", True)),
+            "require_quarantine_before_promotion": bool(dojo_cfg.get("require_quarantine_before_promotion", True)),
+            "require_benchmark_gate": bool(dojo_cfg.get("require_benchmark_gate", True)),
+            "require_quality_proxy_gate": bool(dojo_cfg.get("require_quality_proxy_gate", True)),
+            "require_control_security_gate": bool(dojo_cfg.get("require_control_security_gate", True)),
+            "max_active_promotions": int(dojo_cfg.get("max_active_promotions", 3) or 3),
         },
         "hpo": {
             "backend": str(modeling_cfg.get("optimizer", "optuna_or_flaml")),

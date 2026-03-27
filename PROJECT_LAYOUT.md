@@ -59,6 +59,7 @@ Relaytic/
       compiler/
       completion/
       control/
+      dojo/
       lifecycle/
       data_fabric/
       decision/
@@ -76,6 +77,7 @@ Relaytic/
       policies/
       runs/
       runtime/
+      mission_control/
     corr2surrogate/  # compatibility shim only
   tests/
   README.md
@@ -115,11 +117,13 @@ Relaytic/
 - `src/relaytic/feedback/` owns validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook artifacts
 - `src/relaytic/decision/` owns decision-world models, controller policies, intervention-policy reports, decision-usefulness synthesis, and value-of-more-data reasoning
 - `src/relaytic/data_fabric/` owns source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/dojo/` owns guarded self-improvement review, quarantined proposal bundles, validation results, promotion ledgers, rollback state, and architecture-proposal quarantine
 - `src/relaytic/assist/` owns communicative assistance, stage navigation, bounded takeover, and connection-guide persistence
 - `src/relaytic/interoperability/` owns MCP serving, host-bundle generation, and interoperability self-checks
 - `src/relaytic/integrations/` owns optional-library discovery, compatibility self-checks, and adapter-scoped capability inventory
 - `src/relaytic/runs/` owns MVP-access summaries, run reports, and top-level run presentation helpers
 - `src/relaytic/runtime/` owns the local lab gateway, append-only event stream, hook audit, checkpoints, and capability-profile enforcement
+- `src/relaytic/mission_control/` owns mission-control state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, and control-center rendering
 - `src/relaytic/artifacts/` owns manifest helpers
 - `src/relaytic/policies/` owns policy loading and resolved-policy writing
 - `src/corr2surrogate/` exists only to preserve a narrow temporary compatibility boundary
@@ -147,10 +151,11 @@ Relaytic/
 - `src/relaytic/decision/` owns Slice 10A decision-world models, controller-policy writing, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` owns Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` owns Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
+- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, launch metadata, review-queue state, static control-center rendering, Slice 11C clarity artifacts for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding/live-chat behavior, and the shared operator cockpit surface
+- `src/relaytic/dojo/` owns Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and architecture-proposal quarantine
 
 Reserved future boundaries:
 
-- `src/relaytic/mission_control/` owns the first mission-control MVP, onboarding/install-health state, launch metadata, review-queue state, static control-center rendering, and later professional operator surfaces
 - `src/relaytic/pulse/` should own periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
 - `src/relaytic/tracing/` should own canonical trace schemas, specialist/tool/intervention/branch trace persistence, and replay/query surfaces
 - `src/relaytic/evals/` should own agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs

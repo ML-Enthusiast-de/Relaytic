@@ -261,6 +261,30 @@ def render_profiles_review_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_profiles_review_markdown(*args, **kwargs)
 
 
+def run_dojo_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.dojo import run_dojo_review as _run_dojo_review
+
+    return _run_dojo_review(*args, **kwargs)
+
+
+def rollback_dojo_promotion(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.dojo import rollback_dojo_promotion as _rollback_dojo_promotion
+
+    return _rollback_dojo_promotion(*args, **kwargs)
+
+
+def read_dojo_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.dojo import read_dojo_bundle as _read_dojo_bundle
+
+    return _read_dojo_bundle(*args, **kwargs)
+
+
+def render_dojo_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.dojo import render_dojo_review_markdown as _render_dojo_review_markdown
+
+    return _render_dojo_review_markdown(*args, **kwargs)
+
+
 def run_mission_control_review(*args: Any, **kwargs: Any) -> Any:
     from relaytic.mission_control import run_mission_control_review as _run_mission_control_review
 
@@ -1451,6 +1475,57 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    dojo_surface = sub.add_parser(
+        "dojo",
+        help="Run, inspect, or roll back Slice 12 guarded self-improvement artifacts.",
+    )
+    dojo_sub = dojo_surface.add_subparsers(dest="dojo_command", required=True)
+
+    dojo_review = dojo_sub.add_parser(
+        "review",
+        help="Execute Slice 12 dojo review for an existing run under explicit quarantine gates.",
+    )
+    dojo_review.add_argument("--run-dir", required=True, help="Run directory for Slice 12 dojo artifacts.")
+    dojo_review.add_argument("--config", default=None, help="Optional config/policy source.")
+    dojo_review.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    dojo_review.add_argument("--overwrite", action="store_true", help="Allow overwriting existing dojo artifacts.")
+    dojo_review.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    dojo_review.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    dojo_show = dojo_sub.add_parser(
+        "show",
+        help="Render the current Slice 12 dojo artifacts for a run.",
+    )
+    dojo_show.add_argument("--run-dir", required=True, help="Run directory containing Slice 12 dojo artifacts.")
+    dojo_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    dojo_rollback = dojo_sub.add_parser(
+        "rollback",
+        help="Roll back one active Slice 12 dojo promotion while preserving the promotion ledger.",
+    )
+    dojo_rollback.add_argument("--run-dir", required=True, help="Run directory containing Slice 12 dojo artifacts.")
+    dojo_rollback.add_argument("--proposal-id", required=True, help="Proposal id to roll back.")
+    dojo_rollback.add_argument("--reason", default=None, help="Optional rollback reason recorded in the dojo ledger.")
+    dojo_rollback.add_argument("--config", default=None, help="Optional config/policy source.")
+    dojo_rollback.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    dojo_rollback.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    dojo_rollback.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     feedback_surface = sub.add_parser(
         "feedback",
         help="Record, review, rollback, or inspect Slice 10 feedback and downstream outcome artifacts.",
@@ -1730,7 +1805,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     mission_control = sub.add_parser(
         "mission-control",
-        help="Launch or inspect the Slice 11B local control-center and onboarding surface.",
+        help="Launch or inspect the local control center, onboarding surface, and terminal mission-control chat.",
     )
     mission_control_sub = mission_control.add_subparsers(dest="mission_control_command", required=True)
 
@@ -1756,7 +1831,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     mission_control_launch = mission_control_sub.add_parser(
         "launch",
-        help="Write the local mission-control HTML report and optionally open it in the browser.",
+        help="Write the local mission-control HTML report, optionally open it in the browser, and optionally continue in terminal chat.",
     )
     mission_control_launch.add_argument("--run-dir", default=None, help="Optional run directory to render inside mission control.")
     mission_control_launch.add_argument("--output-dir", default=None, help="Optional state directory for onboarding-only mission control output.")
@@ -1773,11 +1848,44 @@ def build_parser() -> argparse.ArgumentParser:
         help="Do not open the generated static mission-control report in the default browser.",
     )
     mission_control_launch.add_argument(
+        "--interactive",
+        action="store_true",
+        help="After launch, continue in terminal mission-control chat so questions work immediately.",
+    )
+    mission_control_launch.add_argument(
+        "--show-json",
+        action="store_true",
+        help="When using --interactive, print structured payloads after each terminal answer.",
+    )
+    mission_control_launch.add_argument(
+        "--max-turns",
+        type=int,
+        default=0,
+        help="Optional positive turn cap for --interactive. 0 means unlimited until /exit.",
+    )
+    mission_control_launch.add_argument(
         "--format",
         choices=["human", "json", "both"],
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+
+    mission_control_chat = mission_control_sub.add_parser(
+        "chat",
+        help="Run an interactive mission-control terminal chat for onboarding or an existing run.",
+    )
+    mission_control_chat.add_argument("--run-dir", default=None, help="Optional run directory to chat against.")
+    mission_control_chat.add_argument("--output-dir", default=None, help="Optional state directory for onboarding-only mission control output.")
+    mission_control_chat.add_argument("--config", default=None, help="Optional config/policy source.")
+    mission_control_chat.add_argument(
+        "--expected-profile",
+        choices=["core", "full"],
+        default="full",
+        help="Doctor profile mission control should reflect.",
+    )
+    mission_control_chat.add_argument("--data-path", default=None, help="Optional dataset override for rerun/takeover flows when a run exists.")
+    mission_control_chat.add_argument("--show-json", action="store_true", help="Print structured payloads after each turn.")
+    mission_control_chat.add_argument("--max-turns", type=int, default=0, help="Optional positive turn cap. 0 means unlimited until /exit.")
 
     plan = sub.add_parser(
         "plan",
@@ -1978,6 +2086,16 @@ def main(argv: list[str] | None = None) -> int:
                 output_format=args.format,
             )
             return 0
+        if args.mission_control_command == "chat":
+            return _run_mission_control_chat(
+                run_dir=args.run_dir,
+                output_dir=args.output_dir,
+                config_path=args.config,
+                expected_profile=args.expected_profile,
+                data_path=args.data_path,
+                show_json=bool(args.show_json),
+                max_turns=int(args.max_turns),
+            )
         if args.mission_control_command == "launch":
             payload = _launch_mission_control_surface(
                 run_dir=args.run_dir,
@@ -1991,6 +2109,16 @@ def main(argv: list[str] | None = None) -> int:
                 human_text=payload["human_output"],
                 output_format=args.format,
             )
+            if bool(args.interactive):
+                return _run_mission_control_chat(
+                    run_dir=args.run_dir,
+                    output_dir=args.output_dir,
+                    config_path=args.config,
+                    expected_profile=args.expected_profile,
+                    data_path=None,
+                    show_json=bool(args.show_json),
+                    max_turns=int(args.max_turns),
+                )
             return 0
 
     if args.command == "integrations":
@@ -2535,6 +2663,61 @@ def main(argv: list[str] | None = None) -> int:
         try:
             labels = _parse_key_value_pairs(args.label)
             payload = _run_decision_phase(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "dojo":
+        if args.dojo_command == "show":
+            try:
+                payload = _show_dojo_surface(run_dir=args.run_dir)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.dojo_command == "rollback":
+            try:
+                labels = _parse_key_value_pairs(args.label)
+                payload = _run_dojo_rollback(
+                    run_dir=args.run_dir,
+                    proposal_id=args.proposal_id,
+                    reason=args.reason,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    labels=labels,
+                )
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.dojo_command != "review":
+            parser.error("Unsupported dojo subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_dojo_phase(
                 run_dir=args.run_dir,
                 config_path=args.config,
                 run_id=args.run_id,
@@ -3881,7 +4064,13 @@ def _run_assist_chat(
     if max_turns < 0:
         print("max-turns must be >= 0")
         return 2
-    print("relaytic> Communicative assist session started. Commands: /help, /show, /exit.")
+    print(
+        "relaytic> Communicative assist session started. "
+        "Assist chat is the live terminal conversation for an existing run. "
+        "Ask things like `what can you do?`, `why did you choose this route?`, "
+        "`go back to planning`, or `i'm not sure, take over`. "
+        "Commands: /help, /show, /capabilities, /stages, /next, /takeover, /exit."
+    )
     turns = 0
     while True:
         try:
@@ -3901,7 +4090,9 @@ def _run_assist_chat(
             return 0
         if lowered == "/help":
             print(
-                "relaytic> Ask for `status`, `why`, `connect claude`, `go back to research`, or `take over`."
+                "relaytic> Ask for `status`, `why`, `what can you do?`, `connect claude`, "
+                "`go back to research`, or `take over`. "
+                "Shortcuts: /show, /capabilities, /stages, /next, /takeover, /exit."
             )
             continue
         if lowered == "/show":
@@ -3909,6 +4100,64 @@ def _run_assist_chat(
             print(payload["human_output"].rstrip())
             if show_json:
                 print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            continue
+        if lowered == "/capabilities":
+            payload = _run_assist_turn(
+                run_dir=run_dir,
+                message="what can you do?",
+                config_path=config_path,
+                data_path=data_path,
+            )
+            print("relaytic> " + payload["human_output"].strip())
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        if lowered == "/stages":
+            payload = _show_assist_surface(run_dir=run_dir, config_path=config_path)
+            assist_state = dict(payload["surface_payload"].get("assist", {}).get("assist_session_state", {}))
+            stages = [str(item).strip() for item in assist_state.get("available_stage_targets", []) if str(item).strip()]
+            if stages:
+                print(
+                    "relaytic> Relaytic currently supports bounded stage reruns for: "
+                    + ", ".join(f"`{item}`" for item in stages)
+                    + ". This is not arbitrary checkpoint time travel."
+                )
+            else:
+                print("relaytic> No bounded stage reruns are available yet for this run.")
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            continue
+        if lowered == "/next":
+            payload = _show_run_summary_surface(run_dir=run_dir)
+            next_step = dict(payload["surface_payload"].get("run_summary", {}).get("next_step", {}))
+            print(
+                "relaytic> "
+                + (
+                    f"Next recommended action is `{str(next_step.get('recommended_action', '')).strip() or 'none'}`. "
+                    f"{str(next_step.get('rationale', '')).strip() or 'Relaytic has no further rationale yet.'}"
+                )
+            )
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            continue
+        if lowered == "/takeover":
+            payload = _run_assist_turn(
+                run_dir=run_dir,
+                message="i'm not sure, take over",
+                config_path=config_path,
+                data_path=data_path,
+            )
+            print("relaytic> " + payload["human_output"].strip())
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
             continue
         payload = _run_assist_turn(
             run_dir=run_dir,
@@ -3923,6 +4172,291 @@ def _run_assist_chat(
         if max_turns > 0 and turns >= max_turns:
             print("Session ended.")
             return 0
+
+
+def _run_mission_control_chat(
+    *,
+    run_dir: str | None,
+    output_dir: str | None,
+    config_path: str | None,
+    expected_profile: str,
+    data_path: str | None,
+    show_json: bool,
+    max_turns: int,
+) -> int:
+    if max_turns < 0:
+        print("max-turns must be >= 0")
+        return 2
+    run_context = bool(run_dir)
+    current_payload = _show_mission_control_surface(
+        run_dir=run_dir,
+        output_dir=output_dir,
+        config_path=config_path,
+        expected_profile=expected_profile,
+    )
+    if run_context:
+        print(
+            "relaytic> Mission-control chat is the terminal companion to the dashboard. "
+            "Ask things like `what can you do?`, `why did you choose this route?`, "
+            "`go back to planning`, or `i'm not sure, take over`. "
+            "Commands: /help, /show, /capabilities, /stages, /next, /takeover, /exit."
+        )
+    else:
+        print(
+            "relaytic> Mission-control chat is the terminal onboarding surface. "
+            "Ask things like `what is relaytic?`, `how do i start?`, `what data formats do you support?`, "
+            "or `why are some capabilities disabled?`. "
+            "Commands: /help, /show, /start, /formats, /hosts, /exit."
+        )
+    turns = 0
+    while True:
+        try:
+            raw = input("you> ")
+        except EOFError:
+            print("\nSession ended.")
+            return 0
+        except KeyboardInterrupt:
+            print("\nSession interrupted.")
+            return 0
+        message = raw.strip()
+        if not message:
+            continue
+        lowered = message.lower()
+        if lowered in {"/exit", "/quit"}:
+            print("Session ended.")
+            return 0
+        if lowered == "/help":
+            if run_context:
+                print(
+                    "relaytic> Use /show for the dashboard summary, /capabilities for current options, "
+                    "/stages for bounded reruns, /next for the next recommended step, /takeover to let Relaytic continue, or /exit."
+                )
+            else:
+                print(
+                    "relaytic> Use /show for the dashboard summary, /start for first steps, /formats for supported data sources, "
+                    "/hosts for Claude/Codex/OpenClaw guidance, or /exit."
+                )
+            continue
+        if lowered == "/show":
+            current_payload = _show_mission_control_surface(
+                run_dir=run_dir,
+                output_dir=output_dir,
+                config_path=config_path,
+                expected_profile=expected_profile,
+            )
+            print(current_payload["human_output"].rstrip())
+            if show_json:
+                print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
+            continue
+        if not run_context:
+            if lowered == "/start":
+                print("relaytic> " + _onboarding_chat_response(message="how do i start", mission_control_payload=current_payload))
+                turns += 1
+            elif lowered == "/formats":
+                print("relaytic> " + _onboarding_chat_response(message="what data formats do you support", mission_control_payload=current_payload))
+                turns += 1
+            elif lowered == "/hosts":
+                print("relaytic> " + _onboarding_chat_response(message="how do i use this with claude, codex, or openclaw", mission_control_payload=current_payload))
+                turns += 1
+            else:
+                print("relaytic> " + _onboarding_chat_response(message=message, mission_control_payload=current_payload))
+                turns += 1
+            if show_json:
+                print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+
+        if lowered == "/capabilities":
+            payload = _run_assist_turn(
+                run_dir=run_dir,
+                message="what can you do?",
+                config_path=config_path,
+                data_path=data_path,
+            )
+            print("relaytic> " + payload["human_output"].strip())
+            current_payload = _show_mission_control_surface(
+                run_dir=run_dir,
+                output_dir=output_dir,
+                config_path=config_path,
+                expected_profile=expected_profile,
+            )
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        if lowered == "/stages":
+            navigator = dict(current_payload["surface_payload"].get("bundle", {}).get("stage_navigator", {}))
+            stages = [dict(item) for item in navigator.get("available_stages", []) if isinstance(item, dict)]
+            if stages:
+                stage_text = ", ".join(f"`{str(item.get('stage', '')).strip()}`" for item in stages if str(item.get("stage", "")).strip())
+                print(
+                    "relaytic> Relaytic currently supports bounded stage reruns for "
+                    + (stage_text or "`none`")
+                    + ". This is not arbitrary checkpoint time travel."
+                )
+            else:
+                print("relaytic> No bounded stage reruns are available yet for this run.")
+            if show_json:
+                print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
+            continue
+        if lowered == "/next":
+            mission = dict(current_payload["surface_payload"].get("mission_control", {}))
+            print(
+                "relaytic> "
+                + f"Next actor is `{str(mission.get('next_actor') or 'operator')}` and the recommended action is "
+                + f"`{str(mission.get('recommended_action') or 'none')}`."
+            )
+            if show_json:
+                print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
+            continue
+        if lowered == "/takeover":
+            payload = _run_assist_turn(
+                run_dir=run_dir,
+                message="i'm not sure, take over",
+                config_path=config_path,
+                data_path=data_path,
+            )
+            print("relaytic> " + payload["human_output"].strip())
+            current_payload = _show_mission_control_surface(
+                run_dir=run_dir,
+                output_dir=output_dir,
+                config_path=config_path,
+                expected_profile=expected_profile,
+            )
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        onboarding_response = _maybe_onboarding_chat_response(message=message, mission_control_payload=current_payload)
+        if onboarding_response is not None:
+            print("relaytic> " + onboarding_response)
+            if show_json:
+                print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        payload = _run_assist_turn(
+            run_dir=run_dir,
+            message=message,
+            config_path=config_path,
+            data_path=data_path,
+        )
+        print("relaytic> " + payload["human_output"].strip())
+        current_payload = _show_mission_control_surface(
+            run_dir=run_dir,
+            output_dir=output_dir,
+            config_path=config_path,
+            expected_profile=expected_profile,
+        )
+        if show_json:
+            print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+        turns += 1
+        if max_turns > 0 and turns >= max_turns:
+            print("Session ended.")
+            return 0
+
+
+def _maybe_onboarding_chat_response(*, message: str, mission_control_payload: dict[str, Any]) -> str | None:
+    normalized = " ".join(str(message).strip().lower().split())
+    onboarding_tokens = (
+        "what is relaytic",
+        "how do i start",
+        "first step",
+        "data format",
+        "formats",
+        "why are some capabilities disabled",
+        "capabilities disabled",
+        "what can you do",
+        "claude",
+        "codex",
+        "openclaw",
+        "mcp",
+        "host",
+    )
+    if any(token in normalized for token in onboarding_tokens):
+        return _onboarding_chat_response(message=message, mission_control_payload=mission_control_payload)
+    return None
+
+
+def _onboarding_chat_response(*, message: str, mission_control_payload: dict[str, Any]) -> str:
+    normalized = " ".join(str(message).strip().lower().split())
+    bundle = dict(mission_control_payload.get("surface_payload", {}).get("bundle", {}))
+    onboarding = dict(bundle.get("onboarding_status", {}))
+    capabilities = [dict(item) for item in dict(bundle.get("capability_manifest", {})).get("capabilities", []) if isinstance(item, dict)]
+    actions = [dict(item) for item in dict(bundle.get("action_affordances", {})).get("actions", []) if isinstance(item, dict)]
+    questions = [dict(item) for item in dict(bundle.get("question_starters", {})).get("starters", []) if isinstance(item, dict)]
+    host_summary = dict(onboarding.get("host_summary", {}))
+    live_chat_command = str(onboarding.get("live_chat_command") or "relaytic mission-control chat").strip()
+    first_steps = [str(item).strip() for item in onboarding.get("first_steps", []) if str(item).strip()]
+    current_requirements = [str(item).strip() for item in onboarding.get("current_requirements", []) if str(item).strip()]
+    if any(token in normalized for token in ("what is relaytic", "what's relaytic", "what does relaytic do")):
+        return (
+            f"{str(onboarding.get('what_relaytic_is') or 'Relaytic is a local-first structured-data research lab.').strip()} "
+            f"It becomes useful after you point it to data and describe the goal."
+        )
+    if any(token in normalized for token in ("how do i start", "how to start", "first step", "get started", "/start")):
+        step_text = " ".join(first_steps[:3]) or "Point Relaytic to a dataset and describe the goal."
+        return f"Relaytic needs {', '.join(current_requirements[:2]) or 'data plus a goal'}. {step_text}"
+    if any(token in normalized for token in ("data format", "formats", "/formats", "what data do you support")):
+        return (
+            "Relaytic supports local snapshot files like `.csv`, `.tsv`, `.xlsx`, `.xls`, `.parquet`, `.pq`, "
+            "`.feather`, `.json`, `.jsonl`, and `.ndjson`. It also supports local stream-style sources "
+            "materialized into snapshots and local lakehouse-style sources such as partitioned directories and DuckDB files."
+        )
+    if any(token in normalized for token in ("why are some capabilities disabled", "capabilities disabled", "why disabled")):
+        blocked = [
+            item
+            for item in capabilities
+            if str(dict(item).get("status", "")).strip().lower() not in {"enabled", "ready", "ok"}
+        ]
+        if not blocked:
+            return "Nothing important is blocked right now. Current capabilities are already available."
+        top = blocked[:3]
+        details = []
+        for item in top:
+            name = str(item.get("name", "capability")).strip() or "capability"
+            reason = str(item.get("status_reason", "")).strip() or "Needs additional setup or run context."
+            hint = str(item.get("activation_hint", "")).strip()
+            details.append(f"{name}: {reason}" + (f" Next: {hint}" if hint else ""))
+        return "A lot of the deeper capabilities are waiting on real run context rather than being broken. " + " ".join(details)
+    if any(token in normalized for token in ("what can you do", "capabilities", "what are my options")):
+        action_bits = ", ".join(
+            f"`{str(item.get('title', '')).strip()}`" for item in actions[:4] if str(item.get("title", "")).strip()
+        ) or "`Start With Data`"
+        question_bits = ", ".join(
+            f"`{str(item.get('question', '')).strip()}`" for item in questions[:4] if str(item.get("question", "")).strip()
+        ) or "`what is relaytic?`"
+        return (
+            "Relaytic is a local-first structured-data research lab. It needs data plus a goal before the deeper run capabilities activate. "
+            "Right now I can explain what Relaytic is, show you the first steps, describe supported data sources, "
+            "explain why a capability needs setup, and point you to local host integrations. "
+            f"Good next actions are {action_bits}. Good starter questions are {question_bits}. "
+            f"This terminal chat lives at `{live_chat_command}`, while `relaytic mission-control launch` opens the dashboard."
+        )
+    if any(token in normalized for token in ("claude", "codex", "openclaw", "mcp", "/hosts", "host")):
+        discoverable = ", ".join(host_summary.get("discoverable_now", [])) or "none"
+        activation = ", ".join(host_summary.get("requires_activation", [])) or "none"
+        remote = ", ".join(host_summary.get("requires_public_https", [])) or "none"
+        return (
+            f"Relaytic stays local-first and can sit under familiar hosts. Discoverable locally now: `{discoverable}`. "
+            f"Needs activation: `{activation}`. Needs public HTTPS: `{remote}`. "
+            "Use `relaytic interoperability show` to see the exact next step for Claude, Codex, OpenClaw, or other MCP-style hosts."
+        )
+    return (
+        "Relaytic is a local-first structured-data lab. It needs data plus a goal before deeper run capabilities activate. "
+        "Ask `what is relaytic?`, `how do i start?`, `what data formats do you support?`, "
+        "or `why are some capabilities disabled?`."
+    )
 
 
 def _show_runtime_surface(*, run_dir: str | Path, limit: int = 20) -> dict[str, Any]:
@@ -3977,6 +4511,11 @@ def _show_mission_control_surface(
     bundle = review.bundle.to_dict()
     state = dict(bundle.get("mission_control_state", {}))
     queue = dict(bundle.get("review_queue_state", {}))
+    modes = dict(bundle.get("mode_overview", {}))
+    capabilities = dict(bundle.get("capability_manifest", {}))
+    affordances = dict(bundle.get("action_affordances", {}))
+    navigator = dict(bundle.get("stage_navigator", {}))
+    questions = dict(bundle.get("question_starters", {}))
     onboarding = dict(bundle.get("onboarding_status", {}))
     launch = dict(bundle.get("launch_manifest", {}))
     return {
@@ -3990,11 +4529,24 @@ def _show_mission_control_surface(
                 "current_stage": state.get("current_stage"),
                 "recommended_action": state.get("recommended_action"),
                 "review_required": state.get("review_required"),
+                "next_actor": state.get("next_actor"),
                 "card_count": state.get("card_count"),
+                "capability_count": state.get("capability_count"),
+                "action_count": state.get("action_count"),
+                "question_count": state.get("question_count"),
                 "review_queue_pending_count": queue.get("pending_count"),
+                "intelligence_mode": modes.get("intelligence_effective_mode"),
+                "autonomy_mode": modes.get("autonomy_mode"),
+                "can_rerun_stage": navigator.get("can_rerun_stage"),
+                "navigation_scope": navigator.get("navigation_scope"),
                 "launch_ready": onboarding.get("launch_ready"),
                 "doctor_status": onboarding.get("doctor_status"),
+                "needs_data": onboarding.get("needs_data"),
+                "live_chat_command": onboarding.get("live_chat_command"),
                 "html_report_path": launch.get("html_report_path"),
+                "capability_manifest_status": capabilities.get("status"),
+                "action_affordances_status": affordances.get("status"),
+                "question_starters_status": questions.get("status"),
             },
             "bundle": bundle,
         },
@@ -4043,6 +4595,11 @@ def _launch_mission_control_surface(
     manifest_path = _refresh_mission_control_manifest(state_root)
     state = dict(bundle.get("mission_control_state", {}))
     queue = dict(bundle.get("review_queue_state", {}))
+    modes = dict(bundle.get("mode_overview", {}))
+    capabilities = dict(bundle.get("capability_manifest", {}))
+    affordances = dict(bundle.get("action_affordances", {}))
+    navigator = dict(bundle.get("stage_navigator", {}))
+    questions = dict(bundle.get("question_starters", {}))
     onboarding = dict(bundle.get("onboarding_status", {}))
     return {
         "surface_payload": {
@@ -4055,13 +4612,26 @@ def _launch_mission_control_surface(
                 "current_stage": state.get("current_stage"),
                 "recommended_action": state.get("recommended_action"),
                 "review_required": state.get("review_required"),
+                "next_actor": state.get("next_actor"),
                 "card_count": state.get("card_count"),
+                "capability_count": state.get("capability_count"),
+                "action_count": state.get("action_count"),
+                "question_count": state.get("question_count"),
                 "review_queue_pending_count": queue.get("pending_count"),
+                "intelligence_mode": modes.get("intelligence_effective_mode"),
+                "autonomy_mode": modes.get("autonomy_mode"),
+                "can_rerun_stage": navigator.get("can_rerun_stage"),
+                "navigation_scope": navigator.get("navigation_scope"),
                 "launch_ready": onboarding.get("launch_ready"),
                 "doctor_status": onboarding.get("doctor_status"),
+                "needs_data": onboarding.get("needs_data"),
+                "live_chat_command": onboarding.get("live_chat_command"),
                 "html_report_path": launch_payload.get("html_report_path"),
                 "browser_requested": launch_payload.get("browser_requested"),
                 "browser_opened": launch_payload.get("browser_opened"),
+                "capability_manifest_status": capabilities.get("status"),
+                "action_affordances_status": affordances.get("status"),
+                "question_starters_status": questions.get("status"),
             },
             "bundle": bundle,
         },
@@ -4628,6 +5198,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.decision import read_decision_bundle
 
         return read_decision_bundle(run_dir)
+    if bundle == "dojo":
+        from relaytic.dojo import read_dojo_bundle
+
+        return read_dojo_bundle(run_dir)
     if bundle == "feedback":
         from relaytic.feedback import read_feedback_bundle
 
@@ -6137,6 +6711,207 @@ def _show_decision_surface(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _run_dojo_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+) -> dict[str, Any]:
+    from relaytic.dojo import write_dojo_bundle
+
+    root = Path(run_dir)
+    targets = _dojo_output_paths(root)
+    if not overwrite and all(path.exists() for path in targets.values()):
+        return _show_dojo_surface(run_dir=root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    planning_bundle = _read_json_bundle(root, bundle="planning")
+    plan = dict(planning_bundle.get("plan", {}))
+    if not plan or not dict(plan.get("execution_summary", {})):
+        raise ValueError(f"Slice 12 dojo review requires executed planning artifacts in {root}.")
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=foundation_state["resolved"].policy,
+        stage="dojo",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "plan.json",
+            "benchmark_parity_report.json",
+            "beat_target_contract.json",
+            "quality_gate_report.json",
+            "control_injection_audit.json",
+            "method_compiler_report.json",
+        ],
+    )
+    try:
+        dojo_result = run_dojo_review(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            planning_bundle=planning_bundle,
+            research_bundle=_read_json_bundle(root, bundle="research"),
+            benchmark_bundle=_read_json_bundle(root, bundle="benchmark"),
+            decision_bundle=_read_json_bundle(root, bundle="decision"),
+            profiles_bundle=_read_json_bundle(root, bundle="profiles"),
+            control_bundle=_read_json_bundle(root, bundle="control"),
+        )
+        written = write_dojo_bundle(root, bundle=dojo_result.bundle)
+        manifest_path = _refresh_dojo_manifest(
+            root,
+            run_id=run_id,
+            policy_source=foundation_state["policy_path"],
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic evaluated quarantined self-improvement proposals against benchmark, quality, and skeptical-control gates before recording explicit promotions, rejections, and rollback-ready ledgers.",
+        )
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        session = dojo_result.bundle.dojo_session
+        results = dojo_result.bundle.dojo_results
+        promotions = dojo_result.bundle.dojo_promotions
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "dojo": {
+                    "status": session.status,
+                    "benchmark_state": session.benchmark_state,
+                    "quality_gate_status": session.quality_gate_status,
+                    "control_security_state": session.control_security_state,
+                    "active_promotion_count": session.active_promotion_count,
+                    "rejected_count": results.rejected_count,
+                    "quarantined_count": results.quarantined_count,
+                    "rolled_back_count": len(promotions.rolled_back_promotions),
+                },
+                "bundle": dojo_result.bundle.to_dict(),
+            },
+            "human_output": dojo_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_dojo_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="dojo")
+    if not bundle:
+        raise ValueError(f"No Slice 12 dojo artifacts found in {root}.")
+    materialize_run_summary(run_dir=root)
+    manifest_path = _refresh_dojo_manifest(root)
+    session = dict(bundle.get("dojo_session", {}))
+    results = dict(bundle.get("dojo_results", {}))
+    promotions = dict(bundle.get("dojo_promotions", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "dojo": {
+                "status": session.get("status"),
+                "benchmark_state": session.get("benchmark_state"),
+                "quality_gate_status": session.get("quality_gate_status"),
+                "control_security_state": session.get("control_security_state"),
+                "active_promotion_count": int(session.get("active_promotion_count", 0) or 0),
+                "rejected_count": int(results.get("rejected_count", 0) or 0),
+                "quarantined_count": int(results.get("quarantined_count", 0) or 0),
+                "rolled_back_count": len(promotions.get("rolled_back_promotions", [])),
+            },
+            "bundle": bundle,
+        },
+        "human_output": render_dojo_review_markdown(bundle),
+    }
+
+
+def _run_dojo_rollback(
+    *,
+    run_dir: str | Path,
+    proposal_id: str,
+    reason: str | None,
+    config_path: str | None,
+    run_id: str | None,
+    labels: dict[str, str] | None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+) -> dict[str, Any]:
+    from relaytic.dojo import write_dojo_bundle
+
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=foundation_state["resolved"].policy,
+        stage="dojo",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "dojo_session.json",
+            "dojo_results.json",
+            "dojo_promotions.json",
+        ],
+    )
+    try:
+        dojo_result = rollback_dojo_promotion(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            proposal_id=proposal_id,
+            reason=reason,
+        )
+        written = write_dojo_bundle(root, bundle=dojo_result.bundle)
+        manifest_path = _refresh_dojo_manifest(
+            root,
+            run_id=run_id,
+            policy_source=foundation_state["policy_path"],
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary=f"Relaytic rolled back dojo proposal `{proposal_id}` while preserving promotion and rollback provenance.",
+        )
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        return _show_dojo_surface(run_dir=root)
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=foundation_state["resolved"].policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
 def _run_feedback_phase(
     *,
     run_dir: str | Path,
@@ -7485,6 +8260,16 @@ def _decision_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _dojo_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "dojo_session": run_dir / "dojo_session.json",
+        "dojo_hypotheses": run_dir / "dojo_hypotheses.json",
+        "dojo_results": run_dir / "dojo_results.json",
+        "dojo_promotions": run_dir / "dojo_promotions.json",
+        "architecture_proposals": run_dir / "architecture_proposals.json",
+    }
+
+
 def _feedback_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "feedback_intake": run_dir / "feedback_intake.json",
@@ -8730,6 +9515,60 @@ def _refresh_mission_control_manifest(
                 required=key != "mission_control_report",
             )
         )
+    for path in _dojo_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="dojo", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_dojo_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_mission_control_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _dojo_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="dojo", required=True))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:

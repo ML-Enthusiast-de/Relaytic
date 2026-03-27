@@ -81,7 +81,7 @@ def relaytic_show_control(*, run_dir: str) -> dict[str, Any]:
 
 
 def relaytic_show_mission_control(*, run_dir: str | None = None, expected_profile: str = "full") -> dict[str, Any]:
-    """Render the current Slice 11B mission-control surface for a Relaytic run or onboarding state."""
+    """Render the current Slice 11B/11C mission-control surface for a Relaytic run or onboarding state."""
     cli = _cli()
     return cli._show_mission_control_surface(
         run_dir=run_dir,
@@ -89,6 +89,12 @@ def relaytic_show_mission_control(*, run_dir: str | None = None, expected_profil
         config_path=None,
         expected_profile=expected_profile,
     )
+
+
+def relaytic_show_dojo(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 12 dojo surface for a Relaytic run."""
+    cli = _cli()
+    return cli._show_dojo_surface(run_dir=run_dir)
 
 
 def relaytic_get_status(*, run_dir: str) -> dict[str, Any]:
@@ -401,6 +407,27 @@ def relaytic_review_decision(
     )
 
 
+def relaytic_review_dojo(
+    *,
+    run_dir: str,
+    config_path: str | None = None,
+    run_id: str | None = None,
+    overwrite: bool = True,
+    labels: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Execute the Slice 12 dojo review for an existing run."""
+    cli = _cli()
+    return cli._run_dojo_phase(
+        run_dir=run_dir,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_review_dojo",
+    )
+
+
 def relaytic_show_decision(*, run_dir: str) -> dict[str, Any]:
     """Render the current Slice 10A decision-lab surface for a run."""
     cli = _cli()
@@ -598,10 +625,18 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
         InteropToolSpec(
             name="relaytic_show_mission_control",
             title="Show Relaytic Mission Control",
-            description="Render the current Slice 11B operator control-center state, onboarding posture, and launch metadata for a Relaytic run.",
+            description="Render the current Slice 11B/11C operator control-center state, onboarding posture, clarity surfaces, and launch metadata for a Relaytic run.",
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_mission_control,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_dojo",
+            title="Show Relaytic Dojo",
+            description="Render the current Slice 12 guarded self-improvement surface, including promotions, rejections, and rollback-ready state for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_dojo,
         ),
         InteropToolSpec(
             name="relaytic_get_status",
@@ -722,6 +757,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_review_decision,
+        ),
+        InteropToolSpec(
+            name="relaytic_review_dojo",
+            title="Review Dojo",
+            description="Execute the Slice 12 guarded self-improvement layer for an existing Relaytic run under explicit quarantine gates.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_review_dojo,
         ),
         InteropToolSpec(
             name="relaytic_assist_turn",

@@ -58,6 +58,20 @@ STAGE_ALIASES = {
     "runtime": "runtime",
 }
 
+NAVIGABLE_STAGES = [
+    "intake",
+    "investigation",
+    "memory",
+    "planning",
+    "evidence",
+    "intelligence",
+    "research",
+    "benchmark",
+    "completion",
+    "lifecycle",
+    "autonomy",
+]
+
 
 @dataclass(frozen=True)
 class AssistIntent:
@@ -118,6 +132,13 @@ def build_assist_bundle(
         host_options=host_options,
     )
     generated_at = _utc_now()
+    available_actions = _available_actions(controls=controls)
+    available_stage_targets = _available_stage_targets(controls=controls)
+    suggested_questions = _suggested_questions(
+        run_summary=run_summary,
+        controls=controls,
+        available_stage_targets=available_stage_targets,
+    )
     return AssistBundle(
         assist_mode=AssistModeArtifact(
             schema_version=ASSIST_MODE_SCHEMA_VERSION,
@@ -147,10 +168,15 @@ def build_assist_bundle(
             last_requested_stage=last_requested_stage,
             last_action_kind=last_action_kind,
             turn_count=max(0, int(turn_count or 0)),
+            available_actions=available_actions,
+            available_stage_targets=available_stage_targets,
+            suggested_questions=suggested_questions,
             summary=_session_state_summary(
                 current_stage=current_stage,
                 next_action=next_action,
                 last_action_kind=last_action_kind,
+                available_actions=available_actions,
+                available_stage_targets=available_stage_targets,
             ),
             trace=trace,
         ),
@@ -185,6 +211,9 @@ def plan_assist_turn(
     bundle = assist_bundle or {}
     if intent.intent_type == "connection_guidance":
         response = _build_connection_response(bundle=bundle)
+        return AssistTurnPlan(intent=intent, action_kind="respond", requested_stage=requested_stage, response_message=response)
+    if intent.intent_type == "capabilities":
+        response = _build_capabilities_response(bundle=bundle, run_summary=run_summary)
         return AssistTurnPlan(intent=intent, action_kind="respond", requested_stage=requested_stage, response_message=response)
     if intent.intent_type == "rerun_stage":
         if requested_stage is None:
@@ -232,6 +261,21 @@ def render_assist_markdown(bundle: AssistBundle | dict[str, Any]) -> str:
         f"- Takeover enabled: `{mode.get('takeover_enabled')}`",
         f"- Recommended connection path: `{guide.get('recommended_path') or 'unknown'}`",
     ]
+    available_actions = [str(item).strip() for item in state.get("available_actions", []) if str(item).strip()]
+    if available_actions:
+        lines.extend(["", "## Available Actions"])
+        lines.extend(f"- `{item}`" for item in available_actions[:6])
+    available_stages = [str(item).strip() for item in state.get("available_stage_targets", []) if str(item).strip()]
+    if available_stages:
+        lines.extend(["", "## Stage Navigation"])
+        lines.append(
+            "- Relaytic supports bounded stage reruns, not arbitrary checkpoint time travel yet."
+        )
+        lines.append(f"- Available stages: `{', '.join(available_stages)}`")
+    suggested_questions = [str(item).strip() for item in state.get("suggested_questions", []) if str(item).strip()]
+    if suggested_questions:
+        lines.extend(["", "## Suggested Questions"])
+        lines.extend(f"- `{item}`" for item in suggested_questions[:6])
     local_options = list(guide.get("local_options", []))
     if local_options:
         lines.extend(["", "## Local Options"])
@@ -250,6 +294,8 @@ def render_assist_markdown(bundle: AssistBundle | dict[str, Any]) -> str:
 def _intent_type(normalized: str, *, requested_stage: str | None) -> str:
     if _looks_like_connection_request(normalized):
         return "connection_guidance"
+    if _looks_like_capability_request(normalized):
+        return "capabilities"
     if _looks_like_stage_rerun(normalized):
         return "rerun_stage"
     if _looks_like_takeover(normalized):
@@ -306,6 +352,23 @@ def _looks_like_takeover(normalized: str) -> bool:
 
 def _looks_like_stage_rerun(normalized: str) -> bool:
     return any(token in normalized for token in ("go back", "rerun", "redo", "revisit", "restart from"))
+
+
+def _looks_like_capability_request(normalized: str) -> bool:
+    return any(
+        token in normalized
+        for token in (
+            "what can you do",
+            "what can i do",
+            "capabilities",
+            "what are my options",
+            "what are the options",
+            "what can i ask",
+            "how can i steer",
+            "help me navigate",
+            "help options",
+        )
+    )
 
 
 def _looks_like_explanation_request(normalized: str) -> bool:
@@ -412,6 +475,25 @@ def _build_connection_response(*, bundle: dict[str, Any]) -> str:
     )
 
 
+def _build_capabilities_response(*, bundle: dict[str, Any], run_summary: dict[str, Any]) -> str:
+    state = dict(bundle.get("assist_session_state", {}))
+    available_actions = [str(item).strip() for item in state.get("available_actions", []) if str(item).strip()]
+    available_stages = [str(item).strip() for item in state.get("available_stage_targets", []) if str(item).strip()]
+    suggested_questions = [str(item).strip() for item in state.get("suggested_questions", []) if str(item).strip()]
+    current_stage = _clean_text(state.get("current_stage")) or _clean_text(run_summary.get("stage_completed")) or "unknown"
+    action_bits = ", ".join(f"`{item}`" for item in available_actions[:4]) or "`respond`"
+    stage_bits = ", ".join(f"`{item}`" for item in available_stages[:6]) or "`none`"
+    question_bits = "; ".join(suggested_questions[:3]) or "why did you choose this route?"
+    return (
+        f"Relaytic is currently at `{current_stage}`. "
+        f"You can ask bounded questions, request connection guidance, rerun from bounded stages, or let Relaytic take over safely. "
+        f"Available actions now: {action_bits}. "
+        f"Bounded stage navigation currently supports: {stage_bits}. "
+        f"Relaytic will challenge truth-bearing steering rather than blindly obeying it. "
+        f"Good starter questions are: {question_bits}."
+    )
+
+
 def _build_host_options(*, interoperability_inventory: dict[str, Any]) -> list[dict[str, Any]]:
     hosts = interoperability_inventory.get("hosts", [])
     if not isinstance(hosts, list):
@@ -512,11 +594,68 @@ def _assist_mode_summary(*, controls: AssistControls, backend_status: str, backe
     )
 
 
-def _session_state_summary(*, current_stage: str, next_action: str | None, last_action_kind: str | None) -> str:
+def _session_state_summary(
+    *,
+    current_stage: str,
+    next_action: str | None,
+    last_action_kind: str | None,
+    available_actions: list[str],
+    available_stage_targets: list[str],
+) -> str:
+    action_text = ", ".join(available_actions[:4]) if available_actions else "none"
+    stage_text = ", ".join(available_stage_targets[:5]) if available_stage_targets else "none"
     return (
         f"Relaytic assist is currently anchored at `{current_stage}` with next action "
-        f"`{next_action or 'none'}` and last assist action `{last_action_kind or 'none'}`."
+        f"`{next_action or 'none'}` and last assist action `{last_action_kind or 'none'}`. "
+        f"Available actions: `{action_text}`. Stage navigation: `{stage_text}`."
     )
+
+
+def _available_actions(*, controls: AssistControls) -> list[str]:
+    actions = ["ask_question"]
+    if controls.allow_host_connection_guidance:
+        actions.append("connection_guidance")
+    if controls.allow_stage_navigation:
+        actions.append("rerun_stage")
+    if controls.allow_assistant_takeover:
+        actions.append("take_over")
+    return actions
+
+
+def _available_stage_targets(*, controls: AssistControls) -> list[str]:
+    if not controls.allow_stage_navigation:
+        return []
+    return list(NAVIGABLE_STAGES)
+
+
+def _suggested_questions(
+    *,
+    run_summary: dict[str, Any],
+    controls: AssistControls,
+    available_stage_targets: list[str],
+) -> list[str]:
+    questions = [
+        "why did you choose this route?",
+        "what can you do right now?",
+    ]
+    benchmark = dict(run_summary.get("benchmark", {}))
+    decision_lab = dict(run_summary.get("decision_lab", {}))
+    control = dict(run_summary.get("control", {}))
+    next_step = dict(run_summary.get("next_step", {}))
+    if benchmark.get("incumbent_present"):
+        questions.append("why did you or didn't you beat the incumbent?")
+    if decision_lab.get("review_required"):
+        questions.append("why does the decision lab want review?")
+    if control.get("decision"):
+        questions.append("why was my steering request challenged?")
+    if available_stage_targets:
+        default_stage = "benchmark" if "benchmark" in available_stage_targets else available_stage_targets[0]
+        questions.append(f"go back to {default_stage}")
+    if controls.allow_assistant_takeover:
+        questions.append("i'm not sure, take over")
+    if _clean_text(next_step.get("recommended_action")):
+        questions.append("what should happen next?")
+    return questions[:6]
 
 
 def _connection_guide_summary(*, recommended_path: str, host_options: list[dict[str, Any]]) -> str:

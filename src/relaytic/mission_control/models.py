@@ -15,6 +15,11 @@ INSTALL_EXPERIENCE_REPORT_SCHEMA_VERSION = "relaytic.install_experience_report.v
 LAUNCH_MANIFEST_SCHEMA_VERSION = "relaytic.launch_manifest.v1"
 DEMO_SESSION_MANIFEST_SCHEMA_VERSION = "relaytic.demo_session_manifest.v1"
 UI_PREFERENCES_SCHEMA_VERSION = "relaytic.ui_preferences.v1"
+MODE_OVERVIEW_SCHEMA_VERSION = "relaytic.mode_overview.v1"
+CAPABILITY_MANIFEST_SCHEMA_VERSION = "relaytic.capability_manifest.v1"
+ACTION_AFFORDANCES_SCHEMA_VERSION = "relaytic.action_affordances.v1"
+STAGE_NAVIGATOR_SCHEMA_VERSION = "relaytic.stage_navigator.v1"
+QUESTION_STARTERS_SCHEMA_VERSION = "relaytic.question_starters.v1"
 
 
 @dataclass(frozen=True)
@@ -58,9 +63,13 @@ class MissionControlState:
     headline: str
     current_stage: str | None
     recommended_action: str | None
+    next_actor: str | None
     review_required: bool
     card_count: int
     review_queue_pending_count: int
+    capability_count: int
+    action_count: int
+    question_count: int
     cards: list[dict[str, Any]]
     summary: str
     trace: MissionControlTrace
@@ -111,6 +120,106 @@ class ControlCenterLayout:
 
 
 @dataclass(frozen=True)
+class ModeOverview:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    current_stage: str
+    next_actor: str | None
+    autonomy_mode: str | None
+    intelligence_effective_mode: str | None
+    intelligence_routed_mode: str | None
+    local_profile: str | None
+    takeover_available: bool
+    skeptical_control_active: bool
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class CapabilityManifest:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    capability_count: int
+    capabilities: list[dict[str, Any]]
+    host_summary: dict[str, Any]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ActionAffordances:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    action_count: int
+    actions: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class StageNavigator:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    current_stage: str
+    can_rerun_stage: bool
+    can_jump_to_any_point: bool
+    navigation_scope: str
+    available_stages: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class QuestionStarters:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    question_count: int
+    starters: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class OnboardingStatus:
     schema_version: str
     generated_at: str
@@ -121,6 +230,13 @@ class OnboardingStatus:
     launch_ready: bool
     package_installed: bool
     doctor_status: str
+    what_relaytic_is: str
+    needs_data: bool
+    current_requirements: list[str]
+    first_steps: list[str]
+    interaction_modes: list[dict[str, Any]]
+    live_chat_ready: bool
+    live_chat_command: str
     host_summary: dict[str, Any]
     recommended_commands: list[str]
     summary: str
@@ -227,6 +343,11 @@ class MissionControlBundle:
     mission_control_state: MissionControlState
     review_queue_state: ReviewQueueState
     control_center_layout: ControlCenterLayout
+    mode_overview: ModeOverview
+    capability_manifest: CapabilityManifest
+    action_affordances: ActionAffordances
+    stage_navigator: StageNavigator
+    question_starters: QuestionStarters
     onboarding_status: OnboardingStatus
     install_experience_report: InstallExperienceReport
     launch_manifest: LaunchManifest
@@ -238,6 +359,11 @@ class MissionControlBundle:
             "mission_control_state": self.mission_control_state.to_dict(),
             "review_queue_state": self.review_queue_state.to_dict(),
             "control_center_layout": self.control_center_layout.to_dict(),
+            "mode_overview": self.mode_overview.to_dict(),
+            "capability_manifest": self.capability_manifest.to_dict(),
+            "action_affordances": self.action_affordances.to_dict(),
+            "stage_navigator": self.stage_navigator.to_dict(),
+            "question_starters": self.question_starters.to_dict(),
             "onboarding_status": self.onboarding_status.to_dict(),
             "install_experience_report": self.install_experience_report.to_dict(),
             "launch_manifest": self.launch_manifest.to_dict(),

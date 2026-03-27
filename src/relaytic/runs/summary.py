@@ -165,6 +165,16 @@ def build_run_summary(
             "compiled_benchmark_protocol": "compiled_benchmark_protocol.json",
         },
     )
+    dojo_bundle = _read_bundle(
+        root,
+        {
+            "dojo_session": "dojo_session.json",
+            "dojo_hypotheses": "dojo_hypotheses.json",
+            "dojo_results": "dojo_results.json",
+            "dojo_promotions": "dojo_promotions.json",
+            "architecture_proposals": "architecture_proposals.json",
+        },
+    )
     feedback_bundle = _read_bundle(
         root,
         {
@@ -297,6 +307,11 @@ def build_run_summary(
     compiled_challenger_templates = _bundle_item(decision_bundle, "compiled_challenger_templates")
     compiled_feature_hypotheses = _bundle_item(decision_bundle, "compiled_feature_hypotheses")
     compiled_benchmark_protocol = _bundle_item(decision_bundle, "compiled_benchmark_protocol")
+    dojo_session = _bundle_item(dojo_bundle, "dojo_session")
+    dojo_hypotheses = _bundle_item(dojo_bundle, "dojo_hypotheses")
+    dojo_results = _bundle_item(dojo_bundle, "dojo_results")
+    dojo_promotions = _bundle_item(dojo_bundle, "dojo_promotions")
+    architecture_proposals = _bundle_item(dojo_bundle, "architecture_proposals")
     feedback_intake = _bundle_item(feedback_bundle, "feedback_intake")
     feedback_validation = _bundle_item(feedback_bundle, "feedback_validation")
     feedback_effect_report = _bundle_item(feedback_bundle, "feedback_effect_report")
@@ -381,6 +396,7 @@ def build_run_summary(
             research_bundle=research_bundle,
             benchmark_bundle=benchmark_bundle,
             decision_bundle=decision_bundle,
+            dojo_bundle=dojo_bundle,
             profiles_bundle=profiles_bundle,
             feedback_bundle=feedback_bundle,
             control_bundle=control_bundle,
@@ -570,6 +586,26 @@ def build_run_summary(
             "baseline_action": _clean_text(handoff_controller_report.get("baseline_action")),
             "primary_decision_question": _clean_text(decision_world_model.get("primary_decision_question")),
         },
+        "dojo": {
+            "status": _clean_text(dojo_session.get("status")),
+            "benchmark_state": _clean_text(dojo_session.get("benchmark_state")),
+            "quality_gate_status": _clean_text(dojo_session.get("quality_gate_status")),
+            "control_security_state": _clean_text(dojo_session.get("control_security_state")),
+            "active_promotion_count": int(dojo_session.get("active_promotion_count", 0) or 0),
+            "proposal_count": int(dojo_hypotheses.get("proposal_count", 0) or 0),
+            "promoted_count": int(dojo_results.get("promoted_count", 0) or 0),
+            "rejected_count": int(dojo_results.get("rejected_count", 0) or 0),
+            "quarantined_count": int(dojo_results.get("quarantined_count", 0) or 0),
+            "rolled_back_count": len(dojo_promotions.get("rolled_back_promotions", []))
+            if isinstance(dojo_promotions.get("rolled_back_promotions"), list)
+            else 0,
+            "active_categories": [
+                str(item.get("category", "")).strip()
+                for item in dojo_promotions.get("active_promotions", [])
+                if isinstance(item, dict) and str(item.get("category", "")).strip()
+            ][:5],
+            "architecture_proposal_count": int(architecture_proposals.get("proposal_count", 0) or 0),
+        },
         "feedback": {
             "status": _clean_text(feedback_effect_report.get("status")) or _clean_text(feedback_validation.get("status")) or _clean_text(feedback_intake.get("status")),
             "accepted_count": int(feedback_validation.get("accepted_count", 0) or 0),
@@ -751,6 +787,11 @@ def build_run_summary(
             "method_compiler_report_path": _path_if_exists(root / "method_compiler_report.json"),
             "source_graph_path": _path_if_exists(root / "source_graph.json"),
             "join_candidate_report_path": _path_if_exists(root / "join_candidate_report.json"),
+            "dojo_session_path": _path_if_exists(root / "dojo_session.json"),
+            "dojo_hypotheses_path": _path_if_exists(root / "dojo_hypotheses.json"),
+            "dojo_results_path": _path_if_exists(root / "dojo_results.json"),
+            "dojo_promotions_path": _path_if_exists(root / "dojo_promotions.json"),
+            "architecture_proposals_path": _path_if_exists(root / "architecture_proposals.json"),
             "feedback_effect_report_path": _path_if_exists(root / "feedback_effect_report.json"),
             "feedback_casebook_path": _path_if_exists(root / "feedback_casebook.json"),
             "quality_contract_path": _path_if_exists(root / "quality_contract.json"),
@@ -781,6 +822,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     research = dict(summary.get("research", {}))
     benchmark = dict(summary.get("benchmark", {}))
     decision_lab = dict(summary.get("decision_lab", {}))
+    dojo = dict(summary.get("dojo", {}))
     feedback = dict(summary.get("feedback", {}))
     contracts = dict(summary.get("contracts", {}))
     profiles = dict(summary.get("profiles", {}))
@@ -962,6 +1004,24 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         )
         if decision_lab.get("recommended_source_id"):
             lines.append(f"- Recommended local source: `{decision_lab.get('recommended_source_id')}`")
+    if dojo and any(value not in (None, 0, False, "", []) for value in dojo.values()):
+        lines.extend(
+            [
+                "",
+                "## Dojo",
+                f"- Status: `{dojo.get('status') or 'unknown'}`",
+                f"- Benchmark state: `{dojo.get('benchmark_state') or 'unknown'}`",
+                f"- Quality gate: `{dojo.get('quality_gate_status') or 'unknown'}`",
+                f"- Control security: `{dojo.get('control_security_state') or 'unknown'}`",
+                f"- Active promotions: `{dojo.get('active_promotion_count', 0)}`",
+                f"- Rejected proposals: `{dojo.get('rejected_count', 0)}`",
+                f"- Quarantined proposals: `{dojo.get('quarantined_count', 0)}`",
+                f"- Rolled back promotions: `{dojo.get('rolled_back_count', 0)}`",
+            ]
+        )
+        categories = [str(item).strip() for item in dojo.get("active_categories", []) if str(item).strip()]
+        if categories:
+            lines.append(f"- Active categories: `{', '.join(categories)}`")
     if feedback and any(value not in (None, 0, False, "", []) for value in feedback.values()):
         lines.extend(
             [
@@ -1216,6 +1276,7 @@ def _resolve_stage(
     research_bundle: dict[str, Any],
     benchmark_bundle: dict[str, Any],
     decision_bundle: dict[str, Any],
+    dojo_bundle: dict[str, Any],
     profiles_bundle: dict[str, Any],
     feedback_bundle: dict[str, Any],
     control_bundle: dict[str, Any],
@@ -1223,6 +1284,8 @@ def _resolve_stage(
     lifecycle_bundle: dict[str, Any],
     autonomy_bundle: dict[str, Any],
 ) -> str:
+    if dojo_bundle:
+        return "dojo_reviewed"
     if any(isinstance(value, dict) and value for value in feedback_bundle.values()):
         return "feedback_reviewed"
     if any(isinstance(value, dict) and value for value in control_bundle.values()):
@@ -1258,6 +1321,15 @@ def _resolve_stage(
 
 
 def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: str) -> str | None:
+    if any(
+        (root / filename).exists()
+        for filename in (
+            "dojo_session.json",
+            "dojo_results.json",
+            "dojo_promotions.json",
+        )
+    ):
+        return "dojo"
     if (root / "feedback_effect_report.json").exists():
         return "feedback"
     if latest_stage == "control" or last_event_stage == "control":
