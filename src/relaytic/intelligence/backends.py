@@ -180,6 +180,8 @@ def discover_backend(
         )
 
     config = load_config(config_path)
+    if "policy" in config and isinstance(config.get("policy"), dict):
+        config = dict(config["policy"])
     policy = apply_environment_overrides(load_runtime_policy(config))
     runtime_cfg = dict(config.get("runtime", {}))
     requested_provider = str(runtime_cfg.get("provider", policy.provider)).strip() or str(policy.provider).strip()

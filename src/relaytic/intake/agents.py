@@ -89,6 +89,9 @@ HORIZON_PATTERNS = (
 )
 
 ACTOR_TYPES = {"user", "operator", "agent"}
+ACTOR_TYPE_ALIASES = {
+    "human": "operator",
+}
 
 STRUCTURED_TEMPLATE_FIELDS = {
     "target": "task_target_column",
@@ -591,8 +594,12 @@ def run_intake_interpretation(
     data_start_row: int | None = None,
 ) -> IntakeResolution:
     """Interpret free-form intake into Slice 04 artifacts and updated foundation objects."""
+    actor_type = _normalize_actor_type(actor_type)
     if actor_type not in ACTOR_TYPES:
-        raise ValueError(f"Unsupported actor type '{actor_type}'. Use one of {sorted(ACTOR_TYPES)}.")
+        raise ValueError(
+            f"Unsupported actor type '{actor_type}'. Use one of {sorted(ACTOR_TYPES)}. "
+            "Relaytic also accepts the alias `human` and normalizes it to `operator`."
+        )
     normalized_message = message.strip()
     if not normalized_message:
         raise ValueError("Intake message must not be empty.")
@@ -2113,3 +2120,10 @@ def _is_overridable_default(*, section_name: str, key: str, existing_value: Any)
     if not allowed:
         return False
     return str(existing_value).strip().casefold() in {item.casefold() for item in allowed}
+
+
+def _normalize_actor_type(actor_type: str) -> str:
+    normalized = str(actor_type or "").strip().lower()
+    if normalized in ACTOR_TYPE_ALIASES:
+        return ACTOR_TYPE_ALIASES[normalized]
+    return normalized

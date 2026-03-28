@@ -97,6 +97,26 @@ def test_run_intake_interpretation_deterministically_updates_foundation(tmp_path
     assert any(match.field == "task_brief.target_column" for match in resolution.intake_bundle.semantic_mapping.field_matches)
 
 
+def test_run_intake_interpretation_accepts_human_actor_alias(tmp_path: Path) -> None:
+    data_path = _write_dataset(tmp_path / "human_alias.csv")
+    policy = load_policy().policy
+    mandate_bundle, context_bundle = _build_foundation(policy)
+
+    resolution = run_intake_interpretation(
+        message="Predict failure_flag from sensor_a.",
+        actor_type="human",
+        actor_name="operator_alias",
+        channel="mission_control_chat",
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        data_path=str(data_path),
+    )
+
+    assert resolution.intake_bundle.intake_record.actor_type == "operator"
+    assert resolution.task_brief.target_column == "failure_flag"
+
+
 def test_run_intake_interpretation_parses_structured_template_fields(tmp_path: Path) -> None:
     data_path = _write_dataset(tmp_path / "template.csv")
     policy = load_policy().policy

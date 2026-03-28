@@ -25,13 +25,16 @@ Treat Relaytic artifacts as the source of truth. Do not replace them with ad hoc
 Use this order:
 
 ```powershell
+python scripts/install_relaytic.py --profile full --format json
 relaytic doctor --expected-profile full --format json
 relaytic mission-control show --output-dir artifacts\mission_control --format json
-relaytic run --run-dir artifacts\demo --data-path <data.csv> --text "Describe the goal here." --format json
+relaytic mission-control chat
 relaytic show --run-dir artifacts\demo --format json
 relaytic assist show --run-dir artifacts\demo --format json
 relaytic assist turn --run-dir artifacts\demo --message "what can you do?" --format json
 ```
+
+If the human is present at first contact, prefer mission-control chat before forcing a perfect `relaytic run` command. The chat now supports path capture, objective capture, `/state`, `/reset`, and explicit confirmation before run creation.
 
 ## What Each Surface Is For
 
@@ -41,7 +44,7 @@ Top-level onboarding, capability state, next actions, handbook discovery, and op
 
 ### `mission-control chat`
 
-Onboarding questions, demo flow help, mode explanations, and stuck recovery.
+Onboarding questions, demo flow help, mode explanations, stuck recovery, dataset-path capture, and objective capture for messy human input.
 
 ### `show`
 
@@ -60,8 +63,10 @@ Attach an incumbent and force an honest comparison.
 When the user knows little:
 
 1. point them to mission control first
-2. point them to the human handbook if they need narrative orientation
-3. keep the interaction simple: what it is, what it needs, how to start, what is blocked, and what to do next
+2. let them paste the dataset path or say the goal in their own words
+3. use `/state` or ask what Relaytic has captured if the conversation gets messy
+4. point them to the human handbook if they need narrative orientation
+5. keep the interaction simple: what it is, what it needs, how to start, what is blocked, and what to do next
 
 When the user already has a run:
 
@@ -74,6 +79,7 @@ When the user already has a run:
 
 - Relaytic is local-first by default
 - copy-only data handling is part of the contract
+- the full install profile now attempts to provision a lightweight local onboarding helper for human-facing chat
 - bounded stage reruns are supported; arbitrary checkpoint time travel is not
 - skeptical control is intentional; do not expect blind compliance
 - remote intelligence is optional and policy-gated
@@ -101,9 +107,10 @@ Do this:
 
 1. run `relaytic doctor`
 2. inspect mission control
-3. read the action affordances and starter questions
-4. use mission-control chat for onboarding questions
-5. read [relaytic_demo_walkthrough.md](./relaytic_demo_walkthrough.md)
+3. inspect `onboarding_chat_session_state.json` if the issue is in first-contact capture
+4. read the action affordances and starter questions
+5. use mission-control chat for onboarding questions
+6. read [relaytic_demo_walkthrough.md](./relaytic_demo_walkthrough.md)
 
 ## If The Human Is Stuck
 

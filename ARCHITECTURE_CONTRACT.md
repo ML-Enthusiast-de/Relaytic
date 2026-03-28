@@ -44,7 +44,7 @@ Current canonical boundaries:
 - `src/relaytic/compiler/` owns Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` owns Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/benchmark/`, `src/relaytic/evidence/`, and `src/relaytic/lifecycle/` now also own Slice 11A imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts
-- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding plus live terminal mission-control chat surfaces, Slice 11E role-specific handbook discovery and handbook-aware onboarding surfaces, Slice 11F demo-grade onboarding, explicit mode education, stuck recovery, and recruiter-safe walkthrough surfaces, and later Slice 15 branch DAG, confidence map, trace exploration, and change-attribution surfaces
+- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding plus live terminal mission-control chat surfaces, Slice 11E role-specific handbook discovery and handbook-aware onboarding surfaces, Slice 11F demo-grade onboarding, explicit mode education, stuck recovery, recruiter-safe walkthrough surfaces, Slice 11G adaptive human onboarding capture plus lightweight local semantic guidance surfaces, and later Slice 15 branch DAG, confidence map, trace exploration, and change-attribution surfaces
 - `src/relaytic/dojo/` owns Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback state, and architecture-proposal quarantine
 
 Reserved future boundaries:
@@ -93,6 +93,7 @@ These files are required and must stay current:
 - `docs/build_slices/phase_11d.md`
 - `docs/build_slices/phase_11e.md`
 - `docs/build_slices/phase_11f.md`
+- `docs/build_slices/phase_11g.md`
 - `docs/build_slices/phase_12.md`
 - `docs/build_slices/phase_12a.md`
 - `docs/build_slices/phase_12b.md`
@@ -258,6 +259,7 @@ Current mission-control artifact names:
 - `stage_navigator.json`
 - `question_starters.json`
 - `onboarding_status.json`
+- `onboarding_chat_session_state.json`
 - `install_experience_report.json`
 - `launch_manifest.json`
 - `demo_session_manifest.json`

@@ -225,6 +225,13 @@ Avoid introducing new references to:
 - extended the existing mission-control onboarding boundary so `onboarding_status.json`, `action_affordances.json`, `question_starters.json`, and rendered mission-control surfaces now include guided demo flow, explicit mode explanations, and stuck-recovery guidance
 - upgraded the existing mission-control chat surface with `/demo`, `/modes`, and `/stuck` so first-contact users do not need repo knowledge to recover or continue
 
+### Slice 11G
+
+- extended the existing `src/relaytic/mission_control/`, `src/relaytic/ui/cli.py`, `src/relaytic/intelligence/backends.py`, and `scripts/install_relaytic.py` boundaries rather than introducing a separate onboarding-conversation product
+- introduced the mission-control artifact boundary `onboarding_chat_session_state.json`
+- upgraded the existing mission-control chat surface so it can capture dataset paths and objectives across turns, expose `/state` and `/reset`, and start the first run after explicit confirmation
+- upgraded the existing bootstrap installer so the full profile attempts lightweight onboarding-local-LLM provisioning by default instead of leaving that setup as a hidden follow-up step
+
 ### Slice 12
 
 - introduced the canonical package boundary `src/relaytic/dojo/`
@@ -263,7 +270,7 @@ Avoid introducing new references to:
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/benchmark/` for Slice 11A imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts on top of Slice 11 reference comparisons
-- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D live onboarding/chat behavior, Slice 11E handbook discovery surfaces, and Slice 11F guided demo/mode-education/stuck-recovery surfaces
+- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D live onboarding/chat behavior, Slice 11E handbook discovery surfaces, Slice 11F guided demo/mode-education/stuck-recovery surfaces, and Slice 11G adaptive onboarding/session-capture/lightweight-semantic-helper surfaces
 - `src/relaytic/dojo/` for Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and architecture-proposal quarantine
 - `docs/handbooks/` for Slice 11E role-specific human/operator and external-agent onboarding guides
 - `docs/handbooks/relaytic_demo_walkthrough.md` for Slice 11F recruiter-safe demo sequencing and first-contact presentation
@@ -313,6 +320,7 @@ Shipped artifact names:
 - `stage_navigator.json`
 - `question_starters.json`
 - `onboarding_status.json`
+- `onboarding_chat_session_state.json`
 - `install_experience_report.json`
 - `launch_manifest.json`
 - `demo_session_manifest.json`

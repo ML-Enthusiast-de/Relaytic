@@ -844,6 +844,8 @@ def _resolve_run_dir(*, run_dir: str | None, data_path: str | None) -> Path:
 
 def _normalize_actor_type(actor_type: str) -> str:
     normalized = str(actor_type or "agent").strip().lower()
+    if normalized == "human":
+        return "operator"
     if normalized not in {"user", "operator", "agent"}:
         return "agent"
     return normalized

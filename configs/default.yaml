@@ -113,6 +113,10 @@ communication:
   allow_assistant_takeover: true
   prefer_local_semantic_assist: true
   allow_host_connection_guidance: true
+  adaptive_onboarding_chat_enabled: true
+  adaptive_onboarding_semantic_assist: true
+  adaptive_onboarding_confirmation_required: true
+  adaptive_onboarding_default_run_dir: artifacts/demo
   max_turn_history: 20
 
 mission_control:

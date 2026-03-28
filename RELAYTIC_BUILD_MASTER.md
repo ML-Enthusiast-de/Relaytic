@@ -86,6 +86,7 @@ Start with:
 11D. guided onboarding, live terminal mission-control chat, and capability explanations
 11E. role-specific handbooks and handbook-aware onboarding
 11F. demo-grade onboarding, mode education, and stuck recovery
+11G. adaptive human onboarding and lightweight local semantic guidance
 12. dojo mode and guarded self-improvement
 12A. lab pulse, periodic awareness, and bounded proactive follow-up
 12B. first-class tracing, agent evaluation, and runtime security harnesses
@@ -119,13 +120,14 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 19. Slice 11D
 20. Slice 11E
 21. Slice 11F
-22. Slice 12
-23. Slice 12A
-24. Slice 12B
-25. Slice 13
-26. Slice 14
-27. Slice 15
-28. Slice 16
+22. Slice 11G
+23. Slice 12
+24. Slice 12A
+25. Slice 12B
+26. Slice 13
+27. Slice 14
+28. Slice 15
+29. Slice 16
 
 Reason:
 
@@ -150,6 +152,7 @@ Reason:
 - Slice 11D is now implemented and makes first contact far less confusing by adding guided onboarding, a real terminal mission-control chat, explicit capability reasons, and a clearer dashboard-versus-chat split
 - Slice 11E is now implemented and gives that onboarding surface explicit role-specific handbooks, handbook-aware chat/help affordances, and consistent agent host entry points instead of leaving orientation scattered across repo docs
 - Slice 11F is now implemented and turns that onboarding surface into a better demo product by adding a guided walkthrough, explicit mode education, and stuck-recovery guidance directly inside mission control, terminal chat, and the handbook stack
+- Slice 11G is now implemented and makes that first-contact flow much more human-tolerant by adding adaptive onboarding capture, visible onboarding session state, lightweight local semantic rescue for messy input, and full-install local-helper provisioning
 - Slice 12 is now implemented and gives Relaytic a guarded dojo layer with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, architecture-proposal quarantine, and mission-control visibility
 - Slice 12A should come after dojo because periodic awareness and bounded background follow-up are much safer once self-improvement already has quarantine and promotion rules
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because Relaytic needs one canonical trace substrate plus explicit agent/security evaluation before wider search and full trace-explorer claims become credible
@@ -157,7 +160,7 @@ Reason:
 
 Current repo state:
 
-- implemented through Slice 12, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, and Slice 12 guarded dojo review now landed
+- implemented through Slice 12, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, and Slice 12 guarded dojo review now landed
 - next execution target: Slice 12A
 - next pulse follow-on: Slice 12A
 - next trace-and-safety follow-on after Slice 12A: Slice 12B

@@ -212,6 +212,14 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "allow_assistant_takeover": bool(communication_cfg.get("allow_assistant_takeover", True)),
             "prefer_local_semantic_assist": bool(communication_cfg.get("prefer_local_semantic_assist", True)),
             "allow_host_connection_guidance": bool(communication_cfg.get("allow_host_connection_guidance", True)),
+            "adaptive_onboarding_chat_enabled": bool(communication_cfg.get("adaptive_onboarding_chat_enabled", True)),
+            "adaptive_onboarding_semantic_assist": bool(communication_cfg.get("adaptive_onboarding_semantic_assist", True)),
+            "adaptive_onboarding_confirmation_required": bool(
+                communication_cfg.get("adaptive_onboarding_confirmation_required", True)
+            ),
+            "adaptive_onboarding_default_run_dir": str(
+                communication_cfg.get("adaptive_onboarding_default_run_dir", "artifacts/demo") or "artifacts/demo"
+            ),
             "max_turn_history": int(communication_cfg.get("max_turn_history", 20) or 20),
         },
         "research": {

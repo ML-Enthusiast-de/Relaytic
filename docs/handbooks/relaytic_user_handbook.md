@@ -22,6 +22,8 @@ You point it to data, describe the goal in plain language, and Relaytic creates 
 
 Relaytic is not meant to be a vague chat shell. Its source of truth is the local artifact graph it writes during a run.
 
+For first-contact UX, Relaytic can also use a lightweight local onboarding helper on the full install profile. That helper is there to understand messy human onboarding messages, not to replace deterministic run control.
+
 ## What Relaytic Needs First
 
 Relaytic becomes meaningfully useful after you give it:
@@ -41,7 +43,14 @@ Good examples of goals:
 Run these in order:
 
 ```powershell
+python scripts/install_relaytic.py --profile full --launch-control-center
 relaytic doctor --expected-profile full --format json
+relaytic mission-control chat
+```
+
+If you already know the dataset path and objective, you can still create the first run directly:
+
+```powershell
 relaytic run --run-dir artifacts\demo --data-path <data.csv> --text "Describe the goal here."
 relaytic mission-control launch --run-dir artifacts\demo
 ```
@@ -81,6 +90,14 @@ Good questions:
 - `i'm stuck, what should i do?`
 - `why are some capabilities disabled?`
 
+You can also paste things directly instead of phrasing them perfectly:
+
+- a local dataset path
+- a plain-language goal
+- both in one messy sentence
+
+Relaytic should capture what matters, show you what it understood, and ask for the next missing piece.
+
 ### Assist
 
 `relaytic assist chat --run-dir <run_dir>`
@@ -105,10 +122,29 @@ This is the intended operator flow:
 1. Verify the install with `relaytic doctor`.
 2. Point Relaytic at a real local dataset.
 3. Give it a short goal.
-4. Open mission control.
-5. Inspect the current stage, next action, and capability state.
-6. Ask Relaytic questions if anything is unclear.
-7. Only then decide whether to let it continue, rerun a bounded stage, or attach an incumbent.
+4. Confirm what Relaytic captured if you started from mission-control chat.
+5. Open mission control.
+6. Inspect the current stage, next action, and capability state.
+7. Ask Relaytic questions if anything is unclear.
+8. Only then decide whether to let it continue, rerun a bounded stage, or attach an incumbent.
+
+## How Mission-Control Chat Works
+
+Mission-control chat is meant for humans first.
+
+It should let you:
+
+- paste a dataset path directly
+- say the objective in plain language
+- check what Relaytic has captured with `/state`
+- clear the captured onboarding state with `/reset`
+- confirm before it creates the first governed run
+
+If the lightweight local onboarding helper is available, Relaytic should also recover gracefully from messy phrasing such as:
+
+- `maybe use "C:\data\churn.csv" because I care about churn risk`
+- `this file should predict malignant cases`
+- `maybe compare this against our old model too`
 
 ## What Happens After You Start A Run
 

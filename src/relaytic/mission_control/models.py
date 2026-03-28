@@ -20,6 +20,7 @@ CAPABILITY_MANIFEST_SCHEMA_VERSION = "relaytic.capability_manifest.v1"
 ACTION_AFFORDANCES_SCHEMA_VERSION = "relaytic.action_affordances.v1"
 STAGE_NAVIGATOR_SCHEMA_VERSION = "relaytic.stage_navigator.v1"
 QUESTION_STARTERS_SCHEMA_VERSION = "relaytic.question_starters.v1"
+ONBOARDING_CHAT_SESSION_STATE_SCHEMA_VERSION = "relaytic.onboarding_chat_session_state.v1"
 
 
 @dataclass(frozen=True)
@@ -253,6 +254,39 @@ class OnboardingStatus:
 
 
 @dataclass(frozen=True)
+class OnboardingChatSessionState:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    current_phase: str
+    detected_data_path: str | None
+    data_path_exists: bool | None
+    detected_objective: str | None
+    incumbent_path: str | None
+    incumbent_path_exists: bool | None
+    suggested_run_dir: str | None
+    ready_to_start_run: bool
+    created_run_dir: str | None
+    next_expected_input: str | None
+    last_user_message: str | None
+    last_system_question: str | None
+    semantic_backend_status: str
+    semantic_model: str | None
+    llm_used_last_turn: bool
+    turn_count: int
+    notes: list[str]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class InstallExperienceReport:
     schema_version: str
     generated_at: str
@@ -352,6 +386,7 @@ class MissionControlBundle:
     stage_navigator: StageNavigator
     question_starters: QuestionStarters
     onboarding_status: OnboardingStatus
+    onboarding_chat_session_state: OnboardingChatSessionState
     install_experience_report: InstallExperienceReport
     launch_manifest: LaunchManifest
     demo_session_manifest: DemoSessionManifest
@@ -368,6 +403,7 @@ class MissionControlBundle:
             "stage_navigator": self.stage_navigator.to_dict(),
             "question_starters": self.question_starters.to_dict(),
             "onboarding_status": self.onboarding_status.to_dict(),
+            "onboarding_chat_session_state": self.onboarding_chat_session_state.to_dict(),
             "install_experience_report": self.install_experience_report.to_dict(),
             "launch_manifest": self.launch_manifest.to_dict(),
             "demo_session_manifest": self.demo_session_manifest.to_dict(),

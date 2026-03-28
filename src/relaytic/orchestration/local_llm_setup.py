@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import platform
 import shutil
 import subprocess
 import time
@@ -47,6 +48,8 @@ def setup_local_llm(
 ) -> dict[str, Any]:
     """Set up configured local/remote LLM runtime and return a machine-readable report."""
     config = load_config(config_path)
+    if "policy" in config and isinstance(config.get("policy"), dict):
+        config = dict(config["policy"])
     policy = apply_environment_overrides(load_runtime_policy(config))
 
     target_provider = (provider or policy.provider).strip().lower()
@@ -163,28 +166,26 @@ def _setup_ollama(
     }
     binary = shutil.which("ollama")
     if binary is None and install_provider:
-        install_result = _run_command(
-            [
-                "winget",
-                "install",
-                "--id",
-                "Ollama.Ollama",
-                "-e",
-                "--accept-package-agreements",
-                "--accept-source-agreements",
-                "--disable-interactivity",
-            ],
-            timeout_seconds=1800,
-        )
-        report["steps"].append(
-            {
-                "action": "install_provider",
-                "ok": install_result["ok"],
-                "exit_code": install_result["exit_code"],
-                "stderr": install_result["stderr_tail"],
-            }
-        )
-        binary = shutil.which("ollama")
+        install_command = _provider_install_command("ollama")
+        if install_command is not None:
+            install_result = _run_command(
+                install_command,
+                timeout_seconds=1800,
+            )
+            report["steps"].append(
+                {
+                    "action": "install_provider",
+                    "command": install_command,
+                    "ok": install_result["ok"],
+                    "exit_code": install_result["exit_code"],
+                    "stderr": install_result["stderr_tail"],
+                }
+            )
+            binary = shutil.which("ollama")
+        else:
+            report["warnings"].append(
+                "Automatic Ollama installation is not available on this platform. Install Ollama manually and rerun setup."
+            )
 
     if binary is None:
         report["errors"].append("Ollama binary not found in PATH.")
@@ -268,28 +269,26 @@ def _setup_llama_cpp(
     }
     binary = _find_llama_server_binary()
     if binary is None and install_provider:
-        install_result = _run_command(
-            [
-                "winget",
-                "install",
-                "--id",
-                "ggml.llamacpp",
-                "-e",
-                "--accept-package-agreements",
-                "--accept-source-agreements",
-                "--disable-interactivity",
-            ],
-            timeout_seconds=900,
-        )
-        report["steps"].append(
-            {
-                "action": "install_provider",
-                "ok": install_result["ok"],
-                "exit_code": install_result["exit_code"],
-                "stderr": install_result["stderr_tail"],
-            }
-        )
-        binary = _find_llama_server_binary()
+        install_command = _provider_install_command("llama_cpp")
+        if install_command is not None:
+            install_result = _run_command(
+                install_command,
+                timeout_seconds=900,
+            )
+            report["steps"].append(
+                {
+                    "action": "install_provider",
+                    "command": install_command,
+                    "ok": install_result["ok"],
+                    "exit_code": install_result["exit_code"],
+                    "stderr": install_result["stderr_tail"],
+                }
+            )
+            binary = _find_llama_server_binary()
+        else:
+            report["warnings"].append(
+                "Automatic llama.cpp installation is not available on this platform. Install llama.cpp manually and rerun setup."
+            )
     if binary is None:
         report["errors"].append("`llama-server` binary not found.")
         return report
@@ -379,6 +378,40 @@ def _resolve_endpoint(provider: str, runtime_cfg: dict[str, Any]) -> str:
             )
         )
     raise ValueError(f"Unsupported provider '{provider}'.")
+
+
+def _provider_install_command(provider: str) -> list[str] | None:
+    normalized = provider.strip().lower()
+    system = platform.system().lower()
+    if system == "windows" and shutil.which("winget"):
+        if normalized == "ollama":
+            return [
+                "winget",
+                "install",
+                "--id",
+                "Ollama.Ollama",
+                "-e",
+                "--accept-package-agreements",
+                "--accept-source-agreements",
+                "--disable-interactivity",
+            ]
+        if normalized in {"llama_cpp", "llama.cpp"}:
+            return [
+                "winget",
+                "install",
+                "--id",
+                "ggml.llamacpp",
+                "-e",
+                "--accept-package-agreements",
+                "--accept-source-agreements",
+                "--disable-interactivity",
+            ]
+    if shutil.which("brew"):
+        if normalized == "ollama":
+            return ["brew", "install", "ollama"]
+        if normalized in {"llama_cpp", "llama.cpp"}:
+            return ["brew", "install", "llama.cpp"]
+    return None
 
 
 def _ollama_server_ready(endpoint: str, *, timeout_seconds: int) -> bool:

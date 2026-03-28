@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import json
 import re
 import shutil
@@ -4187,9 +4188,10 @@ def _run_mission_control_chat(
     if max_turns < 0:
         print("max-turns must be >= 0")
         return 2
-    run_context = bool(run_dir)
+    active_run_dir = run_dir
+    run_context = bool(active_run_dir)
     current_payload = _show_mission_control_surface(
-        run_dir=run_dir,
+        run_dir=active_run_dir,
         output_dir=output_dir,
         config_path=config_path,
         expected_profile=expected_profile,
@@ -4204,9 +4206,10 @@ def _run_mission_control_chat(
     else:
         print(
             "relaytic> Mission-control chat is the terminal onboarding surface. "
+            "You can paste a dataset path directly, describe the goal in plain language, or do both in one message. "
             "Ask things like `what is relaytic?`, `how do i start?`, `what data formats do you support?`, "
             "or `why are some capabilities disabled?`. "
-            "Commands: /help, /show, /start, /demo, /formats, /hosts, /modes, /stuck, /handbook, /exit."
+            "Commands: /help, /show, /start, /demo, /formats, /hosts, /modes, /stuck, /handbook, /state, /reset, /exit."
         )
     turns = 0
     while True:
@@ -4236,12 +4239,13 @@ def _run_mission_control_chat(
                 print(
                     "relaytic> Use /show for the dashboard summary, /start for first steps, /demo for a guided walkthrough, "
                     "/formats for supported data sources, /hosts for Claude/Codex/OpenClaw guidance, /modes for surface explanations, "
-                    "/stuck for recovery guidance, /handbook for the role-specific guides, or /exit."
+                    "/stuck for recovery guidance, /handbook for the role-specific guides, /state to show captured inputs, "
+                    "/reset to start over, or /exit."
                 )
             continue
         if lowered == "/show":
             current_payload = _show_mission_control_surface(
-                run_dir=run_dir,
+                run_dir=active_run_dir,
                 output_dir=output_dir,
                 config_path=config_path,
                 expected_profile=expected_profile,
@@ -4278,8 +4282,68 @@ def _run_mission_control_chat(
             elif lowered == "/stuck":
                 print("relaytic> " + _onboarding_chat_response(message="i'm stuck, what should i do", mission_control_payload=current_payload))
                 turns += 1
+            elif lowered == "/state":
+                adaptive = _run_adaptive_onboarding_turn(
+                    message="/state",
+                    mission_control_payload=current_payload,
+                    output_dir=output_dir,
+                    config_path=config_path,
+                    expected_profile=expected_profile,
+                )
+                current_payload = _show_mission_control_surface(
+                    run_dir=None,
+                    output_dir=output_dir,
+                    config_path=config_path,
+                    expected_profile=expected_profile,
+                )
+                print("relaytic> " + adaptive["response_text"])
+                turns += 1
+            elif lowered == "/reset":
+                adaptive = _run_adaptive_onboarding_turn(
+                    message="/reset",
+                    mission_control_payload=current_payload,
+                    output_dir=output_dir,
+                    config_path=config_path,
+                    expected_profile=expected_profile,
+                )
+                current_payload = _show_mission_control_surface(
+                    run_dir=None,
+                    output_dir=output_dir,
+                    config_path=config_path,
+                    expected_profile=expected_profile,
+                )
+                print("relaytic> " + adaptive["response_text"])
+                turns += 1
             else:
-                print("relaytic> " + _onboarding_chat_response(message=message, mission_control_payload=current_payload))
+                adaptive = _run_adaptive_onboarding_turn(
+                    message=message,
+                    mission_control_payload=current_payload,
+                    output_dir=output_dir,
+                    config_path=config_path,
+                    expected_profile=expected_profile,
+                )
+                print("relaytic> " + adaptive["response_text"])
+                if adaptive["started_run_dir"] is not None:
+                    active_run_dir = adaptive["started_run_dir"]
+                    run_context = True
+                    current_payload = _show_mission_control_surface(
+                        run_dir=active_run_dir,
+                        output_dir=output_dir,
+                        config_path=config_path,
+                        expected_profile=expected_profile,
+                    )
+                    print(
+                        "relaytic> Relaytic is now in run-specific mode. "
+                        "You can ask `what can you do?`, `why did you choose this route?`, `go back to planning`, "
+                        "or `i'm not sure, take over`."
+                    )
+                else:
+                    current_payload = _show_mission_control_surface(
+                        run_dir=None,
+                        output_dir=output_dir,
+                        config_path=config_path,
+                        expected_profile=expected_profile,
+                    )
                 turns += 1
             if show_json:
                 print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
@@ -4290,14 +4354,14 @@ def _run_mission_control_chat(
 
         if lowered == "/capabilities":
             payload = _run_assist_turn(
-                run_dir=run_dir,
+                run_dir=active_run_dir,
                 message="what can you do?",
                 config_path=config_path,
                 data_path=data_path,
             )
             print("relaytic> " + payload["human_output"].strip())
             current_payload = _show_mission_control_surface(
-                run_dir=run_dir,
+                run_dir=active_run_dir,
                 output_dir=output_dir,
                 config_path=config_path,
                 expected_profile=expected_profile,
@@ -4336,14 +4400,14 @@ def _run_mission_control_chat(
             continue
         if lowered == "/takeover":
             payload = _run_assist_turn(
-                run_dir=run_dir,
+                run_dir=active_run_dir,
                 message="i'm not sure, take over",
                 config_path=config_path,
                 data_path=data_path,
             )
             print("relaytic> " + payload["human_output"].strip())
             current_payload = _show_mission_control_surface(
-                run_dir=run_dir,
+                run_dir=active_run_dir,
                 output_dir=output_dir,
                 config_path=config_path,
                 expected_profile=expected_profile,
@@ -4384,14 +4448,14 @@ def _run_mission_control_chat(
                 return 0
             continue
         payload = _run_assist_turn(
-            run_dir=run_dir,
+            run_dir=active_run_dir,
             message=message,
             config_path=config_path,
             data_path=data_path,
         )
         print("relaytic> " + payload["human_output"].strip())
         current_payload = _show_mission_control_surface(
-            run_dir=run_dir,
+            run_dir=active_run_dir,
             output_dir=output_dir,
             config_path=config_path,
             expected_profile=expected_profile,
@@ -4532,6 +4596,599 @@ def _onboarding_chat_response(*, message: str, mission_control_payload: dict[str
     )
 
 
+def _run_adaptive_onboarding_turn(
+    *,
+    message: str,
+    mission_control_payload: dict[str, Any],
+    output_dir: str | None,
+    config_path: str | None,
+    expected_profile: str,
+) -> dict[str, Any]:
+    from relaytic.intelligence import build_intelligence_controls_from_policy
+    from relaytic.intelligence.backends import discover_backend
+    from relaytic.mission_control import write_mission_control_artifact
+
+    state_root = _resolve_mission_control_root(run_dir=None, output_dir=output_dir)
+    state_root.mkdir(parents=True, exist_ok=True)
+    policy = _load_mission_control_policy(run_dir=None, config_path=config_path)
+    communication_cfg = dict(policy.get("communication", {}))
+    if not bool(communication_cfg.get("adaptive_onboarding_chat_enabled", True)):
+        return {
+            "response_text": _onboarding_chat_response(message=message, mission_control_payload=mission_control_payload),
+            "started_run_dir": None,
+        }
+    confirmation_required = bool(communication_cfg.get("adaptive_onboarding_confirmation_required", True))
+    session_state = _read_onboarding_chat_session_state_from_payload(mission_control_payload)
+    session_state.setdefault("schema_version", "relaytic.onboarding_chat_session_state.v1")
+    session_state.setdefault("generated_at", datetime.now(timezone.utc).replace(microsecond=0).isoformat())
+    session_state.setdefault("status", "ready")
+    session_state.setdefault("current_phase", "need_data")
+    session_state.setdefault("suggested_run_dir", _suggested_onboarding_run_dir(policy=policy))
+    session_state.setdefault("next_expected_input", "dataset path")
+    session_state.setdefault("turn_count", 0)
+    configured_run_dir = _suggested_onboarding_run_dir(policy=policy)
+    if _clean_text(session_state.get("suggested_run_dir")) in {None, "artifacts/demo", r"artifacts\demo"}:
+        session_state["suggested_run_dir"] = configured_run_dir
+    session_state["turn_count"] = int(session_state.get("turn_count", 0) or 0) + 1
+    session_state["last_user_message"] = message
+
+    semantic_result = _extract_onboarding_semantics(
+        message=message,
+        session_state=session_state,
+        policy=policy,
+        config_path=config_path,
+    )
+    llm_status = str(semantic_result.get("backend_status") or "not_used")
+    llm_model = _clean_text(semantic_result.get("model"))
+    llm_used = bool(semantic_result.get("llm_used"))
+    session_state["semantic_backend_status"] = llm_status
+    session_state["semantic_model"] = llm_model
+    session_state["llm_used_last_turn"] = llm_used
+
+    path_detection = _resolve_onboarding_data_path(
+        message=message,
+        semantic_result=semantic_result,
+    )
+    if path_detection["candidate"] is not None:
+        session_state["detected_data_path"] = path_detection["candidate"]
+        session_state["data_path_exists"] = path_detection["exists"]
+
+    incumbent_detection = _resolve_onboarding_incumbent_path(
+        message=message,
+        semantic_result=semantic_result,
+        current_data_path=_clean_text(session_state.get("detected_data_path")),
+    )
+    if incumbent_detection["candidate"] is not None:
+        session_state["incumbent_path"] = incumbent_detection["candidate"]
+        session_state["incumbent_path_exists"] = incumbent_detection["exists"]
+
+    objective = _resolve_onboarding_objective(
+        message=message,
+        semantic_result=semantic_result,
+        current_data_path=_clean_text(session_state.get("detected_data_path")),
+        incumbent_path=_clean_text(session_state.get("incumbent_path")),
+        current_objective=_clean_text(session_state.get("detected_objective")),
+    )
+    if objective is not None:
+        session_state["detected_objective"] = objective
+
+    if _looks_like_reset_request(message):
+        session_state = _fresh_onboarding_chat_session_state(policy=policy)
+        session_state["last_user_message"] = message
+        session_state["semantic_backend_status"] = llm_status
+        session_state["semantic_model"] = llm_model
+        session_state["llm_used_last_turn"] = llm_used
+        session_state["last_system_question"] = "Paste a dataset path or describe the goal."
+        session_state["summary"] = "Relaytic cleared the captured onboarding state and is ready to start again."
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {
+            "response_text": "I cleared the captured onboarding state. Paste a dataset path, describe the objective, or do both in one message.",
+            "started_run_dir": None,
+        }
+
+    if _looks_like_state_request(message):
+        _finalize_onboarding_session_state(session_state)
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {
+            "response_text": _render_onboarding_state_response(session_state=session_state),
+            "started_run_dir": None,
+        }
+
+    if path_detection["candidate"] is not None and not path_detection["exists"]:
+        session_state["current_phase"] = "need_valid_data"
+        session_state["ready_to_start_run"] = False
+        session_state["next_expected_input"] = "existing dataset path"
+        session_state["last_system_question"] = "Please paste a dataset path that exists on this machine."
+        session_state["notes"] = [f"Relaytic saw a path-like value but it does not exist: {path_detection['candidate']}"]
+        session_state["summary"] = "Relaytic needs a valid local dataset path before it can start a run."
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {
+            "response_text": f"I found a dataset path candidate, but it does not exist here: `{path_detection['candidate']}`. Paste the correct local path and I’ll keep going.",
+            "started_run_dir": None,
+        }
+
+    if incumbent_detection["candidate"] is not None and not incumbent_detection["exists"]:
+        session_state["notes"] = [f"Relaytic saw an incumbent path candidate but it does not exist: {incumbent_detection['candidate']}"]
+
+    has_data = bool(_clean_text(session_state.get("detected_data_path"))) and bool(session_state.get("data_path_exists"))
+    has_objective = bool(_clean_text(session_state.get("detected_objective")))
+    wants_start = _looks_like_run_confirmation(message) or bool(semantic_result.get("confirm_start"))
+
+    if has_data and has_objective and (wants_start or not confirmation_required):
+        chosen_run_dir = str(
+            Path(
+                _clean_text(session_state.get("suggested_run_dir")) or _suggested_onboarding_run_dir(policy=policy)
+            ).expanduser()
+        )
+        access_payload = _run_access_flow(
+            run_dir=chosen_run_dir,
+            data_path=str(session_state["detected_data_path"]),
+            source_type="auto",
+            source_table=None,
+            sql_query=None,
+            stream_window_rows=5000,
+            stream_format="auto",
+            materialized_format="auto",
+            config_path=config_path,
+            run_id=None,
+            text=str(session_state["detected_objective"]),
+            text_file=None,
+            actor_type="operator",
+            actor_name=None,
+            channel="mission_control_chat",
+            sheet_name=None,
+            header_row=None,
+            data_start_row=None,
+            timestamp_column=None,
+            overwrite=False,
+            labels=None,
+        )
+        started_run_dir = str(access_payload["surface_payload"]["run_dir"])
+        session_state["current_phase"] = "run_started"
+        session_state["created_run_dir"] = started_run_dir
+        session_state["ready_to_start_run"] = False
+        session_state["next_expected_input"] = None
+        session_state["last_system_question"] = "Relaytic created the run and switched into run-specific control."
+        session_state["notes"] = ["Relaytic started the first governed run from onboarding chat after explicit confirmation."]
+        session_state["summary"] = f"Relaytic created `{started_run_dir}` from the captured data path and objective."
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {
+            "response_text": (
+                f"I've started a governed run at `{started_run_dir}` using `{session_state['detected_data_path']}` "
+                f"with objective `{session_state['detected_objective']}`. Mission control will now follow that run."
+            ),
+            "started_run_dir": started_run_dir,
+        }
+
+    if has_data and not has_objective:
+        session_state["current_phase"] = "need_objective"
+        session_state["ready_to_start_run"] = False
+        session_state["next_expected_input"] = "objective"
+        session_state["last_system_question"] = "What do you want to predict, classify, explain, or evaluate on this dataset?"
+        session_state["notes"] = ["Relaytic captured a dataset path and is waiting for the objective."]
+        session_state["summary"] = "Relaytic has a dataset path and now needs the plain-language objective."
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {
+            "response_text": (
+                f"I found a dataset path: `{session_state['detected_data_path']}`. "
+                "It exists and looks usable. What do you want to predict, classify, explain, or evaluate with it?"
+            ),
+            "started_run_dir": None,
+        }
+
+    if has_objective and not has_data:
+        session_state["current_phase"] = "need_data"
+        session_state["ready_to_start_run"] = False
+        session_state["next_expected_input"] = "dataset path"
+        session_state["last_system_question"] = "Please paste the dataset path you want Relaytic to use."
+        session_state["notes"] = ["Relaytic captured the objective and is waiting for the dataset path."]
+        session_state["summary"] = "Relaytic has an objective and now needs the dataset path."
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {
+            "response_text": (
+                f"I understand the objective as `{session_state['detected_objective']}`. "
+                "Now paste the dataset path you want me to use."
+            ),
+            "started_run_dir": None,
+        }
+
+    if has_data and has_objective:
+        session_state["current_phase"] = "confirm_start"
+        session_state["ready_to_start_run"] = True
+        session_state["next_expected_input"] = "confirmation"
+        session_state["last_system_question"] = "Should I start the run now?"
+        notes = ["Relaytic has the data path and the objective and is waiting for confirmation."]
+        incumbent_path = _clean_text(session_state.get("incumbent_path"))
+        if incumbent_path and bool(session_state.get("incumbent_path_exists")):
+            notes.append(f"An incumbent path was also captured: {incumbent_path}")
+        session_state["notes"] = notes
+        session_state["summary"] = "Relaytic is ready to start the first run once the human confirms."
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        extra = ""
+        if incumbent_path and bool(session_state.get("incumbent_path_exists")):
+            extra = f" I also noticed an incumbent path at `{incumbent_path}` and can compare against it after the run exists."
+        return {
+            "response_text": (
+                f"I have both the data and the objective. Dataset: `{session_state['detected_data_path']}`. "
+                f"Objective: `{session_state['detected_objective']}`. "
+                f"I’ll use run directory `{session_state['suggested_run_dir']}` unless you want a different one. "
+                + (
+                    f"Say `yes`, `start`, or `go` when you want me to create the run.{extra}"
+                    if confirmation_required
+                    else f"I am ready to create the run now.{extra}"
+                )
+            ),
+            "started_run_dir": None,
+        }
+
+    faq_response = _maybe_onboarding_chat_response(message=message, mission_control_payload=mission_control_payload)
+    if faq_response is not None:
+        _finalize_onboarding_session_state(session_state)
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {"response_text": faq_response, "started_run_dir": None}
+
+    session_state["current_phase"] = "need_data"
+    session_state["ready_to_start_run"] = False
+    session_state["next_expected_input"] = "dataset path or objective"
+    session_state["last_system_question"] = "Paste a dataset path, describe the objective, or ask for the demo flow."
+    session_state["notes"] = [
+        "Relaytic is waiting for a dataset path, a plain-language objective, or both in one message."
+    ]
+    session_state["summary"] = "Relaytic is waiting for the first useful onboarding input."
+    write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+    return {
+        "response_text": (
+            "I can work with a pasted dataset path, a plain-language objective, or both in one messy message. "
+            "For example: `C:\\data\\churn.csv` or `Predict customer churn from this file.`"
+        ),
+        "started_run_dir": None,
+    }
+
+
+def _extract_onboarding_semantics(
+    *,
+    message: str,
+    session_state: dict[str, Any],
+    policy: dict[str, Any],
+    config_path: str | None,
+) -> dict[str, Any]:
+    from relaytic.intelligence import build_intelligence_controls_from_policy
+    from relaytic.intelligence.backends import discover_backend
+
+    communication_cfg = dict(policy.get("communication", {}))
+    if not bool(communication_cfg.get("adaptive_onboarding_semantic_assist", True)):
+        return {"backend_status": "disabled", "llm_used": False}
+    try:
+        controls = build_intelligence_controls_from_policy(policy)
+        controls = replace(
+            controls,
+            enabled=True,
+            intelligence_mode="assist",
+            prefer_local_llm=True,
+            allow_frontier_llm=False,
+            minimum_local_llm_enabled=True,
+            minimum_local_llm_profile=(
+                controls.minimum_local_llm_profile
+                if str(controls.minimum_local_llm_profile).strip().lower() not in {"", "none"}
+                else "small_cpu"
+            ),
+        )
+        discovery = discover_backend(controls=controls, config_path=config_path)
+        if discovery.advisor is None:
+            return {
+                "backend_status": discovery.status,
+                "model": discovery.resolved_model,
+                "llm_used": False,
+            }
+        result = discovery.advisor.complete_json(
+            task_name="mission_control_onboarding",
+            system_prompt=(
+                "You are Relaytic's bounded onboarding extractor. "
+                "Return only JSON with keys: intent, data_path, objective, incumbent_path, confirm_start, wants_reset, question_focus, confidence. "
+                "Extract useful structured hints from messy human input, but do not invent file paths. "
+                "If the message is mostly a question, keep data_path and objective null unless clearly stated."
+            ),
+            payload={
+                "message": message,
+                "current_phase": session_state.get("current_phase"),
+                "captured_data_path": session_state.get("detected_data_path"),
+                "captured_objective": session_state.get("detected_objective"),
+                "captured_incumbent_path": session_state.get("incumbent_path"),
+                "next_expected_input": session_state.get("next_expected_input"),
+            },
+        )
+        if result.status != "ok" or not isinstance(result.payload, dict):
+            return {
+                "backend_status": discovery.status if result.status == "ok" else result.status,
+                "model": discovery.resolved_model,
+                "llm_used": False,
+            }
+        payload = dict(result.payload)
+        payload["backend_status"] = discovery.status
+        payload["model"] = discovery.resolved_model
+        payload["llm_used"] = True
+        return payload
+    except Exception as exc:
+        return {
+            "backend_status": "error",
+            "model": None,
+            "llm_used": False,
+            "notes": [str(exc)],
+        }
+
+
+def _resolve_onboarding_data_path(
+    *,
+    message: str,
+    semantic_result: dict[str, Any],
+) -> dict[str, Any]:
+    semantic_candidate = _clean_text(semantic_result.get("data_path"))
+    candidates = []
+    if semantic_candidate:
+        candidates.append(semantic_candidate)
+    candidates.extend(_extract_path_candidates(message))
+    seen: set[str] = set()
+    for candidate in candidates:
+        normalized = candidate.strip().strip("\"'").strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        path = Path(normalized).expanduser()
+        if path.exists():
+            return {"candidate": str(path), "exists": True}
+    for candidate in candidates:
+        normalized = candidate.strip().strip("\"'").strip()
+        if _looks_like_path(normalized):
+            return {"candidate": normalized, "exists": False}
+    return {"candidate": None, "exists": None}
+
+
+def _resolve_onboarding_incumbent_path(
+    *,
+    message: str,
+    semantic_result: dict[str, Any],
+    current_data_path: str | None,
+) -> dict[str, Any]:
+    semantic_candidate = _clean_text(semantic_result.get("incumbent_path"))
+    if semantic_candidate:
+        path = Path(semantic_candidate).expanduser()
+        if current_data_path and str(path) == str(current_data_path):
+            return {"candidate": None, "exists": None}
+        return {"candidate": str(path), "exists": path.exists()}
+    lowered = " ".join(message.lower().split())
+    if "incumbent" not in lowered and "baseline" not in lowered and "existing model" not in lowered:
+        return {"candidate": None, "exists": None}
+    for candidate in _extract_path_candidates(message):
+        normalized = candidate.strip().strip("\"'").strip()
+        if current_data_path and normalized == current_data_path:
+            continue
+        path = Path(normalized).expanduser()
+        return {"candidate": str(path), "exists": path.exists()}
+    return {"candidate": None, "exists": None}
+
+
+def _resolve_onboarding_objective(
+    *,
+    message: str,
+    semantic_result: dict[str, Any],
+    current_data_path: str | None,
+    incumbent_path: str | None,
+    current_objective: str | None,
+) -> str | None:
+    semantic_objective = _clean_text(semantic_result.get("objective"))
+    if semantic_objective:
+        return semantic_objective
+    cleaned = str(message)
+    for candidate in _extract_path_candidates(message):
+        cleaned = cleaned.replace(candidate, " ")
+    if current_data_path:
+        cleaned = cleaned.replace(current_data_path, " ")
+    if incumbent_path:
+        cleaned = cleaned.replace(incumbent_path, " ")
+    cleaned = re.sub(r"\s+", " ", cleaned).strip(" ,;:-")
+    normalized = " ".join(cleaned.lower().split())
+    if not normalized:
+        return current_objective
+    if _looks_like_question(cleaned) and not _looks_like_objective(cleaned):
+        return current_objective
+    if _looks_like_objective(cleaned):
+        return cleaned
+    if current_data_path and len(cleaned.split()) >= 3 and not normalized.startswith("/"):
+        return cleaned
+    return current_objective
+
+
+def _extract_path_candidates(message: str) -> list[str]:
+    raw = str(message).strip()
+    candidates: list[str] = []
+    whole = raw.strip("\"'")
+    if whole:
+        candidates.append(whole)
+    quoted = re.findall(r"['\"]([^'\"]+)['\"]", raw)
+    candidates.extend(item for item in quoted if item.strip())
+    tokens = re.split(r"\s+", raw)
+    for token in tokens:
+        cleaned = token.strip().strip("\"'`,;()[]{}")
+        if cleaned:
+            candidates.append(cleaned)
+    result: list[str] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        normalized = candidate.strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        if _looks_like_path(normalized):
+            result.append(normalized)
+    return result
+
+
+def _looks_like_path(candidate: str) -> bool:
+    text = str(candidate).strip()
+    if not text:
+        return False
+    if text.startswith("~"):
+        return True
+    if re.match(r"^[A-Za-z]:[\\/]", text):
+        return True
+    if text.startswith("/") or text.startswith("./") or text.startswith("../"):
+        return True
+    if "\\" in text or "/" in text:
+        suffix = Path(text).suffix.lower()
+        return bool(suffix) or Path(text).name.lower() in {"duckdb"}
+    suffix = Path(text).suffix.lower()
+    return suffix in {".csv", ".tsv", ".xlsx", ".xls", ".parquet", ".pq", ".feather", ".json", ".jsonl", ".ndjson", ".duckdb", ".pkl", ".joblib"}
+
+
+def _looks_like_question(message: str) -> bool:
+    normalized = " ".join(str(message).strip().lower().split())
+    if not normalized:
+        return False
+    if normalized.endswith("?"):
+        return True
+    return normalized.startswith(("what ", "why ", "how ", "can ", "should ", "could ", "where ", "when "))
+
+
+def _looks_like_objective(message: str) -> bool:
+    normalized = " ".join(str(message).strip().lower().split())
+    objective_tokens = (
+        "predict",
+        "prediction",
+        "classify",
+        "classification",
+        "forecast",
+        "regression",
+        "detect",
+        "detection",
+        "identify",
+        "estimate",
+        "score",
+        "rank",
+        "segment",
+        "evaluate",
+        "beat",
+        "benchmark",
+        "diagnosis",
+        "churn",
+        "fraud",
+        "default",
+        "failure",
+        "target",
+        "malignant",
+        "benign",
+        "disease",
+        "customer",
+    )
+    return any(token in normalized for token in objective_tokens)
+
+
+def _looks_like_run_confirmation(message: str) -> bool:
+    normalized = " ".join(str(message).strip().lower().split())
+    if not normalized:
+        return False
+    confirmations = {
+        "yes",
+        "y",
+        "start",
+        "go",
+        "continue",
+        "run it",
+        "do it",
+        "sounds good",
+        "looks good",
+        "okay",
+        "ok",
+        "please start",
+        "start it",
+    }
+    return normalized in confirmations
+
+
+def _looks_like_reset_request(message: str) -> bool:
+    normalized = " ".join(str(message).strip().lower().split())
+    return normalized in {"/reset", "reset", "start over", "clear this", "clear state"}
+
+
+def _looks_like_state_request(message: str) -> bool:
+    normalized = " ".join(str(message).strip().lower().split())
+    return normalized in {"/state", "state", "what do you have", "what have you captured", "show state"}
+
+
+def _suggested_onboarding_run_dir(*, policy: dict[str, Any]) -> str:
+    communication_cfg = dict(policy.get("communication", {}))
+    configured = _clean_text(communication_cfg.get("adaptive_onboarding_default_run_dir"))
+    return str(Path(configured).expanduser()) if configured else str(Path("artifacts") / "demo")
+
+
+def _fresh_onboarding_chat_session_state(*, policy: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": "relaytic.onboarding_chat_session_state.v1",
+        "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "status": "ready",
+        "current_phase": "need_data",
+        "detected_data_path": None,
+        "data_path_exists": None,
+        "detected_objective": None,
+        "incumbent_path": None,
+        "incumbent_path_exists": None,
+        "suggested_run_dir": _suggested_onboarding_run_dir(policy=policy),
+        "ready_to_start_run": False,
+        "created_run_dir": None,
+        "next_expected_input": "dataset path",
+        "last_user_message": None,
+        "last_system_question": None,
+        "semantic_backend_status": "not_checked",
+        "semantic_model": None,
+        "llm_used_last_turn": False,
+        "turn_count": 0,
+        "notes": [],
+        "summary": "Relaytic is waiting for the first useful onboarding input.",
+    }
+
+
+def _finalize_onboarding_session_state(session_state: dict[str, Any]) -> None:
+    has_data = bool(_clean_text(session_state.get("detected_data_path"))) and bool(session_state.get("data_path_exists"))
+    has_objective = bool(_clean_text(session_state.get("detected_objective")))
+    if has_data and has_objective:
+        session_state["current_phase"] = "confirm_start"
+        session_state["ready_to_start_run"] = True
+        session_state["next_expected_input"] = "confirmation"
+        session_state["summary"] = "Relaytic has both the data path and the objective and is waiting for confirmation."
+    elif has_data:
+        session_state["current_phase"] = "need_objective"
+        session_state["ready_to_start_run"] = False
+        session_state["next_expected_input"] = "objective"
+        session_state["summary"] = "Relaytic has a data path and is waiting for the objective."
+    elif has_objective:
+        session_state["current_phase"] = "need_data"
+        session_state["ready_to_start_run"] = False
+        session_state["next_expected_input"] = "dataset path"
+        session_state["summary"] = "Relaytic has an objective and is waiting for the dataset path."
+    else:
+        session_state["current_phase"] = "need_data"
+        session_state["ready_to_start_run"] = False
+        session_state["next_expected_input"] = "dataset path or objective"
+        session_state["summary"] = "Relaytic is waiting for the first useful onboarding input."
+
+
+def _render_onboarding_state_response(*, session_state: dict[str, Any]) -> str:
+    data_path = _clean_text(session_state.get("detected_data_path")) or "none yet"
+    objective = _clean_text(session_state.get("detected_objective")) or "none yet"
+    next_expected = _clean_text(session_state.get("next_expected_input")) or "dataset path or objective"
+    suggested_run_dir = _clean_text(session_state.get("suggested_run_dir")) or r"artifacts\demo"
+    return (
+        f"So far I have data path `{data_path}` and objective `{objective}`. "
+        f"The next thing I need is `{next_expected}`. "
+        f"If we get to confirmation, I’ll use run directory `{suggested_run_dir}` unless you want a different one."
+    )
+
+
+def _read_onboarding_chat_session_state_from_payload(mission_control_payload: dict[str, Any]) -> dict[str, Any]:
+    bundle = dict(mission_control_payload.get("surface_payload", {}).get("bundle", {}))
+    existing = dict(bundle.get("onboarding_chat_session_state", {}))
+    return existing if existing else {}
+
+
 def _show_runtime_surface(*, run_dir: str | Path, limit: int = 20) -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
@@ -4591,6 +5248,7 @@ def _show_mission_control_surface(
     questions = dict(bundle.get("question_starters", {}))
     onboarding = dict(bundle.get("onboarding_status", {}))
     launch = dict(bundle.get("launch_manifest", {}))
+    onboarding_session = dict(bundle.get("onboarding_chat_session_state", {}))
     return {
         "surface_payload": {
             "status": "ok",
@@ -4616,6 +5274,10 @@ def _show_mission_control_surface(
                 "doctor_status": onboarding.get("doctor_status"),
                 "needs_data": onboarding.get("needs_data"),
                 "live_chat_command": onboarding.get("live_chat_command"),
+                "captured_data_path": onboarding_session.get("detected_data_path"),
+                "captured_objective": onboarding_session.get("detected_objective"),
+                "next_expected_input": onboarding_session.get("next_expected_input"),
+                "onboarding_semantic_status": onboarding_session.get("semantic_backend_status"),
                 "html_report_path": launch.get("html_report_path"),
                 "capability_manifest_status": capabilities.get("status"),
                 "action_affordances_status": affordances.get("status"),

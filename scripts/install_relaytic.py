@@ -19,6 +19,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--format", choices=["human", "json", "both"], default="human", help="Output format for verification and launch surfaces.")
     parser.add_argument("--expected-profile", choices=["core", "full"], default=None, help="Doctor profile to verify after install. Defaults to `core` for --profile core, otherwise `full`.")
     parser.add_argument("--launch-control-center", action="store_true", help="Launch the local Relaytic mission-control surface after doctor succeeds.")
+    parser.add_argument("--no-setup-onboarding-llm", action="store_true", help="Skip provisioning the lightweight local onboarding LLM during the full install flow.")
+    parser.add_argument("--onboarding-llm-provider", choices=["llama_cpp", "llama.cpp", "ollama"], default="llama_cpp", help="Preferred local provider for the lightweight onboarding LLM.")
+    parser.add_argument("--onboarding-llm-model", default=None, help="Optional local onboarding model override. Defaults to Relaytic's CPU-safe Qwen 3 4B profile.")
     parser.add_argument("--run-dir", default=None, help="Optional Relaytic run directory to open inside mission control.")
     parser.add_argument("--output-dir", default=None, help="Optional onboarding-only state directory for mission control when no run dir is provided.")
     parser.add_argument("--no-browser", action="store_true", help="Do not open the mission-control report in the default browser.")
@@ -57,18 +60,63 @@ def main(argv: list[str] | None = None) -> int:
         text=True,
         check=False,
     )
-    if args.format == "json":
-        if not args.launch_control_center:
-            sys.stdout.write(doctor.stdout)
-            sys.stderr.write(doctor.stderr)
-            return int(doctor.returncode)
-    else:
+    if args.format != "json":
         sys.stdout.write(doctor.stdout)
         sys.stderr.write(doctor.stderr)
     if doctor.returncode != 0:
         return int(doctor.returncode)
 
+    llm_payload: dict[str, Any] | None = None
+    should_setup_onboarding_llm = (
+        not bool(args.no_setup_onboarding_llm)
+        and (args.profile in {"full", "dev"} or (args.extras or "").strip().lower() == "full")
+    )
+    if should_setup_onboarding_llm:
+        llm_cmd = [
+            sys.executable,
+            "-m",
+            "relaytic.ui.cli",
+            "setup-local-llm",
+            "--provider",
+            args.onboarding_llm_provider,
+        ]
+        if not args.skip_install:
+            llm_cmd.append("--install-provider")
+        if args.onboarding_llm_model:
+            llm_cmd.extend(["--model", args.onboarding_llm_model])
+        llm_setup = subprocess.run(
+            llm_cmd,
+            cwd=repo_root,
+            env=relaytic_env,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        llm_payload = _parse_json_payload(llm_setup.stdout)
+        if args.format != "json":
+            sys.stdout.write(llm_setup.stdout)
+            sys.stderr.write(llm_setup.stderr)
+
     if not args.launch_control_center:
+        if args.format == "json":
+            payload: dict[str, Any] = {
+                "status": "ok" if doctor.returncode == 0 else "error",
+                "install": {
+                    "skip_install": bool(args.skip_install),
+                    "profile": args.profile,
+                    "extras": extras or "",
+                    "expected_profile": expected_profile,
+                    "mission_control_requested": False,
+                    "onboarding_llm_requested": should_setup_onboarding_llm,
+                },
+                "doctor": _parse_json_payload(doctor.stdout),
+            }
+            if llm_payload is not None:
+                payload["onboarding_local_llm"] = llm_payload
+            sys.stdout.write(json.dumps(payload, indent=2, ensure_ascii=False))
+            sys.stdout.write("\n")
+            sys.stderr.write(doctor.stderr)
+            return int(doctor.returncode)
         return int(doctor.returncode)
 
     launch_cmd = [
@@ -106,10 +154,13 @@ def main(argv: list[str] | None = None) -> int:
                 "extras": extras or "",
                 "expected_profile": expected_profile,
                 "mission_control_requested": True,
+                "onboarding_llm_requested": should_setup_onboarding_llm,
             },
             "doctor": _parse_json_payload(doctor.stdout),
             "mission_control": _parse_json_payload(launch.stdout),
         }
+        if llm_payload is not None:
+            payload["onboarding_local_llm"] = llm_payload
         sys.stdout.write(json.dumps(payload, indent=2, ensure_ascii=False))
         sys.stdout.write("\n")
         if doctor.stderr:

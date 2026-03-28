@@ -17,6 +17,8 @@ Use it for:
 - one local structured dataset
 - a short goal in plain language
 
+If you use the full install profile, Relaytic will also try to provision a lightweight local onboarding helper. That helper is meant to make first-contact chat more forgiving for humans; it does not replace deterministic run control.
+
 Any small local CSV, TSV, Excel, Parquet, JSON, JSONL, or NDJSON file is enough for a first demo.
 
 ## The Five-Step Demo
@@ -24,16 +26,33 @@ Any small local CSV, TSV, Excel, Parquet, JSON, JSONL, or NDJSON file is enough 
 ### 1. Verify The Local Environment
 
 ```powershell
-relaytic doctor --expected-profile full --format json
+python scripts/install_relaytic.py --profile full --launch-control-center
 ```
 
 What to say:
 
 - Relaytic is local-first
 - it checks its own install before touching data
+- on the full profile it tries to provision a lightweight local onboarding helper for messy first-contact human input
 - the environment health is part of the product surface
 
-### 2. Create One Real Run
+### 2. Start From Mission-Control Chat Or Create One Real Run
+
+Human-first path:
+
+```powershell
+relaytic mission-control chat
+```
+
+Then paste:
+
+- the dataset path
+- the objective
+- or both in one message
+
+Relaytic should capture what it understands, ask for the missing piece, and confirm before it creates the run.
+
+Direct CLI path:
 
 ```powershell
 relaytic run --run-dir artifacts\demo --data-path <data.csv> --text "Describe the goal here." --format json

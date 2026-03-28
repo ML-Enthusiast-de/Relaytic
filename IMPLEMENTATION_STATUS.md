@@ -4,7 +4,7 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 12, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, and Slice 11F demo-grade onboarding plus stuck recovery
+- completed slices: 00 through 12, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, and Slice 11G adaptive human onboarding with lightweight local semantic guidance
 - next recommended slice: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
 - next trace-and-safety follow-on after 12A: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
@@ -64,6 +64,8 @@ The repository currently supports:
 - install-launch coupling so `python scripts/install_relaytic.py --launch-control-center` can verify the environment and land a user in the same local control-center flow without inventing a separate onboarding truth
 - role-specific handbook discovery through mission control, mission-control chat, and checked-in host notes so the product can point humans to `docs/handbooks/relaytic_user_handbook.md` and external agents to `docs/handbooks/relaytic_agent_handbook.md` on first contact
 - demo-grade onboarding through explicit guided demo flow, mode explanations, stuck-recovery guidance, and a recruiter-safe walkthrough surfaced directly from mission control, chat, and the handbook stack
+- adaptive human onboarding with visible captured chat state, dataset-path detection, objective capture, confirmation-before-run behavior, and bounded local semantic extraction for messy first-contact human input
+- full-profile bootstrap that now attempts to provision a lightweight CPU-safe onboarding model so mission-control chat can be more forgiving without changing deterministic run control
 - explicit dojo review via `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`, with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, and mission-control visibility
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
@@ -347,6 +349,15 @@ The most important not-yet-implemented shifts after the current baseline are:
 - expanded the human and agent handbooks so they now explain the main flow, what happens after a run starts, what each surface is for, and what to do when something is unclear
 - added targeted Slice 11F CLI and handbook verification for demo-grade onboarding, mode explanation, and stuck recovery
 
+### Slice 11G
+
+- extended `src/relaytic/mission_control/`, `src/relaytic/ui/cli.py`, `src/relaytic/intelligence/backends.py`, `src/relaytic/orchestration/local_llm_setup.py`, and `scripts/install_relaytic.py` so first-contact chat can capture messy human input, keep visible onboarding state, and use a lightweight local semantic helper without making semantic inference part of the authority path
+- added `onboarding_chat_session_state.json` as a first-class mission-control artifact for captured dataset path, objective, next expected input, semantic-backend status, and run-start readiness
+- upgraded mission-control chat so humans can paste a dataset path directly, provide the objective in a later turn, inspect captured state with `/state`, reset with `/reset`, and confirm before the first run is created
+- hardened local semantic backend discovery and local-LLM setup so canonical `policy:` configs work in the same way as legacy top-level config files for onboarding use
+- upgraded `python scripts/install_relaytic.py --profile full` so the one-line bootstrap now attempts to provision Relaytic's lightweight local onboarding helper by default
+- added targeted Slice 11G onboarding and install verification for dataset-path capture, objective capture plus confirmation, messy-input semantic rescue, and one-line-installer onboarding-local-LLM setup
+
 ### Slice 12
 
 - added `src/relaytic/dojo/` with typed guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and storage helpers
@@ -394,7 +405,7 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-With Slice 11F and Slice 12 now landed, the next high-leverage frontier follow-ons are:
+With Slice 11G and Slice 12 now landed, the next high-leverage frontier follow-ons are:
 
 - Slice 12A lab pulse, periodic awareness, and bounded proactive follow-up
 - Slice 12B first-class tracing, agent evaluation, and runtime security harnesses

@@ -21,6 +21,7 @@ MISSION_CONTROL_FILENAMES = {
     "stage_navigator": "stage_navigator.json",
     "question_starters": "question_starters.json",
     "onboarding_status": "onboarding_status.json",
+    "onboarding_chat_session_state": "onboarding_chat_session_state.json",
     "install_experience_report": "install_experience_report.json",
     "launch_manifest": "launch_manifest.json",
     "demo_session_manifest": "demo_session_manifest.json",
