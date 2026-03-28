@@ -247,7 +247,11 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
     cards = [dict(item) for item in state.get("cards", []) if isinstance(item, dict)]
     current_requirements = [str(item).strip() for item in onboarding.get("current_requirements", []) if str(item).strip()]
     first_steps = [str(item).strip() for item in onboarding.get("first_steps", []) if str(item).strip()]
+    guided_demo_flow = [str(item).strip() for item in onboarding.get("guided_demo_flow", []) if str(item).strip()]
+    stuck_guide = [str(item).strip() for item in onboarding.get("stuck_guide", []) if str(item).strip()]
+    mode_explanations = [dict(item) for item in onboarding.get("mode_explanations", []) if isinstance(item, dict)]
     interaction_modes = [dict(item) for item in onboarding.get("interaction_modes", []) if isinstance(item, dict)]
+    handbooks = [item for item in interaction_modes if str(dict(item).get("kind", "")).strip().lower() == "guide"]
     lines = [
         "# Relaytic Mission Control",
         "",
@@ -273,17 +277,39 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
         lines.append("")
     if first_steps:
         lines.extend(["## First Steps"])
-        lines.extend(f"- {item}" for item in first_steps[:4])
+        lines.extend(f"- {item}" for item in first_steps[:6])
+        lines.append("")
+    if guided_demo_flow:
+        lines.extend(["## Guided Demo Flow"])
+        lines.extend(f"- {item}" for item in guided_demo_flow[:8])
+        lines.append("")
+    if mode_explanations:
+        lines.extend(["## What The Modes Mean"])
+        for item in mode_explanations[:8]:
+            name = str(item.get("name", "Mode")).strip() or "Mode"
+            detail = str(item.get("detail", "")).strip()
+            lines.append(f"- `{name}`: {detail}")
+        lines.append("")
+    if stuck_guide:
+        lines.extend(["## If You Get Stuck"])
+        lines.extend(f"- {item}" for item in stuck_guide[:8])
         lines.append("")
     if interaction_modes:
         lines.extend(["## How To Interact"])
-        for item in interaction_modes[:4]:
+        for item in interaction_modes[:6]:
             command = str(item.get("command", "")).strip()
             detail = str(item.get("detail", "")).strip()
             line = f"- `{item.get('name', 'Mode')}`: {detail}"
             if command:
                 line += f" Use `{command}`."
             lines.append(line)
+        lines.append("")
+    if handbooks:
+        lines.extend(["## Handbooks"])
+        for item in handbooks[:4]:
+            command = str(item.get("command", "")).strip()
+            detail = str(item.get("detail", "")).strip()
+            lines.append(f"- `{item.get('name', 'Handbook')}`: {detail}" + (f" Path: `{command}`." if command else ""))
         lines.append("")
     lines.extend([
         "## Cards",
@@ -383,7 +409,7 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
     commands = [str(item).strip() for item in onboarding.get("recommended_commands", []) if str(item).strip()]
     if commands:
         lines.extend(["", "## Commands"])
-        lines.extend(f"- `{item}`" for item in commands[:5])
+        lines.extend(f"- `{item}`" for item in commands[:8])
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -406,7 +432,11 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
     commands = [str(item).strip() for item in onboarding.get("recommended_commands", []) if str(item).strip()]
     current_requirements = [str(item).strip() for item in onboarding.get("current_requirements", []) if str(item).strip()]
     first_steps = [str(item).strip() for item in onboarding.get("first_steps", []) if str(item).strip()]
+    guided_demo_flow = [str(item).strip() for item in onboarding.get("guided_demo_flow", []) if str(item).strip()]
+    stuck_guide = [str(item).strip() for item in onboarding.get("stuck_guide", []) if str(item).strip()]
+    mode_explanations = [dict(item) for item in onboarding.get("mode_explanations", []) if isinstance(item, dict)]
     interaction_modes = [dict(item) for item in onboarding.get("interaction_modes", []) if isinstance(item, dict)]
+    handbook_modes = [item for item in interaction_modes if str(dict(item).get("kind", "")).strip().lower() == "guide"]
     panels = [dict(item) for item in layout.get("panels", []) if isinstance(item, dict)]
     capability_items = [dict(item) for item in capabilities.get("capabilities", []) if isinstance(item, dict)]
     blocked_capability_items = [
@@ -565,8 +595,24 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
           <div class="note">Mission control is a dashboard. For natural-language questions in the terminal, use <code>{escape(live_chat_command)}</code>.</div>
         </article>
         <article class="panel">
+          <h2>Guided Demo Flow</h2>
+          <ul>{_render_string_items(guided_demo_flow or ["Run doctor, point Relaytic at data, inspect mission control, ask what it can do, then review the next recommended action."])}</ul>
+        </article>
+        <article class="panel">
+          <h2>If You Get Stuck</h2>
+          <ul>{_render_string_items(stuck_guide or ["Use mission-control chat, read the handbook, rerun doctor, and let Relaytic explain the next safe step."])}</ul>
+        </article>
+        <article class="panel">
           <h2>How To Interact</h2>
           <ul>{_render_interaction_mode_items(interaction_modes)}</ul>
+        </article>
+        <article class="panel">
+          <h2>What The Modes Mean</h2>
+          <ul>{_render_mode_explanations(mode_explanations)}</ul>
+        </article>
+        <article class="panel">
+          <h2>Handbooks</h2>
+          <ul>{_render_interaction_mode_items(handbook_modes)}</ul>
         </article>
         <article class="panel">
           <h2>Review Queue</h2>
@@ -762,6 +808,17 @@ def _render_interaction_mode_items(items: list[dict[str, Any]]) -> str:
     return "".join(rendered)
 
 
+def _render_mode_explanations(items: list[dict[str, Any]]) -> str:
+    if not items:
+        return "<li>Mode explanations are not available yet.</li>"
+    rendered: list[str] = []
+    for item in items[:8]:
+        name = escape(str(item.get("name", "Mode")).strip() or "Mode")
+        detail = escape(str(item.get("detail", "")).strip() or "No detail available.")
+        rendered.append(f"<li><strong>{name}</strong>: {detail}</li>")
+    return "".join(rendered)
+
+
 def _build_review_queue_state(
     *,
     controls: MissionControlControls,
@@ -918,6 +975,20 @@ def _build_cards(
                 "title": "Live Terminal Chat",
                 "value": "mission-control chat",
                 "detail": "Mission control is a dashboard, not a chat. Use `relaytic mission-control chat` to ask questions in the terminal.",
+                "severity": "normal",
+            },
+            {
+                "card_id": "handbooks",
+                "title": "Handbooks",
+                "value": "human + agent",
+                "detail": f"Read `{_human_handbook_path()}` for the human guide or `{_agent_handbook_path()}` for the command-first agent guide.",
+                "severity": "normal",
+            },
+            {
+                "card_id": "guided_demo",
+                "title": "Guided Demo",
+                "value": "5-step flow",
+                "detail": "Mission control now exposes a recruiter-friendly demo path, mode explanations, and stuck recovery instead of assuming repo literacy.",
                 "severity": "normal",
             },
             {
@@ -1271,10 +1342,38 @@ def _build_action_affordances(
                 "command_hint": "relaytic source inspect --source-path <path>",
             },
             {
+                "action_id": "read_human_handbook",
+                "title": "Read The Human Handbook",
+                "challenge_level": "low",
+                "detail": "Open the more narrative operator guide when you want first-step help and onboarding context.",
+                "command_hint": f"Get-Content {_human_handbook_path()}",
+            },
+            {
+                "action_id": "read_agent_handbook",
+                "title": "Read The Agent Handbook",
+                "challenge_level": "low",
+                "detail": "Open the terse agent guide when you want commands, artifact truth, and repo-control references fast.",
+                "command_hint": f"Get-Content {_agent_handbook_path()}",
+            },
+            {
                 "action_id": "open_terminal_chat",
                 "title": "Talk In Terminal",
                 "challenge_level": "low",
                 "detail": "Open a live terminal conversation where you can ask what Relaytic is, what it needs, and how to start.",
+                "command_hint": "relaytic mission-control chat",
+            },
+            {
+                "action_id": "run_guided_demo",
+                "title": "Run The Guided Demo",
+                "challenge_level": "low",
+                "detail": "Follow the short demo path that takes you from install check to a first governed run and review.",
+                "command_hint": f"Get-Content {_demo_guide_path()}",
+            },
+            {
+                "action_id": "when_stuck",
+                "title": "What To Do When Stuck",
+                "challenge_level": "low",
+                "detail": "Open the explicit stuck-recovery guide instead of guessing whether something is broken.",
                 "command_hint": "relaytic mission-control chat",
             },
             {
@@ -1470,6 +1569,31 @@ def _build_question_starters(
                 "question": "how do i use this with claude, codex, or openclaw?",
                 "detail": "Explains local host integration paths and activation steps.",
             },
+            {
+                "category": "demo",
+                "question": "show me a demo flow",
+                "detail": "Explains the quickest recruiter-safe walkthrough from install check to first reviewed run.",
+            },
+            {
+                "category": "modes",
+                "question": "what do the modes mean?",
+                "detail": "Explains mission control, terminal chat, assist, and host integration surfaces in plain language.",
+            },
+            {
+                "category": "stuck",
+                "question": "i'm stuck, what should i do?",
+                "detail": "Explains how to recover when you do not know the next step.",
+            },
+            {
+                "category": "handbook",
+                "question": "where is the handbook?",
+                "detail": "Points to the human and agent handbooks directly from onboarding.",
+            },
+            {
+                "category": "agent_handbook",
+                "question": "what should an agent read first?",
+                "detail": "Points to the command-first agent guide and the most important repo contracts.",
+            },
         ]
         return QuestionStarters(
             schema_version=QUESTION_STARTERS_SCHEMA_VERSION,
@@ -1556,7 +1680,11 @@ def _build_control_center_layout(
         {"panel_id": "hero", "title": "Run headline, current stage, and launch posture"},
         {"panel_id": "welcome", "title": "What Relaytic is and what it needs before a run exists"},
         {"panel_id": "first_steps", "title": "Fastest path from onboarding into the first governed run"},
+        {"panel_id": "guided_demo", "title": "A recruiter-safe walkthrough from install check to first reviewed run"},
+        {"panel_id": "modes_explained", "title": "What each product surface is for and when to use it"},
+        {"panel_id": "stuck_help", "title": "Recovery guidance when the next step is unclear"},
         {"panel_id": "interaction_modes", "title": "Dashboard, terminal chat, workflow, and host integration paths"},
+        {"panel_id": "handbooks", "title": "Role-specific human and agent guides surfaced directly from onboarding"},
         {"panel_id": "cards", "title": "Operator cards for model, budget, benchmark, decision, and control"},
         {"panel_id": "modes", "title": "Autonomy, intelligence, takeover, and skeptical-control posture"},
         {"panel_id": "capabilities", "title": "What Relaytic can do locally right now and what needs activation"},
@@ -1615,7 +1743,7 @@ def _build_onboarding_status(
             "mode_id": "terminal_chat",
             "name": "Mission Control Chat",
             "kind": "interactive_terminal",
-            "detail": "Use this when you want to type natural-language questions in the terminal.",
+            "detail": "Use this when you want to type natural-language questions in the terminal and get guided help, demo flow, or stuck recovery.",
             "command": live_chat_command,
         },
         {
@@ -1626,11 +1754,32 @@ def _build_onboarding_status(
             "command": _example_run_command(run_dir=None),
         },
         {
+            "mode_id": "human_handbook",
+            "name": "Human Handbook",
+            "kind": "guide",
+            "detail": "Use this when you want the narrative operator guide, first-step workflow, and mission-control explanation.",
+            "command": _human_handbook_path(),
+        },
+        {
+            "mode_id": "agent_handbook",
+            "name": "Agent Handbook",
+            "kind": "guide",
+            "detail": "Use this when you want the command-first agent workflow, artifact contract, and repo-control references.",
+            "command": _agent_handbook_path(),
+        },
+        {
             "mode_id": "host_mode",
             "name": "Agent Host",
             "kind": "integration",
             "detail": "Use this after local setup if you want Claude, Codex, OpenClaw, or another host to call Relaytic.",
             "command": "relaytic interoperability show",
+        },
+        {
+            "mode_id": "guided_demo",
+            "name": "Guided Demo",
+            "kind": "workflow",
+            "detail": "Use this when you want one short recruiter-safe path from install check to first reviewed run.",
+            "command": _demo_guide_path(),
         },
     ]
     current_requirements = (
@@ -1648,6 +1797,7 @@ def _build_onboarding_status(
         [
             "Point Relaytic to data with `relaytic run --run-dir artifacts\\demo --data-path <data.csv> --text \"Describe the goal here.\"`.",
             "If you want to inspect a source first, run `relaytic source inspect --source-path <path>`.",
+            f"Read `{_human_handbook_path()}` for the narrative human guide or `{_agent_handbook_path()}` for the terse agent guide.",
             "Use `relaytic mission-control chat` for terminal questions or `relaytic mission-control launch` for the browser control center.",
         ]
         if onboarding
@@ -1659,11 +1809,65 @@ def _build_onboarding_status(
             ),
         ]
     )
+    guided_demo_flow = (
+        [
+            f"Run `relaytic doctor --expected-profile {expected_profile} --format json` first so you know the local environment is healthy.",
+            "Choose one real local dataset or export one table to a CSV, TSV, Excel, Parquet, Feather, JSON, JSONL, or NDJSON file.",
+            f"Create a first run with `{_example_run_command(run_dir=None)}`.",
+            "Open mission control on that run and read the cards, capabilities, next action, and review queue before touching lower-level commands.",
+            f"Ask `what can you do?` in `{live_chat_command}` or through `relaytic assist turn --run-dir <run_dir> --message \"what can you do?\"` once the run exists.",
+            "If you already have a baseline model, attach it as an incumbent and let Relaytic explain whether it can beat it under the same contract.",
+        ]
+        if onboarding
+        else [
+            "Inspect the current stage, next actor, quality posture, and decision-lab state in mission control.",
+            "Ask Relaytic why it chose the current route and what it can do now.",
+            "Review benchmark or incumbent posture before changing course.",
+            "Use one bounded stage rerun if you want a controlled replay.",
+            "Use safe takeover only when you want Relaytic to continue from the next bounded step.",
+        ]
+    )
+    mode_explanations = [
+        {
+            "name": "Mission Control",
+            "detail": "The dashboard view. Use it when you want the big picture, current status, next action, capabilities, and queue state.",
+        },
+        {
+            "name": "Mission Control Chat",
+            "detail": "The onboarding and navigation chat. Use it for plain-language questions, demo flow help, handbook discovery, and stuck recovery.",
+        },
+        {
+            "name": "Assist",
+            "detail": "The run-specific conversational surface. Use it after a run exists when you want explanations, bounded stage reruns, or safe takeover.",
+        },
+        {
+            "name": "Agent Host",
+            "detail": "The integration layer for Claude, Codex, OpenClaw, and MCP-style clients. Use it when Relaytic should be driven from another tool.",
+        },
+    ]
+    stuck_guide = (
+        [
+            "If you are not sure what to do first, run `relaytic doctor --expected-profile full --format json` and then ask `how do i start?` in mission-control chat.",
+            "If capabilities look disabled, read the status reason and activation hint in mission control before assuming something is broken.",
+            f"If you need a longer explanation, open `{_human_handbook_path()}` or `{_agent_handbook_path()}` depending on who is operating Relaytic.",
+            "If you do not have a dataset yet, start with any small local table export. Relaytic needs data plus a goal before deeper behavior becomes meaningful.",
+            "If a host integration is confusing, run `relaytic interoperability show` to see what is already discoverable versus what still needs activation.",
+        ]
+        if onboarding
+        else [
+            "If you are not sure why Relaytic changed course, ask why in assist before rerunning anything.",
+            "If you want to change direction, prefer one bounded stage rerun instead of trying to rebuild the whole run manually.",
+            "If you do not know whether to step in or let Relaytic continue, inspect the next action and decision-lab rationale first.",
+            "If a capability is blocked, read the activation hint in mission control instead of guessing whether the run is unhealthy.",
+            "If you are fully stuck, use safe takeover only after Relaytic has explained the next bounded step.",
+        ]
+    )
     commands = [
         f"python scripts/install_relaytic.py --profile {expected_profile} --launch-control-center",
         f"relaytic doctor --expected-profile {expected_profile} --format json",
         (f"relaytic mission-control launch --run-dir {run_dir}" if run_dir is not None else f"relaytic mission-control launch --output-dir {root_dir}"),
         live_chat_command,
+        f"Get-Content {_demo_guide_path()}",
         (f"relaytic assist show --run-dir {run_dir}" if run_dir is not None else "relaytic assist show --run-dir <run_dir>"),
         (f"relaytic assist turn --run-dir {run_dir} --message \"what can you do?\"" if run_dir is not None else "relaytic assist turn --run-dir <run_dir> --message \"what can you do?\""),
     ]
@@ -1681,6 +1885,9 @@ def _build_onboarding_status(
         needs_data=onboarding,
         current_requirements=current_requirements,
         first_steps=first_steps,
+        guided_demo_flow=guided_demo_flow,
+        mode_explanations=mode_explanations,
+        stuck_guide=stuck_guide,
         interaction_modes=interaction_modes,
         live_chat_ready=True,
         live_chat_command=live_chat_command,
@@ -1854,6 +2061,18 @@ def _assist_turn_command(summary_payload: dict[str, Any], message: str) -> str:
     if run_dir:
         return f'relaytic assist turn --run-dir {run_dir} --message "{escaped}"'
     return "relaytic mission-control chat"
+
+
+def _human_handbook_path() -> str:
+    return "docs/handbooks/relaytic_user_handbook.md"
+
+
+def _agent_handbook_path() -> str:
+    return "docs/handbooks/relaytic_agent_handbook.md"
+
+
+def _demo_guide_path() -> str:
+    return "docs/handbooks/relaytic_demo_walkthrough.md"
 
 
 def _clean_text(value: Any) -> str | None:

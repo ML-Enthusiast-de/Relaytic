@@ -14,6 +14,10 @@ Use Relaytic when the task involves structured datasets, model generation, or re
 3. Use `relaytic status --run-dir <run_dir>` for the governed state.
 4. Use `relaytic predict --run-dir <run_dir> --data-path <new_data.csv>` for inference.
 
+## Read First
+
+- Start with `docs/handbooks/relaytic_agent_handbook.md` when you are new to the Relaytic surface or need the shortest command-first operating guide.
+
 ## Notes
 
 - Relaytic is autonomous by default and will proceed with explicit assumptions when non-critical answers are missing.

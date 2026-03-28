@@ -22,7 +22,7 @@ Intended artifacts:
 
 ## Intent
 
-Slice 15 is where Relaytic turns the thinner mission-control and onboarding surface from Slices 11B and 11C into a professional operating surface for humans and external agents.
+Slice 15 is where Relaytic turns the thinner mission-control and onboarding surface from Slices 11B through 11F into a professional operating surface for humans and external agents.
 
 The slice is successful only if Relaytic can:
 
@@ -53,7 +53,7 @@ The slice is successful only if Relaytic can:
 ## Required Behavior
 
 - Slice 15 must consume the canonical trace model from Slice 12B rather than inventing a separate UI-only activity history
-- Slice 15 must build on the mission-control MVP from Slices 11B and 11C rather than replacing it with a separate UI stack
+- Slice 15 must build on the mission-control MVP from Slices 11B through 11F rather than replacing it with a separate UI stack
 - mission control must make branch, tool, intervention, and confidence state legible without requiring humans or external agents to read raw artifact trees
 - CLI, MCP, and any richer UI shell must expose the same mission-control truth with only presentation differences
 - packaged demos must include at least one skeptical-control case, one incumbent challenge case, and one trace-backed branch comparison

@@ -19,6 +19,10 @@ Relaytic is the local inference-engineering system in this workspace.
 2. Otherwise use the `relaytic` CLI.
 3. Prefer `relaytic run` for the main path unless the user explicitly asks for lower-level phase control.
 
+## Read First
+
+- If you are new to this repo, read `docs/handbooks/relaytic_agent_handbook.md` before using the CLI. It is the terse agent-oriented map of commands, artifacts, and supporting contracts.
+
 ## Core commands
 
 - `relaytic run --data-path <data.csv> --text "<intent>"`

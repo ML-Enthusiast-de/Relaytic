@@ -38,6 +38,8 @@ The repository already supports a working early product baseline:
 - a thin mission-control surface via `relaytic mission-control show` and `relaytic mission-control launch`, backed by shared run-summary, control, benchmark, decision, onboarding, and launch artifacts
 - a clearer mission-control and assist surface that always exposes current modes, capabilities, safe next actions, bounded stage reruns, and starter questions instead of requiring users or external agents to guess the interaction model
 - guided onboarding and live terminal mission-control chat through `relaytic mission-control chat` and `relaytic mission-control launch --interactive`, with explicit explanations of what Relaytic is, what it needs first, why capabilities need setup, and how the dashboard differs from terminal chat
+- role-specific handbooks surfaced directly from mission control and chat, so human operators are pointed to a narrative `docs/handbooks/relaytic_user_handbook.md` while external agents and host wrappers are pointed to the command-first `docs/handbooks/relaytic_agent_handbook.md`
+- demo-grade onboarding through an explicit walkthrough, clearer mode education, and stuck-recovery guidance surfaced directly from mission control, chat, and `docs/handbooks/relaytic_demo_walkthrough.md`
 - optional install-to-launch onboarding through `python scripts/install_relaytic.py --launch-control-center`
 - guarded dojo review through `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`, with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, and mission-control visibility
 - host-neutral MCP interoperability with checked-in wrappers for Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing connector guidance
@@ -47,7 +49,7 @@ The repository already supports a working early product baseline:
 - end-to-end local routes for regression, binary classification, multiclass classification, and fraud/anomaly-style rare-event classification
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, and 12 are now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; make quality gates and budget posture explicit; challenge human or external-agent steering through typed intervention contracts, override decisions, replayable checkpoints, and causal steering memory; turn the resulting run state into a visible decision-world model with controller policy, value-of-more-data reasoning, source-graph/join analysis, and compiled challenger or feature hypotheses; pressure the run against imported incumbent models, rulesets, and prediction files under the same local contract; surface the current operator truth through one thin mission-control layer plus a one-command install-and-launch path; make that surface legible through explicit modes, capabilities, action affordances, bounded stage navigation, starter questions, guided onboarding, and live terminal chat; and run guarded dojo review with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, and rollback-ready state. Every later slice is expected to extend that same surface rather than treating UI as a separate late-polish lane.
+Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, and 12 are now implemented: Relaytic can ingest human, external-agent, runtime, benchmark, and downstream-outcome feedback; validate trustworthiness; emit explicit reversible effect reports; make quality gates and budget posture explicit; challenge human or external-agent steering through typed intervention contracts, override decisions, replayable checkpoints, and causal steering memory; turn the resulting run state into a visible decision-world model with controller policy, value-of-more-data reasoning, source-graph/join analysis, and compiled challenger or feature hypotheses; pressure the run against imported incumbent models, rulesets, and prediction files under the same local contract; surface the current operator truth through one thin mission-control layer plus a one-command install-and-launch path; make that surface legible through explicit modes, capabilities, action affordances, bounded stage navigation, starter questions, guided onboarding, live terminal chat, role-specific handbooks for humans and agents, a recruiter-safe demo walkthrough, and explicit stuck-recovery guidance; and run guarded dojo review with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, and rollback-ready state. Every later slice is expected to extend that same surface rather than treating UI as a separate late-polish lane.
 
 The next frontier upgrades are:
 
@@ -55,7 +57,7 @@ The next frontier upgrades are:
 - richer long-term memory with retention, compaction, pinning, and replay rules so specialists do not repeatedly forget the same lesson
 - a first-class trace model plus agent/security harnesses so Relaytic can replay specialist/tool/intervention behavior and prove its control layer is actually robust
 - a stronger search/HPO controller that widens, prunes, and allocates effort under explicit value and budget contracts
-- deeper mission-control surfaces that build on the shipped 11B and 11C control-center foundation to show branch structure, confidence, trace history, and change attribution to humans and external agents
+- deeper mission-control surfaces that build on the shipped 11B through 11F control-center foundation to show branch structure, confidence, trace history, and change attribution to humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive models as one promising backend family
 
 ## Design Principles
@@ -170,6 +172,13 @@ python scripts/install_relaytic.py
 ```
 
 That command installs the full local Relaytic stack in editable mode and immediately runs `relaytic doctor` to verify the environment.
+
+If you are new after install:
+
+- human operators should start with `docs/handbooks/relaytic_user_handbook.md`
+- external agents and host wrappers should start with `docs/handbooks/relaytic_agent_handbook.md`
+- the shortest recruiter-safe demo path is in `docs/handbooks/relaytic_demo_walkthrough.md`
+- mission control can point you to both through `relaytic mission-control show`, `relaytic mission-control chat`, or the `/handbook` chat shortcut
 
 Manual install:
 

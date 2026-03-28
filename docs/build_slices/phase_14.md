@@ -47,7 +47,7 @@ Slice 14 is where Relaytic stops treating feasibility as a post-hoc warning and 
 - physical, regulatory, and operational constraints must be explicit inputs to proposal generation, not cosmetic warnings after the fact
 - Relaytic must distinguish promising, unproven, physically implausible, operationally infeasible, and policy-constrained proposals
 - action-boundary reasoning must integrate with abstention, review, rollback, and data-acquisition suggestions rather than living in a separate report
-- feasibility and action-boundary changes must extend the mission-control surface introduced in Slice 11B and clarified in Slice 11C so operator-facing recommendations stay legible as constraints sharpen
+- feasibility and action-boundary changes must extend the mission-control surface introduced in Slice 11B and expanded through Slices 11C, 11D, 11E, and 11F so operator-facing recommendations stay legible as constraints sharpen
 
 ## Proof Obligation
 

@@ -1,0 +1,242 @@
+# Relaytic User Handbook
+
+## Who This Is For
+
+This handbook is for a human operator who wants to understand what Relaytic is, how to start, how the product is meant to be used, and what to do when something is unclear.
+
+If you are an external agent or host wrapper, start with [relaytic_agent_handbook.md](./relaytic_agent_handbook.md) instead.
+
+## What Relaytic Is
+
+Relaytic is a local-first structured-data research lab.
+
+You point it to data, describe the goal in plain language, and Relaytic creates a governed run that can:
+
+- investigate the dataset
+- infer likely task structure and route choices
+- build and review a model
+- challenge itself
+- compare against benchmarks and incumbents
+- explain what it is doing
+- keep the whole process auditable
+
+Relaytic is not meant to be a vague chat shell. Its source of truth is the local artifact graph it writes during a run.
+
+## What Relaytic Needs First
+
+Relaytic becomes meaningfully useful after you give it:
+
+- a dataset or local source path
+- a short goal in plain language
+
+Good examples of goals:
+
+- `Predict customer churn from this table.`
+- `Classify diagnosis_flag from the measurement columns.`
+- `Tell me if this existing model is good enough and try to beat it.`
+- `Do everything on your own, but keep me informed.`
+
+## The Fastest Start
+
+Run these in order:
+
+```powershell
+relaytic doctor --expected-profile full --format json
+relaytic run --run-dir artifacts\demo --data-path <data.csv> --text "Describe the goal here."
+relaytic mission-control launch --run-dir artifacts\demo
+```
+
+If you want questions in the terminal instead of the dashboard:
+
+```powershell
+relaytic mission-control chat
+```
+
+## The Main Surfaces
+
+### Mission Control
+
+`relaytic mission-control show` or `relaytic mission-control launch`
+
+Use this when you want the big picture:
+
+- what Relaytic is doing now
+- what stage the run is in
+- what Relaytic thinks should happen next
+- what capabilities are available
+- what is blocked and why
+
+### Mission Control Chat
+
+`relaytic mission-control chat`
+
+Use this when you want onboarding help or a plain-language explanation.
+
+Good questions:
+
+- `what is relaytic?`
+- `how do i start?`
+- `show me a demo flow`
+- `what do the modes mean?`
+- `i'm stuck, what should i do?`
+- `why are some capabilities disabled?`
+
+### Assist
+
+`relaytic assist chat --run-dir <run_dir>`
+
+Use this after a run exists when you want run-specific help:
+
+- explanations of route choice
+- bounded stage reruns
+- safe takeover
+- clearer understanding of the next action
+
+### Show
+
+`relaytic show --run-dir <run_dir>`
+
+Use this when you want the current run summary truth in one place.
+
+## The Main Flow
+
+This is the intended operator flow:
+
+1. Verify the install with `relaytic doctor`.
+2. Point Relaytic at a real local dataset.
+3. Give it a short goal.
+4. Open mission control.
+5. Inspect the current stage, next action, and capability state.
+6. Ask Relaytic questions if anything is unclear.
+7. Only then decide whether to let it continue, rerun a bounded stage, or attach an incumbent.
+
+## What Happens After You Start A Run
+
+After `relaytic run`, Relaytic typically:
+
+1. interprets the goal and context
+2. profiles and investigates the dataset
+3. plans a route
+4. builds and evaluates a model
+5. challenges itself
+6. reviews completion and lifecycle posture
+7. surfaces the next bounded action in mission control
+
+This means you usually do not need to guess the next step. Relaytic should show it.
+
+## What The Modes Mean
+
+Relaytic uses different surfaces for different jobs.
+
+### Mission Control
+
+The dashboard. Use it for state, overview, and visibility.
+
+### Mission Control Chat
+
+The onboarding and guidance chat. Use it when you want Relaytic to explain the system, the first steps, the demo flow, or what to do when you are stuck.
+
+### Assist
+
+The run-specific conversation surface. Use it when a run already exists and you want Relaytic to explain a concrete run, rerun one bounded stage, or continue safely.
+
+### Agent Host
+
+The integration layer for Claude, Codex, OpenClaw, and MCP-style clients. Use it when Relaytic is being driven from another tool rather than directly by you.
+
+## Why Some Capabilities Are Disabled
+
+A disabled capability usually means one of three things:
+
+- Relaytic needs a run first
+- Relaytic needs data first
+- a host or backend still needs activation
+
+Common examples:
+
+- bounded stage reruns need an existing run
+- safe takeover needs an existing run with enough state
+- incumbent comparison needs a run before Relaytic can compare under the same contract
+- some host integrations need explicit activation even though Relaytic itself is healthy
+
+Mission control should show both:
+
+- why the capability is not ready
+- what activates it
+
+If it does not, treat that as a UX problem, not your fault.
+
+## What To Do When You Are Stuck
+
+Use this order:
+
+1. Run `relaytic doctor --expected-profile full --format json`
+2. Ask `how do i start?` or `show me a demo flow` in mission-control chat
+3. Read the capability reasons in mission control before assuming something is broken
+4. Read this handbook or the demo walkthrough
+5. If a run exists, ask `what can you do?` in assist or mission-control chat
+6. If a run exists and you want Relaytic to continue, use safe takeover rather than guessing commands
+
+If you are stuck because you have no data:
+
+- export any small local table to CSV, TSV, Excel, Parquet, JSON, JSONL, or NDJSON
+- then run Relaytic on that file
+
+Relaytic cannot do meaningful modeling without data. That is expected.
+
+## The Best First Demo
+
+Use this five-step pattern:
+
+1. Show `relaytic doctor`
+2. Run `relaytic run` on a real local dataset
+3. Open mission control
+4. Ask `what can you do?`
+5. Show the next action, capability reasons, and one bounded steering path
+
+If you have a baseline model or prediction file:
+
+6. attach it as an incumbent
+7. let Relaytic explain whether it can beat it honestly
+
+## If You Want A Longer Walkthrough
+
+Use:
+
+- [relaytic_demo_walkthrough.md](./relaytic_demo_walkthrough.md)
+
+## Host Integrations
+
+Relaytic can sit under:
+
+- Claude
+- Codex / OpenAI-style skill environments
+- OpenClaw
+- MCP-capable clients
+
+Use:
+
+```powershell
+relaytic interoperability show
+```
+
+to see what is already discoverable locally and what still needs activation.
+
+## Safe Steering
+
+You can steer Relaytic, but Relaytic is intentionally skeptical about truth-bearing overrides.
+
+That means:
+
+- you can ask questions
+- you can request bounded reruns
+- you can let Relaytic continue
+- but Relaytic may challenge, modify, or reject requests that would weaken the run or bypass guardrails
+
+That is part of the design, not a bug.
+
+## What To Read Next
+
+- [relaytic_demo_walkthrough.md](./relaytic_demo_walkthrough.md)
+- [README.md](../../README.md)
+- [INTEROPERABILITY.md](../../INTEROPERABILITY.md)

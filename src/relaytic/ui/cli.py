@@ -4199,14 +4199,14 @@ def _run_mission_control_chat(
             "relaytic> Mission-control chat is the terminal companion to the dashboard. "
             "Ask things like `what can you do?`, `why did you choose this route?`, "
             "`go back to planning`, or `i'm not sure, take over`. "
-            "Commands: /help, /show, /capabilities, /stages, /next, /takeover, /exit."
+            "Commands: /help, /show, /capabilities, /stages, /next, /takeover, /modes, /stuck, /handbook, /exit."
         )
     else:
         print(
             "relaytic> Mission-control chat is the terminal onboarding surface. "
             "Ask things like `what is relaytic?`, `how do i start?`, `what data formats do you support?`, "
             "or `why are some capabilities disabled?`. "
-            "Commands: /help, /show, /start, /formats, /hosts, /exit."
+            "Commands: /help, /show, /start, /demo, /formats, /hosts, /modes, /stuck, /handbook, /exit."
         )
     turns = 0
     while True:
@@ -4229,12 +4229,14 @@ def _run_mission_control_chat(
             if run_context:
                 print(
                     "relaytic> Use /show for the dashboard summary, /capabilities for current options, "
-                    "/stages for bounded reruns, /next for the next recommended step, /takeover to let Relaytic continue, or /exit."
+                    "/stages for bounded reruns, /next for the next recommended step, /takeover to let Relaytic continue, "
+                    "/modes for surface explanations, /stuck for recovery guidance, /handbook for the user/agent guides, or /exit."
                 )
             else:
                 print(
-                    "relaytic> Use /show for the dashboard summary, /start for first steps, /formats for supported data sources, "
-                    "/hosts for Claude/Codex/OpenClaw guidance, or /exit."
+                    "relaytic> Use /show for the dashboard summary, /start for first steps, /demo for a guided walkthrough, "
+                    "/formats for supported data sources, /hosts for Claude/Codex/OpenClaw guidance, /modes for surface explanations, "
+                    "/stuck for recovery guidance, /handbook for the role-specific guides, or /exit."
                 )
             continue
         if lowered == "/show":
@@ -4248,15 +4250,33 @@ def _run_mission_control_chat(
             if show_json:
                 print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
             continue
+        if lowered == "/handbook":
+            print("relaytic> " + _onboarding_chat_response(message="where is the handbook?", mission_control_payload=current_payload))
+            if show_json:
+                print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
         if not run_context:
             if lowered == "/start":
                 print("relaytic> " + _onboarding_chat_response(message="how do i start", mission_control_payload=current_payload))
+                turns += 1
+            elif lowered == "/demo":
+                print("relaytic> " + _onboarding_chat_response(message="show me a demo flow", mission_control_payload=current_payload))
                 turns += 1
             elif lowered == "/formats":
                 print("relaytic> " + _onboarding_chat_response(message="what data formats do you support", mission_control_payload=current_payload))
                 turns += 1
             elif lowered == "/hosts":
                 print("relaytic> " + _onboarding_chat_response(message="how do i use this with claude, codex, or openclaw", mission_control_payload=current_payload))
+                turns += 1
+            elif lowered == "/modes":
+                print("relaytic> " + _onboarding_chat_response(message="what do the modes mean", mission_control_payload=current_payload))
+                turns += 1
+            elif lowered == "/stuck":
+                print("relaytic> " + _onboarding_chat_response(message="i'm stuck, what should i do", mission_control_payload=current_payload))
                 turns += 1
             else:
                 print("relaytic> " + _onboarding_chat_response(message=message, mission_control_payload=current_payload))
@@ -4335,6 +4355,24 @@ def _run_mission_control_chat(
                 print("Session ended.")
                 return 0
             continue
+        if lowered == "/modes":
+            print("relaytic> " + _onboarding_chat_response(message="what do the modes mean", mission_control_payload=current_payload))
+            if show_json:
+                print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        if lowered == "/stuck":
+            print("relaytic> " + _onboarding_chat_response(message="i'm stuck, what should i do", mission_control_payload=current_payload))
+            if show_json:
+                print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
         onboarding_response = _maybe_onboarding_chat_response(message=message, mission_control_payload=current_payload)
         if onboarding_response is not None:
             print("relaytic> " + onboarding_response)
@@ -4377,6 +4415,17 @@ def _maybe_onboarding_chat_response(*, message: str, mission_control_payload: di
         "why are some capabilities disabled",
         "capabilities disabled",
         "what can you do",
+        "where is the handbook",
+        "handbook",
+        "what should an agent read first",
+        "show me a demo flow",
+        "demo flow",
+        "what do the modes mean",
+        "mode",
+        "i'm stuck",
+        "im stuck",
+        "stuck",
+        "what happens next",
         "claude",
         "codex",
         "openclaw",
@@ -4395,6 +4444,9 @@ def _onboarding_chat_response(*, message: str, mission_control_payload: dict[str
     capabilities = [dict(item) for item in dict(bundle.get("capability_manifest", {})).get("capabilities", []) if isinstance(item, dict)]
     actions = [dict(item) for item in dict(bundle.get("action_affordances", {})).get("actions", []) if isinstance(item, dict)]
     questions = [dict(item) for item in dict(bundle.get("question_starters", {})).get("starters", []) if isinstance(item, dict)]
+    guided_demo_flow = [str(item).strip() for item in onboarding.get("guided_demo_flow", []) if str(item).strip()]
+    stuck_guide = [str(item).strip() for item in onboarding.get("stuck_guide", []) if str(item).strip()]
+    mode_explanations = [dict(item) for item in onboarding.get("mode_explanations", []) if isinstance(item, dict)]
     host_summary = dict(onboarding.get("host_summary", {}))
     live_chat_command = str(onboarding.get("live_chat_command") or "relaytic mission-control chat").strip()
     first_steps = [str(item).strip() for item in onboarding.get("first_steps", []) if str(item).strip()]
@@ -4407,12 +4459,25 @@ def _onboarding_chat_response(*, message: str, mission_control_payload: dict[str
     if any(token in normalized for token in ("how do i start", "how to start", "first step", "get started", "/start")):
         step_text = " ".join(first_steps[:3]) or "Point Relaytic to a dataset and describe the goal."
         return f"Relaytic needs {', '.join(current_requirements[:2]) or 'data plus a goal'}. {step_text}"
+    if any(token in normalized for token in ("show me a demo flow", "demo flow", "/demo", "what happens next")):
+        demo_text = " ".join(guided_demo_flow[:4]) or "Run doctor, point Relaytic to data, create a run, and inspect mission control."
+        return f"Here is the shortest useful demo path. {demo_text}"
     if any(token in normalized for token in ("data format", "formats", "/formats", "what data do you support")):
         return (
             "Relaytic supports local snapshot files like `.csv`, `.tsv`, `.xlsx`, `.xls`, `.parquet`, `.pq`, "
             "`.feather`, `.json`, `.jsonl`, and `.ndjson`. It also supports local stream-style sources "
             "materialized into snapshots and local lakehouse-style sources such as partitioned directories and DuckDB files."
         )
+    if any(token in normalized for token in ("what do the modes mean", "/modes", "mode")):
+        parts = [
+            f"{str(item.get('name', 'Mode')).strip()}: {str(item.get('detail', '')).strip()}"
+            for item in mode_explanations[:4]
+            if str(item.get("name", "")).strip()
+        ]
+        return "Relaytic exposes different surfaces on purpose. " + (" ".join(parts) if parts else "Mission control is the dashboard, mission-control chat is for onboarding questions, assist is for run-specific help, and host mode is for Claude/Codex/OpenClaw style integration.")
+    if any(token in normalized for token in ("i'm stuck", "im stuck", "stuck", "/stuck")):
+        stuck_text = " ".join(stuck_guide[:4]) or "Run doctor, ask how to start, and let mission control explain the next safe step."
+        return f"If you are stuck, do not guess. {stuck_text}"
     if any(token in normalized for token in ("why are some capabilities disabled", "capabilities disabled", "why disabled")):
         blocked = [
             item
@@ -4439,9 +4504,17 @@ def _onboarding_chat_response(*, message: str, mission_control_payload: dict[str
         return (
             "Relaytic is a local-first structured-data research lab. It needs data plus a goal before the deeper run capabilities activate. "
             "Right now I can explain what Relaytic is, show you the first steps, describe supported data sources, "
-            "explain why a capability needs setup, and point you to local host integrations. "
+            "explain why a capability needs setup, walk you through a short demo flow, explain what the modes mean, help you recover when you are stuck, and point you to local host integrations. "
             f"Good next actions are {action_bits}. Good starter questions are {question_bits}. "
-            f"This terminal chat lives at `{live_chat_command}`, while `relaytic mission-control launch` opens the dashboard."
+            f"This terminal chat lives at `{live_chat_command}`, while `relaytic mission-control launch` opens the dashboard. "
+            "The role-specific guides live at `docs/handbooks/relaytic_user_handbook.md` and `docs/handbooks/relaytic_agent_handbook.md`, and the guided walkthrough lives at `docs/handbooks/relaytic_demo_walkthrough.md`."
+        )
+    if any(token in normalized for token in ("where is the handbook", "handbook", "what should an agent read first")):
+        return (
+            "Relaytic ships with two handbook paths. Human operators should start with "
+            "`docs/handbooks/relaytic_user_handbook.md`, which explains what Relaytic is, what it needs, "
+            "and how to navigate the control center. External agents should start with "
+            "`docs/handbooks/relaytic_agent_handbook.md`, which is command-first and points directly to the key repo contracts and artifacts."
         )
     if any(token in normalized for token in ("claude", "codex", "openclaw", "mcp", "/hosts", "host")):
         discoverable = ", ".join(host_summary.get("discoverable_now", [])) or "none"
@@ -4454,8 +4527,8 @@ def _onboarding_chat_response(*, message: str, mission_control_payload: dict[str
         )
     return (
         "Relaytic is a local-first structured-data lab. It needs data plus a goal before deeper run capabilities activate. "
-        "Ask `what is relaytic?`, `how do i start?`, `what data formats do you support?`, "
-        "or `why are some capabilities disabled?`."
+        "Ask `what is relaytic?`, `how do i start?`, `show me a demo flow`, `what do the modes mean?`, "
+        "`i'm stuck, what should i do?`, or `why are some capabilities disabled?`."
     )
 
 

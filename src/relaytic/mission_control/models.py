@@ -234,6 +234,9 @@ class OnboardingStatus:
     needs_data: bool
     current_requirements: list[str]
     first_steps: list[str]
+    guided_demo_flow: list[str]
+    mode_explanations: list[dict[str, Any]]
+    stuck_guide: list[str]
     interaction_modes: list[dict[str, Any]]
     live_chat_ready: bool
     live_chat_command: str

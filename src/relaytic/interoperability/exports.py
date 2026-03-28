@@ -226,6 +226,10 @@ Use Relaytic for local-first structured-data modeling, review, and inference.
 2. Fall back to the `relaytic` CLI if MCP is unavailable.
 3. Keep runs local-first and deterministic unless the user explicitly asks for stronger semantic help.
 
+## Read First
+
+- Start with `docs/handbooks/relaytic_agent_handbook.md` when you are new to the Relaytic surface or need the shortest command-first operating guide.
+
 ## Fast paths
 
 - End-to-end: `relaytic run --data-path <data.csv> --text "Do everything on your own. Predict <target>."`
@@ -266,6 +270,10 @@ Relaytic is the local inference-engineering system in this workspace.
 2. Otherwise use the `relaytic` CLI.
 3. Prefer `relaytic run` for the main path unless the user explicitly asks for lower-level phase control.
 
+## Read First
+
+- If you are new to this repo, read `docs/handbooks/relaytic_agent_handbook.md` before using the CLI. It is the terse agent-oriented map of commands, artifacts, and supporting contracts.
+
 ## Core commands
 
 - `relaytic run --data-path <data.csv> --text "<intent>"`
@@ -302,6 +310,10 @@ Use Relaytic when the task involves structured datasets, model generation, or re
 2. Inspect with `relaytic show --run-dir <run_dir>`.
 3. Use `relaytic status --run-dir <run_dir>` for the governed state.
 4. Use `relaytic predict --run-dir <run_dir> --data-path <new_data.csv>` for inference.
+
+## Read First
+
+- Start with `docs/handbooks/relaytic_agent_handbook.md` when you are new to the Relaytic surface or need the shortest command-first operating guide.
 
 ## Notes
 

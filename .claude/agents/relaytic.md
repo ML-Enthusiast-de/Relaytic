@@ -13,6 +13,10 @@ Use Relaytic for local-first structured-data modeling, review, and inference.
 2. Fall back to the `relaytic` CLI if MCP is unavailable.
 3. Keep runs local-first and deterministic unless the user explicitly asks for stronger semantic help.
 
+## Read First
+
+- Start with `docs/handbooks/relaytic_agent_handbook.md` when you are new to the Relaytic surface or need the shortest command-first operating guide.
+
 ## Fast paths
 
 - End-to-end: `relaytic run --data-path <data.csv> --text "Do everything on your own. Predict <target>."`

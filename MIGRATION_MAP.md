@@ -204,6 +204,27 @@ Avoid introducing new references to:
 - upgraded the existing public commands `relaytic mission-control show`, `relaytic mission-control launch`, `relaytic assist show`, and `relaytic assist turn` so mission-control clarity is available through shared artifacts instead of UI-only state
 - upgraded CLI and MCP mission-control quick payloads so next actor, current mode, capability counts, action counts, question counts, and stage-navigation scope remain visible without decoding the full bundle
 
+### Slice 11D
+
+- extended the existing `src/relaytic/mission_control/` boundary plus `src/relaytic/ui/cli.py` rather than introducing a separate onboarding shell
+- introduced the public command `relaytic mission-control chat`
+- extended the public command `relaytic mission-control launch` with `--interactive`
+- upgraded the existing mission-control and assist chat surfaces so onboarding guidance, capability reasons, activation hints, and chat shortcuts are available from the same local product entrypoints
+
+### Slice 11E
+
+- extended the existing `src/relaytic/mission_control/` boundary and checked-in host wrapper notes instead of introducing a separate handbook runtime package
+- introduced checked-in handbook surfaces at `docs/handbooks/relaytic_user_handbook.md` and `docs/handbooks/relaytic_agent_handbook.md`
+- upgraded the existing public commands `relaytic mission-control show`, `relaytic mission-control chat`, and `relaytic mission-control launch` so role-specific handbook discovery is part of onboarding instead of hidden repo knowledge
+- upgraded the checked-in Claude, Codex/OpenAI, and OpenClaw host notes so new agents are pointed to the same agent handbook before they start driving Relaytic
+
+### Slice 11F
+
+- extended the existing `src/relaytic/mission_control/` boundary and `src/relaytic/ui/cli.py` rather than introducing a separate demo shell
+- introduced the checked-in walkthrough surface at `docs/handbooks/relaytic_demo_walkthrough.md`
+- extended the existing mission-control onboarding boundary so `onboarding_status.json`, `action_affordances.json`, `question_starters.json`, and rendered mission-control surfaces now include guided demo flow, explicit mode explanations, and stuck-recovery guidance
+- upgraded the existing mission-control chat surface with `/demo`, `/modes`, and `/stuck` so first-contact users do not need repo knowledge to recover or continue
+
 ### Slice 12
 
 - introduced the canonical package boundary `src/relaytic/dojo/`
@@ -242,8 +263,10 @@ Avoid introducing new references to:
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/benchmark/` for Slice 11A imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts on top of Slice 11 reference comparisons
-- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, static control-center rendering, and Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions
+- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D live onboarding/chat behavior, Slice 11E handbook discovery surfaces, and Slice 11F guided demo/mode-education/stuck-recovery surfaces
 - `src/relaytic/dojo/` for Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and architecture-proposal quarantine
+- `docs/handbooks/` for Slice 11E role-specific human/operator and external-agent onboarding guides
+- `docs/handbooks/relaytic_demo_walkthrough.md` for Slice 11F recruiter-safe demo sequencing and first-contact presentation
 
 Shipped artifact names:
 

@@ -43,6 +43,7 @@ Relaytic/
   models/
   docs/
     build_slices/
+    handbooks/
   skills/
     relaytic/
   scripts/
@@ -136,6 +137,7 @@ Relaytic/
 - `data/private/` is reserved for local private inputs and must remain ignored
 - `artifacts/`, `reports/`, and `models/` contain generated outputs and must remain ignored except for sentinel files
 - `docs/build_slices/` tracks bounded implementation slices
+- `docs/handbooks/` stores the role-specific onboarding guides for human operators and external agents
 - `scripts/` stores local bootstrap and support scripts such as `install_relaytic.py`
 - `tests/` provides regression coverage for both product and compatibility boundaries
 
@@ -151,7 +153,7 @@ Relaytic/
 - `src/relaytic/decision/` owns Slice 10A decision-world models, controller-policy writing, decision usefulness, and value-of-more-data reasoning
 - `src/relaytic/compiler/` owns Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` owns Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
-- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, launch metadata, review-queue state, static control-center rendering, Slice 11C clarity artifacts for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding/live-chat behavior, and the shared operator cockpit surface
+- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, launch metadata, review-queue state, static control-center rendering, Slice 11C clarity artifacts for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding/live-chat behavior, Slice 11E handbook discovery/onboarding behavior, Slice 11F demo flow/mode education/stuck-recovery behavior, and the shared operator cockpit surface
 - `src/relaytic/dojo/` owns Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and architecture-proposal quarantine
 
 Reserved future boundaries:

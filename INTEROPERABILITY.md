@@ -17,6 +17,8 @@ Relaytic's source of truth is a Relaytic-owned MCP server plus the canonical `re
 - OpenClaw: workspace-local discovery through `skills/relaytic/SKILL.md`
 - ChatGPT: no repository auto-discovery; requires explicit connector registration against a public HTTPS `/mcp` endpoint
 
+All checked-in agent-facing host notes should point new agents to `docs/handbooks/relaytic_agent_handbook.md` before they begin driving Relaytic.
+
 ## Quick checks
 
 ```bash
@@ -59,6 +61,12 @@ Relaytic keeps thin wrappers for common hosts:
 - OpenClaw workspace skill: [skills/relaytic/SKILL.md](skills/relaytic/SKILL.md)
 - OpenClaw: [openclaw/skills/relaytic/SKILL.md](openclaw/skills/relaytic/SKILL.md)
 - ChatGPT connector guidance: [connectors/chatgpt/README.md](connectors/chatgpt/README.md)
+
+For human onboarding and operator-facing explanation, use:
+
+- [docs/handbooks/relaytic_user_handbook.md](docs/handbooks/relaytic_user_handbook.md)
+- [docs/handbooks/relaytic_agent_handbook.md](docs/handbooks/relaytic_agent_handbook.md)
+- [docs/handbooks/relaytic_demo_walkthrough.md](docs/handbooks/relaytic_demo_walkthrough.md)
 
 Generate fresh copies into another directory with:
 

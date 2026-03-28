@@ -157,6 +157,10 @@ If a later slice adds "smartness" without strengthening at least one of those pr
   once Slice 11A lands, one case where a user or external agent imports an existing model, prediction set, scorecard, or ruleset as the incumbent and Relaytic honestly reports whether it can beat it under the same local split and metric contract
 - **control-center path**
   once Slice 11C lands, one case where a new user can install Relaytic, launch one local control center, inspect run status, quality/budget posture, decision state, incumbent parity, current modes, capabilities, safe assist/control actions, and bounded stage reruns from one coherent surface instead of stitching together multiple commands
+- **handbook path**
+  once Slice 11E lands, one case where a new human or external agent can open mission control, discover the correct role-specific handbook immediately, and get pointed to the right next command without reading the repo tree
+- **demo-onboarding path**
+  once Slice 11F lands, one case where a new person who knows nothing about Relaytic can discover what it is, how to start, what the modes mean, what to do when stuck, and what the shortest useful demo flow is without repo literacy or hand-holding
 - **pulse path**
   once Slice 12A lands, one case where Relaytic wakes on a bounded schedule, notices something worth attention, writes explicit recommendations or watchlists, and either safely skips or queues one bounded follow-up without silently mutating core behavior
 - **trace path**
@@ -188,13 +192,15 @@ Stable slice numbering stays the same, but the preferred execution order after S
 16. Slice 11B
 17. Slice 11C
 18. Slice 11D
-19. Slice 12
-20. Slice 12A
-21. Slice 12B
-22. Slice 13
-23. Slice 14
-24. Slice 15
-25. Slice 16
+19. Slice 11E
+20. Slice 11F
+21. Slice 12
+22. Slice 12A
+23. Slice 12B
+24. Slice 13
+25. Slice 14
+26. Slice 15
+27. Slice 16
 
 Why:
 
@@ -216,13 +222,15 @@ Why:
 - Slice 11B is now implemented and gives Relaytic a real operator-facing control center plus a low-friction install/onboarding path before dojo and later frontier slices expand the lab
 - Slice 11C is now implemented and makes that control center legible on first contact by surfacing modes, capabilities, safe next actions, bounded stage reruns, and starter questions even before a user has discovered the assist surface manually
 - Slice 11D is now implemented and makes first contact far less confusing by adding guided onboarding, real terminal mission-control chat, explicit capability reasons, and a clearer dashboard-versus-chat split
+- Slice 11E is now implemented and makes that onboarding surface explicit for both humans and external agents by surfacing role-specific handbooks directly from mission control, chat, and checked-in host notes
+- Slice 11F is now implemented and makes the experience much more demo-ready by surfacing a guided walkthrough, explicit mode explanations, and stuck-recovery guidance directly from mission control, chat, and the handbook stack
 - Slice 12A should come after dojo because periodic awareness, innovation watching, and bounded background follow-up are much safer once self-improvement stays quarantined and promotion rules already exist
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because wider search and full trace-backed mission control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 12, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, and Slice 12 guarded dojo review
+- implemented baseline: Slice 00 through Slice 12, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, and Slice 12 guarded dojo review
 - next execution target: Slice 12A
 - next pulse follow-on: Slice 12A
 - next trace-and-safety follow-on after Slice 12A: Slice 12B
@@ -1422,6 +1430,135 @@ Innovation hook:
 
 - this is the slice that turns the control center from a strong operator dashboard into something that feels immediately understandable, steerable, and demo-ready for first-time humans and external agents
 
+## Slice 11E - Role-specific handbooks and handbook-aware onboarding
+
+Status:
+- implemented
+
+Goal:
+- role-specific handbooks
+- handbook-aware onboarding
+- handbook-aware terminal chat
+- consistent host-facing agent entrypoints
+
+Load-bearing improvement:
+
+- Relaytic should stop assuming that one onboarding surface works equally well for first-time humans and external agents. The product should point each audience to the shortest correct guide directly from mission control, terminal chat, and checked-in host notes.
+
+Human surface:
+
+- human operators should be able to discover the narrative handbook directly from `relaytic mission-control show`, `relaytic mission-control chat`, and `relaytic mission-control launch --interactive`
+- mission control should surface handbook cards, actions, and question starters instead of expecting the operator to browse the repo manually
+
+Agent surface:
+
+- external agents and host wrappers should be able to discover the command-first handbook from mission control and from the checked-in Claude, Codex/OpenAI, and OpenClaw host notes
+- handbook discovery should be stable enough that another agent can learn the right repo contracts and CLI surfaces without guessing which markdown file matters first
+
+Intelligence source:
+
+- deterministic onboarding structure
+- existing mission-control cards, action affordances, and question starters
+- existing host-wrapper documentation surfaces
+
+Fallback rule:
+
+- if no run exists, Relaytic must still expose both handbook paths and explain which one a human versus an external agent should read first
+- if a host-specific wrapper is missing, the handbook paths surfaced through mission control remain authoritative
+
+Required behavior:
+
+- mission control must expose both a human handbook and an agent handbook directly from onboarding state
+- mission-control chat must answer handbook questions directly and support a `/handbook` shortcut
+- handbook discovery must remain visible through question starters, action affordances, and control-center layout
+- checked-in host wrapper notes should point to the agent handbook so new agents do not drift into competing local onboarding stories
+
+Required outputs:
+
+- `docs/handbooks/relaytic_user_handbook.md`
+- `docs/handbooks/relaytic_agent_handbook.md`
+- handbook-aware onboarding fields inside `onboarding_status.json`
+- handbook-aware action affordances inside `action_affordances.json`
+- handbook-aware starter questions inside `question_starters.json`
+
+Minimum proof:
+
+- one onboarding mission-control case where both handbook paths are visible without a run
+- one mission-control chat case where `where is the handbook?` returns both guides with role-specific explanation
+- one mission-control chat shortcut case where `/handbook` returns the same role-specific explanation
+- one checked-in host-note case where a new agent is pointed to the same agent handbook instead of a divergent local instruction path
+
+Innovation hook:
+
+- this is the slice that makes Relaytic feel like a product that knows how to onboard both humans and agents, instead of a repo that expects them to reverse-engineer the right markdown file
+
+## Slice 11F - Demo-grade onboarding, mode education, and stuck recovery
+
+Status:
+- implemented
+
+Goal:
+- guided demo flow
+- mode education
+- stuck recovery
+- recruiter-safe first-contact experience
+
+Load-bearing improvement:
+
+- Relaytic should stop requiring first-time demo audiences to infer the product shape. Mission control, chat, and the handbook stack should explain the shortest useful demo flow, what each major surface is for, and what to do when the next step is unclear.
+
+Human surface:
+
+- humans should be able to open mission control and immediately find a demo flow, mode explanations, stuck guidance, and a recruiter-safe walkthrough
+- mission-control chat should support direct help through `/demo`, `/modes`, and `/stuck`
+
+Agent surface:
+
+- external agents should be able to consume guided demo flow, mode explanations, and stuck guidance directly from onboarding payloads
+- the handbook stack should explain safe operating patterns and source-of-truth rules without forcing an agent to reverse-engineer the repo
+
+Intelligence source:
+
+- deterministic onboarding structure
+- current mission-control, capability, and action truth
+- handbook and walkthrough documents
+
+Fallback rule:
+
+- if no run exists, Relaytic must still explain the demo path, the modes, and stuck recovery
+- if a run exists, the same guidance must remain available without weakening bounded stage and skeptical-control rules
+
+Required behavior:
+
+- mission control must expose guided demo flow directly from onboarding state
+- mission control must expose explicit mode explanations directly from onboarding state
+- mission control must expose explicit stuck guidance directly from onboarding state
+- mission-control chat must support `/demo`, `/modes`, and `/stuck`
+- the same guidance must also work through natural-language onboarding questions
+- the user handbook must explain the main flow, what happens after a run starts, and what to do when stuck
+- the agent handbook must explain the safe operating pattern, source-of-truth hierarchy, and what to do when stuck
+- a separate demo walkthrough must exist for recruiter-safe demos
+
+Required outputs:
+
+- guided demo flow inside `onboarding_status.json`
+- mode explanations inside `onboarding_status.json`
+- stuck guidance inside `onboarding_status.json`
+- onboarding action affordances for demo and stuck recovery
+- onboarding starter questions for demo flow, mode explanation, and stuck recovery
+- `docs/handbooks/relaytic_demo_walkthrough.md`
+
+Minimum proof:
+
+- one mission-control onboarding case where guided demo flow, mode explanations, and stuck guidance are visible
+- one rendered mission-control case where those sections appear in the human-facing output
+- one mission-control chat case where `/demo`, `/modes`, and `/stuck` work
+- one handbook case where user, agent, and walkthrough docs all cover demo flow and stuck recovery
+
+Innovation hook:
+
+- this is the slice that makes Relaytic feel much less like a powerful internal tool and much more like something you can hand to a smart outsider without standing next to them
+
 ## Slice 12 - Dojo mode and guarded self-improvement
 
 Status:
@@ -1466,7 +1603,7 @@ Required behavior:
 - dojo must improve strategies, priors, challenger design, route search, decision-world-model heuristics, and method-compilation logic before it is allowed to touch deeper architecture proposals
 - dojo must not weaken intervention contracts, override skepticism, or control-injection defenses without explicit regression evidence that those guarantees still hold
 - every dojo promotion must preserve rollback, provenance, and benchmark comparability
-- dojo proposals, promotions, rejections, and rollbacks must extend the mission-control surface introduced in Slice 11B and clarified in Slice 11C instead of remaining CLI-only state
+- dojo proposals, promotions, rejections, and rollbacks must extend the mission-control surface introduced in Slice 11B and expanded through Slices 11C, 11D, 11E, and 11F instead of remaining CLI-only state
 - early architecture proposals must remain explicitly quarantined and non-authoritative even when method-level proposals are promotable
 - dojo review and rollback must be available through stable CLI surfaces before later pulse, trace, or search slices build on them
 
@@ -1666,7 +1803,7 @@ Required behavior:
 - Slice 13 must consume the explicit quality and budget contracts from Slice 10B instead of inventing separate hidden search limits
 - Slice 13 must consume real runtime/control accounting and any beat-target contract from Slice 11A rather than relying only on estimated search effort or abstract parity goals
 - Slice 13 should consume the canonical trace/eval artifacts from Slice 12B so branch expansion, pruning, and controller changes can be justified by replayable evidence rather than implicit heuristics
-- search widening, pruning, HPO allocation, and device/backend choices must extend the mission-control surface introduced in Slice 11B and clarified in Slice 11C so humans and external agents can see why search did or did not go deeper
+- search widening, pruning, HPO allocation, and device/backend choices must extend the mission-control surface introduced in Slice 11B and expanded through Slices 11C, 11D, 11E, and 11F so humans and external agents can see why search did or did not go deeper
 - device-aware planning must change *how* Relaytic executes, not silently change *what* it believes
 - distributed execution must remain resumable and safe for long local runs
 - search expansion must remain budgeted and justified by expected decision value, not only by abstract score-chasing
@@ -1722,7 +1859,7 @@ Required behavior:
 - physical, regulatory, and operational constraints must be explicit inputs to proposal generation, not cosmetic warnings after the fact
 - Relaytic must distinguish "promising", "unproven", "physically implausible", "operationally infeasible", and "policy-constrained" proposals
 - action-boundary reasoning must integrate with abstention, review, rollback, and data-acquisition suggestions rather than living in a separate report
-- feasibility and action-boundary changes must extend the mission-control surface introduced in Slice 11B and clarified in Slice 11C so operator-facing recommendations stay legible as constraints sharpen
+- feasibility and action-boundary changes must extend the mission-control surface introduced in Slice 11B and expanded through Slices 11C, 11D, 11E, and 11F so operator-facing recommendations stay legible as constraints sharpen
 
 Minimum proof:
 
@@ -1781,7 +1918,7 @@ Required outputs:
 Required behavior:
 
 - Slice 15 must consume the canonical trace model from Slice 12B rather than inventing a separate UI-only activity history
-- Slice 15 must build on the mission-control MVP from Slices 11B and 11C rather than replacing it with a separate UI stack
+- Slice 15 must build on the mission-control MVP from Slices 11B through 11F rather than replacing it with a separate UI stack
 - mission control must make branch, tool, intervention, and confidence state legible without requiring humans or external agents to read raw artifact trees
 - CLI, MCP, and any richer UI shell must expose the same mission-control truth with only presentation differences
 - the packaged demos must include at least one skeptical-control case, one incumbent challenge case, and one trace-backed branch comparison

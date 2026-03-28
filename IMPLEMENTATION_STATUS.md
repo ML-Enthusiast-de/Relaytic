@@ -4,7 +4,7 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 12, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, and Slice 10C behavioral control contracts with skeptical steering and causal intervention memory
+- completed slices: 00 through 12, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, and Slice 11F demo-grade onboarding plus stuck recovery
 - next recommended slice: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
 - next trace-and-safety follow-on after 12A: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
@@ -62,6 +62,8 @@ The repository currently supports:
 - one-line bootstrap via `python scripts/install_relaytic.py` plus install-health verification via `relaytic doctor`
 - a thin but real mission-control surface via `relaytic mission-control show` and `relaytic mission-control launch`, with shared local truth for onboarding, review queue, operator cards, launch metadata, and demo-session state
 - install-launch coupling so `python scripts/install_relaytic.py --launch-control-center` can verify the environment and land a user in the same local control-center flow without inventing a separate onboarding truth
+- role-specific handbook discovery through mission control, mission-control chat, and checked-in host notes so the product can point humans to `docs/handbooks/relaytic_user_handbook.md` and external agents to `docs/handbooks/relaytic_agent_handbook.md` on first contact
+- demo-grade onboarding through explicit guided demo flow, mode explanations, stuck-recovery guidance, and a recruiter-safe walkthrough surfaced directly from mission control, chat, and the handbook stack
 - explicit dojo review via `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`, with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, and mission-control visibility
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
@@ -329,6 +331,22 @@ The most important not-yet-implemented shifts after the current baseline are:
 - upgraded `relaytic assist chat` with clearer startup guidance plus `/capabilities`, `/stages`, `/next`, and `/takeover` shortcuts while keeping the existing bounded stage and skeptical-control contract intact
 - added targeted Slice 11D CLI verification for onboarding, interactive launch, mission-control chat, and assist-chat clarity
 
+### Slice 11E
+
+- extended `src/relaytic/mission_control/` and `src/relaytic/ui/cli.py` so mission control can point humans and external agents to different guides instead of assuming the same onboarding shape fits both
+- added `docs/handbooks/relaytic_user_handbook.md` and `docs/handbooks/relaytic_agent_handbook.md`
+- upgraded onboarding cards, interaction modes, question starters, action affordances, control-center layout, and mission-control chat so handbook discovery is explicit and available through `/handbook` as well as natural onboarding questions
+- upgraded `.claude/agents/relaytic.md`, `.agents/skills/relaytic/SKILL.md`, `skills/relaytic/SKILL.md`, and `openclaw/skills/relaytic/SKILL.md` so checked-in host notes point to the same agent handbook instead of drifting independently
+- added targeted Slice 11E CLI verification for handbook discovery through mission control and mission-control chat
+
+### Slice 11F
+
+- extended `src/relaytic/mission_control/`, `src/relaytic/ui/cli.py`, and the handbook stack so Relaytic now exposes an explicit demo path, mode education, and stuck-recovery guidance instead of assuming first-time users can infer the right flow
+- added `docs/handbooks/relaytic_demo_walkthrough.md`
+- upgraded mission-control onboarding, action affordances, question starters, markdown/html rendering, and mission-control chat so users can ask for a demo flow, mode explanation, or stuck guidance directly through `/demo`, `/modes`, `/stuck`, and equivalent plain-language questions
+- expanded the human and agent handbooks so they now explain the main flow, what happens after a run starts, what each surface is for, and what to do when something is unclear
+- added targeted Slice 11F CLI and handbook verification for demo-grade onboarding, mode explanation, and stuck recovery
+
 ### Slice 12
 
 - added `src/relaytic/dojo/` with typed guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and storage helpers
@@ -376,7 +394,7 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-With Slice 11D and Slice 12 now landed, the next high-leverage frontier follow-ons are:
+With Slice 11F and Slice 12 now landed, the next high-leverage frontier follow-ons are:
 
 - Slice 12A lab pulse, periodic awareness, and bounded proactive follow-up
 - Slice 12B first-class tracing, agent evaluation, and runtime security harnesses
