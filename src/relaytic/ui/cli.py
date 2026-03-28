@@ -4569,6 +4569,7 @@ def _onboarding_chat_response(*, message: str, mission_control_payload: dict[str
             "Relaytic is a local-first structured-data research lab. It needs data plus a goal before the deeper run capabilities activate. "
             "Right now I can explain what Relaytic is, show you the first steps, describe supported data sources, "
             "explain why a capability needs setup, walk you through a short demo flow, explain what the modes mean, help you recover when you are stuck, and point you to local host integrations. "
+            "If you paste a dataset path, I can also help you choose between a quick analysis-first pass for things like top signals or correlation review and the full governed modeling path. "
             f"Good next actions are {action_bits}. Good starter questions are {question_bits}. "
             f"This terminal chat lives at `{live_chat_command}`, while `relaytic mission-control launch` opens the dashboard. "
             "The role-specific guides live at `docs/handbooks/relaytic_user_handbook.md` and `docs/handbooks/relaytic_agent_handbook.md`, and the guided walkthrough lives at `docs/handbooks/relaytic_demo_walkthrough.md`."
@@ -4671,6 +4672,18 @@ def _run_adaptive_onboarding_turn(
     )
     if objective is not None:
         session_state["detected_objective"] = objective
+    objective_family = _classify_onboarding_objective_family(
+        message=message,
+        semantic_result=semantic_result,
+        detected_objective=_clean_text(session_state.get("detected_objective")),
+        incumbent_path=_clean_text(session_state.get("incumbent_path")),
+        current_family=_clean_text(session_state.get("objective_family")),
+    )
+    if objective_family is not None:
+        session_state["objective_family"] = objective_family
+        if objective_family != "analysis":
+            session_state["last_analysis_report_path"] = None
+            session_state["last_analysis_summary"] = None
 
     if _looks_like_reset_request(message):
         session_state = _fresh_onboarding_chat_session_state(policy=policy)
@@ -4713,6 +4726,34 @@ def _run_adaptive_onboarding_turn(
     has_data = bool(_clean_text(session_state.get("detected_data_path"))) and bool(session_state.get("data_path_exists"))
     has_objective = bool(_clean_text(session_state.get("detected_objective")))
     wants_start = _looks_like_run_confirmation(message) or bool(semantic_result.get("confirm_start"))
+    objective_family = _clean_text(session_state.get("objective_family")) or "governed_run"
+
+    if has_data and has_objective and objective_family == "analysis":
+        analysis_payload = _run_direct_onboarding_analysis(
+            data_path=str(session_state["detected_data_path"]),
+            objective=str(session_state["detected_objective"]),
+            config_path=config_path,
+            output_dir=output_dir,
+        )
+        session_state["current_phase"] = "analysis_completed"
+        session_state["ready_to_start_run"] = False
+        session_state["created_run_dir"] = None
+        session_state["last_analysis_report_path"] = analysis_payload.get("report_path")
+        session_state["last_analysis_summary"] = analysis_payload.get("summary")
+        session_state["next_expected_input"] = "optional follow-up objective"
+        session_state["last_system_question"] = (
+            "Ask for another analysis question or say that you want a governed model if you want Relaytic to start the full run."
+        )
+        session_state["notes"] = [
+            "Relaytic handled this as a direct analysis-first request instead of forcing the full governed modeling path.",
+            "If you now want a model, say so explicitly and Relaytic will switch to the governed run flow.",
+        ]
+        session_state["summary"] = "Relaytic completed a direct analysis-first pass without creating a governed run."
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {
+            "response_text": analysis_payload["response_text"],
+            "started_run_dir": None,
+        }
 
     if has_data and has_objective and (wants_start or not confirmation_required):
         chosen_run_dir = str(
@@ -4764,14 +4805,14 @@ def _run_adaptive_onboarding_turn(
         session_state["current_phase"] = "need_objective"
         session_state["ready_to_start_run"] = False
         session_state["next_expected_input"] = "objective"
-        session_state["last_system_question"] = "What do you want to predict, classify, explain, or evaluate on this dataset?"
+        session_state["last_system_question"] = "What do you want to do with this dataset: a quick analysis first or a governed model/benchmark run?"
         session_state["notes"] = ["Relaytic captured a dataset path and is waiting for the objective."]
         session_state["summary"] = "Relaytic has a dataset path and now needs the plain-language objective."
         write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
         return {
             "response_text": (
                 f"I found a dataset path: `{session_state['detected_data_path']}`. "
-                "It exists and looks usable. What do you want to predict, classify, explain, or evaluate with it?"
+                "It exists and looks usable. Do you want a quick analysis first, or should I start the full governed path for modeling, benchmarking, or comparison?"
             ),
             "started_run_dir": None,
         }
@@ -4811,6 +4852,7 @@ def _run_adaptive_onboarding_turn(
             "response_text": (
                 f"I have both the data and the objective. Dataset: `{session_state['detected_data_path']}`. "
                 f"Objective: `{session_state['detected_objective']}`. "
+                f"Objective family: `{objective_family}`. "
                 f"I’ll use run directory `{session_state['suggested_run_dir']}` unless you want a different one. "
                 + (
                     f"Say `yes`, `start`, or `go` when you want me to create the run.{extra}"
@@ -4839,7 +4881,8 @@ def _run_adaptive_onboarding_turn(
     return {
         "response_text": (
             "I can work with a pasted dataset path, a plain-language objective, or both in one messy message. "
-            "For example: `C:\\data\\churn.csv` or `Predict customer churn from this file.`"
+            "For example: `C:\\data\\churn.csv`, `analyze this data and give me the top 3 signals`, "
+            "or `predict customer churn from this file`."
         ),
         "started_run_dir": None,
     }
@@ -4884,9 +4927,10 @@ def _extract_onboarding_semantics(
             task_name="mission_control_onboarding",
             system_prompt=(
                 "You are Relaytic's bounded onboarding extractor. "
-                "Return only JSON with keys: intent, data_path, objective, incumbent_path, confirm_start, wants_reset, question_focus, confidence. "
+                "Return only JSON with keys: intent, data_path, objective, objective_family, incumbent_path, confirm_start, wants_reset, question_focus, confidence. "
                 "Extract useful structured hints from messy human input, but do not invent file paths. "
-                "If the message is mostly a question, keep data_path and objective null unless clearly stated."
+                "If the message is mostly a question, keep data_path and objective null unless clearly stated. "
+                "objective_family should be one of analysis, governed_run, benchmark, or prediction when you can tell."
             ),
             payload={
                 "message": message,
@@ -4915,6 +4959,246 @@ def _extract_onboarding_semantics(
             "llm_used": False,
             "notes": [str(exc)],
         }
+
+
+def _classify_onboarding_objective_family(
+    *,
+    message: str,
+    semantic_result: dict[str, Any],
+    detected_objective: str | None,
+    incumbent_path: str | None,
+    current_family: str | None,
+) -> str | None:
+    semantic_family = _normalize_objective_family(semantic_result.get("objective_family"))
+    if semantic_family is not None:
+        return semantic_family
+    objective_text = _clean_text(detected_objective) or _clean_text(message)
+    if not objective_text:
+        return current_family
+    normalized = " ".join(objective_text.lower().split())
+    explicit_modeling = _looks_like_explicit_modeling_request(normalized)
+    if incumbent_path and any(token in normalized for token in ("benchmark", "compare", "beat", "evaluate", "incumbent", "baseline")):
+        return "benchmark"
+    if _looks_like_analysis_objective(normalized) and not explicit_modeling:
+        return "analysis"
+    if any(token in normalized for token in ("predict on", "score these rows", "run inference", "predict these")):
+        return "prediction"
+    if explicit_modeling or _looks_like_modeling_objective(normalized):
+        return "governed_run"
+    return current_family or "governed_run"
+
+
+def _normalize_objective_family(value: Any) -> str | None:
+    normalized = _clean_text(value)
+    if normalized is None:
+        return None
+    normalized = normalized.lower().replace("-", "_").replace(" ", "_")
+    aliases = {
+        "analysis_only": "analysis",
+        "analysis_first": "analysis",
+        "exploration": "analysis",
+        "exploratory_analysis": "analysis",
+        "explore": "analysis",
+        "model": "governed_run",
+        "modeling": "governed_run",
+        "governed_modeling": "governed_run",
+        "governed_run": "governed_run",
+        "benchmark": "benchmark",
+        "comparison": "benchmark",
+        "prediction": "prediction",
+        "inference": "prediction",
+    }
+    resolved = aliases.get(normalized, normalized)
+    if resolved in {"analysis", "governed_run", "benchmark", "prediction"}:
+        return resolved
+    return None
+
+
+def _looks_like_analysis_objective(message: str) -> bool:
+    normalized = " ".join(str(message).strip().lower().split())
+    analysis_tokens = (
+        "analyze",
+        "analysis",
+        "explore",
+        "exploration",
+        "correlation",
+        "correlations",
+        "top 3",
+        "top three",
+        "top signals",
+        "top predictors",
+        "find signals",
+        "important signals",
+        "inspect this data",
+        "look at this data",
+        "understand this dataset",
+    )
+    return any(token in normalized for token in analysis_tokens)
+
+
+def _looks_like_modeling_objective(message: str) -> bool:
+    normalized = " ".join(str(message).strip().lower().split())
+    modeling_tokens = (
+        "predict",
+        "prediction",
+        "classify",
+        "classification",
+        "forecast",
+        "regression",
+        "detect",
+        "detection",
+        "identify",
+        "estimate",
+        "score",
+        "rank",
+        "segment",
+        "evaluate",
+        "beat",
+        "benchmark",
+        "diagnosis",
+        "churn",
+        "fraud",
+        "default",
+        "failure",
+        "target",
+        "malignant",
+        "benign",
+        "disease",
+        "customer",
+        "build a model",
+        "train a model",
+        "model for",
+    )
+    return any(token in normalized for token in modeling_tokens)
+
+
+def _looks_like_explicit_modeling_request(message: str) -> bool:
+    normalized = " ".join(str(message).strip().lower().split())
+    explicit_tokens = (
+        "predict",
+        "prediction",
+        "classify",
+        "classification",
+        "forecast",
+        "regression",
+        "detect",
+        "detection",
+        "identify",
+        "estimate",
+        "score",
+        "rank",
+        "segment",
+        "evaluate",
+        "beat",
+        "benchmark",
+        "build a model",
+        "train a model",
+        "model for",
+    )
+    return any(token in normalized for token in explicit_tokens)
+
+
+def _run_direct_onboarding_analysis(
+    *,
+    data_path: str,
+    objective: str,
+    config_path: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    try:
+        registry = build_default_registry()
+        task_type_hint = _infer_analysis_task_type_hint(objective)
+        tool_args: dict[str, Any] = {
+            "data_path": data_path,
+            "save_artifacts": True,
+            "save_report": True,
+            "enable_strategy_search": True,
+            "strategy_search_candidates": 3,
+        }
+        if task_type_hint is not None:
+            tool_args["task_type_hint"] = task_type_hint
+        result = registry.execute("run_agent1_analysis", tool_args)
+        output = result.output if isinstance(result.output, dict) else {}
+    except Exception as exc:
+        message = str(exc).strip() or "The direct analysis-first path raised an unexpected error."
+        return {
+            "report_path": None,
+            "summary": "Relaytic could not complete the direct analysis-first request.",
+            "response_text": (
+                "I understood this as a quick analysis-first request, but the analysis path did not complete successfully. "
+                f"{message} If you want, we can still switch to the full governed run path."
+            ),
+        }
+    if result.status != "ok" or not isinstance(output, dict):
+        message = str(output.get("message") or f"Direct analysis failed with status `{result.status}`.").strip()
+        return {
+            "report_path": None,
+            "summary": "Relaytic could not complete the direct analysis-first request.",
+            "response_text": (
+                "I understood this as a quick analysis-first request, but the analysis path did not complete successfully. "
+                f"{message} If you want, we can still switch to the full governed run path."
+            ),
+        }
+    summary = _summarize_direct_analysis_output(output=output)
+    report_path = _clean_text(output.get("report_path"))
+    report_detail = f" Report saved at `{report_path}`." if report_path else ""
+    return {
+        "report_path": report_path,
+        "summary": summary,
+        "response_text": (
+            f"I ran a direct analysis-first pass on `{data_path}` instead of forcing the full governed modeling path. "
+            f"{summary}.{report_detail} If you want, the next step can be a governed model run on the same data."
+        ),
+    }
+
+
+def _infer_analysis_task_type_hint(objective: str) -> str | None:
+    normalized = " ".join(str(objective).strip().lower().split())
+    if "fraud" in normalized:
+        return "fraud_detection"
+    if "anomaly" in normalized or "outlier" in normalized:
+        return "anomaly_detection"
+    if any(token in normalized for token in ("regression", "forecast", "estimate")):
+        return "regression"
+    if any(token in normalized for token in ("multiclass", "three classes", "multiple classes")):
+        return "multiclass_classification"
+    if any(token in normalized for token in ("classify", "classification", "diagnosis", "malignant", "benign", "churn")):
+        return "binary_classification"
+    return None
+
+
+def _summarize_direct_analysis_output(*, output: dict[str, Any]) -> str:
+    ranking = [dict(item) for item in output.get("ranking", []) if isinstance(item, dict)]
+    target_analyses = [
+        dict(item)
+        for item in output.get("correlations", {}).get("target_analyses", [])
+        if isinstance(item, dict)
+    ]
+    top_signals = [
+        str(item.get("target_signal", "")).strip()
+        for item in ranking[:3]
+        if str(item.get("target_signal", "")).strip()
+    ]
+    if not top_signals:
+        top_signals = [
+            str(item.get("target_signal", "")).strip()
+            for item in target_analyses[:3]
+            if str(item.get("target_signal", "")).strip()
+        ]
+    if target_analyses:
+        primary_target = target_analyses[0]
+        predictors = list(primary_target.get("top_predictors") or [])
+        predictor_text = ", ".join(f"`{item}`" for item in predictors[:3] if str(item).strip()) or "no strong predictors surfaced yet"
+        target_name = str(primary_target.get("target_signal", "the leading target")).strip() or "the leading target"
+        signal_text = ", ".join(f"`{item}`" for item in top_signals[:3]) if top_signals else "no ranked signals yet"
+        return (
+            f"Top candidate signals: {signal_text}. "
+            f"For `{target_name}`, the strongest predictors were {predictor_text}"
+        )
+    if top_signals:
+        signal_text = ", ".join(f"`{item}`" for item in top_signals[:3])
+        return f"Top candidate signals: {signal_text}"
+    return "Relaytic completed the quick analysis, but there were no strong ranked signal candidates to summarize yet"
 
 
 def _resolve_onboarding_data_path(
@@ -5002,7 +5286,8 @@ def _extract_path_candidates(message: str) -> list[str]:
     raw = str(message).strip()
     candidates: list[str] = []
     whole = raw.strip("\"'")
-    if whole:
+    whole_path = Path(whole).expanduser() if whole else None
+    if whole and (whole_path.exists() or (len(whole.split()) == 1 and _looks_like_path(whole))):
         candidates.append(whole)
     quoted = re.findall(r"['\"]([^'\"]+)['\"]", raw)
     candidates.extend(item for item in quoted if item.strip())
@@ -5051,35 +5336,7 @@ def _looks_like_question(message: str) -> bool:
 
 def _looks_like_objective(message: str) -> bool:
     normalized = " ".join(str(message).strip().lower().split())
-    objective_tokens = (
-        "predict",
-        "prediction",
-        "classify",
-        "classification",
-        "forecast",
-        "regression",
-        "detect",
-        "detection",
-        "identify",
-        "estimate",
-        "score",
-        "rank",
-        "segment",
-        "evaluate",
-        "beat",
-        "benchmark",
-        "diagnosis",
-        "churn",
-        "fraud",
-        "default",
-        "failure",
-        "target",
-        "malignant",
-        "benign",
-        "disease",
-        "customer",
-    )
-    return any(token in normalized for token in objective_tokens)
+    return _looks_like_modeling_objective(normalized) or _looks_like_analysis_objective(normalized)
 
 
 def _looks_like_run_confirmation(message: str) -> bool:
@@ -5129,11 +5386,14 @@ def _fresh_onboarding_chat_session_state(*, policy: dict[str, Any]) -> dict[str,
         "detected_data_path": None,
         "data_path_exists": None,
         "detected_objective": None,
+        "objective_family": None,
         "incumbent_path": None,
         "incumbent_path_exists": None,
         "suggested_run_dir": _suggested_onboarding_run_dir(policy=policy),
         "ready_to_start_run": False,
         "created_run_dir": None,
+        "last_analysis_report_path": None,
+        "last_analysis_summary": None,
         "next_expected_input": "dataset path",
         "last_user_message": None,
         "last_system_question": None,
@@ -5149,7 +5409,13 @@ def _fresh_onboarding_chat_session_state(*, policy: dict[str, Any]) -> dict[str,
 def _finalize_onboarding_session_state(session_state: dict[str, Any]) -> None:
     has_data = bool(_clean_text(session_state.get("detected_data_path"))) and bool(session_state.get("data_path_exists"))
     has_objective = bool(_clean_text(session_state.get("detected_objective")))
-    if has_data and has_objective:
+    objective_family = _clean_text(session_state.get("objective_family")) or "governed_run"
+    if has_data and has_objective and objective_family == "analysis":
+        session_state["current_phase"] = "analysis_ready"
+        session_state["ready_to_start_run"] = False
+        session_state["next_expected_input"] = "analysis request or model request"
+        session_state["summary"] = "Relaytic has the data path and an analysis-first objective and can run a direct exploratory pass immediately."
+    elif has_data and has_objective:
         session_state["current_phase"] = "confirm_start"
         session_state["ready_to_start_run"] = True
         session_state["next_expected_input"] = "confirmation"
@@ -5174,12 +5440,19 @@ def _finalize_onboarding_session_state(session_state: dict[str, Any]) -> None:
 def _render_onboarding_state_response(*, session_state: dict[str, Any]) -> str:
     data_path = _clean_text(session_state.get("detected_data_path")) or "none yet"
     objective = _clean_text(session_state.get("detected_objective")) or "none yet"
+    objective_family = _clean_text(session_state.get("objective_family")) or "none yet"
     next_expected = _clean_text(session_state.get("next_expected_input")) or "dataset path or objective"
     suggested_run_dir = _clean_text(session_state.get("suggested_run_dir")) or r"artifacts\demo"
+    analysis_summary = _clean_text(session_state.get("last_analysis_summary"))
     return (
-        f"So far I have data path `{data_path}` and objective `{objective}`. "
+        f"So far I have data path `{data_path}`, objective `{objective}`, and objective family `{objective_family}`. "
         f"The next thing I need is `{next_expected}`. "
-        f"If we get to confirmation, I’ll use run directory `{suggested_run_dir}` unless you want a different one."
+        + (
+            f"The last direct analysis summary is: {analysis_summary}. "
+            if analysis_summary
+            else ""
+        )
+        + f"If we get to the governed run path, I’ll use run directory `{suggested_run_dir}` unless you want a different one."
     )
 
 
@@ -5276,8 +5549,11 @@ def _show_mission_control_surface(
                 "live_chat_command": onboarding.get("live_chat_command"),
                 "captured_data_path": onboarding_session.get("detected_data_path"),
                 "captured_objective": onboarding_session.get("detected_objective"),
+                "objective_family": onboarding_session.get("objective_family"),
                 "next_expected_input": onboarding_session.get("next_expected_input"),
                 "onboarding_semantic_status": onboarding_session.get("semantic_backend_status"),
+                "last_analysis_summary": onboarding_session.get("last_analysis_summary"),
+                "last_analysis_report_path": onboarding_session.get("last_analysis_report_path"),
                 "html_report_path": launch.get("html_report_path"),
                 "capability_manifest_status": capabilities.get("status"),
                 "action_affordances_status": affordances.get("status"),

@@ -227,7 +227,7 @@ Why:
 - Slice 11D is now implemented and makes first contact far less confusing by adding guided onboarding, real terminal mission-control chat, explicit capability reasons, and a clearer dashboard-versus-chat split
 - Slice 11E is now implemented and makes that onboarding surface explicit for both humans and external agents by surfacing role-specific handbooks directly from mission control, chat, and checked-in host notes
 - Slice 11F is now implemented and makes the experience much more demo-ready by surfacing a guided walkthrough, explicit mode explanations, and stuck-recovery guidance directly from mission control, chat, and the handbook stack
-- Slice 11G is now implemented and makes that first-contact UX much more forgiving by adding adaptive onboarding capture, visible chat session state, lightweight local semantic rescue for messy human input, and full-install helper provisioning
+- Slice 11G is now implemented and makes that first-contact UX much more forgiving by adding adaptive onboarding capture, visible chat session state, explicit analysis-first versus governed-run routing, lightweight local semantic rescue for messy human input, and full-install helper provisioning
 - Slice 12A should come after dojo because periodic awareness, innovation watching, and bounded background follow-up are much safer once self-improvement stays quarantined and promotion rules already exist
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because wider search and full trace-backed mission control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
@@ -1571,16 +1571,18 @@ Status:
 Goal:
 - adaptive human onboarding
 - visible onboarding session state
+- analysis-first versus governed-run routing
 - messy-input recovery
 - lightweight local semantic help
 
 Load-bearing improvement:
 
-- Relaytic should stop assuming first-contact humans behave like disciplined CLI users. Mission-control chat should capture data paths, objectives, and run-start readiness across turns, rescue messy first messages when a lightweight local helper is available, and still keep validation and run creation deterministic.
+- Relaytic should stop assuming first-contact humans behave like disciplined CLI users. Mission-control chat should capture data paths, objectives, and run-start readiness across turns, distinguish quick analysis-first requests from full governed-run requests, rescue messy first messages when a lightweight local helper is available, and still keep validation and run creation deterministic.
 
 Human surface:
 
 - humans should be able to paste a dataset path directly into mission-control chat, describe the goal later, inspect captured state with `/state`, reset with `/reset`, and confirm before the first run starts
+- humans should be able to ask for a quick analysis, top signals, or a correlation pass without being forced into the full governed run path
 - the full one-line bootstrap should attempt to provision the lightweight onboarding helper automatically on the full profile
 
 Agent surface:
@@ -1606,6 +1608,7 @@ Required behavior:
 - mission-control chat must support one messy first-turn case that combines a dataset hint and a goal
 - mission-control chat must expose captured state through `/state`
 - mission-control chat must support `/reset`
+- mission-control chat must distinguish analysis-first requests from full governed-run requests and execute a direct exploratory pass when the lightweight path is enough
 - configured onboarding run directories must respect policy defaults instead of hardcoded demo paths
 - full-profile install bootstrap must attempt lightweight onboarding-helper setup by default
 - canonical `policy:` configs and legacy top-level configs must both work for local semantic onboarding
@@ -1614,12 +1617,14 @@ Required outputs:
 
 - `onboarding_chat_session_state.json`
 - updated mission-control onboarding cards and rendered onboarding sections
+- onboarding-state visibility for objective family plus direct-analysis summary/report path
 - install payloads that include onboarding-local-LLM setup intent and result
 
 Minimum proof:
 
 - one mission-control chat case where Relaytic captures a dataset path and asks for the objective
 - one mission-control chat case where Relaytic captures data plus objective and starts the first run after confirmation
+- one mission-control chat case where Relaytic handles an analysis-first request without creating a full governed run
 - one mission-control chat case where a lightweight local semantic helper rescues messy human wording
 - one install-bootstrap case where onboarding-local-LLM setup is requested
 

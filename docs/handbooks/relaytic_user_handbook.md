@@ -35,8 +35,17 @@ Good examples of goals:
 
 - `Predict customer churn from this table.`
 - `Classify diagnosis_flag from the measurement columns.`
+- `Analyze this dataset first and give me the top 3 signals.`
+- `Run a correlation analysis before we decide whether to model anything.`
 - `Tell me if this existing model is good enough and try to beat it.`
 - `Do everything on your own, but keep me informed.`
+
+Relaytic now supports two clean onboarding directions:
+
+- `analysis first`
+  Use this when you want exploration, top signals, or a quick correlation-style pass without starting the full governed modeling flow yet.
+- `governed run`
+  Use this when you want Relaytic to build, challenge, benchmark, and judge a model or incumbent under the full artifact contract.
 
 ## The Fastest Start
 
@@ -95,6 +104,7 @@ You can also paste things directly instead of phrasing them perfectly:
 - a local dataset path
 - a plain-language goal
 - both in one messy sentence
+- a quick-analysis request such as `analyze this data first` or `give me the top 3 signals`
 
 Relaytic should capture what matters, show you what it understood, and ask for the next missing piece.
 
@@ -136,6 +146,7 @@ It should let you:
 
 - paste a dataset path directly
 - say the objective in plain language
+- choose between a quick analysis-first pass and the full governed modeling path
 - check what Relaytic has captured with `/state`
 - clear the captured onboarding state with `/reset`
 - confirm before it creates the first governed run
@@ -145,6 +156,17 @@ If the lightweight local onboarding helper is available, Relaytic should also re
 - `maybe use "C:\data\churn.csv" because I care about churn risk`
 - `this file should predict malignant cases`
 - `maybe compare this against our old model too`
+
+## Quick Analysis First
+
+If you are not ready to start a full governed run, mission-control chat should also handle lighter requests like:
+
+- `analyze this data`
+- `give me the top 3 signals`
+- `run a correlation analysis`
+- `explore this dataset first`
+
+That path should produce a direct analysis-first result and then tell you how to switch into the full governed run path if you want modeling next.
 
 ## What Happens After You Start A Run
 

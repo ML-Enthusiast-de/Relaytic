@@ -64,9 +64,12 @@ When the user knows little:
 
 1. point them to mission control first
 2. let them paste the dataset path or say the goal in their own words
-3. use `/state` or ask what Relaytic has captured if the conversation gets messy
-4. point them to the human handbook if they need narrative orientation
-5. keep the interaction simple: what it is, what it needs, how to start, what is blocked, and what to do next
+3. distinguish between quick analysis-first objectives like `analyze this data`, `give me the top 3 signals`, or `run a correlation analysis`
+4. distinguish those from full governed-run objectives like `build a fraud model`, `classify diagnosis_flag`, or `benchmark against this incumbent`
+5. use the quick analysis-first path when that is enough, instead of forcing the user into the full governed run flow
+6. use `/state` or ask what Relaytic has captured if the conversation gets messy
+7. point them to the human handbook if they need narrative orientation
+8. keep the interaction simple: what it is, what it needs, how to start, what is blocked, and what to do next
 
 When the user already has a run:
 
@@ -80,6 +83,7 @@ When the user already has a run:
 - Relaytic is local-first by default
 - copy-only data handling is part of the contract
 - the full install profile now attempts to provision a lightweight local onboarding helper for human-facing chat
+- mission-control chat now supports both `analysis first` and `governed run` objective families
 - bounded stage reruns are supported; arbitrary checkpoint time travel is not
 - skeptical control is intentional; do not expect blind compliance
 - remote intelligence is optional and policy-gated

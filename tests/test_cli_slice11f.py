@@ -113,11 +113,13 @@ def test_handbooks_cover_demo_flow_and_stuck_recovery() -> None:
     demo_text = Path("docs/handbooks/relaytic_demo_walkthrough.md").read_text(encoding="utf-8")
 
     assert "## The Fastest Start" in user_text
+    assert "## Quick Analysis First" in user_text
     assert "## The Main Flow" in user_text
     assert "## What To Do When You Are Stuck" in user_text
     assert "## The Best First Demo" in user_text
     assert "## First Session Workflow" in agent_text
     assert "## The Main Operating Pattern" in agent_text
+    assert "analysis-first objectives" in agent_text
     assert "## If You Are Stuck" in agent_text
     assert "## The Five-Step Demo" in demo_text
     assert "## If You Need To Explain Why This Is Different" in demo_text

@@ -267,6 +267,9 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
     handbooks = [item for item in interaction_modes if str(dict(item).get("kind", "")).strip().lower() == "guide"]
     detected_data_path = str(onboarding_session.get("detected_data_path") or "").strip()
     detected_objective = str(onboarding_session.get("detected_objective") or "").strip()
+    objective_family = str(onboarding_session.get("objective_family") or "").strip()
+    last_analysis_summary = str(onboarding_session.get("last_analysis_summary") or "").strip()
+    last_analysis_report_path = str(onboarding_session.get("last_analysis_report_path") or "").strip()
     next_expected_input = str(onboarding_session.get("next_expected_input") or "").strip()
     lines = [
         "# Relaytic Mission Control",
@@ -301,8 +304,14 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
             lines.append(f"- Detected data path: `{detected_data_path}`")
         if detected_objective:
             lines.append(f"- Detected objective: `{detected_objective}`")
+        if objective_family:
+            lines.append(f"- Objective family: `{objective_family}`")
         if next_expected_input:
             lines.append(f"- Next expected input: `{next_expected_input}`")
+        if last_analysis_summary:
+            lines.append(f"- Last direct analysis: {last_analysis_summary}")
+        if last_analysis_report_path:
+            lines.append(f"- Direct analysis report: `{last_analysis_report_path}`")
         lines.append("")
     if guided_demo_flow:
         lines.extend(["## Guided Demo Flow"])
@@ -465,6 +474,9 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
     handbook_modes = [item for item in interaction_modes if str(dict(item).get("kind", "")).strip().lower() == "guide"]
     detected_data_path = str(onboarding_session.get("detected_data_path") or "").strip()
     detected_objective = str(onboarding_session.get("detected_objective") or "").strip()
+    objective_family = str(onboarding_session.get("objective_family") or "").strip()
+    last_analysis_summary = str(onboarding_session.get("last_analysis_summary") or "").strip()
+    last_analysis_report_path = str(onboarding_session.get("last_analysis_report_path") or "").strip()
     next_expected_input = str(onboarding_session.get("next_expected_input") or "").strip()
     panels = [dict(item) for item in layout.get("panels", []) if isinstance(item, dict)]
     capability_items = [dict(item) for item in capabilities.get("capabilities", []) if isinstance(item, dict)]
@@ -628,7 +640,10 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
           <div class="meta-list">
             <div class="meta-row"><span class="label">Detected data path</span><span class="value-compact">{escape(detected_data_path or "none yet")}</span></div>
             <div class="meta-row"><span class="label">Detected objective</span><span class="value-compact">{escape(detected_objective or "none yet")}</span></div>
+            <div class="meta-row"><span class="label">Objective family</span><span class="value-compact">{escape(objective_family or "none yet")}</span></div>
             <div class="meta-row"><span class="label">Next expected input</span><span class="value-compact">{escape(next_expected_input or "data or objective")}</span></div>
+            <div class="meta-row"><span class="label">Last direct analysis</span><span class="value-compact">{escape(last_analysis_summary or "none yet")}</span></div>
+            <div class="meta-row"><span class="label">Analysis report</span><span class="value-compact">{escape(last_analysis_report_path or "none yet")}</span></div>
           </div>
         </article>
         <article class="panel">
@@ -988,6 +1003,8 @@ def _build_cards(
         discoverable_hosts = ", ".join(host_summary.get("discoverable_now", [])) or "none"
         detected_data_path = _clean_text(onboarding_chat_session.get("detected_data_path"))
         detected_objective = _clean_text(onboarding_chat_session.get("detected_objective"))
+        objective_family = _clean_text(onboarding_chat_session.get("objective_family"))
+        last_analysis_summary = _clean_text(onboarding_chat_session.get("last_analysis_summary"))
         next_expected_input = _clean_text(onboarding_chat_session.get("next_expected_input"))
         current_capture_value = "none yet"
         current_capture_detail = "Paste a dataset path, describe the objective, or do both in one messy sentence."
@@ -995,6 +1012,7 @@ def _build_cards(
             current_capture_value = "data + objective"
             current_capture_detail = (
                 f"Relaytic has `{detected_data_path}` and objective `{detected_objective}`. "
+                + (f"Objective family is `{objective_family}`. " if objective_family else "")
                 + ("Next expected input is " + f"`{next_expected_input}`." if next_expected_input else "The next step is confirmation before creating the run.")
             )
         elif detected_data_path:
@@ -1007,8 +1025,12 @@ def _build_cards(
             current_capture_value = "objective captured"
             current_capture_detail = (
                 f"Relaytic detected `{detected_objective}`. "
+                + (f"Objective family is `{objective_family}`. " if objective_family else "")
                 + (f"Next expected input is `{next_expected_input}`." if next_expected_input else "It now needs a dataset path.")
             )
+        if last_analysis_summary:
+            current_capture_value = "analysis completed"
+            current_capture_detail = last_analysis_summary
         return [
             {
                 "card_id": "what_is_relaytic",
@@ -1020,8 +1042,8 @@ def _build_cards(
             {
                 "card_id": "what_it_needs",
                 "title": "What It Needs",
-                "value": "data + objective",
-                "detail": "Point Relaytic to a dataset or local source and tell it what you want to predict, explain, or evaluate.",
+                "value": "data + intent",
+                "detail": "Point Relaytic to a dataset or local source and tell it whether you want a quick analysis first or a governed modeling run.",
                 "severity": "normal",
             },
             {
@@ -1438,6 +1460,20 @@ def _build_action_affordances(
                 "command_hint": "relaytic mission-control chat",
             },
             {
+                "action_id": "analyze_data_first",
+                "title": "Analyze Data First",
+                "challenge_level": "low",
+                "detail": "Ask Relaytic for a quick data analysis, top signals, or correlation review without starting the full governed modeling run yet.",
+                "command_hint": "relaytic mission-control chat",
+            },
+            {
+                "action_id": "start_governed_modeling",
+                "title": "Start Governed Modeling",
+                "challenge_level": "moderate",
+                "detail": "Tell Relaytic to build a model, compare against an incumbent, or benchmark the dataset under the full governed run path.",
+                "command_hint": _example_run_command(run_dir=None),
+            },
+            {
                 "action_id": "run_guided_demo",
                 "title": "Run The Guided Demo",
                 "challenge_level": "low",
@@ -1637,6 +1673,16 @@ def _build_question_starters(
                 "category": "start",
                 "question": "how do i start?",
                 "detail": "Explains the first steps and the fastest run command.",
+            },
+            {
+                "category": "analysis",
+                "question": "can you just analyze the data first?",
+                "detail": "Explains the quick analysis-first path for top signals, correlations, and exploratory summaries without a full governed run.",
+            },
+            {
+                "category": "analysis",
+                "question": "give me the top 3 signals",
+                "detail": "Routes to the direct analysis path when a lightweight exploratory answer is enough.",
             },
             {
                 "category": "capture",
@@ -1880,7 +1926,7 @@ def _build_onboarding_status(
     current_requirements = (
         [
             "A dataset path or local source path.",
-            "A short goal in plain language, for example what you want to predict or evaluate.",
+            "A short goal in plain language, for example whether you want a quick analysis first or a governed model/benchmark run.",
         ]
         if onboarding
         else [
@@ -1891,7 +1937,8 @@ def _build_onboarding_status(
     first_steps = (
         [
             f"Run `python scripts/install_relaytic.py --profile {expected_profile} --launch-control-center` for the easiest first launch. On the full profile, Relaytic also tries to provision a lightweight local onboarding model for human-friendly chat.",
-            "Point Relaytic to data with `relaytic run --run-dir artifacts\\demo --data-path <data.csv> --text \"Describe the goal here.\"`.",
+            "Point Relaytic to data with `relaytic run --run-dir artifacts\\demo --data-path <data.csv> --text \"Describe the goal here.\"` if you already know you want the full governed modeling path.",
+            "If you only want a quick analysis first, use mission-control chat and say things like `analyze this data`, `give me the top 3 signals`, or `run a correlation analysis` after you paste the dataset path.",
             "If you want to inspect a source first, run `relaytic source inspect --source-path <path>`.",
             f"Read `{_human_handbook_path()}` for the narrative human guide or `{_agent_handbook_path()}` for the terse agent guide.",
             "Use `relaytic mission-control chat` for terminal questions, direct path pasting, and guided startup or `relaytic mission-control launch` for the browser control center.",
@@ -1910,7 +1957,7 @@ def _build_onboarding_status(
             f"Run `relaytic doctor --expected-profile {expected_profile} --format json` first so you know the local environment is healthy.",
             "If you installed the full profile, let Relaytic keep the lightweight local onboarding helper enabled. It is there to interpret messy first-turn human input, not to replace deterministic run control.",
             "Choose one real local dataset or export one table to a CSV, TSV, Excel, Parquet, Feather, JSON, JSONL, or NDJSON file.",
-            "Paste the dataset path directly into mission-control chat or create the first run explicitly with "
+            "Paste the dataset path directly into mission-control chat, then either ask for a quick analysis-first pass or create the first governed run explicitly with "
             f"`{_example_run_command(run_dir=None)}`.",
             "Open mission control on that run and read the cards, capabilities, next action, and review queue before touching lower-level commands.",
             f"Ask `what can you do?` in `{live_chat_command}` or through `relaytic assist turn --run-dir <run_dir> --message \"what can you do?\"` once the run exists.",
@@ -1979,7 +2026,7 @@ def _build_onboarding_status(
         launch_ready=launch_ready,
         package_installed=bool(doctor_report.get("package", {}).get("installed")),
         doctor_status=doctor_status,
-        what_relaytic_is="Relaytic is a local-first structured-data research lab. It needs data plus a goal, then it builds, challenges, judges, and explains a governed run. The full install can also provision a lightweight local onboarding helper so first-contact chat is more forgiving for humans.",
+        what_relaytic_is="Relaytic is a local-first structured-data research lab. It needs data plus a goal, then it can either run a quick analysis-first pass or build, challenge, judge, and explain a governed run. The full install can also provision a lightweight local onboarding helper so first-contact chat is more forgiving for humans.",
         needs_data=onboarding,
         current_requirements=current_requirements,
         first_steps=first_steps,
@@ -2021,11 +2068,14 @@ def _build_onboarding_chat_session_state(
             detected_data_path=None,
             data_path_exists=None,
             detected_objective=None,
+            objective_family=None,
             incumbent_path=None,
             incumbent_path_exists=None,
             suggested_run_dir=str(run_dir),
             ready_to_start_run=False,
             created_run_dir=str(run_dir),
+            last_analysis_report_path=None,
+            last_analysis_summary=None,
             next_expected_input=None,
             last_user_message=None,
             last_system_question=None,
@@ -2049,20 +2099,24 @@ def _build_onboarding_chat_session_state(
             detected_data_path=None,
             data_path_exists=None,
             detected_objective=None,
+            objective_family=None,
             incumbent_path=None,
             incumbent_path_exists=None,
             suggested_run_dir=suggested_run_dir,
             ready_to_start_run=False,
             created_run_dir=None,
+            last_analysis_report_path=None,
+            last_analysis_summary=None,
             next_expected_input="dataset path",
             last_user_message=None,
-            last_system_question="Send a dataset path or tell Relaytic what you want to predict.",
+            last_system_question="Send a dataset path and tell Relaytic whether you want a quick analysis first or a governed model.",
             semantic_backend_status="not_checked",
             semantic_model=None,
             llm_used_last_turn=False,
             turn_count=0,
             notes=[
                 "Adaptive onboarding is waiting for a dataset path or a plain-language objective.",
+                "Relaytic can branch between direct analysis-first work and the full governed modeling flow once it understands the intent.",
                 "Relaytic will confirm before it creates the first run.",
             ],
             summary="Relaytic is waiting for the first useful human input: a dataset path, an objective, or both.",
@@ -2082,11 +2136,14 @@ def _build_onboarding_chat_session_state(
         detected_data_path=_clean_text(existing.get("detected_data_path")),
         data_path_exists=_maybe_bool(existing.get("data_path_exists")),
         detected_objective=_clean_text(existing.get("detected_objective")),
+        objective_family=_clean_text(existing.get("objective_family")),
         incumbent_path=_clean_text(existing.get("incumbent_path")),
         incumbent_path_exists=_maybe_bool(existing.get("incumbent_path_exists")),
         suggested_run_dir=_clean_text(existing.get("suggested_run_dir")) or "artifacts/demo",
         ready_to_start_run=bool(existing.get("ready_to_start_run")),
         created_run_dir=_clean_text(existing.get("created_run_dir")),
+        last_analysis_report_path=_clean_text(existing.get("last_analysis_report_path")),
+        last_analysis_summary=_clean_text(existing.get("last_analysis_summary")),
         next_expected_input=_clean_text(existing.get("next_expected_input")),
         last_user_message=_clean_text(existing.get("last_user_message")),
         last_system_question=_clean_text(existing.get("last_system_question")),

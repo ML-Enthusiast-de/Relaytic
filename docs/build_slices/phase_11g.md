@@ -8,6 +8,7 @@ The goal is to make the onboarding flow resilient to messy human input:
 
 - accept pasted dataset paths directly from chat
 - capture objectives from plain language instead of rigid prompts only
+- distinguish quick analysis-first objectives from full governed-run objectives
 - keep visible onboarding state across turns
 - use a lightweight local semantic helper for bounded interpretation when it is available
 - stay deterministic for validation, run creation, and final control decisions
@@ -43,6 +44,7 @@ If no local semantic backend is available:
 - Relaytic must still accept explicit objective text
 - Relaytic must still keep visible onboarding state across turns
 - Relaytic must still confirm before creating the first run
+- Relaytic must still allow quick direct analysis when the request is clearly exploratory and does not need the full governed run
 
 If a local semantic backend is available:
 
@@ -59,6 +61,7 @@ If a local semantic backend is available:
 6. The suggested onboarding run directory must respect policy-configured defaults instead of hardcoding `artifacts/demo`.
 7. The full one-line installer must attempt to provision the lightweight onboarding helper by default.
 8. Canonical `policy:` configs and legacy top-level configs must both work for local semantic onboarding setup.
+9. If the user clearly asks for exploratory work like top signals or correlation analysis, Relaytic must be able to run a direct analysis-first path without forcing the full governed modeling flow.
 
 ## Proof obligation
 
@@ -75,6 +78,7 @@ Slice 11G is acceptable only if:
 - updated onboarding cards in `mission_control_state.json`
 - updated onboarding sections in `onboarding_status.json`
 - install payloads that expose onboarding-local-LLM setup intent and results
+- direct-analysis summaries and report paths reflected back into onboarding state when the human chooses the analysis-first path
 
 ## Tests
 
@@ -82,5 +86,6 @@ Slice 11G should not be considered complete without targeted tests that cover at
 
 - one dataset-path capture case
 - one objective capture plus confirmation case
+- one analysis-first case that proves Relaytic can respond with direct exploratory output instead of creating a full governed run
 - one local-semantic messy-input case
 - one one-line-installer local-onboarding-LLM case

@@ -7,6 +7,7 @@ import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from types import SimpleNamespace
 
 from relaytic.ui.cli import main
 from tests.public_datasets import write_public_breast_cancer_dataset
@@ -102,7 +103,7 @@ def test_cli_mission_control_chat_captures_dataset_path_and_requests_objective(
 
     assert "You can paste a dataset path directly" in output
     assert "I found a dataset path" in output
-    assert "What do you want to predict" in output
+    assert "Do you want a quick analysis first" in output
     assert session["detected_data_path"] == str(data_path)
     assert session["data_path_exists"] is True
     assert session["current_phase"] == "need_objective"
@@ -316,6 +317,41 @@ def test_install_script_full_profile_requests_onboarding_local_llm(
     assert payload["onboarding_local_llm"]["ready"] is True
 
 
+def test_cli_mission_control_show_exposes_analysis_first_objective_guidance(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    output_dir = tmp_path / "analysis_first_guidance"
+
+    assert main(
+        [
+            "mission-control",
+            "show",
+            "--output-dir",
+            str(output_dir),
+            "--expected-profile",
+            "full",
+            "--format",
+            "json",
+        ]
+    ) == 0
+    payload = json.loads(capsys.readouterr().out)
+    bundle = dict(payload["bundle"])
+    onboarding = dict(bundle["onboarding_status"])
+    actions = dict(bundle["action_affordances"])
+    starters = dict(bundle["question_starters"])
+
+    action_ids = {str(dict(item).get("action_id", "")).strip() for item in actions.get("actions", [])}
+    starter_questions = {str(dict(item).get("question", "")).strip().lower() for item in starters.get("starters", [])}
+    first_steps = [str(item).strip().lower() for item in onboarding.get("first_steps", [])]
+
+    assert "analyze_data_first" in action_ids
+    assert "start_governed_modeling" in action_ids
+    assert "can you just analyze the data first?" in starter_questions
+    assert "give me the top 3 signals" in starter_questions
+    assert any("quick analysis first" in step for step in first_steps)
+
+
 def test_cli_mission_control_chat_starts_real_run_from_single_message_without_mocked_access_flow(
     tmp_path: Path,
     capsys,
@@ -365,3 +401,82 @@ def test_cli_mission_control_chat_starts_real_run_from_single_message_without_mo
     assert summary["stage_completed"] is not None
     assert summary["decision"]["target_column"] == "fraud_flag"
     assert intake_record["actor_type"] == "operator"
+
+
+def test_cli_mission_control_chat_runs_direct_analysis_for_analysis_first_objective(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    output_dir = tmp_path / "adaptive_onboarding_analysis"
+    data_path = _write_small_fraud_dataset(tmp_path / "analysis_input.csv")
+    config_path = tmp_path / "analysis_onboarding_config.yaml"
+    config_path.write_text(
+        "\n".join(
+            [
+                "communication:",
+                "  adaptive_onboarding_confirmation_required: true",
+                "  adaptive_onboarding_semantic_assist: false",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    prompts = iter([f"{data_path} analyze this fraud data and give me the top 3 signals"])
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(prompts))
+
+    captured: dict[str, object] = {}
+
+    class _FakeRegistry:
+        def execute(self, tool_name: str, arguments: dict[str, object]):
+            captured["tool_name"] = tool_name
+            captured["arguments"] = dict(arguments)
+            return SimpleNamespace(
+                status="ok",
+                output={
+                    "status": "ok",
+                    "report_path": str(tmp_path / "reports" / "agent1_analysis.md"),
+                    "ranking": [
+                        {"target_signal": "fraud_flag"},
+                        {"target_signal": "velocity_score"},
+                        {"target_signal": "device_risk"},
+                    ],
+                    "correlations": {
+                        "target_analyses": [
+                            {
+                                "target_signal": "fraud_flag",
+                                "top_predictors": ["velocity_score", "device_risk", "amount_norm"],
+                            }
+                        ]
+                    },
+                },
+            )
+
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: _FakeRegistry())
+
+    assert main(
+        [
+            "mission-control",
+            "chat",
+            "--output-dir",
+            str(output_dir),
+            "--config",
+            str(config_path),
+            "--expected-profile",
+            "full",
+            "--max-turns",
+            "1",
+        ]
+    ) == 0
+    output = capsys.readouterr().out
+    session = json.loads((output_dir / "onboarding_chat_session_state.json").read_text(encoding="utf-8"))
+
+    assert "I ran a direct analysis-first pass" in output
+    assert "`fraud_flag`" in output
+    assert captured["tool_name"] == "run_agent1_analysis"
+    assert dict(captured["arguments"])["data_path"] == str(data_path)
+    assert dict(captured["arguments"])["task_type_hint"] == "fraud_detection"
+    assert session["objective_family"] == "analysis"
+    assert session["current_phase"] == "analysis_completed"
+    assert session["created_run_dir"] is None
+    assert session["last_analysis_report_path"] == str(tmp_path / "reports" / "agent1_analysis.md")
+    assert "Top candidate signals" in str(session["last_analysis_summary"])

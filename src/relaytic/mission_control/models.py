@@ -263,11 +263,14 @@ class OnboardingChatSessionState:
     detected_data_path: str | None
     data_path_exists: bool | None
     detected_objective: str | None
+    objective_family: str | None
     incumbent_path: str | None
     incumbent_path_exists: bool | None
     suggested_run_dir: str | None
     ready_to_start_run: bool
     created_run_dir: str | None
+    last_analysis_report_path: str | None
+    last_analysis_summary: str | None
     next_expected_input: str | None
     last_user_message: str | None
     last_system_question: str | None
