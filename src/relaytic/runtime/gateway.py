@@ -111,6 +111,17 @@ _STAGE_PLAN: dict[str, dict[str, Any]] = {
             "semantic_uncertainty_report.json",
         ],
     },
+    "pulse": {
+        "specialists": ["lab_pulse"],
+        "input_artifacts": [
+            "run_summary.json",
+            "benchmark_parity_report.json",
+            "research_source_inventory.json",
+            "control_injection_audit.json",
+            "memory_retrieval.json",
+            "dojo_session.json",
+        ],
+    },
 }
 
 

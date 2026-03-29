@@ -166,7 +166,7 @@ If a later slice adds "smartness" without strengthening at least one of those pr
 - **pulse path**
   once Slice 12A lands, one case where Relaytic wakes on a bounded schedule, notices something worth attention, writes explicit recommendations or watchlists, and either safely skips or queues one bounded follow-up without silently mutating core behavior
 - **trace path**
-  once Slice 12B lands, one case where a human or external agent can replay one run across specialist turns, tool calls, interventions, and branch decisions from one trace model instead of stitching multiple logs together
+  once Slice 12B lands, one case where a human or external agent can replay one run across specialist turns, tool calls, interventions, branch decisions, competing claim packets, and deterministic adjudication from one trace model instead of stitching multiple logs together
 - **agent-security path**
   once Slice 12B lands, one case where Relaytic deliberately withstands or rejects a control-injection, tool-misuse, or unsafe branch-expansion request and records the defense or failure mode in an explicit evaluation artifact
 - **mission-control path**
@@ -234,9 +234,9 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 12, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, and Slice 12 guarded dojo review
-- next execution target: Slice 12A
-- next pulse follow-on: Slice 12A
+- implemented baseline: Slice 00 through Slice 12A, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, and Slice 12A lab pulse
+- next execution target: Slice 12B
+- latest pulse slice: Slice 12A
 - next trace-and-safety follow-on after Slice 12A: Slice 12B
 - next scale-and-search follow-on after Slice 12B: Slice 13
 - later mission-control expansion after Slice 14: Slice 15
@@ -1701,6 +1701,8 @@ Innovation hook:
 
 ## Slice 12A - Lab Pulse, periodic awareness, and bounded proactive follow-up
 
+Status: implemented.
+
 Goal:
 - scheduled lab pulse
 - bounded periodic awareness
@@ -1779,29 +1781,31 @@ Innovation hook:
 Goal:
 - one canonical trace model
 - replayable specialist/tool/intervention/branch traces
+- structured competing claim packets
+- deterministic adjudication scorecards
 - agent-behavior evaluation
 - runtime security harnesses
 - adversarial control and tool-safety testing
 
 Load-bearing improvement:
 
-- Relaytic should be able to explain, replay, compare, and test complex agentic behavior from one trace substrate instead of scattered logs, while continuously evaluating whether the runtime resists unsafe steering, tool misuse, and branch-controller errors
+- Relaytic should be able to explain, replay, compare, and test complex agentic behavior from one trace substrate instead of scattered logs, while resolving multi-specialist disagreement through explicit claim packets and deterministic adjudication rather than hidden precedence only
 
 Human surface:
 
-- humans should be able to inspect one trace timeline across specialists, tools, interventions, and branches, plus visible security/evaluation summaries that explain where Relaytic held the line or failed
+- humans should be able to inspect one trace timeline across specialists, tools, interventions, and branches, see competing proposals for a decision, and read exactly why one claim won and others lost
 
 Agent surface:
 
-- external agents should be able to consume trace spans, branch graphs, evaluation matrices, and security-harness results through stable JSON-first surfaces rather than scraping logs
+- external agents should be able to consume trace spans, branch graphs, claim packets, adjudication scorecards, replay reports, evaluation matrices, and security-harness results through stable JSON-first surfaces rather than scraping logs
 
 Intelligence source:
 
-- runtime events, control artifacts, autonomy lineage, benchmark outcomes, replayable tool traces, adversarial prompts, and policy-aware evaluation harnesses
+- runtime events, control artifacts, autonomy lineage, benchmark outcomes, replayable tool traces, deterministic claim scoring, adversarial prompts, and policy-aware evaluation harnesses
 
 Fallback rule:
 
-- if richer trace sinks or external observability adapters are unavailable, Relaytic must still write the same canonical local trace and evaluation artifacts on disk
+- if richer trace sinks, semantic helpers, or external observability adapters are unavailable, Relaytic must still write the same canonical local trace, deterministic claim packets, adjudication scorecards, and evaluation artifacts on disk
 
 Required outputs:
 - `trace_model.json`
@@ -1810,6 +1814,9 @@ Required outputs:
 - `tool_trace_log.jsonl`
 - `intervention_trace_log.jsonl`
 - `branch_trace_graph.json`
+- `claim_packet_log.jsonl`
+- `adjudication_scorecard.json`
+- `decision_replay_report.json`
 - `agent_eval_matrix.json`
 - `security_eval_report.json`
 - `red_team_report.json`
@@ -1818,16 +1825,24 @@ Required behavior:
 
 - Slice 12B must treat runtime traces as a first-class local source of truth for replay and comparison rather than a debug side channel
 - trace spans must cover specialist execution, tool calls, intervention handling, branch expansion, retries, and final decisions under one stable schema
+- every specialist contribution that can affect a later decision should be representable as a structured claim packet rather than only prose or implicit artifact precedence
+- the claim packet contract should carry at least `claim_id`, `stage`, `specialist`, `claim_type`, `proposed_action`, `confidence`, `evidence_refs`, `risk_flags`, `assumptions`, `falsifiers`, `policy_constraints`, and `trace_ref`
+- Slice 12B must add one deterministic adjudicator that scores competing claims under an explicit scorecard instead of deciding purely through hidden precedence
+- the adjudication scorecard should score each claim on explicit axes such as empirical support, policy fit, benchmark fit, memory consistency, decision value, uncertainty penalty, risk penalty, cost penalty, and reversibility bonus
+- optional semantic helpers may generate or critique claim packets, but they must not become the final adjudicator
 - evaluation harnesses must cover at least control injection, tool misuse, unsafe branch expansion, and skeptical-override regression
 - security/eval results must be consumable by later dojo, search-controller, and mission-control slices without hand translation
 - any optional observability adapter must remain secondary to the canonical local trace artifacts
+- mission-control should later consume the trace graph and adjudication scorecard directly so humans and agents can see competing proposals, rejected alternatives, and why Relaytic chose the winning claim
 
 Minimum proof:
 
 - one run replayed end to end from the canonical trace artifacts
+- one decision with at least three competing claim packets and one explicit winning claim
+- one higher-confidence claim that still loses because policy, risk, benchmark fit, or decision value says it should lose
 - one adversarial steering case that is rejected and captured in the security-eval report
 - one tool-misuse or unsafe-branch case that fails safely and is recorded in the eval matrix
-- one case where later mission-control or search logic can read the trace graph directly
+- one case where later mission-control or search logic can read the trace graph and adjudication scorecard directly
 
 ## Slice 13 - Search controller, accelerated execution, and distributed local experimentation
 

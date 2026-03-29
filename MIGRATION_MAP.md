@@ -240,6 +240,14 @@ Avoid introducing new references to:
 - introduced MCP-visible dojo inspection and review through `relaytic_show_dojo` and `relaytic_review_dojo`
 - upgraded run-summary and mission-control surfaces so dojo proposal state, validation outcomes, promotion counts, and rollback state remain visible instead of becoming CLI-only side state
 
+### Slice 12A
+
+- introduced the canonical package boundary `src/relaytic/pulse/`
+- introduced artifact boundaries for `pulse_schedule.json`, `pulse_run_report.json`, `pulse_skip_report.json`, `pulse_recommendations.json`, `innovation_watch_report.json`, `challenge_watchlist.json`, `pulse_checkpoint.json`, `memory_compaction_plan.json`, `memory_compaction_report.json`, and `memory_pinning_index.json`
+- introduced public commands `relaytic pulse review` and `relaytic pulse show`
+- introduced MCP-visible pulse inspection and review through `relaytic_show_pulse` and `relaytic_review_pulse`
+- upgraded memory retrieval, run-summary, mission-control, and manifest surfaces so bounded periodic awareness, rowless innovation watch, safe queued follow-up, and memory pinning remain visible instead of becoming sidecar scheduler state
+
 ### Slice 10
 
 - introduced the canonical package boundary `src/relaytic/feedback/`
@@ -337,28 +345,20 @@ Shipped artifact names:
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
 - `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
-- `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
-- `src/relaytic/tracing/` for Slice 12B canonical trace schemas, specialist/tool/intervention/branch traces, and replay/query surfaces
-- `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs
+- `src/relaytic/tracing/` for Slice 12B canonical trace schemas, specialist/tool/intervention/branch traces, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
+- `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, adversarial steering tests, runtime regression packs, and scenario/result matrices
 - `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Reserved future artifact names:
-- `pulse_schedule.json`
-- `pulse_run_report.json`
-- `pulse_skip_report.json`
-- `pulse_recommendations.json`
-- `innovation_watch_report.json`
-- `challenge_watchlist.json`
-- `pulse_checkpoint.json`
-- `memory_compaction_plan.json`
-- `memory_compaction_report.json`
-- `memory_pinning_index.json`
 - `trace_model.json`
 - `trace_span_log.jsonl`
 - `specialist_trace_index.json`
 - `tool_trace_log.jsonl`
 - `intervention_trace_log.jsonl`
 - `branch_trace_graph.json`
+- `claim_packet_log.jsonl`
+- `adjudication_scorecard.json`
+- `decision_replay_report.json`
 - `agent_eval_matrix.json`
 - `security_eval_report.json`
 - `red_team_report.json`

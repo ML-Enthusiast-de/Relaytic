@@ -286,6 +286,24 @@ def render_dojo_review_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_dojo_review_markdown(*args, **kwargs)
 
 
+def run_pulse_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.pulse import run_pulse_review as _run_pulse_review
+
+    return _run_pulse_review(*args, **kwargs)
+
+
+def read_pulse_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.pulse import read_pulse_bundle as _read_pulse_bundle
+
+    return _read_pulse_bundle(*args, **kwargs)
+
+
+def render_pulse_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.pulse import render_pulse_review_markdown as _render_pulse_review_markdown
+
+    return _render_pulse_review_markdown(*args, **kwargs)
+
+
 def run_mission_control_review(*args: Any, **kwargs: Any) -> Any:
     from relaytic.mission_control import run_mission_control_review as _run_mission_control_review
 
@@ -1527,6 +1545,40 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    pulse_surface = sub.add_parser(
+        "pulse",
+        help="Run or inspect Slice 12A lab pulse artifacts for periodic awareness, watchlists, and bounded follow-up.",
+    )
+    pulse_sub = pulse_surface.add_subparsers(dest="pulse_command", required=True)
+
+    pulse_review = pulse_sub.add_parser(
+        "review",
+        help="Execute Slice 12A pulse review for an existing run and record explicit skip/recommend/action artifacts.",
+    )
+    pulse_review.add_argument("--run-dir", required=True, help="Run directory for Slice 12A pulse artifacts.")
+    pulse_review.add_argument("--config", default=None, help="Optional config/policy source.")
+    pulse_review.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    pulse_review.add_argument("--overwrite", action="store_true", help="Allow overwriting existing pulse artifacts.")
+    pulse_review.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    pulse_review.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    pulse_show = pulse_sub.add_parser(
+        "show",
+        help="Render the current Slice 12A pulse artifacts for a run.",
+    )
+    pulse_show.add_argument("--run-dir", required=True, help="Run directory containing Slice 12A pulse artifacts.")
+    pulse_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     feedback_surface = sub.add_parser(
         "feedback",
         help="Record, review, rollback, or inspect Slice 10 feedback and downstream outcome artifacts.",
@@ -2719,6 +2771,41 @@ def main(argv: list[str] | None = None) -> int:
         try:
             labels = _parse_key_value_pairs(args.label)
             payload = _run_dojo_phase(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "pulse":
+        if args.pulse_command == "show":
+            try:
+                payload = _show_pulse_surface(run_dir=args.run_dir)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.pulse_command != "review":
+            parser.error("Unsupported pulse subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_pulse_phase(
                 run_dir=args.run_dir,
                 config_path=args.config,
                 run_id=args.run_id,
@@ -5522,6 +5609,8 @@ def _show_mission_control_surface(
     onboarding = dict(bundle.get("onboarding_status", {}))
     launch = dict(bundle.get("launch_manifest", {}))
     onboarding_session = dict(bundle.get("onboarding_chat_session_state", {}))
+    pulse = read_run_summary(run_dir).get("pulse", {}) if run_dir is not None else {}
+    pulse = dict(pulse) if isinstance(pulse, dict) else {}
     return {
         "surface_payload": {
             "status": "ok",
@@ -5558,6 +5647,9 @@ def _show_mission_control_surface(
                 "capability_manifest_status": capabilities.get("status"),
                 "action_affordances_status": affordances.get("status"),
                 "question_starters_status": questions.get("status"),
+                "pulse_status": pulse.get("status"),
+                "pulse_mode": pulse.get("mode"),
+                "pulse_queued_action_count": pulse.get("queued_action_count"),
             },
             "bundle": bundle,
         },
@@ -5612,6 +5704,8 @@ def _launch_mission_control_surface(
     navigator = dict(bundle.get("stage_navigator", {}))
     questions = dict(bundle.get("question_starters", {}))
     onboarding = dict(bundle.get("onboarding_status", {}))
+    pulse = read_run_summary(run_dir).get("pulse", {}) if run_dir is not None else {}
+    pulse = dict(pulse) if isinstance(pulse, dict) else {}
     return {
         "surface_payload": {
             "status": "ok",
@@ -5643,6 +5737,9 @@ def _launch_mission_control_surface(
                 "capability_manifest_status": capabilities.get("status"),
                 "action_affordances_status": affordances.get("status"),
                 "question_starters_status": questions.get("status"),
+                "pulse_status": pulse.get("status"),
+                "pulse_mode": pulse.get("mode"),
+                "pulse_queued_action_count": pulse.get("queued_action_count"),
             },
             "bundle": bundle,
         },
@@ -6213,6 +6310,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.dojo import read_dojo_bundle
 
         return read_dojo_bundle(run_dir)
+    if bundle == "pulse":
+        from relaytic.pulse import read_pulse_bundle
+
+        return read_pulse_bundle(run_dir)
     if bundle == "feedback":
         from relaytic.feedback import read_feedback_bundle
 
@@ -7857,6 +7958,153 @@ def _show_dojo_surface(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _run_pulse_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+) -> dict[str, Any]:
+    from relaytic.pulse import write_pulse_bundle
+
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    effective_policy_source: str | Path = foundation_state["policy_path"]
+    if config_path:
+        resolved_override = load_policy(config_path)
+        effective_policy = resolved_override.policy
+        effective_policy_source = config_path
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=effective_policy,
+        stage="pulse",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "run_summary.json",
+            "benchmark_parity_report.json",
+            "research_source_inventory.json",
+            "control_injection_audit.json",
+            "memory_retrieval.json",
+            "dojo_session.json",
+        ],
+    )
+    try:
+        pulse_result = run_pulse_review(
+            run_dir=root,
+            policy=effective_policy,
+            trigger_kind="manual",
+        )
+        written = write_pulse_bundle(root, bundle=pulse_result.bundle)
+        manifest_path = _refresh_pulse_manifest(
+            root,
+            run_id=run_id,
+            policy_source=effective_policy_source,
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=effective_policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic pulse inspected local state, wrote explicit skip/recommend/action artifacts, and only performed bounded low-risk follow-up when policy allowed it.",
+        )
+        summary_bundle = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        run_report = pulse_result.bundle.pulse_run_report
+        skip_report = pulse_result.bundle.pulse_skip_report
+        recommendations = pulse_result.bundle.pulse_recommendations
+        innovation = pulse_result.bundle.innovation_watch_report
+        watchlist = pulse_result.bundle.challenge_watchlist
+        compaction = pulse_result.bundle.memory_compaction_report
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "pulse": {
+                    "status": run_report.status,
+                    "mode": pulse_result.bundle.pulse_schedule.mode,
+                    "skip_reason": skip_report.skip_reason,
+                    "recommendation_count": run_report.recommendation_count,
+                    "watchlist_count": run_report.watchlist_count,
+                    "innovation_lead_count": run_report.innovation_lead_count,
+                    "queued_action_count": len(recommendations.queued_actions),
+                    "executed_action_count": len(run_report.executed_actions),
+                    "memory_pinned_count": run_report.memory_pinned_count,
+                    "redacted_innovation": not innovation.raw_rows_exported and not innovation.identifier_leak_detected,
+                    "compaction_executed": compaction.executed,
+                    "top_watch_kind": (watchlist.items[0].get("watch_kind") if watchlist.items else None),
+                },
+                "bundle": pulse_result.bundle.to_dict(),
+                "run_summary": summary_bundle["summary"],
+            },
+            "human_output": pulse_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=effective_policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_pulse_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="pulse")
+    if not bundle:
+        raise ValueError(f"No Slice 12A pulse artifacts found in {root}.")
+    materialize_run_summary(run_dir=root)
+    manifest_path = _refresh_pulse_manifest(root)
+    schedule = dict(bundle.get("pulse_schedule", {}))
+    run_report = dict(bundle.get("pulse_run_report", {}))
+    skip_report = dict(bundle.get("pulse_skip_report", {}))
+    recommendations = dict(bundle.get("pulse_recommendations", {}))
+    innovation = dict(bundle.get("innovation_watch_report", {}))
+    watchlist = dict(bundle.get("challenge_watchlist", {}))
+    compaction = dict(bundle.get("memory_compaction_report", {}))
+    pinning = dict(bundle.get("memory_pinning_index", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "pulse": {
+                "status": run_report.get("status"),
+                "mode": schedule.get("mode"),
+                "skip_reason": skip_report.get("skip_reason"),
+                "due_now": schedule.get("due_now"),
+                "throttled": schedule.get("throttled"),
+                "recommendation_count": run_report.get("recommendation_count"),
+                "watchlist_count": run_report.get("watchlist_count"),
+                "innovation_lead_count": run_report.get("innovation_lead_count"),
+                "queued_action_count": len(recommendations.get("queued_actions", []))
+                if isinstance(recommendations.get("queued_actions"), list)
+                else 0,
+                "memory_pinned_count": pinning.get("pin_count"),
+                "compaction_executed": compaction.get("executed"),
+                "redacted_innovation": not bool(innovation.get("raw_rows_exported")) and not bool(innovation.get("identifier_leak_detected")),
+            },
+            "bundle": bundle,
+        },
+        "human_output": render_pulse_review_markdown(bundle),
+    }
+
+
 def _run_dojo_rollback(
     *,
     run_dir: str | Path,
@@ -9281,6 +9529,21 @@ def _dojo_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _pulse_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "pulse_schedule": run_dir / "pulse_schedule.json",
+        "pulse_run_report": run_dir / "pulse_run_report.json",
+        "pulse_skip_report": run_dir / "pulse_skip_report.json",
+        "pulse_recommendations": run_dir / "pulse_recommendations.json",
+        "innovation_watch_report": run_dir / "innovation_watch_report.json",
+        "challenge_watchlist": run_dir / "challenge_watchlist.json",
+        "pulse_checkpoint": run_dir / "pulse_checkpoint.json",
+        "memory_compaction_plan": run_dir / "memory_compaction_plan.json",
+        "memory_compaction_report": run_dir / "memory_compaction_report.json",
+        "memory_pinning_index": run_dir / "memory_pinning_index.json",
+    }
+
+
 def _feedback_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "feedback_intake": run_dir / "feedback_intake.json",
@@ -10529,6 +10792,9 @@ def _refresh_mission_control_manifest(
     for path in _dojo_output_paths(root).values():
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="dojo", required=True))
+    for path in _pulse_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="pulse", required=True))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:
@@ -10580,6 +10846,57 @@ def _refresh_dojo_manifest(
     for path in _dojo_output_paths(root).values():
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="dojo", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_pulse_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_dojo_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _pulse_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="pulse", required=True))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:

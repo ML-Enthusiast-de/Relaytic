@@ -98,6 +98,7 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     decision_cfg = dict(config.get("decision", {}))
     mission_control_cfg = dict(config.get("mission_control", {}))
     dojo_cfg = dict(config.get("dojo", {}))
+    pulse_cfg = dict(config.get("pulse", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
     contact_email = research_cfg.get("contact_email", "")
     if contact_email is None:
@@ -357,6 +358,19 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "require_quality_proxy_gate": bool(dojo_cfg.get("require_quality_proxy_gate", True)),
             "require_control_security_gate": bool(dojo_cfg.get("require_control_security_gate", True)),
             "max_active_promotions": int(dojo_cfg.get("max_active_promotions", 3) or 3),
+        },
+        "pulse": {
+            "enabled": bool(pulse_cfg.get("enabled", True)),
+            "mode": str(pulse_cfg.get("mode", "propose_only") or "propose_only"),
+            "schedule_minutes": int(pulse_cfg.get("schedule_minutes", 1440) or 1440),
+            "throttle_minutes": int(pulse_cfg.get("throttle_minutes", 60) or 60),
+            "allow_innovation_watch": bool(pulse_cfg.get("allow_innovation_watch", True)),
+            "allow_memory_maintenance": bool(pulse_cfg.get("allow_memory_maintenance", True)),
+            "allow_queue_refresh": bool(pulse_cfg.get("allow_queue_refresh", True)),
+            "max_watchlist_items": int(pulse_cfg.get("max_watchlist_items", 4) or 4),
+            "max_recommendations": int(pulse_cfg.get("max_recommendations", 4) or 4),
+            "max_bounded_actions": int(pulse_cfg.get("max_bounded_actions", 1) or 1),
+            "require_rowless_innovation": bool(pulse_cfg.get("require_rowless_innovation", True)),
         },
         "hpo": {
             "backend": str(modeling_cfg.get("optimizer", "optuna_or_flaml")),

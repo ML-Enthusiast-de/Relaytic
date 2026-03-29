@@ -1100,6 +1100,7 @@ def _build_cards(
     benchmark = dict(summary_payload.get("benchmark", {}))
     decision_lab = dict(summary_payload.get("decision_lab", {}))
     dojo = dict(summary_payload.get("dojo", {}))
+    pulse = dict(summary_payload.get("pulse", {}))
     contracts = dict(summary_payload.get("contracts", {}))
     runtime = dict(summary_payload.get("runtime", {}))
     next_step = dict(summary_payload.get("next_step", {}))
@@ -1148,6 +1149,17 @@ def _build_cards(
             "value": _clean_text(dojo.get("status")) or "not_reviewed",
             "detail": f"Promotions `{dojo.get('active_promotion_count', 0)}` | rejected `{dojo.get('rejected_count', 0)}` | benchmark `{dojo.get('benchmark_state') or 'unknown'}`",
             "severity": "medium" if _clean_text(dojo.get("control_security_state")) == "fail" else "normal",
+        },
+        {
+            "card_id": "pulse",
+            "title": "Pulse",
+            "value": _clean_text(pulse.get("status")) or "not_run",
+            "detail": (
+                f"Mode `{pulse.get('mode') or 'unknown'}`"
+                f" | queued `{pulse.get('queued_action_count', 0)}`"
+                f" | leads `{pulse.get('innovation_lead_count', 0)}`"
+            ),
+            "severity": "medium" if _clean_text(pulse.get("skip_reason")) in {"pulse_disabled_by_policy", "pulse_throttled"} else "normal",
         },
         {
             "card_id": "assist_control",
@@ -1239,6 +1251,7 @@ def _build_capability_manifest(
     assist_state = dict(assist_bundle.get("assist_session_state", {}))
     guide = dict(assist_bundle.get("assistant_connection_guide", {}))
     benchmark = dict(summary_payload.get("benchmark", {}))
+    pulse = dict(summary_payload.get("pulse", {}))
     profiles = dict(summary_payload.get("profiles", {}))
     runtime = dict(summary_payload.get("runtime", {}))
     data = dict(summary_payload.get("data", {}))
@@ -1415,6 +1428,7 @@ def _build_action_affordances(
     assist_state = dict(assist_bundle.get("assist_session_state", {}))
     next_step = dict(summary_payload.get("next_step", {}))
     benchmark = dict(summary_payload.get("benchmark", {}))
+    pulse = dict(summary_payload.get("pulse", {}))
     if _is_onboarding_state(summary_payload):
         actions = [
             {
@@ -1586,6 +1600,16 @@ def _build_action_affordances(
                 "challenge_level": "low",
                 "detail": str(next_step.get("rationale", "")).strip() or "Relaytic has a bounded next action ready.",
                 "command_hint": f"relaytic show --run-dir {run_dir} --format json",
+            }
+        )
+    if pulse:
+        actions.append(
+            {
+                "action_id": "review_pulse",
+                "title": "Review The Lab Pulse",
+                "challenge_level": "low",
+                "detail": "Inspect the latest pulse status, watchlist, innovation leads, and any bounded queued follow-up.",
+                "command_hint": f"relaytic pulse show --run-dir {run_dir}",
             }
         )
     return ActionAffordances(

@@ -155,17 +155,17 @@ Reason:
 - Slice 11G is now implemented and makes that first-contact flow much more human-tolerant by adding adaptive onboarding capture, visible onboarding session state, explicit analysis-first versus governed-run routing, lightweight local semantic rescue for messy input, and full-install local-helper provisioning
 - Slice 12 is now implemented and gives Relaytic a guarded dojo layer with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, architecture-proposal quarantine, and mission-control visibility
 - Slice 12A should come after dojo because periodic awareness and bounded background follow-up are much safer once self-improvement already has quarantine and promotion rules
-- Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because Relaytic needs one canonical trace substrate plus explicit agent/security evaluation before wider search and full trace-explorer claims become credible
+- Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because Relaytic needs one canonical trace substrate, explicit competing-claim/adjudication contracts, and agent/security evaluation before wider search and full trace-explorer claims become credible
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:
 
-- implemented through Slice 12, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, and Slice 12 guarded dojo review now landed
-- next execution target: Slice 12A
-- next pulse follow-on: Slice 12A
+- implemented through Slice 12A, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, and Slice 12A lab pulse now landed
+- next execution target: Slice 12B
+- latest landed pulse slice: Slice 12A
 - next trace-and-safety follow-on after Slice 12A: Slice 12B
 - next scale-and-search follow-on after Slice 12B: Slice 13
-- after Slice 12, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, and dojo-visibility surfaces rather than leaving the UI stale until late polish
+- after Slice 12A, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, and pulse-visibility surfaces rather than leaving the UI stale until late polish
 
 ## MVP boundary
 
@@ -217,7 +217,6 @@ If the goal is to turn the current implementation into something that looks genu
 - imported-incumbent challenge paths so Relaytic can beat real existing systems instead of only abstract baselines
 - a first-class trace model across specialists, tools, interventions, and branches so Relaytic can replay and compare complex multi-stage behavior from one runtime truth
 - runtime agent/security harnesses that test control injection, tool misuse, branch-controller safety, and skeptical override behavior before broader autonomy becomes default
-- a lab pulse that can periodically inspect local state, benchmark debt, research freshness, and memory health, then queue bounded safe follow-up without unsupervised drift
 - outcome learning rather than run-only learning
 - a richer long-term memory stack with retention, compaction, pinning, and replay rules so later specialists inherit durable lessons instead of analog hints alone
 - richer data-fabric reasoning that can suggest joins, entity histories, or additional data before wasting search budget

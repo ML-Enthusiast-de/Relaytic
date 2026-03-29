@@ -181,7 +181,15 @@ def discover_backend(
 
     config = load_config(config_path)
     if "policy" in config and isinstance(config.get("policy"), dict):
-        config = dict(config["policy"])
+        merged_config = dict(config["policy"])
+        for key, value in dict(config).items():
+            if key == "policy":
+                continue
+            if key not in merged_config:
+                merged_config[key] = value
+            elif isinstance(merged_config.get(key), dict) and isinstance(value, dict):
+                merged_config[key] = {**dict(value), **dict(merged_config[key])}
+        config = merged_config
     policy = apply_environment_overrides(load_runtime_policy(config))
     runtime_cfg = dict(config.get("runtime", {}))
     requested_provider = str(runtime_cfg.get("provider", policy.provider)).strip() or str(policy.provider).strip()

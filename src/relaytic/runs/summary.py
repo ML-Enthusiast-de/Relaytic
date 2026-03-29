@@ -175,6 +175,21 @@ def build_run_summary(
             "architecture_proposals": "architecture_proposals.json",
         },
     )
+    pulse_bundle = _read_bundle(
+        root,
+        {
+            "pulse_schedule": "pulse_schedule.json",
+            "pulse_run_report": "pulse_run_report.json",
+            "pulse_skip_report": "pulse_skip_report.json",
+            "pulse_recommendations": "pulse_recommendations.json",
+            "innovation_watch_report": "innovation_watch_report.json",
+            "challenge_watchlist": "challenge_watchlist.json",
+            "pulse_checkpoint": "pulse_checkpoint.json",
+            "memory_compaction_plan": "memory_compaction_plan.json",
+            "memory_compaction_report": "memory_compaction_report.json",
+            "memory_pinning_index": "memory_pinning_index.json",
+        },
+    )
     feedback_bundle = _read_bundle(
         root,
         {
@@ -312,6 +327,14 @@ def build_run_summary(
     dojo_results = _bundle_item(dojo_bundle, "dojo_results")
     dojo_promotions = _bundle_item(dojo_bundle, "dojo_promotions")
     architecture_proposals = _bundle_item(dojo_bundle, "architecture_proposals")
+    pulse_schedule = _bundle_item(pulse_bundle, "pulse_schedule")
+    pulse_run_report = _bundle_item(pulse_bundle, "pulse_run_report")
+    pulse_skip_report = _bundle_item(pulse_bundle, "pulse_skip_report")
+    pulse_recommendations = _bundle_item(pulse_bundle, "pulse_recommendations")
+    innovation_watch_report = _bundle_item(pulse_bundle, "innovation_watch_report")
+    challenge_watchlist = _bundle_item(pulse_bundle, "challenge_watchlist")
+    memory_compaction_report = _bundle_item(pulse_bundle, "memory_compaction_report")
+    memory_pinning_index = _bundle_item(pulse_bundle, "memory_pinning_index")
     feedback_intake = _bundle_item(feedback_bundle, "feedback_intake")
     feedback_validation = _bundle_item(feedback_bundle, "feedback_validation")
     feedback_effect_report = _bundle_item(feedback_bundle, "feedback_effect_report")
@@ -397,6 +420,7 @@ def build_run_summary(
             benchmark_bundle=benchmark_bundle,
             decision_bundle=decision_bundle,
             dojo_bundle=dojo_bundle,
+            pulse_bundle=pulse_bundle,
             profiles_bundle=profiles_bundle,
             feedback_bundle=feedback_bundle,
             control_bundle=control_bundle,
@@ -606,6 +630,29 @@ def build_run_summary(
             ][:5],
             "architecture_proposal_count": int(architecture_proposals.get("proposal_count", 0) or 0),
         },
+        "pulse": {
+            "status": _clean_text(pulse_run_report.get("status")),
+            "mode": _clean_text(pulse_schedule.get("mode")),
+            "skip_reason": _clean_text(pulse_skip_report.get("skip_reason")),
+            "due_now": pulse_schedule.get("due_now"),
+            "throttled": pulse_schedule.get("throttled"),
+            "queued_action_count": len(pulse_recommendations.get("queued_actions", []))
+            if isinstance(pulse_recommendations.get("queued_actions"), list)
+            else 0,
+            "recommendation_count": int(pulse_run_report.get("recommendation_count", 0) or 0),
+            "watchlist_count": int(pulse_run_report.get("watchlist_count", 0) or 0),
+            "innovation_lead_count": int(pulse_run_report.get("innovation_lead_count", 0) or 0),
+            "memory_pinned_count": int(memory_pinning_index.get("pin_count", 0) or 0),
+            "compaction_executed": memory_compaction_report.get("executed"),
+            "redacted_innovation": not bool(innovation_watch_report.get("raw_rows_exported"))
+            and not bool(innovation_watch_report.get("identifier_leak_detected")),
+            "top_watch_kind": (
+                challenge_watchlist.get("items", [])[0].get("watch_kind")
+                if isinstance(challenge_watchlist.get("items"), list) and challenge_watchlist.get("items")
+                and isinstance(challenge_watchlist.get("items")[0], dict)
+                else None
+            ),
+        },
         "feedback": {
             "status": _clean_text(feedback_effect_report.get("status")) or _clean_text(feedback_validation.get("status")) or _clean_text(feedback_intake.get("status")),
             "accepted_count": int(feedback_validation.get("accepted_count", 0) or 0),
@@ -792,6 +839,14 @@ def build_run_summary(
             "dojo_results_path": _path_if_exists(root / "dojo_results.json"),
             "dojo_promotions_path": _path_if_exists(root / "dojo_promotions.json"),
             "architecture_proposals_path": _path_if_exists(root / "architecture_proposals.json"),
+            "pulse_schedule_path": _path_if_exists(root / "pulse_schedule.json"),
+            "pulse_run_report_path": _path_if_exists(root / "pulse_run_report.json"),
+            "pulse_skip_report_path": _path_if_exists(root / "pulse_skip_report.json"),
+            "pulse_recommendations_path": _path_if_exists(root / "pulse_recommendations.json"),
+            "innovation_watch_report_path": _path_if_exists(root / "innovation_watch_report.json"),
+            "challenge_watchlist_path": _path_if_exists(root / "challenge_watchlist.json"),
+            "memory_compaction_report_path": _path_if_exists(root / "memory_compaction_report.json"),
+            "memory_pinning_index_path": _path_if_exists(root / "memory_pinning_index.json"),
             "feedback_effect_report_path": _path_if_exists(root / "feedback_effect_report.json"),
             "feedback_casebook_path": _path_if_exists(root / "feedback_casebook.json"),
             "quality_contract_path": _path_if_exists(root / "quality_contract.json"),
@@ -823,6 +878,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     benchmark = dict(summary.get("benchmark", {}))
     decision_lab = dict(summary.get("decision_lab", {}))
     dojo = dict(summary.get("dojo", {}))
+    pulse = dict(summary.get("pulse", {}))
     feedback = dict(summary.get("feedback", {}))
     contracts = dict(summary.get("contracts", {}))
     profiles = dict(summary.get("profiles", {}))
@@ -1022,6 +1078,27 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         categories = [str(item).strip() for item in dojo.get("active_categories", []) if str(item).strip()]
         if categories:
             lines.append(f"- Active categories: `{', '.join(categories)}`")
+    if pulse and any(value not in (None, 0, False, "", []) for value in pulse.values()):
+        lines.extend(
+            [
+                "",
+                "## Pulse",
+                f"- Status: `{pulse.get('status') or 'unknown'}`",
+                f"- Mode: `{pulse.get('mode') or 'unknown'}`",
+                f"- Skip reason: `{pulse.get('skip_reason') or 'none'}`",
+                f"- Due now: `{pulse.get('due_now')}`",
+                f"- Throttled: `{pulse.get('throttled')}`",
+                f"- Recommendations: `{pulse.get('recommendation_count', 0)}`",
+                f"- Watchlist items: `{pulse.get('watchlist_count', 0)}`",
+                f"- Innovation leads: `{pulse.get('innovation_lead_count', 0)}`",
+                f"- Queued actions: `{pulse.get('queued_action_count', 0)}`",
+                f"- Memory pinned: `{pulse.get('memory_pinned_count', 0)}`",
+                f"- Compaction executed: `{pulse.get('compaction_executed')}`",
+                f"- Redacted innovation: `{pulse.get('redacted_innovation')}`",
+            ]
+        )
+        if pulse.get("top_watch_kind"):
+            lines.append(f"- Top watch kind: `{pulse.get('top_watch_kind')}`")
     if feedback and any(value not in (None, 0, False, "", []) for value in feedback.values()):
         lines.extend(
             [
@@ -1199,7 +1276,7 @@ def _read_bundle(root: Path, mapping: dict[str, str]) -> dict[str, Any]:
     return {
         key: payload
         for key, filename in mapping.items()
-        if isinstance((payload := _read_json(root / filename)), dict)
+        if isinstance((payload := _read_json(root / filename)), dict) and payload
     }
 
 
@@ -1277,6 +1354,7 @@ def _resolve_stage(
     benchmark_bundle: dict[str, Any],
     decision_bundle: dict[str, Any],
     dojo_bundle: dict[str, Any],
+    pulse_bundle: dict[str, Any],
     profiles_bundle: dict[str, Any],
     feedback_bundle: dict[str, Any],
     control_bundle: dict[str, Any],
@@ -1284,6 +1362,8 @@ def _resolve_stage(
     lifecycle_bundle: dict[str, Any],
     autonomy_bundle: dict[str, Any],
 ) -> str:
+    if pulse_bundle:
+        return "pulse_reviewed"
     if dojo_bundle:
         return "dojo_reviewed"
     if any(isinstance(value, dict) and value for value in feedback_bundle.values()):
@@ -1321,6 +1401,15 @@ def _resolve_stage(
 
 
 def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: str) -> str | None:
+    if any(
+        (root / filename).exists()
+        for filename in (
+            "pulse_run_report.json",
+            "pulse_schedule.json",
+            "challenge_watchlist.json",
+        )
+    ):
+        return "pulse"
     if any(
         (root / filename).exists()
         for filename in (

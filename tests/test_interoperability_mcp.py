@@ -110,6 +110,22 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         assert decision_payload["surface_payload"]["status"] == "ok"
                         assert decision_payload["surface_payload"]["decision_lab"]["selected_next_action"] is not None
 
+                        pulse_review_result = await session.call_tool(
+                            "relaytic_review_pulse",
+                            {"run_dir": str(run_dir), "overwrite": True},
+                        )
+                        pulse_review_payload = _structured_payload(pulse_review_result)
+                        assert pulse_review_payload["surface_payload"]["status"] == "ok"
+                        assert pulse_review_payload["surface_payload"]["pulse"]["status"] in {"ok", "skipped"}
+
+                        pulse_show_result = await session.call_tool(
+                            "relaytic_show_pulse",
+                            {"run_dir": str(run_dir)},
+                        )
+                        pulse_show_payload = _structured_payload(pulse_show_result)
+                        assert pulse_show_payload["surface_payload"]["status"] == "ok"
+                        assert pulse_show_payload["surface_payload"]["pulse"]["mode"] is not None
+
                         autonomy_result = await session.call_tool(
                             "relaytic_show_autonomy",
                             {"run_dir": str(run_dir)},

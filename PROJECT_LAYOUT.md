@@ -76,6 +76,7 @@ Relaytic/
       modeling/
       planning/
       policies/
+      pulse/
       runs/
       runtime/
       mission_control/
@@ -119,6 +120,7 @@ Relaytic/
 - `src/relaytic/decision/` owns decision-world models, controller policies, intervention-policy reports, decision-usefulness synthesis, and value-of-more-data reasoning
 - `src/relaytic/data_fabric/` owns source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/dojo/` owns guarded self-improvement review, quarantined proposal bundles, validation results, promotion ledgers, rollback state, and architecture-proposal quarantine
+- `src/relaytic/pulse/` owns periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
 - `src/relaytic/assist/` owns communicative assistance, stage navigation, bounded takeover, and connection-guide persistence
 - `src/relaytic/interoperability/` owns MCP serving, host-bundle generation, and interoperability self-checks
 - `src/relaytic/integrations/` owns optional-library discovery, compatibility self-checks, and adapter-scoped capability inventory
@@ -155,12 +157,12 @@ Relaytic/
 - `src/relaytic/data_fabric/` owns Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, launch metadata, review-queue state, static control-center rendering, Slice 11C clarity artifacts for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding/live-chat behavior, Slice 11E handbook discovery/onboarding behavior, Slice 11F demo flow/mode education/stuck-recovery behavior, Slice 11G adaptive onboarding/session-capture/lightweight-local-semantic behavior, and the shared operator cockpit surface
 - `src/relaytic/dojo/` owns Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and architecture-proposal quarantine
+- `src/relaytic/pulse/` owns Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, memory-maintenance orchestration, and mission-control-visible pulse artifacts
 
 Reserved future boundaries:
 
-- `src/relaytic/pulse/` should own periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
-- `src/relaytic/tracing/` should own canonical trace schemas, specialist/tool/intervention/branch trace persistence, and replay/query surfaces
-- `src/relaytic/evals/` should own agent-behavior evaluation, security harnesses, adversarial steering tests, and runtime regression packs
+- `src/relaytic/tracing/` should own canonical trace schemas, specialist/tool/intervention/branch trace persistence, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces for Slice 12B
+- `src/relaytic/evals/` should own agent-behavior evaluation, security harnesses, adversarial steering tests, runtime regression packs, and scenario/result matrices for Slice 12B
 - `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 ## Naming Rule

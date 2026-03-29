@@ -4,8 +4,8 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 12, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, and Slice 11G adaptive human onboarding with lightweight local semantic guidance
-- next recommended slice: 12A, lab pulse, periodic awareness, and bounded proactive follow-up
+- completed slices: 00 through 12A, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, and Slice 11G adaptive human onboarding with lightweight local semantic guidance
+- next recommended slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - next trace-and-safety follow-on after 12A: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
@@ -67,6 +67,7 @@ The repository currently supports:
 - adaptive human onboarding with visible captured chat state, dataset-path detection, explicit objective-family routing for quick analysis-first versus full governed-run requests, objective capture, confirmation-before-run behavior, direct analysis-first handling for lightweight exploratory requests, and bounded local semantic extraction for messy first-contact human input
 - full-profile bootstrap that now attempts to provision a lightweight CPU-safe onboarding model so mission-control chat can be more forgiving without changing deterministic run control
 - explicit dojo review via `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`, with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, and mission-control visibility
+- explicit lab pulse review via `relaytic pulse review` and `relaytic pulse show`, with bounded schedule/skip reporting, rowless innovation watch, challenge watchlists, safe queued follow-up, memory compaction reports, pulse checkpointing, and mission-control visibility
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement
@@ -86,8 +87,7 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
-- a lab pulse that can periodically inspect local state, watch for new relevant methods or benchmark debt, and queue bounded safe follow-up without silent drift
-- a first-class trace model across specialists, tools, interventions, and branches so Relaytic can replay and compare multi-stage behavior from one runtime truth
+- a first-class trace model across specialists, tools, interventions, and branches so Relaytic can replay and compare multi-stage behavior from one runtime truth, while scoring competing specialist claims under an explicit adjudication contract
 - runtime evaluator and security harnesses that test skeptical control, tool safety, branch-controller safety, and adversarial steering before broader autonomy is trusted
 - richer long-term memory with retention, compaction, pinning, and replay rules so durable lessons survive beyond analog similarity
 - stronger dynamic controller logic that decides who should act next, how deep to branch, and when review is worth it under explicit contracts
@@ -369,6 +369,17 @@ The most important not-yet-implemented shifts after the current baseline are:
 - extended run summary, mission-control, and MCP/service surfaces so dojo posture is visible instead of CLI-only side state
 - added targeted Slice 12 agent, CLI, mission-control, interoperability, and doctor-adjacent verification
 
+### Slice 12A
+
+- added `src/relaytic/pulse/` with typed periodic-awareness controls, rowless innovation-watch reporting, challenge watchlists, pulse checkpoints, memory-compaction planning, memory-pinning state, and storage helpers
+- added `relaytic pulse review` and `relaytic pulse show`
+- added `pulse_schedule.json`, `pulse_run_report.json`, `pulse_skip_report.json`, `pulse_recommendations.json`, `innovation_watch_report.json`, `challenge_watchlist.json`, `pulse_checkpoint.json`, `memory_compaction_plan.json`, `memory_compaction_report.json`, and `memory_pinning_index.json`
+- implemented disabled, observe-only, propose-only, and bounded-execute pulse behavior with honest skip/throttle reporting and no silent core-contract mutation
+- kept innovation watch rowless and redacted while still surfacing method-transfer, benchmark-gap, and compiled-local leads when current artifacts justify them
+- extended memory retrieval so pulse-pinned memory cues can materially influence later analog ordering instead of staying decorative
+- extended run summary, mission-control, CLI, and MCP/service surfaces so pulse posture, queued actions, innovation leads, and memory maintenance remain visible instead of becoming background scheduler state
+- added targeted Slice 12A agent, CLI, memory, interoperability, and MCP verification, plus regression checks for stage-resolution and policy/config merging
+
 ### Cross-Cutting Hardening
 
 - added `src/relaytic/integrations/` as the canonical optional-library discovery boundary
@@ -406,10 +417,9 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-With Slice 11G and Slice 12 now landed, the next high-leverage frontier follow-ons are:
+With Slice 11G, Slice 12, and Slice 12A now landed, the next high-leverage frontier follow-ons are:
 
-- Slice 12A lab pulse, periodic awareness, and bounded proactive follow-up
 - Slice 12B first-class tracing, agent evaluation, and runtime security harnesses
 - Slice 13 search-controller depth, accelerated execution, and distributed local experimentation under explicit value and budget contracts
-- richer long-term memory compaction, pinning, and replay rules that build on the shipped causal and dojo ledgers
+- richer long-term memory compaction, pinning, and replay rules that build on the shipped causal, dojo, and pulse-maintenance ledgers
 - later Slice 15 remote connector adapters for Kafka-style streams, object-store Parquet, and warehouse reads, but only through read-only materialization into immutable run-local snapshots

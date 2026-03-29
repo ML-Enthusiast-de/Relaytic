@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 Intended package boundary:
 
@@ -20,6 +20,16 @@ Intended artifacts:
 - `memory_compaction_plan.json`
 - `memory_compaction_report.json`
 - `memory_pinning_index.json`
+
+Implemented public commands:
+
+- `relaytic pulse review`
+- `relaytic pulse show`
+
+Implemented agent surface:
+
+- `relaytic_review_pulse`
+- `relaytic_show_pulse`
 
 ## Intent
 

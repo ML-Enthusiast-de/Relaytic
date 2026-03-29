@@ -140,6 +140,19 @@ dojo:
   require_control_security_gate: true
   max_active_promotions: 3
 
+pulse:
+  enabled: true
+  mode: propose_only
+  schedule_minutes: 1440
+  throttle_minutes: 60
+  allow_innovation_watch: true
+  allow_memory_maintenance: true
+  allow_queue_refresh: true
+  max_watchlist_items: 4
+  max_recommendations: 4
+  max_bounded_actions: 1
+  require_rowless_innovation: true
+
 research:
   enabled: false
   require_redaction_default: true

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
@@ -247,3 +249,69 @@ def test_run_completion_review_respects_memory_attempt_and_flushes_reflection(tm
     assert Path(written["memory_flush_report"]).exists()
     assert result.bundle.completion_decision.action == "continue_experimentation"
     assert result.bundle.completion_decision.blocking_layer != "missing_memory_support"
+
+
+def test_run_memory_retrieval_prefers_pulse_pinned_analogs_when_similarity_is_otherwise_equal(tmp_path: Path) -> None:
+    policy = load_policy().policy
+    data_path = write_public_breast_cancer_dataset(tmp_path / "breast_cancer_for_pinning.csv")
+    mandate_bundle, context_bundle = _build_binary_foundation(policy)
+    investigation_bundle = run_investigation(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+    ).to_dict()
+
+    unpinned_dir = tmp_path / "analog_unpinned"
+    pinned_dir = tmp_path / "analog_pinned"
+    for run_dir, run_id in [(unpinned_dir, "analog_unpinned"), (pinned_dir, "analog_pinned")]:
+        _write_prior_summary(
+            run_dir,
+            run_id=run_id,
+            domain_archetype=str(
+                investigation_bundle["domain_memo"].get("domain_archetype")
+                or context_bundle["task_brief"].get("domain_archetype_hint")
+                or "generic_tabular"
+            ),
+            row_count=int(investigation_bundle["dataset_profile"]["row_count"]),
+            column_count=int(investigation_bundle["dataset_profile"]["column_count"]),
+            selected_model_family="bagged_tree_classifier",
+            primary_metric=str(investigation_bundle["optimization_profile"]["primary_metric"]),
+            challenger_family="boosted_tree_classifier",
+        )
+    write_json(
+        pinned_dir / "memory_pinning_index.json",
+        {
+            "schema_version": "relaytic.memory_pinning_index.v1",
+            "generated_at": "2026-03-29T00:00:00+00:00",
+            "status": "active",
+            "pin_count": 1,
+            "entries": [
+                {
+                    "pin_id": "pin_0001",
+                    "memory_kind": "harmful_override_pattern",
+                    "pin_reason": "Do not forget this harmful override pattern.",
+                    "retrieval_boost": 0.9,
+                    "source_action": "pin_harmful_override_memory",
+                }
+            ],
+            "retrieval_hint": "Pinned memory should influence later analog ordering.",
+        },
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+
+    memory_result = run_memory_retrieval(
+        run_dir=tmp_path / "current_binary_run_for_pinning",
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        investigation_bundle=investigation_bundle,
+        search_roots=[tmp_path],
+    )
+
+    analogs = memory_result.bundle.analog_run_candidates.candidates
+    assert analogs
+    assert analogs[0]["run_id"] == "analog_pinned"
+    assert analogs[0]["memory_pinning_index"]["pin_count"] == 1

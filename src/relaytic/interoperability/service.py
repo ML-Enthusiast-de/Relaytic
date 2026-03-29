@@ -97,6 +97,12 @@ def relaytic_show_dojo(*, run_dir: str) -> dict[str, Any]:
     return cli._show_dojo_surface(run_dir=run_dir)
 
 
+def relaytic_show_pulse(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 12A pulse surface for a Relaytic run."""
+    cli = _cli()
+    return cli._show_pulse_surface(run_dir=run_dir)
+
+
 def relaytic_get_status(*, run_dir: str) -> dict[str, Any]:
     """Render the completion-governor status for a Relaytic run."""
     cli = _cli()
@@ -428,6 +434,27 @@ def relaytic_review_dojo(
     )
 
 
+def relaytic_review_pulse(
+    *,
+    run_dir: str,
+    config_path: str | None = None,
+    run_id: str | None = None,
+    overwrite: bool = True,
+    labels: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Execute the Slice 12A pulse review for an existing run."""
+    cli = _cli()
+    return cli._run_pulse_phase(
+        run_dir=run_dir,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_review_pulse",
+    )
+
+
 def relaytic_show_decision(*, run_dir: str) -> dict[str, Any]:
     """Render the current Slice 10A decision-lab surface for a run."""
     cli = _cli()
@@ -538,6 +565,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_runtime",
             "relaytic_show_control",
             "relaytic_show_mission_control",
+            "relaytic_show_pulse",
             "relaytic_get_status",
             "relaytic_show_intelligence",
             "relaytic_show_research",
@@ -559,6 +587,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_gather_research",
             "relaytic_run_benchmark",
             "relaytic_review_decision",
+            "relaytic_review_pulse",
             "relaytic_assist_turn",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
@@ -637,6 +666,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_dojo,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_pulse",
+            title="Show Relaytic Pulse",
+            description="Render the current Slice 12A lab pulse surface, including skip reasons, watchlists, innovation leads, and bounded follow-up state for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_pulse,
         ),
         InteropToolSpec(
             name="relaytic_get_status",
@@ -765,6 +802,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_review_dojo,
+        ),
+        InteropToolSpec(
+            name="relaytic_review_pulse",
+            title="Review Pulse",
+            description="Execute the Slice 12A lab pulse review for an existing Relaytic run, writing explicit skip, watchlist, innovation-watch, and bounded follow-up artifacts.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_review_pulse,
         ),
         InteropToolSpec(
             name="relaytic_assist_turn",

@@ -453,6 +453,7 @@ def _discover_candidate_runs(*, current_run_dir: Path, search_roots: list[Path])
                     "summary": summary,
                     "challenger_report": _read_json(run_dir / "challenger_report.json"),
                     "reflection_memory": _read_json(run_dir / "reflection_memory.json"),
+                    "memory_pinning_index": _read_json(run_dir / "memory_pinning_index.json"),
                     "route_prior_updates": _read_json(run_dir / "route_prior_updates.json"),
                     "decision_policy_update_suggestions": _read_json(run_dir / "decision_policy_update_suggestions.json"),
                     "feedback_casebook": _read_json(run_dir / "feedback_casebook.json"),
@@ -546,6 +547,13 @@ def _score_candidate(*, current: dict[str, Any], candidate: dict[str, Any]) -> d
     total_weight += 0.10
     if readiness_bonus >= 0.8:
         reasons.append("prior run ended with strong evidence")
+    pinning_index = dict(candidate.get("memory_pinning_index") or {})
+    pin_boost = _pinning_boost(pinning_index)
+    if pin_boost is not None:
+        score += pin_boost * 0.05
+        total_weight += 0.05
+        if pin_boost >= 0.5:
+            reasons.append("pulse-pinned memory")
     similarity_score = round(score / total_weight, 4) if total_weight > 0.0 else None
     return {
         "run_id": str(summary.get("run_id", "")).strip() or Path(candidate["run_dir"]).name,
@@ -562,6 +570,7 @@ def _score_candidate(*, current: dict[str, Any], candidate: dict[str, Any]) -> d
         },
         "challenger_report": dict(candidate.get("challenger_report") or {}),
         "reflection_memory": dict(candidate.get("reflection_memory") or {}),
+        "memory_pinning_index": pinning_index,
         "route_prior_updates": dict(candidate.get("route_prior_updates") or {}),
         "decision_policy_update_suggestions": dict(candidate.get("decision_policy_update_suggestions") or {}),
         "feedback_casebook": dict(candidate.get("feedback_casebook") or {}),
@@ -602,6 +611,7 @@ def _select_analog_candidates(*, scored_candidates: list[dict[str, Any]], contro
                 },
                 "provenance": dict(item.get("provenance", {})),
                 "reflection_excerpt": _optional_str(dict(item.get("reflection_memory", {})).get("summary")),
+                "memory_pinning_index": dict(item.get("memory_pinning_index") or {}),
                 "challenger_report": dict(item.get("challenger_report") or {}),
                 "route_prior_updates": dict(item.get("route_prior_updates") or {}),
                 "decision_policy_update_suggestions": dict(item.get("decision_policy_update_suggestions") or {}),
@@ -800,6 +810,21 @@ def _memory_outcome_weight(candidate: dict[str, Any]) -> float:
     if _optional_str(outcome.get("completion_action")) in {"benchmark_needed", "memory_support_needed"}:
         multiplier -= 0.15
     return round(max(0.0, base * multiplier), 4)
+
+
+def _pinning_boost(pinning_index: dict[str, Any]) -> float | None:
+    entries = [dict(item) for item in pinning_index.get("entries", []) if isinstance(item, dict)]
+    if not entries:
+        return None
+    boosts: list[float] = []
+    for item in entries:
+        value = _optional_float(item.get("retrieval_boost"))
+        if value is None:
+            continue
+        boosts.append(max(0.0, min(1.0, value / 0.10)))
+    if not boosts:
+        return None
+    return max(boosts)
 
 
 def _challenger_family_from_candidate(candidate: dict[str, Any]) -> str | None:
