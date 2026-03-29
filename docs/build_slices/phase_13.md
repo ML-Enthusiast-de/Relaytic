@@ -22,6 +22,8 @@ Intended artifacts:
 - `scheduler_job_map.json`
 - `checkpoint_state.json`
 - `execution_strategy_report.json`
+- `search_value_report.json`
+- `search_controller_eval_report.json`
 
 ## Intent
 
@@ -63,10 +65,12 @@ The slice is successful only if Relaytic can:
 - device-aware planning must change how Relaytic executes, not silently change what it believes
 - distributed execution must remain resumable and safe for long local runs
 - broader route families, calibration variants, uncertainty wraps, abstention policies, imported-incumbent beat-target branches, and deeper HPO campaigns should be eligible where their value is justified
+- search decisions must produce explicit value-of-search evidence showing why Relaytic widened, pruned, or stopped rather than leaving deeper HPO to ambient availability
+- Slice 13 should include at least one proof where Relaytic declines more search because the value contract says stop, not because hardware or adapters are missing
 
 ## Proof Obligation
 
-- Relaytic must prove that wider search is allocated or denied for explicit decision reasons, not because deeper HPO happened to be available
+- Relaytic must prove that wider search is allocated or denied for explicit decision reasons, not because deeper HPO happened to be available, and that those reasons remain legible to both humans and external agents
 
 ## Acceptance Criteria
 
@@ -76,6 +80,7 @@ Slice 13 is acceptable only if:
 2. one interrupted distributed run resumes from checkpoint
 3. one low-value branch is pruned while a higher-value branch is widened with explicit justification
 4. one case widens or cuts HPO effort because the decision contract, beat-target pressure, or trace evidence says more search is or is not worth it
+5. one case records explicit stop-search reasoning in `search_value_report.json` even though deeper HPO or broader branches were technically available
 
 ## Required Verification
 
@@ -85,4 +90,5 @@ Slice 13 should not be considered complete without targeted tests that cover at 
 - one checkpoint-resume case
 - one branch-pruning case
 - one HPO-allocation case
+- one explicit stop-search-value case
 - one agent-consumable execution-strategy case

@@ -31,6 +31,8 @@ Codex must:
 - keep local artifacts as the canonical source of truth
 - keep semantic and memory systems rowless by default unless policy grants richer access
 - keep specialist capabilities explicit instead of relying on ambient full-repo/full-data access
+- keep protocol surfaces semantically aligned and explicitly conformance-tested as the product grows
+- keep flagship-demo and human-supervision proof tracks alive, not just technical internals
 
 When mature external routines can strengthen a slice faster than in-core reinvention, prefer explicit optional adapters with self-checks and graceful fallback. Current high-leverage candidates are:
 
@@ -52,6 +54,12 @@ Relaytic should be treated as frontier work only when a slice strengthens at lea
 - validated self-improvement
 
 If a slice mainly adds surface area, prose, or orchestration without strengthening one of those axes, it is not sharp enough.
+
+The remaining world-class proof tracks that later slices must make explicit are:
+
+- protocol conformance across CLI, MCP, mission control, and any richer UI shell
+- flagship demo scorecards that remain reproducible across releases
+- human-supervision and onboarding-success evaluation for first-time users
 
 ## Current intended build order
 
@@ -156,6 +164,9 @@ Reason:
 - Slice 12 is now implemented and gives Relaytic a guarded dojo layer with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, architecture-proposal quarantine, and mission-control visibility
 - Slice 12A should come after dojo because periodic awareness and bounded background follow-up are much safer once self-improvement already has quarantine and promotion rules
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because Relaytic needs one canonical trace substrate, explicit competing-claim/adjudication contracts, and agent/security evaluation before wider search and full trace-explorer claims become credible
+- Slice 12B should also establish protocol conformance between CLI, MCP, and later richer UI surfaces instead of assuming those surfaces stay aligned
+- Slice 13 should prove not only deeper search but explicit value-of-search decisions, including when Relaytic refuses to keep searching
+- Slice 15 should close the proof loop with flagship demo packs and human-supervision evaluation rather than treating UI polish as sufficient evidence
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:

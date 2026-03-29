@@ -20,6 +20,7 @@ Every slice must:
 - state what becomes newly autonomous, newly challengeable, and newly inspectable after the slice lands
 - define the deterministic fallback for every optional dependency, model, or external library it introduces
 - leave at least one golden-path case and one adversarial case stronger than before
+- for post-11 host-facing or operator-facing slices, strengthen at least one protocol-conformance, flagship-demo, or human-supervision proof case
 - if it introduces a new autonomous loop, make the loop budgeted, replayable, and explicitly stoppable
 - leave the repository coherent after completion
 
@@ -169,8 +170,17 @@ If a later slice adds "smartness" without strengthening at least one of those pr
   once Slice 12B lands, one case where a human or external agent can replay one run across specialist turns, tool calls, interventions, branch decisions, competing claim packets, and deterministic adjudication from one trace model instead of stitching multiple logs together
 - **agent-security path**
   once Slice 12B lands, one case where Relaytic deliberately withstands or rejects a control-injection, tool-misuse, or unsafe branch-expansion request and records the defense or failure mode in an explicit evaluation artifact
+- **protocol-conformance path**
+  once Slice 12B lands, one case where CLI and MCP expose the same trace, adjudication winner, and defensive-control outcome from the same canonical run truth, and any mismatch becomes an explicit eval failure rather than silent drift
 - **mission-control path**
   once Slice 15 lands, one case where a human or external agent can see branch structure, confidence, and change attribution without reading the entire artifact tree
+- **flagship-demo path**
+  once Slice 15 lands, at least three packaged demos with explicit scorecards should stay green:
+  - unfamiliar dataset to useful governed decision
+  - imported incumbent challenge under the same contract
+  - skeptical override rejection or unsafe-request defense with replayable trace
+- **human-supervision path**
+  once Slice 15 lands, one first-time human and one external agent path should be able to complete onboarding, start useful work, inspect why Relaytic changed course, and recover when stuck without repo literacy
 
 ## Preferred post-MVP execution order
 
@@ -230,6 +240,9 @@ Why:
 - Slice 11G is now implemented and makes that first-contact UX much more forgiving by adding adaptive onboarding capture, visible chat session state, explicit analysis-first versus governed-run routing, lightweight local semantic rescue for messy human input, and full-install helper provisioning
 - Slice 12A should come after dojo because periodic awareness, innovation watching, and bounded background follow-up are much safer once self-improvement stays quarantined and promotion rules already exist
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because wider search and full trace-backed mission control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
+- Slice 12B should also establish protocol conformance between CLI, MCP, and later richer UI surfaces instead of assuming those surfaces stay aligned
+- Slice 13 should prove not only deeper search but explicit value-of-search decisions so the controller can justify both widening and stopping
+- Slice 15 should close the loop with flagship demo packs and human-supervision evaluation rather than treating UI polish as sufficient proof
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state

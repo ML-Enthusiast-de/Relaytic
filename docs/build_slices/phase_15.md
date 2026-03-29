@@ -19,6 +19,10 @@ Intended artifacts:
 - `review_queue_state.json`
 - `trace_explorer_state.json`
 - `branch_replay_index.json`
+- `demo_pack_manifest.json`
+- `flagship_demo_scorecard.json`
+- `human_factors_eval_report.json`
+- `onboarding_success_report.json`
 
 ## Intent
 
@@ -29,6 +33,7 @@ The slice is successful only if Relaytic can:
 - show current stage, branch structure, confidence, intervention history, and next action from one coherent surface
 - expose the same mission-control truth through CLI, MCP, and any richer UI shell
 - package that experience into demos, onboarding, doctor, backup/restore, and ecosystem integrations that feel like software rather than a research repo
+- prove that first-time humans and external agents can actually succeed with that surface instead of only exposing it
 
 ## Load-Bearing Improvement
 
@@ -57,10 +62,13 @@ The slice is successful only if Relaytic can:
 - mission control must make branch, tool, intervention, and confidence state legible without requiring humans or external agents to read raw artifact trees
 - CLI, MCP, and any richer UI shell must expose the same mission-control truth with only presentation differences
 - packaged demos must include at least one skeptical-control case, one incumbent challenge case, and one trace-backed branch comparison
+- packaged demos should become a maintained flagship demo pack with explicit scorecards instead of ad hoc walkthroughs
+- Slice 15 must consume the protocol-conformance outputs from Slice 12B and fail loudly when richer UI shells drift from CLI/MCP truth
+- Slice 15 must include human-supervision evaluation covering first-run success, stuck recovery, and explanation quality for first-time operators
 
 ## Proof Obligation
 
-- Relaytic must prove that humans and external agents can understand why the system changed course without reading raw artifact trees, and that mission control is driven by the same trace/runtime truth as the rest of the product
+- Relaytic must prove that humans and external agents can understand why the system changed course without reading raw artifact trees, that mission control is driven by the same trace/runtime truth as the rest of the product, and that first-time users can actually complete meaningful work with the shipped onboarding surface
 
 ## Acceptance Criteria
 
@@ -69,6 +77,11 @@ Slice 15 is acceptable only if:
 1. one mission-control view replays why Relaytic changed course across at least two branches
 2. one agent-consumable mission-control export shows current stage, branch state, and recommended next action without missing trace context
 3. one packaged demo shows what changed because of memory, research, feedback, and intervention handling from the same surface
+4. one flagship demo pack includes at least:
+   - unfamiliar dataset to useful governed decision
+   - imported incumbent challenge
+   - skeptical override rejection or unsafe-request defense
+5. one human-factors or onboarding-success eval shows that a first-time operator can start, recover, and finish a useful flow without repo literacy
 
 ## Required Verification
 
@@ -78,3 +91,4 @@ Slice 15 should not be considered complete without targeted tests that cover at 
 - one MCP mission-control case
 - one trace-backed replay case
 - one packaged demo health check
+- one human-factors or onboarding-success case

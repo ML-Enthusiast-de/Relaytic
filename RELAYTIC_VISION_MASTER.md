@@ -108,6 +108,21 @@ It is:
 
 Any slice that does not strengthen at least one of those axes is polish, not frontier progress.
 
+## World-class proof doctrine
+
+Relaytic should not call itself world-class because it has many artifacts, many agents, or a polished shell.
+
+The product becomes world-class only when it can repeatedly prove:
+
+- **protocol conformance**
+  CLI, MCP, mission control, and later richer UI or host shells must expose the same run truth, next action, trace posture, and adjudication outcome rather than drifting into surface-specific behavior
+- **flagship demo proof**
+  Relaytic should keep a small set of recruiter-safe and lab-safe flagship demos with explicit scorecards, not just ad hoc walkthroughs
+- **human-supervision success**
+  a first-time human should be able to start, recover, inspect why Relaytic changed course, and complete a useful run without repo literacy or hidden operator lore
+
+Future slices that add autonomy, new host surfaces, or new operator-facing behavior should strengthen at least one of those proof tracks in addition to their local feature work.
+
 ## Anti-mediocrity guardrails
 
 Relaytic must not degrade into:
@@ -146,6 +161,15 @@ By the time the product is mature, Relaytic should be able to show, not just cla
 - it can explain why it continued, stopped, recalibrated, retrained, promoted, or rolled back
 - it improves itself only through validated method changes rather than silent behavior drift
 
+It should also be able to show, not just claim, that:
+
+- CLI, MCP, mission control, and later richer UI shells stay semantically aligned on the same run truth
+- at least three flagship demos still pass under current code and policy:
+  - unfamiliar dataset to useful governed decision
+  - imported incumbent challenge under the same contract
+  - skeptical override rejection or unsafe-request defense with replayable trace
+- first-contact human onboarding remains usable without repo literacy, including stuck recovery and explanation of why Relaytic took the next step
+
 All major performance claims should always be separated into:
 
 - deterministic floor
@@ -175,6 +199,9 @@ They are:
 - a **lab pulse** that can periodically inspect runtime state, benchmark debt, research freshness, and memory health, then queue bounded safe follow-up without unsupervised drift
 - a **richer data-understanding fabric** that can reason about nearby sources, join candidates, entity histories, and what additional data would reduce uncertainty most
 - a **mission-control surface** that shows branch structure, confidence map, intervention history, incumbent-versus-Relaytic state, what changed because of memory, intelligence, research, or feedback, and what Relaytic would do next
+- a **protocol-conformance harness** that proves CLI, MCP, mission control, and later richer UI shells expose the same control truth rather than drifting by surface
+- a **flagship demo pack** with explicit scorecards so Relaytic can be judged by repeatable proof cases rather than one-off founder narration
+- a **human-supervision evaluation track** that measures first-run success, stuck recovery, explanation quality, and whether operators can tell what Relaytic expects next
 - benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, lifecycle constraints, and decision usefulness actually matter
 
 These are the places where the project most needs to become stronger if it wants to look like the next big thing rather than a well-structured research product.

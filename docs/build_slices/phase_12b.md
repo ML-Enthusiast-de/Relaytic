@@ -32,6 +32,8 @@ Intended artifacts:
 - `agent_eval_matrix.json`
 - `security_eval_report.json`
 - `red_team_report.json`
+- `protocol_conformance_report.json`
+- `host_surface_matrix.json`
 
 Intended public commands:
 
@@ -57,6 +59,7 @@ The slice is successful only if Relaytic can:
 - represent specialist disagreement as structured competing claims instead of implicit precedence only
 - adjudicate those claims deterministically under one explicit scorecard
 - evaluate whether the runtime resisted unsafe steering, tool misuse, and unsafe branch expansion
+- evaluate whether CLI, MCP, and later richer UI shells stay semantically aligned on the same trace and adjudication truth
 - feed those evaluations back into later search, dojo, and mission-control work without hand translation
 
 ## Load-Bearing Improvement
@@ -73,7 +76,7 @@ The slice is successful only if Relaytic can:
 
 ## Intelligence Source
 
-- runtime events, control artifacts, autonomy lineage, benchmark outcomes, replayable tool traces, deterministic claim scoring, adversarial prompts, and policy-aware evaluation harnesses
+- runtime events, control artifacts, autonomy lineage, benchmark outcomes, replayable tool traces, deterministic claim scoring, host-surface observations, adversarial prompts, and policy-aware evaluation harnesses
 
 ## Fallback Rule
 
@@ -111,7 +114,10 @@ The slice is successful only if Relaytic can:
 - optional semantic helpers may generate or critique claim packets, but they must not become the final adjudicator
 - the winning claim, losing claims, and why they won or lost must be persisted in machine-readable form
 - evaluation harnesses must cover at least control injection, tool misuse, unsafe branch expansion, and skeptical-override regression
+- protocol-conformance harnesses must cover at least CLI versus MCP agreement on current stage, winning claim, next action, and defensive-control outcome from the same run
+- `host_surface_matrix.json` must record which host or operator surfaces are evaluated, what truth they consume, and which control or trace fields are contract-critical
 - security/eval results must be consumable by later dojo, search-controller, and mission-control slices without narrative-only interpretation
+- conformance failures must be recorded explicitly; Relaytic must not silently pick a winner between disagreeing surfaces
 - the canonical trace must become the activity substrate for the existing mission-control surface rather than sitting beside a separate UI-only history
 - mission-control should later be able to render:
   - competing proposals
@@ -160,7 +166,7 @@ Slice 12B should be coded in this shape:
 
 ## Proof Obligation
 
-- Relaytic must prove that one run can be replayed from canonical traces, that competing claims can be scored deterministically, and that at least one adversarial behavior case is caught or honestly surfaced by the evaluation harness rather than hidden
+- Relaytic must prove that one run can be replayed from canonical traces, that competing claims can be scored deterministically, that at least one adversarial behavior case is caught or honestly surfaced by the evaluation harness rather than hidden, and that major host surfaces remain semantically aligned on the same run truth
 
 ## Acceptance Criteria
 
@@ -171,7 +177,8 @@ Slice 12B is acceptable only if:
 3. one higher-confidence claim loses because policy, risk, benchmark fit, or decision value scores say it should lose
 4. one adversarial steering case is rejected and captured in the security-eval report
 5. one tool-misuse or unsafe-branch case fails safely and is recorded in the eval matrix
-6. one later surface consumes the trace graph and adjudication scorecard directly instead of reconstructing state from raw logs
+6. one CLI-versus-MCP conformance case passes or records an explicit failure in `protocol_conformance_report.json`
+7. one later surface consumes the trace graph and adjudication scorecard directly instead of reconstructing state from raw logs
 
 ## Required Verification
 
@@ -184,4 +191,5 @@ Slice 12B should not be considered complete without targeted tests that cover at
 - one control-injection case
 - one tool-safety case
 - one unsafe-branch-expansion case
+- one protocol-conformance case across at least CLI and MCP
 - one trace-consumer integration case

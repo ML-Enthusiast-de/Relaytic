@@ -59,6 +59,9 @@ The next frontier upgrades are:
 - richer long-term memory with retention, compaction, pinning, and replay rules so specialists do not repeatedly forget the same lesson
 - a first-class trace model plus agent/security harnesses so Relaytic can replay specialist/tool/intervention behavior, score competing claims deterministically, and prove its control layer is actually robust
 - a stronger search/HPO controller that widens, prunes, and allocates effort under explicit value and budget contracts
+- protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth
+- flagship demo packs with explicit scorecards so Relaytic can be judged by repeatable proof cases rather than ad hoc walkthroughs
+- human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy
 - deeper mission-control surfaces that build on the shipped 11B through 11G control-center foundation to show branch structure, confidence, trace history, and change attribution to humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive models as one promising backend family
 

@@ -51,7 +51,7 @@ Current canonical boundaries:
 Reserved future boundaries:
 
 - `src/relaytic/tracing/` should own Slice 12B canonical trace schemas, specialist/tool/intervention/branch span persistence, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
-- `src/relaytic/evals/` should own Slice 12B agent-behavior evaluation, security harnesses, adversarial steering tests, runtime regression packs, and scenario/result matrices
+- `src/relaytic/evals/` should own Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
@@ -297,13 +297,21 @@ Reserved future artifact names:
 - `agent_eval_matrix.json`
 - `security_eval_report.json`
 - `red_team_report.json`
+- `protocol_conformance_report.json`
+- `host_surface_matrix.json`
 - `hpo_campaign_report.json`
 - `search_decision_ledger.json`
+- `search_value_report.json`
+- `search_controller_eval_report.json`
 - `branch_dag.json`
 - `confidence_map.json`
 - `change_attribution_report.json`
 - `trace_explorer_state.json`
 - `branch_replay_index.json`
+- `demo_pack_manifest.json`
+- `flagship_demo_scorecard.json`
+- `human_factors_eval_report.json`
+- `onboarding_success_report.json`
 - `representation_engine_profile.json`
 - `latent_state_report.json`
 - `embedding_index_report.json`

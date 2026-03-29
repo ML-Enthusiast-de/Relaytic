@@ -92,6 +92,9 @@ The most important not-yet-implemented shifts after the current baseline are:
 - richer long-term memory with retention, compaction, pinning, and replay rules so durable lessons survive beyond analog similarity
 - stronger dynamic controller logic that decides who should act next, how deep to branch, and when review is worth it under explicit contracts
 - stronger search/HPO/controller logic that widens, prunes, and allocates effort under explicit value and budget contracts
+- protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth instead of drifting by surface
+- flagship demo packs with explicit scorecards so Relaytic can be judged by repeatable proof scenarios instead of ad hoc walkthroughs
+- human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy
 - mission-control surfaces that expose branch DAG, confidence, and change attribution to both humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family
 
