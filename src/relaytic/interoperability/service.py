@@ -103,6 +103,45 @@ def relaytic_show_pulse(*, run_dir: str) -> dict[str, Any]:
     return cli._show_pulse_surface(run_dir=run_dir)
 
 
+def relaytic_show_trace(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 12B trace surface for a Relaytic run."""
+    cli = _cli()
+    return cli._show_trace_surface(run_dir=run_dir)
+
+
+def relaytic_replay_trace(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 12B replay surface for a Relaytic run."""
+    cli = _cli()
+    return cli._replay_trace_surface(run_dir=run_dir)
+
+
+def relaytic_run_agent_evals(
+    *,
+    run_dir: str,
+    config_path: str | None = None,
+    run_id: str | None = None,
+    overwrite: bool = False,
+    labels: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Execute the Slice 12B eval harness for an existing Relaytic run."""
+    cli = _cli()
+    return cli._run_evals_phase(
+        run_dir=run_dir,
+        config_path=config_path,
+        run_id=run_id,
+        overwrite=overwrite,
+        labels=_normalize_labels(labels),
+        runtime_surface="mcp",
+        runtime_command="relaytic_run_agent_evals",
+    )
+
+
+def relaytic_show_agent_evals(*, run_dir: str) -> dict[str, Any]:
+    """Render the current Slice 12B eval surface for a Relaytic run."""
+    cli = _cli()
+    return cli._show_evals_surface(run_dir=run_dir)
+
+
 def relaytic_get_status(*, run_dir: str) -> dict[str, Any]:
     """Render the completion-governor status for a Relaytic run."""
     cli = _cli()
@@ -566,6 +605,9 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_control",
             "relaytic_show_mission_control",
             "relaytic_show_pulse",
+            "relaytic_show_trace",
+            "relaytic_replay_trace",
+            "relaytic_show_agent_evals",
             "relaytic_get_status",
             "relaytic_show_intelligence",
             "relaytic_show_research",
@@ -588,6 +630,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_run_benchmark",
             "relaytic_review_decision",
             "relaytic_review_pulse",
+            "relaytic_run_agent_evals",
             "relaytic_assist_turn",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
@@ -674,6 +717,30 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_pulse,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_trace",
+            title="Show Relaytic Trace",
+            description="Render the current Slice 12B canonical trace surface, including competing claims, deterministic adjudication, and winning-action truth for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_trace,
+        ),
+        InteropToolSpec(
+            name="relaytic_replay_trace",
+            title="Replay Relaytic Trace",
+            description="Render the current Slice 12B replay timeline so a host can inspect why Relaytic chose the winning action over competing claims.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_replay_trace,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_agent_evals",
+            title="Show Relaytic Agent Evals",
+            description="Render the current Slice 12B protocol, security, and deterministic-debate proof surface for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_agent_evals,
         ),
         InteropToolSpec(
             name="relaytic_get_status",
@@ -810,6 +877,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_review_pulse,
+        ),
+        InteropToolSpec(
+            name="relaytic_run_agent_evals",
+            title="Run Agent Evals",
+            description="Execute the Slice 12B protocol, security, and deterministic-debate proof harness for an existing Relaytic run.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_run_agent_evals,
         ),
         InteropToolSpec(
             name="relaytic_assist_turn",

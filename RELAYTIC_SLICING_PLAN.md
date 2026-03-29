@@ -247,10 +247,10 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 12A, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, and Slice 12A lab pulse
-- next execution target: Slice 12B
+- implemented baseline: Slice 00 through Slice 12B, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, and Slice 12B first-class tracing plus runtime evaluation
+- next execution target: Slice 13
 - latest pulse slice: Slice 12A
-- next trace-and-safety follow-on after Slice 12A: Slice 12B
+- latest trace-and-safety follow-on: Slice 12B
 - next scale-and-search follow-on after Slice 12B: Slice 13
 - later mission-control expansion after Slice 14: Slice 15
 - late optional representation follow-on after Slice 15: Slice 16
@@ -1791,6 +1791,9 @@ Innovation hook:
 
 ## Slice 12B - First-class tracing, agent evaluation, and runtime security harnesses
 
+Status:
+- Implemented.
+
 Goal:
 - one canonical trace model
 - replayable specialist/tool/intervention/branch traces
@@ -1833,6 +1836,8 @@ Required outputs:
 - `agent_eval_matrix.json`
 - `security_eval_report.json`
 - `red_team_report.json`
+- `protocol_conformance_report.json`
+- `host_surface_matrix.json`
 
 Required behavior:
 
@@ -1855,7 +1860,8 @@ Minimum proof:
 - one higher-confidence claim that still loses because policy, risk, benchmark fit, or decision value says it should lose
 - one adversarial steering case that is rejected and captured in the security-eval report
 - one tool-misuse or unsafe-branch case that fails safely and is recorded in the eval matrix
-- one case where later mission-control or search logic can read the trace graph and adjudication scorecard directly
+- one CLI-versus-MCP conformance case that passes or records an explicit failure in `protocol_conformance_report.json`
+- one case where mission control reads the trace graph, adjudication winner, or eval posture directly
 
 ## Slice 13 - Search controller, accelerated execution, and distributed local experimentation
 

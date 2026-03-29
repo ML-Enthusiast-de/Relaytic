@@ -4,9 +4,9 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 12A, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, and Slice 11G adaptive human onboarding with lightweight local semantic guidance
-- next recommended slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
-- next trace-and-safety follow-on after 12A: 12B, first-class tracing, agent evaluation, and runtime security harnesses
+- completed slices: 00 through 12B, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, and Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation
+- next recommended slice: 13, search controller, accelerated execution, and distributed local experimentation
+- latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -68,6 +68,8 @@ The repository currently supports:
 - full-profile bootstrap that now attempts to provision a lightweight CPU-safe onboarding model so mission-control chat can be more forgiving without changing deterministic run control
 - explicit dojo review via `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`, with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, and mission-control visibility
 - explicit lab pulse review via `relaytic pulse review` and `relaytic pulse show`, with bounded schedule/skip reporting, rowless innovation watch, challenge watchlists, safe queued follow-up, memory compaction reports, pulse checkpointing, and mission-control visibility
+- first-class trace review via `relaytic trace show` and `relaytic trace replay`, with canonical specialist/tool/intervention/branch traces, structured competing claim packets, deterministic adjudication scorecards, replayable decision reports, and direct runtime-span emission from the shared gateway
+- agent/security evaluation via `relaytic evals run` and `relaytic evals show`, with protocol-conformance reports, host-surface matrices, adversarial steering coverage, red-team findings, and explicit open-finding reporting instead of silent pass/fail drift
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement
@@ -87,15 +89,13 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
-- a first-class trace model across specialists, tools, interventions, and branches so Relaytic can replay and compare multi-stage behavior from one runtime truth, while scoring competing specialist claims under an explicit adjudication contract
-- runtime evaluator and security harnesses that test skeptical control, tool safety, branch-controller safety, and adversarial steering before broader autonomy is trusted
 - richer long-term memory with retention, compaction, pinning, and replay rules so durable lessons survive beyond analog similarity
 - stronger dynamic controller logic that decides who should act next, how deep to branch, and when review is worth it under explicit contracts
 - stronger search/HPO/controller logic that widens, prunes, and allocates effort under explicit value and budget contracts
-- protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth instead of drifting by surface
+- broader protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth as the surface area grows
 - flagship demo packs with explicit scorecards so Relaytic can be judged by repeatable proof scenarios instead of ad hoc walkthroughs
 - human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy
-- mission-control surfaces that expose branch DAG, confidence, and change attribution to both humans and external agents
+- mission-control surfaces that expose branch DAG, confidence, trace replay, and change attribution to both humans and external agents
 - an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family
 
 ## Implemented Slices
@@ -383,6 +383,18 @@ The most important not-yet-implemented shifts after the current baseline are:
 - extended run summary, mission-control, CLI, and MCP/service surfaces so pulse posture, queued actions, innovation leads, and memory maintenance remain visible instead of becoming background scheduler state
 - added targeted Slice 12A agent, CLI, memory, interoperability, and MCP verification, plus regression checks for stage-resolution and policy/config merging
 
+### Slice 12B
+
+- added `src/relaytic/tracing/` with canonical trace schemas, runtime span persistence, specialist/tool/intervention/branch trace logs, claim-packet storage, deterministic adjudication scorecards, replay reports, and storage helpers
+- added `src/relaytic/evals/` with protocol-conformance, host-surface, security, red-team, and agent-evaluation bundles plus storage helpers
+- added `relaytic trace show`, `relaytic trace replay`, `relaytic evals run`, and `relaytic evals show`
+- added `trace_model.json`, `trace_span_log.jsonl`, `specialist_trace_index.json`, `tool_trace_log.jsonl`, `intervention_trace_log.jsonl`, `branch_trace_graph.json`, `claim_packet_log.jsonl`, `adjudication_scorecard.json`, `decision_replay_report.json`, `agent_eval_matrix.json`, `security_eval_report.json`, `red_team_report.json`, `protocol_conformance_report.json`, and `host_surface_matrix.json`
+- implemented runtime-direct trace emission from the shared gateway so replay no longer depends only on post hoc reconstruction from unrelated logs
+- implemented deterministic claim adjudication with explicit score axes, including proof that a higher-confidence claim can lose when the active contract says it should
+- implemented CLI-versus-MCP protocol conformance checks so host-surface drift becomes an explicit eval failure instead of silent inconsistency
+- extended run summary, mission control, and MCP/service surfaces so trace status, winning claim/action, conformance posture, and open security findings remain visible instead of becoming internal-only diagnostics
+- added targeted Slice 12B trace, runtime, CLI, interoperability, and evaluation verification, plus regression coverage for partial-bundle materialization and direct runtime-span emission
+
 ### Cross-Cutting Hardening
 
 - added `src/relaytic/integrations/` as the canonical optional-library discovery boundary
@@ -420,9 +432,8 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-With Slice 11G, Slice 12, and Slice 12A now landed, the next high-leverage frontier follow-ons are:
+With Slice 11G, Slice 12, Slice 12A, and Slice 12B now landed, the next high-leverage frontier follow-ons are:
 
-- Slice 12B first-class tracing, agent evaluation, and runtime security harnesses
 - Slice 13 search-controller depth, accelerated execution, and distributed local experimentation under explicit value and budget contracts
 - richer long-term memory compaction, pinning, and replay rules that build on the shipped causal, dojo, and pulse-maintenance ledgers
 - later Slice 15 remote connector adapters for Kafka-style streams, object-store Parquet, and warehouse reads, but only through read-only materialization into immutable run-local snapshots

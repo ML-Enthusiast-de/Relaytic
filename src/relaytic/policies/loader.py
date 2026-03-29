@@ -99,6 +99,8 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     mission_control_cfg = dict(config.get("mission_control", {}))
     dojo_cfg = dict(config.get("dojo", {}))
     pulse_cfg = dict(config.get("pulse", {}))
+    tracing_cfg = dict(config.get("tracing", {}))
+    evals_cfg = dict(config.get("evals", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
     contact_email = research_cfg.get("contact_email", "")
     if contact_email is None:
@@ -371,6 +373,30 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "max_recommendations": int(pulse_cfg.get("max_recommendations", 4) or 4),
             "max_bounded_actions": int(pulse_cfg.get("max_bounded_actions", 1) or 1),
             "require_rowless_innovation": bool(pulse_cfg.get("require_rowless_innovation", True)),
+        },
+        "tracing": {
+            "enabled": bool(tracing_cfg.get("enabled", True)),
+            "backfill_from_runtime_events": bool(tracing_cfg.get("backfill_from_runtime_events", True)),
+            "direct_runtime_span_writes": bool(tracing_cfg.get("direct_runtime_span_writes", True)),
+            "max_replay_spans": int(tracing_cfg.get("max_replay_spans", 80) or 80),
+            "conformance_surfaces": [
+                str(item).strip().lower()
+                for item in tracing_cfg.get("conformance_surfaces", ["cli", "mcp"])
+                if str(item).strip()
+            ],
+        },
+        "evals": {
+            "enabled": bool(evals_cfg.get("enabled", True)),
+            "require_protocol_conformance": bool(evals_cfg.get("require_protocol_conformance", True)),
+            "require_security_evals": bool(evals_cfg.get("require_security_evals", True)),
+            "require_high_confidence_loser_proof": bool(evals_cfg.get("require_high_confidence_loser_proof", True)),
+            "fail_on_protocol_mismatch": bool(evals_cfg.get("fail_on_protocol_mismatch", True)),
+            "tracked_surfaces": [
+                str(item).strip().lower()
+                for item in evals_cfg.get("tracked_surfaces", ["cli", "mcp"])
+                if str(item).strip()
+            ],
+            "max_reported_findings": int(evals_cfg.get("max_reported_findings", 6) or 6),
         },
         "hpo": {
             "backend": str(modeling_cfg.get("optimizer", "optuna_or_flaml")),

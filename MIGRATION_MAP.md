@@ -248,6 +248,15 @@ Avoid introducing new references to:
 - introduced MCP-visible pulse inspection and review through `relaytic_show_pulse` and `relaytic_review_pulse`
 - upgraded memory retrieval, run-summary, mission-control, and manifest surfaces so bounded periodic awareness, rowless innovation watch, safe queued follow-up, and memory pinning remain visible instead of becoming sidecar scheduler state
 
+### Slice 12B
+
+- introduced the canonical package boundaries `src/relaytic/tracing/` and `src/relaytic/evals/`
+- introduced artifact boundaries for `trace_model.json`, `trace_span_log.jsonl`, `specialist_trace_index.json`, `tool_trace_log.jsonl`, `intervention_trace_log.jsonl`, `branch_trace_graph.json`, `claim_packet_log.jsonl`, `adjudication_scorecard.json`, `decision_replay_report.json`, `agent_eval_matrix.json`, `security_eval_report.json`, `red_team_report.json`, `protocol_conformance_report.json`, and `host_surface_matrix.json`
+- introduced public commands `relaytic trace show`, `relaytic trace replay`, `relaytic evals run`, and `relaytic evals show`
+- introduced MCP-visible trace and eval surfaces through `relaytic_show_trace`, `relaytic_replay_trace`, `relaytic_run_agent_evals`, and `relaytic_show_agent_evals`
+- upgraded the runtime gateway so stage transitions and runtime events emit canonical trace spans directly instead of relying only on later reconstruction
+- upgraded run-summary and mission-control surfaces so trace truth, adjudication winners, protocol conformance, and open security findings remain visible instead of becoming debug-only output
+
 ### Slice 10
 
 - introduced the canonical package boundary `src/relaytic/feedback/`
@@ -280,6 +289,9 @@ Avoid introducing new references to:
 - `src/relaytic/benchmark/` for Slice 11A imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts on top of Slice 11 reference comparisons
 - `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D live onboarding/chat behavior, Slice 11E handbook discovery surfaces, Slice 11F guided demo/mode-education/stuck-recovery surfaces, and Slice 11G adaptive onboarding/session-capture/lightweight-semantic-helper surfaces
 - `src/relaytic/dojo/` for Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and architecture-proposal quarantine
+- `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, explicit memory-maintenance orchestration, and pulse-to-mission-control visibility surfaces
+- `src/relaytic/tracing/` for Slice 12B canonical trace schemas, specialist/tool/intervention/branch traces, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
+- `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
 - `docs/handbooks/` for Slice 11E role-specific human/operator and external-agent onboarding guides
 - `docs/handbooks/relaytic_demo_walkthrough.md` for Slice 11F recruiter-safe demo sequencing and first-contact presentation
 
@@ -339,17 +351,16 @@ Shipped artifact names:
 - `dojo_results.json`
 - `dojo_promotions.json`
 - `architecture_proposals.json`
-
-## Reserved Future Boundaries
-
-The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
-
-- `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
-- `src/relaytic/tracing/` for Slice 12B canonical trace schemas, specialist/tool/intervention/branch traces, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
-- `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
-- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
-
-Reserved future artifact names:
+- `pulse_schedule.json`
+- `pulse_run_report.json`
+- `pulse_skip_report.json`
+- `pulse_recommendations.json`
+- `innovation_watch_report.json`
+- `challenge_watchlist.json`
+- `pulse_checkpoint.json`
+- `memory_compaction_plan.json`
+- `memory_compaction_report.json`
+- `memory_pinning_index.json`
 - `trace_model.json`
 - `trace_span_log.jsonl`
 - `specialist_trace_index.json`
@@ -364,6 +375,15 @@ Reserved future artifact names:
 - `red_team_report.json`
 - `protocol_conformance_report.json`
 - `host_surface_matrix.json`
+
+## Reserved Future Boundaries
+
+The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
+
+- `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
+- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+
+Reserved future artifact names:
 - `hpo_campaign_report.json`
 - `search_decision_ledger.json`
 - `search_value_report.json`

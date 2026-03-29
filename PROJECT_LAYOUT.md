@@ -77,6 +77,8 @@ Relaytic/
       planning/
       policies/
       pulse/
+      tracing/
+      evals/
       runs/
       runtime/
       mission_control/
@@ -158,11 +160,11 @@ Relaytic/
 - `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, launch metadata, review-queue state, static control-center rendering, Slice 11C clarity artifacts for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding/live-chat behavior, Slice 11E handbook discovery/onboarding behavior, Slice 11F demo flow/mode education/stuck-recovery behavior, Slice 11G adaptive onboarding/session-capture/lightweight-local-semantic behavior, and the shared operator cockpit surface
 - `src/relaytic/dojo/` owns Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and architecture-proposal quarantine
 - `src/relaytic/pulse/` owns Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, memory-maintenance orchestration, and mission-control-visible pulse artifacts
+- `src/relaytic/tracing/` owns Slice 12B canonical trace schemas, specialist/tool/intervention/branch trace persistence, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
+- `src/relaytic/evals/` owns Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
 
 Reserved future boundaries:
 
-- `src/relaytic/tracing/` should own canonical trace schemas, specialist/tool/intervention/branch trace persistence, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces for Slice 12B
-- `src/relaytic/evals/` should own agent-behavior evaluation, security harnesses, adversarial steering tests, runtime regression packs, and scenario/result matrices for Slice 12B
 - `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 ## Naming Rule

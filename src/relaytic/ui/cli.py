@@ -1579,6 +1579,73 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    trace_surface = sub.add_parser(
+        "trace",
+        help="Inspect Slice 12B trace spans, competing claim packets, deterministic adjudication, and replay truth.",
+    )
+    trace_sub = trace_surface.add_subparsers(dest="trace_command", required=True)
+
+    trace_show = trace_sub.add_parser(
+        "show",
+        help="Materialize and render the current Slice 12B trace review for a run.",
+    )
+    trace_show.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    trace_show.add_argument("--config", default=None, help="Optional config/policy source used when trace needs to be materialized.")
+    trace_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    trace_replay = trace_sub.add_parser(
+        "replay",
+        help="Render the current Slice 12B replay timeline and winning-vs-losing claim story for a run.",
+    )
+    trace_replay.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    trace_replay.add_argument("--config", default=None, help="Optional config/policy source used when trace needs to be materialized.")
+    trace_replay.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    evals_surface = sub.add_parser(
+        "evals",
+        help="Run or inspect Slice 12B protocol, security, and deterministic-debate proof evals.",
+    )
+    evals_sub = evals_surface.add_subparsers(dest="evals_command", required=True)
+
+    evals_run = evals_sub.add_parser(
+        "run",
+        help="Execute the Slice 12B eval harness for an existing run and record protocol/security proof artifacts.",
+    )
+    evals_run.add_argument("--run-dir", required=True, help="Run directory for Slice 12B eval artifacts.")
+    evals_run.add_argument("--config", default=None, help="Optional config/policy source.")
+    evals_run.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    evals_run.add_argument("--overwrite", action="store_true", help="Allow overwriting existing eval artifacts.")
+    evals_run.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    evals_run.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    evals_show = evals_sub.add_parser(
+        "show",
+        help="Render the current Slice 12B eval proof surface for a run.",
+    )
+    evals_show.add_argument("--run-dir", required=True, help="Run directory containing Slice 12B eval artifacts.")
+    evals_show.add_argument("--config", default=None, help="Optional config/policy source used when evals need to be materialized.")
+    evals_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     feedback_surface = sub.add_parser(
         "feedback",
         help="Record, review, rollback, or inspect Slice 10 feedback and downstream outcome artifacts.",
@@ -2806,6 +2873,60 @@ def main(argv: list[str] | None = None) -> int:
         try:
             labels = _parse_key_value_pairs(args.label)
             payload = _run_pulse_phase(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "trace":
+        try:
+            if args.trace_command == "show":
+                payload = _show_trace_surface(run_dir=args.run_dir, config_path=args.config)
+            elif args.trace_command == "replay":
+                payload = _replay_trace_surface(run_dir=args.run_dir, config_path=args.config)
+            else:
+                parser.error("Unsupported trace subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "evals":
+        if args.evals_command == "show":
+            try:
+                payload = _show_evals_surface(run_dir=args.run_dir, config_path=args.config)
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.evals_command != "run":
+            parser.error("Unsupported evals subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_evals_phase(
                 run_dir=args.run_dir,
                 config_path=args.config,
                 run_id=args.run_id,
@@ -4815,6 +4936,26 @@ def _run_adaptive_onboarding_turn(
     wants_start = _looks_like_run_confirmation(message) or bool(semantic_result.get("confirm_start"))
     objective_family = _clean_text(session_state.get("objective_family")) or "governed_run"
 
+    if _looks_like_off_topic_detour(message):
+        response_text = _render_off_topic_redirect_response(
+            session_state=session_state,
+            has_data=has_data,
+            has_objective=has_objective,
+        )
+        _finalize_onboarding_session_state(session_state)
+        session_state["last_system_question"] = (
+            "Relaytic redirected an off-topic detour back to the current onboarding need."
+        )
+        existing_notes = [str(item).strip() for item in session_state.get("notes", []) if str(item).strip()]
+        existing_notes.append("Relaytic ignored an off-topic detour and kept the onboarding state intact.")
+        session_state["notes"] = existing_notes[-4:]
+        session_state["summary"] = "Relaytic kept the onboarding state and redirected the conversation back to the dataset workflow."
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {
+            "response_text": response_text,
+            "started_run_dir": None,
+        }
+
     if has_data and has_objective and objective_family == "analysis":
         analysis_payload = _run_direct_onboarding_analysis(
             data_path=str(session_state["detected_data_path"]),
@@ -5446,6 +5587,55 @@ def _looks_like_run_confirmation(message: str) -> bool:
         "start it",
     }
     return normalized in confirmations
+
+
+def _looks_like_off_topic_detour(message: str) -> bool:
+    normalized = " ".join(str(message).strip().lower().split())
+    return any(
+        token in normalized
+        for token in (
+            "weather",
+            "temperature outside",
+            "is it raining",
+            "what time is it",
+            "tell me a joke",
+            "do you like",
+        )
+    )
+
+
+def _render_off_topic_redirect_response(
+    *,
+    session_state: dict[str, Any],
+    has_data: bool,
+    has_objective: bool,
+) -> str:
+    data_path = _clean_text(session_state.get("detected_data_path"))
+    objective = _clean_text(session_state.get("detected_objective"))
+    suggested_run_dir = _clean_text(session_state.get("suggested_run_dir")) or "artifacts/demo"
+    if has_data and has_objective:
+        return (
+            "I’m here to help with the Relaytic workflow rather than general side questions. "
+            f"I still have dataset `{data_path}` and objective `{objective}`. "
+            f"If you want, say `yes`, `start`, or `go` and I’ll create the run in `{suggested_run_dir}`, "
+            "or tell me what you want changed."
+        )
+    if has_data:
+        return (
+            "I’m here to help with the Relaytic workflow rather than general side questions. "
+            f"I still have dataset `{data_path}` captured. "
+            "Now tell me the goal, for example `analyze this first`, `give me the top 3 signals`, or `build a fraud model`."
+        )
+    if has_objective:
+        return (
+            "I’m here to help with the Relaytic workflow rather than general side questions. "
+            f"I still have the objective `{objective}`. "
+            "Now paste the dataset path you want Relaytic to use."
+        )
+    return (
+        "I’m here to help with the Relaytic workflow rather than general side questions. "
+        "Paste a dataset path, describe the goal, or do both in one message and I’ll keep going."
+    )
 
 
 def _looks_like_reset_request(message: str) -> bool:
@@ -6314,6 +6504,14 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.pulse import read_pulse_bundle
 
         return read_pulse_bundle(run_dir)
+    if bundle == "trace":
+        from relaytic.tracing import read_trace_bundle
+
+        return read_trace_bundle(run_dir)
+    if bundle == "evals":
+        from relaytic.evals import read_eval_bundle
+
+        return read_eval_bundle(run_dir)
     if bundle == "feedback":
         from relaytic.feedback import read_feedback_bundle
 
@@ -8105,6 +8303,247 @@ def _show_pulse_surface(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _materialize_trace_bundle(*, run_dir: Path, config_path: str | None) -> tuple[dict[str, Any], dict[str, Any], str | Path]:
+    from relaytic.tracing import run_trace_review, write_trace_bundle
+
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=run_dir,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    effective_policy_source: str | Path = foundation_state["policy_path"]
+    if config_path:
+        resolved_override = load_policy(config_path)
+        effective_policy = resolved_override.policy
+        effective_policy_source = config_path
+    trace_result = run_trace_review(run_dir=run_dir, policy=effective_policy)
+    written = write_trace_bundle(run_dir, bundle=trace_result.bundle)
+    return trace_result.bundle.to_dict(), written, effective_policy_source
+
+
+def _show_trace_surface(*, run_dir: str | Path, config_path: str | None = None) -> dict[str, Any]:
+    from relaytic.tracing import render_trace_review_markdown
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="trace")
+    effective_policy_source: str | Path | None = None
+    if not bundle or not isinstance(bundle.get("trace_model"), dict) or not bundle.get("trace_model"):
+        bundle, _, effective_policy_source = _materialize_trace_bundle(run_dir=root, config_path=config_path)
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_trace_manifest(root, policy_source=effective_policy_source)
+    trace_model = dict(bundle.get("trace_model", {}))
+    adjudication = dict(bundle.get("adjudication_scorecard", {}))
+    replay = dict(bundle.get("decision_replay_report", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "summary_path": str(summary_materialized["summary_path"]),
+            "report_path": str(summary_materialized["report_path"]),
+            "trace": {
+                "status": trace_model.get("status"),
+                "span_count": trace_model.get("span_count"),
+                "claim_count": trace_model.get("claim_count"),
+                "winning_claim_id": adjudication.get("winning_claim_id"),
+                "winning_action": adjudication.get("winning_action"),
+                "competing_claim_count": replay.get("competing_claim_count"),
+                "direct_runtime_emission_detected": trace_model.get("direct_runtime_emission_detected"),
+            },
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_trace_review_markdown(bundle),
+    }
+
+
+def _replay_trace_surface(*, run_dir: str | Path, config_path: str | None = None) -> dict[str, Any]:
+    from relaytic.tracing import render_trace_replay_markdown
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="trace")
+    effective_policy_source: str | Path | None = None
+    if not bundle or not isinstance(bundle.get("decision_replay_report"), dict) or not bundle.get("decision_replay_report"):
+        bundle, _, effective_policy_source = _materialize_trace_bundle(run_dir=root, config_path=config_path)
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_trace_manifest(root, policy_source=effective_policy_source)
+    replay = dict(bundle.get("decision_replay_report", {}))
+    adjudication = dict(bundle.get("adjudication_scorecard", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "summary_path": str(summary_materialized["summary_path"]),
+            "report_path": str(summary_materialized["report_path"]),
+            "trace": {
+                "winning_claim_id": adjudication.get("winning_claim_id"),
+                "winning_action": adjudication.get("winning_action"),
+                "competing_claim_count": replay.get("competing_claim_count"),
+                "timeline_count": len(replay.get("timeline", [])) if isinstance(replay.get("timeline"), list) else 0,
+                "status": replay.get("status"),
+            },
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_trace_replay_markdown(bundle),
+    }
+
+
+def _run_evals_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+    runtime_surface: str = "cli",
+    runtime_command: str | None = None,
+) -> dict[str, Any]:
+    from relaytic.evals import run_agent_evals, write_eval_bundle
+
+    root = Path(run_dir)
+    targets = _evals_output_paths(root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    effective_policy_source: str | Path = foundation_state["policy_path"]
+    if config_path:
+        resolved_override = load_policy(config_path)
+        effective_policy = resolved_override.policy
+        effective_policy_source = config_path
+    _materialize_trace_bundle(run_dir=root, config_path=config_path)
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=effective_policy,
+        stage="evals",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "trace_model.json",
+            "adjudication_scorecard.json",
+            "decision_replay_report.json",
+            "protocol_conformance_report.json",
+            "run_summary.json",
+        ],
+    )
+    try:
+        eval_result = run_agent_evals(run_dir=root, policy=effective_policy)
+        written = write_eval_bundle(root, bundle=eval_result.bundle)
+        manifest_path = _refresh_evals_manifest(
+            root,
+            run_id=run_id,
+            policy_source=effective_policy_source,
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=effective_policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic compared CLI and MCP host surfaces against the same trace truth, scored deterministic-debate proof cases, and recorded explicit security and red-team eval artifacts.",
+        )
+        summary_bundle = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        matrix = eval_result.bundle.agent_eval_matrix
+        protocol = eval_result.bundle.protocol_conformance_report
+        security = eval_result.bundle.security_eval_report
+        red_team = eval_result.bundle.red_team_report
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "evals": {
+                    "status": matrix.status,
+                    "passed_count": matrix.passed_count,
+                    "failed_count": matrix.failed_count,
+                    "not_applicable_count": matrix.not_applicable_count,
+                    "protocol_status": protocol.status,
+                    "protocol_mismatch_count": protocol.mismatch_count,
+                    "security_status": security.status,
+                    "security_open_finding_count": security.open_finding_count,
+                    "red_team_status": red_team.status,
+                    "red_team_finding_count": red_team.finding_count,
+                },
+                "bundle": eval_result.bundle.to_dict(),
+                "run_summary": summary_bundle["summary"],
+            },
+            "human_output": eval_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=effective_policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_evals_surface(*, run_dir: str | Path, config_path: str | None = None) -> dict[str, Any]:
+    from relaytic.evals import render_eval_review_markdown
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="evals")
+    if not bundle or not isinstance(bundle.get("agent_eval_matrix"), dict) or not bundle.get("agent_eval_matrix"):
+        payload = _run_evals_phase(
+            run_dir=root,
+            config_path=config_path,
+            run_id=None,
+            overwrite=True,
+            labels=None,
+        )
+        return {
+            "surface_payload": payload["surface_payload"],
+            "human_output": payload["human_output"],
+        }
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_evals_manifest(root)
+    matrix = dict(bundle.get("agent_eval_matrix", {}))
+    protocol = dict(bundle.get("protocol_conformance_report", {}))
+    security = dict(bundle.get("security_eval_report", {}))
+    red_team = dict(bundle.get("red_team_report", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "summary_path": str(summary_materialized["summary_path"]),
+            "report_path": str(summary_materialized["report_path"]),
+            "evals": {
+                "status": matrix.get("status"),
+                "passed_count": matrix.get("passed_count"),
+                "failed_count": matrix.get("failed_count"),
+                "not_applicable_count": matrix.get("not_applicable_count"),
+                "protocol_status": protocol.get("status"),
+                "protocol_mismatch_count": protocol.get("mismatch_count"),
+                "security_status": security.get("status"),
+                "security_open_finding_count": security.get("open_finding_count"),
+                "red_team_status": red_team.get("status"),
+                "red_team_finding_count": red_team.get("finding_count"),
+            },
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_eval_review_markdown(bundle),
+    }
+
+
 def _run_dojo_rollback(
     *,
     run_dir: str | Path,
@@ -9544,6 +9983,30 @@ def _pulse_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _trace_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "trace_model": run_dir / "trace_model.json",
+        "specialist_trace_index": run_dir / "specialist_trace_index.json",
+        "branch_trace_graph": run_dir / "branch_trace_graph.json",
+        "adjudication_scorecard": run_dir / "adjudication_scorecard.json",
+        "decision_replay_report": run_dir / "decision_replay_report.json",
+        "trace_span_log": run_dir / "trace_span_log.jsonl",
+        "tool_trace_log": run_dir / "tool_trace_log.jsonl",
+        "intervention_trace_log": run_dir / "intervention_trace_log.jsonl",
+        "claim_packet_log": run_dir / "claim_packet_log.jsonl",
+    }
+
+
+def _evals_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "agent_eval_matrix": run_dir / "agent_eval_matrix.json",
+        "security_eval_report": run_dir / "security_eval_report.json",
+        "red_team_report": run_dir / "red_team_report.json",
+        "protocol_conformance_report": run_dir / "protocol_conformance_report.json",
+        "host_surface_matrix": run_dir / "host_surface_matrix.json",
+    }
+
+
 def _feedback_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "feedback_intake": run_dir / "feedback_intake.json",
@@ -10897,6 +11360,108 @@ def _refresh_pulse_manifest(
     for path in _pulse_output_paths(root).values():
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="pulse", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_trace_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_pulse_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _trace_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="trace", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_evals_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_trace_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _evals_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="evals", required=True))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:

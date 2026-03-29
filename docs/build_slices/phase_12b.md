@@ -2,14 +2,14 @@
 
 ## Status
 
-Planned.
+Implemented.
 
-Intended package boundaries:
+Canonical package boundaries:
 
 - `src/relaytic/tracing/`
 - `src/relaytic/evals/`
 
-Intended minimum modules:
+Landed minimum modules:
 
 - `src/relaytic/tracing/models.py`
 - `src/relaytic/tracing/storage.py`
@@ -18,7 +18,7 @@ Intended minimum modules:
 - `src/relaytic/evals/storage.py`
 - `src/relaytic/evals/agents.py`
 
-Intended artifacts:
+Canonical artifacts:
 
 - `trace_model.json`
 - `trace_span_log.jsonl`
@@ -35,14 +35,14 @@ Intended artifacts:
 - `protocol_conformance_report.json`
 - `host_surface_matrix.json`
 
-Intended public commands:
+Public commands:
 
 - `relaytic trace show`
 - `relaytic trace replay`
 - `relaytic evals run`
 - `relaytic evals show`
 
-Intended MCP surfaces:
+MCP surfaces:
 
 - `relaytic_show_trace`
 - `relaytic_replay_trace`
@@ -52,6 +52,15 @@ Intended MCP surfaces:
 ## Intent
 
 Slice 12B is where Relaytic stops treating runtime traces and agent safety checks as debugging side work and turns them into first-class product truth.
+
+Landed implementation notes:
+
+- `src/relaytic/tracing/` now owns canonical trace schemas, claim-packet persistence, deterministic adjudication, replay reports, and runtime event backfill helpers
+- `src/relaytic/evals/` now owns protocol-conformance reporting, host-surface matrices, adversarial/security evaluation, and evaluation bundle persistence
+- the shared runtime gateway now emits trace spans directly during stage start, stage completion, stage failure, and runtime bootstrap
+- `relaytic run` and `relaytic show` now surface trace and eval summaries once 12B artifacts exist
+- mission control now exposes one `trace_evals` card plus review-queue entries when trace truth, protocol conformance, or security posture need attention
+- targeted verification landed for deterministic adjudication, runtime-direct span emission, CLI trace/eval materialization, and MCP trace/eval tool exposure
 
 The slice is successful only if Relaytic can:
 

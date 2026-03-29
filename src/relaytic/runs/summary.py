@@ -190,6 +190,26 @@ def build_run_summary(
             "memory_pinning_index": "memory_pinning_index.json",
         },
     )
+    trace_bundle = _read_bundle(
+        root,
+        {
+            "trace_model": "trace_model.json",
+            "specialist_trace_index": "specialist_trace_index.json",
+            "branch_trace_graph": "branch_trace_graph.json",
+            "adjudication_scorecard": "adjudication_scorecard.json",
+            "decision_replay_report": "decision_replay_report.json",
+        },
+    )
+    evals_bundle = _read_bundle(
+        root,
+        {
+            "agent_eval_matrix": "agent_eval_matrix.json",
+            "security_eval_report": "security_eval_report.json",
+            "red_team_report": "red_team_report.json",
+            "protocol_conformance_report": "protocol_conformance_report.json",
+            "host_surface_matrix": "host_surface_matrix.json",
+        },
+    )
     feedback_bundle = _read_bundle(
         root,
         {
@@ -335,6 +355,14 @@ def build_run_summary(
     challenge_watchlist = _bundle_item(pulse_bundle, "challenge_watchlist")
     memory_compaction_report = _bundle_item(pulse_bundle, "memory_compaction_report")
     memory_pinning_index = _bundle_item(pulse_bundle, "memory_pinning_index")
+    trace_model = _bundle_item(trace_bundle, "trace_model")
+    adjudication_scorecard = _bundle_item(trace_bundle, "adjudication_scorecard")
+    decision_replay_report = _bundle_item(trace_bundle, "decision_replay_report")
+    agent_eval_matrix = _bundle_item(evals_bundle, "agent_eval_matrix")
+    security_eval_report = _bundle_item(evals_bundle, "security_eval_report")
+    red_team_report = _bundle_item(evals_bundle, "red_team_report")
+    protocol_conformance_report = _bundle_item(evals_bundle, "protocol_conformance_report")
+    host_surface_matrix = _bundle_item(evals_bundle, "host_surface_matrix")
     feedback_intake = _bundle_item(feedback_bundle, "feedback_intake")
     feedback_validation = _bundle_item(feedback_bundle, "feedback_validation")
     feedback_effect_report = _bundle_item(feedback_bundle, "feedback_effect_report")
@@ -653,6 +681,34 @@ def build_run_summary(
                 else None
             ),
         },
+        "trace": {
+            "status": _clean_text(trace_model.get("status")),
+            "span_count": int(trace_model.get("span_count", 0) or 0),
+            "claim_count": int(trace_model.get("claim_count", 0) or 0),
+            "branch_count": int(trace_model.get("branch_count", 0) or 0),
+            "winning_claim_id": _clean_text(adjudication_scorecard.get("winning_claim_id")),
+            "winning_action": _clean_text(adjudication_scorecard.get("winning_action")),
+            "competing_claim_count": int(decision_replay_report.get("competing_claim_count", 0) or 0),
+            "timeline_count": len(decision_replay_report.get("timeline", []))
+            if isinstance(decision_replay_report.get("timeline"), list)
+            else 0,
+            "direct_runtime_emission_detected": trace_model.get("direct_runtime_emission_detected"),
+        },
+        "evals": {
+            "status": _clean_text(agent_eval_matrix.get("status")),
+            "passed_count": int(agent_eval_matrix.get("passed_count", 0) or 0),
+            "failed_count": int(agent_eval_matrix.get("failed_count", 0) or 0),
+            "not_applicable_count": int(agent_eval_matrix.get("not_applicable_count", 0) or 0),
+            "protocol_status": _clean_text(protocol_conformance_report.get("status")),
+            "protocol_mismatch_count": int(protocol_conformance_report.get("mismatch_count", 0) or 0),
+            "security_status": _clean_text(security_eval_report.get("status")),
+            "security_open_finding_count": int(security_eval_report.get("open_finding_count", 0) or 0),
+            "red_team_status": _clean_text(red_team_report.get("status")),
+            "red_team_finding_count": int(red_team_report.get("finding_count", 0) or 0),
+            "surface_count": len(host_surface_matrix.get("surfaces", []))
+            if isinstance(host_surface_matrix.get("surfaces"), list)
+            else 0,
+        },
         "feedback": {
             "status": _clean_text(feedback_effect_report.get("status")) or _clean_text(feedback_validation.get("status")) or _clean_text(feedback_intake.get("status")),
             "accepted_count": int(feedback_validation.get("accepted_count", 0) or 0),
@@ -847,6 +903,18 @@ def build_run_summary(
             "challenge_watchlist_path": _path_if_exists(root / "challenge_watchlist.json"),
             "memory_compaction_report_path": _path_if_exists(root / "memory_compaction_report.json"),
             "memory_pinning_index_path": _path_if_exists(root / "memory_pinning_index.json"),
+            "trace_model_path": _path_if_exists(root / "trace_model.json"),
+            "specialist_trace_index_path": _path_if_exists(root / "specialist_trace_index.json"),
+            "branch_trace_graph_path": _path_if_exists(root / "branch_trace_graph.json"),
+            "adjudication_scorecard_path": _path_if_exists(root / "adjudication_scorecard.json"),
+            "decision_replay_report_path": _path_if_exists(root / "decision_replay_report.json"),
+            "trace_span_log_path": _path_if_exists(root / "trace_span_log.jsonl"),
+            "claim_packet_log_path": _path_if_exists(root / "claim_packet_log.jsonl"),
+            "agent_eval_matrix_path": _path_if_exists(root / "agent_eval_matrix.json"),
+            "security_eval_report_path": _path_if_exists(root / "security_eval_report.json"),
+            "red_team_report_path": _path_if_exists(root / "red_team_report.json"),
+            "protocol_conformance_report_path": _path_if_exists(root / "protocol_conformance_report.json"),
+            "host_surface_matrix_path": _path_if_exists(root / "host_surface_matrix.json"),
             "feedback_effect_report_path": _path_if_exists(root / "feedback_effect_report.json"),
             "feedback_casebook_path": _path_if_exists(root / "feedback_casebook.json"),
             "quality_contract_path": _path_if_exists(root / "quality_contract.json"),
@@ -879,6 +947,8 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     decision_lab = dict(summary.get("decision_lab", {}))
     dojo = dict(summary.get("dojo", {}))
     pulse = dict(summary.get("pulse", {}))
+    trace = dict(summary.get("trace", {}))
+    evals = dict(summary.get("evals", {}))
     feedback = dict(summary.get("feedback", {}))
     contracts = dict(summary.get("contracts", {}))
     profiles = dict(summary.get("profiles", {}))
@@ -1099,6 +1169,37 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         )
         if pulse.get("top_watch_kind"):
             lines.append(f"- Top watch kind: `{pulse.get('top_watch_kind')}`")
+    if trace and any(value not in (None, 0, False, "", []) for value in trace.values()):
+        lines.extend(
+            [
+                "",
+                "## Trace",
+                f"- Status: `{trace.get('status') or 'unknown'}`",
+                f"- Spans: `{trace.get('span_count', 0)}`",
+                f"- Claims: `{trace.get('claim_count', 0)}`",
+                f"- Winning claim: `{trace.get('winning_claim_id') or 'unknown'}`",
+                f"- Winning action: `{trace.get('winning_action') or 'unknown'}`",
+                f"- Replay timeline: `{trace.get('timeline_count', 0)}`",
+                f"- Direct runtime emission: `{trace.get('direct_runtime_emission_detected')}`",
+            ]
+        )
+    if evals and any(value not in (None, 0, False, "", []) for value in evals.values()):
+        lines.extend(
+            [
+                "",
+                "## Evals",
+                f"- Status: `{evals.get('status') or 'unknown'}`",
+                f"- Passed: `{evals.get('passed_count', 0)}`",
+                f"- Failed: `{evals.get('failed_count', 0)}`",
+                f"- Protocol status: `{evals.get('protocol_status') or 'unknown'}`",
+                f"- Security status: `{evals.get('security_status') or 'unknown'}`",
+                f"- Red-team status: `{evals.get('red_team_status') or 'unknown'}`",
+            ]
+        )
+        if evals.get("protocol_mismatch_count"):
+            lines.append(f"- Protocol mismatches: `{evals.get('protocol_mismatch_count')}`")
+        if evals.get("security_open_finding_count"):
+            lines.append(f"- Open security findings: `{evals.get('security_open_finding_count')}`")
     if feedback and any(value not in (None, 0, False, "", []) for value in feedback.values()):
         lines.extend(
             [

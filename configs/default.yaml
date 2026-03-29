@@ -153,6 +153,26 @@ pulse:
   max_bounded_actions: 1
   require_rowless_innovation: true
 
+tracing:
+  enabled: true
+  backfill_from_runtime_events: true
+  direct_runtime_span_writes: true
+  max_replay_spans: 80
+  conformance_surfaces:
+    - cli
+    - mcp
+
+evals:
+  enabled: true
+  require_protocol_conformance: true
+  require_security_evals: true
+  require_high_confidence_loser_proof: true
+  fail_on_protocol_mismatch: true
+  tracked_surfaces:
+    - cli
+    - mcp
+  max_reported_findings: 6
+
 research:
   enabled: false
   require_redaction_default: true

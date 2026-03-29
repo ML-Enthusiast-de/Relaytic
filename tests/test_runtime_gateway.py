@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from relaytic.tracing import read_jsonl_records
 from relaytic.policies import load_policy
 from relaytic.runtime import (
     build_runtime_surface,
@@ -68,6 +69,9 @@ def test_runtime_gateway_records_events_checkpoints_and_denied_accesses(tmp_path
     assert any(item["event_type"] == "stage_started" for item in events)
     assert any(item["event_type"] == "stage_completed" for item in events)
     assert any(item["event_type"] == "checkpoint_written" for item in events)
+    trace_spans = read_jsonl_records(run_dir / "trace_span_log.jsonl")
+    assert any(item["event_type"] == "stage_started" for item in trace_spans)
+    assert any(item["event_type"] == "stage_completed" for item in trace_spans)
 
 
 def test_runtime_gateway_executes_bounded_write_hook_when_policy_allows_it(tmp_path: Path) -> None:

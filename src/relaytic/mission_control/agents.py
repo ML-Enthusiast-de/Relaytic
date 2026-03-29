@@ -884,6 +884,8 @@ def _build_review_queue_state(
     decision_lab = dict(summary_payload.get("decision_lab", {}))
     dojo = dict(summary_payload.get("dojo", {}))
     control = dict(summary_payload.get("control", {}))
+    trace_state = dict(summary_payload.get("trace", {}))
+    evals = dict(summary_payload.get("evals", {}))
     next_step = dict(summary_payload.get("next_step", {}))
 
     doctor_status = str(doctor_report.get("status", "")).strip()
@@ -957,6 +959,36 @@ def _build_review_queue_state(
                 "title": "Recent steering request was challenged",
                 "detail": f"Control decision is `{control.get('decision')}` with challenge level `{control.get('challenge_level') or 'unknown'}`.",
                 "recommended_action": _clean_text(control.get("approved_action_kind")) or "review_override",
+            }
+        )
+    if _clean_text(trace_state.get("status")) not in {None, "ok", "empty"}:
+        items.append(
+            {
+                "source": "trace",
+                "severity": "medium",
+                "title": "Trace truth needs review",
+                "detail": f"Trace status is `{trace_state.get('status')}` and winning action is `{trace_state.get('winning_action') or 'unknown'}`.",
+                "recommended_action": "trace_show",
+            }
+        )
+    if _clean_text(evals.get("protocol_status")) == "fail":
+        items.append(
+            {
+                "source": "evals",
+                "severity": "blocking",
+                "title": "Host-surface protocol conformance failed",
+                "detail": f"Relaytic detected `{evals.get('protocol_mismatch_count', 0)}` CLI vs MCP mismatches.",
+                "recommended_action": "evals_show",
+            }
+        )
+    if int(evals.get("security_open_finding_count", 0) or 0) > 0:
+        items.append(
+            {
+                "source": "evals",
+                "severity": "medium",
+                "title": "Security evals recorded open findings",
+                "detail": f"Relaytic still has `{evals.get('security_open_finding_count', 0)}` open security findings.",
+                "recommended_action": "evals_show",
             }
         )
     if not items and _clean_text(next_step.get("recommended_action")):
@@ -1101,6 +1133,8 @@ def _build_cards(
     decision_lab = dict(summary_payload.get("decision_lab", {}))
     dojo = dict(summary_payload.get("dojo", {}))
     pulse = dict(summary_payload.get("pulse", {}))
+    trace_state = dict(summary_payload.get("trace", {}))
+    evals = dict(summary_payload.get("evals", {}))
     contracts = dict(summary_payload.get("contracts", {}))
     runtime = dict(summary_payload.get("runtime", {}))
     next_step = dict(summary_payload.get("next_step", {}))
@@ -1160,6 +1194,17 @@ def _build_cards(
                 f" | leads `{pulse.get('innovation_lead_count', 0)}`"
             ),
             "severity": "medium" if _clean_text(pulse.get("skip_reason")) in {"pulse_disabled_by_policy", "pulse_throttled"} else "normal",
+        },
+        {
+            "card_id": "trace_evals",
+            "title": "Trace + Evals",
+            "value": _clean_text(trace_state.get("winning_action")) or _clean_text(trace_state.get("status")) or "not_materialized",
+            "detail": (
+                f"Trace spans `{trace_state.get('span_count', 0)}`"
+                f" | protocol `{evals.get('protocol_status') or 'unknown'}`"
+                f" | security `{evals.get('security_status') or 'unknown'}`"
+            ),
+            "severity": "medium" if _clean_text(evals.get("protocol_status")) == "fail" or int(evals.get("failed_count", 0) or 0) > 0 else "normal",
         },
         {
             "card_id": "assist_control",
@@ -1429,6 +1474,8 @@ def _build_action_affordances(
     next_step = dict(summary_payload.get("next_step", {}))
     benchmark = dict(summary_payload.get("benchmark", {}))
     pulse = dict(summary_payload.get("pulse", {}))
+    trace_state = dict(summary_payload.get("trace", {}))
+    evals = dict(summary_payload.get("evals", {}))
     if _is_onboarding_state(summary_payload):
         actions = [
             {
@@ -1610,6 +1657,26 @@ def _build_action_affordances(
                 "challenge_level": "low",
                 "detail": "Inspect the latest pulse status, watchlist, innovation leads, and any bounded queued follow-up.",
                 "command_hint": f"relaytic pulse show --run-dir {run_dir}",
+            }
+        )
+    if trace_state:
+        actions.append(
+            {
+                "action_id": "review_trace",
+                "title": "Review Trace",
+                "challenge_level": "low",
+                "detail": "Inspect the canonical span log, competing claims, and the deterministic winning action.",
+                "command_hint": f"relaytic trace show --run-dir {run_dir}",
+            }
+        )
+    if evals:
+        actions.append(
+            {
+                "action_id": "review_evals",
+                "title": "Review Agent Evals",
+                "challenge_level": "low",
+                "detail": "Inspect protocol conformance, skeptical-control proof, and red-team findings.",
+                "command_hint": f"relaytic evals show --run-dir {run_dir}",
             }
         )
     return ActionAffordances(
@@ -1857,6 +1924,7 @@ def _build_control_center_layout(
         {"panel_id": "actions", "title": "What a human or external agent can do next without guessing"},
         {"panel_id": "stage_navigator", "title": "Bounded stage reruns with explicit scope and limitations"},
         {"panel_id": "questions", "title": "Starter questions that make the lab feel immediately explorable"},
+        {"panel_id": "trace_evals", "title": "Canonical traces, competing claims, conformance checks, and security proof"},
         {"panel_id": "dojo", "title": "Guarded self-improvement, promotions, and rollback state"},
         {"panel_id": "review_queue", "title": "Queued blocking and follow-up items"},
         {"panel_id": "onboarding", "title": "Install, doctor, and host-readiness guidance"},
@@ -1870,7 +1938,7 @@ def _build_control_center_layout(
         layout_name="mission_control_mvp",
         default_focus_panel="cards",
         panels=panels,
-        summary="Relaytic exposes one thin mission-control layout that reuses current artifact truth while making modes, capabilities, actions, stage navigation, questions, and dojo state explicit.",
+        summary="Relaytic exposes one thin mission-control layout that reuses current artifact truth while making modes, capabilities, actions, stage navigation, trace proof, eval results, questions, and dojo state explicit.",
         trace=trace,
     )
 

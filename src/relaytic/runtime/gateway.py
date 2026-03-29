@@ -122,6 +122,25 @@ _STAGE_PLAN: dict[str, dict[str, Any]] = {
             "dojo_session.json",
         ],
     },
+    "trace": {
+        "specialists": ["trace_adjudicator"],
+        "input_artifacts": [
+            "run_summary.json",
+            "lab_event_stream.jsonl",
+            "control_injection_audit.json",
+            "override_decision.json",
+        ],
+    },
+    "evals": {
+        "specialists": ["agent_evaluator"],
+        "input_artifacts": [
+            "trace_model.json",
+            "adjudication_scorecard.json",
+            "decision_replay_report.json",
+            "protocol_conformance_report.json",
+            "run_summary.json",
+        ],
+    },
 }
 
 
@@ -178,6 +197,7 @@ def ensure_runtime_initialized(
             metadata={"event_stream_path": str(root / EVENT_STREAM_FILENAME)},
         )
         append_event(root, event=init_event)
+        _emit_trace_event(root=root, policy=policy, event=init_event)
         _record_hook(
             root,
             controls,
@@ -252,6 +272,7 @@ def record_stage_start(
         },
     )
     append_event(root, event=event)
+    _emit_trace_event(root=root, policy=policy, event=event)
     decisions = _access_decisions_for_stage(
         stage=stage,
         data_path=data_path,
@@ -337,6 +358,7 @@ def record_stage_completion(
         },
     )
     append_event(root, event=completed_event)
+    _emit_trace_event(root=root, policy=policy, event=completed_event)
     _update_context_stage_report(
         root,
         controls,
@@ -455,6 +477,7 @@ def record_stage_failure(
         },
     )
     append_event(root, event=failed_event)
+    _emit_trace_event(root=root, policy=policy, event=failed_event)
     _update_context_stage_report(
         root,
         controls,
@@ -920,3 +943,12 @@ def _identifier(prefix: str) -> str:
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _emit_trace_event(*, root: Path, policy: dict[str, Any], event: dict[str, Any]) -> None:
+    try:
+        from relaytic.tracing import record_runtime_trace_event
+
+        record_runtime_trace_event(run_dir=root, policy=policy, event=event)
+    except Exception:
+        return

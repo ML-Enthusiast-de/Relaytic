@@ -171,12 +171,12 @@ Reason:
 
 Current repo state:
 
-- implemented through Slice 12A, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, and Slice 12A lab pulse now landed
-- next execution target: Slice 12B
+- implemented through Slice 12B, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, and Slice 12B first-class tracing plus runtime evaluation now landed
+- next execution target: Slice 13
 - latest landed pulse slice: Slice 12A
-- next trace-and-safety follow-on after Slice 12A: Slice 12B
+- latest trace-and-safety slice: Slice 12B
 - next scale-and-search follow-on after Slice 12B: Slice 13
-- after Slice 12A, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, and pulse-visibility surfaces rather than leaving the UI stale until late polish
+- after Slice 12B, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, and trace/eval visibility surfaces rather than leaving the UI stale until late polish
 
 ## MVP boundary
 
@@ -226,8 +226,8 @@ If the goal is to turn the current implementation into something that looks genu
 - causal memory that preserves interventions, method outcomes, and downstream consequences rather than only analog similarity
 - a method compiler that turns research, memory, and operator context into executable challenger and feature templates
 - imported-incumbent challenge paths so Relaytic can beat real existing systems instead of only abstract baselines
-- a first-class trace model across specialists, tools, interventions, and branches so Relaytic can replay and compare complex multi-stage behavior from one runtime truth
-- runtime agent/security harnesses that test control injection, tool misuse, branch-controller safety, and skeptical override behavior before broader autonomy becomes default
+- trace-native mission-control surfaces that turn the shipped specialist/tool/intervention/branch trace model into a polished replay, branch, and change-attribution experience
+- broader runtime agent/security harnesses that expand the shipped control-injection, tool-misuse, branch-safety, and skeptical-override checks into a larger proof pack before broader autonomy becomes default
 - outcome learning rather than run-only learning
 - a richer long-term memory stack with retention, compaction, pinning, and replay rules so later specialists inherit durable lessons instead of analog hints alone
 - richer data-fabric reasoning that can suggest joins, entity histories, or additional data before wasting search budget

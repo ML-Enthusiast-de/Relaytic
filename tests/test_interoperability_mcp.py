@@ -6,6 +6,7 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
 from relaytic.interoperability import (
+    build_interoperability_tool_specs,
     find_available_port,
     run_live_streamable_http_smoke_check,
     start_streamable_http_server_process,
@@ -18,6 +19,16 @@ def test_streamable_http_mcp_smoke_is_ok() -> None:
     assert report["status"] == "ok"
     assert report["server_status"] == "ok"
     assert report["tool_count"] >= 10
+
+
+def test_interoperability_specs_include_trace_and_eval_tools() -> None:
+    names = {spec.name for spec in build_interoperability_tool_specs()}
+    assert {
+        "relaytic_show_trace",
+        "relaytic_replay_trace",
+        "relaytic_run_agent_evals",
+        "relaytic_show_agent_evals",
+    }.issubset(names)
 
 
 def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_path: Path) -> None:

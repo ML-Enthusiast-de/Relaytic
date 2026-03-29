@@ -47,11 +47,11 @@ Current canonical boundaries:
 - `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding plus live terminal mission-control chat surfaces, Slice 11E role-specific handbook discovery and handbook-aware onboarding surfaces, Slice 11F demo-grade onboarding, explicit mode education, stuck recovery, recruiter-safe walkthrough surfaces, Slice 11G adaptive human onboarding capture plus lightweight local semantic guidance surfaces, and later Slice 15 branch DAG, confidence map, trace exploration, and change-attribution surfaces
 - `src/relaytic/dojo/` owns Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback state, and architecture-proposal quarantine
 - `src/relaytic/pulse/` owns Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, explicit memory-maintenance orchestration, and pulse-to-mission-control visibility surfaces
+- `src/relaytic/tracing/` owns Slice 12B canonical trace schemas, specialist/tool/intervention/branch span persistence, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
+- `src/relaytic/evals/` owns Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
 
 Reserved future boundaries:
 
-- `src/relaytic/tracing/` should own Slice 12B canonical trace schemas, specialist/tool/intervention/branch span persistence, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
-- `src/relaytic/evals/` should own Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
@@ -284,7 +284,8 @@ Current dojo artifact names:
 - `memory_compaction_report.json`
 - `memory_pinning_index.json`
 
-Reserved future artifact names:
+Current trace and eval artifact names:
+
 - `trace_model.json`
 - `trace_span_log.jsonl`
 - `specialist_trace_index.json`
@@ -299,6 +300,8 @@ Reserved future artifact names:
 - `red_team_report.json`
 - `protocol_conformance_report.json`
 - `host_surface_matrix.json`
+
+Reserved future artifact names:
 - `hpo_campaign_report.json`
 - `search_decision_ledger.json`
 - `search_value_report.json`
