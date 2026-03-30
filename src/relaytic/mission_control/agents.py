@@ -1135,6 +1135,8 @@ def _build_cards(
     pulse = dict(summary_payload.get("pulse", {}))
     trace_state = dict(summary_payload.get("trace", {}))
     evals = dict(summary_payload.get("evals", {}))
+    handoff = dict(summary_payload.get("handoff", {}))
+    learnings = dict(summary_payload.get("learnings", {}))
     contracts = dict(summary_payload.get("contracts", {}))
     runtime = dict(summary_payload.get("runtime", {}))
     next_step = dict(summary_payload.get("next_step", {}))
@@ -1205,6 +1207,31 @@ def _build_cards(
                 f" | security `{evals.get('security_status') or 'unknown'}`"
             ),
             "severity": "medium" if _clean_text(evals.get("protocol_status")) == "fail" or int(evals.get("failed_count", 0) or 0) > 0 else "normal",
+        },
+        {
+            "card_id": "handoff",
+            "title": "Result Handoff",
+            "value": _clean_text(handoff.get("selected_focus_label"))
+            or _clean_text(handoff.get("recommended_option_id"))
+            or _clean_text(handoff.get("status"))
+            or "not_materialized",
+            "detail": (
+                f"Findings `{handoff.get('key_finding_count', 0)}`"
+                f" | risks `{handoff.get('risk_count', 0)}`"
+                f" | user report `{ 'ready' if _clean_text(handoff.get('user_report_path')) else 'missing' }`"
+            ),
+            "severity": "normal",
+        },
+        {
+            "card_id": "learnings",
+            "title": "Durable Learnings",
+            "value": _clean_text(learnings.get("most_recent_lesson")) or _clean_text(learnings.get("status")) or "not_materialized",
+            "detail": (
+                f"Stored `{learnings.get('state_entry_count', 0)}`"
+                f" | active `{learnings.get('active_count', 0)}`"
+                f" | harvested `{learnings.get('harvested_count', 0)}`"
+            ),
+            "severity": "normal",
         },
         {
             "card_id": "assist_control",
@@ -1300,6 +1327,8 @@ def _build_capability_manifest(
     profiles = dict(summary_payload.get("profiles", {}))
     runtime = dict(summary_payload.get("runtime", {}))
     data = dict(summary_payload.get("data", {}))
+    handoff = dict(summary_payload.get("handoff", {}))
+    learnings = dict(summary_payload.get("learnings", {}))
     host_summary = dict(interoperability_inventory.get("host_summary", {}))
     onboarding = _is_onboarding_state(summary_payload)
     semantic_backend_status = _clean_text(assist_mode.get("semantic_backend_status")) or "unknown"
@@ -1364,6 +1393,54 @@ def _build_capability_manifest(
             "detail": "Truth-bearing override requests are challenged instead of blindly obeyed.",
             "status_reason": "This protection stays on by default so Relaytic does not become a compliant shell.",
             "activation_hint": "You can still steer Relaytic, but it will explain accept, modify, defer, or reject decisions explicitly.",
+        },
+        {
+            "capability_id": "result_handoff",
+            "name": "Differentiated Result Reports",
+            "status": (
+                "enabled"
+                if _clean_text(handoff.get("user_report_path")) or _clean_text(handoff.get("agent_report_path"))
+                else ("needs_run_context" if onboarding else "materializing")
+            ),
+            "detail": "Relaytic can produce a human-oriented result report and a terser agent-oriented handoff from the same run truth.",
+            "status_reason": (
+                "These reports only make sense once a governed run exists."
+                if onboarding
+                else (
+                    "Result handoff artifacts are already available for this run."
+                    if _clean_text(handoff.get("user_report_path")) or _clean_text(handoff.get("agent_report_path"))
+                    else "The reports will appear after summary materialization completes."
+                )
+            ),
+            "activation_hint": (
+                f"Start a run first with `{_example_run_command(run_dir=None)}`."
+                if onboarding
+                else f"Use `relaytic handoff show --run-dir {_display_run_dir(summary_payload)}` or ask `what did you find?`."
+            ),
+        },
+        {
+            "capability_id": "durable_learnings",
+            "name": "Durable Learnings",
+            "status": (
+                "enabled"
+                if _clean_text(learnings.get("learnings_state_path")) or int(learnings.get("state_entry_count", 0) or 0) > 0
+                else ("needs_run_context" if onboarding else "materializing")
+            ),
+            "detail": "Relaytic can retain cross-run learnings, assumptions, feedback, and safety lessons in a local durable memory.",
+            "status_reason": (
+                "Durable learnings become meaningful after at least one run has completed."
+                if onboarding
+                else (
+                    "Durable learnings are already available for this workspace."
+                    if _clean_text(learnings.get("learnings_state_path")) or int(learnings.get("state_entry_count", 0) or 0) > 0
+                    else "The shared learnings state will be created after the current run is summarized."
+                )
+            ),
+            "activation_hint": (
+                f"Start a run first with `{_example_run_command(run_dir=None)}`."
+                if onboarding
+                else f"Use `relaytic learnings show --run-dir {_display_run_dir(summary_payload)}` or ask `show learnings`."
+            ),
         },
         {
             "capability_id": "imported_incumbent_challenge",
@@ -1476,6 +1553,8 @@ def _build_action_affordances(
     pulse = dict(summary_payload.get("pulse", {}))
     trace_state = dict(summary_payload.get("trace", {}))
     evals = dict(summary_payload.get("evals", {}))
+    handoff = dict(summary_payload.get("handoff", {}))
+    learnings = dict(summary_payload.get("learnings", {}))
     if _is_onboarding_state(summary_payload):
         actions = [
             {
@@ -1596,6 +1675,44 @@ def _build_action_affordances(
             "command_hint": f"relaytic assist turn --run-dir {run_dir} --message \"what can you do?\"",
         },
     ]
+    if handoff:
+        actions.append(
+            {
+                "action_id": "show_result_report",
+                "title": "Show Result Report",
+                "challenge_level": "low",
+                "detail": "Read the differentiated handoff so humans and agents can both see what Relaytic found and what it recommends next.",
+                "command_hint": f"relaytic handoff show --run-dir {run_dir}",
+            }
+        )
+        actions.append(
+            {
+                "action_id": "set_next_run_focus",
+                "title": "Set Next-Run Focus",
+                "challenge_level": "low",
+                "detail": "Tell Relaytic whether to stay on the same data, add data, or start over with a new dataset next time.",
+                "command_hint": f"relaytic handoff focus --run-dir {run_dir} --selection same_data --notes \"focus on recall\"",
+            }
+        )
+    if learnings:
+        actions.append(
+            {
+                "action_id": "show_learnings",
+                "title": "Show Learnings",
+                "challenge_level": "low",
+                "detail": "Inspect the durable learnings Relaytic kept for later runs in this workspace.",
+                "command_hint": f"relaytic learnings show --run-dir {run_dir}",
+            }
+        )
+        actions.append(
+            {
+                "action_id": "reset_learnings",
+                "title": "Reset Learnings",
+                "challenge_level": "low",
+                "detail": "Clear durable learnings if you want the next run to start from a fresh workspace memory.",
+                "command_hint": f"relaytic learnings reset --run-dir {run_dir}",
+            }
+        )
     available_stages = [str(item).strip() for item in assist_state.get("available_stage_targets", []) if str(item).strip()]
     if available_stages:
         suggested_stage = "benchmark" if "benchmark" in available_stages else available_stages[0]
@@ -1685,7 +1802,7 @@ def _build_action_affordances(
         controls=controls,
         status="ok",
         action_count=len(actions),
-        actions=actions[:8],
+        actions=actions[:10],
         summary="Relaytic makes the next safe actions explicit so humans and agents do not have to guess how to interact.",
         trace=trace,
     )
@@ -1753,6 +1870,8 @@ def _build_question_starters(
     benchmark = dict(summary_payload.get("benchmark", {}))
     decision_lab = dict(summary_payload.get("decision_lab", {}))
     control = dict(summary_payload.get("control", {}))
+    handoff = dict(summary_payload.get("handoff", {}))
+    learnings = dict(summary_payload.get("learnings", {}))
     if _is_onboarding_state(summary_payload):
         questions = [
             {
@@ -1848,6 +1967,36 @@ def _build_question_starters(
             "detail": "Explains current capabilities, limits, and safe steering options.",
         },
     ]
+    if handoff:
+        questions.append(
+            {
+                "category": "handoff",
+                "question": "what did you find?",
+                "detail": "Shows the differentiated result handoff and highlights what Relaytic thinks matters most.",
+            }
+        )
+        questions.append(
+            {
+                "category": "focus",
+                "question": "use the same data next time but focus on recall",
+                "detail": "Persists a next-run focus without forcing a full rerun immediately.",
+            }
+        )
+    if learnings:
+        questions.append(
+            {
+                "category": "learnings",
+                "question": "show learnings",
+                "detail": "Shows the durable learnings Relaytic kept from earlier runs in the same workspace.",
+            }
+        )
+        questions.append(
+            {
+                "category": "learnings_reset",
+                "question": "reset the learnings",
+                "detail": "Clears durable learnings if you want the workspace memory to start fresh.",
+            }
+        )
     if benchmark.get("incumbent_present"):
         questions.append(
             {
@@ -1896,7 +2045,7 @@ def _build_question_starters(
         controls=controls,
         status="ok",
         question_count=len(questions),
-        starters=questions[:8],
+        starters=questions[:10],
         summary="Relaytic exposes starter questions so users and external agents know how to interact without guessing the shell vocabulary.",
         trace=trace,
     )
@@ -1925,6 +2074,8 @@ def _build_control_center_layout(
         {"panel_id": "stage_navigator", "title": "Bounded stage reruns with explicit scope and limitations"},
         {"panel_id": "questions", "title": "Starter questions that make the lab feel immediately explorable"},
         {"panel_id": "trace_evals", "title": "Canonical traces, competing claims, conformance checks, and security proof"},
+        {"panel_id": "handoff", "title": "Differentiated result reports and explicit next-run focus choices"},
+        {"panel_id": "learnings", "title": "Durable cross-run learnings that can be reviewed or reset deliberately"},
         {"panel_id": "dojo", "title": "Guarded self-improvement, promotions, and rollback state"},
         {"panel_id": "review_queue", "title": "Queued blocking and follow-up items"},
         {"panel_id": "onboarding", "title": "Install, doctor, and host-readiness guidance"},

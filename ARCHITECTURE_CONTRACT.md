@@ -49,6 +49,8 @@ Current canonical boundaries:
 - `src/relaytic/pulse/` owns Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, explicit memory-maintenance orchestration, and pulse-to-mission-control visibility surfaces
 - `src/relaytic/tracing/` owns Slice 12B canonical trace schemas, specialist/tool/intervention/branch span persistence, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
 - `src/relaytic/evals/` owns Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
+- `src/relaytic/handoff/` owns Slice 12C differentiated post-run handoff generation, next-run options, persisted next-run focus, and differentiated report rendering for humans and external agents
+- `src/relaytic/learnings/` owns Slice 12C durable local learnings state, learnings markdown, per-run learnings snapshots, and workspace learnings reset behavior
 
 Reserved future boundaries:
 
@@ -97,6 +99,7 @@ These files are required and must stay current:
 - `docs/build_slices/phase_12.md`
 - `docs/build_slices/phase_12a.md`
 - `docs/build_slices/phase_12b.md`
+- `docs/build_slices/phase_12c.md`
 - `docs/build_slices/phase_13.md`
 - `docs/build_slices/phase_14.md`
 - `docs/build_slices/phase_15.md`
@@ -283,6 +286,17 @@ Current dojo artifact names:
 - `memory_compaction_plan.json`
 - `memory_compaction_report.json`
 - `memory_pinning_index.json`
+
+Current handoff and learnings artifact names:
+
+- `run_handoff.json`
+- `next_run_options.json`
+- `next_run_focus.json`
+- `reports/user_result_report.md`
+- `reports/agent_result_report.md`
+- `lab_learnings_snapshot.json`
+- `learnings_state.json`
+- `learnings.md`
 
 Current trace and eval artifact names:
 

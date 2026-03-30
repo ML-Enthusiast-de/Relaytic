@@ -322,6 +322,66 @@ def render_mission_control_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_mission_control_markdown(*args, **kwargs)
 
 
+def run_handoff_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.handoff import run_handoff_review as _run_handoff_review
+
+    return _run_handoff_review(*args, **kwargs)
+
+
+def apply_next_run_focus(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.handoff import apply_next_run_focus as _apply_next_run_focus
+
+    return _apply_next_run_focus(*args, **kwargs)
+
+
+def read_handoff_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.handoff import read_handoff_bundle as _read_handoff_bundle
+
+    return _read_handoff_bundle(*args, **kwargs)
+
+
+def render_handoff_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.handoff import render_handoff_review_markdown as _render_handoff_review_markdown
+
+    return _render_handoff_review_markdown(*args, **kwargs)
+
+
+def write_next_run_focus(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.handoff import write_next_run_focus as _write_next_run_focus
+
+    return _write_next_run_focus(*args, **kwargs)
+
+
+def default_learnings_state_dir(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.learnings import default_learnings_state_dir as _default_learnings_state_dir
+
+    return _default_learnings_state_dir(*args, **kwargs)
+
+
+def read_learnings_state(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.learnings import read_learnings_state as _read_learnings_state
+
+    return _read_learnings_state(*args, **kwargs)
+
+
+def read_learnings_snapshot(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.learnings import read_learnings_snapshot as _read_learnings_snapshot
+
+    return _read_learnings_snapshot(*args, **kwargs)
+
+
+def reset_learnings(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.learnings import reset_learnings as _reset_learnings
+
+    return _reset_learnings(*args, **kwargs)
+
+
+def render_learnings_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.learnings import render_learnings_markdown as _render_learnings_markdown
+
+    return _render_learnings_markdown(*args, **kwargs)
+
+
 def run_control_review(*args: Any, **kwargs: Any) -> Any:
     from relaytic.control import run_control_review as _run_control_review
 
@@ -2007,6 +2067,89 @@ def build_parser() -> argparse.ArgumentParser:
     mission_control_chat.add_argument("--show-json", action="store_true", help="Print structured payloads after each turn.")
     mission_control_chat.add_argument("--max-turns", type=int, default=0, help="Optional positive turn cap. 0 means unlimited until /exit.")
 
+    handoff_surface = sub.add_parser(
+        "handoff",
+        help="Inspect differentiated post-run reports or set the explicit next-run focus for humans and agents.",
+    )
+    handoff_sub = handoff_surface.add_subparsers(dest="handoff_command", required=True)
+
+    handoff_show = handoff_sub.add_parser(
+        "show",
+        help="Render the current differentiated post-run handoff for a run.",
+    )
+    handoff_show.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    handoff_show.add_argument(
+        "--audience",
+        choices=["user", "agent", "both"],
+        default="both",
+        help="Which report audience to render.",
+    )
+    handoff_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    handoff_focus = handoff_sub.add_parser(
+        "focus",
+        help="Persist the explicit next-run focus for a completed run.",
+    )
+    handoff_focus.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    handoff_focus.add_argument(
+        "--selection",
+        choices=["same_data", "add_data", "new_dataset"],
+        required=True,
+        help="How the next run should relate to the current one.",
+    )
+    handoff_focus.add_argument("--notes", default=None, help="Optional notes for the next run.")
+    handoff_focus.add_argument("--source", default="cli", help="Source label for this focus selection.")
+    handoff_focus.add_argument("--actor-type", default="user", help="Actor type creating the focus selection.")
+    handoff_focus.add_argument("--actor-name", default=None, help="Optional actor name.")
+    handoff_focus.add_argument(
+        "--reset-learnings",
+        action="store_true",
+        help="Reset durable learnings now so the next run starts from a fresh memory state.",
+    )
+    handoff_focus.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    learnings_surface = sub.add_parser(
+        "learnings",
+        help="Inspect or reset Relaytic's durable cross-run learnings memory.",
+    )
+    learnings_sub = learnings_surface.add_subparsers(dest="learnings_command", required=True)
+
+    learnings_show = learnings_sub.add_parser(
+        "show",
+        help="Render the durable learnings state and any current run snapshot.",
+    )
+    learnings_show.add_argument("--run-dir", default=None, help="Optional run directory for the current run snapshot.")
+    learnings_show.add_argument("--state-dir", default=None, help="Optional explicit learnings state directory.")
+    learnings_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    learnings_reset = learnings_sub.add_parser(
+        "reset",
+        help="Reset durable learnings for this workspace or explicit state directory.",
+    )
+    learnings_reset.add_argument("--run-dir", default=None, help="Optional run directory whose workspace learnings should be reset.")
+    learnings_reset.add_argument("--state-dir", default=None, help="Optional explicit learnings state directory.")
+    learnings_reset.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     plan = sub.add_parser(
         "plan",
         help="Create Slice 05 planning artifacts and execute the first deterministic route.",
@@ -2240,6 +2383,61 @@ def main(argv: list[str] | None = None) -> int:
                     max_turns=int(args.max_turns),
                 )
             return 0
+
+    if args.command == "handoff":
+        try:
+            if args.handoff_command == "show":
+                payload = _show_handoff_surface(
+                    run_dir=args.run_dir,
+                    audience=args.audience,
+                )
+            elif args.handoff_command == "focus":
+                payload = _set_next_run_focus_surface(
+                    run_dir=args.run_dir,
+                    selection_id=args.selection,
+                    notes=args.notes,
+                    source=args.source,
+                    actor_type=args.actor_type,
+                    actor_name=args.actor_name,
+                    reset_requested=bool(args.reset_learnings),
+                )
+            else:
+                parser.error("Unsupported handoff subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "learnings":
+        try:
+            if args.learnings_command == "show":
+                payload = _show_learnings_surface(
+                    run_dir=args.run_dir,
+                    state_dir=args.state_dir,
+                )
+            elif args.learnings_command == "reset":
+                payload = _reset_learnings_surface(
+                    run_dir=args.run_dir,
+                    state_dir=args.state_dir,
+                )
+            else:
+                parser.error("Unsupported learnings subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
 
     if args.command == "integrations":
         if args.integrations_command == "show":
@@ -4105,6 +4303,139 @@ def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _show_handoff_surface(*, run_dir: str | Path, audience: str = "both") -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    summary_materialized = materialize_run_summary(run_dir=root)
+    summary = dict(summary_materialized["summary"])
+    bundle = read_handoff_bundle(root)
+    if not bundle:
+        raise ValueError(f"No differentiated handoff artifacts found in {root}.")
+    handoff = dict(summary.get("handoff", {}))
+    user_report_path = Path(str(handoff.get("user_report_path", "")).strip()) if str(handoff.get("user_report_path", "")).strip() else None
+    agent_report_path = Path(str(handoff.get("agent_report_path", "")).strip()) if str(handoff.get("agent_report_path", "")).strip() else None
+    if audience == "user" and user_report_path is not None and user_report_path.exists():
+        human_output = user_report_path.read_text(encoding="utf-8")
+    elif audience == "agent" and agent_report_path is not None and agent_report_path.exists():
+        human_output = agent_report_path.read_text(encoding="utf-8")
+    else:
+        human_output = render_handoff_review_markdown(bundle, audience=audience)
+    manifest_path = _refresh_access_manifest(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "handoff": handoff,
+            "bundle": bundle,
+            "run_summary": summary,
+        },
+        "human_output": human_output,
+    }
+
+
+def _set_next_run_focus_surface(
+    *,
+    run_dir: str | Path,
+    selection_id: str,
+    notes: str | None,
+    source: str,
+    actor_type: str,
+    actor_name: str | None,
+    reset_requested: bool,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    policy = _load_mission_control_policy(run_dir=str(root), config_path=None)
+    artifact = apply_next_run_focus(
+        run_dir=root,
+        selection_id=selection_id,
+        notes=notes,
+        source=source,
+        actor_type=actor_type,
+        actor_name=actor_name,
+        reset_learnings_requested=reset_requested,
+        policy=policy,
+    )
+    write_next_run_focus(root, artifact=artifact)
+    if reset_requested:
+        reset_learnings(run_dir=root, policy=policy)
+    summary_materialized = materialize_run_summary(run_dir=root)
+    manifest_path = _refresh_access_manifest(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "next_run_focus": artifact.to_dict(),
+            "handoff": dict(summary_materialized["summary"].get("handoff", {})),
+            "learnings": dict(summary_materialized["summary"].get("learnings", {})),
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": (
+            f"Relaytic saved the next-run focus `{artifact.selection_id}`.\n"
+            + (
+                f"{artifact.summary}\n"
+                if artifact.summary
+                else ""
+            )
+            + (
+                "Durable learnings were reset for the workspace.\n"
+                if reset_requested
+                else ""
+            )
+        ),
+    }
+
+
+def _show_learnings_surface(*, run_dir: str | None, state_dir: str | None) -> dict[str, Any]:
+    root = Path(run_dir) if run_dir else None
+    resolved_state_dir = Path(state_dir) if state_dir else default_learnings_state_dir(run_dir=root)
+    state = read_learnings_state(resolved_state_dir)
+    snapshot = read_learnings_snapshot(root) if root is not None and root.exists() else {}
+    human_output = render_learnings_markdown(state, snapshot=snapshot or None)
+    surface_payload: dict[str, Any] = {
+        "status": "ok",
+        "state_dir": str(resolved_state_dir),
+        "learnings_state": state,
+        "snapshot": snapshot,
+    }
+    if root is not None:
+        surface_payload["run_dir"] = str(root)
+    return {
+        "surface_payload": surface_payload,
+        "human_output": human_output,
+    }
+
+
+def _reset_learnings_surface(*, run_dir: str | None, state_dir: str | None) -> dict[str, Any]:
+    root = Path(run_dir) if run_dir else None
+    policy = _load_mission_control_policy(run_dir=str(root) if root is not None else None, config_path=None)
+    artifact = reset_learnings(run_dir=root, state_dir=state_dir, policy=policy)
+    human_output = (
+        "# Relaytic Learnings Reset\n\n"
+        f"- Status: `{artifact.status}`\n"
+        f"- Removed entries: `{artifact.removed_entry_count}`\n"
+        f"- State directory: `{artifact.state_dir}`\n"
+        f"- Summary: {artifact.summary}\n"
+    )
+    surface_payload: dict[str, Any] = {
+        "status": "ok",
+        "reset": artifact.to_dict(),
+    }
+    if root is not None and root.exists():
+        summary_materialized = materialize_run_summary(run_dir=root)
+        surface_payload["run_dir"] = str(root)
+        surface_payload["run_summary"] = summary_materialized["summary"]
+        human_output = human_output + "\n" + summary_materialized["summary"].get("headline", "")
+    return {
+        "surface_payload": surface_payload,
+        "human_output": human_output,
+    }
+
+
 def _show_assist_surface(*, run_dir: str | Path, config_path: str | None) -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
@@ -4183,7 +4514,37 @@ def _run_assist_turn(
         action_message = str(dict(control_bundle.get("override_decision", {})).get("summary") or plan.response_message)
     else:
         action_message = str(plan.response_message)
-    if control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "rerun_stage" and approved_stage:
+    if control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "show_handoff":
+        handoff_payload = _show_handoff_surface(
+            run_dir=root,
+            audience="agent" if str(actor_type).strip().lower() == "agent" else "user",
+        )
+        action_message = str(handoff_payload["human_output"]).rstrip()
+    elif control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "show_learnings":
+        learnings_payload = _show_learnings_surface(run_dir=str(root), state_dir=None)
+        action_message = str(learnings_payload["human_output"]).rstrip()
+    elif control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "reset_learnings":
+        learnings_payload = _reset_learnings_surface(run_dir=str(root), state_dir=None)
+        action_message = str(learnings_payload["human_output"]).rstrip()
+    elif control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "focus_next_run":
+        selection_id = plan.intent.next_run_selection
+        if not selection_id:
+            action_message = (
+                "Relaytic did not detect a concrete next-run selection. "
+                "Use `same_data`, `add_data`, or `new_dataset` in the message."
+            )
+        else:
+            focus_payload = _set_next_run_focus_surface(
+                run_dir=root,
+                selection_id=selection_id,
+                notes=plan.intent.focus_notes,
+                source="assist",
+                actor_type=actor_type,
+                actor_name=actor_name,
+                reset_requested=bool(plan.intent.reset_learnings_requested),
+            )
+            action_message = str(focus_payload["human_output"]).rstrip()
+    elif control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "rerun_stage" and approved_stage:
         executed_stages = _run_assist_stage_pipeline(
             run_dir=root,
             start_stage=approved_stage,
@@ -4277,8 +4638,9 @@ def _run_assist_chat(
         "relaytic> Communicative assist session started. "
         "Assist chat is the live terminal conversation for an existing run. "
         "Ask things like `what can you do?`, `why did you choose this route?`, "
-        "`go back to planning`, or `i'm not sure, take over`. "
-        "Commands: /help, /show, /capabilities, /stages, /next, /takeover, /exit."
+        "`what did you find?`, `use the same data next time but focus on recall`, "
+        "`show learnings`, `go back to planning`, or `i'm not sure, take over`. "
+        "Commands: /help, /show, /capabilities, /report, /learnings, /stages, /next, /takeover, /exit."
     )
     turns = 0
     while True:
@@ -4300,8 +4662,8 @@ def _run_assist_chat(
         if lowered == "/help":
             print(
                 "relaytic> Ask for `status`, `why`, `what can you do?`, `connect claude`, "
-                "`go back to research`, or `take over`. "
-                "Shortcuts: /show, /capabilities, /stages, /next, /takeover, /exit."
+                "`what did you find?`, `show learnings`, `go back to research`, or `take over`. "
+                "Shortcuts: /show, /capabilities, /report, /learnings, /stages, /next, /takeover, /exit."
             )
             continue
         if lowered == "/show":
@@ -4314,6 +4676,36 @@ def _run_assist_chat(
             payload = _run_assist_turn(
                 run_dir=run_dir,
                 message="what can you do?",
+                config_path=config_path,
+                data_path=data_path,
+            )
+            print("relaytic> " + payload["human_output"].strip())
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        if lowered == "/report":
+            payload = _run_assist_turn(
+                run_dir=run_dir,
+                message="what did you find?",
+                config_path=config_path,
+                data_path=data_path,
+            )
+            print("relaytic> " + payload["human_output"].strip())
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        if lowered == "/learnings":
+            payload = _run_assist_turn(
+                run_dir=run_dir,
+                message="show learnings",
                 config_path=config_path,
                 data_path=data_path,
             )
@@ -4408,8 +4800,9 @@ def _run_mission_control_chat(
         print(
             "relaytic> Mission-control chat is the terminal companion to the dashboard. "
             "Ask things like `what can you do?`, `why did you choose this route?`, "
-            "`go back to planning`, or `i'm not sure, take over`. "
-            "Commands: /help, /show, /capabilities, /stages, /next, /takeover, /modes, /stuck, /handbook, /exit."
+            "`what did you find?`, `use the same data next time but focus on recall`, "
+            "`show learnings`, `go back to planning`, or `i'm not sure, take over`. "
+            "Commands: /help, /show, /capabilities, /report, /learnings, /stages, /next, /takeover, /modes, /stuck, /handbook, /exit."
         )
     else:
         print(
@@ -4440,6 +4833,7 @@ def _run_mission_control_chat(
             if run_context:
                 print(
                     "relaytic> Use /show for the dashboard summary, /capabilities for current options, "
+                    "/report for the differentiated result handoff, /learnings for durable memory, "
                     "/stages for bounded reruns, /next for the next recommended step, /takeover to let Relaytic continue, "
                     "/modes for surface explanations, /stuck for recovery guidance, /handbook for the user/agent guides, or /exit."
                 )
@@ -4564,6 +4958,48 @@ def _run_mission_control_chat(
             payload = _run_assist_turn(
                 run_dir=active_run_dir,
                 message="what can you do?",
+                config_path=config_path,
+                data_path=data_path,
+            )
+            print("relaytic> " + payload["human_output"].strip())
+            current_payload = _show_mission_control_surface(
+                run_dir=active_run_dir,
+                output_dir=output_dir,
+                config_path=config_path,
+                expected_profile=expected_profile,
+            )
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        if lowered == "/report":
+            payload = _run_assist_turn(
+                run_dir=active_run_dir,
+                message="what did you find?",
+                config_path=config_path,
+                data_path=data_path,
+            )
+            print("relaytic> " + payload["human_output"].strip())
+            current_payload = _show_mission_control_surface(
+                run_dir=active_run_dir,
+                output_dir=output_dir,
+                config_path=config_path,
+                expected_profile=expected_profile,
+            )
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        if lowered == "/learnings":
+            payload = _run_assist_turn(
+                run_dir=active_run_dir,
+                message="show learnings",
                 config_path=config_path,
                 data_path=data_path,
             )
@@ -6548,6 +6984,15 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.mission_control import read_mission_control_bundle
 
         return read_mission_control_bundle(run_dir)
+    if bundle == "handoff":
+        return read_handoff_bundle(run_dir)
+    if bundle == "learnings":
+        root = Path(run_dir)
+        state_dir = default_learnings_state_dir(run_dir=root)
+        return {
+            "learnings_state": read_learnings_state(state_dir),
+            "lab_learnings_snapshot": read_learnings_snapshot(root),
+        }
     raise ValueError(f"Unsupported bundle '{bundle}'.")
 
 
@@ -10136,6 +10581,12 @@ def _access_surface_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "run_summary": run_dir / "run_summary.json",
         "summary_report": run_dir / "reports" / "summary.md",
+        "run_handoff": run_dir / "run_handoff.json",
+        "next_run_options": run_dir / "next_run_options.json",
+        "next_run_focus": run_dir / "next_run_focus.json",
+        "user_result_report": run_dir / "reports" / "user_result_report.md",
+        "agent_result_report": run_dir / "reports" / "agent_result_report.md",
+        "lab_learnings_snapshot": run_dir / "lab_learnings_snapshot.json",
     }
 
 
@@ -11079,6 +11530,19 @@ def _refresh_access_manifest(
                 required=True,
             )
         )
+    for key in ("run_handoff", "next_run_options", "next_run_focus", "lab_learnings_snapshot"):
+        path = surface_paths[key]
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="handoff" if "handoff" in key or "next_run" in key else "memory", required=False))
+    for key in ("user_result_report", "agent_result_report"):
+        path = surface_paths[key]
+        if path.exists():
+            entries.append(artifact_entry(str(path.relative_to(root)).replace("\\", "/"), run_dir=root, kind="report", required=False))
+    learnings_dir = default_learnings_state_dir(run_dir=root)
+    for filename in ("learnings_state.json", "learnings.md"):
+        path = learnings_dir / filename
+        if path.exists():
+            entries.append(artifact_entry(str(path), run_dir=root, kind="memory", required=False))
     for path in _control_output_paths(root).values():
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="control", required=True))

@@ -32,6 +32,16 @@ def build_run_summary(
 ) -> dict[str, Any]:
     """Build a machine-readable summary for a Relaytic run directory."""
     root = Path(run_dir)
+    from relaytic.handoff import (
+        AGENT_RESULT_REPORT_RELATIVE_PATH,
+        USER_RESULT_REPORT_RELATIVE_PATH,
+        read_handoff_bundle,
+    )
+    from relaytic.learnings import (
+        default_learnings_state_dir,
+        read_learnings_snapshot,
+        read_learnings_state,
+    )
     mandate_bundle = _read_bundle(
         root,
         {
@@ -210,6 +220,10 @@ def build_run_summary(
             "host_surface_matrix": "host_surface_matrix.json",
         },
     )
+    handoff_bundle = read_handoff_bundle(root)
+    learnings_state_dir = default_learnings_state_dir(run_dir=root)
+    learnings_state = read_learnings_state(learnings_state_dir)
+    learnings_snapshot = read_learnings_snapshot(root)
     feedback_bundle = _read_bundle(
         root,
         {
@@ -363,6 +377,9 @@ def build_run_summary(
     red_team_report = _bundle_item(evals_bundle, "red_team_report")
     protocol_conformance_report = _bundle_item(evals_bundle, "protocol_conformance_report")
     host_surface_matrix = _bundle_item(evals_bundle, "host_surface_matrix")
+    run_handoff = dict(handoff_bundle.get("run_handoff", {})) if isinstance(handoff_bundle.get("run_handoff"), dict) else {}
+    next_run_options = dict(handoff_bundle.get("next_run_options", {})) if isinstance(handoff_bundle.get("next_run_options"), dict) else {}
+    next_run_focus = dict(handoff_bundle.get("next_run_focus", {})) if isinstance(handoff_bundle.get("next_run_focus"), dict) else {}
     feedback_intake = _bundle_item(feedback_bundle, "feedback_intake")
     feedback_validation = _bundle_item(feedback_bundle, "feedback_validation")
     feedback_effect_report = _bundle_item(feedback_bundle, "feedback_effect_report")
@@ -449,6 +466,9 @@ def build_run_summary(
             decision_bundle=decision_bundle,
             dojo_bundle=dojo_bundle,
             pulse_bundle=pulse_bundle,
+            handoff_bundle=handoff_bundle,
+            learnings_state=learnings_state,
+            learnings_snapshot=learnings_snapshot,
             profiles_bundle=profiles_bundle,
             feedback_bundle=feedback_bundle,
             control_bundle=control_bundle,
@@ -709,6 +729,41 @@ def build_run_summary(
             if isinstance(host_surface_matrix.get("surfaces"), list)
             else 0,
         },
+        "handoff": {
+            "status": _clean_text(run_handoff.get("status")),
+            "headline": _clean_text(run_handoff.get("headline")),
+            "recommended_option_id": _clean_text(run_handoff.get("recommended_option_id")),
+            "selected_focus_id": _clean_text(run_handoff.get("selected_focus_id"))
+            or _clean_text(next_run_focus.get("selection_id")),
+            "selected_focus_label": _clean_text(next_run_focus.get("selection_label")),
+            "focus_notes": _clean_text(next_run_focus.get("notes")),
+            "focus_reset_learnings_requested": next_run_focus.get("reset_learnings_requested"),
+            "key_finding_count": len(run_handoff.get("key_findings", []))
+            if isinstance(run_handoff.get("key_findings"), list)
+            else 0,
+            "risk_count": len(run_handoff.get("risks", []))
+            if isinstance(run_handoff.get("risks"), list)
+            else 0,
+            "open_question_count": len(run_handoff.get("open_questions", []))
+            if isinstance(run_handoff.get("open_questions"), list)
+            else 0,
+            "option_count": len(next_run_options.get("options", []))
+            if isinstance(next_run_options.get("options"), list)
+            else 0,
+            "user_report_path": _path_if_exists(root / USER_RESULT_REPORT_RELATIVE_PATH),
+            "agent_report_path": _path_if_exists(root / AGENT_RESULT_REPORT_RELATIVE_PATH),
+        },
+        "learnings": {
+            "status": _clean_text(learnings_snapshot.get("status")) or _clean_text(learnings_state.get("status")),
+            "state_dir": str(learnings_state_dir) if learnings_state_dir else None,
+            "state_entry_count": int(learnings_snapshot.get("state_entry_count", 0) or learnings_state.get("entry_count", 0) or 0),
+            "active_count": int(learnings_snapshot.get("active_count", 0) or 0),
+            "harvested_count": int(learnings_snapshot.get("harvested_count", 0) or 0),
+            "learnings_state_path": _path_if_exists(learnings_state_dir / "learnings_state.json"),
+            "learnings_md_path": _path_if_exists(learnings_state_dir / "learnings.md"),
+            "snapshot_path": _path_if_exists(root / "lab_learnings_snapshot.json"),
+            "most_recent_lesson": _first_learning_lesson(learnings_snapshot=learnings_snapshot, learnings_state=learnings_state),
+        },
         "feedback": {
             "status": _clean_text(feedback_effect_report.get("status")) or _clean_text(feedback_validation.get("status")) or _clean_text(feedback_intake.get("status")),
             "accepted_count": int(feedback_validation.get("accepted_count", 0) or 0),
@@ -915,6 +970,14 @@ def build_run_summary(
             "red_team_report_path": _path_if_exists(root / "red_team_report.json"),
             "protocol_conformance_report_path": _path_if_exists(root / "protocol_conformance_report.json"),
             "host_surface_matrix_path": _path_if_exists(root / "host_surface_matrix.json"),
+            "run_handoff_path": _path_if_exists(root / "run_handoff.json"),
+            "next_run_options_path": _path_if_exists(root / "next_run_options.json"),
+            "next_run_focus_path": _path_if_exists(root / "next_run_focus.json"),
+            "user_result_report_path": _path_if_exists(root / USER_RESULT_REPORT_RELATIVE_PATH),
+            "agent_result_report_path": _path_if_exists(root / AGENT_RESULT_REPORT_RELATIVE_PATH),
+            "lab_learnings_snapshot_path": _path_if_exists(root / "lab_learnings_snapshot.json"),
+            "learnings_state_path": _path_if_exists(learnings_state_dir / "learnings_state.json"),
+            "learnings_md_path": _path_if_exists(learnings_state_dir / "learnings.md"),
             "feedback_effect_report_path": _path_if_exists(root / "feedback_effect_report.json"),
             "feedback_casebook_path": _path_if_exists(root / "feedback_casebook.json"),
             "quality_contract_path": _path_if_exists(root / "quality_contract.json"),
@@ -949,6 +1012,8 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     pulse = dict(summary.get("pulse", {}))
     trace = dict(summary.get("trace", {}))
     evals = dict(summary.get("evals", {}))
+    handoff = dict(summary.get("handoff", {}))
+    learnings = dict(summary.get("learnings", {}))
     feedback = dict(summary.get("feedback", {}))
     contracts = dict(summary.get("contracts", {}))
     profiles = dict(summary.get("profiles", {}))
@@ -1200,6 +1265,43 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
             lines.append(f"- Protocol mismatches: `{evals.get('protocol_mismatch_count')}`")
         if evals.get("security_open_finding_count"):
             lines.append(f"- Open security findings: `{evals.get('security_open_finding_count')}`")
+    if handoff and any(value not in (None, 0, False, "", []) for value in handoff.values()):
+        lines.extend(
+            [
+                "",
+                "## Handoff",
+                f"- Status: `{handoff.get('status') or 'unknown'}`",
+                f"- Recommended next-run option: `{handoff.get('recommended_option_id') or 'unknown'}`",
+                f"- Selected focus: `{handoff.get('selected_focus_id') or 'none'}`",
+                f"- Selected focus label: `{handoff.get('selected_focus_label') or 'none'}`",
+                f"- Findings: `{handoff.get('key_finding_count', 0)}`",
+                f"- Risks: `{handoff.get('risk_count', 0)}`",
+                f"- Open questions: `{handoff.get('open_question_count', 0)}`",
+            ]
+        )
+        if handoff.get("focus_notes"):
+            lines.append(f"- Focus notes: {handoff.get('focus_notes')}")
+        if handoff.get("user_report_path"):
+            lines.append(f"- User report: `{handoff.get('user_report_path')}`")
+        if handoff.get("agent_report_path"):
+            lines.append(f"- Agent report: `{handoff.get('agent_report_path')}`")
+        if handoff.get("focus_reset_learnings_requested") is not None:
+            lines.append(f"- Reset learnings requested: `{handoff.get('focus_reset_learnings_requested')}`")
+    if learnings and any(value not in (None, 0, False, "", []) for value in learnings.values()):
+        lines.extend(
+            [
+                "",
+                "## Learnings",
+                f"- Status: `{learnings.get('status') or 'unknown'}`",
+                f"- Stored learnings: `{learnings.get('state_entry_count', 0)}`",
+                f"- Active this run: `{learnings.get('active_count', 0)}`",
+                f"- Harvested this run: `{learnings.get('harvested_count', 0)}`",
+            ]
+        )
+        if learnings.get("most_recent_lesson"):
+            lines.append(f"- Most recent lesson: {learnings.get('most_recent_lesson')}")
+        if learnings.get("learnings_md_path"):
+            lines.append(f"- Learnings handbook: `{learnings.get('learnings_md_path')}`")
     if feedback and any(value not in (None, 0, False, "", []) for value in feedback.values()):
         lines.extend(
             [
@@ -1349,6 +1451,52 @@ def materialize_run_summary(
 ) -> dict[str, Any]:
     """Build and write the machine and human summary artifacts for a run."""
     root = Path(run_dir)
+    from relaytic.handoff import run_handoff_review
+    from relaytic.learnings import (
+        default_learnings_state_dir,
+        read_learnings_snapshot,
+        read_learnings_state,
+        reset_learnings,
+        sync_learnings_from_run,
+    )
+    from relaytic.policies import load_policy
+
+    base_summary = build_run_summary(
+        run_dir=root,
+        data_path=data_path,
+        request_source=request_source,
+        request_text=request_text,
+    )
+    try:
+        policy_path = root / "policy_resolved.yaml"
+        policy = load_policy(policy_path if policy_path.exists() else None).policy
+    except Exception:
+        policy = {}
+    handoff_result = run_handoff_review(
+        run_dir=root,
+        summary_payload=base_summary,
+        policy=policy,
+    )
+    handoff_bundle = handoff_result.bundle.to_dict()
+    next_focus = dict(handoff_bundle.get("next_run_focus", {})) if isinstance(handoff_bundle.get("next_run_focus"), dict) else {}
+    if bool(next_focus.get("reset_learnings_requested")):
+        reset_learnings(run_dir=root, policy=policy)
+    else:
+        state_dir = default_learnings_state_dir(run_dir=root)
+        existing_state = read_learnings_state(state_dir)
+        existing_snapshot = read_learnings_snapshot(root)
+        reset_active_for_current_run = (
+            str(existing_state.get("status", "")).strip() == "reset"
+            and str(existing_snapshot.get("status", "")).strip() == "reset"
+            and str(existing_snapshot.get("run_id", "")).strip() == str(base_summary.get("run_id", "")).strip()
+        )
+        if not reset_active_for_current_run:
+            sync_learnings_from_run(
+                run_dir=root,
+                summary_payload=base_summary,
+                handoff_bundle=handoff_bundle,
+                policy=policy,
+            )
     summary = build_run_summary(
         run_dir=root,
         data_path=data_path,
@@ -1423,6 +1571,24 @@ def _clean_text(value: Any) -> str | None:
     return text
 
 
+def _first_learning_lesson(*, learnings_snapshot: dict[str, Any], learnings_state: dict[str, Any]) -> str | None:
+    for key, source in (
+        ("active_learnings", learnings_snapshot),
+        ("harvested_learnings", learnings_snapshot),
+        ("entries", learnings_state),
+    ):
+        items = source.get(key)
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            lesson = _clean_text(item.get("lesson"))
+            if lesson:
+                return lesson
+    return None
+
+
 def _clean_literal_text(value: Any) -> str | None:
     if value is None:
         return None
@@ -1456,6 +1622,9 @@ def _resolve_stage(
     decision_bundle: dict[str, Any],
     dojo_bundle: dict[str, Any],
     pulse_bundle: dict[str, Any],
+    handoff_bundle: dict[str, Any],
+    learnings_state: dict[str, Any],
+    learnings_snapshot: dict[str, Any],
     profiles_bundle: dict[str, Any],
     feedback_bundle: dict[str, Any],
     control_bundle: dict[str, Any],

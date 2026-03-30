@@ -172,6 +172,8 @@ If a later slice adds "smartness" without strengthening at least one of those pr
   once Slice 12B lands, one case where Relaytic deliberately withstands or rejects a control-injection, tool-misuse, or unsafe branch-expansion request and records the defense or failure mode in an explicit evaluation artifact
 - **protocol-conformance path**
   once Slice 12B lands, one case where CLI and MCP expose the same trace, adjudication winner, and defensive-control outcome from the same canonical run truth, and any mismatch becomes an explicit eval failure rather than silent drift
+- **handoff-and-learnings path**
+  once Slice 12C lands, one case where a completed run yields differentiated human and agent result reports, explicit next-run options, durable learnings that survive across runs, and a deliberate learnings reset that does not silently repopulate on the same refresh
 - **mission-control path**
   once Slice 15 lands, one case where a human or external agent can see branch structure, confidence, and change attribution without reading the entire artifact tree
 - **flagship-demo path**
@@ -210,10 +212,11 @@ Stable slice numbering stays the same, but the preferred execution order after S
 22. Slice 12
 23. Slice 12A
 24. Slice 12B
-25. Slice 13
-26. Slice 14
-27. Slice 15
-28. Slice 16
+25. Slice 12C
+26. Slice 13
+27. Slice 14
+28. Slice 15
+29. Slice 16
 
 Why:
 
@@ -241,20 +244,22 @@ Why:
 - Slice 12A should come after dojo because periodic awareness, innovation watching, and bounded background follow-up are much safer once self-improvement stays quarantined and promotion rules already exist
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because wider search and full trace-backed mission control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
 - Slice 12B should also establish protocol conformance between CLI, MCP, and later richer UI surfaces instead of assuming those surfaces stay aligned
+- Slice 12C should come before Slice 13 because Relaytic still needs a professional post-run handoff, explicit next-run steering, and durable learnings that survive across runs before deeper search and late demo packaging can feel complete
 - Slice 13 should prove not only deeper search but explicit value-of-search decisions so the controller can justify both widening and stopping
 - Slice 15 should close the loop with flagship demo packs and human-supervision evaluation rather than treating UI polish as sufficient proof
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 12B, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, and Slice 12B first-class tracing plus runtime evaluation
+- implemented baseline: Slice 00 through Slice 12C, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, and Slice 12C differentiated result handoff plus durable learnings
 - next execution target: Slice 13
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
+- latest handoff-and-learnings follow-on: Slice 12C
 - next scale-and-search follow-on after Slice 12B: Slice 13
 - later mission-control expansion after Slice 14: Slice 15
 - late optional representation follow-on after Slice 15: Slice 16
-- after Slice 12, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control, onboarding, and dojo-visibility surfaces instead of treating UI as a separate late-polish track
+- after Slice 12C, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, and durable-learnings surfaces instead of treating UI as a separate late-polish track
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -1862,6 +1867,62 @@ Minimum proof:
 - one tool-misuse or unsafe-branch case that fails safely and is recorded in the eval matrix
 - one CLI-versus-MCP conformance case that passes or records an explicit failure in `protocol_conformance_report.json`
 - one case where mission control reads the trace graph, adjudication winner, or eval posture directly
+
+## Slice 12C - Differentiated result handoff and durable learnings
+
+### Status
+
+Implemented.
+
+### Load-bearing improvement
+
+- Relaytic now ends a serious run with differentiated human and agent result reports, explicit next-run options, persisted next-run focus, and durable local learnings that can be reviewed or reset deliberately
+
+### Human surface
+
+- humans can now ask what Relaytic found, read a narrative result report, choose whether the next run should stay on the same data, add data, or start over, inspect what Relaytic learned from prior runs, and reset those learnings when they want a clean slate
+
+### Agent surface
+
+- external agents can now consume a terser agent handoff, persist next-run focus through stable JSON/MCP surfaces, inspect durable learnings, and reset workspace learnings without scraping markdown
+
+### Intelligence source
+
+- canonical run-summary truth, explicit handoff synthesis, and durable local learnings harvested from assumptions, feedback, benchmark outcomes, control incidents, next-run focus decisions, and open safety/eval lessons
+
+### Fallback rule
+
+- if differentiated handoff or durable learnings are unavailable, Relaytic must still preserve `run_summary.json` and `reports/summary.md` as the fallback truth while recording that the handoff or learnings layer is missing
+
+### Required behavior
+
+- the user report and agent report must be generated from the same canonical run summary, not from two separate hidden states
+- Relaytic must expose explicit next-run choices for:
+  - `same_data`
+  - `add_data`
+  - `new_dataset`
+- next-run focus must be persisted and reviewable instead of living only in chat state
+- durable learnings must be local-first, resettable, and surfaced through CLI, mission control, assist, and MCP
+- mission-control chat should support natural turns like:
+  - `what did you find?`
+  - `use the same data next time but focus on recall`
+  - `show learnings`
+  - `reset the learnings`
+- durable learnings should be visible to the memory layer as explicit workspace priors rather than remaining UI-only state
+
+### Proof obligation
+
+- Relaytic must prove that humans and agents receive differentiated but aligned post-run handoffs, that next-run steering is explicit and durable, and that workspace learnings survive across runs until deliberately reset
+
+### Acceptance criteria
+
+- one governed run writes both `reports/user_result_report.md` and `reports/agent_result_report.md` and they are meaningfully different
+- one persisted next-run focus updates run-summary handoff state without forcing a rerun
+- one durable learnings view shows both workspace learnings and current-run active learnings
+- one reset case clears durable learnings and does not silently repopulate them on the same refresh
+- one mission-control run-context chat case supports result-report review, next-run focus selection, learnings review, and learnings reset in a natural multi-turn flow
+- one external-agent or MCP case uses the same handoff and learnings truth without scraping prose
+- one memory case shows that durable learnings are visible as reusable priors
 
 ## Slice 13 - Search controller, accelerated execution, and distributed local experimentation
 

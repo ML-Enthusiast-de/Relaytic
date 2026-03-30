@@ -21,13 +21,17 @@ def test_streamable_http_mcp_smoke_is_ok() -> None:
     assert report["tool_count"] >= 10
 
 
-def test_interoperability_specs_include_trace_and_eval_tools() -> None:
+def test_interoperability_specs_include_trace_eval_handoff_and_learnings_tools() -> None:
     names = {spec.name for spec in build_interoperability_tool_specs()}
     assert {
         "relaytic_show_trace",
         "relaytic_replay_trace",
         "relaytic_run_agent_evals",
         "relaytic_show_agent_evals",
+        "relaytic_show_handoff",
+        "relaytic_set_next_run_focus",
+        "relaytic_show_learnings",
+        "relaytic_reset_learnings",
     }.issubset(names)
 
 
@@ -87,6 +91,40 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         benchmark_payload = _structured_payload(benchmark_result)
                         assert benchmark_payload["surface_payload"]["status"] == "ok"
                         assert "incumbent_present" in benchmark_payload["surface_payload"]["benchmark"]
+
+                        handoff_result = await session.call_tool(
+                            "relaytic_show_handoff",
+                            {"run_dir": str(run_dir), "audience": "agent"},
+                        )
+                        handoff_payload = _structured_payload(handoff_result)
+                        assert handoff_payload["surface_payload"]["status"] == "ok"
+                        assert handoff_payload["surface_payload"]["handoff"]["recommended_option_id"] in {
+                            "same_data",
+                            "add_data",
+                            "new_dataset",
+                        }
+
+                        focus_result = await session.call_tool(
+                            "relaytic_set_next_run_focus",
+                            {
+                                "run_dir": str(run_dir),
+                                "selection": "same_data",
+                                "notes": "focus on recall",
+                                "actor_type": "agent",
+                                "actor_name": "mcp-test",
+                            },
+                        )
+                        focus_payload = _structured_payload(focus_result)
+                        assert focus_payload["surface_payload"]["status"] == "ok"
+                        assert focus_payload["surface_payload"]["next_run_focus"]["selection_id"] == "same_data"
+
+                        learnings_result = await session.call_tool(
+                            "relaytic_show_learnings",
+                            {"run_dir": str(run_dir)},
+                        )
+                        learnings_payload = _structured_payload(learnings_result)
+                        assert learnings_payload["surface_payload"]["status"] == "ok"
+                        assert learnings_payload["surface_payload"]["learnings_state"]["entry_count"] >= 1
 
                         runtime_result = await session.call_tool(
                             "relaytic_show_runtime",

@@ -257,6 +257,14 @@ Avoid introducing new references to:
 - upgraded the runtime gateway so stage transitions and runtime events emit canonical trace spans directly instead of relying only on later reconstruction
 - upgraded run-summary and mission-control surfaces so trace truth, adjudication winners, protocol conformance, and open security findings remain visible instead of becoming debug-only output
 
+### Slice 12C
+
+- introduced the canonical package boundaries `src/relaytic/handoff/` and `src/relaytic/learnings/`
+- introduced artifact boundaries for `run_handoff.json`, `next_run_options.json`, `next_run_focus.json`, `reports/user_result_report.md`, `reports/agent_result_report.md`, `lab_learnings_snapshot.json`, `learnings_state.json`, and `learnings.md`
+- introduced public commands `relaytic handoff show`, `relaytic handoff focus`, `relaytic learnings show`, and `relaytic learnings reset`
+- introduced MCP-visible handoff and learnings surfaces through `relaytic_show_handoff`, `relaytic_set_next_run_focus`, `relaytic_show_learnings`, and `relaytic_reset_learnings`
+- upgraded run-summary, mission-control, assist, memory, manifest, and mission-control-chat surfaces so differentiated result handoff, next-run steering, and durable learnings remain visible instead of becoming side artifacts
+
 ### Slice 10
 
 - introduced the canonical package boundary `src/relaytic/feedback/`
@@ -292,6 +300,8 @@ Avoid introducing new references to:
 - `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, explicit memory-maintenance orchestration, and pulse-to-mission-control visibility surfaces
 - `src/relaytic/tracing/` for Slice 12B canonical trace schemas, specialist/tool/intervention/branch traces, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
 - `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
+- `src/relaytic/handoff/` for Slice 12C differentiated post-run handoff generation, next-run options, persisted next-run focus, and differentiated report rendering for humans and external agents
+- `src/relaytic/learnings/` for Slice 12C durable local learnings state, learnings markdown, per-run learnings snapshots, and workspace learnings reset behavior
 - `docs/handbooks/` for Slice 11E role-specific human/operator and external-agent onboarding guides
 - `docs/handbooks/relaytic_demo_walkthrough.md` for Slice 11F recruiter-safe demo sequencing and first-contact presentation
 
@@ -361,6 +371,14 @@ Shipped artifact names:
 - `memory_compaction_plan.json`
 - `memory_compaction_report.json`
 - `memory_pinning_index.json`
+- `run_handoff.json`
+- `next_run_options.json`
+- `next_run_focus.json`
+- `reports/user_result_report.md`
+- `reports/agent_result_report.md`
+- `lab_learnings_snapshot.json`
+- `learnings_state.json`
+- `learnings.md`
 - `trace_model.json`
 - `trace_span_log.jsonl`
 - `specialist_trace_index.json`

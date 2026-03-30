@@ -173,6 +173,21 @@ evals:
     - mcp
   max_reported_findings: 6
 
+handoff:
+  enabled: true
+  max_findings: 6
+  max_risks: 5
+  include_commands: true
+  include_agent_artifact_paths: true
+
+learnings:
+  enabled: true
+  max_entries: 120
+  max_active_entries: 6
+  track_assumptions: true
+  track_feedback: true
+  track_control_lessons: true
+
 research:
   enabled: false
   require_redaction_default: true

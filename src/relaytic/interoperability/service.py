@@ -506,6 +506,46 @@ def relaytic_show_assist(*, run_dir: str, config_path: str | None = None) -> dic
     return cli._show_assist_surface(run_dir=run_dir, config_path=config_path)
 
 
+def relaytic_show_handoff(*, run_dir: str, audience: str = "agent") -> dict[str, Any]:
+    """Render the current differentiated post-run handoff surface for a run."""
+    cli = _cli()
+    return cli._show_handoff_surface(run_dir=run_dir, audience=audience)
+
+
+def relaytic_set_next_run_focus(
+    *,
+    run_dir: str,
+    selection: str,
+    notes: str | None = None,
+    actor_type: str = "agent",
+    actor_name: str | None = None,
+    reset_learnings: bool = False,
+) -> dict[str, Any]:
+    """Persist the preferred next-run focus for a run without immediately rerunning it."""
+    cli = _cli()
+    return cli._set_next_run_focus_surface(
+        run_dir=run_dir,
+        selection_id=selection,
+        notes=notes,
+        source="mcp",
+        actor_type=_normalize_actor_type(actor_type),
+        actor_name=actor_name,
+        reset_requested=reset_learnings,
+    )
+
+
+def relaytic_show_learnings(*, run_dir: str | None = None, state_dir: str | None = None) -> dict[str, Any]:
+    """Render the durable learnings state for the current workspace and optional run snapshot."""
+    cli = _cli()
+    return cli._show_learnings_surface(run_dir=run_dir, state_dir=state_dir)
+
+
+def relaytic_reset_learnings(*, run_dir: str | None = None, state_dir: str | None = None) -> dict[str, Any]:
+    """Reset the durable learnings state for the current workspace."""
+    cli = _cli()
+    return cli._reset_learnings_surface(run_dir=run_dir, state_dir=state_dir)
+
+
 def relaytic_assist_turn(
     *,
     run_dir: str,
@@ -604,6 +644,8 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_runtime",
             "relaytic_show_control",
             "relaytic_show_mission_control",
+            "relaytic_show_handoff",
+            "relaytic_show_learnings",
             "relaytic_show_pulse",
             "relaytic_show_trace",
             "relaytic_replay_trace",
@@ -632,6 +674,8 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_review_pulse",
             "relaytic_run_agent_evals",
             "relaytic_assist_turn",
+            "relaytic_set_next_run_focus",
+            "relaytic_reset_learnings",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
             "relaytic_run_autonomy",
@@ -701,6 +745,22 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_mission_control,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_handoff",
+            title="Show Relaytic Handoff",
+            description="Render the differentiated user or agent result handoff for a Relaytic run, including findings, risks, and next-run options.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_handoff,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_learnings",
+            title="Show Relaytic Learnings",
+            description="Render the durable cross-run learnings state and the current run's active learnings snapshot for a Relaytic workspace.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_learnings,
         ),
         InteropToolSpec(
             name="relaytic_show_dojo",
@@ -797,6 +857,22 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_predict,
+        ),
+        InteropToolSpec(
+            name="relaytic_set_next_run_focus",
+            title="Set Relaytic Next-Run Focus",
+            description="Persist the preferred next-run focus for a Relaytic run so the next iteration can stay on the same data, add data, or start over.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_set_next_run_focus,
+        ),
+        InteropToolSpec(
+            name="relaytic_reset_learnings",
+            title="Reset Relaytic Learnings",
+            description="Reset the durable Relaytic learnings state for a workspace when an operator or agent wants to start fresh.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_reset_learnings,
         ),
         InteropToolSpec(
             name="relaytic_intake_interpret",

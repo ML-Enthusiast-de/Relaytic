@@ -80,6 +80,9 @@ class AssistIntent:
     wants_takeover: bool = False
     wants_connection_guidance: bool = False
     wants_explanation: bool = False
+    next_run_selection: str | None = None
+    focus_notes: str | None = None
+    reset_learnings_requested: bool = False
 
 
 @dataclass(frozen=True)
@@ -201,12 +204,21 @@ def plan_assist_turn(
 ) -> AssistTurnPlan:
     normalized = " ".join(str(message).strip().lower().split())
     requested_stage = _extract_requested_stage(normalized)
+    next_run_selection = _extract_next_run_selection(normalized)
+    reset_learnings_requested = _looks_like_learnings_reset(normalized)
     intent = AssistIntent(
-        intent_type=_intent_type(normalized, requested_stage=requested_stage),
+        intent_type=_intent_type(
+            normalized,
+            requested_stage=requested_stage,
+            next_run_selection=next_run_selection,
+        ),
         requested_stage=requested_stage,
         wants_takeover=_looks_like_takeover(normalized),
         wants_connection_guidance=_looks_like_connection_request(normalized),
         wants_explanation=_looks_like_explanation_request(normalized),
+        next_run_selection=next_run_selection,
+        focus_notes=_clean_text(message) if next_run_selection else None,
+        reset_learnings_requested=reset_learnings_requested,
     )
     bundle = assist_bundle or {}
     if intent.intent_type == "connection_guidance":
@@ -215,6 +227,47 @@ def plan_assist_turn(
     if intent.intent_type == "capabilities":
         response = _build_capabilities_response(bundle=bundle, run_summary=run_summary)
         return AssistTurnPlan(intent=intent, action_kind="respond", requested_stage=requested_stage, response_message=response)
+    if intent.intent_type == "show_handoff":
+        return AssistTurnPlan(
+            intent=intent,
+            action_kind="show_handoff",
+            requested_stage=None,
+            response_message="Relaytic will show the differentiated result report, the key findings, and the explicit next-run options.",
+        )
+    if intent.intent_type == "show_learnings":
+        return AssistTurnPlan(
+            intent=intent,
+            action_kind="show_learnings",
+            requested_stage=None,
+            response_message="Relaytic will show the durable learnings state and the active learnings for this run.",
+        )
+    if intent.intent_type == "reset_learnings":
+        return AssistTurnPlan(
+            intent=intent,
+            action_kind="reset_learnings",
+            requested_stage=None,
+            response_message="Relaytic will reset the durable learnings state for this workspace.",
+        )
+    if intent.intent_type == "focus_next_run":
+        if not intent.next_run_selection:
+            return AssistTurnPlan(
+                intent=intent,
+                action_kind="respond",
+                requested_stage=None,
+                response_message=(
+                    "Relaytic can set the next-run focus to `same_data`, `add_data`, or `new_dataset`. "
+                    "Say for example `use the same data next time but focus on recall`."
+                ),
+            )
+        return AssistTurnPlan(
+            intent=intent,
+            action_kind="focus_next_run",
+            requested_stage=None,
+            response_message=(
+                f"Relaytic will save the next-run focus `{intent.next_run_selection}`"
+                + (" and reset durable learnings." if intent.reset_learnings_requested else ".")
+            ),
+        )
     if intent.intent_type == "rerun_stage":
         if requested_stage is None:
             return AssistTurnPlan(
@@ -291,9 +344,17 @@ def render_assist_markdown(bundle: AssistBundle | dict[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
-def _intent_type(normalized: str, *, requested_stage: str | None) -> str:
+def _intent_type(normalized: str, *, requested_stage: str | None, next_run_selection: str | None) -> str:
     if _looks_like_connection_request(normalized):
         return "connection_guidance"
+    if _looks_like_learnings_reset(normalized):
+        return "reset_learnings"
+    if next_run_selection is not None and _looks_like_next_run_focus_request(normalized, selection_id=next_run_selection):
+        return "focus_next_run"
+    if _looks_like_handoff_request(normalized):
+        return "show_handoff"
+    if _looks_like_learnings_request(normalized):
+        return "show_learnings"
     if _looks_like_capability_request(normalized):
         return "capabilities"
     if _looks_like_stage_rerun(normalized):
@@ -369,6 +430,70 @@ def _looks_like_capability_request(normalized: str) -> bool:
             "help options",
         )
     )
+
+
+def _looks_like_handoff_request(normalized: str) -> bool:
+    return any(
+        token in normalized
+        for token in (
+            "what did you find",
+            "what did you find out",
+            "show the result report",
+            "show the report",
+            "show the handoff",
+            "result report",
+            "handoff",
+            "next run options",
+            "summarize the findings",
+        )
+    )
+
+
+def _looks_like_learnings_request(normalized: str) -> bool:
+    return any(
+        token in normalized
+        for token in (
+            "show learnings",
+            "what have you learned",
+            "what did you learn",
+            "durable learnings",
+            "learnings.md",
+        )
+    )
+
+
+def _looks_like_learnings_reset(normalized: str) -> bool:
+    return any(
+        token in normalized
+        for token in (
+            "reset learnings",
+            "reset the learnings",
+            "clear learnings",
+            "clear the learnings",
+            "wipe learnings",
+            "wipe the learnings",
+            "forget the learnings",
+            "reset the memory",
+            "clear the memory",
+            "start from zero next time",
+        )
+    )
+
+
+def _extract_next_run_selection(normalized: str) -> str | None:
+    if any(token in normalized for token in ("same data", "same dataset", "keep the same data", "use the same data")):
+        return "same_data"
+    if any(token in normalized for token in ("add data", "more data", "add more data", "bring in more data", "add local data")):
+        return "add_data"
+    if any(token in normalized for token in ("new dataset", "different dataset", "start over", "new data set")):
+        return "new_dataset"
+    return None
+
+
+def _looks_like_next_run_focus_request(normalized: str, *, selection_id: str) -> bool:
+    if selection_id in {"same_data", "add_data", "new_dataset"}:
+        return True
+    return any(token in normalized for token in ("next run", "next time", "focus on", "for the next run"))
 
 
 def _looks_like_explanation_request(normalized: str) -> bool:
@@ -487,6 +612,7 @@ def _build_capabilities_response(*, bundle: dict[str, Any], run_summary: dict[st
     return (
         f"Relaytic is currently at `{current_stage}`. "
         f"You can ask bounded questions, request connection guidance, rerun from bounded stages, or let Relaytic take over safely. "
+        f"You can also ask what Relaytic found, inspect the differentiated result reports, choose the next-run focus, or manage durable learnings. "
         f"Available actions now: {action_bits}. "
         f"Bounded stage navigation currently supports: {stage_bits}. "
         f"Relaytic will challenge truth-bearing steering rather than blindly obeying it. "
@@ -655,6 +781,11 @@ def _suggested_questions(
         questions.append("i'm not sure, take over")
     if _clean_text(next_step.get("recommended_action")):
         questions.append("what should happen next?")
+    if dict(run_summary.get("handoff", {})):
+        questions.append("what did you find?")
+        questions.append("use the same data next time but focus on recall")
+    if dict(run_summary.get("learnings", {})):
+        questions.append("show learnings")
     return questions[:6]
 
 

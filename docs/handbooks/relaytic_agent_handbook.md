@@ -54,6 +54,14 @@ Run summary truth.
 
 Run-specific explanation, bounded stage rerun, safe takeover, and control-aware steering.
 
+### `handoff show` / `handoff focus`
+
+Run-specific differentiated result handoff plus persisted next-run focus.
+
+### `learnings show` / `learnings reset`
+
+Workspace-level durable learnings inspection and reset.
+
 ### `benchmark run`
 
 Attach an incumbent and force an honest comparison.
@@ -74,9 +82,20 @@ When the user knows little:
 When the user already has a run:
 
 1. read `run_summary.json`
-2. inspect mission control
-3. use assist for explanation or bounded rerun
-4. only then propose stronger changes
+2. read the human-facing or agent-facing result handoff
+3. inspect durable learnings if the next step is ambiguous
+4. inspect mission control
+5. use assist for explanation or bounded rerun
+6. only then propose stronger changes
+
+Use these commands:
+
+```powershell
+relaytic handoff show --run-dir <run_dir> --audience agent --format json
+relaytic handoff focus --run-dir <run_dir> --selection same_data --notes "focus on recall" --format json
+relaytic learnings show --run-dir <run_dir> --format json
+relaytic learnings reset --run-dir <run_dir> --format json
+```
 
 ## Important Constraints
 
@@ -84,6 +103,7 @@ When the user already has a run:
 - copy-only data handling is part of the contract
 - the full install profile now attempts to provision a lightweight local onboarding helper for human-facing chat
 - mission-control chat now supports both `analysis first` and `governed run` objective families
+- mission-control chat should also support post-run requests like `what did you find?`, `show learnings`, and next-run focus requests without forcing the human into raw CLI syntax
 - bounded stage reruns are supported; arbitrary checkpoint time travel is not
 - skeptical control is intentional; do not expect blind compliance
 - remote intelligence is optional and policy-gated
@@ -112,9 +132,10 @@ Do this:
 1. run `relaytic doctor`
 2. inspect mission control
 3. inspect `onboarding_chat_session_state.json` if the issue is in first-contact capture
-4. read the action affordances and starter questions
-5. use mission-control chat for onboarding questions
-6. read [relaytic_demo_walkthrough.md](./relaytic_demo_walkthrough.md)
+4. inspect `run_handoff.json`, `next_run_options.json`, or `lab_learnings_snapshot.json` if the issue is in post-run continuation
+5. read the action affordances and starter questions
+6. use mission-control chat for onboarding questions
+7. read [relaytic_demo_walkthrough.md](./relaytic_demo_walkthrough.md)
 
 ## If The Human Is Stuck
 

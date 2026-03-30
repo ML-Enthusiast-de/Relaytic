@@ -65,8 +65,10 @@ Relaytic/
       data_fabric/
       decision/
       feedback/
+      handoff/
       intelligence/
       profiles/
+      learnings/
       memory/
       autonomy/
       research/
@@ -119,7 +121,9 @@ Relaytic/
 - `src/relaytic/research/` owns redacted external research retrieval, method-transfer distillation, benchmark-reference harvesting, and research-audit persistence
 - `src/relaytic/compiler/` owns method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/feedback/` owns validated feedback, outcome learning, reversible effect reporting, and rollback-ready casebook artifacts
+- `src/relaytic/handoff/` owns differentiated post-run handoff generation, next-run options, persisted next-run focus, and differentiated report rendering
 - `src/relaytic/decision/` owns decision-world models, controller policies, intervention-policy reports, decision-usefulness synthesis, and value-of-more-data reasoning
+- `src/relaytic/learnings/` owns durable local learnings state, learnings markdown, per-run learnings snapshots, and workspace learnings reset behavior
 - `src/relaytic/data_fabric/` owns source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/dojo/` owns guarded self-improvement review, quarantined proposal bundles, validation results, promotion ledgers, rollback state, and architecture-proposal quarantine
 - `src/relaytic/pulse/` owns periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, and memory-maintenance orchestration
@@ -162,6 +166,8 @@ Relaytic/
 - `src/relaytic/pulse/` owns Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, memory-maintenance orchestration, and mission-control-visible pulse artifacts
 - `src/relaytic/tracing/` owns Slice 12B canonical trace schemas, specialist/tool/intervention/branch trace persistence, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
 - `src/relaytic/evals/` owns Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
+- `src/relaytic/handoff/` owns Slice 12C differentiated post-run handoff generation, next-run options, persisted next-run focus, and differentiated report rendering for humans and external agents
+- `src/relaytic/learnings/` owns Slice 12C durable local learnings state, learnings markdown, per-run learnings snapshots, workspace learnings reset behavior, and the learnings-to-memory handoff
 
 Reserved future boundaries:
 

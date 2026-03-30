@@ -98,6 +98,7 @@ Start with:
 12. dojo mode and guarded self-improvement
 12A. lab pulse, periodic awareness, and bounded proactive follow-up
 12B. first-class tracing, agent evaluation, and runtime security harnesses
+12C. differentiated result handoff and durable learnings
 13. search controller, accelerated execution, and distributed local experimentation
 14. real-world feasibility, domain constraints, and action boundaries
 15. mission-control expansion, packaging, integrations, demos, and polish
@@ -132,10 +133,11 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 23. Slice 12
 24. Slice 12A
 25. Slice 12B
-26. Slice 13
-27. Slice 14
-28. Slice 15
-29. Slice 16
+26. Slice 12C
+27. Slice 13
+28. Slice 14
+29. Slice 15
+30. Slice 16
 
 Reason:
 
@@ -165,18 +167,20 @@ Reason:
 - Slice 12A should come after dojo because periodic awareness and bounded background follow-up are much safer once self-improvement already has quarantine and promotion rules
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because Relaytic needs one canonical trace substrate, explicit competing-claim/adjudication contracts, and agent/security evaluation before wider search and full trace-explorer claims become credible
 - Slice 12B should also establish protocol conformance between CLI, MCP, and later richer UI surfaces instead of assuming those surfaces stay aligned
+- Slice 12C should come before Slice 13 because Relaytic needs differentiated post-run handoff, explicit next-run steering, and durable local learnings before deeper search and later demo packaging can feel complete to humans or external agents
 - Slice 13 should prove not only deeper search but explicit value-of-search decisions, including when Relaytic refuses to keep searching
 - Slice 15 should close the proof loop with flagship demo packs and human-supervision evaluation rather than treating UI polish as sufficient evidence
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:
 
-- implemented through Slice 12B, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, and Slice 12B first-class tracing plus runtime evaluation now landed
+- implemented through Slice 12C, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, and Slice 12C differentiated result handoff plus durable learnings now landed
 - next execution target: Slice 13
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
+- latest handoff-and-learnings slice: Slice 12C
 - next scale-and-search follow-on after Slice 12B: Slice 13
-- after Slice 12B, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, and trace/eval visibility surfaces rather than leaving the UI stale until late polish
+- after Slice 12C, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, and durable-learnings surfaces rather than leaving the UI stale until late polish
 
 ## MVP boundary
 

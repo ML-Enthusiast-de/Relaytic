@@ -138,7 +138,7 @@ def run_control_review(
         controls=controls,
         status="active" if controls.enabled else "disabled",
         authority_order=["policy", "mandate", "operator", "external_agent", "tool", "research"],
-        low_friction_actions=["respond", "connection_guidance", "rerun_stage"],
+        low_friction_actions=["respond", "connection_guidance", "rerun_stage", "show_handoff", "show_learnings", "focus_next_run", "reset_learnings"],
         challenge_required_actions=["take_over", "planning_override", "evidence_override", "policy_change"],
         blocked_patterns=list(BYPASS_PATTERNS),
         summary="Relaytic applies skeptical steering: navigation stays easy, truth-bearing requests are challenged, and bypass attempts are rejected.",
@@ -619,10 +619,12 @@ def _memory_entry_matches(*, request: InterventionRequest, entry: dict[str, Any]
 
 
 def _classify_request(*, normalized_message: str, action_kind: str, requested_stage: str | None) -> str:
-    if action_kind == "respond":
+    if action_kind in {"respond", "show_handoff", "show_learnings", "reset_learnings"}:
         return "policy_bypass" if any(pattern in normalized_message for pattern in BYPASS_PATTERNS) else "explain"
     if action_kind == "rerun_stage":
         return "navigation"
+    if action_kind == "focus_next_run":
+        return "planning_preference"
     if any(pattern in normalized_message for pattern in BYPASS_PATTERNS):
         return "policy_bypass"
     if action_kind == "take_over":
@@ -641,7 +643,7 @@ def _challenge_required(
         return False
     if classification == "policy_bypass" or bypass_patterns:
         return True
-    if action_kind == "rerun_stage":
+    if action_kind in {"rerun_stage", "show_handoff", "show_learnings", "focus_next_run", "reset_learnings"}:
         return not controls.allow_navigation_without_challenge
     if action_kind == "respond":
         return False
@@ -667,6 +669,14 @@ def _authority_level(*, actor_type: str, source_surface: str) -> str:
 def _request_summary(*, classification: str, action_kind: str, requested_stage: str | None) -> str:
     if action_kind == "rerun_stage" and requested_stage:
         return f"Relaytic normalized the request as navigation to rerun from `{requested_stage}`."
+    if action_kind == "show_handoff":
+        return "Relaytic normalized the request as a low-risk request to show the differentiated run handoff."
+    if action_kind == "show_learnings":
+        return "Relaytic normalized the request as a low-risk request to show durable learnings."
+    if action_kind == "reset_learnings":
+        return "Relaytic normalized the request as a bounded durable-learnings reset."
+    if action_kind == "focus_next_run":
+        return "Relaytic normalized the request as a bounded next-run focus preference."
     if action_kind == "take_over":
         return "Relaytic normalized the request as a takeover proposal that can change downstream artifacts."
     if classification == "policy_bypass":
@@ -685,6 +695,10 @@ def _decision_summary(*, decision: str, action_kind: str, requested_stage: str |
         return "Relaytic accepted the request with a narrower scope because the original instruction was under-specified."
     if action_kind == "rerun_stage" and requested_stage:
         return f"Relaytic accepted the navigation request and checkpointed state before rerunning from `{requested_stage}`."
+    if action_kind == "focus_next_run":
+        return "Relaytic accepted the next-run focus request and recorded it for the next iteration."
+    if action_kind == "reset_learnings":
+        return "Relaytic accepted the learnings reset request and cleared the durable workspace memory."
     return "Relaytic accepted the request under the current control contract."
 
 
@@ -695,6 +709,10 @@ def _outcome_label(*, request: InterventionRequest, decision: OverrideDecision) 
         return "harmful_override"
     if request.requested_action_kind == "take_over" and decision.decision == "accept_with_modification":
         return "harmful_takeover" if request.under_specified else "bounded_takeover"
+    if request.requested_action_kind == "focus_next_run":
+        return "accepted_preference"
+    if request.requested_action_kind in {"show_handoff", "show_learnings", "reset_learnings"}:
+        return "accepted_review"
     return "accepted_navigation" if request.requested_action_kind == "rerun_stage" else "accepted_override"
 
 

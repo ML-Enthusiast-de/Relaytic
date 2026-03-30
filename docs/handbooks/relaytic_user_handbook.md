@@ -182,6 +182,68 @@ After `relaytic run`, Relaytic typically:
 
 This means you usually do not need to guess the next step. Relaytic should show it.
 
+## What To Read After A Run
+
+Relaytic now writes two different post-run reports on purpose:
+
+- `reports/user_result_report.md`
+  Read this when you want the plain-language human result, the main findings, the main risks, and the best next moves.
+- `reports/agent_result_report.md`
+  This is the terser machine-facing version. You usually do not need it unless an external agent is helping you.
+
+You can open the handoff directly with:
+
+```powershell
+relaytic handoff show --run-dir <run_dir>
+```
+
+If you want to tell Relaytic what the next run should focus on:
+
+```powershell
+relaytic handoff focus --run-dir <run_dir> --selection same_data --notes "focus on recall"
+```
+
+The available next-run directions are:
+
+- `same_data`
+  Stay on the same dataset and sharpen the focus
+- `add_data`
+  Bring in more local data before making a stronger claim
+- `new_dataset`
+  Start over with a different dataset or problem
+
+## Durable Learnings
+
+Relaytic now keeps a local durable learnings memory so the next run does not always start from zero.
+
+That learnings layer can include:
+
+- assumptions that mattered
+- accepted feedback
+- skeptical-control lessons
+- benchmark or incumbent lessons
+- next-run focus decisions
+- open safety or evaluation issues
+
+You can inspect it with:
+
+```powershell
+relaytic learnings show --run-dir <run_dir>
+```
+
+If you want a clean slate:
+
+```powershell
+relaytic learnings reset --run-dir <run_dir>
+```
+
+Mission-control chat should also understand plain requests like:
+
+- `what did you find?`
+- `use the same data next time but focus on recall`
+- `show learnings`
+- `reset the learnings`
+
 ## What The Modes Mean
 
 Relaytic uses different surfaces for different jobs.

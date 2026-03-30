@@ -54,6 +54,12 @@ def run_memory_retrieval(
     search_roots: list[str | Path] | None = None,
 ) -> MemoryRunResult:
     """Execute Slice 09A memory retrieval and advisory prior generation."""
+    from relaytic.learnings import (
+        default_learnings_state_dir,
+        read_learnings_snapshot,
+        read_learnings_state,
+    )
+
     controls = build_memory_controls_from_policy(policy)
     root = Path(run_dir)
     intake_bundle = intake_bundle or {}
@@ -63,6 +69,9 @@ def run_memory_retrieval(
     completion_bundle = completion_bundle or {}
     lifecycle_bundle = lifecycle_bundle or {}
     autonomy_bundle = autonomy_bundle or {}
+    learnings_state_dir = default_learnings_state_dir(run_dir=root)
+    learnings_state = read_learnings_state(learnings_state_dir)
+    learnings_snapshot = read_learnings_snapshot(root)
 
     current = _build_current_run_signature(
         run_dir=root,
@@ -75,6 +84,8 @@ def run_memory_retrieval(
         completion_bundle=completion_bundle,
         lifecycle_bundle=lifecycle_bundle,
         autonomy_bundle=autonomy_bundle,
+        learnings_state=learnings_state,
+        learnings_snapshot=learnings_snapshot,
     )
     roots = _resolve_search_roots(root, search_roots=search_roots)
     candidate_details = (
@@ -123,6 +134,8 @@ def run_memory_retrieval(
         retrieval_status=retrieval_status,
         controls=controls,
         trace=trace,
+        learnings_state=learnings_state,
+        learnings_snapshot=learnings_snapshot,
     )
     flush_report = MemoryFlushReport(
         schema_version=MEMORY_FLUSH_REPORT_SCHEMA_VERSION,
@@ -270,6 +283,8 @@ def _build_current_run_signature(
     completion_bundle: dict[str, Any],
     lifecycle_bundle: dict[str, Any],
     autonomy_bundle: dict[str, Any],
+    learnings_state: dict[str, Any],
+    learnings_snapshot: dict[str, Any],
 ) -> dict[str, Any]:
     run_brief = _bundle_item(mandate_bundle, "run_brief")
     task_brief = _bundle_item(context_bundle, "task_brief")
@@ -314,6 +329,8 @@ def _build_current_run_signature(
         _optional_str(plan.get("selected_route_id"))
         or _investigation_route_id(investigation_bundle=investigation_bundle, task_type=task_type)
     )
+    workspace_learning_tags = _workspace_learning_tags(learnings_state=learnings_state, learnings_snapshot=learnings_snapshot)
+    workspace_focus_ids = _workspace_focus_ids(learnings_state=learnings_state, learnings_snapshot=learnings_snapshot)
     return {
         "run_id": run_dir.name or "run",
         "current_stage": current_stage,
@@ -336,6 +353,10 @@ def _build_current_run_signature(
         "promotion_target": _optional_str(promotion_decision.get("selected_model_family")),
         "autonomy_action": _optional_str(autonomy_loop_state.get("selected_action")),
         "autonomy_mode": _optional_str(autonomy_mode.get("requested_mode")),
+        "workspace_learning_tags": workspace_learning_tags,
+        "workspace_learning_kinds": _workspace_learning_kinds(learnings_state=learnings_state, learnings_snapshot=learnings_snapshot),
+        "workspace_recent_focus": workspace_focus_ids[0] if workspace_focus_ids else None,
+        "workspace_recent_lesson": _workspace_recent_lesson(learnings_state=learnings_state, learnings_snapshot=learnings_snapshot),
     }
 
 
@@ -486,6 +507,8 @@ def _score_candidate(*, current: dict[str, Any], candidate: dict[str, Any]) -> d
         "completion_action": _optional_str(completion.get("action")),
         "promotion_action": _optional_str(lifecycle.get("promotion_action")),
         "promotion_target": _optional_str(lifecycle.get("promotion_target")),
+        "selected_focus_id": _optional_str(dict(summary.get("handoff", {})).get("selected_focus_id"))
+        or _optional_str(dict(summary.get("handoff", {})).get("recommended_option_id")),
     }
     score = 0.0
     total_weight = 0.0
@@ -525,6 +548,13 @@ def _score_candidate(*, current: dict[str, Any], candidate: dict[str, Any]) -> d
         total_weight += 0.05
         if target_similarity >= 0.5:
             reasons.append("similar target semantics")
+    current_focus = _optional_str(current.get("workspace_recent_focus"))
+    candidate_focus = _optional_str(snapshot.get("selected_focus_id"))
+    if current_focus and candidate_focus:
+        total_weight += 0.05
+        if current_focus == candidate_focus:
+            score += 0.05
+            reasons.append("similar next-run focus lesson")
     for current_key, candidate_key, weight, label in [
         ("row_count", "row_count", 0.07, "similar dataset size"),
         ("column_count", "column_count", 0.04, "similar feature width"),
@@ -716,6 +746,8 @@ def _build_reflection_memory(
     retrieval_status: str,
     controls: MemoryControls,
     trace: MemoryTrace,
+    learnings_state: dict[str, Any],
+    learnings_snapshot: dict[str, Any],
 ) -> ReflectionMemory:
     memory_delta: list[str] = []
     if dict(route_prior.get("counterfactual", {})).get("changed", False):
@@ -736,10 +768,16 @@ def _build_reflection_memory(
     blocking_layer = _optional_str(current.get("blocking_layer"))
     if blocking_layer:
         lessons.append(f"Current completion pressure is still concentrated in `{blocking_layer}`.")
+    workspace_recent_lesson = _workspace_recent_lesson(learnings_state=learnings_state, learnings_snapshot=learnings_snapshot)
+    if workspace_recent_lesson:
+        lessons.append(f"Workspace learnings still carry: {workspace_recent_lesson}")
     reusable_priors = [
         f"task_type:{current.get('task_type')}",
         f"domain_archetype:{current.get('domain_archetype')}",
     ]
+    workspace_recent_focus = _optional_str(current.get("workspace_recent_focus"))
+    if workspace_recent_focus:
+        reusable_priors.append(f"workspace_focus:{workspace_recent_focus}")
     adjusted = list(route_prior.get("adjusted_candidate_order", []))
     if adjusted:
         reusable_priors.append(f"candidate_order:{' > '.join(adjusted[:3])}")
@@ -770,6 +808,57 @@ def _build_reflection_memory(
         ),
         trace=trace,
     )
+
+
+def _workspace_learning_tags(*, learnings_state: dict[str, Any], learnings_snapshot: dict[str, Any]) -> list[str]:
+    tags: list[str] = []
+    for container_key, payload in (("active_learnings", learnings_snapshot), ("entries", learnings_state)):
+        for item in payload.get(container_key, []):
+            if not isinstance(item, dict):
+                continue
+            for tag in item.get("applicability_tags", []):
+                text = _optional_str(tag)
+                if text:
+                    tags.append(text)
+    return _dedupe_strings(tags)[:12]
+
+
+def _workspace_learning_kinds(*, learnings_state: dict[str, Any], learnings_snapshot: dict[str, Any]) -> list[str]:
+    kinds: list[str] = []
+    for container_key, payload in (("active_learnings", learnings_snapshot), ("entries", learnings_state)):
+        for item in payload.get(container_key, []):
+            if not isinstance(item, dict):
+                continue
+            text = _optional_str(item.get("kind"))
+            if text:
+                kinds.append(text)
+    return _dedupe_strings(kinds)[:8]
+
+
+def _workspace_focus_ids(*, learnings_state: dict[str, Any], learnings_snapshot: dict[str, Any]) -> list[str]:
+    focus_ids: list[str] = []
+    for container_key, payload in (("active_learnings", learnings_snapshot), ("entries", learnings_state)):
+        for item in payload.get(container_key, []):
+            if not isinstance(item, dict):
+                continue
+            if _optional_str(item.get("kind")) != "focus":
+                continue
+            for tag in item.get("applicability_tags", []):
+                text = _optional_str(tag)
+                if text in {"same_data", "add_data", "new_dataset"}:
+                    focus_ids.append(text)
+    return _dedupe_strings(focus_ids)[:3]
+
+
+def _workspace_recent_lesson(*, learnings_state: dict[str, Any], learnings_snapshot: dict[str, Any]) -> str | None:
+    for container_key, payload in (("active_learnings", learnings_snapshot), ("harvested_learnings", learnings_snapshot), ("entries", learnings_state)):
+        for item in payload.get(container_key, []):
+            if not isinstance(item, dict):
+                continue
+            lesson = _optional_str(item.get("lesson"))
+            if lesson:
+                return lesson
+    return None
 
 
 def _default_candidate_order(*, task_type: str, data_mode: str) -> list[str]:

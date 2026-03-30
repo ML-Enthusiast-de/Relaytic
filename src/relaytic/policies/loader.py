@@ -101,6 +101,8 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     pulse_cfg = dict(config.get("pulse", {}))
     tracing_cfg = dict(config.get("tracing", {}))
     evals_cfg = dict(config.get("evals", {}))
+    handoff_cfg = dict(config.get("handoff", {}))
+    learnings_cfg = dict(config.get("learnings", {}))
     agentic_loops_cfg = dict(modeling_cfg.get("agentic_loops", {}))
     contact_email = research_cfg.get("contact_email", "")
     if contact_email is None:
@@ -397,6 +399,21 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
                 if str(item).strip()
             ],
             "max_reported_findings": int(evals_cfg.get("max_reported_findings", 6) or 6),
+        },
+        "handoff": {
+            "enabled": bool(handoff_cfg.get("enabled", True)),
+            "max_findings": int(handoff_cfg.get("max_findings", 6) or 6),
+            "max_risks": int(handoff_cfg.get("max_risks", 5) or 5),
+            "include_commands": bool(handoff_cfg.get("include_commands", True)),
+            "include_agent_artifact_paths": bool(handoff_cfg.get("include_agent_artifact_paths", True)),
+        },
+        "learnings": {
+            "enabled": bool(learnings_cfg.get("enabled", True)),
+            "max_entries": int(learnings_cfg.get("max_entries", 120) or 120),
+            "max_active_entries": int(learnings_cfg.get("max_active_entries", 6) or 6),
+            "track_assumptions": bool(learnings_cfg.get("track_assumptions", True)),
+            "track_feedback": bool(learnings_cfg.get("track_feedback", True)),
+            "track_control_lessons": bool(learnings_cfg.get("track_control_lessons", True)),
         },
         "hpo": {
             "backend": str(modeling_cfg.get("optimizer", "optuna_or_flaml")),

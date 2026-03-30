@@ -4,12 +4,16 @@ from pathlib import Path
 
 from relaytic.interoperability import (
     relaytic_assist_turn,
+    relaytic_reset_learnings,
     relaytic_run,
     relaytic_run_agent_evals,
     relaytic_server_info,
     relaytic_show_agent_evals,
+    relaytic_show_handoff,
+    relaytic_show_learnings,
     relaytic_show_mission_control,
     relaytic_show_trace,
+    relaytic_set_next_run_focus,
 )
 from tests.public_datasets import write_public_breast_cancer_dataset
 
@@ -46,6 +50,23 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     assert capabilities_payload["surface_payload"]["status"] == "ok"
     assert capabilities_payload["surface_payload"]["turn"]["intent_type"] == "capabilities"
 
+    handoff_payload = relaytic_show_handoff(run_dir=str(run_dir))
+    assert handoff_payload["surface_payload"]["status"] == "ok"
+    assert handoff_payload["surface_payload"]["handoff"]["recommended_option_id"] in {"same_data", "add_data", "new_dataset"}
+
+    focus_payload = relaytic_set_next_run_focus(
+        run_dir=str(run_dir),
+        selection="same_data",
+        notes="focus on recall",
+        actor_name="codex-smoke",
+    )
+    assert focus_payload["surface_payload"]["status"] == "ok"
+    assert focus_payload["surface_payload"]["next_run_focus"]["selection_id"] == "same_data"
+
+    learnings_payload = relaytic_show_learnings(run_dir=str(run_dir))
+    assert learnings_payload["surface_payload"]["status"] == "ok"
+    assert learnings_payload["surface_payload"]["learnings_state"]["entry_count"] >= 1
+
     rerun_payload = relaytic_assist_turn(run_dir=str(run_dir), message="go back to planning")
     assert rerun_payload["surface_payload"]["turn"]["action_kind"] == "rerun_stage"
     assert "planning" in list(rerun_payload["surface_payload"]["turn"]["executed_stages"])
@@ -62,8 +83,17 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     assert eval_show_payload["surface_payload"]["evals"]["status"] == "ok"
     assert eval_show_payload["surface_payload"]["evals"]["failed_count"] == 0
 
+    reset_payload = relaytic_reset_learnings(run_dir=str(run_dir))
+    assert reset_payload["surface_payload"]["status"] == "ok"
+    assert reset_payload["surface_payload"]["reset"]["status"] == "ok"
+    assert reset_payload["surface_payload"]["run_summary"]["learnings"]["status"] == "reset"
+
     server_info = relaytic_server_info()
     assert server_info["status"] == "ok"
     assert "relaytic_show_trace" in server_info["inspection_tools"]
+    assert "relaytic_show_handoff" in server_info["inspection_tools"]
+    assert "relaytic_show_learnings" in server_info["inspection_tools"]
     assert "relaytic_run_agent_evals" in server_info["workflow_tools"]
-    assert server_info["tool_count"] >= 20
+    assert "relaytic_set_next_run_focus" in server_info["workflow_tools"]
+    assert "relaytic_reset_learnings" in server_info["workflow_tools"]
+    assert server_info["tool_count"] >= 24

@@ -4,9 +4,10 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 12B, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, and Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation
+- completed slices: 00 through 12C, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, and Slice 12C differentiated result handoff plus durable learnings
 - next recommended slice: 13, search controller, accelerated execution, and distributed local experimentation
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
+- latest handoff-and-learnings slice: 12C, differentiated result reports, next-run focus, and durable workspace learnings
 - next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -70,6 +71,8 @@ The repository currently supports:
 - explicit lab pulse review via `relaytic pulse review` and `relaytic pulse show`, with bounded schedule/skip reporting, rowless innovation watch, challenge watchlists, safe queued follow-up, memory compaction reports, pulse checkpointing, and mission-control visibility
 - first-class trace review via `relaytic trace show` and `relaytic trace replay`, with canonical specialist/tool/intervention/branch traces, structured competing claim packets, deterministic adjudication scorecards, replayable decision reports, and direct runtime-span emission from the shared gateway
 - agent/security evaluation via `relaytic evals run` and `relaytic evals show`, with protocol-conformance reports, host-surface matrices, adversarial steering coverage, red-team findings, and explicit open-finding reporting instead of silent pass/fail drift
+- differentiated post-run handoff via `relaytic handoff show` and `relaytic handoff focus`, with separate user and agent result reports, explicit next-run options, persisted next-run focus, and mission-control-visible handoff state
+- durable local learnings via `relaytic learnings show` and `relaytic learnings reset`, with cross-run learnings markdown/JSON state, per-run learnings snapshots, and memory-visible workspace focus plus recent-lesson priors
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement
@@ -394,6 +397,18 @@ The most important not-yet-implemented shifts after the current baseline are:
 - implemented CLI-versus-MCP protocol conformance checks so host-surface drift becomes an explicit eval failure instead of silent inconsistency
 - extended run summary, mission control, and MCP/service surfaces so trace status, winning claim/action, conformance posture, and open security findings remain visible instead of becoming internal-only diagnostics
 - added targeted Slice 12B trace, runtime, CLI, interoperability, and evaluation verification, plus regression coverage for partial-bundle materialization and direct runtime-span emission
+
+### Slice 12C
+
+- added `src/relaytic/handoff/` with differentiated post-run handoff synthesis, next-run option generation, persisted next-run focus, and user/agent report rendering helpers
+- added `src/relaytic/learnings/` with durable local learnings state, learnings markdown, per-run learnings snapshots, and workspace learnings reset helpers
+- added `relaytic handoff show`, `relaytic handoff focus`, `relaytic learnings show`, and `relaytic learnings reset`
+- added `run_handoff.json`, `next_run_options.json`, `next_run_focus.json`, `reports/user_result_report.md`, `reports/agent_result_report.md`, `lab_learnings_snapshot.json`, `learnings_state.json`, and `learnings.md`
+- implemented differentiated human and agent handoffs from the same canonical run summary instead of one generic post-run surface
+- implemented explicit next-run steering so humans and external agents can persist whether the next iteration should stay on the same data, add data, or start over with a new dataset
+- implemented durable local learnings harvested from assumptions, feedback, benchmark outcomes, control incidents, next-run focus, and open eval lessons, plus explicit learnings reset without silent same-run repopulation
+- extended mission control, mission-control chat, assist, memory, interoperability, and manifest surfaces so result handoff and durable learnings remain visible instead of becoming side artifacts
+- added targeted Slice 12C CLI, mission-control-chat, interoperability, external-agent, and memory verification, including human-detour chat coverage and durable-learnings-to-memory regression checks
 
 ### Cross-Cutting Hardening
 

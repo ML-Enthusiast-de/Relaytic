@@ -57,7 +57,9 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - supports new data arrival, regular retraining, champion/challenger management, recalibration, and rollback
 - versions datasets, features, models, policies, mandates, and reports
 - produces reproducible artifacts, reports, traces, and deployable outputs
+- produces differentiated post-run reports for humans and external agents from the same canonical run truth
 - learns from prior runs and uses memory to improve future planning
+- preserves durable, resettable local learnings so the next run can inherit validated lessons without silently drifting
 - preserves more than analog memory: intervention memory, outcome memory, method memory, and causal links between assumptions, actions, and later results
 - exposes itself as a reusable tool surface for other agents
 - remains deterministic, testable, auditable, and policy-governed

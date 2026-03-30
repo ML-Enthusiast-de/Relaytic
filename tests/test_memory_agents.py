@@ -315,3 +315,94 @@ def test_run_memory_retrieval_prefers_pulse_pinned_analogs_when_similarity_is_ot
     assert analogs
     assert analogs[0]["run_id"] == "analog_pinned"
     assert analogs[0]["memory_pinning_index"]["pin_count"] == 1
+
+
+def test_run_memory_retrieval_includes_workspace_learnings_and_focus_priors(tmp_path: Path) -> None:
+    policy = load_policy().policy
+    data_path = write_public_breast_cancer_dataset(tmp_path / "breast_cancer_with_learnings.csv")
+    mandate_bundle, context_bundle = _build_binary_foundation(policy)
+    investigation_bundle = run_investigation(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+    ).to_dict()
+    current_run_dir = tmp_path / "current_binary_with_learnings"
+    learnings_dir = tmp_path / "lab_memory"
+    learnings_dir.mkdir(parents=True, exist_ok=True)
+    write_json(
+        learnings_dir / "learnings_state.json",
+        {
+            "schema_version": "relaytic.learnings_state.v1",
+            "generated_at": "2026-03-30T00:00:00+00:00",
+            "status": "ok",
+            "state_dir": str(learnings_dir),
+            "entry_count": 2,
+            "entries": [
+                {
+                    "entry_id": "learning_focus_same_data",
+                    "kind": "focus",
+                    "lesson": "The selected next-run focus for this problem is `same_data`.",
+                    "source_run_id": "prior_run",
+                    "applicability_tags": ["binary_classification", "diagnosis_flag", "same_data"],
+                    "last_updated_at": "2026-03-30T00:00:00+00:00",
+                },
+                {
+                    "entry_id": "learning_feedback",
+                    "kind": "feedback",
+                    "lesson": "Accepted feedback in this run pushed Relaytic toward `review_thresholds`.",
+                    "source_run_id": "prior_run",
+                    "applicability_tags": ["binary_classification", "diagnosis_flag", "feedback"],
+                    "last_updated_at": "2026-03-30T00:00:00+00:00",
+                },
+            ],
+        },
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+    current_run_dir.mkdir(parents=True, exist_ok=True)
+    write_json(
+        current_run_dir / "lab_learnings_snapshot.json",
+        {
+            "schema_version": "relaytic.lab_learnings_snapshot.v1",
+            "generated_at": "2026-03-30T00:00:00+00:00",
+            "status": "ok",
+            "run_id": "current_binary_with_learnings",
+            "active_count": 1,
+            "harvested_count": 0,
+            "state_entry_count": 2,
+            "active_learnings": [
+                {
+                    "entry_id": "learning_focus_same_data",
+                    "kind": "focus",
+                    "lesson": "The selected next-run focus for this problem is `same_data`.",
+                    "source_run_id": "prior_run",
+                    "applicability_tags": ["binary_classification", "diagnosis_flag", "same_data"],
+                    "last_updated_at": "2026-03-30T00:00:00+00:00",
+                }
+            ],
+            "harvested_learnings": [],
+        },
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+
+    memory_result = run_memory_retrieval(
+        run_dir=current_run_dir,
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        investigation_bundle=investigation_bundle,
+        search_roots=[tmp_path / "isolated_memory_root"],
+    )
+
+    query_signature = dict(memory_result.bundle.memory_retrieval.query_signature)
+    reflection = memory_result.bundle.reflection_memory
+
+    assert query_signature["workspace_recent_focus"] == "same_data"
+    assert "focus" in list(query_signature["workspace_learning_kinds"])
+    assert "same_data" in list(query_signature["workspace_learning_tags"])
+    assert any(item == "workspace_focus:same_data" for item in reflection.reusable_priors)
+    assert any("Workspace learnings still carry" in item for item in reflection.lessons)
