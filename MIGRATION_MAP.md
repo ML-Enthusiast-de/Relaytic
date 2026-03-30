@@ -304,6 +304,7 @@ Avoid introducing new references to:
 - `src/relaytic/learnings/` for Slice 12C durable local learnings state, learnings markdown, per-run learnings snapshots, and workspace learnings reset behavior
 - `docs/handbooks/` for Slice 11E role-specific human/operator and external-agent onboarding guides
 - `docs/handbooks/relaytic_demo_walkthrough.md` for Slice 11F recruiter-safe demo sequencing and first-contact presentation
+- `docs/specs/` for future normative product-contract docs covering workspace lifecycle, result-contract schema, governed learnings, mission-control flows, proof burden, and flagship demos
 
 Shipped artifact names:
 
@@ -398,10 +399,24 @@ Shipped artifact names:
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
+- `src/relaytic/workspace/` for Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
+- `src/relaytic/iteration/` for Slice 12D next-run planning, focus-decision records, and data-expansion candidates
 - `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
 - `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
+Existing Slice 12C handoff and learnings commands remain part of the public compatibility surface. When Slice 12D lands, those commands should become views over workspace-backed truth rather than being removed or renamed abruptly.
+
 Reserved future artifact names:
+- `workspace_state.json`
+- `workspace_lineage.json`
+- `workspace_focus_history.json`
+- `workspace_memory_policy.json`
+- `result_contract.json`
+- `confidence_posture.json`
+- `belief_revision_triggers.json`
+- `next_run_plan.json`
+- `focus_decision_record.json`
+- `data_expansion_candidates.json`
 - `hpo_campaign_report.json`
 - `search_decision_ledger.json`
 - `search_value_report.json`

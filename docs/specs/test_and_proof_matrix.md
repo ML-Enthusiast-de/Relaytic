@@ -1,0 +1,132 @@
+# Test And Proof Matrix
+
+## Purpose
+
+This document defines the minimum proof burden for future Relaytic work.
+
+The goal is to prevent slices from landing with plausible artifacts but weak evidence.
+
+## Global rule
+
+Every future slice should add:
+
+- targeted unit tests
+- targeted CLI or MCP integration tests
+- one realistic workflow test
+- one regression guard for the most likely failure mode
+
+## Required proof categories
+
+### 1. Schema and contract proof
+
+Future slices that introduce new canonical artifacts must test:
+
+- schema completeness
+- enum validity
+- fallback behavior
+- backward compatibility where promised
+
+### 2. Human workflow proof
+
+Human-facing slices must test:
+
+- first-time use
+- recovery after confusion
+- continuation after a detour
+- post-run next-step understanding
+
+### 3. External-agent proof
+
+Agent-facing slices must test:
+
+- MCP or CLI parity
+- machine-readable continuity
+- command-hint usability
+- no markdown scraping requirement for canonical actions
+
+### 4. Chaos proof
+
+Chaos-style tests should include:
+
+- user pastes only a path
+- user pastes a path and objective in one line
+- user goes off topic and returns
+- user asks for weather or small talk in between
+- user changes objective midstream
+- user asks to reset
+
+### 5. Workspace proof
+
+Workspace-aware slices must test:
+
+- two-run continuity
+- result-contract parity across reports
+- governed learnings invalidation
+- next-run plan transitions
+- start-over versus continue correctness
+
+### 6. Trace and adjudication proof
+
+Trace-aware slices must test:
+
+- canonical replay
+- losing claim visibility
+- contract-driven winner selection
+- protocol-conformance parity across surfaces
+
+## Required future shard groups
+
+To reduce timeout risk, future CI should support at least:
+
+- `mvp_human`
+- `mvp_agent`
+- `workspace_continuity`
+- `trace_and_evals`
+- `search_controller`
+- `mission_control`
+
+## Minimum pass expectation by slice family
+
+### Slice 12D family
+
+- schema tests
+- workspace lineage tests
+- result contract rendering-parity tests
+- governed learnings invalidation/reset tests
+- human continuation tests
+- external-agent continuation tests
+
+### Slice 13 family
+
+- search value tests
+- stop-search tests
+- add-data or new-dataset recommendation tests
+- checkpoint or profile tests
+- agent-consumable strategy tests
+
+### Slice 15 family
+
+- human mission-control tests
+- agent mission-control tests
+- demo-pack health checks
+- onboarding-success tests
+- workspace replay tests
+
+## Release gate
+
+For a slice to be considered recruiter-demo-ready, it should have:
+
+- green targeted tests for the slice
+- green human-chaos tests for impacted flows
+- green external-agent tests for impacted surfaces
+- no newly introduced warnings unless explicitly justified
+
+## Demo gate
+
+For a feature to be shown in a flagship demo, it should have:
+
+- one stable proof case
+- one failure-mode case
+- one recovery or fallback case
+
+If it cannot survive that bar, it should not be presented as a polished demo capability.

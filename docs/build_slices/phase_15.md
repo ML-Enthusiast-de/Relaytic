@@ -9,6 +9,7 @@ Intended package boundaries:
 - `src/relaytic/mission_control/`
 - extend `src/relaytic/interoperability/`
 - extend `src/relaytic/runtime/`
+- extend `src/relaytic/workspace/`
 
 Intended artifacts:
 
@@ -27,6 +28,15 @@ Intended artifacts:
 ## Intent
 
 Slice 15 is where Relaytic turns the thinner mission-control and onboarding surface from Slices 11B through 11G into a professional operating surface for humans and external agents.
+
+This slice must continue obeying:
+
+- `docs/specs/workspace_lifecycle.md`
+- `docs/specs/result_contract_schema.md`
+- `docs/specs/governed_learnings_schema.md`
+- `docs/specs/mission_control_flows.md`
+- `docs/specs/test_and_proof_matrix.md`
+- `docs/specs/flagship_demo_pack.md`
 
 The slice is successful only if Relaytic can:
 
@@ -59,7 +69,9 @@ The slice is successful only if Relaytic can:
 
 - Slice 15 must consume the canonical trace model from Slice 12B rather than inventing a separate UI-only activity history
 - Slice 15 must build on the mission-control MVP from Slices 11B through 11G rather than replacing it with a separate UI stack
+- Slice 15 must consume workspace continuity, result-contract posture, belief-revision triggers, and next-run planning from Slice 12D rather than treating the UI as a current-run-only shell
 - mission control must make branch, tool, intervention, and confidence state legible without requiring humans or external agents to read raw artifact trees
+- mission control must make workspace lineage, focus history, governed learnings posture, current result contract, and next-run options legible without requiring humans or external agents to reconstruct continuity from file paths
 - CLI, MCP, and any richer UI shell must expose the same mission-control truth with only presentation differences
 - packaged demos must include at least one skeptical-control case, one incumbent challenge case, and one trace-backed branch comparison
 - packaged demos should become a maintained flagship demo pack with explicit scorecards instead of ad hoc walkthroughs
@@ -77,11 +89,12 @@ Slice 15 is acceptable only if:
 1. one mission-control view replays why Relaytic changed course across at least two branches
 2. one agent-consumable mission-control export shows current stage, branch state, and recommended next action without missing trace context
 3. one packaged demo shows what changed because of memory, research, feedback, and intervention handling from the same surface
-4. one flagship demo pack includes at least:
+4. one workspace view spans at least two runs and shows lineage, current result contract, governed learnings posture, and next-run planning from the same surface
+5. one flagship demo pack includes at least:
    - unfamiliar dataset to useful governed decision
    - imported incumbent challenge
    - skeptical override rejection or unsafe-request defense
-5. one human-factors or onboarding-success eval shows that a first-time operator can start, recover, and finish a useful flow without repo literacy
+6. one human-factors or onboarding-success eval shows that a first-time operator can start, recover, and finish a useful flow without repo literacy
 
 ## Required Verification
 
@@ -92,3 +105,4 @@ Slice 15 should not be considered complete without targeted tests that cover at 
 - one trace-backed replay case
 - one packaged demo health check
 - one human-factors or onboarding-success case
+- all relevant proof categories from `docs/specs/test_and_proof_matrix.md`

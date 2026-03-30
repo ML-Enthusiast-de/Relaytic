@@ -5,12 +5,14 @@ This document tracks the operational state of the repository. It is an implement
 ## Current Baseline
 
 - completed slices: 00 through 12C, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, and Slice 12C differentiated result handoff plus durable learnings
-- next recommended slice: 13, search controller, accelerated execution, and distributed local experimentation
+- next recommended slice: 12D, workspace-first continuity, result contracts, and governed learnings
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - latest handoff-and-learnings slice: 12C, differentiated result reports, next-run focus, and durable workspace learnings
-- next scale-and-search follow-on after 12B: 13, search controller, accelerated execution, and distributed local experimentation
+- next workspace-and-iteration follow-on after 12C: 12D, workspace-first continuity, result contracts, and governed learnings
+- next scale-and-search follow-on after 12D: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
 - current public CLI: `relaytic`
+- canonical future product-contract pack written under `docs/specs/` for workspace lifecycle, result contracts, governed learnings, mission-control flows, testing/proof burden, and flagship demos
 
 ## Operational Capabilities
 
@@ -92,6 +94,10 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
+- a workspace-first continuity layer with explicit workspace state, lineage, focus history, and memory policy instead of run-only continuity
+- machine-stable result contracts with confidence posture and belief-revision triggers so later work does not restart from prose alone
+- governed learnings with source, confidence, reaffirmation state, invalidation history, and optional expiry instead of sticky untyped memory
+- an iteration planner that can choose same-data continuation, add-data continuation, or new-dataset restart before deeper search consumes more effort
 - richer long-term memory with retention, compaction, pinning, and replay rules so durable lessons survive beyond analog similarity
 - stronger dynamic controller logic that decides who should act next, how deep to branch, and when review is worth it under explicit contracts
 - stronger search/HPO/controller logic that widens, prunes, and allocates effort under explicit value and budget contracts

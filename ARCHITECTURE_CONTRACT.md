@@ -54,6 +54,8 @@ Current canonical boundaries:
 
 Reserved future boundaries:
 
+- `src/relaytic/workspace/` should own Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
+- `src/relaytic/iteration/` should own Slice 12D next-run planning, focus-decision records, data-expansion candidates, and workspace continuation decisions
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
@@ -100,10 +102,19 @@ These files are required and must stay current:
 - `docs/build_slices/phase_12a.md`
 - `docs/build_slices/phase_12b.md`
 - `docs/build_slices/phase_12c.md`
+- `docs/build_slices/phase_12d.md`
 - `docs/build_slices/phase_13.md`
 - `docs/build_slices/phase_14.md`
 - `docs/build_slices/phase_15.md`
 - `docs/build_slices/phase_16.md`
+- `docs/specs/workspace_lifecycle.md`
+- `docs/specs/result_contract_schema.md`
+- `docs/specs/governed_learnings_schema.md`
+- `docs/specs/mission_control_flows.md`
+- `docs/specs/test_and_proof_matrix.md`
+- `docs/specs/flagship_demo_pack.md`
+
+The `docs/specs/` files are normative product-contract documents for future slices. If a later slice changes workspace continuity, result rendering, learnings behavior, mission-control flow, testing burden, or flagship demo expectations, those docs must be updated in the same change.
 
 ## Artifact Contract
 
@@ -298,6 +309,8 @@ Current handoff and learnings artifact names:
 - `learnings_state.json`
 - `learnings.md`
 
+These Slice 12C artifacts remain the current public per-run handoff and learnings surfaces. Slice 12D must build workspace-backed continuity on top of them rather than silently replacing or renaming them.
+
 Current trace and eval artifact names:
 
 - `trace_model.json`
@@ -316,6 +329,16 @@ Current trace and eval artifact names:
 - `host_surface_matrix.json`
 
 Reserved future artifact names:
+- `workspace_state.json`
+- `workspace_lineage.json`
+- `workspace_focus_history.json`
+- `workspace_memory_policy.json`
+- `result_contract.json`
+- `confidence_posture.json`
+- `belief_revision_triggers.json`
+- `next_run_plan.json`
+- `focus_decision_record.json`
+- `data_expansion_candidates.json`
 - `hpo_campaign_report.json`
 - `search_decision_ledger.json`
 - `search_value_report.json`

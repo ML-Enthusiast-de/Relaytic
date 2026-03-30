@@ -9,6 +9,8 @@ Intended package boundaries:
 - extend `src/relaytic/autonomy/`
 - extend `src/relaytic/runtime/`
 - extend `src/relaytic/modeling/`
+- extend `src/relaytic/workspace/`
+- extend `src/relaytic/iteration/`
 
 Intended artifacts:
 
@@ -28,6 +30,14 @@ Intended artifacts:
 ## Intent
 
 Slice 13 is where Relaytic stops running only narrow bounded search and starts managing broader search, deeper HPO, and execution strategy under one explicit controller.
+
+This slice must continue obeying:
+
+- `docs/specs/workspace_lifecycle.md`
+- `docs/specs/result_contract_schema.md`
+- `docs/specs/governed_learnings_schema.md`
+- `docs/specs/test_and_proof_matrix.md`
+- `docs/specs/flagship_demo_pack.md`
 
 The slice is successful only if Relaytic can:
 
@@ -61,11 +71,13 @@ The slice is successful only if Relaytic can:
 - Slice 13 must consume the explicit quality and budget contracts from Slice 10B instead of inventing separate hidden search limits
 - Slice 13 must consume real runtime/control accounting and any beat-target contract from Slice 11A rather than relying only on estimated search effort
 - Slice 13 should consume the canonical trace/eval artifacts from Slice 12B so branch expansion, pruning, and controller changes can be justified by replayable evidence rather than implicit heuristics
+- Slice 13 must consume `workspace_state.json`, `workspace_focus_history.json`, `result_contract.json`, `confidence_posture.json`, and `next_run_plan.json` from Slice 12D rather than treating deeper search as a purely run-local decision
 - search widening, pruning, HPO allocation, and device/backend choices must extend the mission-control surface introduced in Slice 11B and expanded through Slices 11C, 11D, 11E, 11F, and 11G so humans and external agents can see why search did or did not go deeper
 - device-aware planning must change how Relaytic executes, not silently change what it believes
 - distributed execution must remain resumable and safe for long local runs
 - broader route families, calibration variants, uncertainty wraps, abstention policies, imported-incumbent beat-target branches, and deeper HPO campaigns should be eligible where their value is justified
 - search decisions must produce explicit value-of-search evidence showing why Relaytic widened, pruned, or stopped rather than leaving deeper HPO to ambient availability
+- when search evidence says more search on the same data is low value, Slice 13 must be able to recommend `add_data` or `new_dataset` through the workspace and iteration artifacts instead of pretending that every problem should be solved by more HPO
 - Slice 13 should include at least one proof where Relaytic declines more search because the value contract says stop, not because hardware or adapters are missing
 
 ## Proof Obligation
@@ -81,6 +93,7 @@ Slice 13 is acceptable only if:
 3. one low-value branch is pruned while a higher-value branch is widened with explicit justification
 4. one case widens or cuts HPO effort because the decision contract, beat-target pressure, or trace evidence says more search is or is not worth it
 5. one case records explicit stop-search reasoning in `search_value_report.json` even though deeper HPO or broader branches were technically available
+6. one case recommends `add_data` or `new_dataset` through the workspace-backed next-run plan because the search controller concludes that more search on the current data is low value
 
 ## Required Verification
 
@@ -91,4 +104,6 @@ Slice 13 should not be considered complete without targeted tests that cover at 
 - one branch-pruning case
 - one HPO-allocation case
 - one explicit stop-search-value case
+- one workspace-aware add-data or new-dataset case
 - one agent-consumable execution-strategy case
+- all relevant proof categories from `docs/specs/test_and_proof_matrix.md`

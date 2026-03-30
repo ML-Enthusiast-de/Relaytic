@@ -134,10 +134,11 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 24. Slice 12A
 25. Slice 12B
 26. Slice 12C
-27. Slice 13
-28. Slice 14
-29. Slice 15
-30. Slice 16
+27. Slice 12D
+28. Slice 13
+29. Slice 14
+30. Slice 15
+31. Slice 16
 
 Reason:
 
@@ -168,19 +169,22 @@ Reason:
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because Relaytic needs one canonical trace substrate, explicit competing-claim/adjudication contracts, and agent/security evaluation before wider search and full trace-explorer claims become credible
 - Slice 12B should also establish protocol conformance between CLI, MCP, and later richer UI surfaces instead of assuming those surfaces stay aligned
 - Slice 12C should come before Slice 13 because Relaytic needs differentiated post-run handoff, explicit next-run steering, and durable local learnings before deeper search and later demo packaging can feel complete to humans or external agents
-- Slice 13 should prove not only deeper search but explicit value-of-search decisions, including when Relaytic refuses to keep searching
+- Slice 12D should come before Slice 13 because Relaytic should become workspace-first before it becomes search-deeper; the result contract, governed learnings, workspace lineage, and explicit next-run plan need to exist before wider search can decide responsibly between same-data continuation, add-data continuation, or starting over
+- Slice 13 should prove not only deeper search but explicit value-of-search decisions, including when Relaytic refuses to keep searching and when the right answer is to add data or move to a new dataset instead of spending more search budget
 - Slice 15 should close the proof loop with flagship demo packs and human-supervision evaluation rather than treating UI polish as sufficient evidence
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:
 
 - implemented through Slice 12C, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, and Slice 12C differentiated result handoff plus durable learnings now landed
-- next execution target: Slice 13
+- next execution target: Slice 12D
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
 - latest handoff-and-learnings slice: Slice 12C
-- next scale-and-search follow-on after Slice 12B: Slice 13
-- after Slice 12C, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, and durable-learnings surfaces rather than leaving the UI stale until late polish
+- next workspace-and-iteration follow-on after Slice 12C: Slice 12D
+- next scale-and-search follow-on after Slice 12D: Slice 13
+- after Slice 12D, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, and iteration-planning surfaces rather than leaving the UI stale until late polish
+- the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation
 
 ## MVP boundary
 
@@ -223,6 +227,11 @@ before the MVP is undeniable.
 
 If the goal is to turn the current implementation into something that looks genuinely novel rather than merely well-structured, the next leverage points are:
 
+- a workspace-first continuity layer that promotes Relaytic from run-first tooling into a governed multi-run investigation workspace
+- machine-stable result contracts that tell humans and external agents what Relaytic currently believes, how strong the evidence is, what remains unresolved, what it recommends next, and what would change its mind
+- governed learnings that keep source, confidence, reaffirmation state, invalidation history, and optional expiry explicit instead of letting memory drift
+- an iteration planner that can choose same-data continuation, add-data continuation, or new-dataset restart before deeper search spends time and compute
+- a canonical product-spec pack that freezes schemas, flows, and proof burden so later coding work can optimize for quality instead of improvising product behavior
 - a decision-world model that understands action cost, review/defer options, and whether more search is actually the right next move
 - explicit quality and budget contracts that tell humans and external agents what Relaytic currently means by "good enough" and "worth the search"
 - bounded operator/lab profiles that shape review posture and budget posture without personalizing truth-bearing logic

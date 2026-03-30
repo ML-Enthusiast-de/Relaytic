@@ -60,6 +60,14 @@ Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, and 1
 
 The next frontier upgrades are:
 
+The next recommended build is **Slice 12D**, because Relaytic should become workspace-first before it becomes search-deeper.
+
+The future implementation contract for that work is now also frozen in [workspace_lifecycle.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/workspace_lifecycle.md), [result_contract_schema.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/result_contract_schema.md), [governed_learnings_schema.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/governed_learnings_schema.md), [mission_control_flows.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/flagship_demo_pack.md).
+
+- a workspace-first continuity layer so Relaytic becomes a governed multi-run investigation workspace rather than a collection of isolated runs
+- machine-stable result contracts with confidence posture and belief-revision triggers so humans, agents, CLI, MCP, and later richer UI shells can all read the same conclusion differently without drifting
+- governed learnings with source, confidence, reaffirmation, invalidation, reset, and optional expiry semantics
+- an iteration planner that can choose whether the next move should stay on the same data, add data, or start over before deeper search spends more compute
 - richer long-term memory with retention, compaction, pinning, and replay rules so specialists do not repeatedly forget the same lesson
 - a stronger search/HPO controller that widens, prunes, and allocates effort under explicit value and budget contracts
 - richer trace-native mission-control surfaces that turn the shipped canonical trace and scorecards into a polished branch, replay, and change-attribution experience

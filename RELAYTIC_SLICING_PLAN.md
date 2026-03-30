@@ -174,6 +174,8 @@ If a later slice adds "smartness" without strengthening at least one of those pr
   once Slice 12B lands, one case where CLI and MCP expose the same trace, adjudication winner, and defensive-control outcome from the same canonical run truth, and any mismatch becomes an explicit eval failure rather than silent drift
 - **handoff-and-learnings path**
   once Slice 12C lands, one case where a completed run yields differentiated human and agent result reports, explicit next-run options, durable learnings that survive across runs, and a deliberate learnings reset that does not silently repopulate on the same refresh
+- **workspace-continuity path**
+  once Slice 12D lands, one workspace should carry at least two runs with visible lineage, one shared machine-stable result contract per run, governed learnings that can be invalidated or expired without deleting history, and an explicit next-run plan that chooses between same-data continuation, add-data continuation, or starting over
 - **mission-control path**
   once Slice 15 lands, one case where a human or external agent can see branch structure, confidence, and change attribution without reading the entire artifact tree
 - **flagship-demo path**
@@ -197,26 +199,28 @@ Stable slice numbering stays the same, but the preferred execution order after S
 7. Slice 09C
 8. Slice 09D
 9. Slice 09E
-10. Slice 11
-11. Slice 10
-12. Slice 10B
-13. Slice 10C
-14. Slice 10A
-15. Slice 11A
-16. Slice 11B
-17. Slice 11C
-18. Slice 11D
-19. Slice 11E
-20. Slice 11F
-21. Slice 11G
-22. Slice 12
-23. Slice 12A
-24. Slice 12B
-25. Slice 12C
-26. Slice 13
-27. Slice 14
-28. Slice 15
-29. Slice 16
+10. Slice 09F
+11. Slice 11
+12. Slice 10
+13. Slice 10B
+14. Slice 10C
+15. Slice 10A
+16. Slice 11A
+17. Slice 11B
+18. Slice 11C
+19. Slice 11D
+20. Slice 11E
+21. Slice 11F
+22. Slice 11G
+23. Slice 12
+24. Slice 12A
+25. Slice 12B
+26. Slice 12C
+27. Slice 12D
+28. Slice 13
+29. Slice 14
+30. Slice 15
+31. Slice 16
 
 Why:
 
@@ -229,6 +233,7 @@ Why:
 - Slice 09C turns judged recommendations into bounded autonomous second-pass action so Relaytic can execute challenger expansion, recalibration, retraining, and re-planning rather than only recommending them
 - Slice 09D lets Relaytic absorb external SOTA knowledge through redacted research queries, method-transfer artifacts, and benchmark-reference harvesting without exporting user data
 - Slice 09E gives Relaytic a communicative control surface so humans and external agents can ask for explanations, jump back to any bounded stage, or let Relaytic take over safely
+- Slice 09F makes the LLM layer explicit, routed, hardware-aware, and provable instead of leaving semantic help as an ambient feature
 - Slice 11 gives honest proof before feedback or dojo behavior expands too far
 - Slice 10 becomes safer after memory and benchmark doctrine exist
 - Slice 10B makes quality gates, budget posture, and operating-profile assumptions explicit before deeper decision-world modeling and broader search begin leaning on them
@@ -245,21 +250,24 @@ Why:
 - Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because wider search and full trace-backed mission control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
 - Slice 12B should also establish protocol conformance between CLI, MCP, and later richer UI surfaces instead of assuming those surfaces stay aligned
 - Slice 12C should come before Slice 13 because Relaytic still needs a professional post-run handoff, explicit next-run steering, and durable learnings that survive across runs before deeper search and late demo packaging can feel complete
-- Slice 13 should prove not only deeper search but explicit value-of-search decisions so the controller can justify both widening and stopping
+- Slice 12D should come before Slice 13 because Relaytic should become workspace-first before it becomes search-deeper; the result contract, governed learnings, workspace lineage, and explicit next-run plan need to exist before wider search can responsibly choose between same-data continuation, add-data continuation, or starting over
+- Slice 13 should prove not only deeper search but explicit value-of-search decisions so the controller can justify widening, stopping, adding data, or moving to a new dataset
 - Slice 15 should close the loop with flagship demo packs and human-supervision evaluation rather than treating UI polish as sufficient proof
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 12C, including Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, and Slice 12C differentiated result handoff plus durable learnings
-- next execution target: Slice 13
+- implemented baseline: Slice 00 through Slice 12C, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, and Slice 12C differentiated result handoff plus durable learnings
+- next execution target: Slice 12D
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12C
-- next scale-and-search follow-on after Slice 12B: Slice 13
+- next workspace-and-iteration follow-on after Slice 12C: Slice 12D
+- next scale-and-search follow-on after Slice 12D: Slice 13
 - later mission-control expansion after Slice 14: Slice 15
 - late optional representation follow-on after Slice 15: Slice 16
-- after Slice 12C, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, and durable-learnings surfaces instead of treating UI as a separate late-polish track
+- after Slice 12D, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, and iteration-planning surfaces instead of treating UI as a separate late-polish track
+- the canonical product-spec pack for Slice 12D and its follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -1923,6 +1931,95 @@ Implemented.
 - one mission-control run-context chat case supports result-report review, next-run focus selection, learnings review, and learnings reset in a natural multi-turn flow
 - one external-agent or MCP case uses the same handoff and learnings truth without scraping prose
 - one memory case shows that durable learnings are visible as reusable priors
+
+## Slice 12D - Workspace-first continuity, result contracts, and governed learnings
+
+### Status
+
+Planned.
+
+### Load-bearing improvement
+
+- Relaytic should stop treating the isolated run as the whole product and instead become a governed multi-run workspace that carries machine-stable result contracts, explicit continuity state, governed learnings, and next-run planning across runs
+
+### Human surface
+
+- humans should be able to finish a run, review one user-optimized result report, understand what Relaytic currently believes, see what remains unresolved, choose whether to continue on the same data, add data, or start over, and then continue from the same workspace without losing context
+
+### Agent surface
+
+- external agents should be able to consume one machine-stable result contract, workspace lineage, continuity state, governed learnings, and next-run plan without scraping narrative prose or inferring continuity from file layout alone
+
+### Intelligence source
+
+- canonical run truth from Slice 12C, trace and adjudication truth from Slice 12B, durable learnings, feedback/outcome memory, next-run focus decisions, and explicit workspace-level continuity policy
+
+### Fallback rule
+
+- if workspace state is unavailable, Relaytic must still preserve the current per-run handoff and learnings surfaces from Slice 12C while recording that workspace continuity is degraded rather than silently improvising continuity from filenames or directory guesses
+
+### Required behavior
+
+- every serious run should belong to a workspace once continuity exists; Relaytic must not rely on parent-directory heuristics as the primary continuity mechanism
+- Slice 12C handoff artifacts remain public and valid, but they should become per-run snapshots that are mirrored into workspace-backed continuity rather than competing truth sources
+- Relaytic must generate one machine-stable `result_contract.json` per serious run that states:
+  - what Relaytic currently believes
+  - how strong the evidence is
+  - what remains unresolved
+  - what Relaytic recommends next
+  - what would change its mind
+- `reports/user_result_report.md` and `reports/agent_result_report.md` must become differentiated renderings of `result_contract.json`, not separate reasoning products
+- governed learnings must become typed records with explicit source, confidence, status, reaffirmation state, invalidation history, and optional expiry rather than free-form sticky memory
+- Relaytic must maintain workspace lineage and focus history so later runs can explain how the current direction evolved
+- Relaytic must emit one explicit `next_run_plan.json` that can choose between:
+  - `same_data`
+  - `add_data`
+  - `new_dataset`
+  and should also state the lower-level reason, such as more search, recalibration, retraining, incumbent comparison, or restart
+- mission control, assist, and MCP must expose workspace continuity, result-contract posture, and next-run planning directly instead of only showing the current run
+- memory retrieval should prefer explicit workspace state and governed learnings over loose analog assumptions when both are available
+- existing `relaytic handoff *` and `relaytic learnings *` commands must remain supported as compatibility-preserving views over workspace-backed truth once Slice 12D lands
+
+### Proof obligation
+
+- Relaytic must prove that multi-run continuity is explicit, governed, and machine-usable rather than hidden in prose, path conventions, or operator memory
+
+### Required outputs
+
+- `workspace_state.json`
+- `workspace_lineage.json`
+- `workspace_focus_history.json`
+- `workspace_memory_policy.json`
+- `result_contract.json`
+- `confidence_posture.json`
+- `belief_revision_triggers.json`
+- `next_run_plan.json`
+- `focus_decision_record.json`
+- `data_expansion_candidates.json`
+
+### Acceptance criteria
+
+Slice 12D is acceptable only if:
+
+1. one workspace carries at least two runs with visible lineage and focus history
+2. one run proves that the user report and agent report are differentiated renderings of the same `result_contract.json`
+3. one next-run plan chooses `add_data` or `new_dataset` because the value contract says deeper search on the same data is low value
+4. one governed-learning case invalidates or expires stale guidance without deleting its history
+5. one mission-control or assist surface shows current belief, confidence posture, unresolved items, recommended next move, and belief-revision triggers from workspace-backed truth
+6. one external-agent or MCP case continues a workspace using machine-stable workspace and next-run-plan artifacts rather than scraping markdown
+7. one compatibility case proves that existing Slice 12C handoff and learnings commands still work on top of workspace-backed truth
+
+### Required verification
+
+Slice 12D should not be considered complete without targeted tests that cover at least:
+
+- one multi-run workspace lineage case
+- one result-contract rendering-parity case
+- one governed-learning invalidation or expiry case
+- one next-run planner case that chooses between same data, add data, and new dataset
+- one mission-control or assist workspace-continuity case
+- one external-agent or MCP workspace-continuation case
+- one memory-integration case where workspace truth overrides weaker analog guesses
 
 ## Slice 13 - Search controller, accelerated execution, and distributed local experimentation
 

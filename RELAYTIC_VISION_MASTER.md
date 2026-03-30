@@ -60,6 +60,8 @@ Transform this repository from a “data -> surrogate model” framework into a 
 - produces differentiated post-run reports for humans and external agents from the same canonical run truth
 - learns from prior runs and uses memory to improve future planning
 - preserves durable, resettable local learnings so the next run can inherit validated lessons without silently drifting
+- treats the workspace, not the isolated run, as the primary product unit once meaningful continuity exists
+- carries explicit result contracts, confidence posture, and next-run plans between runs so later work does not restart from narrative memory alone
 - preserves more than analog memory: intervention memory, outcome memory, method memory, and causal links between assumptions, actions, and later results
 - exposes itself as a reusable tool surface for other agents
 - remains deterministic, testable, auditable, and policy-governed
@@ -122,8 +124,16 @@ The product becomes world-class only when it can repeatedly prove:
   Relaytic should keep a small set of recruiter-safe and lab-safe flagship demos with explicit scorecards, not just ad hoc walkthroughs
 - **human-supervision success**
   a first-time human should be able to start, recover, inspect why Relaytic changed course, and complete a useful run without repo literacy or hidden operator lore
+- **workspace-continuity proof**
+  Relaytic should be able to carry a governed investigation across multiple runs in one workspace, keep differentiated human and agent handoffs aligned with machine-stable result contracts, and show why the next run should stay on the same data, add data, or start over
+- **result-contract parity proof**
+  the user report, agent report, mission control, CLI, and MCP surfaces should all render the same machine-stable result contract rather than drifting into narrative-only summaries
+- **governed-learning proof**
+  learnings should be typed, confidence-bearing, invalidatable, resettable, and expirable so Relaytic does not silently turn stale memory into hidden truth
 
 Future slices that add autonomy, new host surfaces, or new operator-facing behavior should strengthen at least one of those proof tracks in addition to their local feature work.
+
+Those future slices should also be constrained by explicit product-contract documents for workspace lifecycle, result contracts, governed learnings, mission-control flows, testing burden, and flagship demos. Relaytic should not rely on implementation taste alone for those areas once the spec pack exists.
 
 ## Anti-mediocrity guardrails
 
@@ -187,6 +197,11 @@ For the repository as it exists today, the next major leverage points are not "m
 
 They are:
 
+- a **workspace-first continuity layer** that makes multi-run lineage, focus history, and continuity state explicit before Relaytic tries to search wider
+- **machine-stable result contracts** that define what Relaytic believes, how strong the evidence is, what remains unresolved, what it recommends next, and what would change its mind
+- **governed learnings** that carry source, confidence, reaffirmation state, invalidation history, and optional expiry instead of drifting into an untyped memory blob
+- an **iteration planner** that can explicitly choose between same-data continuation, add-data continuation, or new-dataset restart before deeper search consumes more time or compute
+- a **canonical product-spec pack** that freezes schemas, UX flows, and proof burden so later slices can optimize implementation quality without improvising core product behavior
 - **behavioral contracts** that let humans and external agents steer Relaytic without turning Relaytic into a compliant shell
 - **causal multi-layer memory** that preserves interventions, method outcomes, downstream consequences, and why previous guidance proved right or wrong
 - a **first-class trace model** that records specialist turns, tool calls, intervention handling, branch expansion, and later decisions as one replayable execution truth rather than scattered logs
@@ -215,7 +230,7 @@ One additional long-range opportunity is a **representation engine** for large u
 ### New product identity
 Relaytic becomes:
 
-> A local-first inference engineering system for structured data, where multiple specialist agents independently inspect data, form and challenge hypotheses, run evidence-driven experiments, quantify reliability, recommend additional data, preserve mandate-aware user intent, optionally use grounded expert context, and produce reusable inference systems and artifacts.
+> A local-first inference engineering workspace for structured data, where multiple specialist agents independently inspect data, form and challenge hypotheses, run evidence-driven experiments, quantify reliability, preserve mandate-aware user intent, recommend the right next move across runs, and produce reusable inference systems, result contracts, and governed workspace memory.
 
 ### What Relaytic is not
 Relaytic is **not**:
@@ -226,6 +241,7 @@ Relaytic is **not**:
 
 Relaytic is:
 - an investigator of unknown structured datasets
+- a workspace-first investigation system that can carry governed continuity across runs instead of treating every run as a fresh conversation
 - a builder of robust inference systems
 - a generator of evidence, not just metrics
 - a system with a persistent lab mandate, work-style memory, run-specific brief, and lifecycle-aware retraining logic
@@ -290,7 +306,19 @@ Relaytic is:
 9. **Memory and priors**
    - Planning should improve over time through retrieved priors, plan archetypes, remembered failure modes, and remembered mandate patterns.
 
-10. **Optional knowledge grounding**
+10. **Workspace-first continuity**
+   - Once meaningful continuity exists, Relaytic should treat the workspace, not the isolated run, as the primary product unit.
+   - Later runs should inherit explicit lineage, focus history, and continuity state rather than restarting from conversational memory.
+
+11. **Result contracts over narrative memory**
+   - Every serious run should end in one machine-stable result contract that states what Relaytic believes, how strong the evidence is, what remains unresolved, what it recommends next, and what would change its mind.
+   - Human and agent reports should be differentiated renderings of that same result contract rather than parallel sources of truth.
+
+12. **Governed learnings**
+   - Durable learnings must be typed, confidence-bearing, resettable, invalidatable, and optionally expirable.
+   - Relaytic should remember useful lessons without letting stale assumptions quietly harden into truth.
+
+13. **Optional knowledge grounding**
    - The system should support expert grounding through:
      - deterministic expert priors derived from dataset and context evidence
      - user-supplied domain context
@@ -300,43 +328,43 @@ Relaytic is:
    - When no expert context is provided, the system must still proceed using dataset evidence alone.
    - Every grounded claim must carry provenance.
 
-11. **Portable local intelligence**
+14. **Portable local intelligence**
    - Relaytic should run well on macOS and Linux personal computers.
    - A minimum local LLM baseline may be offered as an optional on-device semantic helper.
    - The minimum local LLM baseline must remain optional, replaceable, and fully disableable.
 
-12. **Intelligence-seeking behavior**
+15. **Intelligence-seeking behavior**
    - Relaytic should be maximally curious about opportunities to gain more useful intelligence.
    - If it detects that a stronger permissible local model or backend is available, it should suggest the upgrade when the expected benefit is meaningful.
    - These suggestions must remain advisory unless the user explicitly enables automatic switching.
 
-13. **Intelligence amplification**
+16. **Intelligence amplification**
    - When a strong LLM is available, Relaytic should gain materially more semantic and strategic power.
    - LLMs should improve understanding, critique, planning, synthesis, and lifecycle judgment.
    - Deterministic execution, verification, and artifact generation must remain intact.
 
-14. **Mandate-aware autonomy**
+17. **Mandate-aware autonomy**
    - Autonomous execution must remain aware of:
      - long-term lab values
      - work-style preferences
      - run-specific intent
 
-15. **Debate with obedience**
+18. **Debate with obedience**
    - Agents must obey binding constraints.
    - Agents may challenge soft preferences when evidence suggests materially better alternatives.
    - Final outputs must show what the mandate preferred, what the evidence preferred, and what compromise was selected.
 
-13. **Resource-aware by default**
+19. **Resource-aware by default**
    - If the user does not supply compute limits, the system must inspect available local hardware and derive conservative default budgets.
    - Plans must adapt to CPU count, RAM, storage pressure, and optional accelerator availability.
    - The default assumption should favor successful completion on personal computers over maximal search depth.
 
-14. **Bounded by default, unbounded by explicit opt-in**
+20. **Bounded by default, unbounded by explicit opt-in**
    - Default runs should be bounded and terminate cleanly.
    - Long-running or indefinite operation must be an explicit user choice.
    - Even in long-running mode, the system must checkpoint, summarize, and remain interruptible.
 
-16. **Continuous usefulness**
+21. **Continuous usefulness**
    - The system must be useful not only for one-off runs but also for:
      - regular retraining
      - new-data evaluation
@@ -345,24 +373,22 @@ Relaytic is:
      - rollback and promotion
      - feature and schema lifecycle management
 
-17. **Agent interoperability**
+22. **Agent interoperability**
    - The system should be usable directly by humans and consumable by other agents as a plugin/tool server.
 
-18. **Showcaseability and operator experience**
+23. **Showcaseability and operator experience**
    - Every major capability should have:
      - a polished local UI flow
      - a one-command demo path
      - README-first documentation
      - inspectable artifacts
 
----
-
-18. **Replaceable subsystems**
+24. **Replaceable subsystems**
    - Relaytic should not hard-wire every backend into the core.
    - Major capabilities should be exposed through explicit engine slots with stable contracts.
    - Swapping a backend must not change Relaytic’s judgment layer or artifact contracts.
 
-19. **Bounded evidence handoffs**
+25. **Bounded evidence handoffs**
    - Specialists should exchange bounded evidence bundles, not unlimited hidden context.
    - Every important handoff should carry:
      - structured summaries
@@ -371,20 +397,20 @@ Relaytic is:
      - confidence
      - size limits
 
-20. **Operator-safe by design**
+26. **Operator-safe by design**
    - Onboarding, health checks, backup, restore, and diagnostics must be first-class features.
    - Relaytic should be easy to install, verify, recover, and move between machines.
 
-21. **Trust boundaries everywhere**
+27. **Trust boundaries everywhere**
    - Every integrated backend, route, or external result must be treated as challengeable.
    - External systems may be useful, but none are authoritative by default.
    - Relaytic must remain fail-closed for risky integrations and explicit about trust mode.
 
-22. **Structured semantic tasks**
+28. **Structured semantic tasks**
    - Relaytic should include a bounded semantic-task primitive for schema-constrained meaning extraction.
    - This should be the safest reusable way to exploit extra intelligence for small semantic jobs.
 
-23. **Focus-aware optimization**
+29. **Focus-aware optimization**
    - Relaytic must not assume that every task should optimize the same thing.
    - A focus-selection layer must debate whether the run should prioritize:
      - predictive accuracy
@@ -396,12 +422,12 @@ Relaytic is:
      - or a multi-objective blend
    - The resolved focus must directly shape metrics, thresholds, HPO depth, challenger strategy, and lifecycle decisions.
 
-24. **Relentless search for the better answer**
+30. **Relentless search for the better answer**
    - Relaytic must never assume that the first strong result is the best final answer.
    - It should integrate strong external systems when they are useful, challenge their outputs when needed, and keep searching for a better justified outcome.
    - “Use what is best for each purpose, then challenge it” should be a core Relaytic value.
 
-25. **Focus-shaped feature engineering**
+31. **Focus-shaped feature engineering**
    - The resolved focus profile must shape feature engineering proposals, not only metrics and tuning.
    - Focus should influence:
      - allowed feature families
@@ -411,12 +437,12 @@ Relaytic is:
      - compute budget for feature generation
      - explanation emphasis in reports
 
-26. **LLM-amplified focus reasoning**
+32. **LLM-amplified focus reasoning**
    - The Focus Council must work deterministically by default.
    - When stronger intelligence is available, it may use LLM-assisted semantic reasoning to better infer which objectives should dominate.
    - This is especially valuable when domain notes, deployment context, or business stakes are ambiguous.
 
-27. **Explicit completion judgment**
+33. **Explicit completion judgment**
    - Relaytic must not leave “are we done yet?” implicit.
    - It should fuse evidence into an explicit completion decision that states whether the system should:
      - stop
@@ -428,7 +454,7 @@ Relaytic is:
      - rollback
      - reject deployment
 
-28. **Visible workflow state**
+34. **Visible workflow state**
    - Users and external agents must be able to see which step Relaytic is currently in.
    - Stage visibility must exist in:
      - UI
@@ -436,26 +462,26 @@ Relaytic is:
      - logs/traces
      - periodic summaries for long-running mode
 
-29. **Validated feedback assimilation**
+35. **Validated feedback assimilation**
    - Relaytic should learn from user feedback and external-agent feedback when that feedback is validated as useful.
    - Feedback must not be ingested blindly.
    - Validated feedback may update policy defaults, route priors, feature strategy priors, benchmark expectations, and lifecycle heuristics for similar future data.
 
-30. **Benchmark parity without hardcoding**
+36. **Benchmark parity without hardcoding**
    - For each supported route, Relaytic should be tested against strong general benchmark datasets and strong standard or gold-reference approaches.
    - Relaytic must aim to reach that level through general reasoning, search, and learned priors rather than hardcoding benchmark-specific answers.
 
-31. **Guarded dojo self-improvement**
+37. **Guarded dojo self-improvement**
    - Relaytic may enter a dojo mode where it tries to improve its own strategies when strong data, strong reference models, or benchmark feedback are available.
    - Dojo improvements must remain quarantined until they prove themselves through benchmark and golden-case validation.
    - Self-improvement must update reusable priors and methods, not silently mutate trusted production behavior.
 
-32. **Local-first, hardware-maximal execution**
+38. **Local-first, hardware-maximal execution**
    - “Local” should include the user’s laptop, workstation, local server, local instance, or local cluster under their control.
    - Relaytic should exploit available permissible hardware aggressively when doing so materially improves speed, breadth, or intelligence.
    - The planner should choose the fastest justified execution profile that remains within policy, trust, and budget boundaries.
 
-33. **Accelerated and distributed awareness**
+39. **Accelerated and distributed awareness**
    - Relaytic should understand CPU, GPU, multi-GPU, and local-cluster execution contexts.
    - Device and scheduler availability should influence route choice, HPO depth, intelligence mode, and benchmark strategy.
    - Distributed execution must remain optional, inspectable, and artifact-rich.

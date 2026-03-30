@@ -171,7 +171,13 @@ Relaytic/
 
 Reserved future boundaries:
 
+- `src/relaytic/workspace/` should own workspace state, multi-run lineage, focus history, and workspace-backed continuity views once Slice 12D lands
+- `src/relaytic/iteration/` should own next-run planning, focus-decision records, and data-expansion candidates once Slice 12D lands
 - `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+
+Documentation boundaries:
+
+- `docs/specs/` owns the canonical future product-contract pack for workspace lifecycle, result-contract schema, governed learnings, mission-control flows, testing/proof burden, and flagship demos
 
 ## Naming Rule
 
