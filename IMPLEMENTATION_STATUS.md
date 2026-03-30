@@ -12,7 +12,7 @@ This document tracks the operational state of the repository. It is an implement
 - next scale-and-search follow-on after 12D: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
 - current public CLI: `relaytic`
-- canonical future product-contract pack written under `docs/specs/` for workspace lifecycle, result contracts, governed learnings, mission-control flows, testing/proof burden, and flagship demos
+- canonical future product-contract pack written under `docs/specs/` for workspace lifecycle, result contracts, governed learnings, mission-control behavior, compatibility migration, testing/proof burden, and flagship demos
 
 ## Operational Capabilities
 

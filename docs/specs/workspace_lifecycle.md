@@ -20,6 +20,11 @@ This contract governs:
 
 This contract does not define the field-level schema for result contracts or governed learnings. Those are covered in separate spec documents.
 
+Compatibility and migration for already-shipped handoff and learnings surfaces are frozen separately in:
+
+- `docs/specs/handoff_result_migration.md`
+- `docs/specs/learnings_migration_contract.md`
+
 ## Canonical objects
 
 Slice 12D should introduce these canonical workspace artifacts:

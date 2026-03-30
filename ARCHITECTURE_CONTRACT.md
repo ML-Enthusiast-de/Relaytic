@@ -110,6 +110,10 @@ These files are required and must stay current:
 - `docs/specs/workspace_lifecycle.md`
 - `docs/specs/result_contract_schema.md`
 - `docs/specs/governed_learnings_schema.md`
+- `docs/specs/mission_control_contract.md`
+- `docs/specs/handoff_result_migration.md`
+- `docs/specs/learnings_migration_contract.md`
+- `docs/specs/external_agent_continuation_contract.md`
 - `docs/specs/mission_control_flows.md`
 - `docs/specs/test_and_proof_matrix.md`
 - `docs/specs/flagship_demo_pack.md`

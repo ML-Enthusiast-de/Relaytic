@@ -184,7 +184,7 @@ Current repo state:
 - next workspace-and-iteration follow-on after Slice 12C: Slice 12D
 - next scale-and-search follow-on after Slice 12D: Slice 13
 - after Slice 12D, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, and iteration-planning surfaces rather than leaving the UI stale until late polish
-- the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation
+- the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [mission_control_contract.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/mission_control_contract.md), [handoff_result_migration.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/external_agent_continuation_contract.md) for already-shipped mission control, handoff, learnings, and external-agent continuation surfaces
 
 ## MVP boundary
 

@@ -6,6 +6,10 @@ This document defines how mission control should present Relaytic to humans and 
 
 The goal is not to add more panels. The goal is to make Relaytic legible on first contact and durable across multi-run work.
 
+The already-shipped mission-control surface contract is frozen separately in:
+
+- `docs/specs/mission_control_contract.md`
+
 ## Primary design rule
 
 Humans should feel oriented.

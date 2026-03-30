@@ -6,6 +6,10 @@ This document defines how durable learnings should behave once Slice 12D lands.
 
 The goal is to preserve useful continuity without letting prior guesses, user preferences, or stale conditions silently become hidden truth.
 
+Compatibility for the already-shipped Slice 12C learnings surfaces is frozen separately in:
+
+- `docs/specs/learnings_migration_contract.md`
+
 ## Canonical artifacts
 
 - `learnings_state.json`

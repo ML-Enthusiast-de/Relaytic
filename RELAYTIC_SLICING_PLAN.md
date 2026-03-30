@@ -267,7 +267,7 @@ Why:
 - later mission-control expansion after Slice 14: Slice 15
 - late optional representation follow-on after Slice 15: Slice 16
 - after Slice 12D, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, and iteration-planning surfaces instead of treating UI as a separate late-polish track
-- the canonical product-spec pack for Slice 12D and its follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation
+- the canonical product-spec pack for Slice 12D and its follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [mission_control_contract.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/mission_control_contract.md), [handoff_result_migration.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](C:/Users/gehra/Documents/GitHub/Relaytic/Relaytic/docs/specs/external_agent_continuation_contract.md) for already-shipped mission control, handoff, learnings, and external-agent continuation surfaces
 
 ## Slice 00 - Normalization and contract freeze
 

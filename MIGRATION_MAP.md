@@ -304,7 +304,7 @@ Avoid introducing new references to:
 - `src/relaytic/learnings/` for Slice 12C durable local learnings state, learnings markdown, per-run learnings snapshots, and workspace learnings reset behavior
 - `docs/handbooks/` for Slice 11E role-specific human/operator and external-agent onboarding guides
 - `docs/handbooks/relaytic_demo_walkthrough.md` for Slice 11F recruiter-safe demo sequencing and first-contact presentation
-- `docs/specs/` for future normative product-contract docs covering workspace lifecycle, result-contract schema, governed learnings, mission-control flows, proof burden, and flagship demos
+- `docs/specs/` for normative product-contract docs covering workspace lifecycle, result-contract schema, governed learnings, mission-control behavior, compatibility migration, proof burden, and flagship demos
 
 Shipped artifact names:
 

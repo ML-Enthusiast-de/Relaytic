@@ -6,6 +6,10 @@ This document defines the canonical machine-stable result contract that every se
 
 Human and agent reports may render this contract differently, but they must not replace it as the authoritative post-run conclusion.
 
+Compatibility for the already-shipped Slice 12C handoff surfaces is frozen separately in:
+
+- `docs/specs/handoff_result_migration.md`
+
 ## Canonical artifact
 
 - `result_contract.json`

@@ -177,7 +177,7 @@ Reserved future boundaries:
 
 Documentation boundaries:
 
-- `docs/specs/` owns the canonical future product-contract pack for workspace lifecycle, result-contract schema, governed learnings, mission-control flows, testing/proof burden, and flagship demos
+- `docs/specs/` owns the canonical product-contract pack for workspace lifecycle, result-contract schema, governed learnings, mission-control behavior, compatibility migration, testing/proof burden, and flagship demos
 
 ## Naming Rule
 
