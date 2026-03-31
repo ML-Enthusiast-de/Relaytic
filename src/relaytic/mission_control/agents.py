@@ -1137,6 +1137,8 @@ def _build_cards(
     evals = dict(summary_payload.get("evals", {}))
     handoff = dict(summary_payload.get("handoff", {}))
     learnings = dict(summary_payload.get("learnings", {}))
+    workspace = dict(summary_payload.get("workspace", {}))
+    result_contract = dict(summary_payload.get("result_contract", {}))
     contracts = dict(summary_payload.get("contracts", {}))
     runtime = dict(summary_payload.get("runtime", {}))
     next_step = dict(summary_payload.get("next_step", {}))
@@ -1234,6 +1236,28 @@ def _build_cards(
             "severity": "normal",
         },
         {
+            "card_id": "workspace",
+            "title": "Workspace",
+            "value": _clean_text(workspace.get("workspace_label")) or _clean_text(workspace.get("workspace_id")) or "not_materialized",
+            "detail": (
+                f"Continuity `{workspace.get('continuity_mode') or 'unknown'}`"
+                f" | prior runs `{workspace.get('prior_run_count', 0)}`"
+                f" | focus `{workspace.get('current_focus') or 'none'}`"
+            ),
+            "severity": "normal",
+        },
+        {
+            "card_id": "result_contract",
+            "title": "Result Contract",
+            "value": _clean_text(result_contract.get("recommended_direction")) or _clean_text(result_contract.get("status")) or "not_materialized",
+            "detail": (
+                f"Confidence `{result_contract.get('overall_confidence') or 'unknown'}`"
+                f" | unresolved `{result_contract.get('unresolved_count', 0)}`"
+                f" | action `{result_contract.get('recommended_action') or 'unknown'}`"
+            ),
+            "severity": "medium" if _clean_text(result_contract.get("review_need")) == "required" else "normal",
+        },
+        {
             "card_id": "assist_control",
             "title": "Assist + Control",
             "value": _clean_text(assist_session.get("next_recommended_action"))
@@ -1329,6 +1353,8 @@ def _build_capability_manifest(
     data = dict(summary_payload.get("data", {}))
     handoff = dict(summary_payload.get("handoff", {}))
     learnings = dict(summary_payload.get("learnings", {}))
+    workspace = dict(summary_payload.get("workspace", {}))
+    result_contract = dict(summary_payload.get("result_contract", {}))
     host_summary = dict(interoperability_inventory.get("host_summary", {}))
     onboarding = _is_onboarding_state(summary_payload)
     semantic_backend_status = _clean_text(assist_mode.get("semantic_backend_status")) or "unknown"
@@ -1440,6 +1466,54 @@ def _build_capability_manifest(
                 f"Start a run first with `{_example_run_command(run_dir=None)}`."
                 if onboarding
                 else f"Use `relaytic learnings show --run-dir {_display_run_dir(summary_payload)}` or ask `show learnings`."
+            ),
+        },
+        {
+            "capability_id": "workspace_continuity",
+            "name": "Workspace Continuity",
+            "status": (
+                "enabled"
+                if _clean_text(workspace.get("workspace_id")) or int(workspace.get("lineage_run_count", 0) or 0) > 0
+                else ("needs_run_context" if onboarding else "materializing")
+            ),
+            "detail": "Relaytic can keep multi-run lineage, continuity mode, current focus, and next-run planning explicit for the same investigation.",
+            "status_reason": (
+                "Workspace continuity becomes meaningful after a governed run exists."
+                if onboarding
+                else (
+                    "Workspace continuity artifacts are already available for this run."
+                    if _clean_text(workspace.get("workspace_id")) or int(workspace.get("lineage_run_count", 0) or 0) > 0
+                    else "Workspace artifacts will appear after summary materialization completes."
+                )
+            ),
+            "activation_hint": (
+                f"Start a run first with `{_example_run_command(run_dir=None)}`."
+                if onboarding
+                else f"Use `relaytic workspace show --run-dir {_display_run_dir(summary_payload)}`."
+            ),
+        },
+        {
+            "capability_id": "result_contract",
+            "name": "Result Contract",
+            "status": (
+                "enabled"
+                if _clean_text(result_contract.get("status")) or int(result_contract.get("belief_count", 0) or 0) > 0
+                else ("needs_run_context" if onboarding else "materializing")
+            ),
+            "detail": "Relaytic can tell humans and agents the same underlying conclusion through one machine-stable result contract.",
+            "status_reason": (
+                "The result contract only exists after a serious run has been summarized."
+                if onboarding
+                else (
+                    "The result contract is already available for this run."
+                    if _clean_text(result_contract.get("status")) or int(result_contract.get("belief_count", 0) or 0) > 0
+                    else "The result contract will appear after summary materialization completes."
+                )
+            ),
+            "activation_hint": (
+                f"Start a run first with `{_example_run_command(run_dir=None)}`."
+                if onboarding
+                else f"Use `relaytic workspace show --run-dir {_display_run_dir(summary_payload)}` and ask `what would change your mind?`."
             ),
         },
         {
@@ -1555,6 +1629,8 @@ def _build_action_affordances(
     evals = dict(summary_payload.get("evals", {}))
     handoff = dict(summary_payload.get("handoff", {}))
     learnings = dict(summary_payload.get("learnings", {}))
+    workspace = dict(summary_payload.get("workspace", {}))
+    result_contract = dict(summary_payload.get("result_contract", {}))
     if _is_onboarding_state(summary_payload):
         actions = [
             {
@@ -1711,6 +1787,35 @@ def _build_action_affordances(
                 "challenge_level": "low",
                 "detail": "Clear durable learnings if you want the next run to start from a fresh workspace memory.",
                 "command_hint": f"relaytic learnings reset --run-dir {run_dir}",
+            }
+        )
+    if workspace:
+        actions.append(
+            {
+                "action_id": "show_workspace",
+                "title": "Show Workspace",
+                "challenge_level": "low",
+                "detail": "Inspect continuity mode, prior runs, explicit focus history, and the current next-run plan.",
+                "command_hint": f"relaytic workspace show --run-dir {run_dir}",
+            }
+        )
+        actions.append(
+            {
+                "action_id": "continue_workspace",
+                "title": "Continue This Workspace",
+                "challenge_level": "low",
+                "detail": "Persist the next workspace direction explicitly instead of relying on implicit continuity.",
+                "command_hint": f"relaytic workspace continue --run-dir {run_dir} --direction same_data --notes \"focus on the main unresolved risk\"",
+            }
+        )
+    if result_contract:
+        actions.append(
+            {
+                "action_id": "ask_revision_trigger",
+                "title": "Ask What Would Change Relaytic's Mind",
+                "challenge_level": "low",
+                "detail": "Inspect the explicit belief-revision triggers behind the current result contract.",
+                "command_hint": f"relaytic assist turn --run-dir {run_dir} --message \"what would change your mind?\"",
             }
         )
     available_stages = [str(item).strip() for item in assist_state.get("available_stage_targets", []) if str(item).strip()]
@@ -1872,6 +1977,8 @@ def _build_question_starters(
     control = dict(summary_payload.get("control", {}))
     handoff = dict(summary_payload.get("handoff", {}))
     learnings = dict(summary_payload.get("learnings", {}))
+    workspace = dict(summary_payload.get("workspace", {}))
+    result_contract = dict(summary_payload.get("result_contract", {}))
     if _is_onboarding_state(summary_payload):
         questions = [
             {
@@ -1997,6 +2104,29 @@ def _build_question_starters(
                 "detail": "Clears durable learnings if you want the workspace memory to start fresh.",
             }
         )
+    if workspace:
+        questions.append(
+            {
+                "category": "workspace",
+                "question": "show the workspace",
+                "detail": "Shows continuity mode, prior runs, current focus, and the explicit next-run plan.",
+            }
+        )
+        questions.append(
+            {
+                "category": "workspace_continue",
+                "question": "use the same data for the next run",
+                "detail": "Keeps the same investigation alive without hiding the continuation choice.",
+            }
+        )
+    if result_contract:
+        questions.append(
+            {
+                "category": "revision",
+                "question": "what would change your mind?",
+                "detail": "Shows the explicit belief-revision triggers behind the current result contract.",
+            }
+        )
     if benchmark.get("incumbent_present"):
         questions.append(
             {
@@ -2076,6 +2206,9 @@ def _build_control_center_layout(
         {"panel_id": "trace_evals", "title": "Canonical traces, competing claims, conformance checks, and security proof"},
         {"panel_id": "handoff", "title": "Differentiated result reports and explicit next-run focus choices"},
         {"panel_id": "learnings", "title": "Durable cross-run learnings that can be reviewed or reset deliberately"},
+        {"panel_id": "workspace", "title": "Workspace continuity, lineage, and current focus"},
+        {"panel_id": "result_contract", "title": "Machine-stable beliefs, confidence posture, and belief-revision triggers"},
+        {"panel_id": "next_run_plan", "title": "Explicit same-data, add-data, or new-dataset continuation planning"},
         {"panel_id": "dojo", "title": "Guarded self-improvement, promotions, and rollback state"},
         {"panel_id": "review_queue", "title": "Queued blocking and follow-up items"},
         {"panel_id": "onboarding", "title": "Install, doctor, and host-readiness guidance"},

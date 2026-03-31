@@ -54,8 +54,8 @@ Current canonical boundaries:
 
 Reserved future boundaries:
 
-- `src/relaytic/workspace/` should own Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
-- `src/relaytic/iteration/` should own Slice 12D next-run planning, focus-decision records, data-expansion candidates, and workspace continuation decisions
+- `src/relaytic/workspace/` owns Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
+- `src/relaytic/iteration/` owns Slice 12D next-run planning, focus-decision records, data-expansion candidates, and workspace continuation decisions
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
@@ -315,6 +315,19 @@ Current handoff and learnings artifact names:
 
 These Slice 12C artifacts remain the current public per-run handoff and learnings surfaces. Slice 12D must build workspace-backed continuity on top of them rather than silently replacing or renaming them.
 
+Current workspace and iteration artifact names:
+
+- `workspace_state.json`
+- `workspace_lineage.json`
+- `workspace_focus_history.json`
+- `workspace_memory_policy.json`
+- `result_contract.json`
+- `confidence_posture.json`
+- `belief_revision_triggers.json`
+- `next_run_plan.json`
+- `focus_decision_record.json`
+- `data_expansion_candidates.json`
+
 Current trace and eval artifact names:
 
 - `trace_model.json`
@@ -333,16 +346,6 @@ Current trace and eval artifact names:
 - `host_surface_matrix.json`
 
 Reserved future artifact names:
-- `workspace_state.json`
-- `workspace_lineage.json`
-- `workspace_focus_history.json`
-- `workspace_memory_policy.json`
-- `result_contract.json`
-- `confidence_posture.json`
-- `belief_revision_triggers.json`
-- `next_run_plan.json`
-- `focus_decision_record.json`
-- `data_expansion_candidates.json`
 - `hpo_campaign_report.json`
 - `search_decision_ledger.json`
 - `search_value_report.json`

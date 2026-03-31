@@ -29,7 +29,9 @@ def test_interoperability_specs_include_trace_eval_handoff_and_learnings_tools()
         "relaytic_run_agent_evals",
         "relaytic_show_agent_evals",
         "relaytic_show_handoff",
+        "relaytic_show_workspace",
         "relaytic_set_next_run_focus",
+        "relaytic_continue_workspace",
         "relaytic_show_learnings",
         "relaytic_reset_learnings",
     }.issubset(names)
@@ -125,6 +127,28 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         learnings_payload = _structured_payload(learnings_result)
                         assert learnings_payload["surface_payload"]["status"] == "ok"
                         assert learnings_payload["surface_payload"]["learnings_state"]["entry_count"] >= 1
+
+                        workspace_result = await session.call_tool(
+                            "relaytic_show_workspace",
+                            {"run_dir": str(run_dir)},
+                        )
+                        workspace_payload = _structured_payload(workspace_result)
+                        assert workspace_payload["surface_payload"]["status"] == "ok"
+                        assert workspace_payload["surface_payload"]["workspace"]["workspace_state"]["workspace_id"] is not None
+
+                        continue_result = await session.call_tool(
+                            "relaytic_continue_workspace",
+                            {
+                                "run_dir": str(run_dir),
+                                "direction": "same_data",
+                                "notes": "continue on the same dataset but focus on recall",
+                                "actor_type": "agent",
+                                "actor_name": "mcp-test",
+                            },
+                        )
+                        continue_payload = _structured_payload(continue_result)
+                        assert continue_payload["surface_payload"]["status"] == "ok"
+                        assert continue_payload["surface_payload"]["continuation"]["selection_id"] == "same_data"
 
                         runtime_result = await session.call_tool(
                             "relaytic_show_runtime",

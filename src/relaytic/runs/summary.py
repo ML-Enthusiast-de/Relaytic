@@ -37,10 +37,16 @@ def build_run_summary(
         USER_RESULT_REPORT_RELATIVE_PATH,
         read_handoff_bundle,
     )
+    from relaytic.iteration import read_iteration_bundle
     from relaytic.learnings import (
         default_learnings_state_dir,
         read_learnings_snapshot,
         read_learnings_state,
+    )
+    from relaytic.workspace import (
+        default_workspace_dir,
+        read_result_contract_artifacts,
+        read_workspace_bundle,
     )
     mandate_bundle = _read_bundle(
         root,
@@ -224,6 +230,10 @@ def build_run_summary(
     learnings_state_dir = default_learnings_state_dir(run_dir=root)
     learnings_state = read_learnings_state(learnings_state_dir)
     learnings_snapshot = read_learnings_snapshot(root)
+    workspace_dir = default_workspace_dir(run_dir=root)
+    workspace_bundle = read_workspace_bundle(workspace_dir)
+    result_contract_bundle = read_result_contract_artifacts(root)
+    iteration_bundle = read_iteration_bundle(workspace_dir=workspace_dir, run_dir=root)
     feedback_bundle = _read_bundle(
         root,
         {
@@ -380,6 +390,16 @@ def build_run_summary(
     run_handoff = dict(handoff_bundle.get("run_handoff", {})) if isinstance(handoff_bundle.get("run_handoff"), dict) else {}
     next_run_options = dict(handoff_bundle.get("next_run_options", {})) if isinstance(handoff_bundle.get("next_run_options"), dict) else {}
     next_run_focus = dict(handoff_bundle.get("next_run_focus", {})) if isinstance(handoff_bundle.get("next_run_focus"), dict) else {}
+    workspace_state = dict(workspace_bundle.get("workspace_state", {})) if isinstance(workspace_bundle.get("workspace_state"), dict) else {}
+    workspace_lineage = dict(workspace_bundle.get("workspace_lineage", {})) if isinstance(workspace_bundle.get("workspace_lineage"), dict) else {}
+    workspace_focus_history = dict(workspace_bundle.get("workspace_focus_history", {})) if isinstance(workspace_bundle.get("workspace_focus_history"), dict) else {}
+    workspace_memory_policy = dict(workspace_bundle.get("workspace_memory_policy", {})) if isinstance(workspace_bundle.get("workspace_memory_policy"), dict) else {}
+    result_contract = dict(result_contract_bundle.get("result_contract", {})) if isinstance(result_contract_bundle.get("result_contract"), dict) else {}
+    confidence_posture = dict(result_contract_bundle.get("confidence_posture", {})) if isinstance(result_contract_bundle.get("confidence_posture"), dict) else {}
+    belief_revision_triggers = dict(result_contract_bundle.get("belief_revision_triggers", {})) if isinstance(result_contract_bundle.get("belief_revision_triggers"), dict) else {}
+    next_run_plan = dict(iteration_bundle.get("next_run_plan", {})) if isinstance(iteration_bundle.get("next_run_plan"), dict) else {}
+    focus_decision_record = dict(iteration_bundle.get("focus_decision_record", {})) if isinstance(iteration_bundle.get("focus_decision_record"), dict) else {}
+    data_expansion_candidates = dict(iteration_bundle.get("data_expansion_candidates", {})) if isinstance(iteration_bundle.get("data_expansion_candidates"), dict) else {}
     feedback_intake = _bundle_item(feedback_bundle, "feedback_intake")
     feedback_validation = _bundle_item(feedback_bundle, "feedback_validation")
     feedback_effect_report = _bundle_item(feedback_bundle, "feedback_effect_report")
@@ -764,6 +784,55 @@ def build_run_summary(
             "snapshot_path": _path_if_exists(root / "lab_learnings_snapshot.json"),
             "most_recent_lesson": _first_learning_lesson(learnings_snapshot=learnings_snapshot, learnings_state=learnings_state),
         },
+        "workspace": {
+            "status": _clean_text(workspace_state.get("status")),
+            "workspace_id": _clean_text(workspace_state.get("workspace_id")),
+            "workspace_label": _clean_text(workspace_state.get("workspace_label")),
+            "workspace_dir": _clean_text(workspace_state.get("workspace_dir")) or str(workspace_dir),
+            "current_run_id": _clean_text(workspace_state.get("current_run_id")),
+            "current_focus": _clean_text(workspace_state.get("current_focus")),
+            "continuity_mode": _clean_text(workspace_state.get("continuity_mode")),
+            "prior_run_count": int(workspace_state.get("prior_run_count", 0) or 0),
+            "lineage_run_count": int(workspace_lineage.get("run_count", 0) or 0),
+            "focus_event_count": int(workspace_focus_history.get("event_count", 0) or 0),
+            "active_learning_count": int(workspace_memory_policy.get("active_learning_count", 0) or 0),
+            "reset_scope_count": len(workspace_memory_policy.get("reset_scopes", []))
+            if isinstance(workspace_memory_policy.get("reset_scopes"), list)
+            else 0,
+        },
+        "result_contract": {
+            "status": _clean_text(result_contract.get("status")),
+            "task_type": _clean_text(dict(result_contract.get("objective_summary", {})).get("task_type")),
+            "target_summary": _clean_text(dict(result_contract.get("objective_summary", {})).get("target_summary")),
+            "belief_count": len(result_contract.get("current_beliefs", []))
+            if isinstance(result_contract.get("current_beliefs"), list)
+            else 0,
+            "unresolved_count": len(result_contract.get("unresolved_items", []))
+            if isinstance(result_contract.get("unresolved_items"), list)
+            else 0,
+            "overall_strength": _clean_text(dict(result_contract.get("evidence_strength", {})).get("overall_strength")),
+            "overall_confidence": _clean_text(confidence_posture.get("overall_confidence")),
+            "review_need": _clean_text(confidence_posture.get("review_need")),
+            "recommended_direction": _clean_text(dict(result_contract.get("recommended_next_move", {})).get("direction")),
+            "recommended_action": _clean_text(dict(result_contract.get("recommended_next_move", {})).get("action")),
+            "belief_revision_trigger_count": len(belief_revision_triggers.get("triggers", []))
+            if isinstance(belief_revision_triggers.get("triggers"), list)
+            else 0,
+        },
+        "iteration": {
+            "status": _clean_text(next_run_plan.get("status")),
+            "recommended_direction": _clean_text(next_run_plan.get("recommended_direction")),
+            "primary_reason": _clean_text(next_run_plan.get("primary_reason")),
+            "secondary_action_count": len(next_run_plan.get("secondary_actions", []))
+            if isinstance(next_run_plan.get("secondary_actions"), list)
+            else 0,
+            "required_input_count": len(next_run_plan.get("required_user_inputs", []))
+            if isinstance(next_run_plan.get("required_user_inputs"), list)
+            else 0,
+            "belief_revision_dependency": _clean_text(next_run_plan.get("belief_revision_dependency")),
+            "focus_record_direction": _clean_text(focus_decision_record.get("selected_direction")),
+            "data_expansion_candidate_count": int(data_expansion_candidates.get("candidate_count", 0) or 0),
+        },
         "feedback": {
             "status": _clean_text(feedback_effect_report.get("status")) or _clean_text(feedback_validation.get("status")) or _clean_text(feedback_intake.get("status")),
             "accepted_count": int(feedback_validation.get("accepted_count", 0) or 0),
@@ -978,6 +1047,16 @@ def build_run_summary(
             "lab_learnings_snapshot_path": _path_if_exists(root / "lab_learnings_snapshot.json"),
             "learnings_state_path": _path_if_exists(learnings_state_dir / "learnings_state.json"),
             "learnings_md_path": _path_if_exists(learnings_state_dir / "learnings.md"),
+            "workspace_state_path": _path_if_exists(workspace_dir / "workspace_state.json"),
+            "workspace_lineage_path": _path_if_exists(workspace_dir / "workspace_lineage.json"),
+            "workspace_focus_history_path": _path_if_exists(workspace_dir / "workspace_focus_history.json"),
+            "workspace_memory_policy_path": _path_if_exists(workspace_dir / "workspace_memory_policy.json"),
+            "result_contract_path": _path_if_exists(root / "result_contract.json"),
+            "confidence_posture_path": _path_if_exists(root / "confidence_posture.json"),
+            "belief_revision_triggers_path": _path_if_exists(root / "belief_revision_triggers.json"),
+            "next_run_plan_path": _path_if_exists(workspace_dir / "next_run_plan.json"),
+            "focus_decision_record_path": _path_if_exists(root / "focus_decision_record.json"),
+            "data_expansion_candidates_path": _path_if_exists(root / "data_expansion_candidates.json"),
             "feedback_effect_report_path": _path_if_exists(root / "feedback_effect_report.json"),
             "feedback_casebook_path": _path_if_exists(root / "feedback_casebook.json"),
             "quality_contract_path": _path_if_exists(root / "quality_contract.json"),
@@ -1014,6 +1093,9 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     evals = dict(summary.get("evals", {}))
     handoff = dict(summary.get("handoff", {}))
     learnings = dict(summary.get("learnings", {}))
+    workspace = dict(summary.get("workspace", {}))
+    result_contract = dict(summary.get("result_contract", {}))
+    iteration = dict(summary.get("iteration", {}))
     feedback = dict(summary.get("feedback", {}))
     contracts = dict(summary.get("contracts", {}))
     profiles = dict(summary.get("profiles", {}))
@@ -1302,6 +1384,49 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
             lines.append(f"- Most recent lesson: {learnings.get('most_recent_lesson')}")
         if learnings.get("learnings_md_path"):
             lines.append(f"- Learnings handbook: `{learnings.get('learnings_md_path')}`")
+    if workspace and any(value not in (None, 0, False, "", []) for value in workspace.values()):
+        lines.extend(
+            [
+                "",
+                "## Workspace",
+                f"- Workspace: `{workspace.get('workspace_label') or workspace.get('workspace_id') or 'unknown'}`",
+                f"- Continuity mode: `{workspace.get('continuity_mode') or 'unknown'}`",
+                f"- Current focus: `{workspace.get('current_focus') or 'none'}`",
+                f"- Prior runs: `{workspace.get('prior_run_count', 0)}`",
+                f"- Focus events: `{workspace.get('focus_event_count', 0)}`",
+            ]
+        )
+    if result_contract and any(value not in (None, 0, False, "", []) for value in result_contract.values()):
+        lines.extend(
+            [
+                "",
+                "## Result Contract",
+                f"- Status: `{result_contract.get('status') or 'unknown'}`",
+                f"- Task type: `{result_contract.get('task_type') or 'unknown'}`",
+                f"- Target summary: `{result_contract.get('target_summary') or 'unknown'}`",
+                f"- Beliefs: `{result_contract.get('belief_count', 0)}`",
+                f"- Unresolved items: `{result_contract.get('unresolved_count', 0)}`",
+                f"- Overall strength: `{result_contract.get('overall_strength') or 'unknown'}`",
+                f"- Overall confidence: `{result_contract.get('overall_confidence') or 'unknown'}`",
+                f"- Review need: `{result_contract.get('review_need') or 'unknown'}`",
+                f"- Recommended direction: `{result_contract.get('recommended_direction') or 'unknown'}`",
+                f"- Recommended action: `{result_contract.get('recommended_action') or 'unknown'}`",
+                f"- Belief revision triggers: `{result_contract.get('belief_revision_trigger_count', 0)}`",
+            ]
+        )
+    if iteration and any(value not in (None, 0, False, "", []) for value in iteration.values()):
+        lines.extend(
+            [
+                "",
+                "## Next-Run Plan",
+                f"- Recommended direction: `{iteration.get('recommended_direction') or 'unknown'}`",
+                f"- Primary reason: {iteration.get('primary_reason') or 'unknown'}",
+                f"- Secondary actions: `{iteration.get('secondary_action_count', 0)}`",
+                f"- Required inputs: `{iteration.get('required_input_count', 0)}`",
+                f"- Focus record: `{iteration.get('focus_record_direction') or 'none'}`",
+                f"- Data expansion candidates: `{iteration.get('data_expansion_candidate_count', 0)}`",
+            ]
+        )
     if feedback and any(value not in (None, 0, False, "", []) for value in feedback.values()):
         lines.extend(
             [
@@ -1451,7 +1576,12 @@ def materialize_run_summary(
 ) -> dict[str, Any]:
     """Build and write the machine and human summary artifacts for a run."""
     root = Path(run_dir)
-    from relaytic.handoff import run_handoff_review
+    from relaytic.handoff import (
+        AGENT_RESULT_REPORT_RELATIVE_PATH,
+        USER_RESULT_REPORT_RELATIVE_PATH,
+        run_handoff_review,
+    )
+    from relaytic.iteration import sync_iteration_from_run
     from relaytic.learnings import (
         default_learnings_state_dir,
         read_learnings_snapshot,
@@ -1460,6 +1590,11 @@ def materialize_run_summary(
         sync_learnings_from_run,
     )
     from relaytic.policies import load_policy
+    from relaytic.workspace import (
+        render_agent_result_report_from_contract,
+        render_user_result_report_from_contract,
+        sync_workspace_from_run,
+    )
 
     base_summary = build_run_summary(
         run_dir=root,
@@ -1497,6 +1632,55 @@ def materialize_run_summary(
                 handoff_bundle=handoff_bundle,
                 policy=policy,
             )
+    intermediate_summary = build_run_summary(
+        run_dir=root,
+        data_path=data_path,
+        request_source=request_source,
+        request_text=request_text,
+    )
+    state_dir = default_learnings_state_dir(run_dir=root)
+    workspace_sync = sync_workspace_from_run(
+        run_dir=root,
+        summary_payload=intermediate_summary,
+        handoff_bundle=handoff_bundle,
+        learnings_state=read_learnings_state(state_dir),
+        learnings_snapshot=read_learnings_snapshot(root),
+        policy=policy,
+    )
+    iteration_sync = sync_iteration_from_run(
+        run_dir=root,
+        workspace_dir=workspace_sync.workspace_dir,
+        workspace_state=workspace_sync.workspace_state.to_dict(),
+        result_contract=workspace_sync.result_contract.to_dict(),
+        belief_revision_triggers=workspace_sync.belief_revision_triggers.to_dict(),
+        summary_payload=intermediate_summary,
+        handoff_bundle=handoff_bundle,
+        policy=policy,
+    )
+    user_report_path = root / USER_RESULT_REPORT_RELATIVE_PATH
+    agent_report_path = root / AGENT_RESULT_REPORT_RELATIVE_PATH
+    user_report_path.parent.mkdir(parents=True, exist_ok=True)
+    agent_report_path.parent.mkdir(parents=True, exist_ok=True)
+    user_report_path.write_text(
+        render_user_result_report_from_contract(
+            result_contract=workspace_sync.result_contract.to_dict(),
+            confidence_posture=workspace_sync.confidence_posture.to_dict(),
+            belief_revision_triggers=workspace_sync.belief_revision_triggers.to_dict(),
+            next_run_plan=iteration_sync.next_run_plan.to_dict(),
+            workspace_state=workspace_sync.workspace_state.to_dict(),
+        ),
+        encoding="utf-8",
+    )
+    agent_report_path.write_text(
+        render_agent_result_report_from_contract(
+            result_contract=workspace_sync.result_contract.to_dict(),
+            confidence_posture=workspace_sync.confidence_posture.to_dict(),
+            belief_revision_triggers=workspace_sync.belief_revision_triggers.to_dict(),
+            next_run_plan=iteration_sync.next_run_plan.to_dict(),
+            workspace_state=workspace_sync.workspace_state.to_dict(),
+        ),
+        encoding="utf-8",
+    )
     summary = build_run_summary(
         run_dir=root,
         data_path=data_path,

@@ -395,18 +395,14 @@ Shipped artifact names:
 - `protocol_conformance_report.json`
 - `host_surface_matrix.json`
 
-## Reserved Future Boundaries
+## Current Workspace Boundaries
 
-The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
+- `src/relaytic/workspace/` now owns Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
+- `src/relaytic/iteration/` now owns Slice 12D next-run planning, focus-decision records, and data-expansion candidates
 
-- `src/relaytic/workspace/` for Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
-- `src/relaytic/iteration/` for Slice 12D next-run planning, focus-decision records, and data-expansion candidates
-- `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
-- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+Existing Slice 12C handoff and learnings commands remain part of the public compatibility surface. Under Slice 12D they now behave as compatibility-preserving views over workspace-backed truth rather than isolated per-run truth sources.
 
-Existing Slice 12C handoff and learnings commands remain part of the public compatibility surface. When Slice 12D lands, those commands should become views over workspace-backed truth rather than being removed or renamed abruptly.
-
-Reserved future artifact names:
+Current Slice 12D artifact names:
 - `workspace_state.json`
 - `workspace_lineage.json`
 - `workspace_focus_history.json`
@@ -417,6 +413,15 @@ Reserved future artifact names:
 - `next_run_plan.json`
 - `focus_decision_record.json`
 - `data_expansion_candidates.json`
+
+## Reserved Future Boundaries
+
+The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
+
+- `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
+- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+
+Reserved future artifact names:
 - `hpo_campaign_report.json`
 - `search_decision_ledger.json`
 - `search_value_report.json`

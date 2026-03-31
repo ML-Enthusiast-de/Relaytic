@@ -546,6 +546,34 @@ def relaytic_reset_learnings(*, run_dir: str | None = None, state_dir: str | Non
     return cli._reset_learnings_surface(run_dir=run_dir, state_dir=state_dir)
 
 
+def relaytic_show_workspace(*, run_dir: str) -> dict[str, Any]:
+    """Render the current workspace continuity surface for a run."""
+    cli = _cli()
+    return cli._show_workspace_surface(run_dir=run_dir)
+
+
+def relaytic_continue_workspace(
+    *,
+    run_dir: str,
+    direction: str,
+    notes: str | None = None,
+    actor_type: str = "agent",
+    actor_name: str | None = None,
+    reset_learnings: bool = False,
+) -> dict[str, Any]:
+    """Persist the next workspace continuation direction without starting a fresh run."""
+    cli = _cli()
+    return cli._continue_workspace_surface(
+        run_dir=run_dir,
+        direction=direction,
+        notes=notes,
+        source="mcp",
+        actor_type=_normalize_actor_type(actor_type),
+        actor_name=actor_name,
+        reset_requested=reset_learnings,
+    )
+
+
 def relaytic_assist_turn(
     *,
     run_dir: str,
@@ -646,6 +674,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_mission_control",
             "relaytic_show_handoff",
             "relaytic_show_learnings",
+            "relaytic_show_workspace",
             "relaytic_show_pulse",
             "relaytic_show_trace",
             "relaytic_replay_trace",
@@ -675,6 +704,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_run_agent_evals",
             "relaytic_assist_turn",
             "relaytic_set_next_run_focus",
+            "relaytic_continue_workspace",
             "relaytic_reset_learnings",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
@@ -761,6 +791,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_learnings,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_workspace",
+            title="Show Relaytic Workspace",
+            description="Render the current Slice 12D workspace continuity, result-contract posture, and next-run plan for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_workspace,
         ),
         InteropToolSpec(
             name="relaytic_show_dojo",
@@ -873,6 +911,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_reset_learnings,
+        ),
+        InteropToolSpec(
+            name="relaytic_continue_workspace",
+            title="Continue Relaytic Workspace",
+            description="Persist the current workspace continuation direction so the next run stays on the same data, adds data, or starts over explicitly.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_continue_workspace,
         ),
         InteropToolSpec(
             name="relaytic_intake_interpret",

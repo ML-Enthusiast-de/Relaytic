@@ -227,6 +227,13 @@ def plan_assist_turn(
     if intent.intent_type == "capabilities":
         response = _build_capabilities_response(bundle=bundle, run_summary=run_summary)
         return AssistTurnPlan(intent=intent, action_kind="respond", requested_stage=requested_stage, response_message=response)
+    if intent.intent_type == "show_workspace":
+        return AssistTurnPlan(
+            intent=intent,
+            action_kind="show_workspace",
+            requested_stage=None,
+            response_message="Relaytic will show the current workspace continuity, result contract, and next-run plan.",
+        )
     if intent.intent_type == "show_handoff":
         return AssistTurnPlan(
             intent=intent,
@@ -351,6 +358,8 @@ def _intent_type(normalized: str, *, requested_stage: str | None, next_run_selec
         return "reset_learnings"
     if next_run_selection is not None and _looks_like_next_run_focus_request(normalized, selection_id=next_run_selection):
         return "focus_next_run"
+    if _looks_like_workspace_request(normalized) or _looks_like_belief_revision_request(normalized):
+        return "show_workspace"
     if _looks_like_handoff_request(normalized):
         return "show_handoff"
     if _looks_like_learnings_request(normalized):
@@ -445,6 +454,35 @@ def _looks_like_handoff_request(normalized: str) -> bool:
             "handoff",
             "next run options",
             "summarize the findings",
+        )
+    )
+
+
+def _looks_like_workspace_request(normalized: str) -> bool:
+    return any(
+        token in normalized
+        for token in (
+            "show workspace",
+            "show the workspace",
+            "workspace",
+            "continuity",
+            "lineage",
+            "next run plan",
+            "result contract",
+        )
+    )
+
+
+def _looks_like_belief_revision_request(normalized: str) -> bool:
+    return any(
+        token in normalized
+        for token in (
+            "what would change your mind",
+            "change your mind",
+            "belief revision",
+            "revision trigger",
+            "revision triggers",
+            "what could change your mind",
         )
     )
 
@@ -612,7 +650,7 @@ def _build_capabilities_response(*, bundle: dict[str, Any], run_summary: dict[st
     return (
         f"Relaytic is currently at `{current_stage}`. "
         f"You can ask bounded questions, request connection guidance, rerun from bounded stages, or let Relaytic take over safely. "
-        f"You can also ask what Relaytic found, inspect the differentiated result reports, choose the next-run focus, or manage durable learnings. "
+        f"You can also ask what Relaytic found, inspect the differentiated result reports, inspect the workspace/result contract, choose the next-run focus, or manage durable learnings. "
         f"Available actions now: {action_bits}. "
         f"Bounded stage navigation currently supports: {stage_bits}. "
         f"Relaytic will challenge truth-bearing steering rather than blindly obeying it. "
@@ -738,7 +776,7 @@ def _session_state_summary(
 
 
 def _available_actions(*, controls: AssistControls) -> list[str]:
-    actions = ["ask_question"]
+    actions = ["ask_question", "show_workspace"]
     if controls.allow_host_connection_guidance:
         actions.append("connection_guidance")
     if controls.allow_stage_navigation:
@@ -786,6 +824,9 @@ def _suggested_questions(
         questions.append("use the same data next time but focus on recall")
     if dict(run_summary.get("learnings", {})):
         questions.append("show learnings")
+    if dict(run_summary.get("workspace", {})) or dict(run_summary.get("result_contract", {})):
+        questions.append("show the workspace")
+        questions.append("what would change your mind?")
     return questions[:6]
 
 

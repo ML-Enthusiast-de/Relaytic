@@ -169,10 +169,13 @@ Relaytic/
 - `src/relaytic/handoff/` owns Slice 12C differentiated post-run handoff generation, next-run options, persisted next-run focus, and differentiated report rendering for humans and external agents
 - `src/relaytic/learnings/` owns Slice 12C durable local learnings state, learnings markdown, per-run learnings snapshots, workspace learnings reset behavior, and the learnings-to-memory handoff
 
+Current workspace-first boundaries:
+
+- `src/relaytic/workspace/` owns Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
+- `src/relaytic/iteration/` owns Slice 12D next-run planning, focus-decision records, and data-expansion candidates
+
 Reserved future boundaries:
 
-- `src/relaytic/workspace/` should own workspace state, multi-run lineage, focus history, and workspace-backed continuity views once Slice 12D lands
-- `src/relaytic/iteration/` should own next-run planning, focus-decision records, and data-expansion candidates once Slice 12D lands
 - `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Documentation boundaries:

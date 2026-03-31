@@ -2,9 +2,9 @@
 
 ## Status
 
-Planned.
+Implemented.
 
-Intended package boundaries:
+Canonical package boundaries:
 
 - `src/relaytic/workspace/`
 - `src/relaytic/iteration/`
@@ -13,7 +13,16 @@ Intended package boundaries:
 - extend `src/relaytic/mission_control/`
 - extend `src/relaytic/memory/`
 
-Intended artifacts:
+Landed minimum modules:
+
+- `src/relaytic/workspace/models.py`
+- `src/relaytic/workspace/storage.py`
+- `src/relaytic/workspace/agents.py`
+- `src/relaytic/iteration/models.py`
+- `src/relaytic/iteration/storage.py`
+- `src/relaytic/iteration/agents.py`
+
+Canonical artifacts:
 
 - `workspace_state.json`
 - `workspace_lineage.json`
@@ -25,6 +34,16 @@ Intended artifacts:
 - `next_run_plan.json`
 - `focus_decision_record.json`
 - `data_expansion_candidates.json`
+
+Public commands:
+
+- `relaytic workspace show`
+- `relaytic workspace continue`
+
+MCP surfaces:
+
+- `relaytic_show_workspace`
+- `relaytic_continue_workspace`
 
 ## Intent
 

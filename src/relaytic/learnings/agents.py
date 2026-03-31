@@ -65,6 +65,16 @@ def sync_learnings_from_run(
         controls=controls,
     )
     retained = [item for item in existing_entries if _clean_text(item.get("source_run_id")) != run_id]
+    next_focus_payload = (handoff_bundle or {}).get("next_run_focus", {})
+    next_focus = dict(next_focus_payload) if isinstance(next_focus_payload, dict) else {}
+    if _clean_text(next_focus.get("selection_id")) == "new_dataset":
+        for item in retained:
+            status = _clean_text(item.get("status")) or "active"
+            if status in {"active", "tentative"}:
+                item["status"] = "expired"
+                item["invalidated_at"] = _utc_now()
+                item["invalidation_reason"] = "new_dataset_restart_selected"
+                item["last_updated_at"] = _utc_now()
     merged = retained + harvested
     merged.sort(key=lambda item: str(item.get("last_updated_at") or ""), reverse=True)
     merged = merged[: controls.max_entries]
@@ -119,7 +129,16 @@ def reset_learnings(
     resolved_state_dir = Path(state_dir) if state_dir is not None else default_learnings_state_dir(run_dir=run_dir)
     controls = build_learning_controls_from_policy(policy)
     existing_state = read_learnings_state(resolved_state_dir)
-    removed_count = len([item for item in existing_state.get("entries", []) if isinstance(item, dict)])
+    existing_entries = [dict(item) for item in existing_state.get("entries", []) if isinstance(item, dict)]
+    removed_count = len([item for item in existing_entries if (_clean_text(item.get("status")) or "active") in {"active", "tentative"}])
+    reset_entries: list[dict[str, Any]] = []
+    for item in existing_entries:
+        reset_item = dict(item)
+        reset_item["status"] = "reset"
+        reset_item["invalidated_at"] = _utc_now()
+        reset_item["invalidation_reason"] = "explicit_learning_reset"
+        reset_item["last_updated_at"] = _utc_now()
+        reset_entries.append(reset_item)
     trace = _trace()
     state_artifact = LearningsStateArtifact(
         schema_version=LEARNINGS_STATE_SCHEMA_VERSION,
@@ -128,7 +147,7 @@ def reset_learnings(
         status="reset",
         state_dir=str(resolved_state_dir),
         entry_count=0,
-        entries=[],
+        entries=reset_entries,
         summary="Relaytic reset the durable learnings state. Future runs can rebuild it from fresh evidence.",
         trace=trace,
     )
@@ -197,12 +216,29 @@ def render_learnings_markdown(state_payload: dict[str, Any], *, snapshot: dict[s
         lines.extend(["", "## Fresh Learnings From This Run"])
         for item in harvested[:6]:
             lines.append(f"- `{item.get('kind') or 'learning'}`: {item.get('lesson') or 'No lesson recorded.'}")
-    if entries:
+    buckets = {
+        "active": [item for item in entries if (_clean_text(item.get("status")) or "active") == "active"],
+        "tentative": [item for item in entries if _clean_text(item.get("status")) == "tentative"],
+        "invalidated": [item for item in entries if _clean_text(item.get("status")) == "invalidated"],
+        "expired": [item for item in entries if _clean_text(item.get("status")) == "expired"],
+        "reset": [item for item in entries if _clean_text(item.get("status")) == "reset"],
+    }
+    if any(buckets.values()):
         lines.extend(["", "## Durable Learnings"])
-        for item in entries[:8]:
-            tags = [str(tag).strip() for tag in item.get("applicability_tags", []) if str(tag).strip()]
-            tag_text = f" | tags `{', '.join(tags)}`" if tags else ""
-            lines.append(f"- `{item.get('kind') or 'learning'}`: {item.get('lesson') or 'No lesson recorded.'}{tag_text}")
+        for section_name, items in (
+            ("Active", buckets["active"]),
+            ("Tentative", buckets["tentative"]),
+            ("Invalidated", buckets["invalidated"]),
+            ("Expired", buckets["expired"]),
+            ("Reset History", buckets["reset"]),
+        ):
+            if not items:
+                continue
+            lines.extend(["", f"### {section_name}"])
+            for item in items[:8]:
+                tags = [str(tag).strip() for tag in item.get("applicability_tags", []) if str(tag).strip()]
+                tag_text = f" | tags `{', '.join(tags)}`" if tags else ""
+                lines.append(f"- `{item.get('kind') or 'learning'}`: {item.get('lesson') or 'No lesson recorded.'}{tag_text}")
     lines.extend(
         [
             "",
@@ -334,6 +370,9 @@ def _select_active_learnings(
     tags = set(_summary_tags(summary_payload))
     scored: list[tuple[int, dict[str, Any]]] = []
     for item in entries:
+        status = _clean_text(item.get("status")) or "active"
+        if status not in {"active", "tentative"}:
+            continue
         item_tags = {str(tag).strip() for tag in item.get("applicability_tags", []) if str(tag).strip()}
         overlap = len(tags.intersection(item_tags))
         recency_bonus = 1 if _clean_text(item.get("source_run_id")) == _clean_text(summary_payload.get("run_id")) else 0
@@ -367,13 +406,46 @@ def _entry(
     digest = hashlib.sha1(f"{run_id}|{kind}|{normalized_lesson}".encode("utf-8")).hexdigest()[:12]
     return {
         "entry_id": f"learning_{digest}",
+        "learning_id": f"learning_{digest}",
         "source_run_id": run_id,
         "kind": kind,
         "lesson": lesson,
+        "statement": lesson,
+        "source_type": _source_type_for_kind(kind),
+        "source_ref": refs[0] if refs else "run_summary.json",
+        "scope": "workspace",
+        "confidence": "medium",
+        "status": "active",
+        "applies_to": {
+            "workspace_id": None,
+            "dataset_signature": None,
+            "objective_type": None,
+            "target_name": None,
+            "route_family": None,
+            "benchmark_family": None,
+        },
+        "created_at": generated_at,
+        "last_reaffirmed_at": generated_at,
+        "invalidated_at": None,
+        "invalidation_reason": None,
+        "expires_at": None,
+        "used_in_runs": [run_id],
         "applicability_tags": [str(tag).strip() for tag in tags if str(tag).strip()],
         "evidence_refs": [str(ref).strip() for ref in refs if str(ref).strip()],
         "last_updated_at": generated_at,
     }
+
+
+def _source_type_for_kind(kind: str) -> str:
+    mapping = {
+        "assumption": "observed_runtime",
+        "feedback": "user_feedback_validated",
+        "control": "control_incident",
+        "benchmark": "benchmark_outcome",
+        "focus": "result_contract",
+        "eval": "operator_override_review",
+    }
+    return mapping.get(str(kind), "observed_runtime")
 
 
 def _clean_text(value: Any) -> str | None:

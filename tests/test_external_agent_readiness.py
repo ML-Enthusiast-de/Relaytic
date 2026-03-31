@@ -4,6 +4,7 @@ from pathlib import Path
 
 from relaytic.interoperability import (
     relaytic_assist_turn,
+    relaytic_continue_workspace,
     relaytic_reset_learnings,
     relaytic_run,
     relaytic_run_agent_evals,
@@ -13,6 +14,7 @@ from relaytic.interoperability import (
     relaytic_show_learnings,
     relaytic_show_mission_control,
     relaytic_show_trace,
+    relaytic_show_workspace,
     relaytic_set_next_run_focus,
 )
 from tests.public_datasets import write_public_breast_cancer_dataset
@@ -67,6 +69,21 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     assert learnings_payload["surface_payload"]["status"] == "ok"
     assert learnings_payload["surface_payload"]["learnings_state"]["entry_count"] >= 1
 
+    workspace_payload = relaytic_show_workspace(run_dir=str(run_dir))
+    assert workspace_payload["surface_payload"]["status"] == "ok"
+    assert workspace_payload["surface_payload"]["workspace"]["workspace_state"]["workspace_id"] is not None
+    assert workspace_payload["surface_payload"]["result_contract"]["result_contract"]["status"] is not None
+
+    continue_payload = relaytic_continue_workspace(
+        run_dir=str(run_dir),
+        direction="same_data",
+        notes="continue with the current dataset but focus on recall risk",
+        actor_name="codex-smoke",
+    )
+    assert continue_payload["surface_payload"]["status"] == "ok"
+    assert continue_payload["surface_payload"]["continuation"]["selection_id"] == "same_data"
+    assert continue_payload["surface_payload"]["run_summary"]["workspace"]["workspace_id"] is not None
+
     rerun_payload = relaytic_assist_turn(run_dir=str(run_dir), message="go back to planning")
     assert rerun_payload["surface_payload"]["turn"]["action_kind"] == "rerun_stage"
     assert "planning" in list(rerun_payload["surface_payload"]["turn"]["executed_stages"])
@@ -93,7 +110,9 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     assert "relaytic_show_trace" in server_info["inspection_tools"]
     assert "relaytic_show_handoff" in server_info["inspection_tools"]
     assert "relaytic_show_learnings" in server_info["inspection_tools"]
+    assert "relaytic_show_workspace" in server_info["inspection_tools"]
     assert "relaytic_run_agent_evals" in server_info["workflow_tools"]
     assert "relaytic_set_next_run_focus" in server_info["workflow_tools"]
     assert "relaytic_reset_learnings" in server_info["workflow_tools"]
-    assert server_info["tool_count"] >= 24
+    assert "relaytic_continue_workspace" in server_info["workflow_tools"]
+    assert server_info["tool_count"] >= 26

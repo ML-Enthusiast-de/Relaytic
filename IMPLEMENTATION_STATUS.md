@@ -4,11 +4,11 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 12C, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, and Slice 12C differentiated result handoff plus durable learnings
-- next recommended slice: 12D, workspace-first continuity, result contracts, and governed learnings
+- completed slices: 00 through 12D, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, and Slice 12D workspace-first continuity plus result contracts and iteration planning
+- next recommended slice: 13, search controller, accelerated execution, and distributed local experimentation
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
-- latest handoff-and-learnings slice: 12C, differentiated result reports, next-run focus, and durable workspace learnings
-- next workspace-and-iteration follow-on after 12C: 12D, workspace-first continuity, result contracts, and governed learnings
+- latest handoff-and-learnings slice: 12D, workspace-first continuity, result contracts, governed learnings migration, and explicit iteration planning
+- next workspace-and-iteration follow-on after 12D: 13, search controller, accelerated execution, and distributed local experimentation
 - next scale-and-search follow-on after 12D: 13, search controller, accelerated execution, and distributed local experimentation
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -75,6 +75,7 @@ The repository currently supports:
 - agent/security evaluation via `relaytic evals run` and `relaytic evals show`, with protocol-conformance reports, host-surface matrices, adversarial steering coverage, red-team findings, and explicit open-finding reporting instead of silent pass/fail drift
 - differentiated post-run handoff via `relaytic handoff show` and `relaytic handoff focus`, with separate user and agent result reports, explicit next-run options, persisted next-run focus, and mission-control-visible handoff state
 - durable local learnings via `relaytic learnings show` and `relaytic learnings reset`, with cross-run learnings markdown/JSON state, per-run learnings snapshots, and memory-visible workspace focus plus recent-lesson priors
+- explicit workspace continuity via `relaytic workspace show` and `relaytic workspace continue`, with shared workspace state, lineage, focus history, workspace memory policy, machine-stable result contracts, confidence posture, belief-revision triggers, and one explicit next-run plan that chooses between same-data continuation, add-data continuation, or a new dataset
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement

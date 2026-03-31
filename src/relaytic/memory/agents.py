@@ -59,6 +59,7 @@ def run_memory_retrieval(
         read_learnings_snapshot,
         read_learnings_state,
     )
+    from relaytic.workspace import read_result_contract_artifacts, read_workspace_bundle_for_run
 
     controls = build_memory_controls_from_policy(policy)
     root = Path(run_dir)
@@ -72,6 +73,8 @@ def run_memory_retrieval(
     learnings_state_dir = default_learnings_state_dir(run_dir=root)
     learnings_state = read_learnings_state(learnings_state_dir)
     learnings_snapshot = read_learnings_snapshot(root)
+    workspace_bundle = read_workspace_bundle_for_run(root)
+    result_contract_bundle = read_result_contract_artifacts(root)
 
     current = _build_current_run_signature(
         run_dir=root,
@@ -86,6 +89,8 @@ def run_memory_retrieval(
         autonomy_bundle=autonomy_bundle,
         learnings_state=learnings_state,
         learnings_snapshot=learnings_snapshot,
+        workspace_bundle=workspace_bundle,
+        result_contract_bundle=result_contract_bundle,
     )
     roots = _resolve_search_roots(root, search_roots=search_roots)
     candidate_details = (
@@ -285,6 +290,8 @@ def _build_current_run_signature(
     autonomy_bundle: dict[str, Any],
     learnings_state: dict[str, Any],
     learnings_snapshot: dict[str, Any],
+    workspace_bundle: dict[str, Any],
+    result_contract_bundle: dict[str, Any],
 ) -> dict[str, Any]:
     run_brief = _bundle_item(mandate_bundle, "run_brief")
     task_brief = _bundle_item(context_bundle, "task_brief")
@@ -301,6 +308,9 @@ def _build_current_run_signature(
     promotion_decision = _bundle_item(lifecycle_bundle, "promotion_decision")
     autonomy_loop_state = _bundle_item(autonomy_bundle, "autonomy_loop_state")
     autonomy_mode = _bundle_item(intake_bundle, "autonomy_mode")
+    workspace_state = dict(workspace_bundle.get("workspace_state") or {})
+    result_contract = dict(result_contract_bundle.get("result_contract") or {})
+    objective_summary = dict(result_contract.get("objective_summary") or {})
     current_stage = (
         ("autonomy_reviewed" if any(autonomy_bundle.values()) else None)
         or ("lifecycle_reviewed" if any(lifecycle_bundle.values()) else None)
@@ -331,16 +341,17 @@ def _build_current_run_signature(
     )
     workspace_learning_tags = _workspace_learning_tags(learnings_state=learnings_state, learnings_snapshot=learnings_snapshot)
     workspace_focus_ids = _workspace_focus_ids(learnings_state=learnings_state, learnings_snapshot=learnings_snapshot)
+    explicit_workspace_focus = _optional_str(workspace_state.get("current_focus"))
     return {
         "run_id": run_dir.name or "run",
         "current_stage": current_stage,
         "task_type": task_type,
         "domain_archetype": _optional_str(domain_memo.get("domain_archetype")) or _optional_str(task_brief.get("domain_archetype_hint")) or "generic_tabular",
-        "objective": _optional_str(run_brief.get("objective")) or "best_robust_pareto_front",
+        "objective": _optional_str(run_brief.get("objective")) or _optional_str(objective_summary.get("decision_context")) or "best_robust_pareto_front",
         "primary_metric": primary_metric,
         "selected_route_id": selected_route_id,
         "selected_model_family": _optional_str(execution_summary.get("selected_model_family")),
-        "target_column": _optional_str(plan.get("target_column")) or _optional_str(task_brief.get("target_column")),
+        "target_column": _optional_str(plan.get("target_column")) or _optional_str(task_brief.get("target_column")) or _optional_str(objective_summary.get("target_summary")),
         "data_mode": _optional_str(dataset_profile.get("data_mode")) or "steady_state",
         "row_count": _coerce_int(dataset_profile.get("row_count")),
         "column_count": _coerce_int(dataset_profile.get("column_count")),
@@ -355,7 +366,7 @@ def _build_current_run_signature(
         "autonomy_mode": _optional_str(autonomy_mode.get("requested_mode")),
         "workspace_learning_tags": workspace_learning_tags,
         "workspace_learning_kinds": _workspace_learning_kinds(learnings_state=learnings_state, learnings_snapshot=learnings_snapshot),
-        "workspace_recent_focus": workspace_focus_ids[0] if workspace_focus_ids else None,
+        "workspace_recent_focus": explicit_workspace_focus or (workspace_focus_ids[0] if workspace_focus_ids else None),
         "workspace_recent_lesson": _workspace_recent_lesson(learnings_state=learnings_state, learnings_snapshot=learnings_snapshot),
     }
 
@@ -491,6 +502,8 @@ def _score_candidate(*, current: dict[str, Any], candidate: dict[str, Any]) -> d
     evidence = dict(summary.get("evidence", {}))
     completion = dict(summary.get("completion", {}))
     lifecycle = dict(summary.get("lifecycle", {}))
+    workspace = dict(summary.get("workspace", {}))
+    result_contract = dict(summary.get("result_contract", {}))
     snapshot = {
         "task_type": _optional_str(decision.get("task_type")) or "unknown",
         "domain_archetype": _optional_str(intent.get("domain_archetype")) or "generic_tabular",
@@ -507,7 +520,9 @@ def _score_candidate(*, current: dict[str, Any], candidate: dict[str, Any]) -> d
         "completion_action": _optional_str(completion.get("action")),
         "promotion_action": _optional_str(lifecycle.get("promotion_action")),
         "promotion_target": _optional_str(lifecycle.get("promotion_target")),
-        "selected_focus_id": _optional_str(dict(summary.get("handoff", {})).get("selected_focus_id"))
+        "selected_focus_id": _optional_str(workspace.get("current_focus"))
+        or _optional_str(result_contract.get("recommended_direction"))
+        or _optional_str(dict(summary.get("handoff", {})).get("selected_focus_id"))
         or _optional_str(dict(summary.get("handoff", {})).get("recommended_option_id")),
     }
     score = 0.0

@@ -382,6 +382,36 @@ def render_learnings_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_learnings_markdown(*args, **kwargs)
 
 
+def default_workspace_dir(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.workspace import default_workspace_dir as _default_workspace_dir
+
+    return _default_workspace_dir(*args, **kwargs)
+
+
+def read_workspace_bundle_for_run(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.workspace import read_workspace_bundle_for_run as _read_workspace_bundle_for_run
+
+    return _read_workspace_bundle_for_run(*args, **kwargs)
+
+
+def read_result_contract_artifacts(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.workspace import read_result_contract_artifacts as _read_result_contract_artifacts
+
+    return _read_result_contract_artifacts(*args, **kwargs)
+
+
+def render_workspace_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.workspace import render_workspace_review_markdown as _render_workspace_review_markdown
+
+    return _render_workspace_review_markdown(*args, **kwargs)
+
+
+def read_iteration_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.iteration import read_iteration_bundle as _read_iteration_bundle
+
+    return _read_iteration_bundle(*args, **kwargs)
+
+
 def run_control_review(*args: Any, **kwargs: Any) -> Any:
     from relaytic.control import run_control_review as _run_control_review
 
@@ -2150,6 +2180,51 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    workspace_surface = sub.add_parser(
+        "workspace",
+        help="Inspect or continue the explicit Relaytic multi-run workspace continuity layer.",
+    )
+    workspace_sub = workspace_surface.add_subparsers(dest="workspace_command", required=True)
+
+    workspace_show = workspace_sub.add_parser(
+        "show",
+        help="Render the current workspace state, result contract, and next-run plan for a run.",
+    )
+    workspace_show.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    workspace_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    workspace_continue = workspace_sub.add_parser(
+        "continue",
+        help="Persist the current workspace continuation direction without starting a fresh run yet.",
+    )
+    workspace_continue.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    workspace_continue.add_argument(
+        "--direction",
+        choices=["same_data", "add_data", "new_dataset"],
+        required=True,
+        help="How the next run should relate to the current workspace.",
+    )
+    workspace_continue.add_argument("--notes", default=None, help="Optional notes for the next run.")
+    workspace_continue.add_argument("--source", default="cli", help="Source label for this continuation choice.")
+    workspace_continue.add_argument("--actor-type", default="user", help="Actor type creating the continuation choice.")
+    workspace_continue.add_argument("--actor-name", default=None, help="Optional actor name.")
+    workspace_continue.add_argument(
+        "--reset-learnings",
+        action="store_true",
+        help="Reset durable learnings now so the next run starts from a fresh workspace memory state.",
+    )
+    workspace_continue.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     plan = sub.add_parser(
         "plan",
         help="Create Slice 05 planning artifacts and execute the first deterministic route.",
@@ -2428,6 +2503,33 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 parser.error("Unsupported learnings subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "workspace":
+        try:
+            if args.workspace_command == "show":
+                payload = _show_workspace_surface(run_dir=args.run_dir)
+            elif args.workspace_command == "continue":
+                payload = _continue_workspace_surface(
+                    run_dir=args.run_dir,
+                    direction=args.direction,
+                    notes=args.notes,
+                    source=args.source,
+                    actor_type=args.actor_type,
+                    actor_name=args.actor_name,
+                    reset_requested=bool(args.reset_learnings),
+                )
+            else:
+                parser.error("Unsupported workspace subcommand.")
                 return 2
         except ValueError as exc:
             parser.error(str(exc))
@@ -4436,6 +4538,66 @@ def _reset_learnings_surface(*, run_dir: str | None, state_dir: str | None) -> d
     }
 
 
+def _show_workspace_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    bundle = read_workspace_bundle_for_run(root)
+    result_contract_bundle = read_result_contract_artifacts(root)
+    next_run_plan = read_iteration_bundle(workspace_dir=default_workspace_dir(run_dir=root), run_dir=root).get("next_run_plan", {})
+    if not bundle and not result_contract_bundle:
+        raise ValueError(f"No workspace continuity artifacts found in {root}.")
+    human_output = render_workspace_review_markdown(
+        workspace_bundle=bundle,
+        result_contract_bundle=result_contract_bundle,
+        next_run_plan=next_run_plan if isinstance(next_run_plan, dict) else None,
+    )
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "workspace": bundle,
+            "result_contract": result_contract_bundle,
+            "next_run_plan": next_run_plan if isinstance(next_run_plan, dict) else {},
+        },
+        "human_output": human_output,
+    }
+
+
+def _continue_workspace_surface(
+    *,
+    run_dir: str | Path,
+    direction: str,
+    notes: str | None,
+    source: str,
+    actor_type: str,
+    actor_name: str | None,
+    reset_requested: bool,
+) -> dict[str, Any]:
+    focus_payload = _set_next_run_focus_surface(
+        run_dir=run_dir,
+        selection_id=direction,
+        notes=notes,
+        source=source,
+        actor_type=actor_type,
+        actor_name=actor_name,
+        reset_requested=reset_requested,
+    )
+    workspace_payload = _show_workspace_surface(run_dir=run_dir)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "continuation": focus_payload["surface_payload"]["next_run_focus"],
+            "workspace": workspace_payload["surface_payload"]["workspace"],
+            "result_contract": workspace_payload["surface_payload"]["result_contract"],
+            "next_run_plan": workspace_payload["surface_payload"]["next_run_plan"],
+            "run_summary": focus_payload["surface_payload"]["run_summary"],
+        },
+        "human_output": (
+            f"Relaytic updated the workspace continuation direction to `{direction}`.\n\n"
+            + str(workspace_payload["human_output"]).rstrip()
+        ),
+    }
+
+
 def _show_assist_surface(*, run_dir: str | Path, config_path: str | None) -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
@@ -4523,6 +4685,9 @@ def _run_assist_turn(
     elif control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "show_learnings":
         learnings_payload = _show_learnings_surface(run_dir=str(root), state_dir=None)
         action_message = str(learnings_payload["human_output"]).rstrip()
+    elif control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "show_workspace":
+        workspace_payload = _show_workspace_surface(run_dir=root)
+        action_message = str(workspace_payload["human_output"]).rstrip()
     elif control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "reset_learnings":
         learnings_payload = _reset_learnings_surface(run_dir=str(root), state_dir=None)
         action_message = str(learnings_payload["human_output"]).rstrip()
@@ -4638,9 +4803,10 @@ def _run_assist_chat(
         "relaytic> Communicative assist session started. "
         "Assist chat is the live terminal conversation for an existing run. "
         "Ask things like `what can you do?`, `why did you choose this route?`, "
-        "`what did you find?`, `use the same data next time but focus on recall`, "
-        "`show learnings`, `go back to planning`, or `i'm not sure, take over`. "
-        "Commands: /help, /show, /capabilities, /report, /learnings, /stages, /next, /takeover, /exit."
+        "`what did you find?`, `show the workspace`, `what would change your mind?`, "
+        "`use the same data next time but focus on recall`, `show learnings`, "
+        "`go back to planning`, or `i'm not sure, take over`. "
+        "Commands: /help, /show, /capabilities, /report, /workspace, /learnings, /stages, /next, /takeover, /exit."
     )
     turns = 0
     while True:
@@ -4662,8 +4828,9 @@ def _run_assist_chat(
         if lowered == "/help":
             print(
                 "relaytic> Ask for `status`, `why`, `what can you do?`, `connect claude`, "
-                "`what did you find?`, `show learnings`, `go back to research`, or `take over`. "
-                "Shortcuts: /show, /capabilities, /report, /learnings, /stages, /next, /takeover, /exit."
+                "`what did you find?`, `show the workspace`, `what would change your mind?`, "
+                "`show learnings`, `go back to research`, or `take over`. "
+                "Shortcuts: /show, /capabilities, /report, /workspace, /learnings, /stages, /next, /takeover, /exit."
             )
             continue
         if lowered == "/show":
@@ -4691,6 +4858,21 @@ def _run_assist_chat(
             payload = _run_assist_turn(
                 run_dir=run_dir,
                 message="what did you find?",
+                config_path=config_path,
+                data_path=data_path,
+            )
+            print("relaytic> " + payload["human_output"].strip())
+            if show_json:
+                print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
+            turns += 1
+            if max_turns > 0 and turns >= max_turns:
+                print("Session ended.")
+                return 0
+            continue
+        if lowered == "/workspace":
+            payload = _run_assist_turn(
+                run_dir=run_dir,
+                message="show the workspace",
                 config_path=config_path,
                 data_path=data_path,
             )
@@ -10578,6 +10760,7 @@ def _resolve_existing_incumbent_config(run_dir: Path) -> dict[str, str | None]:
 
 
 def _access_surface_output_paths(run_dir: Path) -> dict[str, Path]:
+    workspace_dir = default_workspace_dir(run_dir=run_dir)
     return {
         "run_summary": run_dir / "run_summary.json",
         "summary_report": run_dir / "reports" / "summary.md",
@@ -10587,6 +10770,16 @@ def _access_surface_output_paths(run_dir: Path) -> dict[str, Path]:
         "user_result_report": run_dir / "reports" / "user_result_report.md",
         "agent_result_report": run_dir / "reports" / "agent_result_report.md",
         "lab_learnings_snapshot": run_dir / "lab_learnings_snapshot.json",
+        "workspace_state": workspace_dir / "workspace_state.json",
+        "workspace_lineage": workspace_dir / "workspace_lineage.json",
+        "workspace_focus_history": workspace_dir / "workspace_focus_history.json",
+        "workspace_memory_policy": workspace_dir / "workspace_memory_policy.json",
+        "result_contract": run_dir / "result_contract.json",
+        "confidence_posture": run_dir / "confidence_posture.json",
+        "belief_revision_triggers": run_dir / "belief_revision_triggers.json",
+        "next_run_plan": workspace_dir / "next_run_plan.json",
+        "focus_decision_record": run_dir / "focus_decision_record.json",
+        "data_expansion_candidates": run_dir / "data_expansion_candidates.json",
     }
 
 
@@ -11534,6 +11727,15 @@ def _refresh_access_manifest(
         path = surface_paths[key]
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="handoff" if "handoff" in key or "next_run" in key else "memory", required=False))
+    for key in ("workspace_state", "workspace_lineage", "workspace_focus_history", "workspace_memory_policy", "next_run_plan"):
+        path = surface_paths[key]
+        if path.exists():
+            display = str(path.relative_to(root.parent)).replace("\\", "/")
+            entries.append(artifact_entry(display, run_dir=root, kind="workspace", required=False))
+    for key in ("result_contract", "confidence_posture", "belief_revision_triggers", "focus_decision_record", "data_expansion_candidates"):
+        path = surface_paths[key]
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="workspace", required=False))
     for key in ("user_result_report", "agent_result_report"):
         path = surface_paths[key]
         if path.exists():
@@ -11542,7 +11744,8 @@ def _refresh_access_manifest(
     for filename in ("learnings_state.json", "learnings.md"):
         path = learnings_dir / filename
         if path.exists():
-            entries.append(artifact_entry(str(path), run_dir=root, kind="memory", required=False))
+            display = str(path.relative_to(root.parent)).replace("\\", "/")
+            entries.append(artifact_entry(display, run_dir=root, kind="memory", required=False))
     for path in _control_output_paths(root).values():
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="control", required=True))

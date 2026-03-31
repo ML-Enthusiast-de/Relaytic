@@ -406,3 +406,90 @@ def test_run_memory_retrieval_includes_workspace_learnings_and_focus_priors(tmp_
     assert "same_data" in list(query_signature["workspace_learning_tags"])
     assert any(item == "workspace_focus:same_data" for item in reflection.reusable_priors)
     assert any("Workspace learnings still carry" in item for item in reflection.lessons)
+
+
+def test_run_memory_retrieval_prefers_explicit_workspace_focus_over_looser_learning_hints(tmp_path: Path) -> None:
+    policy = load_policy().policy
+    data_path = write_public_breast_cancer_dataset(tmp_path / "breast_cancer_workspace_truth.csv")
+    mandate_bundle, context_bundle = _build_binary_foundation(policy)
+    investigation_bundle = run_investigation(
+        data_path=str(data_path),
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+    ).to_dict()
+    current_run_dir = tmp_path / "current_binary_workspace_truth"
+    learnings_dir = tmp_path / "lab_memory"
+    workspace_dir = tmp_path / "workspace"
+    learnings_dir.mkdir(parents=True, exist_ok=True)
+    workspace_dir.mkdir(parents=True, exist_ok=True)
+    current_run_dir.mkdir(parents=True, exist_ok=True)
+
+    write_json(
+        learnings_dir / "learnings_state.json",
+        {
+            "schema_version": "relaytic.learnings_state.v1",
+            "generated_at": "2026-03-31T00:00:00+00:00",
+            "status": "ok",
+            "state_dir": str(learnings_dir),
+            "entry_count": 1,
+            "entries": [
+                {
+                    "entry_id": "learning_focus_same_data",
+                    "kind": "focus",
+                    "lesson": "Older continuity guidance suggested `same_data`.",
+                    "source_run_id": "prior_run",
+                    "applicability_tags": ["binary_classification", "diagnosis_flag", "same_data"],
+                    "last_updated_at": "2026-03-31T00:00:00+00:00",
+                }
+            ],
+        },
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+    write_json(
+        workspace_dir / "workspace_state.json",
+        {
+            "schema_version": "relaytic.workspace_state.v1",
+            "generated_at": "2026-03-31T00:00:00+00:00",
+            "status": "active",
+            "workspace_id": "workspace_test",
+            "workspace_label": "Workspace Test",
+            "workspace_dir": str(workspace_dir),
+            "current_run_id": current_run_dir.name,
+            "current_focus": "new_dataset",
+            "continuity_mode": "restart",
+            "prior_run_count": 1,
+            "next_run_plan_path": str(workspace_dir / "next_run_plan.json"),
+            "result_contract_path": str(current_run_dir / "result_contract.json"),
+            "learnings_state_path": str(learnings_dir / "learnings_state.json"),
+            "summary": "Workspace truth points to a new dataset restart.",
+            "trace": {
+                "agent": "test",
+                "operating_mode": "deterministic",
+                "llm_used": False,
+                "llm_status": "not_requested",
+                "deterministic_evidence": ["workspace_state"],
+                "advisory_notes": [],
+            },
+        },
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+
+    memory_result = run_memory_retrieval(
+        run_dir=current_run_dir,
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        investigation_bundle=investigation_bundle,
+        search_roots=[tmp_path / "isolated_memory_root"],
+    )
+
+    query_signature = dict(memory_result.bundle.memory_retrieval.query_signature)
+    reflection = memory_result.bundle.reflection_memory
+
+    assert query_signature["workspace_recent_focus"] == "new_dataset"
+    assert any(item == "workspace_focus:new_dataset" for item in reflection.reusable_priors)
