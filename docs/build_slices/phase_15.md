@@ -10,6 +10,8 @@ Intended package boundaries:
 - extend `src/relaytic/interoperability/`
 - extend `src/relaytic/runtime/`
 - extend `src/relaytic/workspace/`
+- extend `src/relaytic/remote_control/`
+- extend `src/relaytic/daemon/`
 
 Intended artifacts:
 
@@ -20,6 +22,10 @@ Intended artifacts:
 - `review_queue_state.json`
 - `trace_explorer_state.json`
 - `branch_replay_index.json`
+- `approval_timeline.json`
+- `background_job_view.json`
+- `permission_mode_card.json`
+- `release_health_report.json`
 - `demo_pack_manifest.json`
 - `flagship_demo_scorecard.json`
 - `human_factors_eval_report.json`
@@ -70,8 +76,13 @@ The slice is successful only if Relaytic can:
 - Slice 15 must consume the canonical trace model from Slice 12B rather than inventing a separate UI-only activity history
 - Slice 15 must build on the mission-control MVP from Slices 11B through 11G rather than replacing it with a separate UI stack
 - Slice 15 must consume workspace continuity, result-contract posture, belief-revision triggers, and next-run planning from Slice 12D rather than treating the UI as a current-run-only shell
+- Slice 15 must consume release-safety posture from Slice 13A so packaging/demo readiness is visible from the same operator surface
+- Slice 15 must consume the event bus and explicit permission modes from Slice 13B rather than presenting stale or UI-only authority state
+- Slice 15 must consume background-job and resume state from Slice 13C so long-running work is visible and controllable from the same mission-control truth
+- Slice 15 must consume remote-approval and supervision-handoff state from Slice 14A instead of building a separate remote-only dashboard model
 - mission control must make branch, tool, intervention, and confidence state legible without requiring humans or external agents to read raw artifact trees
 - mission control must make workspace lineage, focus history, governed learnings posture, current result contract, and next-run options legible without requiring humans or external agents to reconstruct continuity from file paths
+- mission control must make current permission mode, active background jobs, pending approvals, remote-supervision posture, and release-health posture legible from the same top-level surface
 - CLI, MCP, and any richer UI shell must expose the same mission-control truth with only presentation differences
 - packaged demos must include at least one skeptical-control case, one incumbent challenge case, and one trace-backed branch comparison
 - packaged demos should become a maintained flagship demo pack with explicit scorecards instead of ad hoc walkthroughs
@@ -95,6 +106,8 @@ Slice 15 is acceptable only if:
    - imported incumbent challenge
    - skeptical override rejection or unsafe-request defense
 6. one human-factors or onboarding-success eval shows that a first-time operator can start, recover, and finish a useful flow without repo literacy
+7. one mission-control view shows active background jobs, current permission mode, and pending approvals without drifting from CLI or MCP truth
+8. one release-health view shows whether the current build/demo pack is safe to hand out publicly
 
 ## Required Verification
 
@@ -103,6 +116,9 @@ Slice 15 should not be considered complete without targeted tests that cover at 
 - one CLI mission-control case
 - one MCP mission-control case
 - one trace-backed replay case
+- one background-job visibility case
+- one permission-mode visibility case
+- one remote-approval visibility case
 - one packaged demo health check
 - one human-factors or onboarding-success case
 - all relevant proof categories from `docs/specs/test_and_proof_matrix.md`

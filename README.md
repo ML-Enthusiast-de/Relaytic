@@ -62,17 +62,23 @@ Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 14**, because Relaytic now has workspace-first continuity plus an explicit search controller and should next learn to reject statistically attractive but operationally infeasible moves under real-world domain constraints.
+The next recommended build is **Slice 13A**, because Relaytic now has enough operator-facing and recruiter-facing surface that release hygiene, artifact attestation, and packaging discipline need to become a product-enforced gate before we keep widening runtime power.
 
 The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
 
 - machine-stable result contracts with confidence posture and belief-revision triggers so humans, agents, CLI, MCP, and later richer UI shells can all read the same conclusion differently without drifting
 - governed learnings with source, confidence, reaffirmation, invalidation, reset, and optional expiry semantics
 - an iteration planner that can choose whether the next move should stay on the same data, add data, or start over before deeper search spends more compute
+- release-safety and build-attestation gates that scan packaged Relaytic artifacts, docs bundles, host bundles, and demo packs for machine paths, source maps, debug leftovers, and accidental sensitive strings before release
+- an evented runtime and visible permission model so every later background, remote, or approval-based feature is built on one typed event bus and one explicit authority contract
+- a bounded daemon and resumable-job layer so pulse, search, memory maintenance, and long experiments can continue safely over time without becoming hidden background activity
+- a stronger governed-learnings upgrade that migrates the shipped workspace learnings into typed, confidence-bearing, reaffirmable, invalidatable, and optionally expirable records
 - richer long-term memory with retention, compaction, pinning, and replay rules so specialists do not repeatedly forget the same lesson
-- a stronger search/HPO controller that widens, prunes, and allocates effort under explicit value and budget contracts
+- a stronger search/HPO controller that goes beyond the shipped Slice 13 bounded search controller into deeper portfolio ecology, better stop-search proofs, and tighter daemon or resume integration
+- a remote supervision surface that lets humans and external agents inspect, approve, deny, and hand off running workspaces without creating a second source of truth
 - richer trace-native mission-control surfaces that turn the shipped canonical trace and scorecards into a polished branch, replay, and change-attribution experience
 - broader protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth as the surface area grows
+- packaging, release, and long-session regression packs that test the product the way a real frontier operator runtime gets used rather than only as a fast CLI
 - flagship demo packs with explicit scorecards so Relaytic can be judged by repeatable proof cases rather than ad hoc walkthroughs
 - human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy
 - deeper mission-control surfaces that build on the shipped 11B through 11G control-center foundation to show branch structure, confidence, trace history, and change attribution to humans and external agents

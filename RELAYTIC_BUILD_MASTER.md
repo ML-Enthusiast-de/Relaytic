@@ -136,9 +136,13 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 26. Slice 12C
 27. Slice 12D
 28. Slice 13
-29. Slice 14
-30. Slice 15
-31. Slice 16
+29. Slice 13A
+30. Slice 13B
+31. Slice 13C
+32. Slice 14
+33. Slice 14A
+34. Slice 15
+35. Slice 16
 
 Reason:
 
@@ -171,20 +175,28 @@ Reason:
 - Slice 12C should come before Slice 13 because Relaytic needs differentiated post-run handoff, explicit next-run steering, and durable local learnings before deeper search and later demo packaging can feel complete to humans or external agents
 - Slice 12D should come before Slice 13 because Relaytic should become workspace-first before it becomes search-deeper; the result contract, governed learnings, workspace lineage, and explicit next-run plan need to exist before wider search can decide responsibly between same-data continuation, add-data continuation, or starting over
 - Slice 13 should prove not only deeper search but explicit value-of-search decisions, including when Relaytic refuses to keep searching and when the right answer is to add data or move to a new dataset instead of spending more search budget
-- Slice 15 should close the proof loop with flagship demo packs and human-supervision evaluation rather than treating UI polish as sufficient evidence
+- Slice 13A should come immediately after Slice 13 because Relaytic now has enough operator-facing surface that release hygiene, artifact attestation, and packaging discipline must become a product-enforced gate rather than a best-effort repo habit
+- Slice 13B should come after Slice 13A because Relaytic needs one visible event bus and one explicit permission model before daemon work, remote approvals, or richer supervision can be trusted
+- Slice 13C should come after Slice 13B because background work, resumable sessions, and memory-maintenance queues must consume the same event and authority model instead of inventing a second runtime
+- Slice 14 should come after Slice 13C because real-world feasibility is stronger once Relaytic can account for permission posture, waiting approvals, and long-running work instead of treating constraints as static annotations
+- Slice 14A should come after Slice 14 because remote supervision is only credible once local feasibility, permission modes, and background resumability are already explicit
+- Slice 15 should close the proof loop with flagship demo packs, release readiness, remote supervision visibility, and human-supervision evaluation rather than treating UI polish as sufficient evidence
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 Current repo state:
 
 - implemented through Slice 13, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace continuity plus result-contract/iteration planning, and Slice 13 search-controller depth plus execution-strategy selection now landed
-- next execution target: Slice 14
+- next execution target: Slice 13A
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
 - latest handoff-and-learnings slice: Slice 12D
 - latest search-and-execution slice: Slice 13
-- next workspace-and-iteration follow-on after Slice 13: Slice 14
-- next scale-and-search follow-on after Slice 13: Slice 14
-- after Slice 13, every later slice that changes operator-visible behavior or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, and search-controller surfaces rather than leaving the UI stale until late polish
+- next release-and-packaging follow-on after Slice 13: Slice 13A
+- next runtime-and-permission follow-on after Slice 13A: Slice 13B
+- next background-and-resume follow-on after Slice 13B: Slice 13C
+- next workspace-and-iteration follow-on after Slice 13C: Slice 14
+- next remote-supervision follow-on after Slice 14: Slice 14A
+- after Slice 13, every later slice that changes operator-visible behavior, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces rather than leaving the UI stale until late polish
 - the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped mission control, handoff, learnings, and external-agent continuation surfaces
 
 ## MVP boundary

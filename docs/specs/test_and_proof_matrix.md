@@ -74,6 +74,33 @@ Trace-aware slices must test:
 - contract-driven winner selection
 - protocol-conformance parity across surfaces
 
+### 7. Release-safety proof
+
+Release- or packaging-facing slices must test:
+
+- machine-path leak detection
+- source-map or debug-artifact detection
+- attested clean-build generation
+- host-bundle and docs-bundle safety checks
+
+### 8. Permission and supervision proof
+
+Runtime-authority slices must test:
+
+- visible permission-mode transitions
+- allow versus approval-gated versus denied action behavior
+- CLI, MCP, and later remote parity on authority state
+- approval audit correctness
+
+### 9. Background and resume proof
+
+Daemon or long-session slices must test:
+
+- checkpoint resume
+- stale-job detection
+- memory-maintenance queue behavior
+- no hidden background activity outside the canonical job registry
+
 ## Required future shard groups
 
 To reduce timeout risk, future CI should support at least:
@@ -83,6 +110,9 @@ To reduce timeout risk, future CI should support at least:
 - `workspace_continuity`
 - `trace_and_evals`
 - `search_controller`
+- `release_safety`
+- `background_runtime`
+- `remote_supervision`
 - `mission_control`
 
 ## Minimum pass expectation by slice family
@@ -103,6 +133,15 @@ To reduce timeout risk, future CI should support at least:
 - add-data or new-dataset recommendation tests
 - checkpoint or profile tests
 - agent-consumable strategy tests
+
+### Slice 13A through 13C family
+
+- release-safety leak tests
+- artifact-attestation tests
+- event and permission parity tests
+- background-job resume tests
+- memory-maintenance queue tests
+- hidden-activity regression guards
 
 ### Slice 15 family
 

@@ -431,15 +431,63 @@ Current Slice 12D artifact names:
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
+- `src/relaytic/release_safety/` for Slice 13A release-bundle scanning, artifact attestation, source-map auditing, and packaging-discipline reporting
+- `src/relaytic/events/` for Slice 13B typed runtime-event schemas, subscription registries, and event-delivery contracts on top of the existing runtime event stream
+- `src/relaytic/permissions/` for Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, and permission-decision logs
+- `src/relaytic/daemon/` for Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, and memory-maintenance queues
+- `src/relaytic/remote_control/` for Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
 - `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
 - `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Reserved future artifact names:
+- `release_safety_scan.json`
+- `distribution_manifest.json`
+- `artifact_inventory.json`
+- `artifact_attestation.json`
+- `source_map_audit.json`
+- `sensitive_string_audit.json`
+- `release_bundle_report.json`
+- `packaging_regression_report.json`
+- `event_schema.json`
+- `event_subscription_registry.json`
+- `hook_registry.json`
+- `hook_dispatch_report.json`
+- `permission_mode.json`
+- `tool_permission_matrix.json`
+- `approval_policy_report.json`
+- `permission_decision_log.jsonl`
+- `session_capability_contract.json`
+- `daemon_state.json`
+- `background_job_registry.json`
+- `background_job_log.jsonl`
+- `background_checkpoint.json`
+- `resume_session_manifest.json`
+- `background_approval_queue.json`
+- `memory_maintenance_queue.json`
+- `memory_maintenance_report.json`
+- `search_resume_plan.json`
+- `stale_job_report.json`
+- `deployability_assessment.json`
+- `review_gate_state.json`
+- `constraint_override_request.json`
+- `counterfactual_region_report.json`
+- `remote_session_manifest.json`
+- `remote_transport_report.json`
+- `approval_request_queue.json`
+- `approval_decision_log.jsonl`
+- `remote_operator_presence.json`
+- `supervision_handoff.json`
+- `notification_delivery_report.json`
+- `remote_control_audit.json`
 - `branch_dag.json`
 - `confidence_map.json`
 - `change_attribution_report.json`
 - `trace_explorer_state.json`
 - `branch_replay_index.json`
+- `approval_timeline.json`
+- `background_job_view.json`
+- `permission_mode_card.json`
+- `release_health_report.json`
 - `demo_pack_manifest.json`
 - `flagship_demo_scorecard.json`
 - `human_factors_eval_report.json`

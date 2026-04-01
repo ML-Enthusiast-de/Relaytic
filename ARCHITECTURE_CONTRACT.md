@@ -57,6 +57,11 @@ Current canonical boundaries:
 
 Reserved future boundaries:
 
+- `src/relaytic/release_safety/` should own Slice 13A release-bundle scanning, artifact attestation, source-map and sensitive-string audits, and distribution-manifest reporting
+- `src/relaytic/events/` should own Slice 13B typed runtime event schemas, subscription registries, and event-delivery contracts on top of the existing runtime event stream
+- `src/relaytic/permissions/` should own Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, and permission-decision logs
+- `src/relaytic/daemon/` should own Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, and memory-maintenance queues
+- `src/relaytic/remote_control/` should own Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
@@ -105,7 +110,11 @@ These files are required and must stay current:
 - `docs/build_slices/phase_12c.md`
 - `docs/build_slices/phase_12d.md`
 - `docs/build_slices/phase_13.md`
+- `docs/build_slices/phase_13a.md`
+- `docs/build_slices/phase_13b.md`
+- `docs/build_slices/phase_13c.md`
 - `docs/build_slices/phase_14.md`
+- `docs/build_slices/phase_14a.md`
 - `docs/build_slices/phase_15.md`
 - `docs/build_slices/phase_16.md`
 - `docs/specs/workspace_lifecycle.md`
@@ -346,16 +355,70 @@ Current trace and eval artifact names:
 - `protocol_conformance_report.json`
 - `host_surface_matrix.json`
 
-Reserved future artifact names:
+Current search-controller artifact names:
+
+- `search_controller_plan.json`
+- `portfolio_search_trace.json`
 - `hpo_campaign_report.json`
 - `search_decision_ledger.json`
+- `execution_backend_profile.json`
+- `device_allocation.json`
+- `distributed_run_plan.json`
+- `scheduler_job_map.json`
+- `checkpoint_state.json`
+- `execution_strategy_report.json`
 - `search_value_report.json`
 - `search_controller_eval_report.json`
+
+Reserved future artifact names:
+- `release_safety_scan.json`
+- `distribution_manifest.json`
+- `artifact_inventory.json`
+- `artifact_attestation.json`
+- `source_map_audit.json`
+- `sensitive_string_audit.json`
+- `release_bundle_report.json`
+- `packaging_regression_report.json`
+- `event_schema.json`
+- `event_subscription_registry.json`
+- `hook_registry.json`
+- `hook_dispatch_report.json`
+- `permission_mode.json`
+- `tool_permission_matrix.json`
+- `approval_policy_report.json`
+- `permission_decision_log.jsonl`
+- `session_capability_contract.json`
+- `daemon_state.json`
+- `background_job_registry.json`
+- `background_job_log.jsonl`
+- `background_checkpoint.json`
+- `resume_session_manifest.json`
+- `background_approval_queue.json`
+- `memory_maintenance_queue.json`
+- `memory_maintenance_report.json`
+- `search_resume_plan.json`
+- `stale_job_report.json`
+- `deployability_assessment.json`
+- `review_gate_state.json`
+- `constraint_override_request.json`
+- `counterfactual_region_report.json`
+- `remote_session_manifest.json`
+- `remote_transport_report.json`
+- `approval_request_queue.json`
+- `approval_decision_log.jsonl`
+- `remote_operator_presence.json`
+- `supervision_handoff.json`
+- `notification_delivery_report.json`
+- `remote_control_audit.json`
 - `branch_dag.json`
 - `confidence_map.json`
 - `change_attribution_report.json`
 - `trace_explorer_state.json`
 - `branch_replay_index.json`
+- `approval_timeline.json`
+- `background_job_view.json`
+- `permission_mode_card.json`
+- `release_health_report.json`
 - `demo_pack_manifest.json`
 - `flagship_demo_scorecard.json`
 - `human_factors_eval_report.json`

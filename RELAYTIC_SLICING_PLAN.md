@@ -218,9 +218,13 @@ Stable slice numbering stays the same, but the preferred execution order after S
 26. Slice 12C
 27. Slice 12D
 28. Slice 13
-29. Slice 14
-30. Slice 15
-31. Slice 16
+29. Slice 13A
+30. Slice 13B
+31. Slice 13C
+32. Slice 14
+33. Slice 14A
+34. Slice 15
+35. Slice 16
 
 Why:
 
@@ -252,22 +256,30 @@ Why:
 - Slice 12C should come before Slice 13 because Relaytic still needs a professional post-run handoff, explicit next-run steering, and durable learnings that survive across runs before deeper search and late demo packaging can feel complete
 - Slice 12D should come before Slice 13 because Relaytic should become workspace-first before it becomes search-deeper; the result contract, governed learnings, workspace lineage, and explicit next-run plan need to exist before wider search can responsibly choose between same-data continuation, add-data continuation, or starting over
 - Slice 13 should prove not only deeper search but explicit value-of-search decisions so the controller can justify widening, stopping, adding data, or moving to a new dataset
-- Slice 15 should close the loop with flagship demo packs and human-supervision evaluation rather than treating UI polish as sufficient proof
+- Slice 13A should come immediately after Slice 13 because Relaytic now has enough operator-facing surface that release hygiene, artifact attestation, and packaging discipline must become a product-enforced gate instead of a best-effort repo habit
+- Slice 13B should come after Slice 13A because Relaytic needs one visible event bus and one explicit permission model before daemon work, remote approvals, or richer supervision can be trusted
+- Slice 13C should come after Slice 13B because background work, resumable sessions, and memory-maintenance queues must consume the same event and authority model instead of inventing a second runtime
+- Slice 14 should come after Slice 13C because real-world feasibility is stronger once Relaytic can account for permission posture, waiting approvals, and long-running work instead of treating constraints as static annotations
+- Slice 14A should come after Slice 14 because remote supervision is only credible once local feasibility, permission modes, and background resumability are already explicit
+- Slice 15 should close the loop with flagship demo packs, release readiness, remote supervision visibility, and human-supervision evaluation rather than treating UI polish as sufficient proof
 - Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
 
 ## Current execution state
 
 - implemented baseline: Slice 00 through Slice 13, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, and Slice 13 search-controller depth plus execution-strategy selection
-- next execution target: Slice 14
+- next execution target: Slice 13A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
 - latest search-and-execution follow-on: Slice 13
-- next workspace-and-iteration follow-on after Slice 13: Slice 14
-- next scale-and-search follow-on after Slice 13: Slice 14
-- later mission-control expansion after Slice 14: Slice 15
+- next release-and-packaging follow-on after Slice 13: Slice 13A
+- next runtime-and-permission follow-on after Slice 13A: Slice 13B
+- next background-and-resume follow-on after Slice 13B: Slice 13C
+- next workspace-and-iteration follow-on after Slice 13C: Slice 14
+- next remote-supervision follow-on after Slice 14: Slice 14A
+- later mission-control expansion after Slice 14A: Slice 15
 - late optional representation follow-on after Slice 15: Slice 16
-- after Slice 13, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, and search-controller surfaces instead of treating UI as a separate late-polish track
+- after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
 - the canonical product-spec pack for Slice 12D and its follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped mission control, handoff, learnings, and external-agent continuation surfaces
 
 ## Slice 00 - Normalization and contract freeze
@@ -2084,6 +2096,171 @@ Minimum proof:
 - one case where the search controller rejects a low-value branch and expands a higher-value branch with explicit justification
 - one case where the search controller widens or cuts HPO effort because the decision contract, beat-target pressure, or trace evidence says more search is or is not worth it
 
+## Slice 13A - Release safety, build attestation, and packaging discipline
+
+Goal:
+- release-bundle scanning
+- artifact attestation
+- source-map and debug-artifact rejection
+- sensitive-string and machine-path auditing
+- packaging regression gates for demos and public builds
+
+Load-bearing improvement:
+
+- Relaytic should be able to prove that a built distribution contains only the intended product surface and does not leak machine paths, source maps, hidden debug files, or accidental sensitive strings
+
+Human surface:
+
+- humans should be able to inspect one release-safety report that says whether a build is safe to hand out and what must be fixed if it is not
+
+Agent surface:
+
+- external agents should be able to consume one release-safety bundle and fail a packaging workflow without scraping prose
+
+Intelligence source:
+
+- built distributions, docs bundles, host bundles, install surfaces, git-safety rules, and explicit release policy
+
+Fallback rule:
+
+- when a packaged artifact is unavailable, Relaytic should still run the same checks against the local workspace and mark the result as pre-release rather than silently skipping the gate
+
+Required outputs:
+- `release_safety_scan.json`
+- `distribution_manifest.json`
+- `artifact_inventory.json`
+- `artifact_attestation.json`
+- `source_map_audit.json`
+- `sensitive_string_audit.json`
+- `release_bundle_report.json`
+- `packaging_regression_report.json`
+
+Required behavior:
+
+- Slice 13A must upgrade the existing git-safety posture into a real release-safety layer rather than a one-off repository scan
+- release safety must scan built artifacts, host bundles, generated HTML, manifests, packaged docs, and install surfaces rather than only tracked source files
+- release safety must explicitly detect machine paths, source maps, hidden internal URLs, oversized accidental payloads, obvious secret-like strings, and debug-only manifests
+- release attestation must prove which files were intentionally included and which checks were run against them
+- `relaytic doctor` and later mission-control packaging surfaces should consume the same release-safety posture
+
+Minimum proof:
+
+- one build with an injected machine path is rejected with an explicit reason
+- one build with an injected source map or debug manifest is rejected with an explicit artifact path
+- one clean build produces a complete attestation showing scanned files and passed checks
+- one host-bundle or docs-bundle surface is included in the release-safety gate
+
+## Slice 13B - Event bus, runtime hooks, and visible permission modes
+
+Goal:
+- typed runtime-event schemas
+- event subscription registry
+- hook registry and dispatch reporting
+- visible permission modes
+- tool-permission matrix and approval-policy reporting
+
+Load-bearing improvement:
+
+- Relaytic should expose one canonical event bus plus one explicit authority model so later daemon, remote-control, and richer mission-control work can subscribe to real runtime truth instead of reconstructing state from artifacts after the fact
+
+Human surface:
+
+- humans should be able to see the current permission mode, pending approvals, recent event timeline, and which tools or actions are allowed, approval-gated, or denied
+
+Agent surface:
+
+- external agents should be able to query one session capability contract, one permission-mode artifact, and one machine-readable event or hook registry without trial-and-error tool use
+
+Intelligence source:
+
+- the shared runtime gateway, control contracts, capability profiles, workspace continuity state, and explicit operator or agent policy overlays
+
+Fallback rule:
+
+- when subscriptions or richer hook handlers are unavailable, Relaytic must still emit the canonical event stream and permission decisions through stable artifacts rather than silently degrading into hidden local state
+
+Required outputs:
+- `event_schema.json`
+- `event_subscription_registry.json`
+- `hook_registry.json`
+- `hook_dispatch_report.json`
+- `permission_mode.json`
+- `tool_permission_matrix.json`
+- `approval_policy_report.json`
+- `permission_decision_log.jsonl`
+- `session_capability_contract.json`
+
+Required behavior:
+
+- Slice 13B must upgrade the existing `lab_event_stream.jsonl`, `hook_execution_log.json`, and `capability_profiles.json` rather than replacing them with a second incompatible runtime history
+- event emission must cover session lifecycle, prompt submit, tool pre/post use, stage transitions, background-job lifecycle, workspace resume, compaction lifecycle, and approval requested/approved/denied
+- permission modes must be explicit and user-visible, with at least `review`, `plan`, `safe_execute`, and `bounded_autonomy`
+- mission control, CLI, MCP, and later remote surfaces must expose the same current mode and the same tool or action matrix
+- denied and approval-gated actions must be replayable from one permission-decision log rather than scattered across unrelated artifacts
+
+Minimum proof:
+
+- one action allowed in `bounded_autonomy` is blocked or approval-gated in `review`
+- one hook subscriber reacts to a runtime event without changing the canonical source of truth
+- one CLI and one MCP surface report the same permission mode and pending-approval posture
+- one denied or approval-gated action is replayable from the event and permission logs alone
+
+## Slice 13C - Background daemon, resumable jobs, and memory maintenance
+
+Goal:
+- bounded daemon orchestration
+- background-job registry and logs
+- checkpoint-backed resumability
+- explicit background approval queue
+- memory-maintenance queue and stale-job reporting
+
+Load-bearing improvement:
+
+- Relaytic should be able to run bounded background work, resume interrupted jobs, and maintain workspace memory over time without becoming a hidden daemon that acts outside operator or agent visibility
+
+Human surface:
+
+- humans should be able to see active jobs, waiting jobs, resumed jobs, stale jobs, and memory-maintenance jobs from one mission-control surface
+
+Agent surface:
+
+- external agents should be able to query one background-job registry, one resume manifest, and one approval queue to understand what is running, what is paused, and what needs a decision
+
+Intelligence source:
+
+- event bus and permission modes from Slice 13B, pulse watchlists, search-controller outputs, workspace state, result contracts, and governed learnings or memory policy
+
+Fallback rule:
+
+- when background execution is disabled, Relaytic must still produce the same planned job manifests and resume plans so the work can be run interactively without changing truth or dropping state
+
+Required outputs:
+- `daemon_state.json`
+- `background_job_registry.json`
+- `background_job_log.jsonl`
+- `background_checkpoint.json`
+- `resume_session_manifest.json`
+- `background_approval_queue.json`
+- `memory_maintenance_queue.json`
+- `memory_maintenance_report.json`
+- `search_resume_plan.json`
+- `stale_job_report.json`
+
+Required behavior:
+
+- Slice 13C must consume the event and permission substrate from Slice 13B instead of inventing a daemon-specific authority model
+- background work must stay bounded, explicit, and stoppable; no hidden long-running activity is acceptable
+- daemon-managed jobs must cover at least pulse follow-up, search-controller campaigns, memory compaction or reaffirmation maintenance, and long-running benchmark or challenger jobs when policy allows
+- resumability must be based on explicit checkpoints and job manifests rather than process-local memory
+- workspace resume should restore the current result contract, active jobs, pending approvals, and next-run posture coherently
+
+Minimum proof:
+
+- one long-running search or benchmark job resumes from checkpoint after interruption
+- one memory-maintenance task runs in the background and leaves an explicit before/after report
+- one background task is queued, approved, and started through the explicit approval path rather than silently running
+- one stale or failed job is surfaced with a reason and recovery suggestion
+
 ## Slice 14 - Real-world feasibility, domain constraints, and action boundaries
 
 Goal:
@@ -2119,12 +2296,19 @@ Required outputs:
 - `extrapolation_risk_report.json`
 - `decision_constraint_report.json`
 - `action_boundary_report.json`
+- `deployability_assessment.json`
+- `review_gate_state.json`
+- `constraint_override_request.json`
+- `counterfactual_region_report.json`
 
 Required behavior:
 
 - physical, regulatory, and operational constraints must be explicit inputs to proposal generation, not cosmetic warnings after the fact
 - Relaytic must distinguish "promising", "unproven", "physically implausible", "operationally infeasible", and "policy-constrained" proposals
 - action-boundary reasoning must integrate with abstention, review, rollback, and data-acquisition suggestions rather than living in a separate report
+- feasibility must consume permission modes and approval posture from Slice 13B so infeasible or regulated actions can be approval-gated instead of merely annotated
+- feasibility must consume background and resumable job posture from Slice 13C so deferred work, waiting approvals, and long-running experiments remain aligned with real operational constraints
+- feasibility must be able to emit an explicit constraint override request rather than silently flattening domain conflicts into warnings
 - feasibility and action-boundary changes must extend the mission-control surface introduced in Slice 11B and expanded through Slices 11C, 11D, 11E, 11F, and 11G so operator-facing recommendations stay legible as constraints sharpen
 
 Minimum proof:
@@ -2132,6 +2316,61 @@ Minimum proof:
 - one domain case where physically implausible proposals are suppressed
 - one case where feasibility constraints materially alter route or recommendation output
 - one case where operational or compliance constraints alter the decision policy or recommended next action
+- one case where Relaytic emits a review gate or override request instead of only a warning
+
+## Slice 14A - Remote mission control, approvals, and supervision handoff
+
+Goal:
+- trusted remote-inspection surface
+- approval and denial queue
+- remote supervision handoff
+- remote presence and freshness reporting
+- remote-control audit and notification delivery
+
+Load-bearing improvement:
+
+- Relaytic should allow humans and external agents to supervise a workspace remotely through the same truth used locally, including approvals, denials, resume actions, and handoff between operators or agents
+
+Human surface:
+
+- humans should be able to inspect remote session status, pending approvals, supervision handoff state, and remote presence without guessing whether the remote surface is stale or authoritative
+
+Agent surface:
+
+- external agents should be able to read and act on approval queues, supervision handoffs, and remote workspace truth through stable JSON-first surfaces rather than screen-scraping a UI shell
+
+Intelligence source:
+
+- mission-control truth, event bus and permission modes from Slice 13B, daemon state from Slice 13C, workspace or result-contract state, and interoperability transport configuration
+
+Fallback rule:
+
+- when remote transport is disabled or unavailable, Relaytic must still preserve the same approval and supervision artifacts locally so the same decisions can be made through CLI or MCP without remote drift
+
+Required outputs:
+- `remote_session_manifest.json`
+- `remote_transport_report.json`
+- `approval_request_queue.json`
+- `approval_decision_log.jsonl`
+- `remote_operator_presence.json`
+- `supervision_handoff.json`
+- `notification_delivery_report.json`
+- `remote_control_audit.json`
+
+Required behavior:
+
+- Slice 14A must remain local-first by default; remote access should be explicitly enabled and clearly marked
+- remote mission control must be read-mostly unless an action is explicitly approval-scoped or policy-allowed
+- approvals, denials, and handoffs must use the same permission and event substrate as local sessions rather than inventing remote-only authority logic
+- remote session state must expose freshness and transport posture so operators and agents know whether they are looking at live or stale state
+- mission control, CLI, MCP, and remote supervision must remain semantically aligned on result contract, active jobs, pending approvals, and next-run posture
+
+Minimum proof:
+
+- one remote approval or denial changes the same local workspace truth that CLI and MCP later read
+- one supervision handoff transfers control cleanly between a human and an external agent
+- one remote session shows freshness and transport status explicitly
+- one locally disabled remote surface fails closed and leaves a clear audit trail
 
 ## Slice 15 - Mission-control expansion, packaging, integrations, demos, polish
 
@@ -2174,6 +2413,10 @@ Required outputs:
 - `review_queue_state.json`
 - `trace_explorer_state.json`
 - `branch_replay_index.json`
+- `approval_timeline.json`
+- `background_job_view.json`
+- `permission_mode_card.json`
+- `release_health_report.json`
 - one golden demo
 - one Focus Council demo
 - one completion/status demo
@@ -2185,7 +2428,12 @@ Required behavior:
 
 - Slice 15 must consume the canonical trace model from Slice 12B rather than inventing a separate UI-only activity history
 - Slice 15 must build on the mission-control MVP from Slices 11B through 11G rather than replacing it with a separate UI stack
+- Slice 15 must consume release-safety posture from Slice 13A so packaging and demo readiness are visible from the same operator surface
+- Slice 15 must consume the event bus and explicit permission modes from Slice 13B rather than presenting stale or UI-only authority state
+- Slice 15 must consume background-job and resume state from Slice 13C so long-running work is visible and controllable from the same mission-control truth
+- Slice 15 must consume remote-approval and supervision-handoff state from Slice 14A instead of building a separate remote-only dashboard model
 - mission control must make branch, tool, intervention, and confidence state legible without requiring humans or external agents to read raw artifact trees
+- mission control must make current permission mode, active background jobs, pending approvals, remote-supervision posture, and release-health posture legible from the same top-level surface
 - CLI, MCP, and any richer UI shell must expose the same mission-control truth with only presentation differences
 - the packaged demos must include at least one skeptical-control case, one incumbent challenge case, and one trace-backed branch comparison
 
@@ -2195,6 +2443,8 @@ Minimum proof:
 - one agent-consumable mission-control export that shows current stage, branch state, and recommended next action without missing trace context
 - one packaged demo where humans can see what changed because of memory, research, feedback, and intervention handling from the same surface
 - one accelerated execution demo
+- one mission-control view that shows active background jobs, current permission mode, and pending approvals without drifting from CLI or MCP truth
+- one release-health view that shows whether the current build or demo pack is safe to hand out publicly
 
 Required behavior:
 

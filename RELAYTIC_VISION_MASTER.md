@@ -130,6 +130,10 @@ The product becomes world-class only when it can repeatedly prove:
   the user report, agent report, mission control, CLI, and MCP surfaces should all render the same machine-stable result contract rather than drifting into narrative-only summaries
 - **governed-learning proof**
   learnings should be typed, confidence-bearing, invalidatable, resettable, and expirable so Relaytic does not silently turn stale memory into hidden truth
+- **release-discipline proof**
+  Relaytic should be able to prove that a build, demo pack, or install surface is safe to hand out by scanning packaged artifacts for machine paths, source maps, debug leftovers, and accidental sensitive strings before release
+- **runtime-supervision proof**
+  Relaytic should be able to show what is running now, what is waiting for approval, what is blocked by the current permission mode, and what can be resumed later without forcing humans or external agents to infer state from raw logs
 
 Future slices that add autonomy, new host surfaces, or new operator-facing behavior should strengthen at least one of those proof tracks in addition to their local feature work.
 
@@ -197,10 +201,16 @@ For the repository as it exists today, the next major leverage points are not "m
 
 They are:
 
-- a **workspace-first continuity layer** that makes multi-run lineage, focus history, and continuity state explicit before Relaytic tries to search wider
-- **machine-stable result contracts** that define what Relaytic believes, how strong the evidence is, what remains unresolved, what it recommends next, and what would change its mind
-- **governed learnings** that carry source, confidence, reaffirmation state, invalidation history, and optional expiry instead of drifting into an untyped memory blob
-- an **iteration planner** that can explicitly choose between same-data continuation, add-data continuation, or new-dataset restart before deeper search consumes more time or compute
+- a **release-safety and build-attestation layer** so packaged Relaytic artifacts can be handed to recruiters, labs, and external agents without machine-path leaks, source-map leaks, or accidental debug payloads
+- an **evented runtime and visible permission model** so every later background, remote, or approval-based feature is built on one typed event bus and one explicit authority contract
+- a **bounded daemon and resumable-job layer** so pulse, search, memory maintenance, and long experiments can continue safely over time without becoming hidden background activity
+- a stronger **workspace-first continuity layer** that becomes permission-aware, daemon-aware, and remote-supervision-aware rather than only run-to-run aware
+- stronger **machine-stable result contracts** that stay aligned across local, remote, background, and post-run surfaces even as supervision becomes richer
+- stronger **governed learnings** that upgrade the shipped workspace learnings into typed, confidence-bearing, reaffirmable, invalidatable, and optionally expirable records instead of drifting into an untyped memory blob
+- an **iteration planner** that remains explicit as Relaytic adds remote approvals, feasibility gates, and daemon-managed continuation rather than falling back to implicit next-step choices
+- **release-safety and build attestation** so packaged Relaytic artifacts can be handed to recruiters, labs, and external agents without machine-path leaks, source-map leaks, or accidental debug payloads
+- an **evented runtime and visible permission model** so every later background, remote, or approval-based feature is built on one typed event bus and one explicit authority contract
+- a **bounded daemon and resumable-job layer** so pulse, search, memory maintenance, and long experiments can continue safely over time without becoming hidden background activity
 - a **canonical product-spec pack** that freezes schemas, UX flows, and proof burden so later slices can optimize implementation quality without improvising core product behavior
 - **behavioral contracts** that let humans and external agents steer Relaytic without turning Relaytic into a compliant shell
 - **causal multi-layer memory** that preserves interventions, method outcomes, downstream consequences, and why previous guidance proved right or wrong
@@ -209,14 +219,16 @@ They are:
 - a **decision-system world model** that understands what action follows prediction, what errors cost, which cases should defer to humans, and whether more search is actually worth it
 - a **method compiler** that turns papers, benchmark references, memory, and operator notes into executable challenger templates, feature hypotheses, split/evaluation adjustments, and data-collection suggestions
 - **imported incumbent challenge tracks** so Relaytic can beat real existing models instead of only generic baselines
-- a **richer search controller** that chooses broader challenger ecology, HPO depth, calibration breadth, and abstention policy under explicit budgets rather than fixed narrow search
+- a **richer search controller** that goes beyond the shipped bounded search controller and chooses broader challenger ecology, HPO depth, calibration breadth, daemon-backed resume strategy, and abstention policy under explicit budgets rather than fixed narrow search
 - **outcome learning**, not just run learning, so Relaytic improves from interventions taken, overrides, downstream results, and false-positive/false-negative consequences
 - a **richer long-term memory stack** with episodic, intervention, outcome, and method memory plus explicit retention, compaction, pinning, and replay rules so specialists do not keep relearning the same lesson
 - **agent evaluator and security harnesses** that continuously test override skepticism, tool-safety boundaries, branch-controller behavior, and prompt/result injection resistance rather than assuming the runtime is safe because it is local
 - a **lab pulse** that can periodically inspect runtime state, benchmark debt, research freshness, and memory health, then queue bounded safe follow-up without unsupervised drift
 - a **richer data-understanding fabric** that can reason about nearby sources, join candidates, entity histories, and what additional data would reduce uncertainty most
+- a **remote supervision surface** that lets humans and external agents inspect, approve, deny, and hand off running workspaces without creating a second source of truth
 - a **mission-control surface** that shows branch structure, confidence map, intervention history, incumbent-versus-Relaytic state, what changed because of memory, intelligence, research, or feedback, and what Relaytic would do next
 - a **protocol-conformance harness** that proves CLI, MCP, mission control, and later richer UI shells expose the same control truth rather than drifting by surface
+- long-session, resume, and packaging regression packs that test the product the way a real frontier operator runtime gets used rather than only as a fast CLI
 - a **flagship demo pack** with explicit scorecards so Relaytic can be judged by repeatable proof cases rather than one-off founder narration
 - a **human-supervision evaluation track** that measures first-run success, stuck recovery, explanation quality, and whether operators can tell what Relaytic expects next
 - benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, lifecycle constraints, and decision usefulness actually matter
