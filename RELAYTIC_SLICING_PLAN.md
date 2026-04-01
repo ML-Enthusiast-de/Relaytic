@@ -257,16 +257,17 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 12D, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, and Slice 12D workspace-first continuity plus result contracts and explicit iteration planning
-- next execution target: Slice 13
+- implemented baseline: Slice 00 through Slice 13, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, and Slice 13 search-controller depth plus execution-strategy selection
+- next execution target: Slice 14
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
-- next workspace-and-iteration follow-on after Slice 12D: Slice 13
-- next scale-and-search follow-on after Slice 12D: Slice 13
+- latest search-and-execution follow-on: Slice 13
+- next workspace-and-iteration follow-on after Slice 13: Slice 14
+- next scale-and-search follow-on after Slice 13: Slice 14
 - later mission-control expansion after Slice 14: Slice 15
 - late optional representation follow-on after Slice 15: Slice 16
-- after Slice 12D, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, and iteration-planning surfaces instead of treating UI as a separate late-polish track
+- after Slice 13, every later slice that changes operator-visible behavior, major artifact families, or install/dependency posture must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, and search-controller surfaces instead of treating UI as a separate late-polish track
 - the canonical product-spec pack for Slice 12D and its follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped mission control, handoff, learnings, and external-agent continuation surfaces
 
 ## Slice 00 - Normalization and contract freeze

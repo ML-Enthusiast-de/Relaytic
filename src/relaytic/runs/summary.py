@@ -38,6 +38,7 @@ def build_run_summary(
         read_handoff_bundle,
     )
     from relaytic.iteration import read_iteration_bundle
+    from relaytic.search import read_search_bundle
     from relaytic.learnings import (
         default_learnings_state_dir,
         read_learnings_snapshot,
@@ -226,6 +227,7 @@ def build_run_summary(
             "host_surface_matrix": "host_surface_matrix.json",
         },
     )
+    search_bundle = read_search_bundle(root)
     handoff_bundle = read_handoff_bundle(root)
     learnings_state_dir = default_learnings_state_dir(run_dir=root)
     learnings_state = read_learnings_state(learnings_state_dir)
@@ -387,6 +389,13 @@ def build_run_summary(
     red_team_report = _bundle_item(evals_bundle, "red_team_report")
     protocol_conformance_report = _bundle_item(evals_bundle, "protocol_conformance_report")
     host_surface_matrix = _bundle_item(evals_bundle, "host_surface_matrix")
+    search_controller_plan = _bundle_item(search_bundle, "search_controller_plan")
+    portfolio_search_trace = _bundle_item(search_bundle, "portfolio_search_trace")
+    hpo_campaign_report = _bundle_item(search_bundle, "hpo_campaign_report")
+    execution_backend_profile = _bundle_item(search_bundle, "execution_backend_profile")
+    distributed_run_plan = _bundle_item(search_bundle, "distributed_run_plan")
+    execution_strategy_report = _bundle_item(search_bundle, "execution_strategy_report")
+    search_value_report = _bundle_item(search_bundle, "search_value_report")
     run_handoff = dict(handoff_bundle.get("run_handoff", {})) if isinstance(handoff_bundle.get("run_handoff"), dict) else {}
     next_run_options = dict(handoff_bundle.get("next_run_options", {})) if isinstance(handoff_bundle.get("next_run_options"), dict) else {}
     next_run_focus = dict(handoff_bundle.get("next_run_focus", {})) if isinstance(handoff_bundle.get("next_run_focus"), dict) else {}
@@ -486,6 +495,7 @@ def build_run_summary(
             decision_bundle=decision_bundle,
             dojo_bundle=dojo_bundle,
             pulse_bundle=pulse_bundle,
+            search_bundle=search_bundle,
             handoff_bundle=handoff_bundle,
             learnings_state=learnings_state,
             learnings_snapshot=learnings_snapshot,
@@ -748,6 +758,29 @@ def build_run_summary(
             "surface_count": len(host_surface_matrix.get("surfaces", []))
             if isinstance(host_surface_matrix.get("surfaces"), list)
             else 0,
+        },
+        "search": {
+            "status": _clean_text(search_controller_plan.get("status")),
+            "recommended_action": _clean_text(search_controller_plan.get("recommended_action")),
+            "recommended_direction": _clean_text(search_controller_plan.get("recommended_direction"))
+            or _clean_text(search_value_report.get("recommended_direction")),
+            "search_mode": _clean_text(search_controller_plan.get("search_mode")),
+            "selected_hpo_depth": _clean_text(search_controller_plan.get("selected_hpo_depth")),
+            "planned_trial_count": int(search_controller_plan.get("planned_trial_count", 0) or 0),
+            "selected_execution_profile": _clean_text(search_controller_plan.get("selected_execution_profile"))
+            or _clean_text(execution_backend_profile.get("selected_profile")),
+            "value_band": _clean_text(search_value_report.get("value_band")),
+            "value_score": search_value_report.get("value_score"),
+            "stop_search_explicit": search_value_report.get("stop_search_explicit"),
+            "beat_target_pressure": _clean_text(search_value_report.get("beat_target_pressure")),
+            "review_need": _clean_text(search_value_report.get("review_need")),
+            "widened_branch_count": int(portfolio_search_trace.get("widened_branch_count", 0) or 0),
+            "pruned_branch_count": int(portfolio_search_trace.get("pruned_branch_count", 0) or 0),
+            "candidate_branch_count": int(portfolio_search_trace.get("candidate_count", 0) or 0),
+            "execution_strategy": _clean_text(execution_strategy_report.get("selected_strategy")),
+            "execution_mode": _clean_text(distributed_run_plan.get("execution_mode")),
+            "same_plan_across_profiles": execution_strategy_report.get("same_plan_across_profiles"),
+            "max_trials": int(hpo_campaign_report.get("max_trials", 0) or 0),
         },
         "handoff": {
             "status": _clean_text(run_handoff.get("status")),
@@ -1039,6 +1072,18 @@ def build_run_summary(
             "red_team_report_path": _path_if_exists(root / "red_team_report.json"),
             "protocol_conformance_report_path": _path_if_exists(root / "protocol_conformance_report.json"),
             "host_surface_matrix_path": _path_if_exists(root / "host_surface_matrix.json"),
+            "search_controller_plan_path": _path_if_exists(root / "search_controller_plan.json"),
+            "portfolio_search_trace_path": _path_if_exists(root / "portfolio_search_trace.json"),
+            "hpo_campaign_report_path": _path_if_exists(root / "hpo_campaign_report.json"),
+            "search_decision_ledger_path": _path_if_exists(root / "search_decision_ledger.json"),
+            "execution_backend_profile_path": _path_if_exists(root / "execution_backend_profile.json"),
+            "device_allocation_path": _path_if_exists(root / "device_allocation.json"),
+            "distributed_run_plan_path": _path_if_exists(root / "distributed_run_plan.json"),
+            "scheduler_job_map_path": _path_if_exists(root / "scheduler_job_map.json"),
+            "checkpoint_state_path": _path_if_exists(root / "checkpoint_state.json"),
+            "execution_strategy_report_path": _path_if_exists(root / "execution_strategy_report.json"),
+            "search_value_report_path": _path_if_exists(root / "search_value_report.json"),
+            "search_controller_eval_report_path": _path_if_exists(root / "search_controller_eval_report.json"),
             "run_handoff_path": _path_if_exists(root / "run_handoff.json"),
             "next_run_options_path": _path_if_exists(root / "next_run_options.json"),
             "next_run_focus_path": _path_if_exists(root / "next_run_focus.json"),
@@ -1091,6 +1136,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     pulse = dict(summary.get("pulse", {}))
     trace = dict(summary.get("trace", {}))
     evals = dict(summary.get("evals", {}))
+    search = dict(summary.get("search", {}))
     handoff = dict(summary.get("handoff", {}))
     learnings = dict(summary.get("learnings", {}))
     workspace = dict(summary.get("workspace", {}))
@@ -1347,6 +1393,23 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
             lines.append(f"- Protocol mismatches: `{evals.get('protocol_mismatch_count')}`")
         if evals.get("security_open_finding_count"):
             lines.append(f"- Open security findings: `{evals.get('security_open_finding_count')}`")
+    if search and any(value not in (None, 0, False, "", []) for value in search.values()):
+        lines.extend(
+            [
+                "",
+                "## Search Controller",
+                f"- Status: `{search.get('status') or 'unknown'}`",
+                f"- Action: `{search.get('recommended_action') or 'unknown'}`",
+                f"- Direction: `{search.get('recommended_direction') or 'unknown'}`",
+                f"- Value band: `{search.get('value_band') or 'unknown'}`",
+                f"- Search mode: `{search.get('search_mode') or 'unknown'}`",
+                f"- Planned trials: `{search.get('planned_trial_count', 0)}`",
+                f"- Execution profile: `{search.get('selected_execution_profile') or 'unknown'}`",
+                f"- Widened branches: `{search.get('widened_branch_count', 0)}`",
+                f"- Pruned branches: `{search.get('pruned_branch_count', 0)}`",
+                f"- Stop search explicitly: `{search.get('stop_search_explicit')}`",
+            ]
+        )
     if handoff and any(value not in (None, 0, False, "", []) for value in handoff.values()):
         lines.extend(
             [
@@ -1590,6 +1653,7 @@ def materialize_run_summary(
         sync_learnings_from_run,
     )
     from relaytic.policies import load_policy
+    from relaytic.search import read_search_bundle
     from relaytic.workspace import (
         render_agent_result_report_from_contract,
         render_user_result_report_from_contract,
@@ -1647,6 +1711,7 @@ def materialize_run_summary(
         learnings_snapshot=read_learnings_snapshot(root),
         policy=policy,
     )
+    search_bundle = read_search_bundle(root)
     iteration_sync = sync_iteration_from_run(
         run_dir=root,
         workspace_dir=workspace_sync.workspace_dir,
@@ -1655,6 +1720,7 @@ def materialize_run_summary(
         belief_revision_triggers=workspace_sync.belief_revision_triggers.to_dict(),
         summary_payload=intermediate_summary,
         handoff_bundle=handoff_bundle,
+        search_bundle=search_bundle,
         policy=policy,
     )
     user_report_path = root / USER_RESULT_REPORT_RELATIVE_PATH
@@ -1806,6 +1872,7 @@ def _resolve_stage(
     decision_bundle: dict[str, Any],
     dojo_bundle: dict[str, Any],
     pulse_bundle: dict[str, Any],
+    search_bundle: dict[str, Any],
     handoff_bundle: dict[str, Any],
     learnings_state: dict[str, Any],
     learnings_snapshot: dict[str, Any],
@@ -1816,6 +1883,8 @@ def _resolve_stage(
     lifecycle_bundle: dict[str, Any],
     autonomy_bundle: dict[str, Any],
 ) -> str:
+    if search_bundle:
+        return "search_reviewed"
     if pulse_bundle:
         return "pulse_reviewed"
     if dojo_bundle:
@@ -1855,6 +1924,15 @@ def _resolve_stage(
 
 
 def _resolve_runtime_stage(root: Path, *, latest_stage: str, last_event_stage: str) -> str | None:
+    if any(
+        (root / filename).exists()
+        for filename in (
+            "search_controller_plan.json",
+            "search_value_report.json",
+            "search_controller_eval_report.json",
+        )
+    ):
+        return "search"
     if any(
         (root / filename).exists()
         for filename in (

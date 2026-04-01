@@ -399,6 +399,7 @@ Shipped artifact names:
 
 - `src/relaytic/workspace/` now owns Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
 - `src/relaytic/iteration/` now owns Slice 12D next-run planning, focus-decision records, and data-expansion candidates
+- `src/relaytic/search/` now owns Slice 13 search-controller plans, portfolio search traces, HPO campaign reports, execution-strategy selection, and explicit value-of-search artifacts
 
 Existing Slice 12C handoff and learnings commands remain part of the public compatibility surface. Under Slice 12D they now behave as compatibility-preserving views over workspace-backed truth rather than isolated per-run truth sources.
 
@@ -413,6 +414,18 @@ Current Slice 12D artifact names:
 - `next_run_plan.json`
 - `focus_decision_record.json`
 - `data_expansion_candidates.json`
+- `search_controller_plan.json`
+- `portfolio_search_trace.json`
+- `hpo_campaign_report.json`
+- `search_decision_ledger.json`
+- `execution_backend_profile.json`
+- `device_allocation.json`
+- `distributed_run_plan.json`
+- `scheduler_job_map.json`
+- `checkpoint_state.json`
+- `execution_strategy_report.json`
+- `search_value_report.json`
+- `search_controller_eval_report.json`
 
 ## Reserved Future Boundaries
 
@@ -422,10 +435,6 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Reserved future artifact names:
-- `hpo_campaign_report.json`
-- `search_decision_ledger.json`
-- `search_value_report.json`
-- `search_controller_eval_report.json`
 - `branch_dag.json`
 - `confidence_map.json`
 - `change_attribution_report.json`

@@ -24,6 +24,8 @@ def test_streamable_http_mcp_smoke_is_ok() -> None:
 def test_interoperability_specs_include_trace_eval_handoff_and_learnings_tools() -> None:
     names = {spec.name for spec in build_interoperability_tool_specs()}
     assert {
+        "relaytic_show_search",
+        "relaytic_review_search",
         "relaytic_show_trace",
         "relaytic_replay_trace",
         "relaytic_run_agent_evals",
@@ -135,6 +137,26 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         workspace_payload = _structured_payload(workspace_result)
                         assert workspace_payload["surface_payload"]["status"] == "ok"
                         assert workspace_payload["surface_payload"]["workspace"]["workspace_state"]["workspace_id"] is not None
+
+                        search_review_result = await session.call_tool(
+                            "relaytic_review_search",
+                            {"run_dir": str(run_dir), "overwrite": True},
+                        )
+                        search_review_payload = _structured_payload(search_review_result)
+                        assert search_review_payload["surface_payload"]["status"] == "ok"
+                        assert search_review_payload["surface_payload"]["search"]["recommended_action"] is not None
+
+                        search_show_result = await session.call_tool(
+                            "relaytic_show_search",
+                            {"run_dir": str(run_dir)},
+                        )
+                        search_show_payload = _structured_payload(search_show_result)
+                        assert search_show_payload["surface_payload"]["status"] == "ok"
+                        assert search_show_payload["surface_payload"]["search"]["value_band"] in {
+                            "low",
+                            "medium",
+                            "high",
+                        }
 
                         continue_result = await session.call_tool(
                             "relaytic_continue_workspace",

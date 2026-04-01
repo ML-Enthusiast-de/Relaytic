@@ -8,11 +8,13 @@ from relaytic.interoperability import (
     relaytic_reset_learnings,
     relaytic_run,
     relaytic_run_agent_evals,
+    relaytic_review_search,
     relaytic_server_info,
     relaytic_show_agent_evals,
     relaytic_show_handoff,
     relaytic_show_learnings,
     relaytic_show_mission_control,
+    relaytic_show_search,
     relaytic_show_trace,
     relaytic_show_workspace,
     relaytic_set_next_run_focus,
@@ -73,6 +75,14 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     assert workspace_payload["surface_payload"]["status"] == "ok"
     assert workspace_payload["surface_payload"]["workspace"]["workspace_state"]["workspace_id"] is not None
     assert workspace_payload["surface_payload"]["result_contract"]["result_contract"]["status"] is not None
+
+    search_review_payload = relaytic_review_search(run_dir=str(run_dir), overwrite=True)
+    assert search_review_payload["surface_payload"]["status"] == "ok"
+    assert search_review_payload["surface_payload"]["search"]["recommended_action"] is not None
+
+    search_show_payload = relaytic_show_search(run_dir=str(run_dir))
+    assert search_show_payload["surface_payload"]["status"] == "ok"
+    assert search_show_payload["surface_payload"]["search"]["value_band"] in {"low", "medium", "high"}
 
     continue_payload = relaytic_continue_workspace(
         run_dir=str(run_dir),

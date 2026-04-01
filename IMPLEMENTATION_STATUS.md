@@ -4,12 +4,13 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 12D, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, and Slice 12D workspace-first continuity plus result contracts and iteration planning
-- next recommended slice: 13, search controller, accelerated execution, and distributed local experimentation
+- completed slices: 00 through 13, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, and Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting
+- next recommended slice: 14, real-world feasibility, domain constraints, and action boundaries
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - latest handoff-and-learnings slice: 12D, workspace-first continuity, result contracts, governed learnings migration, and explicit iteration planning
-- next workspace-and-iteration follow-on after 12D: 13, search controller, accelerated execution, and distributed local experimentation
-- next scale-and-search follow-on after 12D: 13, search controller, accelerated execution, and distributed local experimentation
+- latest workspace-and-search slice: 13, search controller, bounded branch widening, and execution-strategy selection
+- next workspace-and-iteration follow-on after 13: 14, real-world feasibility, domain constraints, and action boundaries
+- next scale-and-search follow-on after 13: 14, real-world feasibility, domain constraints, and action boundaries
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 - canonical future product-contract pack written under `docs/specs/` for workspace lifecycle, result contracts, governed learnings, mission-control behavior, compatibility migration, testing/proof burden, and flagship demos
@@ -454,8 +455,8 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-With Slice 11G, Slice 12, Slice 12A, and Slice 12B now landed, the next high-leverage frontier follow-ons are:
+With Slice 13 now landed, the next high-leverage frontier follow-ons are:
 
-- Slice 13 search-controller depth, accelerated execution, and distributed local experimentation under explicit value and budget contracts
-- richer long-term memory compaction, pinning, and replay rules that build on the shipped causal, dojo, and pulse-maintenance ledgers
-- later Slice 15 remote connector adapters for Kafka-style streams, object-store Parquet, and warehouse reads, but only through read-only materialization into immutable run-local snapshots
+- Slice 14 real-world feasibility, domain constraints, and action boundaries so Relaytic can explain when a statistically strong route is still operationally wrong
+- richer long-term memory compaction, pinning, and replay rules that keep the shipped workspace/result-contract/search-controller loop durable across longer investigations
+- later Slice 15 mission-control expansion, flagship demos, and human-factors proof so the recruiter-facing MVP reads as polished software rather than a strong terminal prototype

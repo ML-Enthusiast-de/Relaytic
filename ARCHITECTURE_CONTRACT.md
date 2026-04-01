@@ -51,11 +51,12 @@ Current canonical boundaries:
 - `src/relaytic/evals/` owns Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
 - `src/relaytic/handoff/` owns Slice 12C differentiated post-run handoff generation, next-run options, persisted next-run focus, and differentiated report rendering for humans and external agents
 - `src/relaytic/learnings/` owns Slice 12C durable local learnings state, learnings markdown, per-run learnings snapshots, and workspace learnings reset behavior
+- `src/relaytic/workspace/` owns Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
+- `src/relaytic/iteration/` owns Slice 12D next-run planning, focus-decision records, data-expansion candidates, and workspace continuation decisions
+- `src/relaytic/search/` owns Slice 13 search-controller plans, portfolio search traces, HPO campaign reports, bounded branch widening/pruning, execution-backend selection, checkpoint posture, and explicit value-of-search evaluation artifacts
 
 Reserved future boundaries:
 
-- `src/relaytic/workspace/` owns Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
-- `src/relaytic/iteration/` owns Slice 12D next-run planning, focus-decision records, data-expansion candidates, and workspace continuation decisions
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.

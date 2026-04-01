@@ -1133,6 +1133,7 @@ def _build_cards(
     decision_lab = dict(summary_payload.get("decision_lab", {}))
     dojo = dict(summary_payload.get("dojo", {}))
     pulse = dict(summary_payload.get("pulse", {}))
+    search = dict(summary_payload.get("search", {}))
     trace_state = dict(summary_payload.get("trace", {}))
     evals = dict(summary_payload.get("evals", {}))
     handoff = dict(summary_payload.get("handoff", {}))
@@ -1256,6 +1257,17 @@ def _build_cards(
                 f" | action `{result_contract.get('recommended_action') or 'unknown'}`"
             ),
             "severity": "medium" if _clean_text(result_contract.get("review_need")) == "required" else "normal",
+        },
+        {
+            "card_id": "search_controller",
+            "title": "Search Controller",
+            "value": _clean_text(search.get("recommended_action")) or _clean_text(search.get("status")) or "not_materialized",
+            "detail": (
+                f"Value `{search.get('value_band') or 'unknown'}`"
+                f" | trials `{search.get('planned_trial_count', 0)}`"
+                f" | direction `{search.get('recommended_direction') or 'unknown'}`"
+            ),
+            "severity": "medium" if bool(search.get("stop_search_explicit")) else "normal",
         },
         {
             "card_id": "assist_control",
@@ -2208,6 +2220,7 @@ def _build_control_center_layout(
         {"panel_id": "learnings", "title": "Durable cross-run learnings that can be reviewed or reset deliberately"},
         {"panel_id": "workspace", "title": "Workspace continuity, lineage, and current focus"},
         {"panel_id": "result_contract", "title": "Machine-stable beliefs, confidence posture, and belief-revision triggers"},
+        {"panel_id": "search_controller", "title": "Search value, bounded branch widening, and execution strategy"},
         {"panel_id": "next_run_plan", "title": "Explicit same-data, add-data, or new-dataset continuation planning"},
         {"panel_id": "dojo", "title": "Guarded self-improvement, promotions, and rollback state"},
         {"panel_id": "review_queue", "title": "Queued blocking and follow-up items"},

@@ -36,6 +36,7 @@ def sync_iteration_from_run(
     belief_revision_triggers: dict[str, Any],
     summary_payload: dict[str, Any],
     handoff_bundle: dict[str, Any] | None = None,
+    search_bundle: dict[str, Any] | None = None,
     policy: dict[str, Any] | None = None,
 ) -> IterationSyncResult:
     """Create the explicit next-run plan for the current workspace."""
@@ -44,16 +45,32 @@ def sync_iteration_from_run(
     controls = build_iteration_controls_from_policy(policy)
     handoff_payload = (handoff_bundle or {}).get("next_run_focus", {})
     run_handoff_payload = (handoff_bundle or {}).get("run_handoff", {})
+    search_value_payload = (search_bundle or {}).get("search_value_report", {})
     handoff = dict(handoff_payload) if isinstance(handoff_payload, dict) else {}
     run_handoff = dict(run_handoff_payload) if isinstance(run_handoff_payload, dict) else {}
+    search_value = dict(search_value_payload) if isinstance(search_value_payload, dict) else {}
     next_move = dict(result_contract.get("recommended_next_move", {}))
     direction = _clean_text(handoff.get("selection_id")) or _clean_text(next_move.get("direction")) or _clean_text(run_handoff.get("recommended_option_id")) or "same_data"
     action = _clean_text(next_move.get("action")) or "search_more"
+    source = _clean_text(handoff.get("source")) or "relaytic_result_contract"
     triggers = [dict(item) for item in belief_revision_triggers.get("triggers", []) if isinstance(item, dict)]
     decision_lab = dict(summary_payload.get("decision_lab", {}))
     benchmark = dict(summary_payload.get("benchmark", {}))
     workspace_id = _clean_text(workspace_state.get("workspace_id")) or "workspace_unknown"
     run_id = _clean_text(summary_payload.get("run_id")) or root.name or "run"
+    search_direction = _clean_text(search_value.get("recommended_direction"))
+    search_action = _clean_text(search_value.get("recommended_action"))
+    search_override = bool(search_value) and (
+        bool(search_value.get("stop_search_explicit"))
+        or search_direction in {"add_data", "new_dataset"}
+    )
+    if search_override:
+        direction = search_direction or direction
+        action = search_action or action
+        source = "relaytic_search_controller"
+    primary_reason = _primary_reason(direction=direction, action=action, summary_payload=summary_payload)
+    if search_override:
+        primary_reason = _clean_text(search_value.get("summary")) or primary_reason
 
     next_run_plan = NextRunPlanArtifact(
         schema_version=NEXT_RUN_PLAN_SCHEMA_VERSION,
@@ -63,7 +80,7 @@ def sync_iteration_from_run(
         workspace_id=workspace_id,
         run_id=run_id,
         recommended_direction=direction,
-        primary_reason=_primary_reason(direction=direction, action=action, summary_payload=summary_payload),
+        primary_reason=primary_reason,
         secondary_actions=_secondary_actions(direction=direction, action=action, benchmark=benchmark, decision_lab=decision_lab),
         confidence=_clean_text(next_move.get("confidence")) or "medium",
         why_not_the_other_paths=dict(result_contract.get("why_not_other_moves", {})),
@@ -80,7 +97,7 @@ def sync_iteration_from_run(
         workspace_id=workspace_id,
         run_id=run_id,
         selected_direction=direction,
-        source=_clean_text(handoff.get("source")) or "relaytic_result_contract",
+        source=source,
         actor_type=_clean_text(handoff.get("actor_type")) or "relaytic",
         actor_name=_clean_text(handoff.get("actor_name")),
         notes=_clean_text(handoff.get("notes")),

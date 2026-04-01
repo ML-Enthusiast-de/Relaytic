@@ -131,7 +131,7 @@ def run_pyod_anomaly_challenger(
     train = working.iloc[split.train_indices].reset_index(drop=True)
     validation = working.iloc[split.validation_indices].reset_index(drop=True)
     test = working.iloc[split.test_indices].reset_index(drop=True)
-    fill_values = {column: float(train[column].median(skipna=True)) for column in feature_columns}
+    fill_values = {column: _safe_numeric_fill_value(train[column]) for column in feature_columns}
     for bundle in (train, validation, test):
         for column in feature_columns:
             bundle[column] = bundle[column].fillna(fill_values[column])
@@ -252,6 +252,13 @@ def _score_probabilities(scores: np.ndarray) -> np.ndarray:
         positive = (scores - low) / (high - low)
     negative = 1.0 - positive
     return np.column_stack([negative, positive])
+
+
+def _safe_numeric_fill_value(series: pd.Series) -> float:
+    numeric = pd.to_numeric(series, errors="coerce")
+    if numeric.notna().any():
+        return float(numeric.median(skipna=True))
+    return 0.0
 
 
 def self_check_pyod() -> dict[str, Any]:

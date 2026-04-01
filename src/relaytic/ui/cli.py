@@ -2225,6 +2225,41 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    search_surface = sub.add_parser(
+        "search",
+        help="Run or inspect Slice 13 search-controller artifacts.",
+    )
+    search_sub = search_surface.add_subparsers(dest="search_command", required=True)
+
+    search_review = search_sub.add_parser(
+        "review",
+        help="Execute the Slice 13 search-controller review for an existing run.",
+    )
+    search_review.add_argument("--run-dir", required=True, help="Run directory for search-controller artifacts.")
+    search_review.add_argument("--config", default=None, help="Optional config/policy source.")
+    search_review.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    search_review.add_argument("--overwrite", action="store_true", help="Allow overwriting existing search-controller artifacts.")
+    search_review.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    search_review.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    search_show = search_sub.add_parser(
+        "show",
+        help="Render the current Slice 13 search-controller review for a run.",
+    )
+    search_show.add_argument("--run-dir", required=True, help="Run directory containing search-controller artifacts.")
+    search_show.add_argument("--config", default=None, help="Optional config/policy source if artifacts must be materialized.")
+    search_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     plan = sub.add_parser(
         "plan",
         help="Create Slice 05 planning artifacts and execute the first deterministic route.",
@@ -2530,6 +2565,34 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 parser.error("Unsupported workspace subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "search":
+        try:
+            if args.search_command == "review":
+                    payload = _run_search_phase(
+                        run_dir=args.run_dir,
+                        config_path=args.config,
+                        run_id=args.run_id,
+                        overwrite=args.overwrite,
+                        labels=_parse_key_value_pairs(args.label),
+                    )
+            elif args.search_command == "show":
+                payload = _show_search_surface(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                )
+            else:
+                parser.error("Unsupported search subcommand.")
                 return 2
         except ValueError as exc:
             parser.error(str(exc))
@@ -4559,6 +4622,136 @@ def _show_workspace_surface(*, run_dir: str | Path) -> dict[str, Any]:
             "next_run_plan": next_run_plan if isinstance(next_run_plan, dict) else {},
         },
         "human_output": human_output,
+    }
+
+
+def _materialize_search_bundle(*, run_dir: Path, config_path: str | None) -> tuple[dict[str, Any], dict[str, Any], str | Path]:
+    from relaytic.search import run_search_review, write_search_bundle
+
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=run_dir,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    effective_policy_source: str | Path = foundation_state["policy_path"]
+    if config_path:
+        resolved_override = load_policy(config_path)
+        effective_policy = resolved_override.policy
+        effective_policy_source = config_path
+    search_result = run_search_review(run_dir=run_dir, policy=effective_policy)
+    written = write_search_bundle(run_dir, bundle=search_result.bundle)
+    return search_result.bundle.to_dict(), written, effective_policy_source
+
+
+def _run_search_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+    runtime_surface: str = "cli",
+    runtime_command: str = "relaytic search review",
+) -> dict[str, Any]:
+    from relaytic.search import run_search_review, write_search_bundle
+
+    root = Path(run_dir)
+    targets = _search_output_paths(root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=run_id,
+        labels=labels,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    effective_policy_source: str | Path = foundation_state["policy_path"]
+    if config_path:
+        resolved_override = load_policy(config_path)
+        effective_policy = resolved_override.policy
+        effective_policy_source = config_path
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=effective_policy,
+        stage="search",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "run_summary.json",
+            "result_contract.json",
+            "next_run_plan.json",
+            "budget_contract.json",
+            "beat_target_contract.json",
+            "trace_model.json",
+        ],
+    )
+    try:
+        search_result = run_search_review(run_dir=root, policy=effective_policy)
+        written = write_search_bundle(root, bundle=search_result.bundle)
+        manifest_path = _refresh_search_manifest(
+            root,
+            run_id=run_id,
+            policy_source=effective_policy_source,
+            labels=labels,
+        )
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=effective_policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic scored the value of more search, widened or pruned the challenger frontier, selected a bounded execution strategy, and recorded explicit proof artifacts for the chosen search posture.",
+        )
+        summary_bundle = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        surface_search = dict(summary_bundle["summary"].get("search", {}))
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "search": surface_search,
+                "bundle": search_result.bundle.to_dict(),
+                "run_summary": summary_bundle["summary"],
+            },
+            "human_output": search_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=effective_policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_search_surface(*, run_dir: str | Path, config_path: str | None = None) -> dict[str, Any]:
+    from relaytic.search import render_search_review_markdown
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="search")
+    effective_policy_source: str | Path | None = None
+    if not bundle or not isinstance(bundle.get("search_controller_plan"), dict) or not bundle.get("search_controller_plan"):
+        bundle, _, effective_policy_source = _materialize_search_bundle(run_dir=root, config_path=config_path)
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_search_manifest(root, policy_source=effective_policy_source)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "summary_path": str(summary_materialized["summary_path"]),
+            "report_path": str(summary_materialized["report_path"]),
+            "search": dict(summary_materialized["summary"].get("search", {})),
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_search_review_markdown(bundle),
     }
 
 
@@ -7130,6 +7323,10 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.evals import read_eval_bundle
 
         return read_eval_bundle(run_dir)
+    if bundle == "search":
+        from relaytic.search import read_search_bundle
+
+        return read_search_bundle(run_dir)
     if bundle == "feedback":
         from relaytic.feedback import read_feedback_bundle
 
@@ -10634,6 +10831,23 @@ def _evals_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _search_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "search_controller_plan": run_dir / "search_controller_plan.json",
+        "portfolio_search_trace": run_dir / "portfolio_search_trace.json",
+        "hpo_campaign_report": run_dir / "hpo_campaign_report.json",
+        "search_decision_ledger": run_dir / "search_decision_ledger.json",
+        "execution_backend_profile": run_dir / "execution_backend_profile.json",
+        "device_allocation": run_dir / "device_allocation.json",
+        "distributed_run_plan": run_dir / "distributed_run_plan.json",
+        "scheduler_job_map": run_dir / "scheduler_job_map.json",
+        "checkpoint_state": run_dir / "checkpoint_state.json",
+        "execution_strategy_report": run_dir / "execution_strategy_report.json",
+        "search_value_report": run_dir / "search_value_report.json",
+        "search_controller_eval_report": run_dir / "search_controller_eval_report.json",
+    }
+
+
 def _feedback_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "feedback_intake": run_dir / "feedback_intake.json",
@@ -10780,6 +10994,18 @@ def _access_surface_output_paths(run_dir: Path) -> dict[str, Path]:
         "next_run_plan": workspace_dir / "next_run_plan.json",
         "focus_decision_record": run_dir / "focus_decision_record.json",
         "data_expansion_candidates": run_dir / "data_expansion_candidates.json",
+        "search_controller_plan": run_dir / "search_controller_plan.json",
+        "portfolio_search_trace": run_dir / "portfolio_search_trace.json",
+        "hpo_campaign_report": run_dir / "hpo_campaign_report.json",
+        "search_decision_ledger": run_dir / "search_decision_ledger.json",
+        "execution_backend_profile": run_dir / "execution_backend_profile.json",
+        "device_allocation": run_dir / "device_allocation.json",
+        "distributed_run_plan": run_dir / "distributed_run_plan.json",
+        "scheduler_job_map": run_dir / "scheduler_job_map.json",
+        "checkpoint_state": run_dir / "checkpoint_state.json",
+        "execution_strategy_report": run_dir / "execution_strategy_report.json",
+        "search_value_report": run_dir / "search_value_report.json",
+        "search_controller_eval_report": run_dir / "search_controller_eval_report.json",
     }
 
 
@@ -12129,6 +12355,57 @@ def _refresh_evals_manifest(
     for path in _evals_output_paths(root).values():
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="evals", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_search_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_evals_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _search_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="search", required=True))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:

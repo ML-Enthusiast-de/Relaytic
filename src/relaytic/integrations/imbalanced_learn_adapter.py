@@ -137,7 +137,7 @@ def run_resampled_logistic_challenger(
     train = working.iloc[split.train_indices].reset_index(drop=True)
     validation = working.iloc[split.validation_indices].reset_index(drop=True)
     test = working.iloc[split.test_indices].reset_index(drop=True)
-    fill_values = {column: float(train[column].median(skipna=True)) for column in feature_columns}
+    fill_values = {column: _safe_numeric_fill_value(train[column]) for column in feature_columns}
     for bundle in (train, validation, test):
         for column in feature_columns:
             bundle[column] = bundle[column].fillna(fill_values[column])
@@ -252,6 +252,13 @@ def _classification_metrics(
         decision_threshold=0.5 if len(class_labels) == 2 else None,
     ).to_dict()
     return {str(key): float(value) for key, value in metrics.items()}
+
+
+def _safe_numeric_fill_value(series: pd.Series) -> float:
+    numeric = pd.to_numeric(series, errors="coerce")
+    if numeric.notna().any():
+        return float(numeric.median(skipna=True))
+    return 0.0
 
 
 def self_check_imbalanced_learn() -> dict[str, Any]:

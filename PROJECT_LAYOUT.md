@@ -173,6 +173,7 @@ Current workspace-first boundaries:
 
 - `src/relaytic/workspace/` owns Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
 - `src/relaytic/iteration/` owns Slice 12D next-run planning, focus-decision records, and data-expansion candidates
+- `src/relaytic/search/` owns Slice 13 search-controller plans, portfolio search traces, HPO campaign reports, execution-backend selection, checkpoint posture, and explicit value-of-search artifacts
 
 Reserved future boundaries:
 
