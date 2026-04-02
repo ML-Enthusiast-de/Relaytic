@@ -267,6 +267,7 @@ class OnboardingChatSessionState:
     incumbent_path: str | None
     incumbent_path_exists: bool | None
     suggested_run_dir: str | None
+    suggested_run_dir_reason: str | None
     ready_to_start_run: bool
     created_run_dir: str | None
     last_analysis_report_path: str | None

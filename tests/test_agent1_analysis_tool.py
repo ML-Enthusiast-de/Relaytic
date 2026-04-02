@@ -1,5 +1,7 @@
 ﻿from pathlib import Path
 
+import warnings
+
 from relaytic.orchestration.default_tools import build_default_registry
 
 
@@ -205,4 +207,53 @@ def test_run_agent1_analysis_respects_user_preprocessing_when_strategy_search_en
         "drop_rows_drop_sparse",
         "keep_keep",
     }
+
+
+def test_run_agent1_analysis_tool_does_not_emit_pct_change_future_warning(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    csv_path = tmp_path / "pct_change_warning_guard.csv"
+    csv_path.write_text(
+        "\n".join(
+            [
+                "time,sensor_a,sensor_b,target",
+                "0,1.0,10.0,2.0",
+                "1,1.2,,2.3",
+                "2,1.4,10.8,2.7",
+                "3,,11.2,3.0",
+                "4,1.9,11.5,3.6",
+                "5,2.2,,4.1",
+                "6,2.5,12.1,4.8",
+                "7,2.8,12.6,5.3",
+                "8,,13.0,6.0",
+                "9,3.5,13.5,6.9",
+                "10,3.9,13.9,7.8",
+                "11,4.2,,8.4",
+                "12,4.6,14.7,9.1",
+                "13,5.0,15.0,9.9",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    registry = build_default_registry()
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "error",
+            message=r".*fill_method='pad' in Series.pct_change is deprecated.*",
+            category=FutureWarning,
+        )
+        result = registry.execute(
+            "run_agent1_analysis",
+            {
+                "data_path": str(csv_path),
+                "timestamp_column": "time",
+                "target_signals": ["target"],
+                "save_report": False,
+            },
+        )
+
+    assert result.status == "ok"
+    assert result.output["status"] == "ok"
 

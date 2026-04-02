@@ -5644,11 +5644,28 @@ def _run_adaptive_onboarding_turn(
     session_state.setdefault("status", "ready")
     session_state.setdefault("current_phase", "need_data")
     session_state.setdefault("suggested_run_dir", _suggested_onboarding_run_dir(policy=policy))
+    session_state.setdefault("suggested_run_dir_reason", None)
     session_state.setdefault("next_expected_input", "dataset path")
     session_state.setdefault("turn_count", 0)
     configured_run_dir = _suggested_onboarding_run_dir(policy=policy)
     if _clean_text(session_state.get("suggested_run_dir")) in {None, "artifacts/demo", r"artifacts\demo"}:
         session_state["suggested_run_dir"] = configured_run_dir
+    previous_suggested_run_dir = _clean_text(session_state.get("suggested_run_dir"))
+    previous_suggested_run_dir_reason = _clean_text(session_state.get("suggested_run_dir_reason"))
+    safe_run_dir, safe_reason = _resolve_safe_onboarding_run_dir(
+        suggested_run_dir=previous_suggested_run_dir or configured_run_dir,
+        state_root=state_root,
+    )
+    if (
+        safe_reason is None
+        and previous_suggested_run_dir_reason
+        and previous_suggested_run_dir
+        and previous_suggested_run_dir == safe_run_dir
+        and previous_suggested_run_dir != configured_run_dir
+    ):
+        safe_reason = previous_suggested_run_dir_reason
+    session_state["suggested_run_dir"] = safe_run_dir
+    session_state["suggested_run_dir_reason"] = safe_reason
     session_state["turn_count"] = int(session_state.get("turn_count", 0) or 0) + 1
     session_state["last_user_message"] = message
 
@@ -5892,7 +5909,12 @@ def _run_adaptive_onboarding_turn(
                 f"I have both the data and the objective. Dataset: `{session_state['detected_data_path']}`. "
                 f"Objective: `{session_state['detected_objective']}`. "
                 f"Objective family: `{objective_family}`. "
-                f"I’ll use run directory `{session_state['suggested_run_dir']}` unless you want a different one. "
+                + (
+                    f"The default run folder was already in use because {session_state['suggested_run_dir_reason']}, "
+                    f"so I’ll create the governed run in `{session_state['suggested_run_dir']}` instead. "
+                    if _clean_text(session_state.get("suggested_run_dir_reason"))
+                    else f"I’ll use run directory `{session_state['suggested_run_dir']}` unless you want a different one. "
+                )
                 + (
                     f"Say `yes`, `start`, or `go` when you want me to create the run.{extra}"
                     if confirmation_required
@@ -6459,6 +6481,68 @@ def _looks_like_state_request(message: str) -> bool:
     return normalized in {"/state", "state", "what do you have", "what have you captured", "show state"}
 
 
+def _paths_equivalent(left: Path, right: Path) -> bool:
+    try:
+        return left.resolve(strict=False) == right.resolve(strict=False)
+    except OSError:
+        return str(left.absolute()) == str(right.absolute())
+
+
+def _contains_onboarding_or_mission_control_state(path: Path) -> bool:
+    if not path.exists() or not path.is_dir():
+        return False
+    state_filenames = {
+        "assist_session_state.json",
+        "mission_control_state.json",
+        "review_queue_state.json",
+        "control_center_layout.json",
+        "onboarding_status.json",
+        "onboarding_chat_session_state.json",
+        "install_experience_report.json",
+        "launch_manifest.json",
+        "demo_session_manifest.json",
+        "ui_preferences.json",
+    }
+    if any((path / filename).exists() for filename in state_filenames):
+        return True
+    return (path / "reports" / "mission_control.html").exists()
+
+
+def _next_available_onboarding_run_dir(*, preferred: Path, state_root: Path) -> Path:
+    base_candidate = preferred.parent / f"{preferred.name}_run"
+    candidate = base_candidate
+    index = 2
+    while _paths_equivalent(candidate, state_root) or candidate.exists():
+        candidate = preferred.parent / f"{base_candidate.name}_{index}"
+        index += 1
+    return candidate
+
+
+def _resolve_safe_onboarding_run_dir(
+    *,
+    suggested_run_dir: str | Path,
+    state_root: Path,
+) -> tuple[str, str | None]:
+    preferred = Path(suggested_run_dir).expanduser()
+    reason: str | None = None
+    if _paths_equivalent(preferred, state_root):
+        reason = "the current mission-control folder is already storing onboarding state"
+    elif preferred.exists() and preferred.is_file():
+        reason = "that path already exists as a file"
+    elif _contains_onboarding_or_mission_control_state(preferred):
+        reason = "that folder is already storing onboarding or mission-control state"
+    elif preferred.exists() and preferred.is_dir():
+        try:
+            has_any_contents = any(preferred.iterdir())
+        except OSError:
+            has_any_contents = True
+        if has_any_contents:
+            reason = "that folder already contains existing artifacts"
+    if reason is None:
+        return str(preferred), None
+    return str(_next_available_onboarding_run_dir(preferred=preferred, state_root=state_root)), reason
+
+
 def _suggested_onboarding_run_dir(*, policy: dict[str, Any]) -> str:
     communication_cfg = dict(policy.get("communication", {}))
     configured = _clean_text(communication_cfg.get("adaptive_onboarding_default_run_dir"))
@@ -6478,6 +6562,7 @@ def _fresh_onboarding_chat_session_state(*, policy: dict[str, Any]) -> dict[str,
         "incumbent_path": None,
         "incumbent_path_exists": None,
         "suggested_run_dir": _suggested_onboarding_run_dir(policy=policy),
+        "suggested_run_dir_reason": None,
         "ready_to_start_run": False,
         "created_run_dir": None,
         "last_analysis_report_path": None,
@@ -6531,6 +6616,7 @@ def _render_onboarding_state_response(*, session_state: dict[str, Any]) -> str:
     objective_family = _clean_text(session_state.get("objective_family")) or "none yet"
     next_expected = _clean_text(session_state.get("next_expected_input")) or "dataset path or objective"
     suggested_run_dir = _clean_text(session_state.get("suggested_run_dir")) or r"artifacts\demo"
+    suggested_run_dir_reason = _clean_text(session_state.get("suggested_run_dir_reason"))
     analysis_summary = _clean_text(session_state.get("last_analysis_summary"))
     return (
         f"So far I have data path `{data_path}`, objective `{objective}`, and objective family `{objective_family}`. "
@@ -6540,7 +6626,11 @@ def _render_onboarding_state_response(*, session_state: dict[str, Any]) -> str:
             if analysis_summary
             else ""
         )
-        + f"If we get to the governed run path, I’ll use run directory `{suggested_run_dir}` unless you want a different one."
+        + (
+            f"The default run folder was already in use because {suggested_run_dir_reason}, so I’ll create the governed run in `{suggested_run_dir}` unless you want a different one."
+            if suggested_run_dir_reason
+            else f"If we get to the governed run path, I’ll use run directory `{suggested_run_dir}` unless you want a different one."
+        )
     )
 
 

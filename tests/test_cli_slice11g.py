@@ -480,3 +480,59 @@ def test_cli_mission_control_chat_runs_direct_analysis_for_analysis_first_object
     assert session["created_run_dir"] is None
     assert session["last_analysis_report_path"] == str(tmp_path / "reports" / "agent1_analysis.md")
     assert "Top candidate signals" in str(session["last_analysis_summary"])
+
+
+def test_cli_mission_control_chat_switches_from_analysis_to_governed_run_without_reusing_onboarding_root(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    shared_root = tmp_path / "shared_demo"
+    data_path = _write_small_fraud_dataset(tmp_path / "analysis_then_model.csv")
+    config_path = tmp_path / "analysis_then_model_config.yaml"
+    config_path.write_text(
+        "\n".join(
+            [
+                "communication:",
+                f"  adaptive_onboarding_default_run_dir: {shared_root.as_posix()}",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    prompts = iter(
+        [
+            str(data_path),
+            "quick analysis",
+            "I want you to build a model for the output fraud_flag",
+            "go",
+        ]
+    )
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(prompts))
+
+    assert main(
+        [
+            "mission-control",
+            "chat",
+            "--output-dir",
+            str(shared_root),
+            "--config",
+            str(config_path),
+            "--expected-profile",
+            "full",
+            "--max-turns",
+            "4",
+        ]
+    ) == 0
+    output = capsys.readouterr().out
+    session = json.loads((shared_root / "onboarding_chat_session_state.json").read_text(encoding="utf-8"))
+    created_run_dir = Path(str(session["created_run_dir"]))
+    summary = json.loads((created_run_dir / "run_summary.json").read_text(encoding="utf-8"))
+
+    assert "I ran a direct analysis-first pass" in output
+    assert "The default run folder was already in use because" in output
+    assert "I've started a governed run" in output
+    assert created_run_dir != shared_root
+    assert created_run_dir.exists()
+    assert summary["decision"]["target_column"] == "fraud_flag"
+    assert (shared_root / "mission_control_state.json").exists()
+    assert (created_run_dir / "intake_record.json").exists()

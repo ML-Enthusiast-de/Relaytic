@@ -500,7 +500,7 @@ def _univariate_transforms(
         ("square", np.square(series)),
         ("sqrt_abs", np.sqrt(np.abs(series))),
         ("inverse", 1.0 / (series + eps)),
-        ("pct_change", series.pct_change()),
+        ("pct_change", series.pct_change(fill_method=None)),
     ]
     if data_mode == "time_series":
         transforms.append(("delta", series.diff()))
