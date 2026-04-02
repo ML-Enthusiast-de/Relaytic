@@ -10,6 +10,7 @@ from typing import Any
 
 from relaytic.integrations import build_integration_self_check_report
 from relaytic.interoperability import build_interoperability_self_check_report
+from relaytic.release_safety import latest_release_safety_state_dir, read_release_safety_bundle
 
 
 DOCTOR_SCHEMA_VERSION = "relaytic.doctor_report.v1"
@@ -63,6 +64,11 @@ def build_doctor_report(*, expected_profile: str = "core") -> dict[str, Any]:
         relaytic_version = metadata.version("relaytic")
     except metadata.PackageNotFoundError:
         relaytic_version = None
+    release_safety = _build_release_safety_posture()
+    if str(release_safety.get("status", "")).strip() == "error":
+        warnings.append("release_safety")
+        if status != "error":
+            status = "warn"
     return {
         "schema_version": DOCTOR_SCHEMA_VERSION,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
@@ -85,6 +91,7 @@ def build_doctor_report(*, expected_profile: str = "core") -> dict[str, Any]:
         "profile_dependencies": extras,
         "integration_self_check": integration_report,
         "interoperability_self_check": interoperability_report,
+        "release_safety": release_safety,
         "blocking_issues": blocking_issues,
         "warnings": warnings,
     }
@@ -126,6 +133,12 @@ def render_doctor_markdown(report: dict[str, Any]) -> str:
         if mcp_sdk:
             lines.append(f"- MCP SDK installed: `{mcp_sdk.get('installed')}`")
             lines.append(f"- MCP SDK compatible: `{mcp_sdk.get('compatible')}`")
+    release_safety = dict(report.get("release_safety", {}))
+    if release_safety:
+        lines.extend(["", "## Release Safety"])
+        lines.append(f"- Status: `{release_safety.get('status', 'not_run')}`")
+        lines.append(f"- Ship readiness: `{release_safety.get('ship_readiness', 'unknown')}`")
+        lines.append(f"- State directory: `{release_safety.get('state_dir', '')}`")
     blocking = list(report.get("blocking_issues", []))
     warnings = [str(item) for item in report.get("warnings", []) if str(item).strip()]
     if blocking:
@@ -161,3 +174,24 @@ def _render_dep_line(item: dict[str, Any]) -> str:
         f"- `{item.get('package_name', 'unknown')}`: `{item.get('status', 'unknown')}`"
         + (f" (`{item.get('version')}`)" if item.get("version") else "")
     )
+
+
+def _build_release_safety_posture() -> dict[str, Any]:
+    state_dir = latest_release_safety_state_dir()
+    bundle = read_release_safety_bundle(state_dir)
+    scan = dict(bundle.get("release_safety_scan", {}))
+    if not scan:
+        return {
+            "status": "not_run",
+            "ship_readiness": "unknown",
+            "state_dir": str(state_dir),
+            "message": "Run `relaytic release-safety scan` before publishing or demo packaging.",
+        }
+    return {
+        "status": scan.get("status", "unknown"),
+        "ship_readiness": scan.get("ship_readiness", "unknown"),
+        "state_dir": scan.get("state_dir", str(state_dir)),
+        "safe_to_ship": scan.get("safe_to_ship"),
+        "finding_count": scan.get("finding_count", 0),
+        "target_path": scan.get("target_path"),
+    }

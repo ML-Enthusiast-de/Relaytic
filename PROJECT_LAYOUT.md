@@ -177,7 +177,7 @@ Current workspace-first boundaries:
 
 Reserved future boundaries:
 
-- `src/relaytic/release_safety/` should own release-bundle scanning, attestation, and packaging-discipline work after Slice 13
+- `src/relaytic/release_safety/` owns Slice 13A release-bundle scanning, workspace-only pre-release scans, artifact attestation, source-map and sensitive-string audits, distribution-manifest capture, and packaging-regression reporting
 - `src/relaytic/events/` should own typed runtime-event schemas and subscription registries for later event-bus work
 - `src/relaytic/permissions/` should own visible permission modes, tool-permission matrices, approval-policy reporting, and permission-decision logs
 - `src/relaytic/daemon/` should own bounded background-job orchestration, resumable jobs, and memory-maintenance queues

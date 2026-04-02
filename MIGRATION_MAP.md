@@ -431,7 +431,6 @@ Current Slice 12D artifact names:
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
-- `src/relaytic/release_safety/` for Slice 13A release-bundle scanning, artifact attestation, source-map auditing, and packaging-discipline reporting
 - `src/relaytic/events/` for Slice 13B typed runtime-event schemas, subscription registries, and event-delivery contracts on top of the existing runtime event stream
 - `src/relaytic/permissions/` for Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, and permission-decision logs
 - `src/relaytic/daemon/` for Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, and memory-maintenance queues
@@ -439,10 +438,17 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
 - `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
-Reserved future artifact names:
+Implemented release-safety artifact names:
 - `release_safety_scan.json`
 - `distribution_manifest.json`
 - `artifact_inventory.json`
+- `artifact_attestation.json`
+- `source_map_audit.json`
+- `sensitive_string_audit.json`
+- `release_bundle_report.json`
+- `packaging_regression_report.json`
+
+Reserved future artifact names:
 - `artifact_attestation.json`
 - `source_map_audit.json`
 - `sensitive_string_audit.json`

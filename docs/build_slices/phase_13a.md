@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 Intended package boundaries:
 

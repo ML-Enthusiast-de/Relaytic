@@ -109,6 +109,22 @@ def relaytic_show_search(*, run_dir: str, config_path: str | None = None) -> dic
     return cli._show_search_surface(run_dir=run_dir, config_path=config_path)
 
 
+def relaytic_scan_release_safety(
+    *,
+    target_path: str | None = None,
+    state_dir: str | None = None,
+) -> dict[str, Any]:
+    """Execute the Slice 13A release-safety scan for a bundle or the tracked workspace."""
+    cli = _cli()
+    return cli._run_release_safety_scan_surface(target_path=target_path, state_dir=state_dir)
+
+
+def relaytic_show_release_safety(*, state_dir: str | None = None) -> dict[str, Any]:
+    """Render the current Slice 13A release-safety bundle from a state directory."""
+    cli = _cli()
+    return cli._show_release_safety_surface(state_dir=state_dir)
+
+
 def relaytic_show_trace(*, run_dir: str) -> dict[str, Any]:
     """Render the current Slice 12B trace surface for a Relaytic run."""
     cli = _cli()
@@ -704,6 +720,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_workspace",
             "relaytic_show_pulse",
             "relaytic_show_search",
+            "relaytic_show_release_safety",
             "relaytic_show_trace",
             "relaytic_replay_trace",
             "relaytic_show_agent_evals",
@@ -730,6 +747,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_review_decision",
             "relaytic_review_pulse",
             "relaytic_review_search",
+            "relaytic_scan_release_safety",
             "relaytic_run_agent_evals",
             "relaytic_assist_turn",
             "relaytic_set_next_run_focus",
@@ -852,6 +870,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_search,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_release_safety",
+            title="Show Relaytic Release Safety",
+            description="Render the current Slice 13A release-safety attestation, scanned inventory, and packaging-regression posture from a release-safety state directory.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_release_safety,
         ),
         InteropToolSpec(
             name="relaytic_show_trace",
@@ -1044,6 +1070,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_review_search,
+        ),
+        InteropToolSpec(
+            name="relaytic_scan_release_safety",
+            title="Scan Relaytic Release Safety",
+            description="Execute the Slice 13A release-safety scan for a built bundle or the tracked workspace, writing attestation and packaging-regression artifacts.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_scan_release_safety,
         ),
         InteropToolSpec(
             name="relaytic_run_agent_evals",

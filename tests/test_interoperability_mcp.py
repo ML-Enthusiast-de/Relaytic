@@ -25,7 +25,9 @@ def test_interoperability_specs_include_trace_eval_handoff_and_learnings_tools()
     names = {spec.name for spec in build_interoperability_tool_specs()}
     assert {
         "relaytic_show_search",
+        "relaytic_show_release_safety",
         "relaytic_review_search",
+        "relaytic_scan_release_safety",
         "relaytic_show_trace",
         "relaytic_replay_trace",
         "relaytic_run_agent_evals",

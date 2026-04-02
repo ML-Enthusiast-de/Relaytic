@@ -88,6 +88,40 @@ def git_guard_main(argv: list[str] | None = None) -> int:
     return _git_guard_main(argv)
 
 
+def run_release_safety_scan(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.release_safety import run_release_safety_scan as _run_release_safety_scan
+
+    return _run_release_safety_scan(*args, **kwargs)
+
+
+def render_release_safety_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.release_safety import render_release_safety_markdown as _render_release_safety_markdown
+
+    return _render_release_safety_markdown(*args, **kwargs)
+
+
+def read_release_safety_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.release_safety import read_release_safety_bundle as _read_release_safety_bundle
+
+    return _read_release_safety_bundle(*args, **kwargs)
+
+
+def default_release_safety_state_dir(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.release_safety import (
+        default_release_safety_state_dir as _default_release_safety_state_dir,
+    )
+
+    return _default_release_safety_state_dir(*args, **kwargs)
+
+
+def latest_release_safety_state_dir(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.release_safety import (
+        latest_release_safety_state_dir as _latest_release_safety_state_dir,
+    )
+
+    return _latest_release_safety_state_dir(*args, **kwargs)
+
+
 def build_integration_inventory(*args: Any, **kwargs: Any) -> dict[str, Any]:
     from relaytic.integrations import build_integration_inventory as _build_integration_inventory
 
@@ -895,6 +929,49 @@ def build_parser() -> argparse.ArgumentParser:
         "paths",
         nargs="*",
         help="Optional files/directories. If omitted, scans git-tracked files.",
+    )
+
+    release_safety = sub.add_parser(
+        "release-safety",
+        help="Scan a workspace or built bundle for release leaks, package drift, and attestation posture.",
+    )
+    release_safety_sub = release_safety.add_subparsers(dest="release_safety_command", required=True)
+
+    release_safety_scan = release_safety_sub.add_parser(
+        "scan",
+        help="Scan a built bundle or the tracked workspace and write release-safety artifacts plus attestation.",
+    )
+    release_safety_scan.add_argument(
+        "--target-path",
+        default=None,
+        help="Optional built bundle path (file or directory). If omitted, scans git-tracked workspace files in pre-release mode.",
+    )
+    release_safety_scan.add_argument(
+        "--state-dir",
+        default=None,
+        help="Optional output directory for release-safety artifacts. Defaults under artifacts/release_safety/.",
+    )
+    release_safety_scan.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    release_safety_show = release_safety_sub.add_parser(
+        "show",
+        help="Render the current release-safety bundle from a state directory.",
+    )
+    release_safety_show.add_argument(
+        "--state-dir",
+        default=None,
+        help="Optional release-safety artifact directory. Defaults to the latest scan state.",
+    )
+    release_safety_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
     doctor = sub.add_parser(
@@ -2433,8 +2510,42 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "scan-git-safety":
-        passthrough = list(args.paths)
-        return git_guard_main(passthrough)
+        payload = _scan_git_safety_passthrough(paths=args.paths)
+        findings = list(payload["surface_payload"].get("findings", []))
+        if findings:
+            print("Potential leak findings:")
+            for finding in findings:
+                line_number = finding.get("line_number")
+                line_suffix = f":{line_number}" if line_number is not None else ""
+                print(
+                    f"- {finding.get('path', 'unknown')}{line_suffix} "
+                    f"[{finding.get('rule_id', 'unknown')}] {finding.get('excerpt') or finding.get('reason', '')}"
+                )
+            return 1
+        print("No leak patterns detected.")
+        return 0
+
+    if args.command == "release-safety":
+        try:
+            if args.release_safety_command == "scan":
+                payload = _run_release_safety_scan_surface(
+                    target_path=args.target_path,
+                    state_dir=args.state_dir,
+                )
+            elif args.release_safety_command == "show":
+                payload = _show_release_safety_surface(state_dir=args.state_dir)
+            else:
+                parser.error("Unsupported release-safety subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 1 if str(payload["surface_payload"].get("status", "")).strip() == "error" else 0
 
     if args.command == "doctor":
         payload = build_doctor_report(expected_profile=args.expected_profile)
@@ -4752,6 +4863,70 @@ def _show_search_surface(*, run_dir: str | Path, config_path: str | None = None)
             "run_summary": summary_materialized["summary"],
         },
         "human_output": render_search_review_markdown(bundle),
+    }
+
+
+def _run_release_safety_scan_surface(
+    *,
+    target_path: str | None,
+    state_dir: str | None,
+) -> dict[str, Any]:
+    scan_result = run_release_safety_scan(
+        target_path=target_path,
+        state_dir=state_dir,
+        tracked_only=target_path is None,
+    )
+    bundle = scan_result.bundle.to_dict()
+    return {
+        "surface_payload": {
+            "status": bundle["release_safety_scan"]["status"],
+            "state_dir": str(scan_result.state_dir),
+            "target_path": target_path,
+            "release_safety": bundle["release_safety_scan"],
+            "bundle": bundle,
+        },
+        "human_output": scan_result.review_markdown,
+    }
+
+
+def _show_release_safety_surface(*, state_dir: str | None) -> dict[str, Any]:
+    resolved_state_dir = Path(state_dir) if state_dir else latest_release_safety_state_dir()
+    bundle = read_release_safety_bundle(resolved_state_dir)
+    if not bundle or not isinstance(bundle.get("release_safety_scan"), dict):
+        raise ValueError(
+            f"Release-safety artifacts are missing in `{resolved_state_dir}`. Run `relaytic release-safety scan` first."
+        )
+    return {
+        "surface_payload": {
+            "status": bundle["release_safety_scan"]["status"],
+            "state_dir": str(resolved_state_dir),
+            "release_safety": bundle["release_safety_scan"],
+            "bundle": bundle,
+        },
+        "human_output": render_release_safety_markdown(bundle),
+    }
+
+
+def _scan_git_safety_passthrough(*, paths: list[str]) -> dict[str, Any]:
+    explicit_paths = [Path(item) for item in paths] if paths else None
+    scan_result = run_release_safety_scan(
+        target_path=None,
+        state_dir=default_release_safety_state_dir(target_path=None),
+        explicit_paths=explicit_paths,
+        tracked_only=not bool(explicit_paths),
+    )
+    bundle = scan_result.bundle.to_dict()
+    sensitive = list(bundle.get("sensitive_string_audit", {}).get("findings", []))
+    source_maps = list(bundle.get("source_map_audit", {}).get("findings", []))
+    packaging = list(bundle.get("packaging_regression_report", {}).get("findings", []))
+    findings = sensitive + source_maps + packaging
+    return {
+        "surface_payload": {
+            "status": bundle["release_safety_scan"]["status"],
+            "findings": findings,
+            "bundle": bundle,
+        },
+        "human_output": scan_result.review_markdown,
     }
 
 

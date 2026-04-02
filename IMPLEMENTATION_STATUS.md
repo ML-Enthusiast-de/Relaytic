@@ -4,12 +4,12 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 13, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, and Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting
-- next recommended slice: 13A, release safety, build attestation, and packaging discipline
+- completed slices: 00 through 13A, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, and Slice 13A release safety, build attestation, and packaging discipline
+- next recommended slice: 13B, event bus, runtime hooks, and visible permission modes
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - latest handoff-and-learnings slice: 12D, workspace-first continuity, result contracts, governed learnings migration, and explicit iteration planning
 - latest workspace-and-search slice: 13, search controller, bounded branch widening, and execution-strategy selection
-- next release-and-packaging follow-on after 13: 13A, release safety, build attestation, and packaging discipline
+- latest release-and-packaging slice: 13A, release safety, build attestation, and packaging discipline
 - next runtime-and-permission follow-on after 13A: 13B, event bus, runtime hooks, and visible permission modes
 - next background-and-resume follow-on after 13B: 13C, bounded daemon, resumable jobs, and memory maintenance
 - next workspace-and-iteration follow-on after 13C: 14, real-world feasibility, domain constraints, and action boundaries
@@ -79,6 +79,7 @@ The repository currently supports:
 - differentiated post-run handoff via `relaytic handoff show` and `relaytic handoff focus`, with separate user and agent result reports, explicit next-run options, persisted next-run focus, and mission-control-visible handoff state
 - durable local learnings via `relaytic learnings show` and `relaytic learnings reset`, with cross-run learnings markdown/JSON state, per-run learnings snapshots, and memory-visible workspace focus plus recent-lesson priors
 - explicit workspace continuity via `relaytic workspace show` and `relaytic workspace continue`, with shared workspace state, lineage, focus history, workspace memory policy, machine-stable result contracts, confidence posture, belief-revision triggers, and one explicit next-run plan that chooses between same-data continuation, add-data continuation, or a new dataset
+- explicit release safety via `relaytic release-safety scan` and `relaytic release-safety show`, with workspace-only pre-release scans, built-bundle attestation, source-map auditing, sensitive-string and machine-path scanning, package inventory capture, packaging-regression reporting, and doctor-visible release posture
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement
@@ -98,7 +99,6 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
-- release-safety and build-attestation gates that scan packaged Relaytic artifacts, host bundles, docs bundles, and demo packs for machine paths, source maps, debug leftovers, and accidental sensitive strings before release
 - an event-bus and visible-permission-mode layer that upgrades the existing runtime event stream and hook audit into a canonical runtime substrate with explicit `review`, `plan`, `safe_execute`, and `bounded_autonomy` postures
 - a bounded daemon and resumable background-job layer so pulse, search, memory maintenance, and long-running governed experiments can continue safely over time without becoming hidden background activity
 - a stronger governed-learnings upgrade that migrates the shipped workspace learnings into typed, confidence-bearing, reaffirmable, invalidatable, and optionally expirable records instead of mostly durable snapshots plus markdown guidance
