@@ -39,7 +39,10 @@ from .storage import write_release_safety_bundle
 
 DEFAULT_RELEASE_SAFETY_ROOT = Path("artifacts") / "release_safety"
 LATEST_RELEASE_SAFETY_STATE_DIR = DEFAULT_RELEASE_SAFETY_ROOT / "latest"
-_SOURCE_MAPPING_PATTERN = re.compile(r"sourceMappingURL=", re.IGNORECASE)
+_SOURCE_MAPPING_COMMENT_PATTERN = re.compile(
+    r"^\s*(?:(?://[#@]\s*sourceMappingURL=)|(?:/\*[#@]\s*sourceMappingURL=))",
+    re.IGNORECASE,
+)
 _INTERNAL_URL_PATTERN = re.compile(
     r"https?://(?:localhost|127\.0\.0\.1|\[::1\]|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+)(?::\d+)?",
     re.IGNORECASE,
@@ -445,7 +448,7 @@ def _collect_source_map_findings(
         if text is None:
             continue
         for line_number, line in enumerate(text.splitlines(), start=1):
-            if _SOURCE_MAPPING_PATTERN.search(line):
+            if _SOURCE_MAPPING_COMMENT_PATTERN.search(line):
                 findings.append(
                     ReleaseSafetyFinding(
                         path=relative,

@@ -42,6 +42,40 @@ def test_release_safety_scan_flags_source_map_file(tmp_path: Path) -> None:
     assert bundle["source_map_audit"]["findings"][0]["path"] == "app.js.map"
 
 
+def test_release_safety_scan_flags_source_mapping_comment(tmp_path: Path) -> None:
+    bundle_dir = tmp_path / "bundle_source_mapping_comment"
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+    (bundle_dir / "app.js").write_text("console.log('ok');\n//# sourceMappingURL=app.js.map\n", encoding="utf-8")
+
+    result = run_release_safety_scan(
+        target_path=bundle_dir,
+        state_dir=tmp_path / "state_source_mapping_comment",
+    )
+    bundle = result.bundle.to_dict()
+
+    assert bundle["release_safety_scan"]["status"] == "error"
+    assert bundle["source_map_audit"]["finding_count"] == 1
+    assert bundle["source_map_audit"]["findings"][0]["rule_id"] == "source_mapping_comment"
+
+
+def test_release_safety_scan_ignores_literal_source_mapping_text_in_code(tmp_path: Path) -> None:
+    bundle_dir = tmp_path / "bundle_literal_pattern"
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+    (bundle_dir / "scanner.py").write_text(
+        'PATTERN = re.compile(r"sourceMappingURL=", re.IGNORECASE)\n',
+        encoding="utf-8",
+    )
+
+    result = run_release_safety_scan(
+        target_path=bundle_dir,
+        state_dir=tmp_path / "state_literal_pattern",
+    )
+    bundle = result.bundle.to_dict()
+
+    assert bundle["release_safety_scan"]["status"] == "ok"
+    assert bundle["source_map_audit"]["finding_count"] == 0
+
+
 def test_release_safety_scan_attests_clean_bundle_and_includes_host_bundle_and_docs(tmp_path: Path) -> None:
     bundle_dir = tmp_path / "bundle_clean"
     (bundle_dir / ".claude" / "agents").mkdir(parents=True, exist_ok=True)
