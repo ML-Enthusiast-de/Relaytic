@@ -214,6 +214,137 @@ def test_cli_mission_control_chat_starts_run_after_human_confirmation(
     assert session["current_phase"] == "run_started"
 
 
+def test_cli_mission_control_chat_starts_fresh_even_if_previous_onboarding_state_exists(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    output_dir = tmp_path / "adaptive_onboarding_fresh_start"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    stale_state = {
+        "schema_version": "relaytic.onboarding_chat_session_state.v1",
+        "generated_at": "2026-04-02T00:00:00+00:00",
+        "status": "ready",
+        "current_phase": "analysis_completed",
+        "detected_data_path": "C:/stale/data.csv",
+        "data_path_exists": True,
+        "detected_objective": "give me the top 3 signals",
+        "objective_family": "analysis",
+        "incumbent_path": None,
+        "incumbent_path_exists": None,
+        "suggested_run_dir": "artifacts/demo",
+        "suggested_run_dir_reason": None,
+        "ready_to_start_run": False,
+        "created_run_dir": None,
+        "last_analysis_report_path": "reports/stale.md",
+        "last_analysis_summary": "stale analysis",
+        "next_expected_input": "analysis request or model request",
+        "last_user_message": "old message",
+        "last_system_question": "old question",
+        "semantic_backend_status": "available",
+        "semantic_model": "relaytic-4b",
+        "llm_used_last_turn": True,
+        "turn_count": 9,
+        "notes": ["stale note"],
+        "summary": "stale summary",
+    }
+    (output_dir / "onboarding_chat_session_state.json").write_text(
+        json.dumps(stale_state),
+        encoding="utf-8",
+    )
+    prompts = iter(["what can you do?"])
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(prompts))
+
+    assert main(
+        [
+            "mission-control",
+            "chat",
+            "--output-dir",
+            str(output_dir),
+            "--expected-profile",
+            "full",
+            "--max-turns",
+            "1",
+        ]
+    ) == 0
+    output = capsys.readouterr().out
+    session = json.loads((output_dir / "onboarding_chat_session_state.json").read_text(encoding="utf-8"))
+
+    assert "local-first structured-data" in output.lower()
+    assert "I ran a direct analysis-first pass" not in output
+    assert session["detected_data_path"] is None
+    assert session["detected_objective"] is None
+    assert session["turn_count"] == 1
+
+
+def test_cli_mission_control_chat_answers_information_question_without_rerunning_analysis(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    output_dir = tmp_path / "adaptive_onboarding_info_priority"
+    data_path = write_public_breast_cancer_dataset(tmp_path / "info_priority_data.csv")
+    prompts = iter(
+        [
+            str(data_path),
+            "analyze this data first and give me the top signals",
+            "what can you do?",
+        ]
+    )
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(prompts))
+
+    calls: list[dict[str, object]] = []
+
+    class _FakeRegistry:
+        def execute(self, tool_name: str, arguments: dict[str, object]):
+            calls.append({"tool_name": tool_name, "arguments": dict(arguments)})
+            return SimpleNamespace(
+                status="ok",
+                output={
+                    "status": "ok",
+                    "report_path": str(tmp_path / "reports" / "info_priority.md"),
+                    "ranking": [
+                        {"target_signal": "diagnosis_flag"},
+                        {"target_signal": "mean_radius"},
+                        {"target_signal": "mean_texture"},
+                    ],
+                    "correlations": {
+                        "target_analyses": [
+                            {
+                                "target_signal": "diagnosis_flag",
+                                "top_predictors": ["mean_radius", "mean_texture", "mean_perimeter"],
+                            }
+                        ]
+                    },
+                },
+            )
+
+    monkeypatch.setattr("relaytic.ui.cli.build_default_registry", lambda: _FakeRegistry())
+
+    assert main(
+        [
+            "mission-control",
+            "chat",
+            "--output-dir",
+            str(output_dir),
+            "--expected-profile",
+            "full",
+            "--max-turns",
+            "3",
+        ]
+    ) == 0
+    output = capsys.readouterr().out
+    session = json.loads((output_dir / "onboarding_chat_session_state.json").read_text(encoding="utf-8"))
+
+    assert output.count("I ran a direct analysis-first pass") == 1
+    assert "Right now I can explain what Relaytic is" in output
+    assert len(calls) == 1
+    assert calls[0]["tool_name"] == "run_agent1_analysis"
+    assert session["detected_data_path"] == str(data_path)
+    assert session["objective_family"] == "analysis"
+    assert session["last_analysis_summary"] is not None
+
+
 def test_cli_mission_control_chat_uses_local_semantic_assist_for_messy_startup(
     tmp_path: Path,
     capsys,

@@ -2731,14 +2731,15 @@ def _build_lagged_design_frame(
     else:
         combined = frame[required].copy().reset_index(drop=True)
 
-    out = pd.DataFrame(index=combined.index)
+    out_columns: dict[str, pd.Series] = {}
     for col in feature_columns:
         numeric = pd.to_numeric(combined[col], errors="coerce")
-        out[f"{col}__t"] = numeric
+        out_columns[f"{col}__t"] = numeric
         for lag in range(1, int(lag_horizon) + 1):
-            out[f"{col}__lag{lag}"] = numeric.shift(lag)
-    out[target_column] = pd.to_numeric(combined[target_column], errors="coerce")
-    out["_is_current"] = False
+            out_columns[f"{col}__lag{lag}"] = numeric.shift(lag)
+    out_columns[target_column] = pd.to_numeric(combined[target_column], errors="coerce")
+    out_columns["_is_current"] = pd.Series(False, index=combined.index)
+    out = pd.DataFrame(out_columns, index=combined.index)
     out.loc[context_len:, "_is_current"] = True
     out = out.dropna()
     out = out[out["_is_current"]].drop(columns=["_is_current"]).reset_index(drop=True)

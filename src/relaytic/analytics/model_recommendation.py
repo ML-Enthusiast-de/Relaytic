@@ -697,13 +697,14 @@ def _lagged_probe_metrics(
 ) -> dict[str, Any] | None:
     if lag_horizon <= 0:
         return None
-    lag_frame = pd.DataFrame(index=series.index)
+    lag_columns: dict[str, pd.Series] = {}
     for col in predictor_cols:
         numeric = pd.to_numeric(series[col], errors="coerce")
-        lag_frame[f"{col}__t"] = numeric
+        lag_columns[f"{col}__t"] = numeric
         for lag in range(1, lag_horizon + 1):
-            lag_frame[f"{col}__lag{lag}"] = numeric.shift(lag)
-    lag_frame[target_signal] = pd.to_numeric(series[target_signal], errors="coerce")
+            lag_columns[f"{col}__lag{lag}"] = numeric.shift(lag)
+    lag_columns[target_signal] = pd.to_numeric(series[target_signal], errors="coerce")
+    lag_frame = pd.DataFrame(lag_columns, index=series.index)
     lag_frame = lag_frame.dropna().reset_index(drop=True)
     if len(lag_frame) < 30:
         return None

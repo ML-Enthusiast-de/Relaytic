@@ -1,5 +1,9 @@
 ﻿from pathlib import Path
 
+import warnings
+
+import pandas as pd
+
 from relaytic.orchestration.default_tools import build_default_registry
 def test_train_surrogate_candidates_tool_runs_split_safe_linear_and_tree(
     monkeypatch, tmp_path: Path
@@ -118,6 +122,44 @@ def test_train_surrogate_candidates_tool_supports_lagged_linear_time_series(
     assert payload["lag_horizon_samples"] == 3
     assert payload["rows_used"] > 0
     assert payload["selected_metrics"]["test"]["r2"] > 0.8
+
+
+def test_train_surrogate_candidates_lagged_path_does_not_emit_fragmentation_warning(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    csv_path = tmp_path / "train_lagged_warning_guard.csv"
+    rows = ["time,x,y"]
+    base = [0.7, -1.4, 1.1, 0.3, -0.9, 1.6, -0.2, 0.8]
+    values = [base[idx % len(base)] for idx in range(120)]
+    for idx in range(120):
+        x = values[idx]
+        y = 0.0 if idx < 3 else (1.4 * values[idx - 3] - 0.2)
+        rows.append(f"{idx},{x:.5f},{y:.5f}")
+    csv_path.write_text("\n".join(rows), encoding="utf-8")
+
+    registry = build_default_registry()
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "error",
+            message=r".*DataFrame is highly fragmented.*",
+            category=pd.errors.PerformanceWarning,
+        )
+        result = registry.execute(
+            "train_surrogate_candidates",
+            {
+                "data_path": str(csv_path),
+                "target_column": "y",
+                "feature_columns": ["x"],
+                "requested_model_family": "lagged_linear",
+                "timestamp_column": "time",
+                "lag_horizon_samples": 3,
+                "run_id": "lagged_warning_guard_run",
+            },
+        )
+
+    assert result.status == "ok"
+    assert result.output["status"] == "ok"
 
 
 def test_train_surrogate_candidates_auto_can_select_temporal_lagged_model_when_best(

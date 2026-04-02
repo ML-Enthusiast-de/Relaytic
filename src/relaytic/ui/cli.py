@@ -5340,6 +5340,18 @@ def _run_mission_control_chat(
         return 2
     active_run_dir = run_dir
     run_context = bool(active_run_dir)
+    if not run_context:
+        from relaytic.mission_control import write_mission_control_artifact
+
+        state_root = _resolve_mission_control_root(run_dir=None, output_dir=output_dir)
+        policy = _load_mission_control_policy(run_dir=None, config_path=config_path)
+        communication_cfg = dict(policy.get("communication", {}))
+        if not bool(communication_cfg.get("adaptive_onboarding_resume_existing_session", False)):
+            write_mission_control_artifact(
+                state_root,
+                key="onboarding_chat_session_state",
+                payload=_fresh_onboarding_chat_session_state(policy=policy),
+            )
     current_payload = _show_mission_control_surface(
         run_dir=active_run_dir,
         output_dir=output_dir,
@@ -5857,6 +5869,10 @@ def _run_adaptive_onboarding_turn(
     session_state["semantic_model"] = llm_model
     session_state["llm_used_last_turn"] = llm_used
 
+    current_data_path_before = _clean_text(session_state.get("detected_data_path"))
+    current_incumbent_path_before = _clean_text(session_state.get("incumbent_path"))
+    current_objective_before = _clean_text(session_state.get("detected_objective"))
+
     path_detection = _resolve_onboarding_data_path(
         message=message,
         semantic_result=semantic_result,
@@ -5938,6 +5954,35 @@ def _run_adaptive_onboarding_turn(
     has_objective = bool(_clean_text(session_state.get("detected_objective")))
     wants_start = _looks_like_run_confirmation(message) or bool(semantic_result.get("confirm_start"))
     objective_family = _clean_text(session_state.get("objective_family")) or "governed_run"
+    informational_response = _maybe_onboarding_chat_response(
+        message=message,
+        mission_control_payload=mission_control_payload,
+    )
+    message_updates_workflow = (
+        (path_detection["candidate"] is not None and _clean_text(path_detection["candidate"]) != current_data_path_before)
+        or (
+            incumbent_detection["candidate"] is not None
+            and _clean_text(incumbent_detection["candidate"]) != current_incumbent_path_before
+        )
+        or (objective is not None and _clean_text(objective) != current_objective_before)
+        or wants_start
+        or _looks_like_off_topic_detour(message)
+    )
+
+    if informational_response is not None and not message_updates_workflow:
+        session_state["last_system_question"] = (
+            "Relaytic answered an informational onboarding question without changing the captured workflow state."
+        )
+        existing_notes = [str(item).strip() for item in session_state.get("notes", []) if str(item).strip()]
+        existing_notes.append("Relaytic answered an informational onboarding question without starting new work.")
+        session_state["notes"] = existing_notes[-4:]
+        if not _clean_text(session_state.get("summary")):
+            session_state["summary"] = "Relaytic answered an onboarding question and kept the current onboarding state unchanged."
+        write_mission_control_artifact(state_root, key="onboarding_chat_session_state", payload=session_state)
+        return {
+            "response_text": informational_response,
+            "started_run_dir": None,
+        }
 
     if _looks_like_off_topic_detour(message):
         response_text = _render_off_topic_redirect_response(
