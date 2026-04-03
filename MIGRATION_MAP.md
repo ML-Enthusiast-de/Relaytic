@@ -287,7 +287,7 @@ Avoid introducing new references to:
 - introduced MCP-visible decision surfaces through `relaytic_review_decision` and `relaytic_show_decision`
 - upgraded the run-summary, autonomy, runtime, assist, and MCP boundaries so decision-world reasoning can change next-step posture instead of remaining a detached report
 
-## Current Newly-Shipped Boundaries
+## Latest Boundary Additions
 
 - `src/relaytic/profiles/` for Slice 10B quality contracts, budget contracts, operator/lab profile overlays, and budget-consumption reporting
 - `src/relaytic/control/` for Slice 10C intervention contracts, skeptical override handling, control-injection auditing, recovery checkpoints, and control-ledger persistence
@@ -427,12 +427,15 @@ Current Slice 12D artifact names:
 - `search_value_report.json`
 - `search_controller_eval_report.json`
 
+## Current Newly-Shipped Boundaries
+
+- `src/relaytic/events/` for Slice 13B typed runtime-event schemas, subscription registries, hook registries, and projection-only event-delivery contracts on top of the canonical runtime event stream
+- `src/relaytic/permissions/` for Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, append-only permission-decision logs, and session capability contracts
+
 ## Reserved Future Boundaries
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
-- `src/relaytic/events/` for Slice 13B typed runtime-event schemas, subscription registries, and event-delivery contracts on top of the existing runtime event stream
-- `src/relaytic/permissions/` for Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, and permission-decision logs
 - `src/relaytic/daemon/` for Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, and memory-maintenance queues
 - `src/relaytic/remote_control/` for Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
 - `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
@@ -448,12 +451,7 @@ Implemented release-safety artifact names:
 - `release_bundle_report.json`
 - `packaging_regression_report.json`
 
-Reserved future artifact names:
-- `artifact_attestation.json`
-- `source_map_audit.json`
-- `sensitive_string_audit.json`
-- `release_bundle_report.json`
-- `packaging_regression_report.json`
+Implemented event-bus and permission artifact names:
 - `event_schema.json`
 - `event_subscription_registry.json`
 - `hook_registry.json`
@@ -463,6 +461,8 @@ Reserved future artifact names:
 - `approval_policy_report.json`
 - `permission_decision_log.jsonl`
 - `session_capability_contract.json`
+
+Reserved future artifact names:
 - `daemon_state.json`
 - `background_job_registry.json`
 - `background_job_log.jsonl`

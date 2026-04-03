@@ -182,6 +182,78 @@ def run_planning(*args: Any, **kwargs: Any) -> Any:
     return _run_planning(*args, **kwargs)
 
 
+def run_event_bus_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.events import run_event_bus_review as _run_event_bus_review
+
+    return _run_event_bus_review(*args, **kwargs)
+
+
+def render_event_bus_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.events import render_event_bus_markdown as _render_event_bus_markdown
+
+    return _render_event_bus_markdown(*args, **kwargs)
+
+
+def read_event_bus_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.events import read_event_bus_bundle as _read_event_bus_bundle
+
+    return _read_event_bus_bundle(*args, **kwargs)
+
+
+def run_permission_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.permissions import run_permission_review as _run_permission_review
+
+    return _run_permission_review(*args, **kwargs)
+
+
+def render_permission_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.permissions import render_permission_markdown as _render_permission_markdown
+
+    return _render_permission_markdown(*args, **kwargs)
+
+
+def evaluate_permission_action(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.permissions import evaluate_permission_action as _evaluate_permission_action
+
+    return _evaluate_permission_action(*args, **kwargs)
+
+
+def apply_permission_decision(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.permissions import apply_permission_decision as _apply_permission_decision
+
+    return _apply_permission_decision(*args, **kwargs)
+
+
+def run_daemon_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.daemon import run_daemon_review as _run_daemon_review
+
+    return _run_daemon_review(*args, **kwargs)
+
+
+def render_daemon_review_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.daemon import render_daemon_review_markdown as _render_daemon_review_markdown
+
+    return _render_daemon_review_markdown(*args, **kwargs)
+
+
+def read_daemon_bundle(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.daemon import read_daemon_bundle as _read_daemon_bundle
+
+    return _read_daemon_bundle(*args, **kwargs)
+
+
+def run_background_job(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.daemon import run_background_job as _run_background_job
+
+    return _run_background_job(*args, **kwargs)
+
+
+def resume_background_job(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.daemon import resume_background_job as _resume_background_job
+
+    return _resume_background_job(*args, **kwargs)
+
+
 def execute_planned_route(*args: Any, **kwargs: Any) -> Any:
     from relaytic.planning import execute_planned_route as _execute_planned_route
 
@@ -548,6 +620,12 @@ def record_runtime_stage_failure(*args: Any, **kwargs: Any) -> Any:
     from relaytic.runtime import record_stage_failure as _record_stage_failure
 
     return _record_stage_failure(*args, **kwargs)
+
+
+def record_runtime_event(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.runtime import record_runtime_event as _record_runtime_event
+
+    return _record_runtime_event(*args, **kwargs)
 
 
 def materialize_run_summary(*args: Any, **kwargs: Any) -> Any:
@@ -2090,6 +2168,78 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    events_surface = sub.add_parser(
+        "events",
+        help="Inspect the Slice 13B typed event bus, subscription registry, and hook dispatch projection.",
+    )
+    events_sub = events_surface.add_subparsers(dest="events_command", required=True)
+
+    events_show = events_sub.add_parser(
+        "show",
+        help="Render the current event-bus surface for a run directory.",
+    )
+    events_show.add_argument("--run-dir", required=True, help="Run directory containing Relaytic runtime artifacts.")
+    events_show.add_argument("--config", default=None, help="Optional config/policy source.")
+    events_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    permissions_surface = sub.add_parser(
+        "permissions",
+        help="Inspect or evaluate the Slice 13B permission modes, approval posture, and session capability contract.",
+    )
+    permissions_sub = permissions_surface.add_subparsers(dest="permissions_command", required=True)
+
+    permissions_show = permissions_sub.add_parser(
+        "show",
+        help="Render the current permission-mode and approval posture for a run directory.",
+    )
+    permissions_show.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    permissions_show.add_argument("--config", default=None, help="Optional config/policy source.")
+    permissions_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    permissions_check = permissions_sub.add_parser(
+        "check",
+        help="Evaluate one tool or action against the current permission mode and append the decision to the permission log.",
+    )
+    permissions_check.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    permissions_check.add_argument("--action", required=True, help="Tool or action id such as `relaytic_run_autonomy` or `relaytic_review_search`.")
+    permissions_check.add_argument("--config", default=None, help="Optional config/policy source.")
+    permissions_check.add_argument("--mode", default=None, help="Optional mode override such as `review` or `bounded_autonomy` for simulation.")
+    permissions_check.add_argument("--actor-type", default="operator", help="Actor type for the decision log.")
+    permissions_check.add_argument("--actor-name", default=None, help="Optional actor name for the decision log.")
+    permissions_check.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    permissions_decide = permissions_sub.add_parser(
+        "decide",
+        help="Resolve a pending approval request by explicitly approving or denying it.",
+    )
+    permissions_decide.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    permissions_decide.add_argument("--request-id", required=True, help="Pending approval request id from `permission_decision_log.jsonl`.")
+    permissions_decide.add_argument("--decision", required=True, choices=["approve", "deny"], help="Explicit approval outcome.")
+    permissions_decide.add_argument("--config", default=None, help="Optional config/policy source.")
+    permissions_decide.add_argument("--actor-type", default="operator", help="Actor type for the decision log.")
+    permissions_decide.add_argument("--actor-name", default=None, help="Optional actor name for the decision log.")
+    permissions_decide.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     mission_control = sub.add_parser(
         "mission-control",
         help="Launch or inspect the local control center, onboarding surface, and terminal mission-control chat.",
@@ -2337,6 +2487,70 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    daemon_surface = sub.add_parser(
+        "daemon",
+        help="Run or inspect Slice 13C bounded background jobs and resume artifacts.",
+    )
+    daemon_sub = daemon_surface.add_subparsers(dest="daemon_command", required=True)
+
+    daemon_review = daemon_sub.add_parser(
+        "review",
+        help="Materialize the Slice 13C daemon state for an existing run.",
+    )
+    daemon_review.add_argument("--run-dir", required=True, help="Run directory for daemon artifacts.")
+    daemon_review.add_argument("--config", default=None, help="Optional config/policy source.")
+    daemon_review.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    daemon_show = daemon_sub.add_parser(
+        "show",
+        help="Render the current Slice 13C daemon state for a run.",
+    )
+    daemon_show.add_argument("--run-dir", required=True, help="Run directory containing daemon artifacts.")
+    daemon_show.add_argument("--config", default=None, help="Optional config/policy source if artifacts must be materialized.")
+    daemon_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    daemon_run_job = daemon_sub.add_parser(
+        "run-job",
+        help="Start one bounded background job, requesting approval first when policy requires it.",
+    )
+    daemon_run_job.add_argument("--run-dir", required=True, help="Run directory containing daemon artifacts.")
+    daemon_run_job.add_argument("--job-id", required=True, help="Background job id such as `job_search_campaign`.")
+    daemon_run_job.add_argument("--config", default=None, help="Optional config/policy source.")
+    daemon_run_job.add_argument("--actor-type", default="operator", help="Actor type for the daemon job request.")
+    daemon_run_job.add_argument("--actor-name", default=None, help="Optional actor name for the daemon job request.")
+    daemon_run_job.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    daemon_resume_job = daemon_sub.add_parser(
+        "resume-job",
+        help="Resume one paused or stale background job from its explicit checkpoint.",
+    )
+    daemon_resume_job.add_argument("--run-dir", required=True, help="Run directory containing daemon artifacts.")
+    daemon_resume_job.add_argument("--job-id", required=True, help="Background job id such as `job_search_campaign`.")
+    daemon_resume_job.add_argument("--config", default=None, help="Optional config/policy source.")
+    daemon_resume_job.add_argument("--actor-type", default="operator", help="Actor type for the daemon job resume.")
+    daemon_resume_job.add_argument("--actor-name", default=None, help="Optional actor name for the daemon job resume.")
+    daemon_resume_job.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     plan = sub.add_parser(
         "plan",
         help="Create Slice 05 planning artifacts and execute the first deterministic route.",
@@ -2556,6 +2770,58 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 1 if str(payload.get("status", "")).strip() == "error" else 0
 
+    if args.command == "events":
+        try:
+            if args.events_command == "show":
+                payload = _show_event_bus_surface(run_dir=args.run_dir, config_path=args.config)
+            else:
+                parser.error("Unsupported events subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "permissions":
+        try:
+            if args.permissions_command == "show":
+                payload = _show_permission_surface(run_dir=args.run_dir, config_path=args.config)
+            elif args.permissions_command == "check":
+                payload = _check_permission_surface(
+                    run_dir=args.run_dir,
+                    action_id=args.action,
+                    config_path=args.config,
+                    mode=args.mode,
+                    actor_type=args.actor_type,
+                    actor_name=args.actor_name,
+                )
+            elif args.permissions_command == "decide":
+                payload = _decide_permission_surface(
+                    run_dir=args.run_dir,
+                    request_id=args.request_id,
+                    decision=args.decision,
+                    config_path=args.config,
+                    actor_type=args.actor_type,
+                    actor_name=args.actor_name,
+                )
+            else:
+                parser.error("Unsupported permissions subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
     if args.command == "mission-control":
         if args.mission_control_command == "show":
             payload = _show_mission_control_surface(
@@ -2704,6 +2970,47 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 parser.error("Unsupported search subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "daemon":
+        try:
+            if args.daemon_command == "review":
+                payload = _run_daemon_phase(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                )
+            elif args.daemon_command == "show":
+                payload = _show_daemon_surface(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                )
+            elif args.daemon_command == "run-job":
+                payload = _run_background_job_surface(
+                    run_dir=args.run_dir,
+                    job_id=args.job_id,
+                    config_path=args.config,
+                    actor_type=args.actor_type,
+                    actor_name=args.actor_name,
+                )
+            elif args.daemon_command == "resume-job":
+                payload = _resume_background_job_surface(
+                    run_dir=args.run_dir,
+                    job_id=args.job_id,
+                    config_path=args.config,
+                    actor_type=args.actor_type,
+                    actor_name=args.actor_name,
+                )
+            else:
+                parser.error("Unsupported daemon subcommand.")
                 return 2
         except ValueError as exc:
             parser.error(str(exc))
@@ -4717,6 +5024,7 @@ def _show_workspace_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle = read_workspace_bundle_for_run(root)
     result_contract_bundle = read_result_contract_artifacts(root)
     next_run_plan = read_iteration_bundle(workspace_dir=default_workspace_dir(run_dir=root), run_dir=root).get("next_run_plan", {})
+    summary_bundle = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     if not bundle and not result_contract_bundle:
         raise ValueError(f"No workspace continuity artifacts found in {root}.")
     human_output = render_workspace_review_markdown(
@@ -4731,6 +5039,7 @@ def _show_workspace_surface(*, run_dir: str | Path) -> dict[str, Any]:
             "workspace": bundle,
             "result_contract": result_contract_bundle,
             "next_run_plan": next_run_plan if isinstance(next_run_plan, dict) else {},
+            "run_summary": summary_bundle["summary"],
         },
         "human_output": human_output,
     }
@@ -4866,6 +5175,207 @@ def _show_search_surface(*, run_dir: str | Path, config_path: str | None = None)
     }
 
 
+def _materialize_daemon_bundle(*, run_dir: Path, config_path: str | None) -> tuple[dict[str, Any], dict[str, Any], str | Path]:
+    from relaytic.daemon import run_daemon_review, write_daemon_bundle
+
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=run_dir,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    effective_policy_source: str | Path = foundation_state["policy_path"]
+    if config_path:
+        resolved_override = load_policy(config_path)
+        effective_policy = resolved_override.policy
+        effective_policy_source = config_path
+    daemon_result = run_daemon_review(run_dir=run_dir, policy=effective_policy)
+    written = write_daemon_bundle(run_dir, bundle=daemon_result.bundle)
+    return daemon_result.bundle.to_dict(), written, effective_policy_source
+
+
+def _run_daemon_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    runtime_surface: str = "cli",
+    runtime_command: str = "relaytic daemon review",
+) -> dict[str, Any]:
+    from relaytic.daemon import run_daemon_review, write_daemon_bundle
+
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    effective_policy_source: str | Path = foundation_state["policy_path"]
+    if config_path:
+        resolved_override = load_policy(config_path)
+        effective_policy = resolved_override.policy
+        effective_policy_source = config_path
+    runtime_token = _runtime_stage_token(
+        run_dir=root,
+        policy=effective_policy,
+        stage="daemon",
+        data_path=_resolve_run_data_path(root),
+        runtime_surface=runtime_surface,
+        runtime_command=runtime_command,
+        input_artifacts=[
+            "run_summary.json",
+            "search_controller_plan.json",
+            "pulse_recommendations.json",
+            "memory_compaction_plan.json",
+            "result_contract.json",
+            "workspace_state.json",
+            "permission_mode.json",
+        ],
+    )
+    try:
+        daemon_result = run_daemon_review(run_dir=root, policy=effective_policy)
+        written = write_daemon_bundle(root, bundle=daemon_result.bundle)
+        manifest_path = _refresh_daemon_manifest(root, policy_source=effective_policy_source)
+        record_runtime_stage_completion(
+            run_dir=root,
+            policy=effective_policy,
+            stage_token=runtime_token,
+            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
+            summary="Relaytic materialized the bounded background-job registry, checkpoint posture, approval queue, memory-maintenance queue, and resumable daemon artifacts.",
+        )
+        summary_bundle = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+        surface_daemon = dict(summary_bundle["summary"].get("daemon", {}))
+        return {
+            "surface_payload": {
+                "status": "ok",
+                "run_dir": str(root),
+                "manifest_path": str(manifest_path),
+                "paths": {key: str(value) for key, value in written.items()},
+                "daemon": surface_daemon,
+                "bundle": daemon_result.bundle.to_dict(),
+                "run_summary": summary_bundle["summary"],
+            },
+            "human_output": daemon_result.review_markdown,
+        }
+    except Exception as exc:
+        record_runtime_stage_failure(
+            run_dir=root,
+            policy=effective_policy,
+            stage_token=runtime_token,
+            error=exc,
+        )
+        raise
+
+
+def _show_daemon_surface(*, run_dir: str | Path, config_path: str | None = None) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_json_bundle(root, bundle="daemon")
+    effective_policy_source: str | Path | None = None
+    if not bundle or not isinstance(bundle.get("daemon_state"), dict) or not bundle.get("daemon_state"):
+        bundle, _, effective_policy_source = _materialize_daemon_bundle(run_dir=root, config_path=config_path)
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_daemon_manifest(root, policy_source=effective_policy_source)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "summary_path": str(summary_materialized["summary_path"]),
+            "report_path": str(summary_materialized["report_path"]),
+            "daemon": dict(summary_materialized["summary"].get("daemon", {})),
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_daemon_review_markdown(bundle),
+    }
+
+
+def _run_background_job_surface(
+    *,
+    run_dir: str | Path,
+    job_id: str,
+    config_path: str | None,
+    actor_type: str,
+    actor_name: str | None,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    if config_path:
+        effective_policy = load_policy(config_path).policy
+    result = run_background_job(
+        run_dir=root,
+        job_id=job_id,
+        policy=effective_policy,
+        actor_type=actor_type,
+        actor_name=actor_name,
+    )
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_daemon_manifest(root, policy_source=config_path or foundation_state["policy_path"])
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "daemon": dict(summary_materialized["summary"].get("daemon", {})),
+            "job": result.job,
+            "bundle": result.bundle.to_dict(),
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": result.review_markdown,
+    }
+
+
+def _resume_background_job_surface(
+    *,
+    run_dir: str | Path,
+    job_id: str,
+    config_path: str | None,
+    actor_type: str,
+    actor_name: str | None,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    if config_path:
+        effective_policy = load_policy(config_path).policy
+    result = resume_background_job(
+        run_dir=root,
+        job_id=job_id,
+        policy=effective_policy,
+        actor_type=actor_type,
+        actor_name=actor_name,
+    )
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_daemon_manifest(root, policy_source=config_path or foundation_state["policy_path"])
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "daemon": dict(summary_materialized["summary"].get("daemon", {})),
+            "job": result.job,
+            "bundle": result.bundle.to_dict(),
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": result.review_markdown,
+    }
+
+
 def _run_release_safety_scan_surface(
     *,
     target_path: str | None,
@@ -4949,6 +5459,24 @@ def _continue_workspace_surface(
         actor_name=actor_name,
         reset_requested=reset_requested,
     )
+    root = Path(run_dir)
+    policy = _load_mission_control_policy(run_dir=str(root), config_path=None)
+    try:
+        runtime = build_runtime_surface(run_dir=root)
+        stage = str(dict(runtime.get("runtime", {})).get("current_stage", "")).strip() or "workspace"
+        record_runtime_event(
+            run_dir=root,
+            policy=policy,
+            event_type="workspace_resumed",
+            stage=stage,
+            source_surface="cli",
+            source_command="relaytic workspace continue",
+            status="ok",
+            summary=f"Relaytic continued the workspace on direction `{direction}`.",
+            metadata={"direction": direction, "actor_type": actor_type, "actor_name": actor_name},
+        )
+    except Exception:
+        pass
     workspace_payload = _show_workspace_surface(run_dir=run_dir)
     return {
         "surface_payload": {
@@ -5358,6 +5886,37 @@ def _run_mission_control_chat(
         config_path=config_path,
         expected_profile=expected_profile,
     )
+
+    def _current_chat_stage() -> str:
+        mission = dict(current_payload.get("surface_payload", {}).get("mission_control", {}))
+        return str(mission.get("current_stage", "")).strip() or "runtime"
+
+    def _record_chat_event(event_type: str, *, status: str, summary: str, metadata: dict[str, Any] | None = None) -> None:
+        if not active_run_dir:
+            return
+        try:
+            policy = _load_mission_control_policy(run_dir=active_run_dir, config_path=config_path)
+            record_runtime_event(
+                run_dir=active_run_dir,
+                policy=policy,
+                event_type=event_type,
+                stage=_current_chat_stage(),
+                source_surface="cli",
+                source_command="relaytic mission-control chat",
+                status=status,
+                summary=summary,
+                metadata=metadata,
+            )
+        except Exception:
+            return
+
+    if run_context:
+        _record_chat_event(
+            "session_started",
+            status="ok",
+            summary="Relaytic started a mission-control chat session for an existing run.",
+            metadata={"interaction_mode": "mission_control_chat"},
+        )
     if run_context:
         print(
             "relaytic> Mission-control chat is the terminal companion to the dashboard. "
@@ -5379,16 +5938,26 @@ def _run_mission_control_chat(
         try:
             raw = input("you> ")
         except EOFError:
+            _record_chat_event("session_ended", status="ok", summary="Mission-control chat ended after EOF.")
             print("\nSession ended.")
             return 0
         except KeyboardInterrupt:
+            _record_chat_event("session_ended", status="ok", summary="Mission-control chat ended after keyboard interrupt.")
             print("\nSession interrupted.")
             return 0
         message = raw.strip()
         if not message:
             continue
+        if run_context:
+            _record_chat_event(
+                "prompt_submitted",
+                status="ok",
+                summary="Mission-control chat received one operator prompt.",
+                metadata={"message_length": len(message), "is_command": message.startswith("/")},
+            )
         lowered = message.lower()
         if lowered in {"/exit", "/quit"}:
+            _record_chat_event("session_ended", status="ok", summary="Mission-control chat ended explicitly.")
             print("Session ended.")
             return 0
         if lowered == "/help":
@@ -5496,6 +6065,12 @@ def _run_mission_control_chat(
                         config_path=config_path,
                         expected_profile=expected_profile,
                     )
+                    _record_chat_event(
+                        "session_started",
+                        status="ok",
+                        summary="Relaytic promoted onboarding chat into a run-specific mission-control session.",
+                        metadata={"interaction_mode": "mission_control_chat"},
+                    )
                     print(
                         "relaytic> Relaytic is now in run-specific mode. "
                         "You can ask `what can you do?`, `why did you choose this route?`, `go back to planning`, "
@@ -5512,6 +6087,7 @@ def _run_mission_control_chat(
             if show_json:
                 print(dumps_json(current_payload["surface_payload"], indent=2, ensure_ascii=False))
             if max_turns > 0 and turns >= max_turns:
+                _record_chat_event("session_ended", status="ok", summary="Mission-control chat ended after reaching the turn cap.")
                 print("Session ended.")
                 return 0
             continue
@@ -5534,6 +6110,7 @@ def _run_mission_control_chat(
                 print(dumps_json(payload["surface_payload"], indent=2, ensure_ascii=False))
             turns += 1
             if max_turns > 0 and turns >= max_turns:
+                _record_chat_event("session_ended", status="ok", summary="Mission-control chat ended after reaching the turn cap.")
                 print("Session ended.")
                 return 0
             continue
@@ -6860,6 +7437,141 @@ def _read_onboarding_chat_session_state_from_payload(mission_control_payload: di
     return existing if existing else {}
 
 
+def _show_event_bus_surface(*, run_dir: str | Path, config_path: str | None) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    _ensure_runtime_present(root)
+    policy = _load_mission_control_policy(run_dir=str(root), config_path=config_path)
+    review = run_event_bus_review(run_dir=root, policy=policy)
+    bundle = review.bundle.to_dict()
+    dispatch = dict(bundle.get("hook_dispatch_report", {}))
+    subscriptions = dict(bundle.get("event_subscription_registry", {}))
+    schema = dict(bundle.get("event_schema", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "events": {
+                "event_type_count": schema.get("event_type_count"),
+                "subscription_count": subscriptions.get("subscription_count"),
+                "dispatch_count": dispatch.get("dispatch_count"),
+                "observed_event_count": dispatch.get("observed_event_count"),
+                "source_of_truth_preserved": dispatch.get("source_of_truth_preserved"),
+            },
+            "bundle": bundle,
+        },
+        "human_output": review.review_markdown,
+    }
+
+
+def _show_permission_surface(*, run_dir: str | Path, config_path: str | None) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    _ensure_runtime_present(root)
+    policy = _load_mission_control_policy(run_dir=str(root), config_path=config_path)
+    review = run_permission_review(run_dir=root, policy=policy)
+    bundle = review.bundle.to_dict()
+    mode = dict(bundle.get("permission_mode", {}))
+    approval = dict(bundle.get("approval_policy_report", {}))
+    contract = dict(bundle.get("session_capability_contract", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "permissions": {
+                "current_mode": mode.get("current_mode"),
+                "mode_source": mode.get("mode_source"),
+                "pending_approval_count": approval.get("pending_approval_count"),
+                "approval_requested_count": approval.get("approval_requested_count"),
+                "denied_count": approval.get("denied_count"),
+                "allowed_action_count": contract.get("allowed_action_count"),
+                "approval_gated_action_count": contract.get("approval_gated_action_count"),
+                "blocked_action_count": contract.get("blocked_action_count"),
+            },
+            "bundle": bundle,
+        },
+        "human_output": review.review_markdown,
+    }
+
+
+def _check_permission_surface(
+    *,
+    run_dir: str | Path,
+    action_id: str,
+    config_path: str | None,
+    mode: str | None,
+    actor_type: str,
+    actor_name: str | None,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    _ensure_runtime_present(root)
+    policy = _load_mission_control_policy(run_dir=str(root), config_path=config_path)
+    result = evaluate_permission_action(
+        run_dir=root,
+        action_id=action_id,
+        policy=policy,
+        mode_override=mode,
+        actor_type=actor_type,
+        actor_name=actor_name,
+        source_surface="cli",
+        source_command="relaytic permissions check",
+    )
+    bundle = result.bundle.to_dict()
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "decision": result.decision,
+            "permissions": dict(bundle.get("permission_mode", {})),
+            "approval_policy": dict(bundle.get("approval_policy_report", {})),
+            "bundle": bundle,
+        },
+        "human_output": result.review_markdown,
+    }
+
+
+def _decide_permission_surface(
+    *,
+    run_dir: str | Path,
+    request_id: str,
+    decision: str,
+    config_path: str | None,
+    actor_type: str,
+    actor_name: str | None,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    _ensure_runtime_present(root)
+    policy = _load_mission_control_policy(run_dir=str(root), config_path=config_path)
+    result = apply_permission_decision(
+        run_dir=root,
+        request_id=request_id,
+        decision=decision,
+        policy=policy,
+        actor_type=actor_type,
+        actor_name=actor_name,
+        source_surface="cli",
+        source_command="relaytic permissions decide",
+    )
+    bundle = result.bundle.to_dict()
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "decision": result.decision,
+            "permissions": dict(bundle.get("permission_mode", {})),
+            "approval_policy": dict(bundle.get("approval_policy_report", {})),
+            "bundle": bundle,
+        },
+        "human_output": result.review_markdown,
+    }
+
+
 def _show_runtime_surface(*, run_dir: str | Path, limit: int = 20) -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
@@ -6922,6 +7634,9 @@ def _show_mission_control_surface(
     onboarding_session = dict(bundle.get("onboarding_chat_session_state", {}))
     pulse = read_run_summary(run_dir).get("pulse", {}) if run_dir is not None else {}
     pulse = dict(pulse) if isinstance(pulse, dict) else {}
+    summary_payload = read_run_summary(run_dir) if run_dir is not None else {}
+    permissions = dict(summary_payload.get("permissions", {})) if isinstance(summary_payload, dict) else {}
+    event_bus = dict(summary_payload.get("event_bus", {})) if isinstance(summary_payload, dict) else {}
     return {
         "surface_payload": {
             "status": "ok",
@@ -6961,6 +7676,10 @@ def _show_mission_control_surface(
                 "pulse_status": pulse.get("status"),
                 "pulse_mode": pulse.get("mode"),
                 "pulse_queued_action_count": pulse.get("queued_action_count"),
+                "permission_mode": permissions.get("current_mode"),
+                "pending_approval_count": permissions.get("pending_approval_count"),
+                "event_subscription_count": event_bus.get("subscription_count"),
+                "event_dispatch_count": event_bus.get("dispatch_count"),
             },
             "bundle": bundle,
         },
@@ -7637,6 +8356,8 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.search import read_search_bundle
 
         return read_search_bundle(run_dir)
+    if bundle == "daemon":
+        return read_daemon_bundle(run_dir)
     if bundle == "feedback":
         from relaytic.feedback import read_feedback_bundle
 
@@ -7653,6 +8374,12 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
         from relaytic.runtime import read_runtime_bundle
 
         return read_runtime_bundle(run_dir)
+    if bundle == "events":
+        return read_event_bus_bundle(run_dir)
+    if bundle == "permissions":
+        from relaytic.permissions import read_permission_bundle
+
+        return read_permission_bundle(run_dir)
     if bundle == "completion":
         from relaytic.completion import read_completion_bundle
 
@@ -11158,6 +11885,20 @@ def _search_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _daemon_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "daemon_state": run_dir / "daemon_state.json",
+        "background_job_registry": run_dir / "background_job_registry.json",
+        "background_checkpoint": run_dir / "background_checkpoint.json",
+        "resume_session_manifest": run_dir / "resume_session_manifest.json",
+        "background_approval_queue": run_dir / "background_approval_queue.json",
+        "memory_maintenance_queue": run_dir / "memory_maintenance_queue.json",
+        "memory_maintenance_report": run_dir / "memory_maintenance_report.json",
+        "search_resume_plan": run_dir / "search_resume_plan.json",
+        "stale_job_report": run_dir / "stale_job_report.json",
+    }
+
+
 def _feedback_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "feedback_intake": run_dir / "feedback_intake.json",
@@ -12716,6 +13457,60 @@ def _refresh_search_manifest(
     for path in _search_output_paths(root).values():
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="search", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_daemon_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_search_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for path in _daemon_output_paths(root).values():
+        if path.exists():
+            entries.append(artifact_entry(path.name, run_dir=root, kind="daemon", required=True))
+    log_path = root / "background_job_log.jsonl"
+    if log_path.exists():
+        entries.append(artifact_entry(log_path.name, run_dir=root, kind="daemon", required=False))
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:

@@ -266,14 +266,14 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 13, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, and Slice 13 search-controller depth plus execution-strategy selection
-- next execution target: Slice 13A
+- implemented baseline: Slice 00 through Slice 13B, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety, and Slice 13B event bus plus visible permission modes
+- next execution target: Slice 13C
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
 - latest search-and-execution follow-on: Slice 13
-- next release-and-packaging follow-on after Slice 13: Slice 13A
-- next runtime-and-permission follow-on after Slice 13A: Slice 13B
+- latest release-and-packaging follow-on after Slice 13: Slice 13A
+- latest runtime-and-permission slice: Slice 13B
 - next background-and-resume follow-on after Slice 13B: Slice 13C
 - next workspace-and-iteration follow-on after Slice 13C: Slice 14
 - next remote-supervision follow-on after Slice 14: Slice 14A

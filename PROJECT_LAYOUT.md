@@ -61,16 +61,20 @@ Relaytic/
       completion/
       control/
       dojo/
+      events/
       lifecycle/
       data_fabric/
       decision/
+      permissions/
       feedback/
       handoff/
       intelligence/
+      iteration/
       profiles/
       learnings/
       memory/
       autonomy/
+      release_safety/
       research/
       assist/
       interoperability/
@@ -79,11 +83,13 @@ Relaytic/
       planning/
       policies/
       pulse/
+      search/
       tracing/
       evals/
       runs/
       runtime/
       mission_control/
+      workspace/
     corr2surrogate/  # compatibility shim only
   tests/
   README.md
@@ -174,12 +180,12 @@ Current workspace-first boundaries:
 - `src/relaytic/workspace/` owns Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
 - `src/relaytic/iteration/` owns Slice 12D next-run planning, focus-decision records, and data-expansion candidates
 - `src/relaytic/search/` owns Slice 13 search-controller plans, portfolio search traces, HPO campaign reports, execution-backend selection, checkpoint posture, and explicit value-of-search artifacts
+- `src/relaytic/release_safety/` owns Slice 13A release-bundle scanning, workspace-only pre-release scans, artifact attestation, source-map and sensitive-string audits, distribution-manifest capture, and packaging-regression reporting
+- `src/relaytic/events/` owns Slice 13B typed runtime-event schemas, subscription registries, hook registries, and projection-only event-delivery contracts over the canonical runtime stream
+- `src/relaytic/permissions/` owns Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, append-only permission-decision logs, and session capability contracts
 
 Reserved future boundaries:
 
-- `src/relaytic/release_safety/` owns Slice 13A release-bundle scanning, workspace-only pre-release scans, artifact attestation, source-map and sensitive-string audits, distribution-manifest capture, and packaging-regression reporting
-- `src/relaytic/events/` should own typed runtime-event schemas and subscription registries for later event-bus work
-- `src/relaytic/permissions/` should own visible permission modes, tool-permission matrices, approval-policy reporting, and permission-decision logs
 - `src/relaytic/daemon/` should own bounded background-job orchestration, resumable jobs, and memory-maintenance queues
 - `src/relaytic/remote_control/` should own remote mission-control sessions, approval queues, supervision handoff, and remote-control audit
 - `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support

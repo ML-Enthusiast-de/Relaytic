@@ -507,6 +507,40 @@ def record_stage_failure(
     )
 
 
+def record_runtime_event(
+    *,
+    run_dir: str | Path,
+    policy: dict[str, Any],
+    event_type: str,
+    stage: str,
+    source_surface: str,
+    source_command: str,
+    status: str,
+    summary: str,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Append one canonical runtime event and mirror it into tracing when available."""
+    root = Path(run_dir)
+    ensure_runtime_initialized(
+        run_dir=root,
+        policy=policy,
+        source_surface=source_surface,
+        source_command=source_command,
+    )
+    event = _build_event(
+        event_type=event_type,
+        stage=stage,
+        source_surface=source_surface,
+        source_command=source_command,
+        status=status,
+        summary=summary,
+        metadata=metadata,
+    )
+    append_event(root, event=event)
+    _emit_trace_event(root=root, policy=policy, event=event)
+    return event
+
+
 def build_runtime_surface(*, run_dir: str | Path, event_limit: int | None = None) -> dict[str, Any]:
     """Build the current runtime surface for humans and agents."""
     root = Path(run_dir)

@@ -55,11 +55,11 @@ Current canonical boundaries:
 - `src/relaytic/iteration/` owns Slice 12D next-run planning, focus-decision records, data-expansion candidates, and workspace continuation decisions
 - `src/relaytic/search/` owns Slice 13 search-controller plans, portfolio search traces, HPO campaign reports, bounded branch widening/pruning, execution-backend selection, checkpoint posture, and explicit value-of-search evaluation artifacts
 - `src/relaytic/release_safety/` owns Slice 13A release-bundle scanning, workspace-only pre-release scans, artifact attestation, source-map and sensitive-string audits, distribution-manifest reporting, packaging-regression reporting, and doctor-visible release posture
+- `src/relaytic/events/` owns Slice 13B typed runtime event schemas, subscription registries, hook registries, and projection-only event-delivery contracts on top of the canonical runtime event stream
+- `src/relaytic/permissions/` owns Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, append-only permission-decision logs, and session capability contracts
 
 Reserved future boundaries:
 
-- `src/relaytic/events/` should own Slice 13B typed runtime event schemas, subscription registries, and event-delivery contracts on top of the existing runtime event stream
-- `src/relaytic/permissions/` should own Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, and permission-decision logs
 - `src/relaytic/daemon/` should own Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, and memory-maintenance queues
 - `src/relaytic/remote_control/` should own Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support

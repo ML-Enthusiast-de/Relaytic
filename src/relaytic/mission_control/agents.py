@@ -11,9 +11,12 @@ from typing import Any
 
 from relaytic.assist import build_assist_bundle
 from relaytic.assist.storage import read_assist_bundle, write_assist_bundle
+from relaytic.daemon import run_daemon_review
+from relaytic.events import run_event_bus_review
 from relaytic.intelligence import build_intelligence_controls_from_policy
 from relaytic.intelligence.backends import discover_backend
 from relaytic.interoperability.self_check import build_interoperability_inventory
+from relaytic.permissions import run_permission_review
 from relaytic.runs.summary import materialize_run_summary, read_run_summary
 from relaytic.ui.doctor import build_doctor_report
 
@@ -79,6 +82,9 @@ def run_mission_control_review(
     summary_payload: dict[str, Any] = {}
     summary_paths: dict[str, str | None] = {"summary_path": None, "report_path": None}
     if resolved_run_dir is not None and resolved_run_dir.exists():
+        run_event_bus_review(run_dir=resolved_run_dir, policy=policy or {})
+        run_permission_review(run_dir=resolved_run_dir, policy=policy or {})
+        run_daemon_review(run_dir=resolved_run_dir, policy=policy or {})
         materialized = materialize_run_summary(run_dir=resolved_run_dir)
         summary_payload = dict(materialized.get("summary", {}))
         summary_paths = {
@@ -1134,6 +1140,7 @@ def _build_cards(
     dojo = dict(summary_payload.get("dojo", {}))
     pulse = dict(summary_payload.get("pulse", {}))
     search = dict(summary_payload.get("search", {}))
+    daemon = dict(summary_payload.get("daemon", {}))
     trace_state = dict(summary_payload.get("trace", {}))
     evals = dict(summary_payload.get("evals", {}))
     handoff = dict(summary_payload.get("handoff", {}))
@@ -1142,6 +1149,8 @@ def _build_cards(
     result_contract = dict(summary_payload.get("result_contract", {}))
     contracts = dict(summary_payload.get("contracts", {}))
     runtime = dict(summary_payload.get("runtime", {}))
+    event_bus = dict(summary_payload.get("event_bus", {}))
+    permissions = dict(summary_payload.get("permissions", {}))
     next_step = dict(summary_payload.get("next_step", {}))
     assist_mode = dict(assist_bundle.get("assist_mode", {}))
     assist_session = dict(assist_bundle.get("assist_session_state", {}))
@@ -1212,6 +1221,17 @@ def _build_cards(
             "severity": "medium" if _clean_text(evals.get("protocol_status")) == "fail" or int(evals.get("failed_count", 0) or 0) > 0 else "normal",
         },
         {
+            "card_id": "permissions",
+            "title": "Permission Mode",
+            "value": _clean_text(permissions.get("current_mode")) or "not_materialized",
+            "detail": (
+                f"Pending approvals `{permissions.get('pending_approval_count', 0)}`"
+                f" | approval-gated `{permissions.get('approval_gated_action_count', 0)}`"
+                f" | subscribers `{event_bus.get('subscription_count', 0)}`"
+            ),
+            "severity": "medium" if int(permissions.get("pending_approval_count", 0) or 0) > 0 or _clean_text(permissions.get("current_mode")) == "review" else "normal",
+        },
+        {
             "card_id": "handoff",
             "title": "Result Handoff",
             "value": _clean_text(handoff.get("selected_focus_label"))
@@ -1268,6 +1288,17 @@ def _build_cards(
                 f" | direction `{search.get('recommended_direction') or 'unknown'}`"
             ),
             "severity": "medium" if bool(search.get("stop_search_explicit")) else "normal",
+        },
+        {
+            "card_id": "background_daemon",
+            "title": "Background Daemon",
+            "value": _clean_text(daemon.get("status")) or "not_materialized",
+            "detail": (
+                f"Jobs `{daemon.get('job_count', 0)}`"
+                f" | approvals `{daemon.get('pending_approval_count', 0)}`"
+                f" | resumable `{daemon.get('resumable_job_count', 0)}`"
+            ),
+            "severity": "medium" if int(daemon.get("stale_job_count", 0) or 0) > 0 or int(daemon.get("pending_approval_count", 0) or 0) > 0 else "normal",
         },
         {
             "card_id": "assist_control",
@@ -1360,6 +1391,7 @@ def _build_capability_manifest(
     guide = dict(assist_bundle.get("assistant_connection_guide", {}))
     benchmark = dict(summary_payload.get("benchmark", {}))
     pulse = dict(summary_payload.get("pulse", {}))
+    daemon = dict(summary_payload.get("daemon", {}))
     profiles = dict(summary_payload.get("profiles", {}))
     runtime = dict(summary_payload.get("runtime", {}))
     data = dict(summary_payload.get("data", {}))
@@ -1505,6 +1537,30 @@ def _build_capability_manifest(
             ),
         },
         {
+            "capability_id": "background_continuity",
+            "name": "Background Continuity",
+            "status": (
+                "enabled"
+                if int(daemon.get("job_count", 0) or 0) > 0
+                else ("needs_run_context" if onboarding else "materializing")
+            ),
+            "detail": "Relaytic can keep bounded background jobs, approvals, checkpoints, and resume posture visible instead of hiding long-running work.",
+            "status_reason": (
+                "Background continuity becomes meaningful after a governed run exists."
+                if onboarding
+                else (
+                    "Daemon artifacts are already available for this run."
+                    if int(daemon.get("job_count", 0) or 0) > 0 or _clean_text(daemon.get("status"))
+                    else "Daemon artifacts will appear after the daemon review materializes."
+                )
+            ),
+            "activation_hint": (
+                f"Start a run first with `{_example_run_command(run_dir=None)}`."
+                if onboarding
+                else f"Use `relaytic daemon show --run-dir {_display_run_dir(summary_payload)}`."
+            ),
+        },
+        {
             "capability_id": "result_contract",
             "name": "Result Contract",
             "status": (
@@ -1637,6 +1693,7 @@ def _build_action_affordances(
     next_step = dict(summary_payload.get("next_step", {}))
     benchmark = dict(summary_payload.get("benchmark", {}))
     pulse = dict(summary_payload.get("pulse", {}))
+    daemon = dict(summary_payload.get("daemon", {}))
     trace_state = dict(summary_payload.get("trace", {}))
     evals = dict(summary_payload.get("evals", {}))
     handoff = dict(summary_payload.get("handoff", {}))
@@ -1893,6 +1950,16 @@ def _build_action_affordances(
                 "command_hint": f"relaytic pulse show --run-dir {run_dir}",
             }
         )
+    if daemon:
+        actions.append(
+            {
+                "action_id": "show_daemon",
+                "title": "Show Background Jobs",
+                "challenge_level": "low",
+                "detail": "Inspect queued jobs, resumable jobs, approvals, checkpoints, and stale-job recovery from one daemon surface.",
+                "command_hint": f"relaytic daemon show --run-dir {run_dir}",
+            }
+        )
     if trace_state:
         actions.append(
             {
@@ -1987,6 +2054,7 @@ def _build_question_starters(
     benchmark = dict(summary_payload.get("benchmark", {}))
     decision_lab = dict(summary_payload.get("decision_lab", {}))
     control = dict(summary_payload.get("control", {}))
+    daemon = dict(summary_payload.get("daemon", {}))
     handoff = dict(summary_payload.get("handoff", {}))
     learnings = dict(summary_payload.get("learnings", {}))
     workspace = dict(summary_payload.get("workspace", {}))
@@ -2129,6 +2197,14 @@ def _build_question_starters(
                 "category": "workspace_continue",
                 "question": "use the same data for the next run",
                 "detail": "Keeps the same investigation alive without hiding the continuation choice.",
+            }
+        )
+    if daemon:
+        questions.append(
+            {
+                "category": "background",
+                "question": "show the background jobs",
+                "detail": "Shows queued jobs, resumable jobs, approvals, stale jobs, and memory-maintenance state.",
             }
         )
     if result_contract:

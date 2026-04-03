@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 from typing import Any
 
@@ -74,6 +75,60 @@ def relaytic_show_runtime(*, run_dir: str, limit: int = 20) -> dict[str, Any]:
     return cli._show_runtime_surface(run_dir=run_dir, limit=max(1, int(limit)))
 
 
+def relaytic_show_event_bus(*, run_dir: str, config_path: str | None = None) -> dict[str, Any]:
+    """Render the current Slice 13B event-bus surface for a Relaytic run."""
+    cli = _cli()
+    return cli._show_event_bus_surface(run_dir=run_dir, config_path=config_path)
+
+
+def relaytic_show_permissions(*, run_dir: str, config_path: str | None = None) -> dict[str, Any]:
+    """Render the current Slice 13B permission-mode surface for a Relaytic run."""
+    cli = _cli()
+    return cli._show_permission_surface(run_dir=run_dir, config_path=config_path)
+
+
+def relaytic_check_permission(
+    *,
+    run_dir: str,
+    action: str,
+    config_path: str | None = None,
+    mode: str | None = None,
+    actor_type: str = "agent",
+    actor_name: str | None = None,
+) -> dict[str, Any]:
+    """Evaluate one action against the current or overridden permission mode and append the decision."""
+    cli = _cli()
+    return cli._check_permission_surface(
+        run_dir=run_dir,
+        action_id=action,
+        config_path=config_path,
+        mode=mode,
+        actor_type=_normalize_actor_type(actor_type),
+        actor_name=actor_name,
+    )
+
+
+def relaytic_decide_permission(
+    *,
+    run_dir: str,
+    request_id: str,
+    decision: str,
+    config_path: str | None = None,
+    actor_type: str = "agent",
+    actor_name: str | None = None,
+) -> dict[str, Any]:
+    """Approve or deny one pending permission request and append the decision."""
+    cli = _cli()
+    return cli._decide_permission_surface(
+        run_dir=run_dir,
+        request_id=request_id,
+        decision=decision,
+        config_path=config_path,
+        actor_type=_normalize_actor_type(actor_type),
+        actor_name=actor_name,
+    )
+
+
 def relaytic_show_control(*, run_dir: str) -> dict[str, Any]:
     """Render the current Slice 10C control surface for a Relaytic run."""
     cli = _cli()
@@ -107,6 +162,50 @@ def relaytic_show_search(*, run_dir: str, config_path: str | None = None) -> dic
     """Render the current Slice 13 search-controller surface for a Relaytic run."""
     cli = _cli()
     return cli._show_search_surface(run_dir=run_dir, config_path=config_path)
+
+
+def relaytic_show_daemon(*, run_dir: str, config_path: str | None = None) -> dict[str, Any]:
+    """Render the current Slice 13C bounded background-job surface for a Relaytic run."""
+    cli = _cli()
+    return cli._show_daemon_surface(run_dir=run_dir, config_path=config_path)
+
+
+def relaytic_run_background_job(
+    *,
+    run_dir: str,
+    job_id: str,
+    config_path: str | None = None,
+    actor_type: str = "agent",
+    actor_name: str | None = None,
+) -> dict[str, Any]:
+    """Start one bounded background job, requesting approval first when policy requires it."""
+    cli = _cli()
+    return cli._run_background_job_surface(
+        run_dir=run_dir,
+        job_id=job_id,
+        config_path=config_path,
+        actor_type=_normalize_actor_type(actor_type),
+        actor_name=actor_name,
+    )
+
+
+def relaytic_resume_background_job(
+    *,
+    run_dir: str,
+    job_id: str,
+    config_path: str | None = None,
+    actor_type: str = "agent",
+    actor_name: str | None = None,
+) -> dict[str, Any]:
+    """Resume one paused or stale background job from its explicit checkpoint."""
+    cli = _cli()
+    return cli._resume_background_job_surface(
+        run_dir=run_dir,
+        job_id=job_id,
+        config_path=config_path,
+        actor_type=_normalize_actor_type(actor_type),
+        actor_name=actor_name,
+    )
 
 
 def relaytic_scan_release_safety(
@@ -713,6 +812,8 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_server_info",
             "relaytic_show_run",
             "relaytic_show_runtime",
+            "relaytic_show_event_bus",
+            "relaytic_show_permissions",
             "relaytic_show_control",
             "relaytic_show_mission_control",
             "relaytic_show_handoff",
@@ -720,6 +821,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_workspace",
             "relaytic_show_pulse",
             "relaytic_show_search",
+            "relaytic_show_daemon",
             "relaytic_show_release_safety",
             "relaytic_show_trace",
             "relaytic_replay_trace",
@@ -747,12 +849,16 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_review_decision",
             "relaytic_review_pulse",
             "relaytic_review_search",
+            "relaytic_run_background_job",
+            "relaytic_resume_background_job",
             "relaytic_scan_release_safety",
             "relaytic_run_agent_evals",
             "relaytic_assist_turn",
             "relaytic_set_next_run_focus",
             "relaytic_continue_workspace",
             "relaytic_reset_learnings",
+            "relaytic_check_permission",
+            "relaytic_decide_permission",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
             "relaytic_run_autonomy",
@@ -774,7 +880,7 @@ def relaytic_integrations_show() -> dict[str, Any]:
 
 def build_interoperability_tool_specs() -> list[InteropToolSpec]:
     """Return the canonical host-neutral tool contract for Relaytic."""
-    return [
+    specs = [
         InteropToolSpec(
             name="relaytic_server_info",
             title="Relaytic Server Info",
@@ -806,6 +912,22 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_runtime,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_event_bus",
+            title="Show Relaytic Event Bus",
+            description="Render the current Slice 13B typed event bus, subscriber registry, and hook-dispatch projection for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_event_bus,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_permissions",
+            title="Show Relaytic Permissions",
+            description="Render the current Slice 13B permission mode, approval posture, and session capability contract for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_permissions,
         ),
         InteropToolSpec(
             name="relaytic_show_control",
@@ -870,6 +992,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_search,
+        ),
+        InteropToolSpec(
+            name="relaytic_show_daemon",
+            title="Show Relaytic Background Daemon",
+            description="Render the current Slice 13C bounded background-job surface, including approvals, checkpoints, resumable jobs, and memory-maintenance posture for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_daemon,
         ),
         InteropToolSpec(
             name="relaytic_show_release_safety",
@@ -984,6 +1114,22 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             handler=relaytic_continue_workspace,
         ),
         InteropToolSpec(
+            name="relaytic_check_permission",
+            title="Check Relaytic Permission",
+            description="Evaluate one tool or action against the current Relaytic permission mode and append the resulting decision.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_check_permission,
+        ),
+        InteropToolSpec(
+            name="relaytic_decide_permission",
+            title="Decide Relaytic Permission",
+            description="Resolve one pending Relaytic approval request by approving or denying it explicitly.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_decide_permission,
+        ),
+        InteropToolSpec(
             name="relaytic_intake_interpret",
             title="Interpret Relaytic Intake",
             description="Translate free-form human or agent input into Relaytic mandate/context/intake artifacts.",
@@ -1072,6 +1218,22 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             handler=relaytic_review_search,
         ),
         InteropToolSpec(
+            name="relaytic_run_background_job",
+            title="Run Relaytic Background Job",
+            description="Start one bounded Slice 13C background job for an existing Relaytic run, requesting approval first when policy requires it.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_run_background_job,
+        ),
+        InteropToolSpec(
+            name="relaytic_resume_background_job",
+            title="Resume Relaytic Background Job",
+            description="Resume one paused or stale Slice 13C background job from its explicit checkpoint for an existing Relaytic run.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_resume_background_job,
+        ),
+        InteropToolSpec(
             name="relaytic_scan_release_safety",
             title="Scan Relaytic Release Safety",
             description="Execute the Slice 13A release-safety scan for a built bundle or the tracked workspace, writing attestation and packaging-regression artifacts.",
@@ -1152,6 +1314,101 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             handler=relaytic_integrations_show,
         ),
     ]
+    return [_wrap_tool_spec(spec) for spec in specs]
+
+
+def _wrap_tool_spec(spec: InteropToolSpec) -> InteropToolSpec:
+    if spec.name == "relaytic_server_info":
+        return spec
+
+    def _wrapped_handler(**kwargs: Any) -> dict[str, Any]:
+        run_dir = _resolve_tool_event_run_dir(tool_name=spec.name, kwargs=kwargs)
+        if run_dir is not None:
+            _emit_tool_event(
+                tool_name=spec.name,
+                run_dir=run_dir,
+                kwargs=kwargs,
+                event_type="tool_pre_use",
+                status="running",
+                summary=f"Relaytic host tool `{spec.name}` started.",
+            )
+        try:
+            result = spec.handler(**kwargs)
+        except Exception:
+            if run_dir is not None:
+                _emit_tool_event(
+                    tool_name=spec.name,
+                    run_dir=run_dir,
+                    kwargs=kwargs,
+                    event_type="tool_post_use",
+                    status="error",
+                    summary=f"Relaytic host tool `{spec.name}` failed.",
+                )
+            raise
+        if run_dir is not None:
+            _emit_tool_event(
+                tool_name=spec.name,
+                run_dir=run_dir,
+                kwargs=kwargs,
+                event_type="tool_post_use",
+                status="ok",
+                summary=f"Relaytic host tool `{spec.name}` completed.",
+            )
+        return result
+
+    _wrapped_handler.__signature__ = inspect.signature(spec.handler)
+    _wrapped_handler.__name__ = getattr(spec.handler, "__name__", spec.name)
+    _wrapped_handler.__doc__ = getattr(spec.handler, "__doc__", None)
+
+    return InteropToolSpec(
+        name=spec.name,
+        title=spec.title,
+        description=spec.description,
+        category=spec.category,
+        annotations=spec.annotations,
+        handler=_wrapped_handler,
+        structured_output=spec.structured_output,
+    )
+
+
+def _resolve_tool_event_run_dir(*, tool_name: str, kwargs: dict[str, Any]) -> Path | None:
+    run_dir = kwargs.get("run_dir")
+    if run_dir:
+        return Path(str(run_dir))
+    data_path = kwargs.get("data_path")
+    if tool_name == "relaytic_run" and data_path:
+        return _resolve_run_dir(run_dir=None, data_path=str(data_path))
+    return None
+
+
+def _emit_tool_event(
+    *,
+    tool_name: str,
+    run_dir: Path,
+    kwargs: dict[str, Any],
+    event_type: str,
+    status: str,
+    summary: str,
+) -> None:
+    try:
+        cli = _cli()
+        config_path = kwargs.get("config_path") or kwargs.get("config")
+        policy = cli._load_mission_control_policy(run_dir=str(run_dir), config_path=config_path)
+        runtime_payload = cli._show_runtime_surface(run_dir=run_dir, limit=1)
+        stage = str(dict(runtime_payload.get("surface_payload", {}).get("runtime", {})).get("current_stage", "")).strip() or "runtime"
+        cli.record_runtime_event(
+            run_dir=run_dir,
+            policy=policy,
+            event_type=event_type,
+            stage=stage,
+            source_surface="mcp",
+            source_command=tool_name,
+            status=status,
+            summary=summary,
+            metadata={"tool_name": tool_name},
+        )
+    except Exception:
+        return
 
 
 def _resolve_run_dir(*, run_dir: str | None, data_path: str | None) -> Path:

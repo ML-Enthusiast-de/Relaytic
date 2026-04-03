@@ -4,16 +4,23 @@ from pathlib import Path
 
 from relaytic.interoperability import (
     relaytic_assist_turn,
+    relaytic_check_permission,
     relaytic_continue_workspace,
+    relaytic_run_background_job,
+    relaytic_resume_background_job,
+    relaytic_decide_permission,
     relaytic_reset_learnings,
     relaytic_run,
     relaytic_run_agent_evals,
     relaytic_review_search,
     relaytic_server_info,
     relaytic_show_agent_evals,
+    relaytic_show_event_bus,
     relaytic_show_handoff,
     relaytic_show_learnings,
     relaytic_show_mission_control,
+    relaytic_show_permissions,
+    relaytic_show_daemon,
     relaytic_show_search,
     relaytic_show_trace,
     relaytic_show_workspace,
@@ -84,6 +91,18 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     assert search_show_payload["surface_payload"]["status"] == "ok"
     assert search_show_payload["surface_payload"]["search"]["value_band"] in {"low", "medium", "high"}
 
+    daemon_show_payload = relaytic_show_daemon(run_dir=str(run_dir))
+    assert daemon_show_payload["surface_payload"]["status"] == "ok"
+    assert daemon_show_payload["surface_payload"]["daemon"]["job_count"] >= 1
+
+    daemon_run_payload = relaytic_run_background_job(run_dir=str(run_dir), job_id="job_search_campaign")
+    assert daemon_run_payload["surface_payload"]["status"] == "ok"
+    assert daemon_run_payload["surface_payload"]["job"]["status"] == "paused"
+
+    daemon_resume_payload = relaytic_resume_background_job(run_dir=str(run_dir), job_id="job_search_campaign")
+    assert daemon_resume_payload["surface_payload"]["status"] == "ok"
+    assert daemon_resume_payload["surface_payload"]["job"]["status"] == "completed"
+
     continue_payload = relaytic_continue_workspace(
         run_dir=str(run_dir),
         direction="same_data",
@@ -97,6 +116,30 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     rerun_payload = relaytic_assist_turn(run_dir=str(run_dir), message="go back to planning")
     assert rerun_payload["surface_payload"]["turn"]["action_kind"] == "rerun_stage"
     assert "planning" in list(rerun_payload["surface_payload"]["turn"]["executed_stages"])
+
+    event_bus_payload = relaytic_show_event_bus(run_dir=str(run_dir))
+    assert event_bus_payload["surface_payload"]["status"] == "ok"
+    assert event_bus_payload["surface_payload"]["events"]["subscription_count"] >= 1
+
+    permissions_payload = relaytic_show_permissions(run_dir=str(run_dir))
+    assert permissions_payload["surface_payload"]["status"] == "ok"
+    assert permissions_payload["surface_payload"]["permissions"]["current_mode"] is not None
+
+    permission_check_payload = relaytic_check_permission(
+        run_dir=str(run_dir),
+        action="relaytic_run_autonomy",
+        mode="review",
+    )
+    assert permission_check_payload["surface_payload"]["decision"]["decision"] == "approval_requested"
+    request_id = permission_check_payload["surface_payload"]["decision"]["request_id"]
+    assert request_id
+
+    permission_decide_payload = relaytic_decide_permission(
+        run_dir=str(run_dir),
+        request_id=str(request_id),
+        decision="approve",
+    )
+    assert permission_decide_payload["surface_payload"]["decision"]["decision"] == "approved"
 
     trace_payload = relaytic_show_trace(run_dir=str(run_dir))
     assert trace_payload["surface_payload"]["trace"]["span_count"] > 0
@@ -117,10 +160,17 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
 
     server_info = relaytic_server_info()
     assert server_info["status"] == "ok"
+    assert "relaytic_show_event_bus" in server_info["inspection_tools"]
+    assert "relaytic_show_permissions" in server_info["inspection_tools"]
+    assert "relaytic_show_daemon" in server_info["inspection_tools"]
     assert "relaytic_show_trace" in server_info["inspection_tools"]
     assert "relaytic_show_handoff" in server_info["inspection_tools"]
     assert "relaytic_show_learnings" in server_info["inspection_tools"]
     assert "relaytic_show_workspace" in server_info["inspection_tools"]
+    assert "relaytic_check_permission" in server_info["workflow_tools"]
+    assert "relaytic_decide_permission" in server_info["workflow_tools"]
+    assert "relaytic_run_background_job" in server_info["workflow_tools"]
+    assert "relaytic_resume_background_job" in server_info["workflow_tools"]
     assert "relaytic_run_agent_evals" in server_info["workflow_tools"]
     assert "relaytic_set_next_run_focus" in server_info["workflow_tools"]
     assert "relaytic_reset_learnings" in server_info["workflow_tools"]

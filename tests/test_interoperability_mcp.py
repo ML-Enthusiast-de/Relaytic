@@ -25,9 +25,16 @@ def test_interoperability_specs_include_trace_eval_handoff_and_learnings_tools()
     names = {spec.name for spec in build_interoperability_tool_specs()}
     assert {
         "relaytic_show_search",
+        "relaytic_show_daemon",
         "relaytic_show_release_safety",
+        "relaytic_show_event_bus",
+        "relaytic_show_permissions",
         "relaytic_review_search",
+        "relaytic_run_background_job",
+        "relaytic_resume_background_job",
         "relaytic_scan_release_safety",
+        "relaytic_check_permission",
+        "relaytic_decide_permission",
         "relaytic_show_trace",
         "relaytic_replay_trace",
         "relaytic_run_agent_evals",
@@ -160,6 +167,30 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                             "high",
                         }
 
+                        daemon_show_result = await session.call_tool(
+                            "relaytic_show_daemon",
+                            {"run_dir": str(run_dir)},
+                        )
+                        daemon_show_payload = _structured_payload(daemon_show_result)
+                        assert daemon_show_payload["surface_payload"]["status"] == "ok"
+                        assert daemon_show_payload["surface_payload"]["daemon"]["job_count"] >= 1
+
+                        daemon_run_result = await session.call_tool(
+                            "relaytic_run_background_job",
+                            {"run_dir": str(run_dir), "job_id": "job_search_campaign"},
+                        )
+                        daemon_run_payload = _structured_payload(daemon_run_result)
+                        assert daemon_run_payload["surface_payload"]["status"] == "ok"
+                        assert daemon_run_payload["surface_payload"]["job"]["status"] == "paused"
+
+                        daemon_resume_result = await session.call_tool(
+                            "relaytic_resume_background_job",
+                            {"run_dir": str(run_dir), "job_id": "job_search_campaign"},
+                        )
+                        daemon_resume_payload = _structured_payload(daemon_resume_result)
+                        assert daemon_resume_payload["surface_payload"]["status"] == "ok"
+                        assert daemon_resume_payload["surface_payload"]["job"]["status"] == "completed"
+
                         continue_result = await session.call_tool(
                             "relaytic_continue_workspace",
                             {
@@ -182,6 +213,41 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         assert runtime_payload["surface_payload"]["status"] == "ok"
                         assert runtime_payload["surface_payload"]["runtime"]["event_count"] >= 10
                         assert runtime_payload["surface_payload"]["runtime"]["last_surface"] == "mcp"
+
+                        event_bus_result = await session.call_tool(
+                            "relaytic_show_event_bus",
+                            {"run_dir": str(run_dir)},
+                        )
+                        event_bus_payload = _structured_payload(event_bus_result)
+                        assert event_bus_payload["surface_payload"]["status"] == "ok"
+                        assert event_bus_payload["surface_payload"]["events"]["subscription_count"] >= 1
+
+                        permissions_result = await session.call_tool(
+                            "relaytic_show_permissions",
+                            {"run_dir": str(run_dir)},
+                        )
+                        permissions_payload = _structured_payload(permissions_result)
+                        assert permissions_payload["surface_payload"]["status"] == "ok"
+                        assert permissions_payload["surface_payload"]["permissions"]["current_mode"] is not None
+
+                        permission_check_result = await session.call_tool(
+                            "relaytic_check_permission",
+                            {"run_dir": str(run_dir), "action": "relaytic_run_autonomy", "mode": "review"},
+                        )
+                        permission_check_payload = _structured_payload(permission_check_result)
+                        assert permission_check_payload["surface_payload"]["decision"]["decision"] == "approval_requested"
+                        assert permission_check_payload["surface_payload"]["decision"]["request_id"] is not None
+
+                        permission_decide_result = await session.call_tool(
+                            "relaytic_decide_permission",
+                            {
+                                "run_dir": str(run_dir),
+                                "request_id": permission_check_payload["surface_payload"]["decision"]["request_id"],
+                                "decision": "approve",
+                            },
+                        )
+                        permission_decide_payload = _structured_payload(permission_decide_result)
+                        assert permission_decide_payload["surface_payload"]["decision"]["decision"] == "approved"
 
                         assist_result = await session.call_tool(
                             "relaytic_assist_turn",

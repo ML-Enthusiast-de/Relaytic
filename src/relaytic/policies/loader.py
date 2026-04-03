@@ -97,6 +97,9 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     control_cfg = dict(config.get("control", {}))
     decision_cfg = dict(config.get("decision", {}))
     mission_control_cfg = dict(config.get("mission_control", {}))
+    events_cfg = dict(config.get("events", {}))
+    permissions_cfg = dict(config.get("permissions", {}))
+    daemon_cfg = dict(config.get("daemon", {}))
     dojo_cfg = dict(config.get("dojo", {}))
     pulse_cfg = dict(config.get("pulse", {}))
     tracing_cfg = dict(config.get("tracing", {}))
@@ -326,6 +329,36 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "capability_enforcement_enabled": bool(runtime_cfg.get("capability_enforcement_enabled", True)),
             "semantic_rowless_default": bool(runtime_cfg.get("semantic_rowless_default", True)),
             "max_recent_events": int(runtime_cfg.get("max_recent_events", 50) or 50),
+        },
+        "events": {
+            "enabled": bool(events_cfg.get("enabled", True)),
+            "max_recent_dispatches": int(events_cfg.get("max_recent_dispatches", 60) or 60),
+            "project_dispatches_without_live_subscribers": bool(
+                events_cfg.get("project_dispatches_without_live_subscribers", True)
+            ),
+            "read_only_subscribers_only": bool(events_cfg.get("read_only_subscribers_only", True)),
+        },
+        "permissions": {
+            "enabled": bool(permissions_cfg.get("enabled", True)),
+            "default_mode": str(permissions_cfg.get("default_mode", "bounded_autonomy") or "bounded_autonomy"),
+            "require_review_for_high_impact_actions": bool(
+                permissions_cfg.get("require_review_for_high_impact_actions", True)
+            ),
+            "allow_remote_actions": bool(permissions_cfg.get("allow_remote_actions", False)),
+            "max_recent_decisions": int(permissions_cfg.get("max_recent_decisions", 40) or 40),
+        },
+        "daemon": {
+            "enabled": bool(daemon_cfg.get("enabled", True)),
+            "allow_background_execution": bool(daemon_cfg.get("allow_background_execution", True)),
+            "allow_search_campaigns": bool(daemon_cfg.get("allow_search_campaigns", True)),
+            "allow_memory_maintenance": bool(daemon_cfg.get("allow_memory_maintenance", True)),
+            "allow_pulse_followup": bool(daemon_cfg.get("allow_pulse_followup", True)),
+            "allow_benchmark_campaigns": bool(daemon_cfg.get("allow_benchmark_campaigns", False)),
+            "stale_after_minutes": int(daemon_cfg.get("stale_after_minutes", 180) or 180),
+            "max_recent_job_events": int(daemon_cfg.get("max_recent_job_events", 60) or 60),
+            "checkpoint_resume_enabled": bool(daemon_cfg.get("checkpoint_resume_enabled", True)),
+            "require_approval_for_search_campaigns": bool(daemon_cfg.get("require_approval_for_search_campaigns", True)),
+            "require_approval_for_benchmark_campaigns": bool(daemon_cfg.get("require_approval_for_benchmark_campaigns", True)),
         },
         "intelligence": {
             "enabled": bool(intelligence_cfg.get("enabled", True)),

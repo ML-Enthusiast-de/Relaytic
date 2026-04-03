@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 Intended package boundaries:
 
@@ -102,3 +102,29 @@ Slice 13B should not be considered complete without targeted tests that cover at
 - one denied-action or approval-gated case
 - one CLI-versus-MCP parity case
 - one regression guard against hidden authority drift
+
+## Implementation Notes
+
+Shipped public surfaces:
+
+- `relaytic events show`
+- `relaytic permissions show`
+- `relaytic permissions check`
+- `relaytic permissions decide`
+- MCP parity through:
+  - `relaytic_show_event_bus`
+  - `relaytic_show_permissions`
+  - `relaytic_check_permission`
+  - `relaytic_decide_permission`
+
+Shipped artifact set:
+
+- `event_schema.json`
+- `event_subscription_registry.json`
+- `hook_registry.json`
+- `hook_dispatch_report.json`
+- `permission_mode.json`
+- `tool_permission_matrix.json`
+- `approval_policy_report.json`
+- `permission_decision_log.jsonl`
+- `session_capability_contract.json`

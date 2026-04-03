@@ -38,7 +38,10 @@ def build_run_summary(
         read_handoff_bundle,
     )
     from relaytic.iteration import read_iteration_bundle
+    from relaytic.events import read_event_bus_bundle
+    from relaytic.permissions import read_permission_bundle
     from relaytic.search import read_search_bundle
+    from relaytic.daemon import read_daemon_bundle
     from relaytic.learnings import (
         default_learnings_state_dir,
         read_learnings_snapshot,
@@ -286,6 +289,9 @@ def build_run_summary(
             "context_influence_report": "context_influence_report.json",
         },
     )
+    event_bus_bundle = read_event_bus_bundle(root)
+    permission_bundle = read_permission_bundle(root)
+    daemon_bundle = read_daemon_bundle(root)
     lifecycle_bundle = _read_bundle(
         root,
         {
@@ -435,6 +441,23 @@ def build_run_summary(
     capability_profiles = _bundle_item(runtime_bundle, "capability_profiles")
     data_access_audit = _bundle_item(runtime_bundle, "data_access_audit")
     context_influence_report = _bundle_item(runtime_bundle, "context_influence_report")
+    event_schema = dict(event_bus_bundle.get("event_schema", {})) if isinstance(event_bus_bundle.get("event_schema"), dict) else {}
+    event_subscription_registry = dict(event_bus_bundle.get("event_subscription_registry", {})) if isinstance(event_bus_bundle.get("event_subscription_registry"), dict) else {}
+    hook_registry = dict(event_bus_bundle.get("hook_registry", {})) if isinstance(event_bus_bundle.get("hook_registry"), dict) else {}
+    hook_dispatch_report = dict(event_bus_bundle.get("hook_dispatch_report", {})) if isinstance(event_bus_bundle.get("hook_dispatch_report"), dict) else {}
+    permission_mode = dict(permission_bundle.get("permission_mode", {})) if isinstance(permission_bundle.get("permission_mode"), dict) else {}
+    tool_permission_matrix = dict(permission_bundle.get("tool_permission_matrix", {})) if isinstance(permission_bundle.get("tool_permission_matrix"), dict) else {}
+    approval_policy_report = dict(permission_bundle.get("approval_policy_report", {})) if isinstance(permission_bundle.get("approval_policy_report"), dict) else {}
+    session_capability_contract = dict(permission_bundle.get("session_capability_contract", {})) if isinstance(permission_bundle.get("session_capability_contract"), dict) else {}
+    daemon_state = dict(daemon_bundle.get("daemon_state", {})) if isinstance(daemon_bundle.get("daemon_state"), dict) else {}
+    background_job_registry = dict(daemon_bundle.get("background_job_registry", {})) if isinstance(daemon_bundle.get("background_job_registry"), dict) else {}
+    background_checkpoint = dict(daemon_bundle.get("background_checkpoint", {})) if isinstance(daemon_bundle.get("background_checkpoint"), dict) else {}
+    resume_session_manifest = dict(daemon_bundle.get("resume_session_manifest", {})) if isinstance(daemon_bundle.get("resume_session_manifest"), dict) else {}
+    background_approval_queue = dict(daemon_bundle.get("background_approval_queue", {})) if isinstance(daemon_bundle.get("background_approval_queue"), dict) else {}
+    memory_maintenance_queue = dict(daemon_bundle.get("memory_maintenance_queue", {})) if isinstance(daemon_bundle.get("memory_maintenance_queue"), dict) else {}
+    memory_maintenance_report_v2 = dict(daemon_bundle.get("memory_maintenance_report", {})) if isinstance(daemon_bundle.get("memory_maintenance_report"), dict) else {}
+    search_resume_plan = dict(daemon_bundle.get("search_resume_plan", {})) if isinstance(daemon_bundle.get("search_resume_plan"), dict) else {}
+    stale_job_report = dict(daemon_bundle.get("stale_job_report", {})) if isinstance(daemon_bundle.get("stale_job_report"), dict) else {}
     champion_vs_candidate = _bundle_item(lifecycle_bundle, "champion_vs_candidate")
     recalibration_decision = _bundle_item(lifecycle_bundle, "recalibration_decision")
     retrain_decision = _bundle_item(lifecycle_bundle, "retrain_decision")
@@ -496,6 +519,7 @@ def build_run_summary(
             dojo_bundle=dojo_bundle,
             pulse_bundle=pulse_bundle,
             search_bundle=search_bundle,
+            daemon_bundle=daemon_bundle,
             handoff_bundle=handoff_bundle,
             learnings_state=learnings_state,
             learnings_snapshot=learnings_snapshot,
@@ -970,6 +994,40 @@ def build_run_summary(
             if isinstance(context_influence_report.get("stage_reports"), list)
             else 0,
         },
+        "event_bus": {
+            "event_type_count": int(event_schema.get("event_type_count", 0) or 0),
+            "subscription_count": int(event_subscription_registry.get("subscription_count", 0) or 0),
+            "hook_registry_count": int(hook_registry.get("hook_count", 0) or 0),
+            "dispatch_count": int(hook_dispatch_report.get("dispatch_count", 0) or 0),
+            "observed_event_count": int(hook_dispatch_report.get("observed_event_count", 0) or 0),
+            "source_of_truth_preserved": bool(hook_dispatch_report.get("source_of_truth_preserved", False)) if hook_dispatch_report else None,
+        },
+        "permissions": {
+            "current_mode": _clean_text(permission_mode.get("current_mode")),
+            "mode_source": _clean_text(permission_mode.get("mode_source")),
+            "pending_approval_count": int(approval_policy_report.get("pending_approval_count", 0) or 0),
+            "approval_requested_count": int(approval_policy_report.get("approval_requested_count", 0) or 0),
+            "denied_count": int(approval_policy_report.get("denied_count", 0) or 0),
+            "allowed_action_count": int(session_capability_contract.get("allowed_action_count", 0) or 0),
+            "approval_gated_action_count": int(session_capability_contract.get("approval_gated_action_count", 0) or 0),
+            "blocked_action_count": int(session_capability_contract.get("blocked_action_count", 0) or 0),
+        },
+        "daemon": {
+            "status": _clean_text(daemon_state.get("status")),
+            "background_execution_enabled": daemon_state.get("background_execution_enabled"),
+            "job_count": int(daemon_state.get("job_count", 0) or 0),
+            "active_job_count": int(daemon_state.get("active_job_count", 0) or 0),
+            "queued_job_count": int(daemon_state.get("queued_job_count", 0) or 0),
+            "paused_job_count": int(daemon_state.get("paused_job_count", 0) or 0),
+            "pending_approval_count": int(background_approval_queue.get("pending_approval_count", 0) or 0),
+            "resumable_job_count": int(resume_session_manifest.get("resumable_job_count", 0) or 0),
+            "checkpoint_count": int(background_checkpoint.get("checkpoint_count", 0) or 0),
+            "stale_job_count": int(stale_job_report.get("stale_job_count", 0) or 0),
+            "memory_task_count": int(memory_maintenance_queue.get("queued_task_count", 0) or 0),
+            "memory_maintenance_executed": memory_maintenance_report_v2.get("executed"),
+            "search_resume_ready": search_resume_plan.get("resume_ready"),
+            "next_resume_step": _clean_text(search_resume_plan.get("next_step")),
+        },
         "lifecycle": {
             "promotion_action": _clean_text(promotion_decision.get("action")),
             "promotion_target": _clean_text(promotion_decision.get("selected_model_family")),
@@ -1113,6 +1171,25 @@ def build_run_summary(
             "intervention_memory_log_path": _path_if_exists(root / "intervention_memory_log.json"),
             "event_stream_path": _path_if_exists(root / "lab_event_stream.jsonl"),
             "capability_profiles_path": _path_if_exists(root / "capability_profiles.json"),
+            "event_schema_path": _path_if_exists(root / "event_schema.json"),
+            "event_subscription_registry_path": _path_if_exists(root / "event_subscription_registry.json"),
+            "hook_registry_path": _path_if_exists(root / "hook_registry.json"),
+            "hook_dispatch_report_path": _path_if_exists(root / "hook_dispatch_report.json"),
+            "permission_mode_path": _path_if_exists(root / "permission_mode.json"),
+            "tool_permission_matrix_path": _path_if_exists(root / "tool_permission_matrix.json"),
+            "approval_policy_report_path": _path_if_exists(root / "approval_policy_report.json"),
+            "permission_decision_log_path": _path_if_exists(root / "permission_decision_log.jsonl"),
+            "session_capability_contract_path": _path_if_exists(root / "session_capability_contract.json"),
+            "daemon_state_path": _path_if_exists(root / "daemon_state.json"),
+            "background_job_registry_path": _path_if_exists(root / "background_job_registry.json"),
+            "background_checkpoint_path": _path_if_exists(root / "background_checkpoint.json"),
+            "resume_session_manifest_path": _path_if_exists(root / "resume_session_manifest.json"),
+            "background_approval_queue_path": _path_if_exists(root / "background_approval_queue.json"),
+            "memory_maintenance_queue_path": _path_if_exists(root / "memory_maintenance_queue.json"),
+            "memory_maintenance_report_path": _path_if_exists(root / "memory_maintenance_report.json"),
+            "search_resume_plan_path": _path_if_exists(root / "search_resume_plan.json"),
+            "stale_job_report_path": _path_if_exists(root / "stale_job_report.json"),
+            "background_job_log_path": _path_if_exists(root / "background_job_log.jsonl"),
         },
     }
     summary["headline"] = _build_headline(summary)
@@ -1137,6 +1214,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     trace = dict(summary.get("trace", {}))
     evals = dict(summary.get("evals", {}))
     search = dict(summary.get("search", {}))
+    daemon = dict(summary.get("daemon", {}))
     handoff = dict(summary.get("handoff", {}))
     learnings = dict(summary.get("learnings", {}))
     workspace = dict(summary.get("workspace", {}))
@@ -1410,6 +1488,24 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Stop search explicitly: `{search.get('stop_search_explicit')}`",
             ]
         )
+    if daemon and any(value not in (None, 0, False, "", []) for value in daemon.values()):
+        lines.extend(
+            [
+                "",
+                "## Background Daemon",
+                f"- Status: `{daemon.get('status') or 'unknown'}`",
+                f"- Background execution enabled: `{daemon.get('background_execution_enabled')}`",
+                f"- Jobs: `{daemon.get('job_count', 0)}`",
+                f"- Pending approvals: `{daemon.get('pending_approval_count', 0)}`",
+                f"- Resumable jobs: `{daemon.get('resumable_job_count', 0)}`",
+                f"- Checkpoints: `{daemon.get('checkpoint_count', 0)}`",
+                f"- Memory tasks: `{daemon.get('memory_task_count', 0)}`",
+                f"- Memory maintenance executed: `{daemon.get('memory_maintenance_executed')}`",
+                f"- Stale jobs: `{daemon.get('stale_job_count', 0)}`",
+            ]
+        )
+        if daemon.get("next_resume_step"):
+            lines.append(f"- Next resume step: `{daemon.get('next_resume_step')}`")
     if handoff and any(value not in (None, 0, False, "", []) for value in handoff.values()):
         lines.extend(
             [
@@ -1609,6 +1705,34 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
             lines.append(f"- Last event: `{runtime.get('last_event_type')}` via `{runtime.get('last_surface') or 'unknown'}`")
         if runtime.get("semantic_rowless_default") is not None:
             lines.append(f"- Rowless semantic default: `{runtime.get('semantic_rowless_default')}`")
+    event_bus = dict(summary.get("event_bus", {}))
+    if event_bus and any(value is not None for value in event_bus.values()):
+        lines.extend(
+            [
+                "",
+                "## Event Bus",
+                f"- Event types: `{event_bus.get('event_type_count', 0)}`",
+                f"- Subscribers: `{event_bus.get('subscription_count', 0)}`",
+                f"- Hook registry entries: `{event_bus.get('hook_registry_count', 0)}`",
+                f"- Projected dispatches: `{event_bus.get('dispatch_count', 0)}`",
+            ]
+        )
+        if event_bus.get("source_of_truth_preserved") is not None:
+            lines.append(f"- Source of truth preserved: `{event_bus.get('source_of_truth_preserved')}`")
+    permissions = dict(summary.get("permissions", {}))
+    if permissions and any(value is not None for value in permissions.values()):
+        lines.extend(
+            [
+                "",
+                "## Permissions",
+                f"- Current mode: `{permissions.get('current_mode') or 'unknown'}`",
+                f"- Pending approvals: `{permissions.get('pending_approval_count', 0)}`",
+                f"- Approval-gated actions: `{permissions.get('approval_gated_action_count', 0)}`",
+                f"- Blocked actions: `{permissions.get('blocked_action_count', 0)}`",
+            ]
+        )
+        if permissions.get("mode_source"):
+            lines.append(f"- Mode source: `{permissions.get('mode_source')}`")
     lines.extend(
         [
             "",
@@ -1873,6 +1997,7 @@ def _resolve_stage(
     dojo_bundle: dict[str, Any],
     pulse_bundle: dict[str, Any],
     search_bundle: dict[str, Any],
+    daemon_bundle: dict[str, Any],
     handoff_bundle: dict[str, Any],
     learnings_state: dict[str, Any],
     learnings_snapshot: dict[str, Any],
@@ -1883,6 +2008,8 @@ def _resolve_stage(
     lifecycle_bundle: dict[str, Any],
     autonomy_bundle: dict[str, Any],
 ) -> str:
+    if daemon_bundle:
+        return "daemon_reviewed"
     if search_bundle:
         return "search_reviewed"
     if pulse_bundle:

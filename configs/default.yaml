@@ -297,3 +297,29 @@ runtime:
   default_profile: small_cpu
   fallback_order:
     - small_cpu
+
+events:
+  enabled: true
+  max_recent_dispatches: 60
+  project_dispatches_without_live_subscribers: true
+  read_only_subscribers_only: true
+
+permissions:
+  enabled: true
+  default_mode: bounded_autonomy
+  require_review_for_high_impact_actions: true
+  allow_remote_actions: false
+  max_recent_decisions: 40
+
+daemon:
+  enabled: true
+  allow_background_execution: true
+  allow_search_campaigns: true
+  allow_memory_maintenance: true
+  allow_pulse_followup: true
+  allow_benchmark_campaigns: false
+  stale_after_minutes: 180
+  max_recent_job_events: 60
+  checkpoint_resume_enabled: true
+  require_approval_for_search_campaigns: true
+  require_approval_for_benchmark_campaigns: true
