@@ -5273,10 +5273,7 @@ def _show_daemon_surface(*, run_dir: str | Path, config_path: str | None = None)
     root = Path(run_dir)
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
-    bundle = _read_json_bundle(root, bundle="daemon")
-    effective_policy_source: str | Path | None = None
-    if not bundle or not isinstance(bundle.get("daemon_state"), dict) or not bundle.get("daemon_state"):
-        bundle, _, effective_policy_source = _materialize_daemon_bundle(run_dir=root, config_path=config_path)
+    bundle, _, effective_policy_source = _materialize_daemon_bundle(run_dir=root, config_path=config_path)
     summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     manifest_path = _refresh_daemon_manifest(root, policy_source=effective_policy_source)
     return {

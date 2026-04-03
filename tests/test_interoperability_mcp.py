@@ -5,6 +5,7 @@ import anyio
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
+from relaytic.core.json_utils import write_json
 from relaytic.interoperability import (
     build_interoperability_tool_specs,
     find_available_port,
@@ -154,6 +155,18 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         search_review_payload = _structured_payload(search_review_result)
                         assert search_review_payload["surface_payload"]["status"] == "ok"
                         assert search_review_payload["surface_payload"]["search"]["recommended_action"] is not None
+                        write_json(
+                            run_dir / "search_controller_plan.json",
+                            {
+                                "status": "ok",
+                                "recommended_action": "expand_challenger_portfolio",
+                                "recommended_direction": "same_data",
+                                "planned_trial_count": 10,
+                            },
+                            indent=2,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                        )
 
                         search_show_result = await session.call_tool(
                             "relaytic_show_search",
@@ -181,7 +194,27 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         )
                         daemon_run_payload = _structured_payload(daemon_run_result)
                         assert daemon_run_payload["surface_payload"]["status"] == "ok"
-                        assert daemon_run_payload["surface_payload"]["job"]["status"] == "paused"
+                        daemon_job = dict(daemon_run_payload["surface_payload"]["job"])
+                        if daemon_job["status"] == "approval_requested":
+                            request_id = daemon_job["request_id"]
+                            assert request_id is not None
+                            daemon_approve_result = await session.call_tool(
+                                "relaytic_decide_permission",
+                                {
+                                    "run_dir": str(run_dir),
+                                    "request_id": request_id,
+                                    "decision": "approve",
+                                },
+                            )
+                            daemon_approve_payload = _structured_payload(daemon_approve_result)
+                            assert daemon_approve_payload["surface_payload"]["decision"]["decision"] == "approved"
+                            daemon_run_result = await session.call_tool(
+                                "relaytic_run_background_job",
+                                {"run_dir": str(run_dir), "job_id": "job_search_campaign"},
+                            )
+                            daemon_run_payload = _structured_payload(daemon_run_result)
+                            daemon_job = dict(daemon_run_payload["surface_payload"]["job"])
+                        assert daemon_job["status"] == "paused"
 
                         daemon_resume_result = await session.call_tool(
                             "relaytic_resume_background_job",

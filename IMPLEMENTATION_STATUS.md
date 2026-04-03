@@ -4,14 +4,14 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 13B, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, Slice 13A release safety, build attestation, and packaging discipline, and Slice 13B event bus, runtime hooks, and visible permission modes
-- next recommended slice: 13C, bounded daemon, resumable jobs, and memory maintenance
+- completed slices: 00 through 13C, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, Slice 13A release safety, build attestation, and packaging discipline, Slice 13B event bus, runtime hooks, and visible permission modes, and Slice 13C bounded daemon, resumable jobs, stale-job reporting, approval-aware background execution, and memory maintenance
+- next recommended slice: 14, real-world feasibility, domain constraints, and action boundaries
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - latest handoff-and-learnings slice: 12D, workspace-first continuity, result contracts, governed learnings migration, and explicit iteration planning
 - latest workspace-and-search slice: 13, search controller, bounded branch widening, and execution-strategy selection
 - latest release-and-packaging slice: 13A, release safety, build attestation, and packaging discipline
 - latest runtime-and-permission slice: 13B, event bus, runtime hooks, and visible permission modes
-- next background-and-resume follow-on after 13B: 13C, bounded daemon, resumable jobs, and memory maintenance
+- latest background-and-resume slice: 13C, bounded daemon, resumable jobs, and memory maintenance
 - next workspace-and-iteration follow-on after 13C: 14, real-world feasibility, domain constraints, and action boundaries
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -101,8 +101,8 @@ The repository currently supports:
 
 The most important not-yet-implemented shifts after the current baseline are:
 
-- an event-bus and visible-permission-mode layer that upgrades the existing runtime event stream and hook audit into a canonical runtime substrate with explicit `review`, `plan`, `safe_execute`, and `bounded_autonomy` postures
-- a bounded daemon and resumable background-job layer so pulse, search, memory maintenance, and long-running governed experiments can continue safely over time without becoming hidden background activity
+- deeper event-bus and permission-mode adoption so later feasibility, remote supervision, and mission-control slices consume the shipped canonical runtime substrate instead of reconstructing state ad hoc
+- richer daemon orchestration that goes beyond the shipped Slice 13C background continuity layer into remote supervision, tighter feasibility coupling, and deeper long-horizon campaign control
 - a stronger governed-learnings upgrade that migrates the shipped workspace learnings into typed, confidence-bearing, reaffirmable, invalidatable, and optionally expirable records instead of mostly durable snapshots plus markdown guidance
 - a stronger workspace and iteration layer that becomes permission-aware, daemon-aware, and remote-supervision-aware rather than only run-to-run aware
 - a remote-supervision layer that lets humans and external agents inspect, approve, deny, resume, and hand off running workspaces without creating a second source of truth

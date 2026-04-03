@@ -60,7 +60,7 @@ Current canonical boundaries:
 
 Reserved future boundaries:
 
-- `src/relaytic/daemon/` should own Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, and memory-maintenance queues
+- `src/relaytic/daemon/` owns Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, approval-aware execution, and memory-maintenance queues
 - `src/relaytic/remote_control/` should own Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 

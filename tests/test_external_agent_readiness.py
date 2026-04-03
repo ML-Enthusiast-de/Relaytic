@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from relaytic.core.json_utils import write_json
 from relaytic.interoperability import (
     relaytic_assist_turn,
     relaytic_check_permission,
@@ -86,6 +87,18 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     search_review_payload = relaytic_review_search(run_dir=str(run_dir), overwrite=True)
     assert search_review_payload["surface_payload"]["status"] == "ok"
     assert search_review_payload["surface_payload"]["search"]["recommended_action"] is not None
+    write_json(
+        run_dir / "search_controller_plan.json",
+        {
+            "status": "ok",
+            "recommended_action": "expand_challenger_portfolio",
+            "recommended_direction": "same_data",
+            "planned_trial_count": 10,
+        },
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
 
     search_show_payload = relaytic_show_search(run_dir=str(run_dir))
     assert search_show_payload["surface_payload"]["status"] == "ok"
@@ -97,7 +110,19 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
 
     daemon_run_payload = relaytic_run_background_job(run_dir=str(run_dir), job_id="job_search_campaign")
     assert daemon_run_payload["surface_payload"]["status"] == "ok"
-    assert daemon_run_payload["surface_payload"]["job"]["status"] == "paused"
+    daemon_job = dict(daemon_run_payload["surface_payload"]["job"])
+    if daemon_job["status"] == "approval_requested":
+        request_id = daemon_job["request_id"]
+        assert request_id
+        approval_payload = relaytic_decide_permission(
+            run_dir=str(run_dir),
+            request_id=str(request_id),
+            decision="approve",
+        )
+        assert approval_payload["surface_payload"]["decision"]["decision"] == "approved"
+        daemon_run_payload = relaytic_run_background_job(run_dir=str(run_dir), job_id="job_search_campaign")
+        daemon_job = dict(daemon_run_payload["surface_payload"]["job"])
+    assert daemon_job["status"] == "paused"
 
     daemon_resume_payload = relaytic_resume_background_job(run_dir=str(run_dir), job_id="job_search_campaign")
     assert daemon_resume_payload["surface_payload"]["status"] == "ok"

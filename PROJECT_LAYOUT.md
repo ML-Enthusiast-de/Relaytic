@@ -186,7 +186,7 @@ Current workspace-first boundaries:
 
 Reserved future boundaries:
 
-- `src/relaytic/daemon/` should own bounded background-job orchestration, resumable jobs, and memory-maintenance queues
+- `src/relaytic/daemon/` owns Slice 13C bounded background-job orchestration, resumable jobs, approval-aware execution, stale-job reporting, and memory-maintenance queues
 - `src/relaytic/remote_control/` should own remote mission-control sessions, approval queues, supervision handoff, and remote-control audit
 - `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
