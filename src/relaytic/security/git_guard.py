@@ -29,7 +29,7 @@ LEAK_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     (
         "generic_secret_assignment",
         re.compile(
-            r"(?i)\b(api[_-]?key|secret|token|password)\b\s*[:=]\s*['\"]?[A-Za-z0-9_\-]{10,}"
+            r"(?i)\b(api[_-]?key|secret|token|password)\b\s*[:=]\s*(?:['\"][A-Za-z0-9_\-]{10,}['\"]|[A-Za-z0-9_\-]{20,})(?:\s*(?:#.*)?)$"
         ),
     ),
     ("windows_user_path", re.compile(r"C:\\Users\\[^\\\s]+\\", re.IGNORECASE)),

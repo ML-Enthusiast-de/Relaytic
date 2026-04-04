@@ -1,6 +1,13 @@
 """Slice 09E assist subsystem exports."""
 
-from .agents import AssistIntent, AssistTurnPlan, build_assist_bundle, plan_assist_turn, render_assist_markdown
+from .agents import (
+    AssistIntent,
+    AssistTurnPlan,
+    build_assist_audit_explanation,
+    build_assist_bundle,
+    plan_assist_turn,
+    render_assist_markdown,
+)
 from .models import (
     ASSISTANT_CONNECTION_GUIDE_SCHEMA_VERSION,
     ASSIST_CONTROLS_SCHEMA_VERSION,
@@ -31,6 +38,7 @@ __all__ = [
     "AssistTurnPlan",
     "AssistantConnectionGuideArtifact",
     "append_assist_turn_log",
+    "build_assist_audit_explanation",
     "build_assist_bundle",
     "build_assist_controls_from_policy",
     "plan_assist_turn",

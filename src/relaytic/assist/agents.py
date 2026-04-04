@@ -366,6 +366,13 @@ def _intent_type(normalized: str, *, requested_stage: str | None, next_run_selec
         return "show_learnings"
     if _looks_like_capability_request(normalized):
         return "capabilities"
+    if ("why" in normalized or "explain" in normalized) and not (
+        normalized.startswith("go back")
+        or normalized.startswith("rerun")
+        or normalized.startswith("redo")
+        or normalized.startswith("restart from")
+    ):
+        return "explain"
     if _looks_like_stage_rerun(normalized):
         return "rerun_stage"
     if _looks_like_takeover(normalized):
@@ -619,6 +626,88 @@ def _build_stage_explanation(*, stage: str, run_summary: dict[str, Any]) -> str:
             f"mandate alignment `{_clean_text(completion.get('mandate_alignment')) or 'unknown'}`."
         )
     return _build_general_explanation(run_summary=run_summary)
+
+
+def build_assist_audit_explanation(
+    *,
+    message: str,
+    run_summary: dict[str, Any],
+    actor_type: str,
+) -> dict[str, Any]:
+    normalized = " ".join(str(message).strip().lower().split())
+    decision = dict(run_summary.get("decision", {}))
+    decision_lab = dict(run_summary.get("decision_lab", {}))
+    feasibility = dict(run_summary.get("feasibility", {}))
+    completion = dict(run_summary.get("completion", {}))
+    benchmark = dict(run_summary.get("benchmark", {}))
+    result_contract = dict(run_summary.get("result_contract", {}))
+    next_step = dict(run_summary.get("next_step", {}))
+    iteration = dict(run_summary.get("iteration", {}))
+
+    question_type = "general"
+    reasons: list[str] = []
+    evidence_refs: list[str] = []
+
+    if "what would change your mind" in normalized or "change your mind" in normalized:
+        question_type = "belief_revision"
+        reasons = [
+            "Relaytic will revise its current posture if benchmark parity changes, fresh local data materially changes the error pattern, or review pressure opens a new high-severity issue.",
+            f"Current recommended direction is `{_clean_text(result_contract.get('recommended_direction')) or _clean_text(result_contract.get('recommended_action')) or _clean_text(dict(result_contract.get('recommended_next_move', {})).get('direction')) or 'unknown'}` under the workspace contract.",
+        ]
+        evidence_refs = ["belief_revision_triggers.json", "result_contract.json", "next_run_plan.json"]
+    elif "why not" in normalized and "rerun" in normalized:
+        question_type = "why_not_rerun"
+        reasons = [
+            _clean_text(feasibility.get("why_not_rerun"))
+            or "Relaytic did not pick a rerun because the current feasibility or review posture points to a different bounded next step.",
+            f"The selected next action is `{_clean_text(feasibility.get('selected_action')) or _clean_text(next_step.get('recommended_action')) or 'unknown'}`.",
+            f"The current constraint kind is `{_clean_text(feasibility.get('primary_constraint_kind')) or 'none'}` and review gate open = `{feasibility.get('gate_open')}`.",
+        ]
+        evidence_refs = ["counterfactual_region_report.json", "decision_constraint_report.json", "run_summary.json"]
+    elif "why not" in normalized:
+        question_type = "why_not"
+        reasons = [
+            "Relaytic rejected at least one alternative because the current contract, benchmark posture, or feasibility posture favored the selected action instead.",
+            f"Recommended next action is `{_clean_text(feasibility.get('selected_action')) or _clean_text(next_step.get('recommended_action')) or 'unknown'}`.",
+        ]
+        evidence_refs = ["result_contract.json", "decision_constraint_report.json", "run_summary.json"]
+    elif "why" in normalized and "model" in normalized:
+        question_type = "model_choice"
+        reasons = [
+            f"Relaytic selected model family `{_clean_text(decision.get('selected_model_family')) or 'unknown'}` for the active route.",
+            f"The route posture is `{_clean_text(decision.get('selected_route_title')) or _clean_text(decision.get('selected_route_id')) or 'unknown'}` with primary metric `{_clean_text(decision.get('primary_metric')) or 'unknown'}`.",
+            f"Benchmark parity is `{_clean_text(benchmark.get('parity_status')) or 'unknown'}` and the decision-lab next action is `{_clean_text(decision_lab.get('selected_next_action')) or 'unknown'}`.",
+        ]
+        evidence_refs = ["plan.json", "leaderboard.csv", "benchmark_parity_report.json", "decision_world_model.json"]
+    elif "why" in normalized and any(token in normalized for token in ("route", "choose", "happen", "selected")):
+        question_type = "why_this_happened"
+        reasons = [
+            f"Relaytic selected next action `{_clean_text(feasibility.get('selected_action')) or _clean_text(decision_lab.get('selected_next_action')) or 'unknown'}` after considering the decision lab, completion, and feasibility layers.",
+            f"Completion posture is `{_clean_text(completion.get('action')) or 'unknown'}`, benchmark parity is `{_clean_text(benchmark.get('parity_status')) or 'unknown'}`, and deployability is `{_clean_text(feasibility.get('deployability')) or 'unknown'}`.",
+            f"Recommended workspace direction is `{_clean_text(feasibility.get('recommended_direction')) or _clean_text(result_contract.get('recommended_direction')) or _clean_text(dict(result_contract.get('recommended_next_move', {})).get('direction')) or 'unknown'}`.",
+        ]
+        evidence_refs = ["run_summary.json", "completion_decision.json", "benchmark_parity_report.json", "decision_constraint_report.json"]
+    else:
+        question_type = "general"
+        reasons = [
+            _build_general_explanation(run_summary=run_summary),
+        ]
+        evidence_refs = ["run_summary.json"]
+
+    reasons = [item for item in reasons if _clean_text(item)]
+    if actor_type.strip().lower() == "agent":
+        answer = " ".join(reasons)
+    else:
+        answer = " ".join(reasons[:2]) if reasons else _build_general_explanation(run_summary=run_summary)
+
+    return {
+        "question_type": question_type,
+        "answer": answer,
+        "reasons": reasons,
+        "evidence_refs": evidence_refs,
+        "actor_type": actor_type,
+        "llm_enhanced": False,
+    }
 
 
 def _build_connection_response(*, bundle: dict[str, Any]) -> str:

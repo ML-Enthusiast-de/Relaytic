@@ -5526,6 +5526,8 @@ def _run_assist_turn(
     actor_type: str = "user",
     actor_name: str | None = None,
 ) -> dict[str, Any]:
+    from relaytic.assist import build_assist_audit_explanation
+
     root = Path(run_dir)
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
@@ -5565,6 +5567,7 @@ def _run_assist_turn(
     approved_stage_text = str(control_summary.get("approved_stage", "")).strip()
     approved_stage = approved_stage_text or (plan.requested_stage if control_decision in {"accept", "accept_with_modification"} else None)
     executed_stages: list[str] = []
+    audit_payload: dict[str, Any] | None = None
     if control_decision in {"reject", "defer"}:
         action_message = str(dict(control_bundle.get("override_decision", {})).get("summary") or plan.response_message)
     else:
@@ -5636,6 +5639,20 @@ def _run_assist_turn(
                 + ", ".join(executed_stages)
                 + "."
             )
+    elif control_decision in {"accept", "accept_with_modification"} and approved_action_kind == "respond" and plan.intent.intent_type == "explain":
+        audit_payload = build_assist_audit_explanation(
+            message=message,
+            run_summary=run_summary,
+            actor_type=actor_type,
+        )
+        audit_payload = _maybe_enhance_audit_explanation_with_local_advisor(
+            run_dir=root,
+            config_path=config_path,
+            actor_type=actor_type,
+            message=message,
+            audit_payload=audit_payload,
+        )
+        action_message = str(audit_payload.get("answer") or action_message).rstrip()
     refreshed = _materialize_assist_surface(
         run_dir=root,
         config_path=config_path,
@@ -5660,6 +5677,8 @@ def _run_assist_turn(
         "executed_stages": executed_stages,
         "response_message": action_message,
         "next_recommended_action": dict(refreshed["run_summary"].get("next_step", {})).get("recommended_action"),
+        "audit_question_type": None if audit_payload is None else audit_payload.get("question_type"),
+        "audit_llm_enhanced": None if audit_payload is None else audit_payload.get("llm_enhanced"),
     }
     from relaytic.assist import append_assist_turn_log
 
@@ -5674,11 +5693,68 @@ def _run_assist_turn(
             "run_summary": refreshed["run_summary"],
             "control": control_summary,
             "control_bundle": control_bundle,
+            "audit": audit_payload,
             "turn": log_entry,
             "log_path": str(log_path),
         },
         "human_output": action_message + "\n",
     }
+
+
+def _maybe_enhance_audit_explanation_with_local_advisor(
+    *,
+    run_dir: Path,
+    config_path: str | None,
+    actor_type: str,
+    message: str,
+    audit_payload: dict[str, Any],
+) -> dict[str, Any]:
+    if str(actor_type).strip().lower() != "user":
+        return audit_payload
+    try:
+        from relaytic.intelligence import build_intelligence_controls_from_policy
+        from relaytic.intelligence.backends import discover_backend
+
+        foundation_state = _ensure_run_foundation_present(
+            run_dir=run_dir,
+            config_path=config_path,
+            run_id=None,
+            labels=None,
+        )
+        discovery = discover_backend(
+            controls=build_intelligence_controls_from_policy(foundation_state["resolved"].policy),
+            config_path=config_path,
+        )
+        if discovery.status != "available" or discovery.advisor is None:
+            return audit_payload
+        advisory = discovery.advisor.complete_json(
+            task_name="assist_audit_explanation",
+            system_prompt=(
+                "Rewrite the provided deterministic Relaytic audit explanation for a human operator. "
+                "Do not add facts. Keep the answer concise, exact, and grounded in the supplied reasons. "
+                "Return JSON with keys answer and bullets. answer must be a short paragraph string. "
+                "bullets must be a short list of plain-English points."
+            ),
+            payload={
+                "user_question": message,
+                "deterministic_answer": audit_payload.get("answer"),
+                "reasons": audit_payload.get("reasons"),
+                "evidence_refs": audit_payload.get("evidence_refs"),
+            },
+        )
+        if advisory.status != "ok" or not isinstance(advisory.payload, dict):
+            return audit_payload
+        answer = str(advisory.payload.get("answer", "")).strip()
+        bullets = advisory.payload.get("bullets")
+        updated = dict(audit_payload)
+        if answer:
+            updated["answer"] = answer
+        if isinstance(bullets, list):
+            updated["reasons"] = [str(item).strip() for item in bullets if str(item).strip()] or updated.get("reasons", [])
+        updated["llm_enhanced"] = bool(answer or bullets)
+        return updated
+    except Exception:
+        return audit_payload
 
 
 def _run_assist_chat(
@@ -9787,6 +9863,10 @@ def _run_decision_phase(
             completion_bundle=_read_json_bundle(root, bundle="completion"),
             lifecycle_bundle=_read_json_bundle(root, bundle="lifecycle"),
             autonomy_bundle=_read_json_bundle(root, bundle="autonomy"),
+            permission_bundle=_read_json_bundle(root, bundle="permissions"),
+            daemon_bundle=_read_json_bundle(root, bundle="daemon"),
+            result_contract_bundle=read_result_contract_artifacts(root),
+            iteration_bundle=read_iteration_bundle(workspace_dir=default_workspace_dir(run_dir=root), run_dir=root),
         )
         written = write_decision_bundle(root, bundle=decision_result.bundle)
         manifest_path = _refresh_decision_manifest(
@@ -9816,12 +9896,22 @@ def _run_decision_phase(
                     "selected_strategy": decision_result.selected_strategy,
                     "next_actor": decision_result.next_actor,
                     "selected_next_action": decision_result.selected_next_action,
+                    "controller_selected_action": decision_result.bundle.controller_policy.selected_next_action,
                     "review_required": decision_result.bundle.controller_policy.review_required,
                     "changed_next_action": decision_result.changed_next_action,
                     "changed_controller_path": decision_result.changed_controller_path,
                     "join_candidate_count": decision_result.bundle.join_candidate_report.candidate_count,
                     "compiled_challenger_count": decision_result.bundle.method_compiler_report.compiled_challenger_count,
                     "compiled_feature_count": decision_result.bundle.method_compiler_report.compiled_feature_count,
+                },
+                "feasibility": {
+                    "trajectory_status": decision_result.bundle.trajectory_constraint_report.trajectory_status,
+                    "region_posture": decision_result.bundle.feasible_region_map.region_posture,
+                    "risk_band": decision_result.bundle.extrapolation_risk_report.risk_band,
+                    "recommended_direction": decision_result.bundle.decision_constraint_report.recommended_direction,
+                    "deployability": decision_result.bundle.deployability_assessment.deployability,
+                    "gate_open": decision_result.bundle.review_gate_state.gate_open,
+                    "override_required": decision_result.bundle.constraint_override_request.override_required,
                 },
                 "bundle": decision_result.bundle.to_dict(),
             },
@@ -9851,6 +9941,13 @@ def _show_decision_surface(*, run_dir: str | Path) -> dict[str, Any]:
     world = dict(bundle.get("decision_world_model", {}))
     controller = dict(bundle.get("controller_policy", {}))
     usefulness = dict(bundle.get("decision_usefulness_report", {}))
+    constraints = dict(bundle.get("decision_constraint_report", {}))
+    trajectory = dict(bundle.get("trajectory_constraint_report", {}))
+    feasible_region = dict(bundle.get("feasible_region_map", {}))
+    extrapolation = dict(bundle.get("extrapolation_risk_report", {}))
+    deployability = dict(bundle.get("deployability_assessment", {}))
+    review_gate = dict(bundle.get("review_gate_state", {}))
+    override_request = dict(bundle.get("constraint_override_request", {}))
     value_report = dict(bundle.get("value_of_more_data_report", {}))
     join_report = dict(bundle.get("join_candidate_report", {}))
     compiler = dict(bundle.get("method_compiler_report", {}))
@@ -9865,13 +9962,23 @@ def _show_decision_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "under_specified": world.get("under_specified"),
                 "selected_strategy": value_report.get("selected_strategy"),
                 "next_actor": controller.get("next_actor"),
-                "selected_next_action": controller.get("selected_next_action"),
+                "selected_next_action": constraints.get("feasible_selected_action") or controller.get("selected_next_action"),
+                "controller_selected_action": controller.get("selected_next_action"),
                 "review_required": controller.get("review_required"),
                 "changed_next_action": usefulness.get("changed_next_action"),
                 "changed_controller_path": usefulness.get("changed_controller_path"),
                 "join_candidate_count": int(join_report.get("candidate_count", 0) or 0),
                 "compiled_challenger_count": int(compiler.get("compiled_challenger_count", 0) or 0),
                 "compiled_feature_count": int(compiler.get("compiled_feature_count", 0) or 0),
+            },
+            "feasibility": {
+                "trajectory_status": trajectory.get("trajectory_status"),
+                "region_posture": feasible_region.get("region_posture"),
+                "risk_band": extrapolation.get("risk_band"),
+                "recommended_direction": constraints.get("recommended_direction"),
+                "deployability": deployability.get("deployability"),
+                "gate_open": review_gate.get("gate_open"),
+                "override_required": override_request.get("override_required"),
             },
             "bundle": bundle,
         },
@@ -11805,6 +11912,15 @@ def _decision_output_paths(run_dir: Path) -> dict[str, Path]:
         "handoff_controller_report": run_dir / "handoff_controller_report.json",
         "intervention_policy_report": run_dir / "intervention_policy_report.json",
         "decision_usefulness_report": run_dir / "decision_usefulness_report.json",
+        "trajectory_constraint_report": run_dir / "trajectory_constraint_report.json",
+        "feasible_region_map": run_dir / "feasible_region_map.json",
+        "extrapolation_risk_report": run_dir / "extrapolation_risk_report.json",
+        "decision_constraint_report": run_dir / "decision_constraint_report.json",
+        "action_boundary_report": run_dir / "action_boundary_report.json",
+        "deployability_assessment": run_dir / "deployability_assessment.json",
+        "review_gate_state": run_dir / "review_gate_state.json",
+        "constraint_override_request": run_dir / "constraint_override_request.json",
+        "counterfactual_region_report": run_dir / "counterfactual_region_report.json",
         "value_of_more_data_report": run_dir / "value_of_more_data_report.json",
         "data_acquisition_plan": run_dir / "data_acquisition_plan.json",
         "source_graph": run_dir / "source_graph.json",

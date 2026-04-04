@@ -175,6 +175,15 @@ def build_run_summary(
             "handoff_controller_report": "handoff_controller_report.json",
             "intervention_policy_report": "intervention_policy_report.json",
             "decision_usefulness_report": "decision_usefulness_report.json",
+            "trajectory_constraint_report": "trajectory_constraint_report.json",
+            "feasible_region_map": "feasible_region_map.json",
+            "extrapolation_risk_report": "extrapolation_risk_report.json",
+            "decision_constraint_report": "decision_constraint_report.json",
+            "action_boundary_report": "action_boundary_report.json",
+            "deployability_assessment": "deployability_assessment.json",
+            "review_gate_state": "review_gate_state.json",
+            "constraint_override_request": "constraint_override_request.json",
+            "counterfactual_region_report": "counterfactual_region_report.json",
             "value_of_more_data_report": "value_of_more_data_report.json",
             "data_acquisition_plan": "data_acquisition_plan.json",
             "source_graph": "source_graph.json",
@@ -366,6 +375,15 @@ def build_run_summary(
     controller_policy = _bundle_item(decision_bundle, "controller_policy")
     handoff_controller_report = _bundle_item(decision_bundle, "handoff_controller_report")
     decision_usefulness_report = _bundle_item(decision_bundle, "decision_usefulness_report")
+    trajectory_constraint_report = _bundle_item(decision_bundle, "trajectory_constraint_report")
+    feasible_region_map = _bundle_item(decision_bundle, "feasible_region_map")
+    extrapolation_risk_report = _bundle_item(decision_bundle, "extrapolation_risk_report")
+    decision_constraint_report = _bundle_item(decision_bundle, "decision_constraint_report")
+    action_boundary_report = _bundle_item(decision_bundle, "action_boundary_report")
+    deployability_assessment = _bundle_item(decision_bundle, "deployability_assessment")
+    review_gate_state = _bundle_item(decision_bundle, "review_gate_state")
+    constraint_override_request = _bundle_item(decision_bundle, "constraint_override_request")
+    counterfactual_region_report = _bundle_item(decision_bundle, "counterfactual_region_report")
     value_of_more_data_report = _bundle_item(decision_bundle, "value_of_more_data_report")
     data_acquisition_plan = _bundle_item(decision_bundle, "data_acquisition_plan")
     source_graph = _bundle_item(decision_bundle, "source_graph")
@@ -695,7 +713,9 @@ def build_run_summary(
             "threshold_posture": _clean_text(decision_world_model.get("threshold_posture")),
             "under_specified": decision_world_model.get("under_specified"),
             "next_actor": _clean_text(controller_policy.get("next_actor")),
-            "selected_next_action": _clean_text(controller_policy.get("selected_next_action")),
+            "selected_next_action": _clean_text(decision_constraint_report.get("feasible_selected_action"))
+            or _clean_text(controller_policy.get("selected_next_action")),
+            "controller_selected_action": _clean_text(controller_policy.get("selected_next_action")),
             "controller_mode": _clean_text(controller_policy.get("controller_mode")),
             "review_required": controller_policy.get("review_required"),
             "selected_strategy": _clean_text(value_of_more_data_report.get("selected_strategy")),
@@ -711,6 +731,29 @@ def build_run_summary(
             "changed_controller_path": decision_usefulness_report.get("changed_controller_path"),
             "baseline_action": _clean_text(handoff_controller_report.get("baseline_action")),
             "primary_decision_question": _clean_text(decision_world_model.get("primary_decision_question")),
+        },
+        "feasibility": {
+            "trajectory_status": _clean_text(trajectory_constraint_report.get("trajectory_status")),
+            "region_posture": _clean_text(feasible_region_map.get("region_posture")),
+            "in_distribution": feasible_region_map.get("in_distribution"),
+            "deployability": _clean_text(deployability_assessment.get("deployability")),
+            "operational_readiness": _clean_text(deployability_assessment.get("operational_readiness")),
+            "risk_band": _clean_text(extrapolation_risk_report.get("risk_band")),
+            "observed_ood_fraction": extrapolation_risk_report.get("observed_ood_fraction"),
+            "recommended_direction": _clean_text(decision_constraint_report.get("recommended_direction")),
+            "selected_action": _clean_text(decision_constraint_report.get("feasible_selected_action"))
+            or _clean_text(controller_policy.get("selected_next_action")),
+            "controller_selected_action": _clean_text(decision_constraint_report.get("controller_selected_action"))
+            or _clean_text(controller_policy.get("selected_next_action")),
+            "recommendation_changed": decision_constraint_report.get("recommendation_changed"),
+            "primary_constraint_kind": _clean_text(decision_constraint_report.get("primary_constraint_kind")),
+            "blocking_constraint_count": len(decision_constraint_report.get("blocking_constraints", []))
+            if isinstance(decision_constraint_report.get("blocking_constraints"), list)
+            else 0,
+            "gate_open": review_gate_state.get("gate_open"),
+            "gate_kind": _clean_text(review_gate_state.get("gate_kind")),
+            "override_required": constraint_override_request.get("override_required"),
+            "why_not_rerun": _clean_text(counterfactual_region_report.get("why_not_rerun")),
         },
         "dojo": {
             "status": _clean_text(dojo_session.get("status")),
@@ -1056,6 +1099,10 @@ def build_run_summary(
             "recommended_experiment_id": _clean_text(marginal_value.get("recommended_experiment_id")),
             "estimated_value_band": _clean_text(marginal_value.get("estimated_value_band")),
             "rationale": _clean_text(
+                decision_constraint_report.get("summary", "")
+                or review_gate_state.get("summary", "")
+                or deployability_assessment.get("summary", "")
+                or
                 feedback_effect_report.get("summary", "")
                 or decision_usefulness_report.get("summary", "")
                 or value_of_more_data_report.get("summary", "")
@@ -1068,7 +1115,8 @@ def build_run_summary(
                 or belief_update.get("summary", "")
                 or marginal_value.get("rationale", "")
             ),
-            "recommended_action": _clean_text(feedback_effect_report.get("primary_recommended_action"))
+            "recommended_action": _clean_text(decision_constraint_report.get("feasible_selected_action"))
+            or _clean_text(feedback_effect_report.get("primary_recommended_action"))
             or _clean_text(decision_policy_update_suggestions.get("primary_recommended_action"))
             or (
                 _clean_text(controller_policy.get("selected_next_action"))
@@ -1094,6 +1142,15 @@ def build_run_summary(
             "method_transfer_report_path": _path_if_exists(root / "method_transfer_report.json"),
             "external_research_audit_path": _path_if_exists(root / "external_research_audit.json"),
             "benchmark_parity_report_path": _path_if_exists(root / "benchmark_parity_report.json"),
+            "trajectory_constraint_report_path": _path_if_exists(root / "trajectory_constraint_report.json"),
+            "feasible_region_map_path": _path_if_exists(root / "feasible_region_map.json"),
+            "extrapolation_risk_report_path": _path_if_exists(root / "extrapolation_risk_report.json"),
+            "decision_constraint_report_path": _path_if_exists(root / "decision_constraint_report.json"),
+            "action_boundary_report_path": _path_if_exists(root / "action_boundary_report.json"),
+            "deployability_assessment_path": _path_if_exists(root / "deployability_assessment.json"),
+            "review_gate_state_path": _path_if_exists(root / "review_gate_state.json"),
+            "constraint_override_request_path": _path_if_exists(root / "constraint_override_request.json"),
+            "counterfactual_region_report_path": _path_if_exists(root / "counterfactual_region_report.json"),
             "benchmark_gap_report_path": _path_if_exists(root / "benchmark_gap_report.json"),
             "external_challenger_manifest_path": _path_if_exists(root / "external_challenger_manifest.json"),
             "external_challenger_evaluation_path": _path_if_exists(root / "external_challenger_evaluation.json"),
@@ -1220,6 +1277,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     workspace = dict(summary.get("workspace", {}))
     result_contract = dict(summary.get("result_contract", {}))
     iteration = dict(summary.get("iteration", {}))
+    feasibility = dict(summary.get("feasibility", {}))
     feedback = dict(summary.get("feedback", {}))
     contracts = dict(summary.get("contracts", {}))
     profiles = dict(summary.get("profiles", {}))
@@ -1401,6 +1459,23 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         )
         if decision_lab.get("recommended_source_id"):
             lines.append(f"- Recommended local source: `{decision_lab.get('recommended_source_id')}`")
+    if feasibility and any(value not in (None, 0, False, "", []) for value in feasibility.values()):
+        lines.extend(
+            [
+                "",
+                "## Feasibility",
+                f"- Trajectory status: `{feasibility.get('trajectory_status') or 'unknown'}`",
+                f"- Region posture: `{feasibility.get('region_posture') or 'unknown'}`",
+                f"- Extrapolation risk: `{feasibility.get('risk_band') or 'unknown'}`",
+                f"- OOD fraction: `{float(feasibility.get('observed_ood_fraction', 0.0) or 0.0):.4f}`",
+                f"- Recommended direction: `{feasibility.get('recommended_direction') or 'unknown'}`",
+                f"- Selected action: `{feasibility.get('selected_action') or 'unknown'}`",
+                f"- Constraint kind: `{feasibility.get('primary_constraint_kind') or 'none'}`",
+                f"- Deployability: `{feasibility.get('deployability') or 'unknown'}`",
+                f"- Gate open: `{feasibility.get('gate_open')}`",
+                f"- Override required: `{feasibility.get('override_required')}`",
+            ]
+        )
     if dojo and any(value not in (None, 0, False, "", []) for value in dojo.values()):
         lines.extend(
             [

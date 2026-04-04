@@ -393,11 +393,17 @@ def _build_result_contract(
     trace = dict(summary_payload.get("trace", {}))
     next_step = dict(summary_payload.get("next_step", {}))
     decision_lab = dict(summary_payload.get("decision_lab", {}))
+    feasibility = dict(summary_payload.get("feasibility", {}))
     run_handoff_payload = handoff_bundle.get("run_handoff", {})
     next_run_focus_payload = handoff_bundle.get("next_run_focus", {})
     run_handoff = dict(run_handoff_payload) if isinstance(run_handoff_payload, dict) else {}
     next_run_focus = dict(next_run_focus_payload) if isinstance(next_run_focus_payload, dict) else {}
-    focus_id = _clean_text(next_run_focus.get("selection_id")) or _clean_text(run_handoff.get("recommended_option_id")) or "same_data"
+    focus_id = (
+        _clean_text(next_run_focus.get("selection_id"))
+        or _clean_text(feasibility.get("recommended_direction"))
+        or _clean_text(run_handoff.get("recommended_option_id"))
+        or "same_data"
+    )
     action = _normalize_action(direction=focus_id, action_hint=_clean_text(next_step.get("recommended_action")))
     unresolved_items = _unresolved_items(summary_payload=summary_payload, handoff_bundle=handoff_bundle, action=action)
     confidence = _overall_confidence(summary_payload=summary_payload, unresolved_items=unresolved_items)
@@ -603,6 +609,7 @@ def _unresolved_items(*, summary_payload: dict[str, Any], handoff_bundle: dict[s
 def _why_this_move(*, summary_payload: dict[str, Any], focus_id: str, action: str) -> list[dict[str, Any]]:
     evidence = dict(summary_payload.get("evidence", {}))
     benchmark = dict(summary_payload.get("benchmark", {}))
+    feasibility = dict(summary_payload.get("feasibility", {}))
     reasons = [
         {
             "reason_type": "continuity",
@@ -615,6 +622,17 @@ def _why_this_move(*, summary_payload: dict[str, Any], focus_id: str, action: st
             "evidence_refs": ["audit_report.json", "completion_decision.json"],
         },
     ]
+    if _clean_text(feasibility.get("primary_constraint_kind")):
+        reasons.append(
+            {
+                "reason_type": "feasibility",
+                "statement": (
+                    f"Relaytic also applied feasibility constraint `{_clean_text(feasibility.get('primary_constraint_kind'))}` "
+                    f"with deployability `{_clean_text(feasibility.get('deployability')) or 'unknown'}`."
+                ),
+                "evidence_refs": ["decision_constraint_report.json", "deployability_assessment.json"],
+            }
+        )
     incumbent = _clean_text(benchmark.get("incumbent_name"))
     if incumbent:
         reasons.append(
@@ -804,6 +822,12 @@ def _active_constraints(summary_payload: dict[str, Any]) -> list[str]:
         constraints.append("rowless_semantic_default")
     if not bool(summary_payload.get("profiles", {}).get("remote_intelligence_allowed", False)):
         constraints.append("no_remote_truth")
+    feasibility = dict(summary_payload.get("feasibility", {}))
+    primary_constraint = _clean_text(feasibility.get("primary_constraint_kind"))
+    if primary_constraint:
+        constraints.append(f"feasibility:{primary_constraint}")
+    if bool(feasibility.get("gate_open")):
+        constraints.append("review_gate_open")
     budget_posture = _clean_text(summary_payload.get("contracts", {}).get("budget_posture"))
     if budget_posture:
         constraints.append(f"budget:{budget_posture}")

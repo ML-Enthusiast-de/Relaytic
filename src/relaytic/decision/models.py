@@ -20,6 +20,15 @@ CONTROLLER_POLICY_SCHEMA_VERSION = "relaytic.controller_policy.v1"
 HANDOFF_CONTROLLER_REPORT_SCHEMA_VERSION = "relaytic.handoff_controller_report.v1"
 INTERVENTION_POLICY_REPORT_SCHEMA_VERSION = "relaytic.intervention_policy_report.v1"
 DECISION_USEFULNESS_REPORT_SCHEMA_VERSION = "relaytic.decision_usefulness_report.v1"
+TRAJECTORY_CONSTRAINT_REPORT_SCHEMA_VERSION = "relaytic.trajectory_constraint_report.v1"
+FEASIBLE_REGION_MAP_SCHEMA_VERSION = "relaytic.feasible_region_map.v1"
+EXTRAPOLATION_RISK_REPORT_SCHEMA_VERSION = "relaytic.extrapolation_risk_report.v1"
+DECISION_CONSTRAINT_REPORT_SCHEMA_VERSION = "relaytic.decision_constraint_report.v1"
+ACTION_BOUNDARY_REPORT_SCHEMA_VERSION = "relaytic.action_boundary_report.v1"
+DEPLOYABILITY_ASSESSMENT_SCHEMA_VERSION = "relaytic.deployability_assessment.v1"
+REVIEW_GATE_STATE_SCHEMA_VERSION = "relaytic.review_gate_state.v1"
+CONSTRAINT_OVERRIDE_REQUEST_SCHEMA_VERSION = "relaytic.constraint_override_request.v1"
+COUNTERFACTUAL_REGION_REPORT_SCHEMA_VERSION = "relaytic.counterfactual_region_report.v1"
 
 
 @dataclass(frozen=True)
@@ -32,6 +41,9 @@ class DecisionControls:
     max_compiled_templates: int = 6
     default_operator_review_capacity: str = "medium"
     controller_review_threshold: str = "conditional_pass"
+    enable_feasibility_reasoning: bool = True
+    extrapolation_review_threshold: float = 0.2
+    extrapolation_physical_threshold: float = 0.35
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -168,12 +180,210 @@ class DecisionUsefulnessReport:
 
 
 @dataclass(frozen=True)
+class TrajectoryConstraintReport:
+    schema_version: str
+    generated_at: str
+    controls: DecisionControls
+    status: str
+    trajectory_status: str
+    physical_constraint_count: int
+    operational_constraint_count: int
+    policy_constraint_count: int
+    constraint_sources: list[str]
+    summary: str
+    trace: DecisionTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class FeasibleRegionMap:
+    schema_version: str
+    generated_at: str
+    controls: DecisionControls
+    status: str
+    region_posture: str
+    in_distribution: bool
+    deployment_scope: str
+    blocked_regions: list[str]
+    summary: str
+    trace: DecisionTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ExtrapolationRiskReport:
+    schema_version: str
+    generated_at: str
+    controls: DecisionControls
+    status: str
+    risk_band: str
+    observed_ood_fraction: float | None
+    exceeds_review_threshold: bool
+    exceeds_physical_threshold: bool
+    recommended_direction: str | None
+    summary: str
+    trace: DecisionTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class DecisionConstraintReport:
+    schema_version: str
+    generated_at: str
+    controls: DecisionControls
+    status: str
+    controller_selected_action: str | None
+    feasible_selected_action: str | None
+    recommended_direction: str | None
+    recommendation_changed: bool
+    primary_constraint_kind: str | None
+    blocking_constraints: list[dict[str, Any]]
+    summary: str
+    trace: DecisionTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ActionBoundaryReport:
+    schema_version: str
+    generated_at: str
+    controls: DecisionControls
+    status: str
+    proposal_status: str
+    deployability_status: str
+    approval_required: bool
+    review_required: bool
+    override_required: bool
+    rerun_recommended: bool
+    abstain_recommended: bool
+    reason_codes: list[str]
+    summary: str
+    trace: DecisionTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class DeployabilityAssessment:
+    schema_version: str
+    generated_at: str
+    controls: DecisionControls
+    status: str
+    deployability: str
+    decision_usefulness: str
+    operational_readiness: str
+    approval_posture: str
+    summary: str
+    trace: DecisionTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ReviewGateState:
+    schema_version: str
+    generated_at: str
+    controls: DecisionControls
+    status: str
+    gate_open: bool
+    gate_kind: str | None
+    recommended_action: str | None
+    review_reason: str | None
+    summary: str
+    trace: DecisionTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ConstraintOverrideRequest:
+    schema_version: str
+    generated_at: str
+    controls: DecisionControls
+    status: str
+    override_required: bool
+    requested_action: str | None
+    blocked_action: str | None
+    constraint_kind: str | None
+    reason: str | None
+    summary: str
+    trace: DecisionTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class CounterfactualRegionReport:
+    schema_version: str
+    generated_at: str
+    controls: DecisionControls
+    status: str
+    why_not_rerun: str | None
+    why_not_same_data: str | None
+    why_not_new_dataset: str | None
+    alternative_outcomes: list[dict[str, Any]]
+    summary: str
+    trace: DecisionTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class DecisionBundle:
     decision_world_model: DecisionWorldModel
     controller_policy: ControllerPolicy
     handoff_controller_report: HandoffControllerReport
     intervention_policy_report: InterventionPolicyReport
     decision_usefulness_report: DecisionUsefulnessReport
+    trajectory_constraint_report: TrajectoryConstraintReport
+    feasible_region_map: FeasibleRegionMap
+    extrapolation_risk_report: ExtrapolationRiskReport
+    decision_constraint_report: DecisionConstraintReport
+    action_boundary_report: ActionBoundaryReport
+    deployability_assessment: DeployabilityAssessment
+    review_gate_state: ReviewGateState
+    constraint_override_request: ConstraintOverrideRequest
+    counterfactual_region_report: CounterfactualRegionReport
     value_of_more_data_report: dict[str, Any]
     data_acquisition_plan: DataAcquisitionPlan
     source_graph: SourceGraph
@@ -190,6 +400,15 @@ class DecisionBundle:
             "handoff_controller_report": self.handoff_controller_report.to_dict(),
             "intervention_policy_report": self.intervention_policy_report.to_dict(),
             "decision_usefulness_report": self.decision_usefulness_report.to_dict(),
+            "trajectory_constraint_report": self.trajectory_constraint_report.to_dict(),
+            "feasible_region_map": self.feasible_region_map.to_dict(),
+            "extrapolation_risk_report": self.extrapolation_risk_report.to_dict(),
+            "decision_constraint_report": self.decision_constraint_report.to_dict(),
+            "action_boundary_report": self.action_boundary_report.to_dict(),
+            "deployability_assessment": self.deployability_assessment.to_dict(),
+            "review_gate_state": self.review_gate_state.to_dict(),
+            "constraint_override_request": self.constraint_override_request.to_dict(),
+            "counterfactual_region_report": self.counterfactual_region_report.to_dict(),
             "value_of_more_data_report": dict(self.value_of_more_data_report),
             "data_acquisition_plan": self.data_acquisition_plan.to_dict(),
             "source_graph": self.source_graph.to_dict(),
@@ -215,4 +434,7 @@ def build_decision_controls_from_policy(policy: dict[str, Any]) -> DecisionContr
         controller_review_threshold=str(
             decision_cfg.get("controller_review_threshold", "conditional_pass") or "conditional_pass"
         ),
+        enable_feasibility_reasoning=bool(decision_cfg.get("enable_feasibility_reasoning", True)),
+        extrapolation_review_threshold=float(decision_cfg.get("extrapolation_review_threshold", 0.2) or 0.2),
+        extrapolation_physical_threshold=float(decision_cfg.get("extrapolation_physical_threshold", 0.35) or 0.35),
     )
