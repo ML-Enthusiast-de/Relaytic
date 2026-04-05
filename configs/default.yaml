@@ -323,3 +323,14 @@ daemon:
   checkpoint_resume_enabled: true
   require_approval_for_search_campaigns: true
   require_approval_for_benchmark_campaigns: true
+
+remote_control:
+  enabled: false
+  transport_kind: filesystem_sync
+  transport_scope: local_only
+  remote_url:
+  freshness_seconds: 120
+  allow_remote_approval_decisions: true
+  allow_remote_handoffs: true
+  read_mostly: true
+  max_recent_decisions: 40

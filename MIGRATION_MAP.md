@@ -432,12 +432,12 @@ Current Slice 12D artifact names:
 - `src/relaytic/events/` for Slice 13B typed runtime-event schemas, subscription registries, hook registries, and projection-only event-delivery contracts on top of the canonical runtime event stream
 - `src/relaytic/permissions/` for Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, append-only permission-decision logs, and session capability contracts
 - `src/relaytic/daemon/` for Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, approval-aware execution, and memory-maintenance queues
+- `src/relaytic/remote_control/` for Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
 
 ## Reserved Future Boundaries
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
-- `src/relaytic/remote_control/` for Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
 - `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
 - `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
@@ -462,7 +462,7 @@ Implemented event-bus and permission artifact names:
 - `permission_decision_log.jsonl`
 - `session_capability_contract.json`
 
-Reserved future artifact names:
+Implemented daemon, feasibility, and remote-supervision artifact names:
 - `daemon_state.json`
 - `background_job_registry.json`
 - `background_job_log.jsonl`

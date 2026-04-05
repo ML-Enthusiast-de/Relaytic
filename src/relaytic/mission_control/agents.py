@@ -17,6 +17,7 @@ from relaytic.intelligence import build_intelligence_controls_from_policy
 from relaytic.intelligence.backends import discover_backend
 from relaytic.interoperability.self_check import build_interoperability_inventory
 from relaytic.permissions import run_permission_review
+from relaytic.remote_control import run_remote_control_review
 from relaytic.runs.summary import materialize_run_summary, read_run_summary
 from relaytic.ui.doctor import build_doctor_report
 
@@ -85,6 +86,7 @@ def run_mission_control_review(
         run_event_bus_review(run_dir=resolved_run_dir, policy=policy or {})
         run_permission_review(run_dir=resolved_run_dir, policy=policy or {})
         run_daemon_review(run_dir=resolved_run_dir, policy=policy or {})
+        run_remote_control_review(run_dir=resolved_run_dir, policy=policy or {})
         materialized = materialize_run_summary(run_dir=resolved_run_dir)
         summary_payload = dict(materialized.get("summary", {}))
         summary_paths = {
@@ -1141,6 +1143,7 @@ def _build_cards(
     pulse = dict(summary_payload.get("pulse", {}))
     search = dict(summary_payload.get("search", {}))
     daemon = dict(summary_payload.get("daemon", {}))
+    remote = dict(summary_payload.get("remote", {}))
     trace_state = dict(summary_payload.get("trace", {}))
     evals = dict(summary_payload.get("evals", {}))
     handoff = dict(summary_payload.get("handoff", {}))
@@ -1299,6 +1302,25 @@ def _build_cards(
                 f" | resumable `{daemon.get('resumable_job_count', 0)}`"
             ),
             "severity": "medium" if int(daemon.get("stale_job_count", 0) or 0) > 0 or int(daemon.get("pending_approval_count", 0) or 0) > 0 else "normal",
+        },
+        {
+            "card_id": "remote_supervision",
+            "title": "Remote Supervision",
+            "value": _clean_text(remote.get("current_supervisor_type"))
+            or _clean_text(remote.get("transport_kind"))
+            or _clean_text(remote.get("status"))
+            or "not_materialized",
+            "detail": (
+                f"Transport `{remote.get('transport_kind') or 'disabled'}`"
+                f" | freshness `{remote.get('freshness_status') or 'unknown'}`"
+                f" | pending approvals `{remote.get('pending_approval_count', 0)}`"
+            ),
+            "severity": (
+                "medium"
+                if int(remote.get("pending_approval_count", 0) or 0) > 0
+                or int(remote.get("blocked_action_count", 0) or 0) > 0
+                else "normal"
+            ),
         },
         {
             "card_id": "assist_control",

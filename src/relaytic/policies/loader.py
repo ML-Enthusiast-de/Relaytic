@@ -100,6 +100,7 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
     events_cfg = dict(config.get("events", {}))
     permissions_cfg = dict(config.get("permissions", {}))
     daemon_cfg = dict(config.get("daemon", {}))
+    remote_control_cfg = dict(config.get("remote_control", {}))
     dojo_cfg = dict(config.get("dojo", {}))
     pulse_cfg = dict(config.get("pulse", {}))
     tracing_cfg = dict(config.get("tracing", {}))
@@ -359,6 +360,21 @@ def _map_legacy_config_to_policy(config: dict[str, Any]) -> dict[str, Any]:
             "checkpoint_resume_enabled": bool(daemon_cfg.get("checkpoint_resume_enabled", True)),
             "require_approval_for_search_campaigns": bool(daemon_cfg.get("require_approval_for_search_campaigns", True)),
             "require_approval_for_benchmark_campaigns": bool(daemon_cfg.get("require_approval_for_benchmark_campaigns", True)),
+        },
+        "remote_control": {
+            "enabled": bool(remote_control_cfg.get("enabled", False)),
+            "transport_kind": str(remote_control_cfg.get("transport_kind", "filesystem_sync") or "filesystem_sync"),
+            "transport_scope": str(remote_control_cfg.get("transport_scope", "local_only") or "local_only"),
+            "remote_url": (
+                str(remote_control_cfg.get("remote_url", "")).strip() or None
+            ),
+            "freshness_seconds": int(remote_control_cfg.get("freshness_seconds", 120) or 120),
+            "allow_remote_approval_decisions": bool(
+                remote_control_cfg.get("allow_remote_approval_decisions", True)
+            ),
+            "allow_remote_handoffs": bool(remote_control_cfg.get("allow_remote_handoffs", True)),
+            "read_mostly": bool(remote_control_cfg.get("read_mostly", True)),
+            "max_recent_decisions": int(remote_control_cfg.get("max_recent_decisions", 40) or 40),
         },
         "intelligence": {
             "enabled": bool(intelligence_cfg.get("enabled", True)),

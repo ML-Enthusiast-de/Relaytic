@@ -27,6 +27,7 @@ def test_interoperability_specs_include_trace_eval_handoff_and_learnings_tools()
     assert {
         "relaytic_show_search",
         "relaytic_show_daemon",
+        "relaytic_show_remote_control",
         "relaytic_show_release_safety",
         "relaytic_show_event_bus",
         "relaytic_show_permissions",
@@ -36,6 +37,8 @@ def test_interoperability_specs_include_trace_eval_handoff_and_learnings_tools()
         "relaytic_scan_release_safety",
         "relaytic_check_permission",
         "relaytic_decide_permission",
+        "relaytic_decide_remote_approval",
+        "relaytic_handoff_remote_supervision",
         "relaytic_show_trace",
         "relaytic_replay_trace",
         "relaytic_run_agent_evals",
@@ -52,6 +55,19 @@ def test_interoperability_specs_include_trace_eval_handoff_and_learnings_tools()
 def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_path: Path) -> None:
     data_path = _write_small_public_breast_cancer_dataset(tmp_path / "breast_cancer_small.csv")
     run_dir = tmp_path / "mcp_run"
+    config_path = tmp_path / "mcp_remote.yaml"
+    config_path.write_text(
+        "\n".join(
+            [
+                "remote_control:",
+                "  enabled: true",
+                "  transport_kind: filesystem_sync",
+                "  transport_scope: local_only",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     port = find_available_port()
     process = start_streamable_http_server_process(port=port)
     url = f"http://127.0.0.1:{port}/mcp"
@@ -69,6 +85,7 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                                 "run_dir": str(run_dir),
                                 "data_path": str(data_path),
                                 "text": "Do everything on your own. Predict diagnosis_flag from the provided features.",
+                                "config_path": str(config_path),
                                 "actor_type": "agent",
                                 "channel": "mcp-test",
                                 "overwrite": True,
@@ -271,16 +288,42 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         assert permission_check_payload["surface_payload"]["decision"]["decision"] == "approval_requested"
                         assert permission_check_payload["surface_payload"]["decision"]["request_id"] is not None
 
+                        remote_show_result = await session.call_tool(
+                            "relaytic_show_remote_control",
+                            {"run_dir": str(run_dir), "config_path": str(config_path)},
+                        )
+                        remote_show_payload = _structured_payload(remote_show_result)
+                        assert remote_show_payload["surface_payload"]["status"] == "ok"
+                        assert remote_show_payload["surface_payload"]["remote"]["pending_approval_count"] >= 1
+
                         permission_decide_result = await session.call_tool(
-                            "relaytic_decide_permission",
+                            "relaytic_decide_remote_approval",
                             {
                                 "run_dir": str(run_dir),
                                 "request_id": permission_check_payload["surface_payload"]["decision"]["request_id"],
                                 "decision": "approve",
+                                "config_path": str(config_path),
+                                "actor_type": "agent",
+                                "actor_name": "mcp-test",
                             },
                         )
                         permission_decide_payload = _structured_payload(permission_decide_result)
-                        assert permission_decide_payload["surface_payload"]["decision"]["decision"] == "approved"
+                        assert permission_decide_payload["surface_payload"]["decision"]["status"] == "applied"
+
+                        remote_handoff_result = await session.call_tool(
+                            "relaytic_handoff_remote_supervision",
+                            {
+                                "run_dir": str(run_dir),
+                                "to_actor_type": "agent",
+                                "to_actor_name": "mcp-test",
+                                "from_actor_type": "operator",
+                                "from_actor_name": "unit-test",
+                                "reason": "Continue from the MCP host.",
+                                "config_path": str(config_path),
+                            },
+                        )
+                        remote_handoff_payload = _structured_payload(remote_handoff_result)
+                        assert remote_handoff_payload["surface_payload"]["remote"]["current_supervisor_type"] == "agent"
 
                         assist_result = await session.call_tool(
                             "relaytic_assist_turn",

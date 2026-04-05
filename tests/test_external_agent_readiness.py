@@ -7,9 +7,11 @@ from relaytic.interoperability import (
     relaytic_assist_turn,
     relaytic_check_permission,
     relaytic_continue_workspace,
+    relaytic_decide_remote_approval,
     relaytic_run_background_job,
     relaytic_resume_background_job,
     relaytic_decide_permission,
+    relaytic_handoff_remote_supervision,
     relaytic_reset_learnings,
     relaytic_run,
     relaytic_run_agent_evals,
@@ -22,6 +24,7 @@ from relaytic.interoperability import (
     relaytic_show_mission_control,
     relaytic_show_permissions,
     relaytic_show_daemon,
+    relaytic_show_remote_control,
     relaytic_show_search,
     relaytic_show_trace,
     relaytic_show_workspace,
@@ -31,6 +34,19 @@ from tests.public_datasets import write_public_breast_cancer_dataset
 
 
 def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Path) -> None:
+    config_path = tmp_path / "external_agent_remote.yaml"
+    config_path.write_text(
+        "\n".join(
+            [
+                "remote_control:",
+                "  enabled: true",
+                "  transport_kind: filesystem_sync",
+                "  transport_scope: local_only",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     onboarding_payload = relaytic_show_mission_control(expected_profile="full")
     onboarding_bundle = dict(onboarding_payload["surface_payload"]["bundle"])
     onboarding_status = dict(onboarding_bundle["onboarding_status"])
@@ -46,6 +62,7 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
         data_path=str(data_path),
         run_dir=str(run_dir),
         text="Do everything on your own. Classify diagnosis_flag from the provided features and keep the operator informed.",
+        config_path=str(config_path),
         actor_type="agent",
         channel="codex-smoke",
         overwrite=True,
@@ -159,12 +176,30 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     request_id = permission_check_payload["surface_payload"]["decision"]["request_id"]
     assert request_id
 
-    permission_decide_payload = relaytic_decide_permission(
+    remote_show_payload = relaytic_show_remote_control(run_dir=str(run_dir), config_path=str(config_path))
+    assert remote_show_payload["surface_payload"]["status"] == "ok"
+    assert remote_show_payload["surface_payload"]["remote"]["pending_approval_count"] >= 1
+
+    permission_decide_payload = relaytic_decide_remote_approval(
         run_dir=str(run_dir),
         request_id=str(request_id),
         decision="approve",
+        config_path=str(config_path),
+        actor_type="agent",
+        actor_name="codex-smoke",
     )
-    assert permission_decide_payload["surface_payload"]["decision"]["decision"] == "approved"
+    assert permission_decide_payload["surface_payload"]["decision"]["status"] == "applied"
+
+    remote_handoff_payload = relaytic_handoff_remote_supervision(
+        run_dir=str(run_dir),
+        to_actor_type="agent",
+        to_actor_name="codex-smoke",
+        from_actor_type="operator",
+        from_actor_name="unit-test",
+        reason="Continue supervision from the external agent wrapper.",
+        config_path=str(config_path),
+    )
+    assert remote_handoff_payload["surface_payload"]["remote"]["current_supervisor_type"] == "agent"
 
     trace_payload = relaytic_show_trace(run_dir=str(run_dir))
     assert trace_payload["surface_payload"]["trace"]["span_count"] > 0
@@ -188,12 +223,15 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     assert "relaytic_show_event_bus" in server_info["inspection_tools"]
     assert "relaytic_show_permissions" in server_info["inspection_tools"]
     assert "relaytic_show_daemon" in server_info["inspection_tools"]
+    assert "relaytic_show_remote_control" in server_info["inspection_tools"]
     assert "relaytic_show_trace" in server_info["inspection_tools"]
     assert "relaytic_show_handoff" in server_info["inspection_tools"]
     assert "relaytic_show_learnings" in server_info["inspection_tools"]
     assert "relaytic_show_workspace" in server_info["inspection_tools"]
     assert "relaytic_check_permission" in server_info["workflow_tools"]
     assert "relaytic_decide_permission" in server_info["workflow_tools"]
+    assert "relaytic_decide_remote_approval" in server_info["workflow_tools"]
+    assert "relaytic_handoff_remote_supervision" in server_info["workflow_tools"]
     assert "relaytic_run_background_job" in server_info["workflow_tools"]
     assert "relaytic_resume_background_job" in server_info["workflow_tools"]
     assert "relaytic_run_agent_evals" in server_info["workflow_tools"]

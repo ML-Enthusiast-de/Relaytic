@@ -170,6 +170,56 @@ def relaytic_show_daemon(*, run_dir: str, config_path: str | None = None) -> dic
     return cli._show_daemon_surface(run_dir=run_dir, config_path=config_path)
 
 
+def relaytic_show_remote_control(*, run_dir: str, config_path: str | None = None) -> dict[str, Any]:
+    """Render the current Slice 14A remote-supervision state for a Relaytic run."""
+    cli = _cli()
+    return cli._show_remote_control_surface(run_dir=run_dir, config_path=config_path)
+
+
+def relaytic_decide_remote_approval(
+    *,
+    run_dir: str,
+    request_id: str,
+    decision: str,
+    config_path: str | None = None,
+    actor_type: str = "agent",
+    actor_name: str | None = None,
+) -> dict[str, Any]:
+    """Approve or deny one pending request through the Slice 14A remote-supervision surface."""
+    cli = _cli()
+    return cli._decide_remote_approval_surface(
+        run_dir=run_dir,
+        request_id=request_id,
+        decision=decision,
+        config_path=config_path,
+        actor_type=_normalize_actor_type(actor_type),
+        actor_name=actor_name,
+    )
+
+
+def relaytic_handoff_remote_supervision(
+    *,
+    run_dir: str,
+    to_actor_type: str,
+    to_actor_name: str | None = None,
+    from_actor_type: str = "agent",
+    from_actor_name: str | None = None,
+    reason: str | None = None,
+    config_path: str | None = None,
+) -> dict[str, Any]:
+    """Transfer the current remote-supervision role without creating a separate authority path."""
+    cli = _cli()
+    return cli._handoff_remote_supervision_surface(
+        run_dir=run_dir,
+        to_actor_type=_normalize_actor_type(to_actor_type),
+        to_actor_name=to_actor_name,
+        from_actor_type=_normalize_actor_type(from_actor_type),
+        from_actor_name=from_actor_name,
+        reason=reason,
+        config_path=config_path,
+    )
+
+
 def relaytic_run_background_job(
     *,
     run_dir: str,
@@ -822,6 +872,7 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_show_pulse",
             "relaytic_show_search",
             "relaytic_show_daemon",
+            "relaytic_show_remote_control",
             "relaytic_show_release_safety",
             "relaytic_show_trace",
             "relaytic_replay_trace",
@@ -859,6 +910,8 @@ def relaytic_server_info() -> dict[str, Any]:
             "relaytic_reset_learnings",
             "relaytic_check_permission",
             "relaytic_decide_permission",
+            "relaytic_decide_remote_approval",
+            "relaytic_handoff_remote_supervision",
             "relaytic_review_completion",
             "relaytic_review_lifecycle",
             "relaytic_run_autonomy",
@@ -1002,6 +1055,14 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             handler=relaytic_show_daemon,
         ),
         InteropToolSpec(
+            name="relaytic_show_remote_control",
+            title="Show Relaytic Remote Supervision",
+            description="Render the current Slice 14A remote supervision, approval queue, transport freshness, and supervision-handoff surface for a Relaytic run.",
+            category="inspection",
+            annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_show_remote_control,
+        ),
+        InteropToolSpec(
             name="relaytic_show_release_safety",
             title="Show Relaytic Release Safety",
             description="Render the current Slice 13A release-safety attestation, scanned inventory, and packaging-regression posture from a release-safety state directory.",
@@ -1128,6 +1189,22 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
             category="workflow",
             annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_decide_permission,
+        ),
+        InteropToolSpec(
+            name="relaytic_decide_remote_approval",
+            title="Decide Relaytic Remote Approval",
+            description="Approve or deny one pending request through the Slice 14A remote-supervision surface while appending to the same local authority truth.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_decide_remote_approval,
+        ),
+        InteropToolSpec(
+            name="relaytic_handoff_remote_supervision",
+            title="Handoff Relaytic Remote Supervision",
+            description="Transfer the current remote-supervision role between a human and an external agent without creating a separate authority path.",
+            category="workflow",
+            annotations={"readOnlyHint": False, "idempotentHint": False, "destructiveHint": False, "openWorldHint": False},
+            handler=relaytic_handoff_remote_supervision,
         ),
         InteropToolSpec(
             name="relaytic_intake_interpret",

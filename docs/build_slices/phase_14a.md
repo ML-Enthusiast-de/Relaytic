@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Shipped.
 
 Intended package boundaries:
 
@@ -93,3 +93,5 @@ Slice 14A should not be considered complete without targeted tests that cover at
 - one local-versus-remote truth-parity case
 - one disabled-remote fail-closed case
 - one audit-log regression guard
+
+Slice 15 is now the next target.

@@ -254,6 +254,28 @@ def resume_background_job(*args: Any, **kwargs: Any) -> Any:
     return _resume_background_job(*args, **kwargs)
 
 
+def run_remote_control_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.remote_control import run_remote_control_review as _run_remote_control_review
+
+    return _run_remote_control_review(*args, **kwargs)
+
+
+def apply_remote_approval_decision(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.remote_control import (
+        apply_remote_approval_decision as _apply_remote_approval_decision,
+    )
+
+    return _apply_remote_approval_decision(*args, **kwargs)
+
+
+def apply_remote_supervision_handoff(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.remote_control import (
+        apply_remote_supervision_handoff as _apply_remote_supervision_handoff,
+    )
+
+    return _apply_remote_supervision_handoff(*args, **kwargs)
+
+
 def execute_planned_route(*args: Any, **kwargs: Any) -> Any:
     from relaytic.planning import execute_planned_route as _execute_planned_route
 
@@ -2551,6 +2573,60 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    remote_surface = sub.add_parser(
+        "remote",
+        help="Inspect or act through Slice 14A remote supervision, approval, and handoff surfaces.",
+    )
+    remote_sub = remote_surface.add_subparsers(dest="remote_command", required=True)
+
+    remote_show = remote_sub.add_parser(
+        "show",
+        help="Render the current Slice 14A remote supervision state for a run.",
+    )
+    remote_show.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    remote_show.add_argument("--config", default=None, help="Optional config/policy source if artifacts must be materialized.")
+    remote_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    remote_decide = remote_sub.add_parser(
+        "decide",
+        help="Approve or deny one pending request through the Slice 14A remote supervision surface.",
+    )
+    remote_decide.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    remote_decide.add_argument("--request-id", required=True, help="Pending approval request id.")
+    remote_decide.add_argument("--decision", choices=["approve", "deny"], required=True, help="Remote decision to record.")
+    remote_decide.add_argument("--config", default=None, help="Optional config/policy source.")
+    remote_decide.add_argument("--actor-type", default="operator", help="Actor type taking the remote decision.")
+    remote_decide.add_argument("--actor-name", default=None, help="Optional actor name taking the remote decision.")
+    remote_decide.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    remote_handoff = remote_sub.add_parser(
+        "handoff",
+        help="Transfer remote supervision between a human and an external agent without creating a second authority path.",
+    )
+    remote_handoff.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    remote_handoff.add_argument("--to-actor-type", choices=["user", "operator", "agent"], required=True, help="Who should become the current remote supervisor.")
+    remote_handoff.add_argument("--to-actor-name", default=None, help="Optional display name for the new supervisor.")
+    remote_handoff.add_argument("--from-actor-type", choices=["user", "operator", "agent"], default="operator", help="Who is handing off supervision.")
+    remote_handoff.add_argument("--from-actor-name", default=None, help="Optional display name for the previous supervisor.")
+    remote_handoff.add_argument("--reason", default=None, help="Optional handoff rationale.")
+    remote_handoff.add_argument("--config", default=None, help="Optional config/policy source.")
+    remote_handoff.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     plan = sub.add_parser(
         "plan",
         help="Create Slice 05 planning artifacts and execute the first deterministic route.",
@@ -2942,6 +3018,45 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 parser.error("Unsupported workspace subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
+    if args.command == "remote":
+        try:
+            if args.remote_command == "show":
+                payload = _show_remote_control_surface(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                )
+            elif args.remote_command == "decide":
+                payload = _decide_remote_approval_surface(
+                    run_dir=args.run_dir,
+                    request_id=args.request_id,
+                    decision=args.decision,
+                    config_path=args.config,
+                    actor_type=args.actor_type,
+                    actor_name=args.actor_name,
+                )
+            elif args.remote_command == "handoff":
+                payload = _handoff_remote_supervision_surface(
+                    run_dir=args.run_dir,
+                    to_actor_type=args.to_actor_type,
+                    to_actor_name=args.to_actor_name,
+                    from_actor_type=args.from_actor_type,
+                    from_actor_name=args.from_actor_name,
+                    reason=args.reason,
+                    config_path=args.config,
+                )
+            else:
+                parser.error("Unsupported remote subcommand.")
                 return 2
         except ValueError as exc:
             parser.error(str(exc))
@@ -5288,6 +5403,125 @@ def _show_daemon_surface(*, run_dir: str | Path, config_path: str | None = None)
             "run_summary": summary_materialized["summary"],
         },
         "human_output": render_daemon_review_markdown(bundle),
+    }
+
+
+def _show_remote_control_surface(*, run_dir: str | Path, config_path: str | None = None) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    if config_path:
+        effective_policy = load_policy(config_path).policy
+    result = run_remote_control_review(run_dir=root, policy=effective_policy)
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "remote": dict(summary_materialized["summary"].get("remote", {})),
+            "bundle": result.bundle.to_dict(),
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": result.review_markdown,
+    }
+
+
+def _decide_remote_approval_surface(
+    *,
+    run_dir: str | Path,
+    request_id: str,
+    decision: str,
+    config_path: str | None,
+    actor_type: str,
+    actor_name: str | None,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    if config_path:
+        effective_policy = load_policy(config_path).policy
+    result = apply_remote_approval_decision(
+        run_dir=root,
+        request_id=request_id,
+        decision=decision,
+        policy=effective_policy,
+        actor_type=actor_type,
+        actor_name=actor_name,
+        source_surface="cli",
+        source_command="relaytic remote decide",
+    )
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "decision": result.decision,
+            "remote": dict(summary_materialized["summary"].get("remote", {})),
+            "bundle": result.bundle.to_dict(),
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": result.review_markdown,
+    }
+
+
+def _handoff_remote_supervision_surface(
+    *,
+    run_dir: str | Path,
+    to_actor_type: str,
+    to_actor_name: str | None,
+    from_actor_type: str,
+    from_actor_name: str | None,
+    reason: str | None,
+    config_path: str | None,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    foundation_state = _ensure_run_foundation_present(
+        run_dir=root,
+        config_path=config_path,
+        run_id=None,
+        labels=None,
+    )
+    effective_policy = foundation_state["resolved"].policy
+    if config_path:
+        effective_policy = load_policy(config_path).policy
+    result = apply_remote_supervision_handoff(
+        run_dir=root,
+        to_actor_type=to_actor_type,
+        to_actor_name=to_actor_name,
+        from_actor_type=from_actor_type,
+        from_actor_name=from_actor_name,
+        reason=reason,
+        policy=effective_policy,
+        source_surface="cli",
+        source_command="relaytic remote handoff",
+    )
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "handoff": result.decision,
+            "remote": dict(summary_materialized["summary"].get("remote", {})),
+            "bundle": result.bundle.to_dict(),
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": result.review_markdown,
     }
 
 
@@ -7710,6 +7944,7 @@ def _show_mission_control_surface(
     summary_payload = read_run_summary(run_dir) if run_dir is not None else {}
     permissions = dict(summary_payload.get("permissions", {})) if isinstance(summary_payload, dict) else {}
     event_bus = dict(summary_payload.get("event_bus", {})) if isinstance(summary_payload, dict) else {}
+    remote = dict(summary_payload.get("remote", {})) if isinstance(summary_payload, dict) else {}
     return {
         "surface_payload": {
             "status": "ok",
@@ -7751,6 +7986,10 @@ def _show_mission_control_surface(
                 "pulse_queued_action_count": pulse.get("queued_action_count"),
                 "permission_mode": permissions.get("current_mode"),
                 "pending_approval_count": permissions.get("pending_approval_count"),
+                "remote_status": remote.get("status"),
+                "remote_transport_kind": remote.get("transport_kind"),
+                "remote_pending_approval_count": remote.get("pending_approval_count"),
+                "remote_current_supervisor_type": remote.get("current_supervisor_type"),
                 "event_subscription_count": event_bus.get("subscription_count"),
                 "event_dispatch_count": event_bus.get("dispatch_count"),
             },

@@ -52,6 +52,7 @@ def build_run_summary(
         read_result_contract_artifacts,
         read_workspace_bundle,
     )
+    from relaytic.remote_control import read_remote_control_bundle
     mandate_bundle = _read_bundle(
         root,
         {
@@ -301,6 +302,7 @@ def build_run_summary(
     event_bus_bundle = read_event_bus_bundle(root)
     permission_bundle = read_permission_bundle(root)
     daemon_bundle = read_daemon_bundle(root)
+    remote_control_bundle = read_remote_control_bundle(root)
     lifecycle_bundle = _read_bundle(
         root,
         {
@@ -476,6 +478,13 @@ def build_run_summary(
     memory_maintenance_report_v2 = dict(daemon_bundle.get("memory_maintenance_report", {})) if isinstance(daemon_bundle.get("memory_maintenance_report"), dict) else {}
     search_resume_plan = dict(daemon_bundle.get("search_resume_plan", {})) if isinstance(daemon_bundle.get("search_resume_plan"), dict) else {}
     stale_job_report = dict(daemon_bundle.get("stale_job_report", {})) if isinstance(daemon_bundle.get("stale_job_report"), dict) else {}
+    remote_session_manifest = dict(remote_control_bundle.get("remote_session_manifest", {})) if isinstance(remote_control_bundle.get("remote_session_manifest"), dict) else {}
+    remote_transport_report = dict(remote_control_bundle.get("remote_transport_report", {})) if isinstance(remote_control_bundle.get("remote_transport_report"), dict) else {}
+    approval_request_queue = dict(remote_control_bundle.get("approval_request_queue", {})) if isinstance(remote_control_bundle.get("approval_request_queue"), dict) else {}
+    remote_operator_presence = dict(remote_control_bundle.get("remote_operator_presence", {})) if isinstance(remote_control_bundle.get("remote_operator_presence"), dict) else {}
+    supervision_handoff = dict(remote_control_bundle.get("supervision_handoff", {})) if isinstance(remote_control_bundle.get("supervision_handoff"), dict) else {}
+    notification_delivery_report = dict(remote_control_bundle.get("notification_delivery_report", {})) if isinstance(remote_control_bundle.get("notification_delivery_report"), dict) else {}
+    remote_control_audit = dict(remote_control_bundle.get("remote_control_audit", {})) if isinstance(remote_control_bundle.get("remote_control_audit"), dict) else {}
     champion_vs_candidate = _bundle_item(lifecycle_bundle, "champion_vs_candidate")
     recalibration_decision = _bundle_item(lifecycle_bundle, "recalibration_decision")
     retrain_decision = _bundle_item(lifecycle_bundle, "retrain_decision")
@@ -511,6 +520,23 @@ def build_run_summary(
     selected_metrics = execution_summary.get("selected_metrics")
     if not isinstance(selected_metrics, dict):
         selected_metrics = {}
+    next_step_resolution = _resolve_next_step_resolution(
+        decision_constraint_report=decision_constraint_report,
+        review_gate_state=review_gate_state,
+        deployability_assessment=deployability_assessment,
+        feedback_effect_report=feedback_effect_report,
+        decision_usefulness_report=decision_usefulness_report,
+        value_of_more_data_report=value_of_more_data_report,
+        decision_policy_update_suggestions=decision_policy_update_suggestions,
+        route_prior_updates=route_prior_updates,
+        policy_update_suggestions=policy_update_suggestions,
+        outcome_observation_report=outcome_observation_report,
+        controller_policy=controller_policy,
+        lifecycle_bundle=lifecycle_bundle,
+        completion_decision=completion_decision,
+        belief_update=belief_update,
+        marginal_value=marginal_value,
+    )
     summary = {
         "schema_version": RUN_SUMMARY_SCHEMA_VERSION,
         "generated_at": _utc_now(),
@@ -1071,6 +1097,36 @@ def build_run_summary(
             "search_resume_ready": search_resume_plan.get("resume_ready"),
             "next_resume_step": _clean_text(search_resume_plan.get("next_step")),
         },
+        "remote": {
+            "status": _clean_text(remote_session_manifest.get("status"))
+            or _clean_text(remote_control_audit.get("status"))
+            or ("disabled" if remote_transport_report or remote_control_audit else None),
+            "remote_enabled": bool(remote_control_audit.get("remote_enabled", False))
+            if remote_control_audit
+            else bool(remote_session_manifest.get("transport_enabled", False)),
+            "transport_enabled": bool(remote_transport_report.get("transport_enabled", False))
+            if remote_transport_report
+            else None,
+            "transport_kind": _clean_text(remote_transport_report.get("transport_kind"))
+            or _clean_text(remote_session_manifest.get("transport_kind")),
+            "transport_scope": _clean_text(remote_transport_report.get("transport_scope")),
+            "freshness_status": _clean_text(remote_operator_presence.get("freshness_status"))
+            or _clean_text(remote_session_manifest.get("freshness_status")),
+            "current_supervisor_type": _clean_text(remote_operator_presence.get("current_supervisor_type"))
+            or _clean_text((dict(supervision_handoff.get("current_supervisor", {}))).get("actor_type")),
+            "current_supervisor_name": _clean_text(remote_operator_presence.get("current_supervisor_name"))
+            or _clean_text((dict(supervision_handoff.get("current_supervisor", {}))).get("actor_name")),
+            "pending_approval_count": int(approval_request_queue.get("pending_approval_count", 0) or 0),
+            "approval_source_count": int(approval_request_queue.get("approval_source_count", 0) or 0),
+            "write_actions_allowed": remote_session_manifest.get("write_actions_allowed"),
+            "notification_count": int(notification_delivery_report.get("notification_count", 0) or 0),
+            "undelivered_count": int(notification_delivery_report.get("undelivered_count", 0) or 0),
+            "handoff_count": int(supervision_handoff.get("handoff_count", 0) or 0),
+            "blocked_handoff_count": int(supervision_handoff.get("blocked_handoff_count", 0) or 0),
+            "blocked_action_count": int(remote_control_audit.get("blocked_action_count", 0) or 0),
+            "last_remote_action_kind": _clean_text(remote_control_audit.get("last_remote_action_kind")),
+            "last_remote_action_at": _clean_text(remote_control_audit.get("last_remote_action_at")),
+        },
         "lifecycle": {
             "promotion_action": _clean_text(promotion_decision.get("action")),
             "promotion_target": _clean_text(promotion_decision.get("selected_model_family")),
@@ -1098,34 +1154,9 @@ def build_run_summary(
         "next_step": {
             "recommended_experiment_id": _clean_text(marginal_value.get("recommended_experiment_id")),
             "estimated_value_band": _clean_text(marginal_value.get("estimated_value_band")),
-            "rationale": _clean_text(
-                decision_constraint_report.get("summary", "")
-                or review_gate_state.get("summary", "")
-                or deployability_assessment.get("summary", "")
-                or
-                feedback_effect_report.get("summary", "")
-                or decision_usefulness_report.get("summary", "")
-                or value_of_more_data_report.get("summary", "")
-                or decision_policy_update_suggestions.get("summary", "")
-                or route_prior_updates.get("summary", "")
-                or policy_update_suggestions.get("summary", "")
-                or outcome_observation_report.get("summary", "")
-                or
-                completion_decision.get("summary", "")
-                or belief_update.get("summary", "")
-                or marginal_value.get("rationale", "")
-            ),
-            "recommended_action": _clean_text(decision_constraint_report.get("feasible_selected_action"))
-            or _clean_text(feedback_effect_report.get("primary_recommended_action"))
-            or _clean_text(decision_policy_update_suggestions.get("primary_recommended_action"))
-            or (
-                _clean_text(controller_policy.get("selected_next_action"))
-                if _clean_text(value_of_more_data_report.get("selected_strategy")) not in {None, "hold_current_course"}
-                else None
-            )
-            or _lifecycle_primary_action(lifecycle_bundle)
-            or _clean_text(completion_decision.get("action"))
-            or _clean_text(belief_update.get("recommended_action")),
+            "rationale": next_step_resolution["rationale"],
+            "recommended_action": next_step_resolution["recommended_action"],
+            "recommended_action_source": next_step_resolution["source"],
         },
         "artifacts": {
             "manifest_path": _path_if_exists(root / "manifest.json"),
@@ -2269,6 +2300,125 @@ def _resolve_model_state_path(root: Path, *, execution_summary: dict[str, Any]) 
         if candidate.name != "normalization_state.json":
             return str(candidate)
     return None
+
+
+def _resolve_next_step_resolution(
+    *,
+    decision_constraint_report: dict[str, Any],
+    review_gate_state: dict[str, Any],
+    deployability_assessment: dict[str, Any],
+    feedback_effect_report: dict[str, Any],
+    decision_usefulness_report: dict[str, Any],
+    value_of_more_data_report: dict[str, Any],
+    decision_policy_update_suggestions: dict[str, Any],
+    route_prior_updates: dict[str, Any],
+    policy_update_suggestions: dict[str, Any],
+    outcome_observation_report: dict[str, Any],
+    controller_policy: dict[str, Any],
+    lifecycle_bundle: dict[str, Any],
+    completion_decision: dict[str, Any],
+    belief_update: dict[str, Any],
+    marginal_value: dict[str, Any],
+) -> dict[str, Any]:
+    latest_candidates = [
+        {
+            "source": "feedback_effect_report",
+            "generated_at": _parse_generated_at(feedback_effect_report),
+            "action": _clean_text(feedback_effect_report.get("primary_recommended_action")),
+            "rationale": _clean_text(feedback_effect_report.get("summary")),
+        },
+        {
+            "source": "decision_policy_update_suggestions",
+            "generated_at": _parse_generated_at(decision_policy_update_suggestions),
+            "action": _clean_text(decision_policy_update_suggestions.get("primary_recommended_action")),
+            "rationale": _clean_text(decision_policy_update_suggestions.get("summary")),
+        },
+        {
+            "source": "decision_constraint_report",
+            "generated_at": _parse_generated_at(decision_constraint_report),
+            "action": _clean_text(decision_constraint_report.get("feasible_selected_action")),
+            "rationale": _clean_text(
+                decision_constraint_report.get("summary")
+                or review_gate_state.get("summary")
+                or deployability_assessment.get("summary")
+            ),
+        },
+        {
+            "source": "controller_policy",
+            "generated_at": _parse_generated_at(controller_policy),
+            "action": (
+                _clean_text(controller_policy.get("selected_next_action"))
+                if _clean_text(value_of_more_data_report.get("selected_strategy")) not in {None, "hold_current_course"}
+                else None
+            ),
+            "rationale": _clean_text(
+                decision_usefulness_report.get("summary") or value_of_more_data_report.get("summary")
+            ),
+        },
+        {
+            "source": "completion_decision",
+            "generated_at": _parse_generated_at(completion_decision),
+            "action": _clean_text(completion_decision.get("action")),
+            "rationale": _clean_text(completion_decision.get("summary")),
+        },
+        {
+            "source": "belief_update",
+            "generated_at": _parse_generated_at(belief_update),
+            "action": _clean_text(belief_update.get("recommended_action")),
+            "rationale": _clean_text(belief_update.get("summary")),
+        },
+    ]
+    latest_candidates = [item for item in latest_candidates if item["action"]]
+    if latest_candidates:
+        with_timestamp = [item for item in latest_candidates if item["generated_at"] is not None]
+        if with_timestamp:
+            latest_candidates = with_timestamp
+        selected = max(
+            enumerate(latest_candidates),
+            key=lambda pair: (
+                pair[1]["generated_at"] or datetime.min.replace(tzinfo=timezone.utc),
+                -pair[0],
+            ),
+        )[1]
+        return {
+            "recommended_action": selected["action"],
+            "rationale": selected["rationale"] or _clean_text(marginal_value.get("rationale")),
+            "source": selected["source"],
+        }
+    return {
+        "recommended_action": _lifecycle_primary_action(lifecycle_bundle)
+        or _clean_text(completion_decision.get("action"))
+        or _clean_text(belief_update.get("recommended_action")),
+        "rationale": _clean_text(
+            decision_constraint_report.get("summary")
+            or review_gate_state.get("summary")
+            or deployability_assessment.get("summary")
+            or feedback_effect_report.get("summary")
+            or decision_usefulness_report.get("summary")
+            or value_of_more_data_report.get("summary")
+            or decision_policy_update_suggestions.get("summary")
+            or route_prior_updates.get("summary")
+            or policy_update_suggestions.get("summary")
+            or outcome_observation_report.get("summary")
+            or completion_decision.get("summary")
+            or belief_update.get("summary")
+            or marginal_value.get("rationale")
+        ),
+        "source": "fallback",
+    }
+
+
+def _parse_generated_at(payload: dict[str, Any]) -> datetime | None:
+    value = _clean_text(payload.get("generated_at"))
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed
 
 
 def _preview_text(value: Any, *, limit: int = 160) -> str | None:

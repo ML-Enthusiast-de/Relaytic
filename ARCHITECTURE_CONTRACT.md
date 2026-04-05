@@ -57,11 +57,11 @@ Current canonical boundaries:
 - `src/relaytic/release_safety/` owns Slice 13A release-bundle scanning, workspace-only pre-release scans, artifact attestation, source-map and sensitive-string audits, distribution-manifest reporting, packaging-regression reporting, and doctor-visible release posture
 - `src/relaytic/events/` owns Slice 13B typed runtime event schemas, subscription registries, hook registries, and projection-only event-delivery contracts on top of the canonical runtime event stream
 - `src/relaytic/permissions/` owns Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, append-only permission-decision logs, and session capability contracts
+- `src/relaytic/daemon/` owns Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, approval-aware execution, and memory-maintenance queues
+- `src/relaytic/remote_control/` owns Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
 
 Reserved future boundaries:
 
-- `src/relaytic/daemon/` owns Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, approval-aware execution, and memory-maintenance queues
-- `src/relaytic/remote_control/` should own Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
 - `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
