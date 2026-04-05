@@ -62,7 +62,8 @@ Current canonical boundaries:
 
 Reserved future boundaries:
 
-- `src/relaytic/representation/` should own Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+- `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
+- `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
 
@@ -117,9 +118,17 @@ These files are required and must stay current:
 - `docs/build_slices/phase_14a.md`
 - `docs/build_slices/phase_15.md`
 - `docs/build_slices/phase_16.md`
+- `docs/build_slices/phase_16a.md`
+- `docs/build_slices/phase_16b.md`
+- `docs/build_slices/phase_16c.md`
+- `docs/build_slices/phase_16d.md`
+- `docs/build_slices/phase_16e.md`
+- `docs/build_slices/phase_16f.md`
+- `docs/build_slices/phase_17.md`
 - `docs/specs/workspace_lifecycle.md`
 - `docs/specs/result_contract_schema.md`
 - `docs/specs/governed_learnings_schema.md`
+- `docs/specs/capability_academy_contract.md`
 - `docs/specs/mission_control_contract.md`
 - `docs/specs/handoff_result_migration.md`
 - `docs/specs/learnings_migration_contract.md`

@@ -108,7 +108,7 @@ These are not mandatory core dependencies. They are pre-approved optional adapte
   strongest fit: late lifecycle/serving work after Slice 08 and Slice 15
 - **JEPA-family representation engines**
   use later for latent predictive representation learning over large unlabeled local tables, event histories, and streams
-  strongest fit: late-stage research work after Slice 15, especially a future Slice 16 representation-engine track
+  strongest fit: late-stage research work after the post-Slice-15 academy track, especially a future Slice 17 representation-engine track
 
 Adapter rule:
 
@@ -185,6 +185,8 @@ If a later slice adds "smartness" without strengthening at least one of those pr
   - skeptical override rejection or unsafe-request defense with replayable trace
 - **human-supervision path**
   once Slice 15 lands, one first-time human and one external agent path should be able to complete onboarding, start useful work, inspect why Relaytic changed course, and recover when stuck without repo literacy
+- **academy-growth path**
+  once Slices 16B through 16F land, one candidate capability should be visible from replay through shadow, arena decision, and final promotion or retirement without altering authoritative run truth before promotion
 
 ## Preferred post-MVP execution order
 
@@ -225,6 +227,13 @@ Stable slice numbering stays the same, but the preferred execution order after S
 33. Slice 14A
 34. Slice 15
 35. Slice 16
+36. Slice 16A
+37. Slice 16B
+38. Slice 16C
+39. Slice 16D
+40. Slice 16E
+41. Slice 16F
+42. Slice 17
 
 Why:
 
@@ -262,7 +271,14 @@ Why:
 - Slice 14 should come after Slice 13C because real-world feasibility is stronger once Relaytic can account for permission posture, waiting approvals, and long-running work instead of treating constraints as static annotations
 - Slice 14A should come after Slice 14 because remote supervision is only credible once local feasibility, permission modes, and background resumability are already explicit
 - Slice 15 should close the loop with flagship demo packs, release readiness, remote supervision visibility, and human-supervision evaluation rather than treating UI polish as sufficient proof
-- Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
+- Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-15 capability evolution has one coherent contract
+- Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
+- Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
+- Slice 16C should come before hunt-heavy or roster-heavy work because promotion and quarantine logic must be deterministic before Relaytic starts scouting aggressively
+- Slice 16D should come after 16C because hunt campaigns should feed the same replay, shadow, and arena pipeline rather than inventing a parallel innovation loop
+- Slice 16E should come after the tool-focused academy slices because non-core specialist recruitment and retirement should reuse the same proof pipeline instead of becoming a second roster mechanism
+- Slice 16F should close the academy track by turning candidate, shadow, hunt, and promotion truth into one human- and agent-usable surface
+- Slice 17 should remain the optional late-stage representation-engine slice and should land after the academy track so Relaytic can first learn to evolve governed capabilities before it experiments with deeper latent representation engines
 
 ## Current execution state
 
@@ -278,9 +294,10 @@ Why:
 - next workspace-and-iteration follow-on after Slice 14A: Slice 15
 - next remote-supervision follow-on after Slice 14A: Slice 15
 - later mission-control expansion after Slice 14A: Slice 15
-- late optional representation follow-on after Slice 15: Slice 16
+- next planned academy follow-on after Slice 15: Slice 16A
+- late optional representation follow-on after the academy track: Slice 17
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
-- the canonical product-spec pack for Slice 12D and its follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped mission control, handoff, learnings, and external-agent continuation surfaces
+- the canonical product-spec pack for Slice 12D, Slice 15, and the academy follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, academy, handoff, learnings, and external-agent continuation surfaces
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -2466,7 +2483,316 @@ Minimum proof:
 - one mission-control path that shows branch structure, confidence, and change attribution for a non-trivial autonomous run
 - one remote-source demo where Relaytic reads through a connector, materializes a bounded local snapshot, records explicit provenance, and still avoids persisting original absolute source paths
 
-## Slice 16 - Representation engines, JEPA-style latent world models, and unlabeled local corpora
+## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
+
+Goal:
+- governed capability registry
+- replay and shadow validation
+- arena promotion scorecards
+- bounded hunt campaigns
+- non-core specialist recruitment and retirement
+- academy mission-control explainability
+
+Load-bearing improvement:
+
+- Relaytic should be able to discover, trial, promote, demote, and retire new tools and non-core specialist agents through a shadow-tested academy instead of relying only on fixed manually-coded capability growth
+
+Human surface:
+
+- humans should be able to inspect candidate capabilities, shadow-trial outcomes, promotion decisions, hunt campaigns, and retirement reasons from one coherent operator surface
+
+Agent surface:
+
+- external agents should be able to propose capabilities, run replay or shadow trials, inspect promotion scorecards, and consume academy state through stable JSON-first surfaces
+
+Intelligence source:
+
+- pulse watchlists, benchmark gaps, workspace memory, search-controller deficits, external-agent proposals, replay packs, shadow disagreements, and seeded exploration
+
+Fallback rule:
+
+- when the academy is disabled, Relaytic must continue using only the current promoted static capability set and must not silently trial or route candidate tools or non-core specialists
+
+Required behavior:
+
+- core agents must remain immutable from the academy's point of view
+- tools and non-core specialists must move through explicit lifecycle states rather than appearing silently
+- replay and shadow proof must exist before live authority
+- hunt exploration must be seeded, budgeted, and replayable
+- promotion, quarantine, and retirement decisions must be deterministic and audit-backed
+
+Minimum proof:
+
+- one candidate progresses from intake to shadow mode without changing production truth
+- one candidate is promoted through explicit replay, shadow, and arena evidence
+- one candidate is quarantined or retired despite promise because safety, transfer, or policy proof fails
+- one seeded hunt campaign can be replayed exactly
+
+This umbrella slice is delivered through Slices 16A through 16F below.
+
+## Slice 16A - Capability registry and capability cards
+
+Goal:
+- capability registry
+- capability cards
+- core-agent protection
+- non-core specialist registry
+
+Load-bearing improvement:
+
+- Relaytic should be able to represent candidate and promoted tools or specialists explicitly as typed capability cards with lifecycle, risk, owner, and proof posture
+
+Human surface:
+
+- humans should be able to inspect what a capability is, what permissions it needs, and whether it is candidate, promoted, quarantined, or retired
+
+Agent surface:
+
+- external agents should be able to submit candidates and inspect the same capability cards through stable JSON-first surfaces
+
+Intelligence source:
+
+- current workspace gaps, benchmark debt, pulse innovation watch, and external-agent proposals
+
+Fallback rule:
+
+- when the academy registry is unavailable, Relaytic must expose an explicit `academy_unavailable` posture rather than inferring candidate state
+
+Required outputs:
+- `capability_registry.json`
+- `capability_card_log.jsonl`
+- `capability_intake_record.json`
+- `capability_risk_profile.json`
+- `academy_policy_report.json`
+- `core_agent_roster.json`
+- `non_core_specialist_registry.json`
+
+Minimum proof:
+
+- one tool candidate can be registered with a full capability card
+- one non-core specialist candidate can be registered without affecting the core roster
+- one attempt to make a core agent removable is rejected explicitly
+
+## Slice 16B - Offline replay packs and shadow mode
+
+Goal:
+- replay packs
+- non-authoritative shadow mode
+- disagreement capture
+- counterfactual win reporting
+
+Load-bearing improvement:
+
+- Relaytic should be able to evaluate candidate tools or specialists on replayable runs and in live-like shadow mode without allowing them to alter production truth
+
+Human surface:
+
+- humans should be able to see whether a candidate would have helped, hurt, disagreed, or violated constraints before it gets live authority
+
+Agent surface:
+
+- external agents should be able to launch replay and shadow trials and inspect disagreement or counterfactual win reports through stable JSON-first surfaces
+
+Intelligence source:
+
+- historical runs, benchmark packs, trace spans, shadow disagreements, cost envelopes, and feasibility or permission outcomes
+
+Fallback rule:
+
+- when replay packs are unavailable, Relaytic must block promotion and keep the candidate in non-authoritative states
+
+Required outputs:
+- `offline_replay_scorecard.json`
+- `replay_trace_index.json`
+- `capability_failure_taxonomy.json`
+- `shadow_trial_report.json`
+- `shadow_disagreement_log.jsonl`
+- `shadow_counterfactual_win_report.json`
+- `shadow_budget_report.json`
+
+Minimum proof:
+
+- one replay pack produces a comparable scorecard
+- one shadow run leaves authoritative output unchanged
+- one candidate shows a measurable counterfactual win
+- one weak candidate is blocked from advancing
+
+## Slice 16C - Arena evaluation and promotion scorecards
+
+Goal:
+- deterministic arena comparison
+- promotion and quarantine scorecards
+- narrow live trial contracts
+- rollback-ready promotion decisions
+
+Load-bearing improvement:
+
+- Relaytic should be able to compare candidates against incumbents through one deterministic arena and promote only when multi-axis evidence justifies the added complexity
+
+Human surface:
+
+- humans should be able to inspect why one candidate won, why another lost, and what evidence blocked promotion
+
+Agent surface:
+
+- external agents should be able to consume one ranking and one promotion decision report without prompt-only interpretation
+
+Intelligence source:
+
+- replay packs, shadow trials, cost and safety budgets, feasibility outcomes, transfer evidence, and deterministic scorecards
+
+Fallback rule:
+
+- when arena comparison cannot be run, Relaytic must quarantine the candidate and emit an incomplete-proof posture
+
+Required outputs:
+- `capability_arena_scorecard.json`
+- `promotion_candidate_ranking.json`
+- `arena_judge_report.json`
+- `promotion_decision_report.json`
+- `capability_registry_update.json`
+- `trial_scope_contract.json`
+- `trial_rollback_checkpoint.json`
+
+Minimum proof:
+
+- one candidate is promoted through an explicit arena win
+- one metric-strong candidate still loses because safety, feasibility, or transfer evidence is worse
+- one candidate enters a rollbackable narrow live trial
+- one candidate is quarantined because proof is incomplete
+
+## Slice 16D - Hunt campaigns, seeded exploration, and provider feedback
+
+Goal:
+- bounded hunt campaigns
+- seeded exploration
+- provider feedback
+- daemon-backed scouting
+
+Load-bearing improvement:
+
+- Relaytic should be able to use idle daemon or pulse windows to scout benchmark gaps, sample candidates, run bounded hunt campaigns, and generate reusable provider feedback without silently mutating production behavior
+
+Human surface:
+
+- humans should be able to see what Relaytic hunted for, what budget it spent, what it found, and why the hunt stopped
+
+Agent surface:
+
+- external agents should be able to inspect hunt state, seeds, targets, and provider feedback through stable JSON-first surfaces and remote supervision
+
+Intelligence source:
+
+- pulse watchlists, benchmark gaps, repeated workspace failures, imported-incumbent deficits, seeded candidate sampling, and bounded daemon execution
+
+Fallback rule:
+
+- when hunt mode is disabled, Relaytic must keep the same targets and queues visible but must not run autonomous scouting
+
+Required outputs:
+- `hunt_campaign_state.json`
+- `hunt_target_selection.json`
+- `hunt_candidate_log.jsonl`
+- `hunt_outcome_report.json`
+- `provider_feedback_report.json`
+- `exploration_budget_report.json`
+- `exploration_seed_log.jsonl`
+- `exploration_policy_report.json`
+
+Minimum proof:
+
+- one hunt campaign runs from an explicit target gap to a queued candidate outcome
+- one hunt campaign exhausts its budget and stops honestly
+- one failed candidate still yields useful provider feedback
+- one seeded hunt is replayable
+
+## Slice 16E - Non-core specialist recruitment and retirement
+
+Goal:
+- governed specialist recruitment
+- governed specialist retirement
+- core-agent protection
+- roster change audit
+
+Load-bearing improvement:
+
+- Relaytic should be able to recruit useful non-core specialists for recurring needs and retire underperforming non-core specialists without allowing uncontrolled roster drift or any deletion of core agents
+
+Human surface:
+
+- humans should be able to inspect why a non-core specialist was recruited or retired and how that changed capability coverage
+
+Agent surface:
+
+- external agents should be able to propose non-core specialists and inspect roster decisions through stable JSON-first surfaces
+
+Intelligence source:
+
+- repeated workspace gaps, hunt outcomes, arena results, transfer evidence, and deterministic roster rules
+
+Fallback rule:
+
+- when recruitment logic is disabled, Relaytic must preserve the existing roster and record proposals as candidate-only
+
+Required outputs:
+- `specialist_candidate_queue.json`
+- `recruitment_decision_report.json`
+- `specialist_trial_report.json`
+- `capability_retirement_report.json`
+- `roster_change_log.jsonl`
+- `core_agent_protection_report.json`
+
+Minimum proof:
+
+- one non-core specialist is recruited for a recurring gap
+- one underperforming non-core specialist is retired with explicit evidence
+- one attempt to retire a core agent is rejected and audited
+
+## Slice 16F - Academy mission control and explainability surfaces
+
+Goal:
+- academy mission control
+- academy explanation surfaces
+- academy remote supervision views
+- academy MCP exports
+
+Load-bearing improvement:
+
+- Relaytic should expose one professional academy surface that shows promoted capabilities, candidates in replay or shadow, hunt campaigns, roster changes, and promotion or retirement reasons from the same runtime truth
+
+Human surface:
+
+- humans should be able to ask why a capability was promoted, blocked, or retired and get a trace-backed explanation without reading raw artifact trees
+
+Agent surface:
+
+- external agents should be able to query the same academy state, candidate registry, trial posture, and promotion reasoning through stable JSON-first surfaces and MCP tools
+
+Intelligence source:
+
+- capability cards, replay and shadow evidence, arena scorecards, provider feedback, roster history, and remote-supervision state
+
+Fallback rule:
+
+- if richer academy UI rendering is unavailable, Relaytic must still expose the same academy truth through CLI, MCP, and artifacts
+
+Required outputs:
+- `academy_state.json`
+- `academy_registry_view.json`
+- `academy_trial_dashboard.json`
+- `academy_hunt_view.json`
+- `academy_promotion_timeline.json`
+- `academy_explanation_report.json`
+- `academy_remote_approval_view.json`
+
+Minimum proof:
+
+- one human can inspect promoted capabilities, shadow candidates, and hunt campaigns from one academy view
+- one agent can query the same academy state through JSON-first or MCP surfaces
+- one "why was this promoted?" explanation is trace-backed and specific
+- one remote supervisor can inspect academy promotion or hunt state without creating a second authority path
+
+## Slice 17 - Representation engines, JEPA-style latent world models, and unlabeled local corpora
 
 Goal:
 - optional representation-engine slot

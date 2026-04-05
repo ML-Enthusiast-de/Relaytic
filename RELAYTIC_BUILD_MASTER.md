@@ -102,7 +102,14 @@ Start with:
 13. search controller, accelerated execution, and distributed local experimentation
 14. real-world feasibility, domain constraints, and action boundaries
 15. mission-control expansion, packaging, integrations, demos, and polish
-16. representation engines, JEPA-style latent world models, and unlabeled local corpora
+16. Relaytic Academy umbrella track, governed capability evolution, and shadow-tested growth
+16A. capability registry and capability cards
+16B. offline replay packs and shadow mode
+16C. arena evaluation and promotion scorecards
+16D. hunt campaigns, seeded exploration, and provider feedback
+16E. non-core specialist recruitment and retirement
+16F. academy mission control and explainability surfaces
+17. representation engines, JEPA-style latent world models, and unlabeled local corpora
 
 ## Preferred post-MVP execution order
 
@@ -143,6 +150,13 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 33. Slice 14A
 34. Slice 15
 35. Slice 16
+36. Slice 16A
+37. Slice 16B
+38. Slice 16C
+39. Slice 16D
+40. Slice 16E
+41. Slice 16F
+42. Slice 17
 
 Reason:
 
@@ -181,7 +195,14 @@ Reason:
 - Slice 14 should come after Slice 13C because real-world feasibility is stronger once Relaytic can account for permission posture, waiting approvals, and long-running work instead of treating constraints as static annotations
 - Slice 14A should come after Slice 14 because remote supervision is only credible once local feasibility, permission modes, and background resumability are already explicit
 - Slice 15 should close the proof loop with flagship demo packs, release readiness, remote supervision visibility, and human-supervision evaluation rather than treating UI polish as sufficient evidence
-- Slice 16 is the optional late-stage representation-engine slice where Relaytic can evaluate JEPA-style latent predictive models for large unlabeled local corpora, event histories, and streams without promoting them into the authority path prematurely
+- Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so later post-15 capability-evolution work has one coherent contract
+- Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
+- Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
+- Slice 16C should come before hunt-heavy or roster-heavy work because promotion and quarantine logic must be deterministic before Relaytic starts scouting aggressively
+- Slice 16D should come after 16C because hunt campaigns should feed the same replay, shadow, and arena pipeline rather than inventing a parallel innovation loop
+- Slice 16E should come after the tool-focused academy slices because non-core specialist recruitment and retirement should reuse the same proof pipeline instead of becoming a second roster mechanism
+- Slice 16F should close the academy track by turning candidate, shadow, hunt, and promotion truth into one human- and agent-usable surface
+- Slice 17 should remain the optional late-stage representation-engine slice and should land after the academy track so Relaytic can first learn to evolve governed capabilities before it experiments with deeper latent representation engines
 
 Current repo state:
 
@@ -196,8 +217,9 @@ Current repo state:
 - latest background-and-resume slice: Slice 13C
 - next workspace-and-iteration follow-on after Slice 14A: Slice 15
 - next remote-supervision follow-on after Slice 14A: Slice 15
+- next planned academy follow-on after Slice 15: Slice 16A
 - after Slice 13, every later slice that changes operator-visible behavior, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces rather than leaving the UI stale until late polish
-- the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped mission control, handoff, learnings, and external-agent continuation surfaces
+- the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, academy, handoff, learnings, and external-agent continuation surfaces
 
 ## MVP boundary
 
@@ -259,11 +281,12 @@ If the goal is to turn the current implementation into something that looks genu
 - richer data-fabric reasoning that can suggest joins, entity histories, or additional data before wasting search budget
 - a stronger search controller that widens or prunes branches, changes handoff depth, and allocates HPO effort based on expected decision value under budget
 - a mission-control surface that makes branch structure, confidence, intervention history, traces, incumbent-versus-Relaytic state, and change attribution legible to humans and agents
+- a governed capability-academy track that can scout, shadow-test, promote, demote, and retire tools or non-core specialists through deterministic proof instead of ad hoc growth
 - an optional representation engine that can learn from large unlabeled local corpora and improve retrieval, anomaly support, and temporal state understanding without replacing deterministic adjudication
 
 Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.
 Slices 10, 10B, 10C, and 10A are the current category-shift unlocks that turned Relaytic from a governed inference lab into a more explicit decision-and-discovery system with skeptical steering. Slice 11A added real incumbent pressure, Slice 11B completed the first adoption unlock because humans and external agents can now launch, inspect, and demo the system from one coherent control surface, and Slice 11C made that surface legible enough to act as a real MVP cockpit instead of only a technical dashboard.
-Slice 16 is a long-range optional frontier bet, not a prerequisite for the core lab thesis.
+Slices 16A through 16F are the future governed capability-evolution track after Slice 15, and Slice 17 remains the long-range optional representation-engine bet after the academy track.
 
 ## Source of truth precedence
 

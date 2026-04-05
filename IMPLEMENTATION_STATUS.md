@@ -13,6 +13,7 @@ This document tracks the operational state of the repository. It is an implement
 - latest runtime-and-permission slice: 13B, event bus, runtime hooks, and visible permission modes
 - latest background-and-resume slice: 13C, bounded daemon, resumable jobs, and memory maintenance
 - next workspace-and-iteration follow-on after Slice 14A: 15, mission-control expansion, packaging, integrations, demos, and human-factors proof
+- next planned academy follow-on after Slice 15: 16A, capability registry and capability cards
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 - canonical future product-contract pack written under `docs/specs/` for workspace lifecycle, result contracts, governed learnings, mission-control behavior, compatibility migration, testing/proof burden, and flagship demos
@@ -114,7 +115,8 @@ The most important not-yet-implemented shifts after the current baseline are:
 - flagship demo packs with explicit scorecards so Relaytic can be judged by repeatable proof scenarios instead of ad hoc walkthroughs
 - human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy
 - mission-control surfaces that expose branch DAG, confidence, trace replay, and change attribution to both humans and external agents
-- an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family
+- a post-Slice-15 capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement
+- a later optional representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family after the academy track
 
 ## Implemented Slices
 

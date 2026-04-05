@@ -189,11 +189,12 @@ Current workspace-first boundaries:
 
 Reserved future boundaries:
 
-- `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+- `src/relaytic/capability_academy/` should own future academy capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement
+- `src/relaytic/representation/` should own optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support after the academy track lands
 
 Documentation boundaries:
 
-- `docs/specs/` owns the canonical product-contract pack for workspace lifecycle, result-contract schema, governed learnings, mission-control behavior, compatibility migration, testing/proof burden, and flagship demos
+- `docs/specs/` owns the canonical product-contract pack for workspace lifecycle, result-contract schema, governed learnings, capability-academy behavior, mission-control behavior, compatibility migration, testing/proof burden, and flagship demos
 
 ## Naming Rule
 

@@ -439,7 +439,8 @@ Current Slice 12D artifact names:
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
 - `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
-- `src/relaytic/representation/` for Slice 16 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+- `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement
+- `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
 Implemented release-safety artifact names:
 - `release_safety_scan.json`
@@ -462,7 +463,7 @@ Implemented event-bus and permission artifact names:
 - `permission_decision_log.jsonl`
 - `session_capability_contract.json`
 
-Implemented daemon, feasibility, and remote-supervision artifact names:
+Implemented daemon, feasibility, and remote-supervision artifact names plus reserved later mission-control, academy, and representation names:
 - `daemon_state.json`
 - `background_job_registry.json`
 - `background_job_log.jsonl`
@@ -498,6 +499,36 @@ Implemented daemon, feasibility, and remote-supervision artifact names:
 - `flagship_demo_scorecard.json`
 - `human_factors_eval_report.json`
 - `onboarding_success_report.json`
+- `capability_registry.json`
+- `capability_card_log.jsonl`
+- `capability_intake_record.json`
+- `capability_risk_profile.json`
+- `offline_replay_scorecard.json`
+- `shadow_trial_report.json`
+- `shadow_disagreement_log.jsonl`
+- `shadow_counterfactual_win_report.json`
+- `capability_arena_scorecard.json`
+- `promotion_candidate_ranking.json`
+- `promotion_decision_report.json`
+- `capability_registry_update.json`
+- `hunt_campaign_state.json`
+- `hunt_target_selection.json`
+- `hunt_candidate_log.jsonl`
+- `hunt_outcome_report.json`
+- `provider_feedback_report.json`
+- `exploration_budget_report.json`
+- `exploration_seed_log.jsonl`
+- `specialist_candidate_queue.json`
+- `recruitment_decision_report.json`
+- `specialist_trial_report.json`
+- `capability_retirement_report.json`
+- `roster_change_log.jsonl`
+- `academy_state.json`
+- `academy_registry_view.json`
+- `academy_trial_dashboard.json`
+- `academy_hunt_view.json`
+- `academy_promotion_timeline.json`
+- `academy_explanation_report.json`
 - `representation_engine_profile.json`
 - `latent_state_report.json`
 - `embedding_index_report.json`

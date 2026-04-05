@@ -114,6 +114,7 @@ To reduce timeout risk, future CI should support at least:
 - `background_runtime`
 - `remote_supervision`
 - `mission_control`
+- `capability_academy`
 
 ## Minimum pass expectation by slice family
 
@@ -150,6 +151,24 @@ To reduce timeout risk, future CI should support at least:
 - demo-pack health checks
 - onboarding-success tests
 - workspace replay tests
+
+### Slice 16 family
+
+- capability-card schema tests
+- replay-pack tests
+- shadow-mode non-authority tests
+- arena-promotion tests
+- hunt-budget and seeded-replay tests
+- non-core specialist recruitment and retirement tests
+- no-core-deletion guards
+- human and agent explanation tests for promoted or retired capabilities
+
+### Slice 17 family
+
+- representation-slot fallback tests
+- representation-uplift benchmark tests
+- no-gain honesty tests
+- benchmark separation tests between deterministic and representation-augmented modes
 
 ## Release gate
 

@@ -67,7 +67,9 @@ The next frontier upgrades are:
 
 The next recommended build is **Slice 15**, because Relaytic now has local feasibility reasoning, one visible event bus, one explicit permission model, one bounded daemon layer, and a shipped remote-supervision surface, so the next frontier requirement is turning those already-real runtime, authority, and audit contracts into a polished mission-control, demo, packaging, and human-factors proof layer.
 
-The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
+After Slice 15, the next planned frontier track is the **Relaytic Academy** starting at **Slice 16A**, where Relaytic begins governed capability evolution through capability cards, replay packs, shadow mode, arena promotion, hunt campaigns, and non-core specialist recruitment or retirement.
+
+The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
 
 - machine-stable result contracts with confidence posture and belief-revision triggers so humans, agents, CLI, MCP, and later richer UI shells can all read the same conclusion differently without drifting
 - governed learnings with source, confidence, reaffirmation, invalidation, reset, and optional expiry semantics
@@ -84,7 +86,8 @@ The normative product-contract pack that now governs the shipped workspace layer
 - flagship demo packs with explicit scorecards so Relaytic can be judged by repeatable proof cases rather than ad hoc walkthroughs
 - human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy
 - deeper mission-control surfaces that build on the shipped 11B through 11G control-center foundation to show branch structure, confidence, trace history, and change attribution to humans and external agents
-- an optional late-stage representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive models as one promising backend family
+- a post-Slice-15 capability-academy track that can discover, shadow-test, promote, demote, and retire new tools and non-core specialists through replayable proof instead of ad hoc growth
+- a later optional representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive models as one promising backend family
 
 ## Design Principles
 
