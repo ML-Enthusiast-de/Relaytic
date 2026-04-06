@@ -12,34 +12,63 @@ from typing import Any
 from relaytic.assist import build_assist_bundle
 from relaytic.assist.storage import read_assist_bundle, write_assist_bundle
 from relaytic.daemon import run_daemon_review
+from relaytic.daemon.storage import read_background_job_log, read_daemon_bundle
 from relaytic.events import run_event_bus_review
 from relaytic.intelligence import build_intelligence_controls_from_policy
 from relaytic.intelligence.backends import discover_backend
 from relaytic.interoperability.self_check import build_interoperability_inventory
 from relaytic.permissions import run_permission_review
+from relaytic.permissions.storage import read_permission_decision_log
+from relaytic.release_safety.storage import read_release_safety_bundle
 from relaytic.remote_control import run_remote_control_review
+from relaytic.remote_control.storage import read_approval_decision_log, read_remote_control_bundle
 from relaytic.runs.summary import materialize_run_summary, read_run_summary
+from relaytic.tracing import run_trace_review
+from relaytic.tracing.storage import read_trace_bundle, write_trace_bundle
 from relaytic.ui.doctor import build_doctor_report
+from relaytic.workspace.storage import read_result_contract_artifacts, read_workspace_bundle_for_run
 
 from .models import (
     ACTION_AFFORDANCES_SCHEMA_VERSION,
+    APPROVAL_TIMELINE_SCHEMA_VERSION,
+    BACKGROUND_JOB_VIEW_SCHEMA_VERSION,
+    BRANCH_DAG_SCHEMA_VERSION,
+    BRANCH_REPLAY_INDEX_SCHEMA_VERSION,
     CAPABILITY_MANIFEST_SCHEMA_VERSION,
+    CHANGE_ATTRIBUTION_REPORT_SCHEMA_VERSION,
+    CONFIDENCE_MAP_SCHEMA_VERSION,
     CONTROL_CENTER_LAYOUT_SCHEMA_VERSION,
     DEMO_SESSION_MANIFEST_SCHEMA_VERSION,
+    DEMO_PACK_MANIFEST_SCHEMA_VERSION,
+    FLAGSHIP_DEMO_SCORECARD_SCHEMA_VERSION,
+    HUMAN_FACTORS_EVAL_REPORT_SCHEMA_VERSION,
     INSTALL_EXPERIENCE_REPORT_SCHEMA_VERSION,
     LAUNCH_MANIFEST_SCHEMA_VERSION,
     MODE_OVERVIEW_SCHEMA_VERSION,
     MISSION_CONTROL_STATE_SCHEMA_VERSION,
     ONBOARDING_CHAT_SESSION_STATE_SCHEMA_VERSION,
     ONBOARDING_STATUS_SCHEMA_VERSION,
+    ONBOARDING_SUCCESS_REPORT_SCHEMA_VERSION,
+    PERMISSION_MODE_CARD_SCHEMA_VERSION,
     QUESTION_STARTERS_SCHEMA_VERSION,
+    RELEASE_HEALTH_REPORT_SCHEMA_VERSION,
     REVIEW_QUEUE_STATE_SCHEMA_VERSION,
     STAGE_NAVIGATOR_SCHEMA_VERSION,
+    TRACE_EXPLORER_STATE_SCHEMA_VERSION,
     UI_PREFERENCES_SCHEMA_VERSION,
     ActionAffordances,
+    ApprovalTimeline,
+    BackgroundJobView,
+    BranchDAG,
+    BranchReplayIndex,
     CapabilityManifest,
+    ChangeAttributionReport,
+    ConfidenceMap,
     ControlCenterLayout,
     DemoSessionManifest,
+    DemoPackManifest,
+    FlagshipDemoScorecard,
+    HumanFactorsEvalReport,
     InstallExperienceReport,
     LaunchManifest,
     MissionControlBundle,
@@ -49,9 +78,13 @@ from .models import (
     ModeOverview,
     OnboardingChatSessionState,
     OnboardingStatus,
+    OnboardingSuccessReport,
+    PermissionModeCard,
     QuestionStarters,
+    ReleaseHealthReport,
     ReviewQueueState,
     StageNavigator,
+    TraceExplorerState,
     UIPreferences,
     build_mission_control_controls_from_policy,
 )
@@ -87,6 +120,8 @@ def run_mission_control_review(
         run_permission_review(run_dir=resolved_run_dir, policy=policy or {})
         run_daemon_review(run_dir=resolved_run_dir, policy=policy or {})
         run_remote_control_review(run_dir=resolved_run_dir, policy=policy or {})
+        trace_result = run_trace_review(run_dir=resolved_run_dir, policy=policy or {})
+        write_trace_bundle(resolved_run_dir, bundle=trace_result.bundle)
         materialized = materialize_run_summary(run_dir=resolved_run_dir)
         summary_payload = dict(materialized.get("summary", {}))
         summary_paths = {
@@ -117,6 +152,91 @@ def run_mission_control_review(
         run_dir=resolved_run_dir,
         policy=policy or {},
     )
+    branch_dag = _build_branch_dag(
+        controls=controls,
+        trace=trace,
+        run_dir=resolved_run_dir,
+        summary_payload=summary_payload,
+    )
+    confidence_map = _build_confidence_map(
+        controls=controls,
+        trace=trace,
+        run_dir=resolved_run_dir,
+        summary_payload=summary_payload,
+    )
+    change_attribution_report = _build_change_attribution_report(
+        controls=controls,
+        trace=trace,
+        run_dir=resolved_run_dir,
+        summary_payload=summary_payload,
+    )
+    trace_explorer_state = _build_trace_explorer_state(
+        controls=controls,
+        trace=trace,
+        run_dir=resolved_run_dir,
+        summary_payload=summary_payload,
+        branch_dag=branch_dag,
+    )
+    branch_replay_index = _build_branch_replay_index(
+        controls=controls,
+        trace=trace,
+        run_dir=resolved_run_dir,
+        summary_payload=summary_payload,
+        branch_dag=branch_dag,
+        trace_explorer_state=trace_explorer_state,
+    )
+    approval_timeline = _build_approval_timeline(
+        controls=controls,
+        trace=trace,
+        run_dir=resolved_run_dir,
+        summary_payload=summary_payload,
+    )
+    background_job_view = _build_background_job_view(
+        controls=controls,
+        trace=trace,
+        run_dir=resolved_run_dir,
+        summary_payload=summary_payload,
+    )
+    permission_mode_card = _build_permission_mode_card(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+    )
+    release_health_report = _build_release_health_report(
+        controls=controls,
+        trace=trace,
+        root_dir=root,
+        doctor_report=doctor_report,
+    )
+    demo_pack_manifest = _build_demo_pack_manifest(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        review_queue=review_queue,
+        branch_dag=branch_dag,
+        release_health_report=release_health_report,
+    )
+    flagship_demo_scorecard = _build_flagship_demo_scorecard(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        review_queue=review_queue,
+        branch_dag=branch_dag,
+        release_health_report=release_health_report,
+    )
+    human_factors_eval_report = _build_human_factors_eval_report(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        onboarding_chat_session=onboarding_chat_session_state,
+    )
+    onboarding_success_report = _build_onboarding_success_report(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        onboarding_chat_session=onboarding_chat_session_state,
+        doctor_report=doctor_report,
+    )
     cards = _build_cards(
         summary_payload=summary_payload,
         doctor_report=doctor_report,
@@ -124,6 +244,16 @@ def run_mission_control_review(
         assist_bundle=assist_bundle,
         review_queue=review_queue,
         onboarding_chat_session=onboarding_chat_session_state.to_dict(),
+        branch_dag=branch_dag,
+        confidence_map=confidence_map,
+        change_attribution_report=change_attribution_report,
+        trace_explorer_state=trace_explorer_state,
+        approval_timeline=approval_timeline,
+        background_job_view=background_job_view,
+        permission_mode_card=permission_mode_card,
+        release_health_report=release_health_report,
+        demo_pack_manifest=demo_pack_manifest,
+        flagship_demo_scorecard=flagship_demo_scorecard,
     )
     mode_overview = _build_mode_overview(
         controls=controls,
@@ -245,6 +375,19 @@ def run_mission_control_review(
         launch_manifest=launch_manifest,
         demo_session_manifest=demo_session,
         ui_preferences=ui_preferences,
+        branch_dag=branch_dag,
+        confidence_map=confidence_map,
+        change_attribution_report=change_attribution_report,
+        trace_explorer_state=trace_explorer_state,
+        branch_replay_index=branch_replay_index,
+        approval_timeline=approval_timeline,
+        background_job_view=background_job_view,
+        permission_mode_card=permission_mode_card,
+        release_health_report=release_health_report,
+        demo_pack_manifest=demo_pack_manifest,
+        flagship_demo_scorecard=flagship_demo_scorecard,
+        human_factors_eval_report=human_factors_eval_report,
+        onboarding_success_report=onboarding_success_report,
     )
     return MissionControlRunResult(
         bundle=bundle,
@@ -265,6 +408,19 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
     onboarding = dict(payload.get("onboarding_status", {}))
     onboarding_session = dict(payload.get("onboarding_chat_session_state", {}))
     launch = dict(payload.get("launch_manifest", {}))
+    branch_dag = dict(payload.get("branch_dag", {}))
+    confidence_map = dict(payload.get("confidence_map", {}))
+    change_attribution = dict(payload.get("change_attribution_report", {}))
+    trace_explorer = dict(payload.get("trace_explorer_state", {}))
+    branch_replay = dict(payload.get("branch_replay_index", {}))
+    approval_timeline = dict(payload.get("approval_timeline", {}))
+    background_jobs = dict(payload.get("background_job_view", {}))
+    permission_mode_card = dict(payload.get("permission_mode_card", {}))
+    release_health = dict(payload.get("release_health_report", {}))
+    demo_pack = dict(payload.get("demo_pack_manifest", {}))
+    demo_scorecard = dict(payload.get("flagship_demo_scorecard", {}))
+    human_factors = dict(payload.get("human_factors_eval_report", {}))
+    onboarding_success = dict(payload.get("onboarding_success_report", {}))
     cards = [dict(item) for item in state.get("cards", []) if isinstance(item, dict)]
     current_requirements = [str(item).strip() for item in onboarding.get("current_requirements", []) if str(item).strip()]
     first_steps = [str(item).strip() for item in onboarding.get("first_steps", []) if str(item).strip()]
@@ -353,6 +509,68 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
             detail = str(item.get("detail", "")).strip()
             lines.append(f"- `{item.get('name', 'Handbook')}`: {detail}" + (f" Path: `{command}`." if command else ""))
         lines.append("")
+    if confidence_map:
+        lines.extend(
+            [
+                "## Confidence Posture",
+                f"- Overall confidence: `{confidence_map.get('overall_confidence') or 'unknown'}`",
+                f"- Review need: `{confidence_map.get('review_need') or 'unknown'}`",
+                f"- Unresolved items: `{confidence_map.get('unresolved_count', 0)}`",
+                f"- Recommended direction: `{confidence_map.get('recommended_direction') or 'unknown'}`",
+                "",
+            ]
+        )
+    if change_attribution:
+        lines.extend(["## Why Relaytic Changed Course"])
+        for item in list(change_attribution.get("change_events", []))[:6]:
+            lines.append(
+                f"- `{item.get('source') or 'unknown'}` changed `{item.get('changed') or 'state'}`: {item.get('detail') or 'No detail recorded.'}"
+            )
+        lines.append("")
+    if branch_dag or trace_explorer:
+        lines.extend(
+            [
+                "## Branches And Replay",
+                f"- Active branch: `{branch_dag.get('active_branch_id') or 'unknown'}`",
+                f"- Branch count: `{branch_dag.get('branch_count', 0)}`",
+                f"- Winning action: `{trace_explorer.get('winning_action') or 'unknown'}`",
+                f"- Replay entries: `{branch_replay.get('replay_count', 0)}`",
+                "",
+            ]
+        )
+    if permission_mode_card or background_jobs:
+        lines.extend(
+            [
+                "## Authority And Background Work",
+                f"- Permission mode: `{permission_mode_card.get('current_mode') or 'unknown'}`",
+                f"- Pending approvals: `{approval_timeline.get('pending_count', 0)}`",
+                f"- Background jobs: `{background_jobs.get('job_count', 0)}`",
+                f"- Resumable jobs: `{background_jobs.get('resumable_job_count', 0)}`",
+                "",
+            ]
+        )
+    if release_health or demo_pack:
+        lines.extend(
+            [
+                "## Release And Demo Readiness",
+                f"- Release health: `{release_health.get('status') or 'unknown'}`",
+                f"- Safe to hand out publicly: `{release_health.get('safe_to_hand_out_publicly')}`",
+                f"- Demo stories ready: `{demo_pack.get('ready_demo_count', 0)}` / `{demo_pack.get('demo_count', 0)}`",
+                f"- Current demo story: `{demo_scorecard.get('current_run_story') or 'not_scored'}`",
+                "",
+            ]
+        )
+    if human_factors or onboarding_success:
+        lines.extend(
+            [
+                "## First-Time Operator Success",
+                f"- Onboarding ready: `{onboarding_success.get('ready_for_first_time_user')}`",
+                f"- First-run success: `{human_factors.get('first_run_success_ready')}`",
+                f"- Stuck recovery: `{human_factors.get('stuck_recovery_supported')}`",
+                f"- Explanation quality: `{human_factors.get('explanation_quality') or 'unknown'}`",
+                "",
+            ]
+        )
     lines.extend([
         "## Cards",
     ])
@@ -1037,6 +1255,16 @@ def _build_cards(
     assist_bundle: dict[str, Any],
     review_queue: ReviewQueueState,
     onboarding_chat_session: dict[str, Any],
+    branch_dag: BranchDAG,
+    confidence_map: ConfidenceMap,
+    change_attribution_report: ChangeAttributionReport,
+    trace_explorer_state: TraceExplorerState,
+    approval_timeline: ApprovalTimeline,
+    background_job_view: BackgroundJobView,
+    permission_mode_card: PermissionModeCard,
+    release_health_report: ReleaseHealthReport,
+    demo_pack_manifest: DemoPackManifest,
+    flagship_demo_scorecard: FlagshipDemoScorecard,
 ) -> list[dict[str, Any]]:
     if _is_onboarding_state(summary_payload):
         host_summary = dict(interoperability_inventory.get("host_summary", {}))
@@ -1134,6 +1362,20 @@ def _build_cards(
                 "value": _clean_text(doctor_report.get("status")) or "unknown",
                 "detail": "Doctor verifies the local install before you start a run or connect a host.",
                 "severity": "medium" if _clean_text(doctor_report.get("status")) == "error" else "normal",
+            },
+            {
+                "card_id": "release_health",
+                "title": "Release Health",
+                "value": _clean_text(release_health_report.status) or "preflight_only",
+                "detail": release_health_report.summary,
+                "severity": "medium" if not release_health_report.safe_to_hand_out_publicly else "normal",
+            },
+            {
+                "card_id": "onboarding_success",
+                "title": "First-Time Success",
+                "value": "ready" if onboarding_chat_session.get("status") == "ready" else "tracking",
+                "detail": "Relaytic now keeps first-time onboarding, stuck recovery, and post-run continuation visible from the same mission-control surface.",
+                "severity": "normal",
             },
         ]
     decision = dict(summary_payload.get("decision", {}))
@@ -1282,6 +1524,17 @@ def _build_cards(
             "severity": "medium" if _clean_text(result_contract.get("review_need")) == "required" else "normal",
         },
         {
+            "card_id": "confidence_map",
+            "title": "Confidence Map",
+            "value": confidence_map.overall_confidence or confidence_map.status,
+            "detail": (
+                f"Review `{confidence_map.review_need or 'unknown'}`"
+                f" | unresolved `{confidence_map.unresolved_count}`"
+                f" | direction `{confidence_map.recommended_direction or 'unknown'}`"
+            ),
+            "severity": "medium" if (confidence_map.review_need or "").lower() == "required" else "normal",
+        },
+        {
             "card_id": "search_controller",
             "title": "Search Controller",
             "value": _clean_text(search.get("recommended_action")) or _clean_text(search.get("status")) or "not_materialized",
@@ -1304,6 +1557,28 @@ def _build_cards(
             "severity": "medium" if int(daemon.get("stale_job_count", 0) or 0) > 0 or int(daemon.get("pending_approval_count", 0) or 0) > 0 else "normal",
         },
         {
+            "card_id": "branch_replay",
+            "title": "Branches + Replay",
+            "value": branch_dag.active_branch_id or f"{branch_dag.branch_count} branches",
+            "detail": (
+                f"Branches `{branch_dag.branch_count}`"
+                f" | replay `{ 'ready' if trace_explorer_state.replay_available else 'limited' }`"
+                f" | winner `{trace_explorer_state.winning_action or 'unknown'}`"
+            ),
+            "severity": "normal",
+        },
+        {
+            "card_id": "change_attribution",
+            "title": "Why It Changed",
+            "value": change_attribution_report.primary_driver or change_attribution_report.status,
+            "detail": (
+                f"Changes `{change_attribution_report.change_count}`"
+                f" | latest actor `{next_step.get('next_actor') or decision_lab.get('next_actor') or 'operator'}`"
+                f" | approvals `{approval_timeline.pending_count}`"
+            ),
+            "severity": "normal",
+        },
+        {
             "card_id": "remote_supervision",
             "title": "Remote Supervision",
             "value": _clean_text(remote.get("current_supervisor_type"))
@@ -1321,6 +1596,17 @@ def _build_cards(
                 or int(remote.get("blocked_action_count", 0) or 0) > 0
                 else "normal"
             ),
+        },
+        {
+            "card_id": "approvals_jobs",
+            "title": "Approvals + Jobs",
+            "value": permission_mode_card.current_mode or permission_mode_card.status,
+            "detail": (
+                f"Pending approvals `{approval_timeline.pending_count}`"
+                f" | jobs `{background_job_view.job_count}`"
+                f" | resumable `{background_job_view.resumable_job_count}`"
+            ),
+            "severity": "medium" if approval_timeline.pending_count > 0 or background_job_view.pending_approval_count > 0 else "normal",
         },
         {
             "card_id": "assist_control",
@@ -1347,6 +1633,28 @@ def _build_cards(
             "value": _clean_text(doctor_report.get("status")) or "unknown",
             "detail": f"Discoverable hosts `{', '.join(host_summary.get('discoverable_now', [])) or 'none'}` | review queue `{review_queue.pending_count}`",
             "severity": "medium" if _clean_text(doctor_report.get("status")) == "error" else "normal",
+        },
+        {
+            "card_id": "release_health",
+            "title": "Release Health",
+            "value": release_health_report.status,
+            "detail": (
+                f"Doctor `{release_health_report.doctor_status}`"
+                f" | release safety `{release_health_report.release_safety_status or 'not_scanned'}`"
+                f" | public handout `{release_health_report.safe_to_hand_out_publicly}`"
+            ),
+            "severity": "medium" if not release_health_report.safe_to_hand_out_publicly else "normal",
+        },
+        {
+            "card_id": "demo_pack",
+            "title": "Demo Pack",
+            "value": f"{demo_pack_manifest.ready_demo_count}/{demo_pack_manifest.demo_count} ready",
+            "detail": (
+                f"Current story `{flagship_demo_scorecard.current_run_story or 'not_scored'}`"
+                f" | qualifies `{flagship_demo_scorecard.current_run_qualifies}`"
+                f" | review queue `{review_queue.pending_count}`"
+            ),
+            "severity": "normal",
         },
     ]
     if decision:
@@ -2729,6 +3037,837 @@ def _build_ui_preferences(
         summary="Relaytic defaults to one comfortable local mission-control layout with explicit modes, capabilities, actions, and stage navigation.",
         trace=trace,
     )
+
+
+def _build_branch_dag(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    run_dir: Path | None,
+    summary_payload: dict[str, Any],
+) -> BranchDAG:
+    if run_dir is None:
+        return BranchDAG(
+            schema_version=BRANCH_DAG_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="onboarding",
+            branch_count=0,
+            active_branch_id=None,
+            replay_available=False,
+            nodes=[],
+            edges=[],
+            summary="Relaytic will expose branch structure after the first governed run materializes trace artifacts.",
+            trace=trace,
+        )
+    trace_bundle = read_trace_bundle(run_dir)
+    raw_graph = dict(trace_bundle.get("branch_trace_graph", {}))
+    raw_nodes = [dict(item) for item in raw_graph.get("nodes", []) if isinstance(item, dict)]
+    raw_edges = [dict(item) for item in raw_graph.get("edges", []) if isinstance(item, dict)]
+    current_stage = _clean_text(summary_payload.get("stage_completed")) or _clean_text(dict(summary_payload.get("runtime", {})).get("current_stage")) or "unknown"
+    winning_action = _clean_text(dict(summary_payload.get("trace", {})).get("winning_action"))
+    if not raw_nodes:
+        raw_nodes = [
+            {
+                "node_id": "root",
+                "kind": "root",
+                "label": "current_run",
+                "stage": current_stage,
+                "winning": True,
+                "winning_action": winning_action,
+            }
+        ]
+    nodes: list[dict[str, Any]] = []
+    for item in raw_nodes:
+        node_id = _clean_text(item.get("node_id")) or _clean_text(item.get("branch_id")) or f"node_{len(nodes) + 1:02d}"
+        nodes.append(
+            {
+                "branch_id": node_id,
+                "label": _clean_text(item.get("label")) or node_id,
+                "kind": _clean_text(item.get("kind")) or "branch",
+                "winning": bool(item.get("winning")),
+                "stage": _clean_text(item.get("stage")) or current_stage,
+                "winning_action": _clean_text(item.get("winning_action")) or winning_action,
+            }
+        )
+    edges = [
+        {
+            "from": _clean_text(item.get("from")) or "root",
+            "to": _clean_text(item.get("to")) or _clean_text(item.get("target")) or "unknown",
+            "relation": _clean_text(item.get("relation")) or "candidate_branch",
+        }
+        for item in raw_edges
+    ]
+    active_branch_id = _clean_text(raw_graph.get("winning_branch_id")) or _clean_text(raw_graph.get("active_branch_id"))
+    if active_branch_id is None and nodes:
+        for item in nodes:
+            if item.get("winning"):
+                active_branch_id = _clean_text(item.get("branch_id"))
+                break
+        active_branch_id = active_branch_id or _clean_text(nodes[0].get("branch_id"))
+    replay_available = bool(trace_bundle.get("decision_replay_report")) or bool(dict(summary_payload.get("trace", {})).get("span_count"))
+    branch_count = int(raw_graph.get("branch_count", 0) or len(nodes))
+    return BranchDAG(
+        schema_version=BRANCH_DAG_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status=_clean_text(raw_graph.get("status")) or ("ok" if nodes else "empty"),
+        branch_count=branch_count,
+        active_branch_id=active_branch_id,
+        replay_available=replay_available,
+        nodes=nodes[:12],
+        edges=edges[:24],
+        summary=(
+            f"Relaytic is tracking `{branch_count}` branch node(s) with active branch `{active_branch_id or 'unknown'}`."
+            if nodes
+            else "Relaytic has not materialized any branch structure yet."
+        ),
+        trace=trace,
+    )
+
+
+def _build_confidence_map(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    run_dir: Path | None,
+    summary_payload: dict[str, Any],
+) -> ConfidenceMap:
+    if run_dir is None:
+        return ConfidenceMap(
+            schema_version=CONFIDENCE_MAP_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="onboarding",
+            overall_confidence=None,
+            review_need=None,
+            unresolved_count=0,
+            recommended_direction=None,
+            recommended_action=None,
+            facets=[],
+            summary="Confidence posture becomes meaningful once Relaytic has completed a governed run.",
+            trace=trace,
+        )
+    result_contract_bundle = read_result_contract_artifacts(run_dir)
+    confidence_posture = dict(result_contract_bundle.get("confidence_posture", {}))
+    belief_revision_triggers = dict(result_contract_bundle.get("belief_revision_triggers", {}))
+    result_contract = dict(result_contract_bundle.get("result_contract", {}))
+    summary_contract = dict(summary_payload.get("result_contract", {}))
+    search = dict(summary_payload.get("search", {}))
+    feasibility = dict(summary_payload.get("feasibility", {}))
+    triggers = [dict(item) for item in belief_revision_triggers.get("triggers", []) if isinstance(item, dict)]
+    overall_confidence = _clean_text(confidence_posture.get("overall_confidence")) or _clean_text(summary_contract.get("overall_confidence"))
+    review_need = _clean_text(confidence_posture.get("review_need")) or _clean_text(summary_contract.get("review_need"))
+    unresolved_count = int(summary_contract.get("unresolved_count", 0) or 0)
+    recommended_direction = _clean_text(summary_contract.get("recommended_direction")) or _clean_text(dict(summary_payload.get("iteration", {})).get("recommended_direction"))
+    recommended_action = _clean_text(summary_contract.get("recommended_action")) or _clean_text(dict(summary_payload.get("next_step", {})).get("recommended_action"))
+    facets = [
+        {
+            "facet_id": "overall_confidence",
+            "label": "Overall confidence",
+            "value": overall_confidence or "unknown",
+            "detail": _clean_text(confidence_posture.get("summary")) or _clean_text(result_contract.get("summary")),
+        },
+        {
+            "facet_id": "review_need",
+            "label": "Review need",
+            "value": review_need or "unknown",
+            "detail": f"Unresolved items `{unresolved_count}`.",
+        },
+        {
+            "facet_id": "belief_revision_triggers",
+            "label": "Belief revision triggers",
+            "value": str(len(triggers)),
+            "detail": ", ".join(_clean_text(item.get("trigger_label")) or _clean_text(item.get("kind")) or "trigger" for item in triggers[:3]) or "No explicit triggers recorded.",
+        },
+        {
+            "facet_id": "search_value",
+            "label": "Search value",
+            "value": _clean_text(search.get("value_band")) or "unknown",
+            "detail": f"Search controller suggests `{search.get('recommended_action') or 'unknown'}`.",
+        },
+        {
+            "facet_id": "deployability",
+            "label": "Deployability",
+            "value": _clean_text(feasibility.get("deployability")) or "unknown",
+            "detail": f"Feasibility direction `{feasibility.get('recommended_direction') or 'unknown'}`.",
+        },
+    ]
+    return ConfidenceMap(
+        schema_version=CONFIDENCE_MAP_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok" if overall_confidence or result_contract else "not_materialized",
+        overall_confidence=overall_confidence,
+        review_need=review_need,
+        unresolved_count=unresolved_count,
+        recommended_direction=recommended_direction,
+        recommended_action=recommended_action,
+        facets=facets,
+        summary=f"Relaytic confidence is `{overall_confidence or 'unknown'}` with review need `{review_need or 'unknown'}` and `{unresolved_count}` unresolved item(s).",
+        trace=trace,
+    )
+
+
+def _build_change_attribution_report(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    run_dir: Path | None,
+    summary_payload: dict[str, Any],
+) -> ChangeAttributionReport:
+    if run_dir is None:
+        return ChangeAttributionReport(
+            schema_version=CHANGE_ATTRIBUTION_REPORT_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="onboarding",
+            change_count=0,
+            primary_driver=None,
+            change_events=[],
+            summary="Change attribution becomes meaningful once Relaytic has completed at least one governed run.",
+            trace=trace,
+        )
+    feedback = dict(summary_payload.get("feedback", {}))
+    memory = dict(summary_payload.get("memory", {}))
+    research = dict(summary_payload.get("research", {}))
+    control = dict(summary_payload.get("control", {}))
+    learnings = dict(summary_payload.get("learnings", {}))
+    search = dict(summary_payload.get("search", {}))
+    feasibility = dict(summary_payload.get("feasibility", {}))
+    remote = dict(summary_payload.get("remote", {}))
+    change_events: list[dict[str, Any]] = []
+    if int(feedback.get("accepted_count", 0) or 0) > 0:
+        change_events.append({"source": "feedback", "changed": feedback.get("primary_recommended_action") or "next_step", "detail": f"Accepted feedback `{feedback.get('accepted_count', 0)}` influenced later route or threshold posture."})
+    if bool(memory.get("route_prior_applied")) or int(memory.get("analog_count", 0) or 0) > 0:
+        change_events.append({"source": "memory", "changed": "route_priors", "detail": f"Memory surfaced `{memory.get('analog_count', 0)}` analog run(s) and influenced route priors."})
+    if int(research.get("source_count", 0) or 0) > 0:
+        change_events.append({"source": "research", "changed": "evidence_posture", "detail": f"Research gathered `{research.get('source_count', 0)}` source(s) across `{research.get('provider_count', 0)}` provider(s)."})
+    if _clean_text(control.get("decision")) in {"accept_with_modification", "defer", "reject"}:
+        change_events.append({"source": "intervention", "changed": control.get("approved_action_kind") or control.get("decision"), "detail": f"Control decision `{control.get('decision')}` changed what Relaytic would do next."})
+    if int(learnings.get("active_count", 0) or 0) > 0:
+        change_events.append({"source": "learnings", "changed": "continuation_posture", "detail": f"Relaytic carried `{learnings.get('active_count', 0)}` active learning(s) into later reasoning."})
+    if _clean_text(search.get("recommended_action")):
+        change_events.append({"source": "search", "changed": search.get("recommended_action"), "detail": f"Search value band is `{search.get('value_band') or 'unknown'}` with direction `{search.get('recommended_direction') or 'unknown'}`."})
+    if _clean_text(feasibility.get("recommended_direction")):
+        change_events.append({"source": "feasibility", "changed": feasibility.get("recommended_direction"), "detail": f"Feasibility marked deployability `{feasibility.get('deployability') or 'unknown'}` and recommended `{feasibility.get('recommended_direction') or 'unknown'}`."})
+    if _clean_text(remote.get("current_supervisor_type")):
+        change_events.append({"source": "remote_supervision", "changed": "supervision_path", "detail": f"Current supervisor is `{remote.get('current_supervisor_type')}` via `{remote.get('transport_kind') or 'disabled'}`."})
+    primary_driver = _clean_text(change_events[0].get("source")) if change_events else None
+    return ChangeAttributionReport(
+        schema_version=CHANGE_ATTRIBUTION_REPORT_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok" if change_events else "stable",
+        change_count=len(change_events),
+        primary_driver=primary_driver,
+        change_events=change_events[:10],
+        summary=(
+            f"Relaytic can attribute the current posture to `{primary_driver}` plus `{max(0, len(change_events) - 1)}` other visible change driver(s)."
+            if change_events
+            else "Relaytic did not detect any strong change drivers beyond the default run contract."
+        ),
+        trace=trace,
+    )
+
+
+def _build_trace_explorer_state(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    run_dir: Path | None,
+    summary_payload: dict[str, Any],
+    branch_dag: BranchDAG,
+) -> TraceExplorerState:
+    if run_dir is None:
+        return TraceExplorerState(
+            schema_version=TRACE_EXPLORER_STATE_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="onboarding",
+            span_count=0,
+            claim_count=0,
+            winning_action=None,
+            winning_claim_id=None,
+            branch_count=0,
+            replay_available=False,
+            recent_spans=[],
+            summary="Trace explorer becomes available after the first governed run writes trace artifacts.",
+            trace=trace,
+        )
+    trace_bundle = read_trace_bundle(run_dir)
+    trace_model = dict(trace_bundle.get("trace_model", {}))
+    spans = [dict(item) for item in trace_bundle.get("trace_span_log", []) if isinstance(item, dict)]
+    adjudication = dict(trace_bundle.get("adjudication_scorecard", {}))
+    span_count = int(trace_model.get("span_count", 0) or len(spans))
+    claim_count = int(trace_model.get("claim_count", 0) or 0)
+    recent_spans = sorted(spans, key=lambda item: (str(item.get("occurred_at", "")), str(item.get("span_id", ""))))[-6:]
+    simplified_spans = [
+        {
+            "occurred_at": _clean_text(item.get("occurred_at")),
+            "event_type": _clean_text(item.get("event_type")),
+            "stage": _clean_text(item.get("stage")),
+            "summary": _clean_text(item.get("summary")),
+            "source_surface": _clean_text(item.get("source_surface")) or "cli",
+        }
+        for item in recent_spans
+    ]
+    winning_action = _clean_text(adjudication.get("winning_action")) or _clean_text(dict(summary_payload.get("trace", {})).get("winning_action"))
+    winning_claim_id = _clean_text(adjudication.get("winning_claim_id")) or _clean_text(dict(summary_payload.get("trace", {})).get("winning_claim_id"))
+    replay_available = bool(trace_bundle.get("decision_replay_report")) or bool(simplified_spans)
+    return TraceExplorerState(
+        schema_version=TRACE_EXPLORER_STATE_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status=_clean_text(trace_model.get("status")) or ("ok" if span_count else "empty"),
+        span_count=span_count,
+        claim_count=claim_count,
+        winning_action=winning_action,
+        winning_claim_id=winning_claim_id,
+        branch_count=branch_dag.branch_count,
+        replay_available=replay_available,
+        recent_spans=simplified_spans,
+        summary=f"Relaytic trace explorer is tracking `{span_count}` span(s), `{claim_count}` claim(s), and winning action `{winning_action or 'unknown'}`.",
+        trace=trace,
+    )
+
+
+def _build_branch_replay_index(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    run_dir: Path | None,
+    summary_payload: dict[str, Any],
+    branch_dag: BranchDAG,
+    trace_explorer_state: TraceExplorerState,
+) -> BranchReplayIndex:
+    if run_dir is None:
+        return BranchReplayIndex(
+            schema_version=BRANCH_REPLAY_INDEX_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="onboarding",
+            replay_count=0,
+            active_replay_id=None,
+            replays=[],
+            summary="Branch replay will appear once Relaytic has both trace spans and branch structure.",
+            trace=trace,
+        )
+    trace_bundle = read_trace_bundle(run_dir)
+    replay_report = dict(trace_bundle.get("decision_replay_report", {}))
+    timeline = [dict(item) for item in replay_report.get("timeline", []) if isinstance(item, dict)]
+    replays = [
+        {
+            "replay_id": str(index + 1),
+            "branch_id": item.get("branch_id"),
+            "title": item.get("label") or item.get("branch_id") or f"Branch {index + 1}",
+            "winning": bool(item.get("winning")),
+            "stage": item.get("stage"),
+            "command_hint": f"relaytic trace replay --run-dir {run_dir} --format json",
+        }
+        for index, item in enumerate(branch_dag.nodes)
+    ]
+    if timeline:
+        replays.insert(
+            0,
+            {
+                "replay_id": "winning_decision",
+                "branch_id": branch_dag.active_branch_id,
+                "title": "Winning decision replay",
+                "winning": True,
+                "stage": _clean_text(summary_payload.get("stage_completed")),
+                "timeline_entry_count": len(timeline),
+                "command_hint": f"relaytic trace replay --run-dir {run_dir} --format json",
+            },
+        )
+    active_replay_id = "winning_decision" if timeline else _clean_text(branch_dag.active_branch_id)
+    return BranchReplayIndex(
+        schema_version=BRANCH_REPLAY_INDEX_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok" if replays else "empty",
+        replay_count=len(replays),
+        active_replay_id=active_replay_id,
+        replays=replays[:12],
+        summary=(
+            f"Relaytic can replay `{len(replays)}` branch or decision path(s) from the same mission-control surface."
+            if replays
+            else "Relaytic does not have enough trace evidence to build a replay index yet."
+        ),
+        trace=trace,
+    )
+
+
+def _build_approval_timeline(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    run_dir: Path | None,
+    summary_payload: dict[str, Any],
+) -> ApprovalTimeline:
+    if run_dir is None:
+        return ApprovalTimeline(
+            schema_version=APPROVAL_TIMELINE_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="onboarding",
+            event_count=0,
+            pending_count=0,
+            latest_decision=None,
+            events=[],
+            summary="Approval history appears after Relaytic needs a permission or remote review decision.",
+            trace=trace,
+        )
+    permission_log = read_permission_decision_log(run_dir, limit=20)
+    remote_log = read_approval_decision_log(run_dir, limit=20)
+    remote_bundle = read_remote_control_bundle(run_dir)
+    permission_summary = dict(summary_payload.get("permissions", {}))
+    remote_summary = dict(summary_payload.get("remote", {}))
+    pending_approvals = [dict(item) for item in dict(remote_bundle.get("approval_request_queue", {})).get("approvals", []) if isinstance(item, dict)]
+    events: list[dict[str, Any]] = []
+    for item in permission_log:
+        events.append(
+            {
+                "occurred_at": _clean_text(item.get("recorded_at")) or _clean_text(item.get("occurred_at")),
+                "source": "permissions",
+                "request_id": _clean_text(item.get("request_id")),
+                "decision": _clean_text(item.get("decision")),
+                "action_id": _clean_text(item.get("action_id")),
+            }
+        )
+    for item in remote_log:
+        events.append(
+            {
+                "occurred_at": _clean_text(item.get("recorded_at")) or _clean_text(item.get("occurred_at")),
+                "source": "remote",
+                "request_id": _clean_text(item.get("request_id")),
+                "decision": _clean_text(item.get("decision")),
+                "action_id": _clean_text(item.get("action_id")),
+            }
+        )
+    for item in pending_approvals:
+        events.append(
+            {
+                "occurred_at": _clean_text(item.get("requested_at")),
+                "source": _clean_text(item.get("queue_source")) or "pending_queue",
+                "request_id": _clean_text(item.get("request_id")),
+                "decision": "pending",
+                "action_id": _clean_text(item.get("action_id")) or _clean_text(item.get("job_id")),
+            }
+        )
+    events = sorted(events, key=lambda item: (str(item.get("occurred_at", "")), str(item.get("request_id", ""))))
+    latest_decision = None
+    for item in reversed(events):
+        latest_decision = _clean_text(item.get("decision"))
+        if latest_decision:
+            break
+    pending_count = int(permission_summary.get("pending_approval_count", 0) or 0)
+    pending_count = max(pending_count, int(remote_summary.get("pending_approval_count", 0) or 0), len(pending_approvals))
+    return ApprovalTimeline(
+        schema_version=APPROVAL_TIMELINE_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok" if events or pending_count else "idle",
+        event_count=len(events),
+        pending_count=pending_count,
+        latest_decision=latest_decision,
+        events=events[-12:],
+        summary=(
+            f"Relaytic approval history shows `{len(events)}` event(s) with `{pending_count}` request(s) still pending."
+            if events or pending_count
+            else "Relaytic has not needed any permission or remote approval decisions yet."
+        ),
+        trace=trace,
+    )
+
+
+def _build_background_job_view(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    run_dir: Path | None,
+    summary_payload: dict[str, Any],
+) -> BackgroundJobView:
+    if run_dir is None:
+        return BackgroundJobView(
+            schema_version=BACKGROUND_JOB_VIEW_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="onboarding",
+            job_count=0,
+            resumable_job_count=0,
+            pending_approval_count=0,
+            jobs=[],
+            recent_events=[],
+            summary="Background jobs appear after Relaytic has a run context and bounded daemon work to track.",
+            trace=trace,
+        )
+    daemon_bundle = read_daemon_bundle(run_dir)
+    daemon_state = dict(summary_payload.get("daemon", {}))
+    registry = dict(daemon_bundle.get("background_job_registry", {}))
+    resume_manifest = dict(daemon_bundle.get("resume_session_manifest", {}))
+    jobs = [dict(item) for item in registry.get("jobs", []) if isinstance(item, dict)]
+    recent_log = read_background_job_log(run_dir, limit=8)
+    recent_events = [
+        {
+            "occurred_at": _clean_text(item.get("occurred_at")) or _clean_text(item.get("recorded_at")),
+            "job_id": _clean_text(item.get("job_id")),
+            "status": _clean_text(item.get("status")),
+            "summary": _clean_text(item.get("summary")),
+        }
+        for item in recent_log
+    ]
+    return BackgroundJobView(
+        schema_version=BACKGROUND_JOB_VIEW_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status=_clean_text(daemon_state.get("status")) or ("ok" if jobs else "idle"),
+        job_count=int(daemon_state.get("job_count", 0) or len(jobs)),
+        resumable_job_count=int(daemon_state.get("resumable_job_count", 0) or resume_manifest.get("resumable_job_count", 0) or 0),
+        pending_approval_count=int(daemon_state.get("pending_approval_count", 0) or 0),
+        jobs=jobs[:8],
+        recent_events=recent_events,
+        summary=f"Relaytic is tracking `{daemon_state.get('job_count', len(jobs))}` background job(s) with `{daemon_state.get('pending_approval_count', 0)}` waiting for approval.",
+        trace=trace,
+    )
+
+
+def _build_permission_mode_card(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+) -> PermissionModeCard:
+    permissions = dict(summary_payload.get("permissions", {}))
+    remote = dict(summary_payload.get("remote", {}))
+    return PermissionModeCard(
+        schema_version=PERMISSION_MODE_CARD_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok" if permissions else "not_materialized",
+        current_mode=_clean_text(permissions.get("current_mode")),
+        mode_source=_clean_text(permissions.get("mode_source")),
+        pending_approval_count=int(permissions.get("pending_approval_count", 0) or 0),
+        approval_gated_action_count=int(permissions.get("approval_gated_action_count", 0) or 0),
+        remote_supervisor_type=_clean_text(remote.get("current_supervisor_type")),
+        summary=(
+            f"Relaytic is currently in permission mode `{permissions.get('current_mode') or 'unknown'}` with `{permissions.get('pending_approval_count', 0)}` pending approval(s)."
+            if permissions
+            else "Permission posture will appear after summary materialization."
+        ),
+        trace=trace,
+    )
+
+
+def _build_release_health_report(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    root_dir: Path,
+    doctor_report: dict[str, Any],
+) -> ReleaseHealthReport:
+    release_bundle = read_release_safety_bundle(root_dir)
+    scan = dict(release_bundle.get("release_safety_scan", {}))
+    packaging = dict(release_bundle.get("packaging_regression_report", {}))
+    findings: list[dict[str, Any]] = []
+    doctor_status = str(doctor_report.get("status", "")).strip() or "unknown"
+    if doctor_status == "error":
+        findings.append({"source": "doctor", "severity": "blocking", "detail": "Doctor reported an environment error."})
+    scan_status = _clean_text(scan.get("status"))
+    if scan_status and scan_status not in {"ok", "workspace_only", "pre_release_only"}:
+        findings.append(
+            {
+                "source": "release_safety",
+                "severity": "blocking",
+                "detail": _clean_text(scan.get("summary")) or "Release-safety scan reported blocking findings.",
+            }
+        )
+    if int(packaging.get("finding_count", 0) or 0) > 0:
+        findings.append(
+            {
+                "source": "packaging_regression",
+                "severity": "medium",
+                "detail": f"Packaging regression report found `{packaging.get('finding_count', 0)}` issue(s).",
+            }
+        )
+    safe_to_hand_out_publicly = doctor_status in {"ok", "warn"} and not findings and scan_status in {None, "ok", "workspace_only", "pre_release_only"}
+    return ReleaseHealthReport(
+        schema_version=RELEASE_HEALTH_REPORT_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="safe_to_ship" if safe_to_hand_out_publicly and scan_status == "ok" else ("preflight_only" if safe_to_hand_out_publicly else "needs_attention"),
+        doctor_status=doctor_status,
+        release_safety_status=scan_status,
+        safe_to_hand_out_publicly=safe_to_hand_out_publicly,
+        findings=findings,
+        recommended_action=("run_release_safety_scan" if scan_status is None else "fix_release_issues") if not safe_to_hand_out_publicly else "package_demo_or_release",
+        summary=(
+            "Relaytic can currently be handed to a reviewer safely."
+            if safe_to_hand_out_publicly
+            else "Relaytic should not be handed out publicly until doctor and release-safety posture are both clean."
+        ),
+        trace=trace,
+    )
+
+
+def _build_demo_pack_manifest(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+    review_queue: ReviewQueueState,
+    branch_dag: BranchDAG,
+    release_health_report: ReleaseHealthReport,
+) -> DemoPackManifest:
+    benchmark = dict(summary_payload.get("benchmark", {}))
+    control = dict(summary_payload.get("control", {}))
+    workspace = dict(summary_payload.get("workspace", {}))
+    trace_state = dict(summary_payload.get("trace", {}))
+    demos = [
+        {
+            "demo_id": "unknown_dataset_to_governed_decision",
+            "title": "Unknown dataset to governed decision",
+            "available": bool(summary_payload.get("decision")) and bool(summary_payload.get("result_contract")),
+            "evidence": ["result_contract.json", "mission_control_state.json", "onboarding_success_report.json"],
+        },
+        {
+            "demo_id": "incumbent_challenge",
+            "title": "Incumbent challenge",
+            "available": bool(benchmark.get("incumbent_present")),
+            "evidence": ["incumbent_parity_report.json", "run_summary.json"],
+        },
+        {
+            "demo_id": "skeptical_override_rejection",
+            "title": "Skeptical override rejection",
+            "available": _clean_text(control.get("decision")) in {"accept_with_modification", "defer", "reject"},
+            "evidence": ["control_challenge_report.json", "decision_replay_report.json", "adjudication_scorecard.json"],
+        },
+        {
+            "demo_id": "multi_run_workspace_continuity",
+            "title": "Multi-run workspace continuity",
+            "available": int(workspace.get("lineage_run_count", 0) or 0) >= 2,
+            "evidence": ["workspace_lineage.json", "result_contract.json", "next_run_plan.json"],
+        },
+        {
+            "demo_id": "trace_backed_branch_comparison",
+            "title": "Trace-backed branch comparison",
+            "available": branch_dag.branch_count >= 1 and bool(trace_state.get("span_count")),
+            "evidence": ["branch_trace_graph.json", "decision_replay_report.json", "trace_model.json"],
+        },
+    ]
+    ready_demo_count = sum(1 for item in demos if item.get("available"))
+    status = "ready" if ready_demo_count >= 3 and release_health_report.safe_to_hand_out_publicly and review_queue.blocking_count == 0 else "partial"
+    return DemoPackManifest(
+        schema_version=DEMO_PACK_MANIFEST_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status=status,
+        demo_count=len(demos),
+        ready_demo_count=ready_demo_count,
+        demos=demos,
+        summary=f"Relaytic currently has `{ready_demo_count}` demo(s) ready out of `{len(demos)}` flagship stories.",
+        trace=trace,
+    )
+
+
+def _build_flagship_demo_scorecard(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+    review_queue: ReviewQueueState,
+    branch_dag: BranchDAG,
+    release_health_report: ReleaseHealthReport,
+) -> FlagshipDemoScorecard:
+    benchmark = dict(summary_payload.get("benchmark", {}))
+    control = dict(summary_payload.get("control", {}))
+    workspace = dict(summary_payload.get("workspace", {}))
+    scored_demos = [
+        _score_demo_story(
+            demo_id="unknown_dataset_to_governed_decision",
+            title="Unknown dataset to governed decision",
+            clarity=bool(summary_payload.get("headline")) and bool(summary_payload.get("result_contract")),
+            correctness=bool(summary_payload.get("decision")),
+            continuity=bool(workspace.get("workspace_id")),
+            operator_trust=review_queue.blocking_count == 0,
+            agent_usability=bool(summary_payload.get("trace")),
+            replayability=branch_dag.branch_count >= 1,
+        ),
+        _score_demo_story(
+            demo_id="incumbent_challenge",
+            title="Incumbent challenge",
+            clarity=bool(benchmark.get("incumbent_name")),
+            correctness=bool(benchmark.get("incumbent_present")),
+            continuity=bool(workspace.get("workspace_id")),
+            operator_trust=review_queue.blocking_count == 0,
+            agent_usability=bool(summary_payload.get("search")),
+            replayability=bool(summary_payload.get("trace")),
+        ),
+        _score_demo_story(
+            demo_id="skeptical_override_rejection",
+            title="Skeptical override rejection",
+            clarity=_clean_text(control.get("decision")) in {"accept_with_modification", "defer", "reject"},
+            correctness=_clean_text(control.get("decision")) in {"accept_with_modification", "defer", "reject"},
+            continuity=bool(workspace.get("workspace_id")),
+            operator_trust=review_queue.blocking_count == 0,
+            agent_usability=bool(summary_payload.get("trace")),
+            replayability=branch_dag.branch_count >= 1,
+        ),
+        _score_demo_story(
+            demo_id="multi_run_workspace_continuity",
+            title="Multi-run workspace continuity",
+            clarity=int(workspace.get("lineage_run_count", 0) or 0) >= 2,
+            correctness=bool(summary_payload.get("result_contract")),
+            continuity=int(workspace.get("lineage_run_count", 0) or 0) >= 2,
+            operator_trust=review_queue.blocking_count == 0,
+            agent_usability=bool(summary_payload.get("workspace")),
+            replayability=bool(summary_payload.get("trace")),
+        ),
+    ]
+    current_run_story = None
+    if _clean_text(control.get("decision")) in {"accept_with_modification", "defer", "reject"}:
+        current_run_story = "skeptical_override_rejection"
+    elif bool(benchmark.get("incumbent_present")):
+        current_run_story = "incumbent_challenge"
+    elif int(workspace.get("lineage_run_count", 0) or 0) >= 2:
+        current_run_story = "multi_run_workspace_continuity"
+    elif bool(summary_payload.get("decision")):
+        current_run_story = "unknown_dataset_to_governed_decision"
+    current_run_qualifies = bool(current_run_story) and release_health_report.safe_to_hand_out_publicly
+    return FlagshipDemoScorecard(
+        schema_version=FLAGSHIP_DEMO_SCORECARD_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ready" if current_run_qualifies else "partial",
+        current_run_qualifies=current_run_qualifies,
+        current_run_story=current_run_story,
+        scored_demos=scored_demos,
+        summary=(
+            f"Relaytic currently scores this run as `{current_run_story}`."
+            if current_run_story
+            else "Relaytic has not yet matched the current run to a flagship demo story."
+        ),
+        trace=trace,
+    )
+
+
+def _build_human_factors_eval_report(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+    onboarding_chat_session: OnboardingChatSessionState,
+) -> HumanFactorsEvalReport:
+    evidence = [
+        {
+            "criterion": "first_run_success",
+            "status": "pass" if bool(summary_payload.get("decision")) or onboarding_chat_session.ready_to_start_run else "watch",
+            "detail": "Relaytic can capture data and objective, then either analyze or start a governed run.",
+        },
+        {
+            "criterion": "stuck_recovery",
+            "status": "pass" if bool(onboarding_chat_session.next_expected_input or onboarding_chat_session.notes) else "watch",
+            "detail": "Mission control keeps explicit next expected input and recovery notes for confused users.",
+        },
+        {
+            "criterion": "explanation_quality",
+            "status": "pass" if bool(summary_payload.get("trace")) and bool(summary_payload.get("result_contract")) else "watch",
+            "detail": "Relaytic can answer why/why-not questions from trace, result contract, and next-step posture.",
+        },
+    ]
+    first_run_success_ready = any(item["criterion"] == "first_run_success" and item["status"] == "pass" for item in evidence)
+    stuck_recovery_supported = any(item["criterion"] == "stuck_recovery" and item["status"] == "pass" for item in evidence)
+    explanation_quality = "strong" if any(item["criterion"] == "explanation_quality" and item["status"] == "pass" for item in evidence) else "developing"
+    return HumanFactorsEvalReport(
+        schema_version=HUMAN_FACTORS_EVAL_REPORT_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ok" if first_run_success_ready and stuck_recovery_supported else "watch",
+        first_run_success_ready=first_run_success_ready,
+        stuck_recovery_supported=stuck_recovery_supported,
+        explanation_quality=explanation_quality,
+        evidence=evidence,
+        summary="Relaytic keeps first-run success, stuck recovery, and explanation quality visible from mission control.",
+        trace=trace,
+    )
+
+
+def _build_onboarding_success_report(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    summary_payload: dict[str, Any],
+    onboarding_chat_session: OnboardingChatSessionState,
+    doctor_report: dict[str, Any],
+) -> OnboardingSuccessReport:
+    criteria = [
+        {
+            "criterion": "accepts_data_and_objective",
+            "passed": True,
+            "detail": "Mission-control chat accepts pasted paths, natural objectives, and mixed messy input.",
+        },
+        {
+            "criterion": "supports_analysis_first",
+            "passed": True,
+            "detail": "Operators can ask for quick analysis before committing to a governed run.",
+        },
+        {
+            "criterion": "supports_governed_run",
+            "passed": doctor_report.get("status") in {"ok", "warn"},
+            "detail": "Environment health plus onboarding confirmation is enough to start a governed run.",
+        },
+        {
+            "criterion": "supports_recovery",
+            "passed": bool(onboarding_chat_session.next_expected_input or onboarding_chat_session.notes),
+            "detail": "Relaytic keeps the next expected input explicit instead of forcing users to infer what is missing.",
+        },
+        {
+            "criterion": "supports_continue_after_run",
+            "passed": bool(summary_payload.get("workspace")) or bool(summary_payload.get("handoff")),
+            "detail": "After a run, Relaytic points users toward workspace continuity, reports, and next-run options.",
+        },
+    ]
+    return OnboardingSuccessReport(
+        schema_version=ONBOARDING_SUCCESS_REPORT_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ready" if all(bool(item.get("passed")) for item in criteria[:4]) else "watch",
+        ready_for_first_time_user=all(bool(item.get("passed")) for item in criteria[:4]),
+        supports_analysis_first=True,
+        supports_governed_run=doctor_report.get("status") in {"ok", "warn"},
+        supports_recovery=bool(onboarding_chat_session.next_expected_input or onboarding_chat_session.notes),
+        supports_continue_after_run=bool(summary_payload.get("workspace")) or bool(summary_payload.get("handoff")),
+        criteria=criteria,
+        summary="Relaytic keeps first-time onboarding success measurable instead of assuming repo literacy.",
+        trace=trace,
+    )
+
+
+def _score_demo_story(
+    *,
+    demo_id: str,
+    title: str,
+    clarity: bool,
+    correctness: bool,
+    continuity: bool,
+    operator_trust: bool,
+    agent_usability: bool,
+    replayability: bool,
+) -> dict[str, Any]:
+    checks = [clarity, correctness, continuity, operator_trust, agent_usability, replayability]
+    passed = sum(1 for item in checks if item)
+    status = "ready" if passed >= 5 else ("partial" if passed >= 3 else "watch")
+    return {
+        "demo_id": demo_id,
+        "title": title,
+        "status": status,
+        "clarity": "strong" if clarity else "weak",
+        "correctness": "strong" if correctness else "weak",
+        "continuity": "strong" if continuity else "weak",
+        "operator_trust": "strong" if operator_trust else "weak",
+        "agent_usability": "strong" if agent_usability else "weak",
+        "replayability": "strong" if replayability else "weak",
+    }
 
 
 def _materialize_mission_control_assist_bundle(

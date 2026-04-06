@@ -5,6 +5,11 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from relaytic.ui.cli import main
+from tests.public_datasets import (
+    write_public_breast_cancer_dataset,
+    write_public_diabetes_dataset,
+    write_public_wine_dataset,
+)
 
 
 def _write_small_fraud_dataset(path: Path) -> Path:
@@ -254,3 +259,154 @@ def test_mvp_onboarding_chat_handles_weather_detour_without_losing_captured_stat
     assert session["detected_data_path"] == str(data_path)
     assert session["created_run_dir"] == str(run_dir)
     assert summary["decision"]["target_column"] == "fraud_flag"
+
+
+def test_mvp_onboarding_chat_reset_clears_prior_capture_before_new_dataset_run(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    output_dir = tmp_path / "mvp_reset_then_run"
+    configured_run_dir = tmp_path / "mvp_reset_created_run"
+    first_data_path = write_public_breast_cancer_dataset(tmp_path / "reset_breast_cancer.csv")
+    second_data_path = write_public_diabetes_dataset(tmp_path / "reset_diabetes.csv")
+    config_path = tmp_path / "mvp_reset_config.yaml"
+    config_path.write_text(
+        "\n".join(
+            [
+                "communication:",
+                f"  adaptive_onboarding_default_run_dir: {configured_run_dir.as_posix()}",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    prompts = iter(
+        [
+            str(first_data_path),
+            "build a model for diagnosis_flag",
+            "/reset",
+            str(second_data_path),
+            "predict disease_progression",
+            "yes",
+        ]
+    )
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(prompts))
+
+    assert main(
+        [
+            "mission-control",
+            "chat",
+            "--output-dir",
+            str(output_dir),
+            "--config",
+            str(config_path),
+            "--expected-profile",
+            "full",
+            "--max-turns",
+            "6",
+        ]
+    ) == 0
+    output = capsys.readouterr().out
+    session = json.loads((output_dir / "onboarding_chat_session_state.json").read_text(encoding="utf-8"))
+    created_run_dir = Path(str(session["created_run_dir"]))
+    summary = json.loads((created_run_dir / "run_summary.json").read_text(encoding="utf-8"))
+
+    assert "I cleared the captured onboarding state" in output
+    assert session["detected_data_path"] == str(second_data_path)
+    assert "disease_progression" in str(session["detected_objective"])
+    assert session["current_phase"] == "run_started"
+    assert created_run_dir.exists()
+    assert summary["decision"]["target_column"] == "disease_progression"
+
+
+def test_mvp_onboarding_chat_uses_latest_dataset_when_user_changes_mind_before_start(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    output_dir = tmp_path / "mvp_switch_dataset"
+    first_data_path = write_public_breast_cancer_dataset(tmp_path / "switch_breast_cancer.csv")
+    second_data_path = write_public_diabetes_dataset(tmp_path / "switch_diabetes.csv")
+    prompts = iter(
+        [
+            str(first_data_path),
+            str(second_data_path),
+            "predict disease_progression",
+            "yes",
+        ]
+    )
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(prompts))
+
+    assert main(
+        [
+            "mission-control",
+            "chat",
+            "--output-dir",
+            str(output_dir),
+            "--expected-profile",
+            "full",
+            "--max-turns",
+            "4",
+        ]
+    ) == 0
+    output = capsys.readouterr().out
+    session = json.loads((output_dir / "onboarding_chat_session_state.json").read_text(encoding="utf-8"))
+    created_run_dir = Path(str(session["created_run_dir"]))
+    summary = json.loads((created_run_dir / "run_summary.json").read_text(encoding="utf-8"))
+
+    assert output.count("I found a dataset path") >= 2
+    assert session["detected_data_path"] == str(second_data_path)
+    assert summary["decision"]["target_column"] == "disease_progression"
+
+
+def test_mvp_onboarding_chat_keeps_ready_state_through_off_topic_question_before_confirmation(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    output_dir = tmp_path / "mvp_ready_state_detour"
+    run_dir = tmp_path / "mvp_ready_state_run"
+    data_path = write_public_wine_dataset(tmp_path / "wine_ready_state.csv")
+    config_path = tmp_path / "mvp_ready_state_config.yaml"
+    config_path.write_text(
+        "\n".join(
+            [
+                "communication:",
+                f"  adaptive_onboarding_default_run_dir: {run_dir.as_posix()}",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    prompts = iter(
+        [
+            str(data_path),
+            "build a classifier for wine_class",
+            "what's the weather in berlin today?",
+            "go",
+        ]
+    )
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(prompts))
+
+    assert main(
+        [
+            "mission-control",
+            "chat",
+            "--output-dir",
+            str(output_dir),
+            "--config",
+            str(config_path),
+            "--expected-profile",
+            "full",
+            "--max-turns",
+            "4",
+        ]
+    ) == 0
+    output = capsys.readouterr().out
+    session = json.loads((output_dir / "onboarding_chat_session_state.json").read_text(encoding="utf-8"))
+    summary = json.loads((run_dir / "run_summary.json").read_text(encoding="utf-8"))
+
+    assert "rather than general side questions" in output
+    assert "I still have dataset" in output
+    assert output.count("I've started a governed run") == 1
+    assert session["created_run_dir"] == str(run_dir)
+    assert summary["decision"]["target_column"] == "wine_class"

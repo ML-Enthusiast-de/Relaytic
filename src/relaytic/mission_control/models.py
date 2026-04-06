@@ -21,6 +21,19 @@ ACTION_AFFORDANCES_SCHEMA_VERSION = "relaytic.action_affordances.v1"
 STAGE_NAVIGATOR_SCHEMA_VERSION = "relaytic.stage_navigator.v1"
 QUESTION_STARTERS_SCHEMA_VERSION = "relaytic.question_starters.v1"
 ONBOARDING_CHAT_SESSION_STATE_SCHEMA_VERSION = "relaytic.onboarding_chat_session_state.v1"
+BRANCH_DAG_SCHEMA_VERSION = "relaytic.branch_dag.v1"
+CONFIDENCE_MAP_SCHEMA_VERSION = "relaytic.confidence_map.v1"
+CHANGE_ATTRIBUTION_REPORT_SCHEMA_VERSION = "relaytic.change_attribution_report.v1"
+TRACE_EXPLORER_STATE_SCHEMA_VERSION = "relaytic.trace_explorer_state.v1"
+BRANCH_REPLAY_INDEX_SCHEMA_VERSION = "relaytic.branch_replay_index.v1"
+APPROVAL_TIMELINE_SCHEMA_VERSION = "relaytic.approval_timeline.v1"
+BACKGROUND_JOB_VIEW_SCHEMA_VERSION = "relaytic.background_job_view.v1"
+PERMISSION_MODE_CARD_SCHEMA_VERSION = "relaytic.permission_mode_card.v1"
+RELEASE_HEALTH_REPORT_SCHEMA_VERSION = "relaytic.release_health_report.v1"
+DEMO_PACK_MANIFEST_SCHEMA_VERSION = "relaytic.demo_pack_manifest.v1"
+FLAGSHIP_DEMO_SCORECARD_SCHEMA_VERSION = "relaytic.flagship_demo_scorecard.v1"
+HUMAN_FACTORS_EVAL_REPORT_SCHEMA_VERSION = "relaytic.human_factors_eval_report.v1"
+ONBOARDING_SUCCESS_REPORT_SCHEMA_VERSION = "relaytic.onboarding_success_report.v1"
 
 
 @dataclass(frozen=True)
@@ -380,6 +393,273 @@ class UIPreferences:
 
 
 @dataclass(frozen=True)
+class BranchDAG:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    branch_count: int
+    active_branch_id: str | None
+    replay_available: bool
+    nodes: list[dict[str, Any]]
+    edges: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ConfidenceMap:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    overall_confidence: str | None
+    review_need: str | None
+    unresolved_count: int
+    recommended_direction: str | None
+    recommended_action: str | None
+    facets: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ChangeAttributionReport:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    change_count: int
+    primary_driver: str | None
+    change_events: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class TraceExplorerState:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    span_count: int
+    claim_count: int
+    winning_action: str | None
+    winning_claim_id: str | None
+    branch_count: int
+    replay_available: bool
+    recent_spans: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BranchReplayIndex:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    replay_count: int
+    active_replay_id: str | None
+    replays: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ApprovalTimeline:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    event_count: int
+    pending_count: int
+    latest_decision: str | None
+    events: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BackgroundJobView:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    job_count: int
+    resumable_job_count: int
+    pending_approval_count: int
+    jobs: list[dict[str, Any]]
+    recent_events: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class PermissionModeCard:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    current_mode: str | None
+    mode_source: str | None
+    pending_approval_count: int
+    approval_gated_action_count: int
+    remote_supervisor_type: str | None
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ReleaseHealthReport:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    doctor_status: str
+    release_safety_status: str | None
+    safe_to_hand_out_publicly: bool
+    findings: list[dict[str, Any]]
+    recommended_action: str | None
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class DemoPackManifest:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    demo_count: int
+    ready_demo_count: int
+    demos: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class FlagshipDemoScorecard:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    current_run_qualifies: bool
+    current_run_story: str | None
+    scored_demos: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class HumanFactorsEvalReport:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    first_run_success_ready: bool
+    stuck_recovery_supported: bool
+    explanation_quality: str
+    evidence: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class OnboardingSuccessReport:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    ready_for_first_time_user: bool
+    supports_analysis_first: bool
+    supports_governed_run: bool
+    supports_recovery: bool
+    supports_continue_after_run: bool
+    criteria: list[dict[str, Any]]
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class MissionControlBundle:
     mission_control_state: MissionControlState
     review_queue_state: ReviewQueueState
@@ -395,6 +675,19 @@ class MissionControlBundle:
     launch_manifest: LaunchManifest
     demo_session_manifest: DemoSessionManifest
     ui_preferences: UIPreferences
+    branch_dag: BranchDAG
+    confidence_map: ConfidenceMap
+    change_attribution_report: ChangeAttributionReport
+    trace_explorer_state: TraceExplorerState
+    branch_replay_index: BranchReplayIndex
+    approval_timeline: ApprovalTimeline
+    background_job_view: BackgroundJobView
+    permission_mode_card: PermissionModeCard
+    release_health_report: ReleaseHealthReport
+    demo_pack_manifest: DemoPackManifest
+    flagship_demo_scorecard: FlagshipDemoScorecard
+    human_factors_eval_report: HumanFactorsEvalReport
+    onboarding_success_report: OnboardingSuccessReport
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -412,6 +705,19 @@ class MissionControlBundle:
             "launch_manifest": self.launch_manifest.to_dict(),
             "demo_session_manifest": self.demo_session_manifest.to_dict(),
             "ui_preferences": self.ui_preferences.to_dict(),
+            "branch_dag": self.branch_dag.to_dict(),
+            "confidence_map": self.confidence_map.to_dict(),
+            "change_attribution_report": self.change_attribution_report.to_dict(),
+            "trace_explorer_state": self.trace_explorer_state.to_dict(),
+            "branch_replay_index": self.branch_replay_index.to_dict(),
+            "approval_timeline": self.approval_timeline.to_dict(),
+            "background_job_view": self.background_job_view.to_dict(),
+            "permission_mode_card": self.permission_mode_card.to_dict(),
+            "release_health_report": self.release_health_report.to_dict(),
+            "demo_pack_manifest": self.demo_pack_manifest.to_dict(),
+            "flagship_demo_scorecard": self.flagship_demo_scorecard.to_dict(),
+            "human_factors_eval_report": self.human_factors_eval_report.to_dict(),
+            "onboarding_success_report": self.onboarding_success_report.to_dict(),
         }
 
 

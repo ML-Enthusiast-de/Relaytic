@@ -7939,6 +7939,19 @@ def _show_mission_control_surface(
     onboarding = dict(bundle.get("onboarding_status", {}))
     launch = dict(bundle.get("launch_manifest", {}))
     onboarding_session = dict(bundle.get("onboarding_chat_session_state", {}))
+    branch_dag = dict(bundle.get("branch_dag", {}))
+    confidence_map = dict(bundle.get("confidence_map", {}))
+    change_attribution = dict(bundle.get("change_attribution_report", {}))
+    trace_explorer = dict(bundle.get("trace_explorer_state", {}))
+    branch_replay = dict(bundle.get("branch_replay_index", {}))
+    approval_timeline = dict(bundle.get("approval_timeline", {}))
+    background_jobs = dict(bundle.get("background_job_view", {}))
+    permission_mode_card = dict(bundle.get("permission_mode_card", {}))
+    release_health = dict(bundle.get("release_health_report", {}))
+    demo_pack = dict(bundle.get("demo_pack_manifest", {}))
+    demo_scorecard = dict(bundle.get("flagship_demo_scorecard", {}))
+    human_factors = dict(bundle.get("human_factors_eval_report", {}))
+    onboarding_success = dict(bundle.get("onboarding_success_report", {}))
     pulse = read_run_summary(run_dir).get("pulse", {}) if run_dir is not None else {}
     pulse = dict(pulse) if isinstance(pulse, dict) else {}
     summary_payload = read_run_summary(run_dir) if run_dir is not None else {}
@@ -7992,6 +8005,28 @@ def _show_mission_control_surface(
                 "remote_current_supervisor_type": remote.get("current_supervisor_type"),
                 "event_subscription_count": event_bus.get("subscription_count"),
                 "event_dispatch_count": event_bus.get("dispatch_count"),
+                "workspace_id": dict(summary_payload.get("workspace", {})).get("workspace_id"),
+                "workspace_label": dict(summary_payload.get("workspace", {})).get("workspace_label"),
+                "overall_confidence": confidence_map.get("overall_confidence"),
+                "review_need": confidence_map.get("review_need"),
+                "unresolved_count": confidence_map.get("unresolved_count"),
+                "branch_count": branch_dag.get("branch_count"),
+                "active_branch_id": branch_dag.get("active_branch_id"),
+                "trace_winning_action": trace_explorer.get("winning_action"),
+                "trace_replay_count": branch_replay.get("replay_count"),
+                "primary_change_driver": change_attribution.get("primary_driver"),
+                "latest_approval_decision": approval_timeline.get("latest_decision"),
+                "background_job_count": background_jobs.get("job_count"),
+                "resumable_job_count": background_jobs.get("resumable_job_count"),
+                "permission_mode_source": permission_mode_card.get("mode_source"),
+                "release_health_status": release_health.get("status"),
+                "safe_to_hand_out_publicly": release_health.get("safe_to_hand_out_publicly"),
+                "demo_ready_count": demo_pack.get("ready_demo_count"),
+                "demo_story_count": demo_pack.get("demo_count"),
+                "current_demo_story": demo_scorecard.get("current_run_story"),
+                "current_run_qualifies_demo": demo_scorecard.get("current_run_qualifies"),
+                "first_run_success_ready": human_factors.get("first_run_success_ready"),
+                "onboarding_ready_for_first_time_user": onboarding_success.get("ready_for_first_time_user"),
             },
             "bundle": bundle,
         },
@@ -8046,6 +8081,13 @@ def _launch_mission_control_surface(
     navigator = dict(bundle.get("stage_navigator", {}))
     questions = dict(bundle.get("question_starters", {}))
     onboarding = dict(bundle.get("onboarding_status", {}))
+    branch_dag = dict(bundle.get("branch_dag", {}))
+    confidence_map = dict(bundle.get("confidence_map", {}))
+    trace_explorer = dict(bundle.get("trace_explorer_state", {}))
+    background_jobs = dict(bundle.get("background_job_view", {}))
+    release_health = dict(bundle.get("release_health_report", {}))
+    demo_scorecard = dict(bundle.get("flagship_demo_scorecard", {}))
+    onboarding_success = dict(bundle.get("onboarding_success_report", {}))
     pulse = read_run_summary(run_dir).get("pulse", {}) if run_dir is not None else {}
     pulse = dict(pulse) if isinstance(pulse, dict) else {}
     return {
@@ -8082,6 +8124,13 @@ def _launch_mission_control_surface(
                 "pulse_status": pulse.get("status"),
                 "pulse_mode": pulse.get("mode"),
                 "pulse_queued_action_count": pulse.get("queued_action_count"),
+                "overall_confidence": confidence_map.get("overall_confidence"),
+                "branch_count": branch_dag.get("branch_count"),
+                "trace_winning_action": trace_explorer.get("winning_action"),
+                "background_job_count": background_jobs.get("job_count"),
+                "release_health_status": release_health.get("status"),
+                "current_demo_story": demo_scorecard.get("current_run_story"),
+                "onboarding_ready_for_first_time_user": onboarding_success.get("ready_for_first_time_user"),
             },
             "bundle": bundle,
         },

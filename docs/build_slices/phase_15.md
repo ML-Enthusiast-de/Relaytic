@@ -2,7 +2,17 @@
 
 ## Status
 
-Planned.
+Implemented.
+
+Delivered package boundaries:
+
+- `src/relaytic/mission_control/`
+- extend `src/relaytic/interoperability/`
+- extend `src/relaytic/ui/`
+- consume `src/relaytic/tracing/`
+- consume `src/relaytic/permissions/`
+- consume `src/relaytic/daemon/`
+- consume `src/relaytic/remote_control/`
 
 Intended package boundaries:
 

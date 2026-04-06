@@ -165,6 +165,19 @@ def test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset(tmp_p
                         assert workspace_payload["surface_payload"]["status"] == "ok"
                         assert workspace_payload["surface_payload"]["workspace"]["workspace_state"]["workspace_id"] is not None
 
+                        mission_result = await session.call_tool(
+                            "relaytic_show_mission_control",
+                            {"run_dir": str(run_dir), "expected_profile": "full"},
+                        )
+                        mission_payload = _structured_payload(mission_result)
+                        mission_control = dict(mission_payload["surface_payload"]["mission_control"])
+                        mission_bundle = dict(mission_payload["surface_payload"]["bundle"])
+                        assert mission_control["overall_confidence"] is not None
+                        assert mission_control["branch_count"] >= 1
+                        assert mission_control["background_job_count"] is not None
+                        assert dict(mission_bundle["trace_explorer_state"])["span_count"] > 0
+                        assert dict(mission_bundle["demo_pack_manifest"])["demo_count"] >= 4
+
                         search_review_result = await session.call_tool(
                             "relaytic_review_search",
                             {"run_dir": str(run_dir), "overwrite": True},

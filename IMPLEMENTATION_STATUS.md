@@ -4,15 +4,15 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 14A, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, Slice 13A release safety, build attestation, and packaging discipline, Slice 13B event bus, runtime hooks, and visible permission modes, Slice 13C bounded daemon, resumable jobs, stale-job reporting, approval-aware background execution, and memory maintenance, Slice 14 real-world feasibility, domain constraints, action boundaries, and auditability reasoning, and Slice 14A remote supervision, approvals, and supervision handoff
-- next recommended slice: 15, mission-control expansion, packaging, integrations, demos, and human-factors proof
+- completed slices: 00 through 15, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, Slice 13A release safety, build attestation, and packaging discipline, Slice 13B event bus, runtime hooks, and visible permission modes, Slice 13C bounded daemon, resumable jobs, stale-job reporting, approval-aware background execution, and memory maintenance, Slice 14 real-world feasibility, domain constraints, action boundaries, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, and Slice 15 mission-control expansion, demo packs, release-health posture, and human-factors proof
+- next recommended slice: 16A, capability registry and capability cards
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - latest handoff-and-learnings slice: 12D, workspace-first continuity, result contracts, governed learnings migration, and explicit iteration planning
 - latest workspace-and-search slice: 13, search controller, bounded branch widening, and execution-strategy selection
 - latest release-and-packaging slice: 13A, release safety, build attestation, and packaging discipline
 - latest runtime-and-permission slice: 13B, event bus, runtime hooks, and visible permission modes
 - latest background-and-resume slice: 13C, bounded daemon, resumable jobs, and memory maintenance
-- next workspace-and-iteration follow-on after Slice 14A: 15, mission-control expansion, packaging, integrations, demos, and human-factors proof
+- latest mission-control-and-proof slice: 15, branch-aware operator surfaces, demo packs, release-health posture, and onboarding-success evaluation
 - next planned academy follow-on after Slice 15: 16A, capability registry and capability cards
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -83,6 +83,7 @@ The repository currently supports:
 - explicit release safety via `relaytic release-safety scan` and `relaytic release-safety show`, with workspace-only pre-release scans, built-bundle attestation, source-map auditing, sensitive-string and machine-path scanning, package inventory capture, packaging-regression reporting, and doctor-visible release posture
 - explicit event-bus review via `relaytic events show`, with a typed event schema, subscription registry, hook registry, dispatch projections, and one projection-only view over the canonical runtime stream
 - explicit permission review via `relaytic permissions show`, `relaytic permissions check`, and `relaytic permissions decide`, with visible `review`, `plan`, `safe_execute`, and `bounded_autonomy` modes, one tool-permission matrix, one approval-policy report, one append-only permission-decision log, and a machine-readable session capability contract
+- a professional mission-control surface via `relaytic mission-control show` and `relaytic mission-control launch`, with branch DAGs, confidence posture, trace replay state, change attribution, approval timelines, background-job visibility, permission-mode cards, release-health posture, flagship demo manifests, human-factors scorecards, and onboarding-success reporting
 - host-neutral MCP interoperability via `relaytic interoperability serve-mcp` plus checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
 - machine-readable host activation/discovery state so Relaytic can say which hosts can call it immediately and which still require connector registration
 - optional local-LLM advisory support without making local LLMs a hard requirement
@@ -111,10 +112,10 @@ The most important not-yet-implemented shifts after the current baseline are:
 - stronger dynamic controller logic that decides who should act next, how deep to branch, and when review is worth it under explicit contracts
 - stronger search/HPO/controller logic that goes beyond the shipped Slice 13 bounded search controller into deeper portfolio ecology, better stop-search proofs, and tighter daemon/resume integration
 - broader protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth as the surface area grows
-- packaging, release, and long-session regression packs that test the product the way a real frontier operator runtime is used rather than only as a fast CLI
-- flagship demo packs with explicit scorecards so Relaytic can be judged by repeatable proof scenarios instead of ad hoc walkthroughs
-- human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy
-- mission-control surfaces that expose branch DAG, confidence, trace replay, and change attribution to both humans and external agents
+- deeper packaging, release, and long-session regression packs that test the product the way a real frontier operator runtime is used rather than only as a fast CLI
+- broader flagship demo packs and harder scorecards so Relaytic can be judged by repeatable proof scenarios instead of ad hoc walkthroughs
+- broader human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy across more datasets and host paths
+- later academy-aware mission-control surfaces that explain capability promotion, shadow trials, hunt campaigns, and roster changes to both humans and external agents
 - a post-Slice-15 capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement
 - a later optional representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family after the academy track
 
@@ -464,8 +465,8 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-With Slice 14 now landed, the next high-leverage frontier follow-ons are:
+With Slice 15 now landed, the next high-leverage frontier follow-ons are:
 
-- Slice 15 mission-control expansion, packaging, integrations, demo packs, and human-factors proof so the shipped runtime feels polished without drifting away from the local artifact truth
+- Slice 16A capability registry and capability cards so future academy growth has one canonical capability truth instead of ad hoc additions
 - richer long-term memory compaction, pinning, and replay rules that keep the shipped workspace/result-contract/search-controller loop durable across longer investigations
-- later Slice 15 mission-control expansion, flagship demos, and human-factors proof so the recruiter-facing MVP reads as polished software rather than a strong terminal prototype
+- broader flagship demos and harder human-factors proof so the recruiter-facing MVP keeps reading as polished software rather than a strong terminal prototype

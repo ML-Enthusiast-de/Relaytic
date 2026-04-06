@@ -30,7 +30,7 @@ from relaytic.interoperability import (
     relaytic_show_workspace,
     relaytic_set_next_run_focus,
 )
-from tests.public_datasets import write_public_breast_cancer_dataset
+from tests.public_datasets import write_public_breast_cancer_dataset, write_public_diabetes_dataset
 
 
 def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Path) -> None:
@@ -72,8 +72,19 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
 
     mission_payload = relaytic_show_mission_control(run_dir=str(run_dir), expected_profile="full")
     mission_control = dict(mission_payload["surface_payload"]["mission_control"])
+    mission_bundle = dict(mission_payload["surface_payload"]["bundle"])
     assert mission_control["current_stage"] is not None
     assert mission_control["recommended_action"] is not None
+    assert mission_control["overall_confidence"] is not None
+    assert mission_control["branch_count"] >= 1
+    assert mission_control["background_job_count"] is not None
+    assert mission_control["demo_story_count"] >= 4
+    assert dict(mission_bundle["confidence_map"])["overall_confidence"] is not None
+    assert dict(mission_bundle["branch_dag"])["branch_count"] >= 1
+    assert dict(mission_bundle["trace_explorer_state"])["span_count"] > 0
+    assert dict(mission_bundle["background_job_view"])["status"] in {"ok", "idle", "needs_attention"}
+    assert dict(mission_bundle["demo_pack_manifest"])["demo_count"] >= 4
+    assert dict(mission_bundle["human_factors_eval_report"])["explanation_quality"] in {"strong", "developing"}
 
     capabilities_payload = relaytic_assist_turn(run_dir=str(run_dir), message="what can you do?")
     assert capabilities_payload["surface_payload"]["status"] == "ok"
@@ -239,3 +250,40 @@ def test_external_agent_wrappers_support_a_real_run_and_proof_flow(tmp_path: Pat
     assert "relaytic_reset_learnings" in server_info["workflow_tools"]
     assert "relaytic_continue_workspace" in server_info["workflow_tools"]
     assert server_info["tool_count"] >= 26
+
+
+def test_external_agent_wrappers_handle_regression_dataset_and_rerun_question(tmp_path: Path) -> None:
+    run_dir = tmp_path / "external_agent_regression_run"
+    data_path = write_public_diabetes_dataset(tmp_path / "external_agent_diabetes.csv")
+
+    run_payload = relaytic_run(
+        data_path=str(data_path),
+        run_dir=str(run_dir),
+        text="Do everything on your own. Predict disease_progression from the provided features and explain whether a rerun is worth it.",
+        actor_type="agent",
+        channel="codex-regression-smoke",
+        overwrite=True,
+    )
+    run_summary = dict(run_payload["surface_payload"]["run_summary"])
+    assert run_payload["surface_payload"]["status"] == "ok"
+    assert dict(run_summary["decision"])["target_column"] == "disease_progression"
+
+    assist_payload = relaytic_assist_turn(run_dir=str(run_dir), message="why not a rerun?")
+    audit = dict(assist_payload["surface_payload"]["audit"])
+    assert audit["question_type"] == "why_not_rerun"
+    assert audit["actor_type"] == "agent"
+    assert audit["answer"]
+
+    mission_payload = relaytic_show_mission_control(run_dir=str(run_dir), expected_profile="full")
+    mission_control = dict(mission_payload["surface_payload"]["mission_control"])
+    assert mission_control["current_stage"] is not None
+    assert mission_control["overall_confidence"] is not None
+    assert mission_control["branch_count"] >= 1
+
+    workspace_payload = relaytic_show_workspace(run_dir=str(run_dir))
+    result_contract = dict(workspace_payload["surface_payload"]["result_contract"]["result_contract"])
+    next_run_plan = dict(workspace_payload["surface_payload"]["next_run_plan"])
+    assert workspace_payload["surface_payload"]["status"] == "ok"
+    assert result_contract["status"] in {"ok", "watch", "needs_attention", "provisional"}
+    recommended_direction = str(dict(result_contract.get("recommended_next_move", {})).get("direction") or next_run_plan.get("recommended_direction"))
+    assert recommended_direction in {"same_data", "add_data", "new_dataset"}

@@ -260,7 +260,7 @@ Why:
 - Slice 11F is now implemented and makes the experience much more demo-ready by surfacing a guided walkthrough, explicit mode explanations, and stuck-recovery guidance directly from mission control, chat, and the handbook stack
 - Slice 11G is now implemented and makes that first-contact UX much more forgiving by adding adaptive onboarding capture, visible chat session state, explicit analysis-first versus governed-run routing, lightweight local semantic rescue for messy human input, and full-install helper provisioning
 - Slice 12A should come after dojo because periodic awareness, innovation watching, and bounded background follow-up are much safer once self-improvement stays quarantined and promotion rules already exist
-- Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because wider search and full trace-backed mission control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
+- Slice 12B should come before Slice 13 and the Slice 15 mission-control expansion because wider search and full trace-backed mission control both need one canonical trace substrate plus explicit agent/security evaluation before they are believable
 - Slice 12B should also establish protocol conformance between CLI, MCP, and later richer UI surfaces instead of assuming those surfaces stay aligned
 - Slice 12C should come before Slice 13 because Relaytic still needs a professional post-run handoff, explicit next-run steering, and durable learnings that survive across runs before deeper search and late demo packaging can feel complete
 - Slice 12D should come before Slice 13 because Relaytic should become workspace-first before it becomes search-deeper; the result contract, governed learnings, workspace lineage, and explicit next-run plan need to exist before wider search can responsibly choose between same-data continuation, add-data continuation, or starting over
@@ -282,8 +282,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 14A, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, and Slice 14A remote supervision, approvals, and supervision handoff
-- next execution target: Slice 15
+- implemented baseline: Slice 00 through Slice 15, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, and Slice 15 mission-control expansion, release-health visibility, demo packs, and human-factors proof
+- next execution target: Slice 16A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -291,9 +291,7 @@ Why:
 - latest release-and-packaging follow-on after Slice 13: Slice 13A
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
-- next workspace-and-iteration follow-on after Slice 14A: Slice 15
-- next remote-supervision follow-on after Slice 14A: Slice 15
-- later mission-control expansion after Slice 14A: Slice 15
+- latest mission-control-and-proof slice: Slice 15
 - next planned academy follow-on after Slice 15: Slice 16A
 - late optional representation follow-on after the academy track: Slice 17
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -1966,7 +1964,7 @@ Implemented.
 
 ### Status
 
-Planned.
+Implemented.
 
 ### Load-bearing improvement
 

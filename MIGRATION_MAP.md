@@ -295,11 +295,11 @@ Avoid introducing new references to:
 - `src/relaytic/compiler/` for Slice 10A method compilation, executable challenger templates, compiled feature hypotheses, and compiled benchmark protocols
 - `src/relaytic/data_fabric/` for Slice 10A source-graph reasoning, join-candidate analysis, entity-history understanding, and acquisition planning
 - `src/relaytic/benchmark/` for Slice 11A imported-incumbent evaluation, incumbent parity reporting, and beat-target contracts on top of Slice 11 reference comparisons
-- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D live onboarding/chat behavior, Slice 11E handbook discovery surfaces, Slice 11F guided demo/mode-education/stuck-recovery surfaces, and Slice 11G adaptive onboarding/session-capture/lightweight-semantic-helper surfaces
+- `src/relaytic/mission_control/` for Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, demo-session state, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D live onboarding/chat behavior, Slice 11E handbook discovery surfaces, Slice 11F guided demo/mode-education/stuck-recovery surfaces, Slice 11G adaptive onboarding/session-capture/lightweight-semantic-helper surfaces, and Slice 15 branch-aware operator/proof surfaces
 - `src/relaytic/dojo/` for Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback-ready state, and architecture-proposal quarantine
 - `src/relaytic/pulse/` for Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, explicit memory-maintenance orchestration, and pulse-to-mission-control visibility surfaces
 - `src/relaytic/tracing/` for Slice 12B canonical trace schemas, specialist/tool/intervention/branch traces, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
-- `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and later Slice 15 human-supervision/onboarding evaluation reports
+- `src/relaytic/evals/` for Slice 12B agent-behavior evaluation, security harnesses, protocol-conformance checks, adversarial steering tests, runtime regression packs, scenario/result matrices, and Slice 15 human-supervision/onboarding evaluation reports
 - `src/relaytic/handoff/` for Slice 12C differentiated post-run handoff generation, next-run options, persisted next-run focus, and differentiated report rendering for humans and external agents
 - `src/relaytic/learnings/` for Slice 12C durable local learnings state, learnings markdown, per-run learnings snapshots, and workspace learnings reset behavior
 - `docs/handbooks/` for Slice 11E role-specific human/operator and external-agent onboarding guides
@@ -433,12 +433,12 @@ Current Slice 12D artifact names:
 - `src/relaytic/permissions/` for Slice 13B visible permission modes, tool-permission matrices, approval-policy reporting, append-only permission-decision logs, and session capability contracts
 - `src/relaytic/daemon/` for Slice 13C bounded background-job orchestration, checkpoint-backed resumability, stale-job reporting, approval-aware execution, and memory-maintenance queues
 - `src/relaytic/remote_control/` for Slice 14A remote supervision sessions, approval queues, supervision handoff, remote-control audit, and transport reporting
+- `src/relaytic/mission_control/` for Slice 15 branch DAGs, confidence posture, trace explorer state, change attribution, approval timelines, background-job views, permission cards, release-health posture, demo-pack manifests, flagship demo scorecards, and human-factors/onboarding-success reporting
 
 ## Reserved Future Boundaries
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
-- `src/relaytic/mission_control/` for later Slice 15 branch DAG, confidence map, trace exploration, change attribution, and broader professional operator surfaces on top of the shipped Slice 11B mission-control foundation
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
@@ -463,7 +463,7 @@ Implemented event-bus and permission artifact names:
 - `permission_decision_log.jsonl`
 - `session_capability_contract.json`
 
-Implemented daemon, feasibility, and remote-supervision artifact names plus reserved later mission-control, academy, and representation names:
+Implemented daemon, feasibility, remote-supervision, and mission-control proof artifact names plus reserved later academy and representation names:
 - `daemon_state.json`
 - `background_job_registry.json`
 - `background_job_log.jsonl`

@@ -26,6 +26,19 @@ MISSION_CONTROL_FILENAMES = {
     "launch_manifest": "launch_manifest.json",
     "demo_session_manifest": "demo_session_manifest.json",
     "ui_preferences": "ui_preferences.json",
+    "branch_dag": "branch_dag.json",
+    "confidence_map": "confidence_map.json",
+    "change_attribution_report": "change_attribution_report.json",
+    "trace_explorer_state": "trace_explorer_state.json",
+    "branch_replay_index": "branch_replay_index.json",
+    "approval_timeline": "approval_timeline.json",
+    "background_job_view": "background_job_view.json",
+    "permission_mode_card": "permission_mode_card.json",
+    "release_health_report": "release_health_report.json",
+    "demo_pack_manifest": "demo_pack_manifest.json",
+    "flagship_demo_scorecard": "flagship_demo_scorecard.json",
+    "human_factors_eval_report": "human_factors_eval_report.json",
+    "onboarding_success_report": "onboarding_success_report.json",
 }
 MISSION_CONTROL_REPORT_RELATIVE_PATH = Path("reports") / "mission_control.html"
 

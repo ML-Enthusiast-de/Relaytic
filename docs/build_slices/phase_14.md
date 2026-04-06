@@ -4,7 +4,7 @@ Status: shipped. Slice 14A is the next target.
 
 ## Status
 
-Planned.
+Implemented.
 
 Intended package boundaries:
 

@@ -184,7 +184,7 @@ Reason:
 - Slice 11G is now implemented and makes that first-contact flow much more human-tolerant by adding adaptive onboarding capture, visible onboarding session state, explicit analysis-first versus governed-run routing, lightweight local semantic rescue for messy input, and full-install local-helper provisioning
 - Slice 12 is now implemented and gives Relaytic a guarded dojo layer with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, architecture-proposal quarantine, and mission-control visibility
 - Slice 12A should come after dojo because periodic awareness and bounded background follow-up are much safer once self-improvement already has quarantine and promotion rules
-- Slice 12B should come before Slice 13 and the later Slice 15 mission-control expansion because Relaytic needs one canonical trace substrate, explicit competing-claim/adjudication contracts, and agent/security evaluation before wider search and full trace-explorer claims become credible
+- Slice 12B should come before Slice 13 and the Slice 15 mission-control expansion because Relaytic needs one canonical trace substrate, explicit competing-claim/adjudication contracts, and agent/security evaluation before wider search and full trace-explorer claims become credible
 - Slice 12B should also establish protocol conformance between CLI, MCP, and later richer UI surfaces instead of assuming those surfaces stay aligned
 - Slice 12C should come before Slice 13 because Relaytic needs differentiated post-run handoff, explicit next-run steering, and durable local learnings before deeper search and later demo packaging can feel complete to humans or external agents
 - Slice 12D should come before Slice 13 because Relaytic should become workspace-first before it becomes search-deeper; the result contract, governed learnings, workspace lineage, and explicit next-run plan need to exist before wider search can decide responsibly between same-data continuation, add-data continuation, or starting over
@@ -206,8 +206,8 @@ Reason:
 
 Current repo state:
 
-- implemented through Slice 14A, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace continuity plus result-contract/iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety plus build attestation, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, and Slice 14A remote supervision, approvals, and supervision handoff now landed
-- next execution target: Slice 15
+- implemented through Slice 15, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace continuity plus result-contract/iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety plus build attestation, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, and Slice 15 mission-control expansion, demo packs, release-health posture, and human-supervision proof now landed
+- next execution target: Slice 16A
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
 - latest handoff-and-learnings slice: Slice 12D
@@ -215,8 +215,7 @@ Current repo state:
 - latest release-and-packaging slice: Slice 13A
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
-- next workspace-and-iteration follow-on after Slice 14A: Slice 15
-- next remote-supervision follow-on after Slice 14A: Slice 15
+- latest mission-control-and-proof slice: Slice 15
 - next planned academy follow-on after Slice 15: Slice 16A
 - after Slice 13, every later slice that changes operator-visible behavior, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces rather than leaving the UI stale until late polish
 - the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, academy, handoff, learnings, and external-agent continuation surfaces
@@ -274,13 +273,13 @@ If the goal is to turn the current implementation into something that looks genu
 - causal memory that preserves interventions, method outcomes, and downstream consequences rather than only analog similarity
 - a method compiler that turns research, memory, and operator context into executable challenger and feature templates
 - imported-incumbent challenge paths so Relaytic can beat real existing systems instead of only abstract baselines
-- trace-native mission-control surfaces that turn the shipped specialist/tool/intervention/branch trace model into a polished replay, branch, and change-attribution experience
+- academy-aware operating surfaces that turn the shipped specialist/tool/intervention/branch trace model into polished replay, promotion, and change-attribution experiences
 - broader runtime agent/security harnesses that expand the shipped control-injection, tool-misuse, branch-safety, and skeptical-override checks into a larger proof pack before broader autonomy becomes default
 - outcome learning rather than run-only learning
 - a richer long-term memory stack with retention, compaction, pinning, and replay rules so later specialists inherit durable lessons instead of analog hints alone
 - richer data-fabric reasoning that can suggest joins, entity histories, or additional data before wasting search budget
 - a stronger search controller that widens or prunes branches, changes handoff depth, and allocates HPO effort based on expected decision value under budget
-- a mission-control surface that makes branch structure, confidence, intervention history, traces, incumbent-versus-Relaytic state, and change attribution legible to humans and agents
+- academy-aware mission control that makes branch structure, confidence, intervention history, traces, incumbent-versus-Relaytic state, capability growth, and change attribution legible to humans and agents
 - a governed capability-academy track that can scout, shadow-test, promote, demote, and retire tools or non-core specialists through deterministic proof instead of ad hoc growth
 - an optional representation engine that can learn from large unlabeled local corpora and improve retrieval, anomaly support, and temporal state understanding without replacing deterministic adjudication
 

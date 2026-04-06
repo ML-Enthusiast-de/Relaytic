@@ -136,7 +136,7 @@ def relaytic_show_control(*, run_dir: str) -> dict[str, Any]:
 
 
 def relaytic_show_mission_control(*, run_dir: str | None = None, expected_profile: str = "full") -> dict[str, Any]:
-    """Render the current Slice 11B/11C mission-control surface for a Relaytic run or onboarding state."""
+    """Render the current Slice 15 mission-control surface for a Relaytic run or onboarding state."""
     cli = _cli()
     return cli._show_mission_control_surface(
         run_dir=run_dir,
@@ -993,7 +993,7 @@ def build_interoperability_tool_specs() -> list[InteropToolSpec]:
         InteropToolSpec(
             name="relaytic_show_mission_control",
             title="Show Relaytic Mission Control",
-            description="Render the current Slice 11B/11C operator control-center state, onboarding posture, clarity surfaces, and launch metadata for a Relaytic run.",
+            description="Render the current Slice 15 operator surface, including workspace continuity, branches, confidence posture, approvals, background work, demo readiness, and onboarding state for a Relaytic run.",
             category="inspection",
             annotations={"readOnlyHint": True, "idempotentHint": True, "destructiveHint": False, "openWorldHint": False},
             handler=relaytic_show_mission_control,
