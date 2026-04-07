@@ -101,6 +101,15 @@ Daemon or long-session slices must test:
 - memory-maintenance queue behavior
 - no hidden background activity outside the canonical job registry
 
+### 10. Benchmark-pack proof
+
+Paper-facing benchmark packs should test:
+
+- coverage across the main Relaytic task families
+- primary-source dataset traceability
+- bundled versus network-backed separation
+- representative benchmark plus eval materialization on a smaller heavy subset
+
 ## Required future shard groups
 
 To reduce timeout risk, future CI should support at least:
@@ -114,6 +123,7 @@ To reduce timeout risk, future CI should support at least:
 - `background_runtime`
 - `remote_supervision`
 - `mission_control`
+- `paper_benchmark_pack`
 - `capability_academy`
 
 ## Minimum pass expectation by slice family

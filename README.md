@@ -467,6 +467,15 @@ $env:RELAYTIC_ENABLE_NETWORK_DATASETS="1"
 python -m pytest tests/test_domain_dataset_flows.py -q
 ```
 
+Prepare the broader paper-grade benchmark and eval pack:
+
+```bash
+$env:RELAYTIC_ENABLE_PAPER_BENCHMARKS="1"
+python -m pytest tests/test_paper_benchmark_pack.py -q
+```
+
+Dataset rationale and source links for that pack live in `docs/specs/paper_benchmark_pack.md`.
+
 If you touch packaging, CLI, or security surfaces, also run:
 
 ```bash

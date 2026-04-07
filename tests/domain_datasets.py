@@ -53,6 +53,37 @@ def write_uci_concrete_strength_dataset(path: Path) -> Path:
     return path
 
 
+def write_uci_energy_efficiency_heating_dataset(path: Path) -> Path:
+    features, targets = _fetch_frame(242)
+    frame = features.copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    target = targets[["Y1"]].copy()
+    target.columns = ["heating_load"]
+    frame = pd.concat([frame, target], axis=1)
+    frame.to_csv(path, index=False)
+    return path
+
+
+def write_uci_bank_marketing_dataset(path: Path, *, max_rows: int = 6000) -> Path:
+    features, targets = _fetch_frame(222)
+    frame = pd.concat([features, targets], axis=1).copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    frame = frame.rename(columns={"y": "term_deposit_flag"})
+    frame = _sample_frame(frame, target_column="term_deposit_flag", max_rows=max_rows, stratify=True)
+    frame.to_csv(path, index=False)
+    return path
+
+
+def write_uci_statlog_german_credit_dataset(path: Path) -> Path:
+    features, targets = _fetch_frame(144)
+    frame = pd.concat([features, targets], axis=1).copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    frame["credit_risk_flag"] = (frame["class"].astype(int) == 2).astype(int)
+    frame = frame.drop(columns=["class"])
+    frame.to_csv(path, index=False)
+    return path
+
+
 def write_uci_iranian_churn_dataset(path: Path, *, max_rows: int = 2500) -> Path:
     features, targets = _fetch_frame(563)
     frame = pd.concat([features, targets], axis=1).copy()
@@ -84,5 +115,24 @@ def write_uci_ai4i_machine_failure_dataset(path: Path, *, max_rows: int = 3000) 
     frame = pd.concat([frame, target], axis=1)
     frame.columns = [_normalize_name(name) for name in frame.columns]
     frame = _sample_frame(frame, target_column="machine_failure", max_rows=max_rows, stratify=True)
+    frame.to_csv(path, index=False)
+    return path
+
+
+def write_uci_dry_bean_dataset(path: Path, *, max_rows: int = 4000) -> Path:
+    features, targets = _fetch_frame(602)
+    frame = pd.concat([features, targets], axis=1).copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    frame = frame.rename(columns={"class": "bean_class"})
+    frame = _sample_frame(frame, target_column="bean_class", max_rows=max_rows, stratify=True)
+    frame.to_csv(path, index=False)
+    return path
+
+
+def write_uci_dermatology_dataset(path: Path) -> Path:
+    features, targets = _fetch_frame(33)
+    frame = pd.concat([features, targets], axis=1).copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    frame = frame.rename(columns={"class": "dermatology_class"})
     frame.to_csv(path, index=False)
     return path

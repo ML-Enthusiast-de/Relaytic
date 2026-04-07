@@ -13,7 +13,7 @@ This document tracks the operational state of the repository. It is an implement
 - latest runtime-and-permission slice: 13B, event bus, runtime hooks, and visible permission modes
 - latest background-and-resume slice: 13C, bounded daemon, resumable jobs, and memory maintenance
 - latest mission-control-and-proof slice: 15, branch-aware operator surfaces, demo packs, release-health posture, and onboarding-success evaluation
-- latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, and broader human-chaos coverage
+- latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, broader human-chaos coverage, and a prepared paper-grade benchmark/eval pack
 - next planned academy follow-on after Slice 15: 16A, capability registry and capability cards
 - current public package: `relaytic`
 - current public CLI: `relaytic`
