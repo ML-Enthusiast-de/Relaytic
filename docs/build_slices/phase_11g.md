@@ -18,7 +18,7 @@ The goal is to make the onboarding flow resilient to messy human input:
 - `relaytic mission-control chat`
 - `relaytic mission-control launch --interactive`
 - `relaytic mission-control show`
-- `python scripts/install_relaytic.py --profile full --launch-control-center`
+- `.\scripts\bootstrap.ps1 -Profile full -LaunchControlCenter` on Windows, or `bash ./scripts/bootstrap.sh --profile full --launch-control-center` on macOS/Linux
 - `/state`
 - `/reset`
 

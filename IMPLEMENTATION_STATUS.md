@@ -13,6 +13,7 @@ This document tracks the operational state of the repository. It is an implement
 - latest runtime-and-permission slice: 13B, event bus, runtime hooks, and visible permission modes
 - latest background-and-resume slice: 13C, bounded daemon, resumable jobs, and memory maintenance
 - latest mission-control-and-proof slice: 15, branch-aware operator surfaces, demo packs, release-health posture, and onboarding-success evaluation
+- latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, and broader human-chaos coverage
 - next planned academy follow-on after Slice 15: 16A, capability registry and capability cards
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -62,13 +63,13 @@ The repository currently supports:
 - method compilation that turns research, memory, and operator context into executable challenger families, compiled feature hypotheses, and benchmark-protocol change proposals
 - visible research support inside completion, autonomy, `relaytic run`, `relaytic show`, explicit `relaytic research` surfaces, and the MCP contract
 - visible benchmark support inside completion, `relaytic run`, `relaytic show`, explicit `relaytic benchmark` surfaces, assist, runtime, and the MCP contract
-- imported incumbent challenge support through `relaytic benchmark run --incumbent-path ...`, including local model replay, ruleset/scorecard execution, prediction-file fallback with reduced claims, explicit incumbent parity reports, and beat-target contracts that autonomy can consume
+- imported incumbent challenge support through `relaytic benchmark run --incumbent-path ...`, including explicit trust-gated local model replay, ruleset/scorecard execution, prediction-file fallback with reduced claims, explicit incumbent parity reports, and beat-target contracts that autonomy can consume
 - communicative assist surfaces via `relaytic assist show`, `relaytic assist turn`, and `relaytic assist chat` so humans and agents can ask for explanations, request stage navigation, or let Relaytic take over safely
 - routed intelligence profiles, explicit local semantic baseline selection, backend capability matrices, verifier-specific artifacts, and semantic-proof reporting so the optional LLM layer is visible and measurable rather than implicit
 - connection guidance that can recommend deterministic local-only use, lightweight local LLM setup, or local host connections for Claude, Codex/OpenAI, OpenClaw, and ChatGPT connector paths without making any of them mandatory
-- one-line bootstrap via `python scripts/install_relaytic.py` plus install-health verification via `relaytic doctor`
+- one-line bootstrap via `.\scripts\bootstrap.ps1` on Windows, `bash ./scripts/bootstrap.sh` on macOS/Linux, or `python scripts/install_relaytic.py` when the interpreter is already controlled, plus install-health verification via `relaytic doctor`
 - a thin but real mission-control surface via `relaytic mission-control show` and `relaytic mission-control launch`, with shared local truth for onboarding, review queue, operator cards, launch metadata, and demo-session state
-- install-launch coupling so `python scripts/install_relaytic.py --launch-control-center` can verify the environment and land a user in the same local control-center flow without inventing a separate onboarding truth
+- install-launch coupling so the documented bootstrap wrappers can verify the environment and land a user in the same local control-center flow without inventing a separate onboarding truth
 - role-specific handbook discovery through mission control, mission-control chat, and checked-in host notes so the product can point humans to `docs/handbooks/relaytic_user_handbook.md` and external agents to `docs/handbooks/relaytic_agent_handbook.md` on first contact
 - demo-grade onboarding through explicit guided demo flow, mode explanations, stuck-recovery guidance, and a recruiter-safe walkthrough surfaced directly from mission control, chat, and the handbook stack
 - adaptive human onboarding with visible captured chat state, dataset-path detection, explicit objective-family routing for quick analysis-first versus full governed-run requests, objective capture, confirmation-before-run behavior, direct analysis-first handling for lightweight exploratory requests, and bounded local semantic extraction for messy first-contact human input
@@ -380,7 +381,7 @@ The most important not-yet-implemented shifts after the current baseline are:
 - upgraded mission-control chat so humans can paste a dataset path directly, provide the objective in a later turn, inspect captured state with `/state`, reset with `/reset`, and confirm before the first run is created
 - expanded onboarding so Relaytic now distinguishes quick analysis-first requests from full governed-run requests and can execute lightweight direct analysis for top-signal, exploratory, and correlation-style objectives without forcing debate-heavy modeling
 - hardened local semantic backend discovery and local-LLM setup so canonical `policy:` configs work in the same way as legacy top-level config files for onboarding use
-- upgraded `python scripts/install_relaytic.py --profile full` so the one-line bootstrap now attempts to provision Relaytic's lightweight local onboarding helper by default
+- upgraded the documented full-profile bootstrap flow so the one-line startup path now attempts to provision Relaytic's lightweight local onboarding helper by default
 - added targeted Slice 11G onboarding and install verification for dataset-path capture, objective capture plus confirmation, messy-input semantic rescue, and one-line-installer onboarding-local-LLM setup
 
 ### Slice 12
@@ -434,7 +435,7 @@ The most important not-yet-implemented shifts after the current baseline are:
 - added `relaytic integrations show` for human and agent visibility into mature OSS capabilities
 - added `relaytic integrations self-check` so wired adapters can be compatibility-checked after package changes
 - wired Pandera into intake validation, statsmodels into evidence audit diagnostics, imbalanced-learn into rare-event challenger execution, and PyOD into anomaly challenger execution
-- added `relaytic doctor` as the canonical runtime/install-health surface and a one-line bootstrap script at `scripts/install_relaytic.py`
+- added `relaytic doctor` as the canonical runtime/install-health surface and one-line bootstrap entry points through `scripts/bootstrap.ps1`, `scripts/bootstrap.sh`, and `scripts/install_relaytic.py`
 - adopted bundled public datasets for stable end-to-end regression, binary-classification, and multiclass-classification tests without introducing network-bound CI behavior
 - added an opt-in official-UCI domain-dataset suite so Relaytic can be exercised on domain-specific public data without making default CI depend on live network fetches
 - sharpened `RELAYTIC_SLICING_PLAN.md` into a stricter future-slice execution contract with explicit intelligence sources, proof obligations, fallbacks, and a preferred post-MVP execution order

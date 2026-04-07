@@ -55,6 +55,7 @@ def test_cli_mission_control_show_and_launch_reuse_current_run_truth(tmp_path: P
             "model",
             "--incumbent-name",
             "strong_incumbent",
+            "--trust-incumbent-model",
             "--overwrite",
             "--format",
             "json",

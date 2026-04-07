@@ -52,9 +52,15 @@ Relaytic now supports two clean onboarding directions:
 Run these in order:
 
 ```powershell
-python scripts/install_relaytic.py --profile full --launch-control-center
+.\scripts\bootstrap.ps1 -Profile full -LaunchControlCenter
 relaytic doctor --expected-profile full --format json
 relaytic mission-control chat
+```
+
+On macOS/Linux, use:
+
+```bash
+bash ./scripts/bootstrap.sh --profile full --launch-control-center
 ```
 
 If you already know the dataset path and objective, you can still create the first run directly:

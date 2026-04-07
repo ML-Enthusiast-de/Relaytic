@@ -29,19 +29,19 @@ The repository already supports a working early product baseline:
 - bounded autonomous follow-up loops with challenger queues, recalibration/retrain requests, loop budgets, and champion lineage tracking
 - privacy-safe external research retrieval from redacted run signatures with typed source inventory, method-transfer reports, benchmark-reference capture, and explicit external-research audit
 - benchmark parity and gap reporting against explicit reference approaches under the same split and metric contract
-- imported incumbent challenge support so Relaytic can reevaluate a local model, ruleset/scorecard, or prediction file and issue an honest beat-target contract instead of only generic parity language
+- imported incumbent challenge support so Relaytic can reevaluate a trusted local model, ruleset/scorecard, or prediction file and issue an honest beat-target contract instead of only generic parity language
 - validated feedback and outcome learning with explicit intake, trust scoring, reversible effect reports, route-prior updates, and rollback-ready casebook artifacts
 - decision-lab review with explicit decision-world models, controller policies, value-of-more-data reasoning, local source-graph/join analysis, and compiled challenger/feature/benchmark templates
 - communicative assist surfaces that explain what Relaytic is doing, let humans or external agents jump back to any bounded stage, and let Relaytic take over when the operator stops or is unsure
 - concise run summaries for humans and stable summary artifacts for agents
-- one-line bootstrap install plus post-install dependency verification
+- one-line Windows and macOS/Linux bootstrap wrappers plus post-install dependency verification
 - a thin mission-control surface via `relaytic mission-control show` and `relaytic mission-control launch`, backed by shared run-summary, control, benchmark, decision, onboarding, and launch artifacts
 - a clearer mission-control and assist surface that always exposes current modes, capabilities, safe next actions, bounded stage reruns, and starter questions instead of requiring users or external agents to guess the interaction model
 - guided onboarding and live terminal mission-control chat through `relaytic mission-control chat` and `relaytic mission-control launch --interactive`, with explicit explanations of what Relaytic is, what it needs first, why capabilities need setup, and how the dashboard differs from terminal chat
 - role-specific handbooks surfaced directly from mission control and chat, so human operators are pointed to a narrative `docs/handbooks/relaytic_user_handbook.md` while external agents and host wrappers are pointed to the command-first `docs/handbooks/relaytic_agent_handbook.md`
 - demo-grade onboarding through an explicit walkthrough, clearer mode education, and stuck-recovery guidance surfaced directly from mission control, chat, and `docs/handbooks/relaytic_demo_walkthrough.md`
 - adaptive human onboarding through mission-control chat, with visible captured onboarding state, direct dataset-path handling, explicit objective-family routing for quick analysis-first versus full governed-run requests, confirmation before the first run, and bounded local semantic extraction for messy first-contact messages
-- optional install-to-launch onboarding through `python scripts/install_relaytic.py --launch-control-center`
+- optional install-to-launch onboarding through `.\scripts\bootstrap.ps1 -Profile full -LaunchControlCenter` on Windows, `bash ./scripts/bootstrap.sh --profile full --launch-control-center` on macOS/Linux, or `python scripts/install_relaytic.py --launch-control-center` when you already control the Python environment
 - full-profile bootstrap now attempts to provision a lightweight CPU-safe local onboarding model so first-contact chat can recover messy human input without making LLMs part of the truth-bearing execution path
 - differentiated post-run handoff through `relaytic handoff show` and `relaytic handoff focus`, with separate user and agent result reports, explicit next-run options, and persisted next-run focus
 - durable local learnings through `relaytic learnings show` and `relaytic learnings reset`, with cross-run learnings markdown/JSON state, per-run learnings snapshots, and memory-visible workspace priors
@@ -197,11 +197,25 @@ The default product path remains local-first and deterministic. Frontier or exte
 
 Preferred one-line bootstrap:
 
-```bash
-python scripts/install_relaytic.py
+Windows PowerShell:
+
+```powershell
+.\scripts\bootstrap.ps1 -Profile full -LaunchControlCenter
 ```
 
-That command installs the full local Relaytic stack in editable mode, immediately runs `relaytic doctor` to verify the environment, and on the full profile attempts to provision Relaytic's lightweight local onboarding helper for more forgiving first-contact chat.
+macOS/Linux:
+
+```bash
+bash ./scripts/bootstrap.sh --profile full --launch-control-center
+```
+
+Those wrappers create or reuse a repo-local `.venv`, upgrade `pip`, install Relaytic in editable mode, run `relaytic doctor`, and on the full profile attempt to provision Relaytic's lightweight local onboarding helper for more forgiving first-contact chat.
+
+If you already control the active Python interpreter, you can still call the installer directly:
+
+```bash
+python scripts/install_relaytic.py --profile full --launch-control-center
+```
 
 If you are new after install:
 
@@ -244,6 +258,12 @@ Run the repository leak scan before commits:
 ```bash
 python -m relaytic.ui.cli scan-git-safety
 ```
+
+Imported incumbent model files deserve one extra safety note:
+
+- Relaytic blocks `.pkl` and `.joblib` incumbent model deserialization by default because those formats execute local pickle/joblib payloads.
+- Prefer prediction files or JSON rulesets when sharing incumbents across trust boundaries.
+- Only use `relaytic benchmark run --trust-incumbent-model ...` when you explicitly trust the local file.
 
 ## Interoperability
 

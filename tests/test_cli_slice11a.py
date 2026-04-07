@@ -112,6 +112,7 @@ def test_cli_benchmark_run_supports_imported_incumbents_and_honest_parity(tmp_pa
             "model",
             "--incumbent-name",
             "memorized_incumbent",
+            "--trust-incumbent-model",
             "--overwrite",
             "--format",
             "json",
@@ -206,6 +207,7 @@ def test_cli_autonomy_consumes_unmet_beat_target_contract(tmp_path: Path, capsys
             "model",
             "--incumbent-name",
             "strong_incumbent",
+            "--trust-incumbent-model",
             "--overwrite",
             "--format",
             "json",
@@ -236,6 +238,58 @@ def test_cli_autonomy_consumes_unmet_beat_target_contract(tmp_path: Path, capsys
     assert autonomy_payload["status"] == "ok"
     assert autonomy_payload["autonomy"]["selected_action"] == "expand_challenger_portfolio"
     assert autonomy_payload["bundle"]["autonomy_loop_state"]["selected_action"] == "expand_challenger_portfolio"
+
+
+def test_cli_benchmark_blocks_executable_incumbent_models_by_default(tmp_path: Path, capsys) -> None:
+    run_dir = tmp_path / "incumbent_blocked"
+    data_path = write_public_breast_cancer_dataset(tmp_path / "blocked_breast_cancer.csv")
+
+    assert main(
+        [
+            "run",
+            "--run-dir",
+            str(run_dir),
+            "--data-path",
+            str(data_path),
+            "--text",
+            "Do everything on your own. Classify diagnosis_flag from the provided features and benchmark against strong references.",
+            "--format",
+            "json",
+        ]
+    ) == 0
+    capsys.readouterr()
+
+    plan = json.loads((run_dir / "plan.json").read_text(encoding="utf-8"))
+    model_path = _write_memorized_incumbent_model(
+        path=tmp_path / "blocked_incumbent.pkl",
+        data_path=data_path,
+        plan=plan,
+    )
+
+    assert main(
+        [
+            "benchmark",
+            "run",
+            "--run-dir",
+            str(run_dir),
+            "--data-path",
+            str(data_path),
+            "--incumbent-path",
+            str(model_path),
+            "--incumbent-kind",
+            "model",
+            "--incumbent-name",
+            "blocked_incumbent",
+            "--overwrite",
+            "--format",
+            "json",
+        ]
+    ) == 0
+    blocked_payload = json.loads(capsys.readouterr().out)
+    evaluation = blocked_payload["bundle"]["external_challenger_evaluation"]
+    assert evaluation["status"] == "blocked"
+    assert "unsafe_model_deserialization_blocked" in evaluation["reason_codes"]
+    assert "blocked by default" in evaluation["summary"]
 
 
 def _write_memorized_incumbent_model(

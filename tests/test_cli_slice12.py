@@ -158,6 +158,7 @@ def test_cli_dojo_review_rejects_when_imported_incumbent_is_stronger(tmp_path: P
             "model",
             "--incumbent-name",
             "strong_incumbent",
+            "--trust-incumbent-model",
             "--overwrite",
             "--format",
             "json",

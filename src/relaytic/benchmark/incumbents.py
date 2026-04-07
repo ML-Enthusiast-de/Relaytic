@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import pickle
 from pathlib import Path
 from typing import Any
@@ -26,12 +27,19 @@ from .models import (
     IncumbentParityReport,
 )
 
+TRUST_LOCAL_MODELS_ENV = "RELAYTIC_TRUST_LOCAL_MODELS"
+
+
+class UnsafeIncumbentModelError(ValueError):
+    """Raised when executable incumbent model deserialization is blocked."""
+
 
 def evaluate_incumbent(
     *,
     incumbent_path: str | None,
     incumbent_kind: str | None,
     incumbent_name: str | None,
+    trust_model_deserialization: bool = False,
     controls: BenchmarkControls,
     generated_at: str,
     trace: BenchmarkTrace,
@@ -94,6 +102,7 @@ def evaluate_incumbent(
             evaluation = _evaluate_model_incumbent(
                 path=path,
                 label=label,
+                trust_model_deserialization=trust_model_deserialization,
                 controls=controls,
                 generated_at=generated_at,
                 trace=trace,
@@ -134,6 +143,23 @@ def evaluate_incumbent(
                 feature_columns=feature_columns,
                 target_column=target_column,
             )
+    except UnsafeIncumbentModelError:
+        return _incumbent_error_outputs(
+            controls=controls,
+            generated_at=generated_at,
+            trace=trace,
+            manifest=manifest,
+            comparison_metric=comparison_metric,
+            metric_direction=metric_direction,
+            relaytic_reference=relaytic_reference,
+            status="blocked",
+            reason_codes=["unsafe_model_deserialization_blocked"],
+            summary=(
+                "Relaytic refused to deserialize the imported incumbent model because executable pickle and "
+                "joblib payloads are blocked by default. Use prediction files or rulesets, or rerun with "
+                "`--trust-incumbent-model` only when you trust the file."
+            ),
+        )
     except Exception as exc:
         return _incumbent_error_outputs(
             controls=controls,
@@ -375,6 +401,7 @@ def _evaluate_model_incumbent(
     *,
     path: Path,
     label: str,
+    trust_model_deserialization: bool,
     controls: BenchmarkControls,
     generated_at: str,
     trace: BenchmarkTrace,
@@ -386,7 +413,7 @@ def _evaluate_model_incumbent(
     feature_columns: list[str],
     target_column: str,
 ) -> ExternalChallengerEvaluation:
-    loaded = _load_incumbent_object(path)
+    loaded = _load_incumbent_object(path, trust_model_deserialization=trust_model_deserialization)
     estimator = loaded["estimator"]
     incumbent_features = [item for item in loaded.get("feature_columns", feature_columns) if item in feature_columns]
     if not incumbent_features:
@@ -806,7 +833,9 @@ def _predict_classification_probabilities(estimator: Any, features: np.ndarray, 
     return probabilities
 
 
-def _load_incumbent_object(path: Path) -> dict[str, Any]:
+def _load_incumbent_object(path: Path, *, trust_model_deserialization: bool) -> dict[str, Any]:
+    if not _trust_local_models_enabled(trust_model_deserialization):
+        raise UnsafeIncumbentModelError("Relaytic blocks executable incumbent model deserialization by default.")
     suffix = path.suffix.lower()
     if suffix == ".joblib":
         try:
@@ -825,6 +854,13 @@ def _load_incumbent_object(path: Path) -> dict[str, Any]:
         columns = [str(item) for item in feature_columns] if isinstance(feature_columns, (list, tuple)) else None
         return {"estimator": estimator, "feature_columns": columns}
     return {"estimator": loaded, "feature_columns": None}
+
+
+def _trust_local_models_enabled(trust_model_deserialization: bool) -> bool:
+    if trust_model_deserialization:
+        return True
+    value = str(os.environ.get(TRUST_LOCAL_MODELS_ENV, "")).strip().lower()
+    return value in {"1", "true", "yes", "on"}
 
 
 def _prediction_frame_to_probabilities(

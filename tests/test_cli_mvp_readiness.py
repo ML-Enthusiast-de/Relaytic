@@ -410,3 +410,58 @@ def test_mvp_onboarding_chat_keeps_ready_state_through_off_topic_question_before
     assert output.count("I've started a governed run") == 1
     assert session["created_run_dir"] == str(run_dir)
     assert summary["decision"]["target_column"] == "wine_class"
+
+
+def test_mvp_onboarding_chat_recovers_after_unsupported_file_type_then_valid_dataset(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    output_dir = tmp_path / "mvp_wrong_file_type"
+    run_dir = tmp_path / "mvp_wrong_file_type_run"
+    unsupported_path = tmp_path / "notes.txt"
+    unsupported_path.write_text("this is not structured tabular data", encoding="utf-8")
+    data_path = write_public_diabetes_dataset(tmp_path / "wrong_file_type_diabetes.csv")
+    config_path = tmp_path / "mvp_wrong_file_type_config.yaml"
+    config_path.write_text(
+        "\n".join(
+            [
+                "communication:",
+                f"  adaptive_onboarding_default_run_dir: {run_dir.as_posix()}",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    prompts = iter(
+        [
+            str(unsupported_path),
+            str(data_path),
+            "predict disease_progression",
+            "yes",
+        ]
+    )
+    monkeypatch.setattr("builtins.input", lambda _prompt="": next(prompts))
+
+    assert main(
+        [
+            "mission-control",
+            "chat",
+            "--output-dir",
+            str(output_dir),
+            "--config",
+            str(config_path),
+            "--expected-profile",
+            "full",
+            "--max-turns",
+            "4",
+        ]
+    ) == 0
+    output = capsys.readouterr().out
+    session = json.loads((output_dir / "onboarding_chat_session_state.json").read_text(encoding="utf-8"))
+    summary = json.loads((run_dir / "run_summary.json").read_text(encoding="utf-8"))
+
+    assert "structured dataset path" in output.lower() or "dataset path" in output.lower()
+    assert "I found a dataset path" in output
+    assert session["detected_data_path"] == str(data_path)
+    assert session["created_run_dir"] == str(run_dir)
+    assert summary["decision"]["target_column"] == "disease_progression"

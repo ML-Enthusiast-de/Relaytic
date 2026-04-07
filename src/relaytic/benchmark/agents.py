@@ -56,6 +56,7 @@ def run_benchmark_review(
     incumbent_path: str | None = None,
     incumbent_kind: str | None = None,
     incumbent_name: str | None = None,
+    trust_model_deserialization: bool = False,
 ) -> BenchmarkRunResult:
     controls = build_benchmark_controls_from_policy(policy)
     plan = _bundle_item(planning_bundle, "plan")
@@ -233,6 +234,7 @@ def run_benchmark_review(
         incumbent_path=incumbent_path,
         incumbent_kind=incumbent_kind,
         incumbent_name=incumbent_name,
+        trust_model_deserialization=trust_model_deserialization,
         controls=controls,
         generated_at=generated_at,
         trace=trace,

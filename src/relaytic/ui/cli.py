@@ -1709,6 +1709,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     benchmark_run.add_argument("--incumbent-name", default=None, help="Optional display name for the imported incumbent.")
     benchmark_run.add_argument(
+        "--trust-incumbent-model",
+        action="store_true",
+        help=(
+            "Allow Relaytic to deserialize an imported `.pkl` or `.joblib` incumbent model. "
+            "This executes local pickle/joblib payloads and should only be used for trusted files."
+        ),
+    )
+    benchmark_run.add_argument(
         "--format",
         choices=["human", "json", "both"],
         default="human",
@@ -4077,6 +4085,7 @@ def main(argv: list[str] | None = None) -> int:
                 incumbent_path=args.incumbent_path,
                 incumbent_kind=args.incumbent_kind,
                 incumbent_name=args.incumbent_name,
+                trust_model_deserialization=bool(args.trust_incumbent_model),
             )
         except ValueError as exc:
             parser.error(str(exc))
@@ -9948,6 +9957,7 @@ def _run_benchmark_phase(
     incumbent_path: str | None = None,
     incumbent_kind: str | None = None,
     incumbent_name: str | None = None,
+    trust_model_deserialization: bool = False,
     runtime_surface: str = "cli",
     runtime_command: str | None = None,
 ) -> dict[str, Any]:
@@ -9996,6 +10006,7 @@ def _run_benchmark_phase(
             incumbent_path=incumbent_path,
             incumbent_kind=incumbent_kind,
             incumbent_name=incumbent_name,
+            trust_model_deserialization=trust_model_deserialization,
         )
         written = write_benchmark_bundle(root, bundle=benchmark_result.bundle)
         manifest_path = _refresh_benchmark_manifest(

@@ -30,3 +30,10 @@ Legacy `C2S_*` variables are compatibility-only and should not be introduced in 
 - Do not persist raw secrets into reports or artifacts
 - Do not log auth headers
 - Keep generated outputs in ignored directories unless a sanitized example is intentionally added
+
+## Executable Model Files
+
+- Treat `.pkl` and `.joblib` files as executable local code, not inert model blobs.
+- Relaytic blocks imported incumbent model deserialization by default.
+- Prefer prediction files or JSON rulesets when comparing across trust boundaries.
+- Only use `--trust-incumbent-model` or `RELAYTIC_TRUST_LOCAL_MODELS=1` when you explicitly trust the file and the machine it runs on.

@@ -24,8 +24,10 @@ Treat Relaytic artifacts as the source of truth. Do not replace them with ad hoc
 
 Use this order:
 
+Windows PowerShell:
+
 ```powershell
-python scripts/install_relaytic.py --profile full --format json
+.\scripts\bootstrap.ps1 -Profile full -LaunchControlCenter:$false --format json
 relaytic doctor --expected-profile full --format json
 relaytic mission-control show --output-dir artifacts\mission_control --format json
 relaytic mission-control chat
@@ -33,6 +35,20 @@ relaytic show --run-dir artifacts\demo --format json
 relaytic assist show --run-dir artifacts\demo --format json
 relaytic assist turn --run-dir artifacts\demo --message "what can you do?" --format json
 ```
+
+macOS/Linux:
+
+```bash
+bash ./scripts/bootstrap.sh --profile full --no-launch-control-center --format json
+relaytic doctor --expected-profile full --format json
+relaytic mission-control show --output-dir artifacts/mission_control --format json
+relaytic mission-control chat
+relaytic show --run-dir artifacts/demo --format json
+relaytic assist show --run-dir artifacts/demo --format json
+relaytic assist turn --run-dir artifacts/demo --message "what can you do?" --format json
+```
+
+If you already control the Python interpreter, `python scripts/install_relaytic.py --profile full --format json` remains the direct-install fallback.
 
 If the human is present at first contact, prefer mission-control chat before forcing a perfect `relaytic run` command. The chat now supports path capture, objective capture, `/state`, `/reset`, and explicit confirmation before run creation.
 

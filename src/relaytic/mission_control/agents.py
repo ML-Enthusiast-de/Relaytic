@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from html import escape
@@ -1963,7 +1964,7 @@ def _build_capability_manifest(
                 else "A semantic backend is available for richer optional phrasing."
             ),
             "activation_hint": (
-                "Run `python scripts/install_relaytic.py --profile full --launch-control-center` for the easiest setup, or use `relaytic setup-local-llm --provider llama_cpp --install-provider` if you want to provision the lightweight local semantic helper directly."
+                f"{_bootstrap_install_hint('full')} You can also run `relaytic setup-local-llm --provider llama_cpp --install-provider` if you want to provision the lightweight local semantic helper directly."
                 if semantic_backend_status in {"unknown", "unavailable", "error"}
                 else "Local semantic help is optional; Relaytic still works without it."
             ),
@@ -2731,7 +2732,7 @@ def _build_onboarding_status(
     )
     first_steps = (
         [
-            f"Run `python scripts/install_relaytic.py --profile {expected_profile} --launch-control-center` for the easiest first launch. On the full profile, Relaytic also tries to provision a lightweight local onboarding model for human-friendly chat.",
+            f"{_bootstrap_install_hint(expected_profile)} On the full profile, Relaytic also tries to provision a lightweight local onboarding model for human-friendly chat.",
             "Point Relaytic to data with `relaytic run --run-dir artifacts\\demo --data-path <data.csv> --text \"Describe the goal here.\"` if you already know you want the full governed modeling path.",
             "If you only want a quick analysis first, use mission-control chat and say things like `analyze this data`, `give me the top 3 signals`, or `run a correlation analysis` after you paste the dataset path.",
             "If you want to inspect a source first, run `relaytic source inspect --source-path <path>`.",
@@ -2803,11 +2804,12 @@ def _build_onboarding_status(
         ]
     )
     commands = [
-        f"python scripts/install_relaytic.py --profile {expected_profile} --launch-control-center",
+        _windows_bootstrap_command(expected_profile),
+        _posix_bootstrap_command(expected_profile),
         f"relaytic doctor --expected-profile {expected_profile} --format json",
         (f"relaytic mission-control launch --run-dir {run_dir}" if run_dir is not None else f"relaytic mission-control launch --output-dir {root_dir}"),
         live_chat_command,
-        f"Get-Content {_demo_guide_path()}",
+        f"Open {_demo_guide_path()}",
         (f"relaytic assist show --run-dir {run_dir}" if run_dir is not None else "relaytic assist show --run-dir <run_dir>"),
         (f"relaytic assist turn --run-dir {run_dir} --message \"what can you do?\"" if run_dir is not None else "relaytic assist turn --run-dir <run_dir> --message \"what can you do?\""),
     ]
@@ -2970,7 +2972,7 @@ def _build_install_experience_report(
     run_dir: Path | None,
     root_dir: Path,
 ) -> InstallExperienceReport:
-    install_command = f"python scripts/install_relaytic.py --profile {expected_profile} --launch-control-center"
+    install_command = _default_bootstrap_command(expected_profile)
     doctor_command = f"relaytic doctor --expected-profile {expected_profile} --format json"
     launch_command = f"relaytic mission-control launch --run-dir {run_dir}" if run_dir is not None else f"relaytic mission-control launch --output-dir {root_dir}"
     return InstallExperienceReport(
@@ -2986,11 +2988,12 @@ def _build_install_experience_report(
         doctor_status=str(doctor_report.get("status", "")).strip() or "unknown",
         package_installed=bool(doctor_report.get("package", {}).get("installed")),
         next_steps=[
+            f"Bootstrap Relaytic with `{_windows_bootstrap_command(expected_profile)}` on Windows or `{_posix_bootstrap_command(expected_profile)}` on macOS/Linux.",
             "Verify dependency health with Relaytic doctor.",
-            "Launch the local control center from one command.",
+            "Launch the local control center from the same bootstrap flow or via mission-control launch.",
             "Use the same mission-control state through UI, CLI, or MCP.",
         ],
-        summary="Relaytic now has one documented bootstrap path that ends in verification plus a launchable local control center.",
+        summary="Relaytic now has documented Windows and macOS/Linux bootstrap wrappers that end in verification plus a launchable local control center.",
         trace=trace,
     )
 
@@ -3939,6 +3942,35 @@ def _is_onboarding_state(summary_payload: dict[str, Any]) -> bool:
 def _example_run_command(run_dir: str | None) -> str:
     target_run_dir = _clean_text(run_dir) or r"artifacts\demo"
     return f'relaytic run --run-dir {target_run_dir} --data-path <data.csv> --text "Describe the goal here."'
+
+
+def _windows_bootstrap_command(expected_profile: str, *, launch_control_center: bool = True) -> str:
+    launch_flag = " -LaunchControlCenter" if launch_control_center else ""
+    return f".\\scripts\\bootstrap.ps1 -Profile {expected_profile}{launch_flag}"
+
+
+def _posix_bootstrap_command(expected_profile: str, *, launch_control_center: bool = True) -> str:
+    launch_flag = " --launch-control-center" if launch_control_center else ""
+    return f"bash ./scripts/bootstrap.sh --profile {expected_profile}{launch_flag}"
+
+
+def _direct_install_command(expected_profile: str, *, launch_control_center: bool = True) -> str:
+    launch_flag = " --launch-control-center" if launch_control_center else ""
+    return f"python scripts/install_relaytic.py --profile {expected_profile}{launch_flag}"
+
+
+def _bootstrap_install_hint(expected_profile: str) -> str:
+    return (
+        f"Use `{_windows_bootstrap_command(expected_profile)}` on Windows or "
+        f"`{_posix_bootstrap_command(expected_profile)}` on macOS/Linux. "
+        f"If you already control the Python interpreter, `{_direct_install_command(expected_profile)}` still works."
+    )
+
+
+def _default_bootstrap_command(expected_profile: str, *, launch_control_center: bool = True) -> str:
+    if os.name == "nt":
+        return _windows_bootstrap_command(expected_profile, launch_control_center=launch_control_center)
+    return _posix_bootstrap_command(expected_profile, launch_control_center=launch_control_center)
 
 
 def _display_run_dir(summary_payload: dict[str, Any]) -> str:

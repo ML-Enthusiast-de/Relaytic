@@ -10,6 +10,9 @@ import subprocess
 import sys
 from typing import Any
 
+MINIMUM_PYTHON = (3, 10)
+REEXEC_MARKER = "RELAYTIC_INSTALL_NO_REEXEC"
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Install Relaytic, verify the environment, and optionally launch mission control.")
@@ -29,9 +32,24 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    cli_args = list(argv) if argv is not None else list(sys.argv[1:])
     parser = build_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args(cli_args)
     repo_root = Path(__file__).resolve().parents[1]
+    delegated = _preferred_repo_python(repo_root=repo_root, current_executable=Path(sys.executable))
+    if delegated is not None:
+        return _delegate_to_repo_python(
+            python_path=delegated,
+            repo_root=repo_root,
+            cli_args=cli_args,
+            format_name=args.format,
+        )
+    if not _python_version_supported():
+        return _emit_python_version_error(
+            format_name=args.format,
+            profile=args.profile,
+            expected_profile=args.expected_profile or ("core" if args.profile == "core" and args.extras is None else "full"),
+        )
     relaytic_env = _relaytic_env(repo_root)
     extras = args.extras if args.extras is not None else _extras_for_profile(args.profile)
     expected_profile = args.expected_profile or ("core" if args.profile == "core" and args.extras is None else "full")
@@ -64,6 +82,31 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write(doctor.stdout)
         sys.stderr.write(doctor.stderr)
     if doctor.returncode != 0:
+        if args.format == "json":
+            payload: dict[str, Any] = {
+                "status": "error",
+                "install": {
+                    "skip_install": bool(args.skip_install),
+                    "profile": args.profile,
+                    "extras": extras or "",
+                    "expected_profile": expected_profile,
+                    "mission_control_requested": bool(args.launch_control_center),
+                    "onboarding_llm_requested": False,
+                },
+                "doctor": _parse_json_payload(doctor.stdout),
+                "next_steps": _recommended_next_steps(repo_root, expected_profile),
+            }
+            sys.stdout.write(json.dumps(payload, indent=2, ensure_ascii=False))
+            sys.stdout.write("\n")
+            if doctor.stderr:
+                sys.stderr.write(doctor.stderr)
+        elif doctor.stderr:
+            sys.stderr.write(
+                "\nRelaytic bootstrap could not verify this Python environment. "
+                "Use the repo-local bootstrap command below so Relaytic runs inside a dedicated virtual environment.\n"
+            )
+            for command in _recommended_next_steps(repo_root, expected_profile):
+                sys.stderr.write(f"- {command}\n")
         return int(doctor.returncode)
 
     llm_payload: dict[str, Any] | None = None
@@ -193,6 +236,105 @@ def _relaytic_env(repo_root: Path) -> dict[str, str]:
     current = env.get("PYTHONPATH", "")
     env["PYTHONPATH"] = src_dir if not current else src_dir + os.pathsep + current
     return env
+
+
+def _python_version_supported(version_info: Any | None = None) -> bool:
+    current = version_info or sys.version_info
+    major = int(getattr(current, "major", current[0]))
+    minor = int(getattr(current, "minor", current[1]))
+    return (major, minor) >= MINIMUM_PYTHON
+
+
+def _repo_venv_python(repo_root: Path) -> Path | None:
+    candidates = [
+        repo_root / ".venv" / "Scripts" / "python.exe",
+        repo_root / ".venv" / "bin" / "python",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def _preferred_repo_python(*, repo_root: Path, current_executable: Path) -> Path | None:
+    if os.environ.get(REEXEC_MARKER) == "1":
+        return None
+    preferred = _repo_venv_python(repo_root)
+    if preferred is None:
+        return None
+    try:
+        current_resolved = current_executable.resolve()
+    except OSError:
+        current_resolved = current_executable
+    try:
+        preferred_resolved = preferred.resolve()
+    except OSError:
+        preferred_resolved = preferred
+    if current_resolved == preferred_resolved:
+        return None
+    return preferred
+
+
+def _delegate_to_repo_python(
+    *,
+    python_path: Path,
+    repo_root: Path,
+    cli_args: list[str],
+    format_name: str,
+) -> int:
+    if format_name != "json":
+        sys.stderr.write(
+            f"Relaytic bootstrap found the repo-local environment at `{python_path}` and is switching to it.\n"
+        )
+    command = [str(python_path), str(Path(__file__).resolve()), *cli_args]
+    env = os.environ.copy()
+    env[REEXEC_MARKER] = "1"
+    completed = subprocess.run(command, cwd=repo_root, env=env, check=False)
+    return int(completed.returncode)
+
+
+def _recommended_next_steps(repo_root: Path, expected_profile: str) -> list[str]:
+    windows = ".\\scripts\\bootstrap.ps1"
+    unix = "bash ./scripts/bootstrap.sh"
+    return [
+        f"Windows PowerShell: {windows} -Profile {expected_profile} -LaunchControlCenter",
+        f"macOS/Linux: {unix} --profile {expected_profile} --launch-control-center",
+        f"Direct doctor after install: relaytic doctor --expected-profile {expected_profile} --format json",
+    ]
+
+
+def _emit_python_version_error(*, format_name: str, profile: str, expected_profile: str) -> int:
+    message = (
+        f"Relaytic requires Python {MINIMUM_PYTHON[0]}.{MINIMUM_PYTHON[1]}+ but this interpreter is "
+        f"{sys.version_info.major}.{sys.version_info.minor}. Use the repo bootstrap script so Relaytic can create "
+        "or reuse a dedicated virtual environment."
+    )
+    if format_name == "json":
+        payload = {
+            "status": "error",
+            "install": {
+                "skip_install": False,
+                "profile": profile,
+                "expected_profile": expected_profile,
+                "mission_control_requested": False,
+            },
+            "python": {
+                "version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+                "compatible": False,
+            },
+            "error": {
+                "code": "python_version_unsupported",
+                "message": message,
+            },
+            "next_steps": _recommended_next_steps(Path(__file__).resolve().parents[1], expected_profile),
+        }
+        sys.stdout.write(json.dumps(payload, indent=2, ensure_ascii=False))
+        sys.stdout.write("\n")
+    else:
+        sys.stderr.write(message + "\n")
+        for command in _recommended_next_steps(Path(__file__).resolve().parents[1], expected_profile):
+            sys.stderr.write(f"- {command}\n")
+    return 2
 
 
 def _parse_json_payload(raw: str) -> dict[str, Any]:

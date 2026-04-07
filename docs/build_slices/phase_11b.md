@@ -97,6 +97,6 @@ The implemented surface now includes:
 
 - `relaytic mission-control show`
 - `relaytic mission-control launch`
-- `python scripts/install_relaytic.py --launch-control-center`
+- `.\scripts\bootstrap.ps1 -Profile full -LaunchControlCenter` on Windows, or `bash ./scripts/bootstrap.sh --profile full --launch-control-center` on macOS/Linux
 - MCP-visible inspection through `relaytic_show_mission_control`
 - shared persisted artifacts for onboarding state, review queue, launch metadata, demo-session state, and a static local HTML report

@@ -25,8 +25,16 @@ Any small local CSV, TSV, Excel, Parquet, JSON, JSONL, or NDJSON file is enough 
 
 ### 1. Verify The Local Environment
 
+Windows PowerShell:
+
 ```powershell
-python scripts/install_relaytic.py --profile full --launch-control-center
+.\scripts\bootstrap.ps1 -Profile full -LaunchControlCenter
+```
+
+macOS/Linux:
+
+```bash
+bash ./scripts/bootstrap.sh --profile full --launch-control-center
 ```
 
 What to say:

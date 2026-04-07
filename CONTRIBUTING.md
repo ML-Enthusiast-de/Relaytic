@@ -2,6 +2,11 @@
 
 ## Development Setup
 
+Fastest local bootstrap:
+
+- Windows PowerShell: `.\scripts\bootstrap.ps1 -Profile full`
+- macOS/Linux: `bash ./scripts/bootstrap.sh --profile full`
+
 1. Create a virtual environment.
    - Windows: `py -3.11 -m venv .venv`
    - macOS/Linux: `python3 -m venv .venv`
@@ -28,6 +33,7 @@ Confirm that `data/private/`, `reports/`, `artifacts/`, `models/`, `.env*`, and 
 - Do not commit secrets, machine-specific paths, private datasets, local environments, or generated credentials.
 - Do not introduce new `corr2surrogate` branding into the repository.
 - Track compatibility shims explicitly in `MIGRATION_MAP.md` and remove them deliberately.
+- Do not deserialize untrusted `.pkl` or `.joblib` model files; imported incumbent models require explicit trust.
 
 ## PR Expectations
 
