@@ -168,11 +168,17 @@ def _infer_task_profile(
     anomaly_named = any(token in name_lower for token in _ANOMALY_KEYWORDS)
     discrete_threshold = max(3, min(16, int(round(math.sqrt(row_count) * 0.6))))
     small_class_limit = max(3, min(8, int(round(math.sqrt(row_count)))))
+    string_label_like = (
+        numeric_ratio <= 0.1
+        and class_count >= 2
+        and class_count <= max(discrete_threshold, 12)
+        and class_count < row_count
+    )
     classification_like = bool_like or (
         integer_like
         and class_count <= discrete_threshold
         and (distinct_ratio <= 0.12 or class_count <= small_class_limit)
-    )
+    ) or string_label_like
 
     if class_count == 2 and classification_like:
         task_type = "binary_classification"

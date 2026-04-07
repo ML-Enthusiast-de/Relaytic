@@ -33,14 +33,52 @@ def _sample_frame(
     if max_rows is None or len(frame) <= max_rows:
         return frame.reset_index(drop=True)
     if stratify:
-        groups = []
-        grouped = frame.groupby(target_column, group_keys=False)
-        for _, part in grouped:
+        grouped_parts = [(key, part.copy()) for key, part in frame.groupby(target_column, group_keys=False)]
+        requested = min(max_rows, len(frame))
+        allocations: dict[object, int] = {}
+        remainders: list[tuple[float, object]] = []
+        for key, part in grouped_parts:
             share = len(part) / len(frame)
-            take = max(1, int(round(max_rows * share)))
-            groups.append(part.sample(n=min(take, len(part)), random_state=42))
+            raw_take = requested * share
+            base_take = int(raw_take)
+            if requested >= len(grouped_parts):
+                base_take = max(1, base_take)
+            base_take = min(base_take, len(part))
+            allocations[key] = base_take
+            remainders.append((raw_take - int(raw_take), key))
+
+        allocated = sum(allocations.values())
+        if allocated > requested:
+            overflow = allocated - requested
+            for _, key in sorted(remainders):
+                if overflow <= 0:
+                    break
+                if allocations[key] > 1:
+                    allocations[key] -= 1
+                    overflow -= 1
+
+        remaining = requested - sum(allocations.values())
+        while remaining > 0:
+            progress = False
+            for _, key in sorted(remainders, reverse=True):
+                part = next(part for current_key, part in grouped_parts if current_key == key)
+                if allocations[key] >= len(part):
+                    continue
+                allocations[key] += 1
+                remaining -= 1
+                progress = True
+                if remaining <= 0:
+                    break
+            if not progress:
+                break
+
+        groups = [
+            part.sample(n=allocations[key], random_state=42)
+            for key, part in grouped_parts
+            if allocations[key] > 0
+        ]
         sampled = pd.concat(groups, axis=0).sample(frac=1.0, random_state=42)
-        return sampled.head(max_rows).reset_index(drop=True)
+        return sampled.reset_index(drop=True)
     return frame.sample(n=max_rows, random_state=42).reset_index(drop=True)
 
 

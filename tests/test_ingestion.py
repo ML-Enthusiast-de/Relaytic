@@ -66,6 +66,21 @@ def test_infer_header_prefers_dense_signal_row_over_sparse_description_row() -> 
     assert inferred.header_row == 0
 
 
+def test_infer_header_keeps_first_dense_mixed_type_row_as_data() -> None:
+    raw = pd.DataFrame(
+        [
+            ["age", "job", "marital", "balance", "housing", "target"],
+            [41, "admin.", "married", 1200, "yes", "no"],
+            [32, "technician", "single", 850, "no", "yes"],
+        ]
+    )
+
+    inferred = _infer_header_and_data_start(raw, raw, confidence_threshold=0.70)
+
+    assert inferred.header_row == 0
+    assert inferred.data_start_row == 1
+
+
 def test_load_tabular_data_parquet_uses_schema_bearing_columns(tmp_path) -> None:
     parquet_path = tmp_path / "signals.parquet"
     frame = pd.DataFrame(

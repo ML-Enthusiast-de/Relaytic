@@ -108,7 +108,13 @@ def run_inference_from_artifacts(
     _require_columns(frame=frame, columns=feature_columns)
 
     preprocessing_info = _extract_preprocessing_info(model_params=model_params)
-    prepared = _prepare_inference_frame(frame=frame, target_column=target_column, preprocessing_info=preprocessing_info)
+    task_type = "binary_classification" if resolved["model_name"] in _CLASSIFICATION_MODEL_NAMES else "regression"
+    prepared = _prepare_inference_frame(
+        frame=frame,
+        target_column=target_column,
+        preprocessing_info=preprocessing_info,
+        task_type=task_type,
+    )
     prepared_frame = prepared["frame"]
     raw_prepared_frame = prepared["raw_frame"]
     model_feature_columns = [str(item) for item in prepared["model_feature_columns"] if str(item).strip()]
@@ -348,6 +354,7 @@ def _prepare_inference_frame(
     frame: pd.DataFrame,
     target_column: str,
     preprocessing_info: dict[str, Any],
+    task_type: str,
 ) -> dict[str, Any]:
     preprocessing = dict(preprocessing_info.get("preprocessing", {}))
     if preprocessing.get("raw_feature_columns") and preprocessing.get("model_feature_columns"):
@@ -355,6 +362,7 @@ def _prepare_inference_frame(
             frame=frame,
             target_column=target_column,
             preprocessing=preprocessing,
+            task_type=task_type,
         )
 
     raw_feature_columns = [str(item) for item in preprocessing.get("raw_feature_columns", []) if str(item).strip()]

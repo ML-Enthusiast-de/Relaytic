@@ -359,7 +359,12 @@ def _infer_data_start_row(raw: pd.DataFrame, *, start_at: int) -> int:
         if non_null.empty:
             continue
         values = [str(v).strip() for v in non_null.tolist()]
+        density = len(values) / max(len(row), 1)
         numeric_ratio = sum(_looks_numeric(v) for v in values) / len(values)
+        unique_ratio = len(set(values)) / len(values)
+        average_length = sum(len(v) for v in values) / len(values)
+        if density >= 0.6 and (numeric_ratio >= 0.3 or unique_ratio >= 0.5) and average_length <= 24:
+            return idx
         if numeric_ratio >= 0.5:
             return idx
     return start_at

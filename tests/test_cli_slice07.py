@@ -2,6 +2,7 @@ import csv
 import json
 from pathlib import Path
 
+import relaytic.ui.cli as cli_module
 from relaytic.ui.cli import main
 
 
@@ -95,6 +96,51 @@ def test_cli_status_and_completion_review_surfaces_are_machine_readable(tmp_path
     assert review_payload["status"] == "ok"
     assert review_payload["completion"]["action"]
     assert review_payload["bundle"]["next_action_queue"]["actions"]
+
+
+def test_cli_completion_review_reuses_existing_stage_artifacts(tmp_path: Path, capsys, monkeypatch) -> None:
+    run_dir = tmp_path / "run_slice07_cached_completion"
+    data_path = _write_dataset(tmp_path / "slice07_cached_completion.csv")
+
+    assert main(
+        [
+            "run",
+            "--run-dir",
+            str(run_dir),
+            "--data-path",
+            str(data_path),
+            "--text",
+            "Do everything on your own. Predict failure_flag. Do not use future_failure_flag or post_inspection_flag.",
+            "--format",
+            "json",
+        ]
+    ) == 0
+    capsys.readouterr()
+
+    def _unexpected_rerun(*args: object, **kwargs: object) -> None:
+        raise AssertionError("completion review should reuse existing stage artifacts for completed runs")
+
+    monkeypatch.setattr(cli_module, "_run_memory_phase", _unexpected_rerun)
+    monkeypatch.setattr(cli_module, "_run_intelligence_phase", _unexpected_rerun)
+    monkeypatch.setattr(cli_module, "_run_research_phase", _unexpected_rerun)
+    monkeypatch.setattr(cli_module, "_run_benchmark_phase", _unexpected_rerun)
+    monkeypatch.setattr(cli_module, "_run_profiles_phase", _unexpected_rerun)
+    monkeypatch.setattr(cli_module, "_run_decision_phase", _unexpected_rerun)
+
+    assert main(
+        [
+            "completion",
+            "review",
+            "--run-dir",
+            str(run_dir),
+            "--overwrite",
+            "--format",
+            "json",
+        ]
+    ) == 0
+    review_payload = json.loads(capsys.readouterr().out)
+    assert review_payload["status"] == "ok"
+    assert review_payload["completion"]["current_stage"] == "completion_reviewed"
 
 
 def test_cli_show_human_output_includes_completion_section(tmp_path: Path, capsys) -> None:

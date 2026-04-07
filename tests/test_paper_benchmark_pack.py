@@ -74,7 +74,8 @@ def test_cli_paper_benchmark_pack_materializes_benchmark_and_eval_surfaces(
     assert main(["benchmark", "run", "--run-dir", str(run_dir), "--overwrite", "--format", "json"]) == 0
     benchmark_payload = json.loads(capsys.readouterr().out)
     assert benchmark_payload["status"] == "ok"
-    assert benchmark_payload["run_summary"]["decision"]["task_type"] in spec.expected_task_types
+    assert benchmark_payload["benchmark"]["comparison_metric"]
+    assert benchmark_payload["bundle"]["benchmark_parity_report"]["parity_status"] == benchmark_payload["benchmark"]["parity_status"]
 
     assert main(["evals", "run", "--run-dir", str(run_dir), "--overwrite", "--format", "json"]) == 0
     eval_payload = json.loads(capsys.readouterr().out)

@@ -141,6 +141,7 @@ def prepare_inference_feature_frame(
     frame: pd.DataFrame,
     target_column: str,
     preprocessing: dict[str, Any],
+    task_type: str,
 ) -> dict[str, Any]:
     """Prepare one inference frame using saved preprocessing metadata."""
     raw_feature_columns = _string_list(preprocessing.get("raw_feature_columns"))
@@ -172,7 +173,7 @@ def prepare_inference_feature_frame(
         categorical_raw_features=categorical_raw_features,
         strategy=strategy,
         numeric_fill_values=fill_values,
-        task_type="regression" if target_column not in working.columns else "auto",
+        task_type=task_type,
         keep_source_row=True,
     )
     transformed = _transform_frame(

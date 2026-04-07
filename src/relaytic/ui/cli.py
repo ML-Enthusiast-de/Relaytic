@@ -11346,65 +11346,81 @@ def _run_completion_phase(
     evidence_bundle = _read_json_bundle(root, bundle="evidence")
     if not evidence_bundle:
         raise ValueError(f"Slice 07 completion requires Slice 06 evidence artifacts in {root}.")
-    _run_memory_phase(
-        run_dir=root,
-        data_path=_resolve_run_data_path(root),
-        config_path=config_path,
-        run_id=run_id,
-        labels=labels,
-        search_roots=None,
-        runtime_surface=runtime_surface,
-        runtime_command=runtime_command,
-    )
-    _run_intelligence_phase(
-        run_dir=root,
-        config_path=config_path,
-        run_id=run_id,
-        overwrite=overwrite,
-        labels=labels,
-        runtime_surface=runtime_surface,
-        runtime_command=runtime_command,
-    )
-    _run_research_phase(
-        run_dir=root,
-        config_path=config_path,
-        run_id=run_id,
-        overwrite=overwrite,
-        labels=labels,
-        runtime_surface=runtime_surface,
-        runtime_command=runtime_command,
-    )
+    memory_bundle = _read_json_bundle(root, bundle="memory")
+    if not memory_bundle:
+        _run_memory_phase(
+            run_dir=root,
+            data_path=_resolve_run_data_path(root),
+            config_path=config_path,
+            run_id=run_id,
+            labels=labels,
+            search_roots=None,
+            runtime_surface=runtime_surface,
+            runtime_command=runtime_command,
+        )
+        memory_bundle = _read_json_bundle(root, bundle="memory")
+    intelligence_bundle = _read_json_bundle(root, bundle="intelligence")
+    if not intelligence_bundle:
+        _run_intelligence_phase(
+            run_dir=root,
+            config_path=config_path,
+            run_id=run_id,
+            overwrite=overwrite,
+            labels=labels,
+            runtime_surface=runtime_surface,
+            runtime_command=runtime_command,
+        )
+        intelligence_bundle = _read_json_bundle(root, bundle="intelligence")
+    research_bundle = _read_json_bundle(root, bundle="research")
+    if not research_bundle:
+        _run_research_phase(
+            run_dir=root,
+            config_path=config_path,
+            run_id=run_id,
+            overwrite=overwrite,
+            labels=labels,
+            runtime_surface=runtime_surface,
+            runtime_command=runtime_command,
+        )
+        research_bundle = _read_json_bundle(root, bundle="research")
     incumbent_config = _resolve_existing_incumbent_config(root)
-    _run_benchmark_phase(
-        run_dir=root,
-        data_path=_resolve_run_data_path(root),
-        config_path=config_path,
-        run_id=run_id,
-        overwrite=overwrite,
-        labels=labels,
-        incumbent_path=incumbent_config.get("incumbent_path"),
-        incumbent_kind=incumbent_config.get("incumbent_kind"),
-        incumbent_name=incumbent_config.get("incumbent_name"),
-        runtime_surface=runtime_surface,
-        runtime_command=runtime_command,
-    )
-    _run_profiles_phase(
-        run_dir=root,
-        config_path=config_path,
-        run_id=run_id,
-        labels=labels,
-        runtime_surface=runtime_surface,
-        runtime_command=runtime_command,
-    )
-    _run_decision_phase(
-        run_dir=root,
-        config_path=config_path,
-        run_id=run_id,
-        overwrite=overwrite,
-        labels=labels,
-        runtime_surface=runtime_surface,
-        runtime_command=runtime_command,
-    )
+    benchmark_bundle = _read_json_bundle(root, bundle="benchmark")
+    if not benchmark_bundle:
+        _run_benchmark_phase(
+            run_dir=root,
+            data_path=_resolve_run_data_path(root),
+            config_path=config_path,
+            run_id=run_id,
+            overwrite=overwrite,
+            labels=labels,
+            incumbent_path=incumbent_config.get("incumbent_path"),
+            incumbent_kind=incumbent_config.get("incumbent_kind"),
+            incumbent_name=incumbent_config.get("incumbent_name"),
+            runtime_surface=runtime_surface,
+            runtime_command=runtime_command,
+        )
+        benchmark_bundle = _read_json_bundle(root, bundle="benchmark")
+    profiles_bundle = _read_json_bundle(root, bundle="profiles")
+    if not profiles_bundle:
+        _run_profiles_phase(
+            run_dir=root,
+            config_path=config_path,
+            run_id=run_id,
+            labels=labels,
+            runtime_surface=runtime_surface,
+            runtime_command=runtime_command,
+        )
+    decision_bundle = _read_json_bundle(root, bundle="decision")
+    if not decision_bundle:
+        _run_decision_phase(
+            run_dir=root,
+            config_path=config_path,
+            run_id=run_id,
+            overwrite=overwrite,
+            labels=labels,
+            runtime_surface=runtime_surface,
+            runtime_command=runtime_command,
+        )
     runtime_token = _runtime_stage_token(
         run_dir=root,
         policy=foundation_state["resolved"].policy,
@@ -11437,10 +11453,10 @@ def _run_completion_phase(
             investigation_bundle=_read_json_bundle(root, bundle="investigation"),
             planning_bundle=_read_json_bundle(root, bundle="planning"),
             evidence_bundle=evidence_bundle,
-            memory_bundle=_read_json_bundle(root, bundle="memory"),
-            research_bundle=_read_json_bundle(root, bundle="research"),
-            benchmark_bundle=_read_json_bundle(root, bundle="benchmark"),
-            intelligence_bundle=_read_json_bundle(root, bundle="intelligence"),
+            memory_bundle=memory_bundle,
+            research_bundle=research_bundle,
+            benchmark_bundle=benchmark_bundle,
+            intelligence_bundle=intelligence_bundle,
             config_path=config_path,
         )
         written = write_completion_bundle(root, bundle=completion_result.bundle)

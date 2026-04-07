@@ -50,6 +50,25 @@ def _write_multiclass_dataset(path: Path) -> Path:
     return path
 
 
+def _write_string_multiclass_dataset(path: Path) -> Path:
+    rows = [
+        ["area", "roundness", "bean_class"],
+        [0.1, 1.2, "CALI"],
+        [0.2, 1.1, "CALI"],
+        [0.3, 1.0, "CALI"],
+        [1.1, 2.2, "SIRA"],
+        [1.2, 2.1, "SIRA"],
+        [1.3, 2.0, "SIRA"],
+        [2.1, 3.2, "DERMASON"],
+        [2.2, 3.1, "DERMASON"],
+        [2.3, 3.0, "DERMASON"],
+    ]
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerows(rows)
+    return path
+
+
 def _build_foundation(policy: dict) -> tuple[dict, dict]:
     mandate_controls = build_mandate_controls_from_policy(policy)
     context_controls = build_context_controls_from_policy(policy)
@@ -193,6 +212,26 @@ def test_run_intake_interpretation_uses_dataset_evidence_for_multiclass_targets(
     )
 
     assert resolution.task_brief.target_column == "wine_class"
+    assert resolution.task_brief.task_type_hint == "multiclass_classification"
+
+
+def test_run_intake_interpretation_uses_dataset_evidence_for_string_multiclass_targets(tmp_path: Path) -> None:
+    data_path = _write_string_multiclass_dataset(tmp_path / "string_multiclass_intake.csv")
+    policy = load_policy().policy
+    mandate_bundle, context_bundle = _build_foundation(policy)
+
+    resolution = run_intake_interpretation(
+        message="Classify bean_class from the morphology columns. Do everything on your own.",
+        actor_type="user",
+        actor_name="operator_string_multi",
+        channel="cli",
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        data_path=str(data_path),
+    )
+
+    assert resolution.task_brief.target_column == "bean_class"
     assert resolution.task_brief.task_type_hint == "multiclass_classification"
 
 

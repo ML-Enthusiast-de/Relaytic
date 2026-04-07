@@ -58,6 +58,38 @@ def test_assess_task_profile_detects_multiclass_classification() -> None:
     assert profile.task_family == "classification"
 
 
+def test_assess_task_profile_detects_string_multiclass_classification() -> None:
+    frame = pd.DataFrame(
+        {
+            "feature_a": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
+            "bean_class": ["CALI", "SIRA", "DERMASON", "CALI", "SIRA", "DERMASON", "BOMBAY"],
+        }
+    )
+    profile = assess_task_profile(
+        frame=frame,
+        target_column="bean_class",
+        data_mode="steady_state",
+    )
+    assert profile.task_type == "multiclass_classification"
+    assert profile.task_family == "classification"
+
+
+def test_assess_task_profile_detects_string_binary_classification() -> None:
+    frame = pd.DataFrame(
+        {
+            "feature_a": [0.1, 0.2, 0.3, 0.4],
+            "review_outcome": ["approve", "reject", "approve", "reject"],
+        }
+    )
+    profile = assess_task_profile(
+        frame=frame,
+        target_column="review_outcome",
+        data_mode="steady_state",
+    )
+    assert profile.task_type == "binary_classification"
+    assert profile.task_family == "classification"
+
+
 def test_assess_task_profile_respects_override() -> None:
     frame = pd.DataFrame(
         {
