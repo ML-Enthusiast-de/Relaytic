@@ -17,6 +17,8 @@ Intended package boundaries:
 
 Slice 16 is the future umbrella track where Relaytic learns new non-core capabilities without turning into an uncontrolled self-modifying system.
 
+It should start only after the model-competitiveness track in Slices 15A through 15F has strengthened task semantics, architecture routing, HPO depth, benchmark rigor, artifact reuse, and model-family shadow testing.
+
 This is not a single coding pass. It is a governed program delivered through:
 
 - Slice 16A capability registry and capability cards

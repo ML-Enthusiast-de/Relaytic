@@ -28,6 +28,33 @@ The first version of the pack intentionally favors:
 - scikit-learn bundled datasets for deterministic local sanity checks
 - mixed-type and imbalanced datasets, not just perfectly clean toy tables
 
+## Scientific positioning
+
+This pack is good enough for:
+
+- a systems paper benchmark section
+- an agent-for-tabular-data paper where the main claim is reliability, governance, continuity, or operator experience
+- a paper that includes modeling competitiveness as one part of the story instead of claiming pure tabular SOTA
+
+This pack is not enough by itself for:
+
+- a strong claim that Relaytic is state of the art across tabular modeling
+- a claim that Relaytic matches the strongest modern benchmark suites used in pure model papers
+
+Reason:
+
+- the current pack is public, citable, diverse, and reproducible
+- but many datasets are still small to medium classical benchmarks rather than a broad modern benchmark suite
+- it does not yet include a larger OpenML-style benchmark suite, a dedicated time-aware suite, or a stronger public fraud benchmark
+
+So the correct scientific claim today is:
+
+- the pack is legitimate and paper-acceptable
+- it is strong enough for a credible first benchmark section
+- it should later be expanded before making stronger modeling-dominance claims
+
+The dedicated future time-aware benchmark track is specified separately in [temporal_benchmark_pack.md](temporal_benchmark_pack.md).
+
 ## Dataset matrix
 
 ### Regression
@@ -207,3 +234,4 @@ Examples of plausible later additions:
 - a public, ungated credit-card fraud benchmark if we decide the licensing and fetch path are stable enough
 - a larger multiclass benchmark beyond Dry Bean
 - a truly time-aware benchmark once we decide to make time-series evaluation part of the main paper thesis
+- a broader OpenML-style benchmark expansion once we are ready for a more expensive paper-grade comparison suite

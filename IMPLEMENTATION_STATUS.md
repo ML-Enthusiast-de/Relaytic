@@ -5,7 +5,7 @@ This document tracks the operational state of the repository. It is an implement
 ## Current Baseline
 
 - completed slices: 00 through 15, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, Slice 13A release safety, build attestation, and packaging discipline, Slice 13B event bus, runtime hooks, and visible permission modes, Slice 13C bounded daemon, resumable jobs, stale-job reporting, approval-aware background execution, and memory maintenance, Slice 14 real-world feasibility, domain constraints, action boundaries, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, and Slice 15 mission-control expansion, demo packs, release-health posture, and human-factors proof
-- next recommended slice: 16A, capability registry and capability cards
+- next recommended slice: 15A, canonical task contracts, rare-event taxonomy cleanup, and benchmark-vs-deploy separation
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - latest handoff-and-learnings slice: 12D, workspace-first continuity, result contracts, governed learnings migration, and explicit iteration planning
 - latest workspace-and-search slice: 13, search controller, bounded branch widening, and execution-strategy selection
@@ -14,10 +14,13 @@ This document tracks the operational state of the repository. It is an implement
 - latest background-and-resume slice: 13C, bounded daemon, resumable jobs, and memory maintenance
 - latest mission-control-and-proof slice: 15, branch-aware operator surfaces, demo packs, release-health posture, and onboarding-success evaluation
 - latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, broader human-chaos coverage, and a prepared paper-grade benchmark/eval pack
-- next planned academy follow-on after Slice 15: 16A, capability registry and capability cards
+- next planned model-competitiveness follow-on after Slice 15: 15A, canonical task contracts, rare-event taxonomy cleanup, and benchmark-vs-deploy separation
+- next planned academy follow-on after Slice 15F: 16A, capability registry and capability cards
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 - canonical future product-contract pack written under `docs/specs/` for workspace lifecycle, result contracts, governed learnings, mission-control behavior, compatibility migration, testing/proof burden, and flagship demos
+- canonical future model-competitiveness contract written under `docs/specs/model_competitiveness_contract.md` for task semantics, architecture routing, HPO budgets, benchmark mode, and shadow-tested imported model families
+- canonical future temporal benchmark contract written under `docs/specs/temporal_benchmark_pack.md` for timestamped tabular datasets, sequence-native later expansion, and temporal shadow-trial proof
 
 ## Operational Capabilities
 
@@ -112,12 +115,13 @@ The most important not-yet-implemented shifts after the current baseline are:
 - richer long-term memory with retention, compaction, pinning, and replay rules so durable lessons survive beyond analog similarity
 - stronger dynamic controller logic that decides who should act next, how deep to branch, and when review is worth it under explicit contracts
 - stronger search/HPO/controller logic that goes beyond the shipped Slice 13 bounded search controller into deeper portfolio ecology, better stop-search proofs, and tighter daemon/resume integration
+- a pre-academy model-competitiveness track that widens architecture diversity, deepens HPO, separates benchmark truth from deployment truth, and adds replay/shadow-tested imported model-family candidates before generic capability evolution begins
 - broader protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth as the surface area grows
 - deeper packaging, release, and long-session regression packs that test the product the way a real frontier operator runtime is used rather than only as a fast CLI
 - broader flagship demo packs and harder scorecards so Relaytic can be judged by repeatable proof scenarios instead of ad hoc walkthroughs
 - broader human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy across more datasets and host paths
 - later academy-aware mission-control surfaces that explain capability promotion, shadow trials, hunt campaigns, and roster changes to both humans and external agents
-- a post-Slice-15 capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement
+- a post-Slice-15F capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement
 - a later optional representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family after the academy track
 
 ## Implemented Slices

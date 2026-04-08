@@ -66,11 +66,20 @@ Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 16A**, because Relaytic now has a professional operator surface with branch-aware mission control, release-health posture, demo-pack readiness, and onboarding-success proof, so the next frontier requirement is governed capability evolution through explicit capability cards and registry truth instead of ad hoc growth.
+The next recommended build is **Slice 15A**, because the benchmark work showed that Relaytic is now system-credible but still too narrow and tree-centric in how it interprets tasks, chooses model families, and spends training budget. The next improvement track should strengthen model competitiveness before the broader academy work begins.
 
-After Slice 15, the next planned frontier track is the **Relaytic Academy** starting at **Slice 16A**, where Relaytic begins governed capability evolution through capability cards, replay packs, shadow mode, arena promotion, hunt campaigns, and non-core specialist recruitment or retirement.
+After Slice 15, the next planned frontier track is a **model-competitiveness path** through **Slices 15A through 15F**:
 
-The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
+- Slice 15A canonical task contracts, rare-event taxonomy cleanup, and benchmark-vs-deploy separation
+- Slice 15B model registry expansion and adaptive architecture routing
+- Slice 15C budgeted HPO, early stopping, and deeper portfolio loops
+- Slice 15D paper-grade benchmark harness and benchmark rigor
+- Slice 15E execution DAG, freshness contracts, and artifact reuse
+- Slice 15F research-imported architecture candidates with replay and shadow trials
+
+The broader **Relaytic Academy** then starts at **Slice 16A**, where Relaytic generalizes candidate, replay, shadow, promotion, hunt, and retirement ideas from model families into a governed capability-evolution system.
+
+The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [temporal_benchmark_pack.md](docs/specs/temporal_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
 
 - machine-stable result contracts with confidence posture and belief-revision triggers so humans, agents, CLI, MCP, and later richer UI shells can all read the same conclusion differently without drifting
 - governed learnings with source, confidence, reaffirmation, invalidation, reset, and optional expiry semantics
@@ -80,6 +89,7 @@ The normative product-contract pack that now governs the shipped workspace layer
 - a stronger governed-learnings upgrade that migrates the shipped workspace learnings into typed, confidence-bearing, reaffirmable, invalidatable, and optionally expirable records
 - richer long-term memory with retention, compaction, pinning, and replay rules so specialists do not repeatedly forget the same lesson
 - a stronger search/HPO controller that goes beyond the shipped Slice 13 bounded search controller into deeper portfolio ecology, better stop-search proofs, and tighter daemon or resume integration
+- a model-competitiveness track that fixes task-taxonomy drift, expands the model registry, deepens HPO loops, separates benchmark mode from deployment mode, and lets research-imported architectures prove themselves through replay and shadow trials before they gain authority
 - richer remote transports, notification freshness, and connector-aware supervision flows on top of the shipped remote-supervision surface
 - academy-aware operating surfaces that turn the shipped canonical trace and scorecards into polished replay, promotion, and change-attribution experiences
 - broader protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth as the surface area grows

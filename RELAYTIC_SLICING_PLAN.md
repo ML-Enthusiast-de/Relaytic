@@ -226,14 +226,20 @@ Stable slice numbering stays the same, but the preferred execution order after S
 32. Slice 14
 33. Slice 14A
 34. Slice 15
-35. Slice 16
-36. Slice 16A
-37. Slice 16B
-38. Slice 16C
-39. Slice 16D
-40. Slice 16E
-41. Slice 16F
-42. Slice 17
+35. Slice 15A
+36. Slice 15B
+37. Slice 15C
+38. Slice 15D
+39. Slice 15E
+40. Slice 15F
+41. Slice 16
+42. Slice 16A
+43. Slice 16B
+44. Slice 16C
+45. Slice 16D
+46. Slice 16E
+47. Slice 16F
+48. Slice 17
 
 Why:
 
@@ -271,7 +277,8 @@ Why:
 - Slice 14 should come after Slice 13C because real-world feasibility is stronger once Relaytic can account for permission posture, waiting approvals, and long-running work instead of treating constraints as static annotations
 - Slice 14A should come after Slice 14 because remote supervision is only credible once local feasibility, permission modes, and background resumability are already explicit
 - Slice 15 should close the loop with flagship demo packs, release readiness, remote supervision visibility, and human-supervision evaluation rather than treating UI polish as sufficient proof
-- Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-15 capability evolution has one coherent contract
+- Slices 15A through 15F are the model-competitiveness track and should land before the academy track so Relaytic strengthens task semantics, architecture routing, HPO depth, benchmark rigor, artifact reuse, and model-family shadow trials before broader capability evolution begins
+- Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-15F capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
 - Slice 16C should come before hunt-heavy or roster-heavy work because promotion and quarantine logic must be deterministic before Relaytic starts scouting aggressively
@@ -283,7 +290,7 @@ Why:
 ## Current execution state
 
 - implemented baseline: Slice 00 through Slice 15, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, and Slice 15 mission-control expansion, release-health visibility, demo packs, and human-factors proof
-- next execution target: Slice 16A
+- next execution target: Slice 15A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -292,10 +299,11 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after Slice 15: Slice 16A
+- next planned model-competitiveness follow-on after Slice 15: Slice 15A
+- next planned academy follow-on after Slice 15F: Slice 16A
 - late optional representation follow-on after the academy track: Slice 17
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
-- the canonical product-spec pack for Slice 12D, Slice 15, and the academy follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, academy, handoff, learnings, and external-agent continuation surfaces
+- the canonical product-spec pack for Slice 12D, Slice 15, the model-competitiveness track, and the academy follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, academy, handoff, learnings, and external-agent continuation surfaces
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -2480,6 +2488,133 @@ Minimum proof:
 - one recovery path that proves backup/restore or doctor behavior
 - one mission-control path that shows branch structure, confidence, and change attribution for a non-trivial autonomous run
 - one remote-source demo where Relaytic reads through a connector, materializes a bounded local snapshot, records explicit provenance, and still avoids persisting original absolute source paths
+
+## Slice 15A - Canonical task contract, rare-event taxonomy, and benchmark-vs-deploy separation
+
+Goal:
+- freeze one canonical task/problem contract early
+- unify task typing across intake, planning, modeling, benchmark, and explanation
+- separate benchmark competitiveness from deployment readiness
+
+Required outputs:
+- `task_profile_contract.json`
+- `target_semantics_report.json`
+- `metric_contract.json`
+- `benchmark_mode_report.json`
+- `deployment_readiness_report.json`
+- `benchmark_vs_deploy_report.json`
+- `dataset_semantics_audit.json`
+
+Minimum proof:
+
+- one labeled rare-event dataset remains supervised classification instead of drifting into anomaly detection
+- one multiclass string-label dataset stays multiclass through planning, training, benchmark, and explanation surfaces
+- one offline benchmark run is reported as competitive while deployment readiness remains conditional for separate reasons
+
+## Slice 15B - Model registry expansion and adaptive architecture routing
+
+Goal:
+- expand the model registry beyond the narrow current family set
+- choose architectures because they fit the task, not because they are already implemented
+- keep sequence models gated behind real sequence evidence
+
+Required outputs:
+- `architecture_registry.json`
+- `architecture_router_report.json`
+- `candidate_family_matrix.json`
+- `architecture_fit_report.json`
+- `family_capability_matrix.json`
+- `architecture_ablation_report.json`
+
+Minimum proof:
+
+- one mixed-type or categorical-heavy dataset prefers a categorical-aware family when available
+- one multiclass dataset routes to a non-default family because the registry judged it a better fit
+- one static table explicitly rejects sequence-family routing with an auditable explanation
+
+## Slice 15C - Budgeted HPO, early stopping, and deeper portfolio loops
+
+Goal:
+- replace shallow fixed-variant search with explicit bounded HPO
+- add real search spaces, early stopping, threshold tuning, and warm starts
+- make deeper loops explicit instead of hidden in hard-coded variants
+
+Required outputs:
+- `hpo_budget_contract.json`
+- `architecture_search_space.json`
+- `trial_ledger.jsonl`
+- `early_stopping_report.json`
+- `search_loop_scorecard.json`
+- `warm_start_transfer_report.json`
+- `threshold_tuning_report.json`
+
+Minimum proof:
+
+- one family uses a real search space instead of a fixed three-variant sweep
+- one search loop stops because of plateau or budget logic rather than arbitrary variant exhaustion
+- one rerun can warm-start from prior family evidence
+
+## Slice 15D - Paper-grade benchmark harness and benchmark rigor
+
+Goal:
+- turn benchmark work into a reproducible paper-facing harness
+- record rerun variance, ablations, and claim boundaries explicitly
+- keep benchmark truth separate from deployability truth
+
+Required outputs:
+- `paper_benchmark_manifest.json`
+- `paper_benchmark_table.json`
+- `benchmark_ablation_matrix.json`
+- `rerun_variance_report.json`
+- `benchmark_claims_report.json`
+- `benchmark_vs_deploy_report.json`
+
+Minimum proof:
+
+- one full benchmark table is renderable from artifacts without manual cleanup
+- one rerun-variance report shows stability across repeated runs
+- one benchmark claim report states clearly where Relaytic is below reference and why
+
+## Slice 15E - Execution DAG, freshness contracts, and artifact reuse
+
+Goal:
+- make recompute scope explicit
+- avoid heavy reruns when inputs did not change
+- support deeper search and wider benchmark packs through reuse
+
+Required outputs:
+- `artifact_dependency_graph.json`
+- `freshness_contract.json`
+- `recompute_plan.json`
+- `materialization_cache_index.json`
+- `invalidation_report.json`
+
+Minimum proof:
+
+- one no-op review path reuses heavy upstream artifacts instead of rerunning them
+- one changed input invalidates only the correct downstream slices
+- one recompute plan is human- and agent-inspectable before execution
+
+## Slice 15F - Research-imported architecture candidates and shadow trials
+
+Goal:
+- let Relaytic learn promising model families from publications, web research, and adapter discovery
+- keep those families in replay and shadow mode until they prove themselves
+- bridge into the later academy track without opening uncontrolled self-modification
+
+Required outputs:
+- `architecture_candidate_registry.json`
+- `method_import_report.json`
+- `shadow_trial_manifest.json`
+- `shadow_trial_scorecard.json`
+- `candidate_quarantine.json`
+- `promotion_readiness_report.json`
+
+Minimum proof:
+
+- one externally sourced architecture remains shadow-only because proof is weak
+- one externally sourced architecture becomes promotion-ready after replay and shadow evidence
+- one explanation surface answers why a paper-inspired architecture was not yet used live
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 
