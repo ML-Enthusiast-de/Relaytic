@@ -4,8 +4,8 @@ This document tracks the operational state of the repository. It is an implement
 
 ## Current Baseline
 
-- completed slices: 00 through 15, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, Slice 13A release safety, build attestation, and packaging discipline, Slice 13B event bus, runtime hooks, and visible permission modes, Slice 13C bounded daemon, resumable jobs, stale-job reporting, approval-aware background execution, and memory maintenance, Slice 14 real-world feasibility, domain constraints, action boundaries, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, and Slice 15 mission-control expansion, demo packs, release-health posture, and human-factors proof
-- next recommended slice: 15A, canonical task contracts, rare-event taxonomy cleanup, and benchmark-vs-deploy separation
+- completed slices: 00 through 15A, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, Slice 13A release safety, build attestation, and packaging discipline, Slice 13B event bus, runtime hooks, and visible permission modes, Slice 13C bounded daemon, resumable jobs, stale-job reporting, approval-aware background execution, and memory maintenance, Slice 14 real-world feasibility, domain constraints, action boundaries, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, Slice 15 mission-control expansion, demo packs, release-health posture, and human-factors proof, and Slice 15A canonical task contracts, rare-event taxonomy cleanup, benchmark-vs-deploy separation, and temporal benchmark scaffolding
+- next recommended slice: 15B, model registry expansion and adaptive architecture routing
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - latest handoff-and-learnings slice: 12D, workspace-first continuity, result contracts, governed learnings migration, and explicit iteration planning
 - latest workspace-and-search slice: 13, search controller, bounded branch widening, and execution-strategy selection
@@ -14,7 +14,7 @@ This document tracks the operational state of the repository. It is an implement
 - latest background-and-resume slice: 13C, bounded daemon, resumable jobs, and memory maintenance
 - latest mission-control-and-proof slice: 15, branch-aware operator surfaces, demo packs, release-health posture, and onboarding-success evaluation
 - latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, broader human-chaos coverage, and a prepared paper-grade benchmark/eval pack
-- next planned model-competitiveness follow-on after Slice 15: 15A, canonical task contracts, rare-event taxonomy cleanup, and benchmark-vs-deploy separation
+- next planned model-competitiveness follow-on after Slice 15A: 15B, model registry expansion and adaptive architecture routing
 - next planned academy follow-on after Slice 15F: 16A, capability registry and capability cards
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -102,6 +102,10 @@ The repository currently supports:
 - remote streaming, warehouse, and cloud lakehouse connectors remain future adapter work
 - public-dataset end-to-end regression, binary-classification, and multiclass-classification coverage using stable bundled open datasets in the test suite
 - optional official-UCI domain-dataset coverage for concrete strength, telecom churn, credit default, and predictive maintenance through an explicit opt-in network-backed test suite
+- canonical task-contract artifacts through `task_profile_contract.json`, `target_semantics_report.json`, `metric_contract.json`, `benchmark_mode_report.json`, `deployment_readiness_report.json`, `benchmark_vs_deploy_report.json`, and `dataset_semantics_audit.json`
+- benchmark review that now consumes the canonical task contract instead of reinterpreting task type and comparison metric ad hoc
+- assist explanations that can answer `why this task type?` and `why not anomaly detection?` from the same canonical contract humans and agents see
+- optional temporal benchmark dataset scaffolding for Appliances Energy, Beijing PM2.5, Household Power Consumption, Occupancy Detection, and Room Occupancy Estimation through explicit network-backed writers and skipped-by-default benchmark tests
 
 ## Planned High-Leverage Follow-Ons
 

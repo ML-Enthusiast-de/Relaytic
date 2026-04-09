@@ -47,6 +47,10 @@ class TaskProfile:
     target_signal: str
     task_type: str
     task_family: str
+    data_mode: str
+    target_semantics: str
+    problem_posture: str
+    rare_event_supervised: bool
     override_applied: bool
     row_count: int
     class_count: int
@@ -163,6 +167,7 @@ def _infer_task_profile(
     bool_like = _looks_boolean_like(series)
     class_count = int(label_stats["class_count"])
     distinct_ratio = class_count / max(row_count, 1)
+    minority_fraction = _minority_fraction(label_stats["class_balance"], row_count=row_count)
     name_lower = target_column.strip().lower()
     fraud_named = any(token in name_lower for token in _FRAUD_KEYWORDS)
     anomaly_named = any(token in name_lower for token in _ANOMALY_KEYWORDS)
@@ -179,13 +184,20 @@ def _infer_task_profile(
         and class_count <= discrete_threshold
         and (distinct_ratio <= 0.12 or class_count <= small_class_limit)
     ) or string_label_like
+    rare_event_supervised = bool(
+        classification_like
+        and class_count == 2
+        and (
+            (minority_fraction is not None and minority_fraction <= 0.20)
+            or fraud_named
+            or anomaly_named
+        )
+    )
 
     if class_count == 2 and classification_like:
         task_type = "binary_classification"
         if fraud_named:
             task_type = "fraud_detection"
-        elif anomaly_named:
-            task_type = "anomaly_detection"
         rationale = (
             f"Detected 2 discrete target states with class balance {label_stats['class_balance']}."
         )
@@ -213,7 +225,7 @@ def _infer_task_profile(
         )
 
     if (fraud_named or anomaly_named) and class_count <= discrete_threshold and class_count >= 2:
-        task_type = "fraud_detection" if fraud_named else "anomaly_detection"
+        task_type = "fraud_detection" if fraud_named else "binary_classification"
         rationale = (
             "Target name suggests a rare-event label, and the observed label cardinality is low "
             f"({class_count} states)."
@@ -269,10 +281,31 @@ def _build_profile_from_type(
                 f"{rationale} Minority class `{positive_class_label}` covers "
                 f"{minority_fraction:.3%} of labeled rows."
             )
+    rare_event_supervised = bool(
+        is_classification_task(task_type)
+        and task_type != "anomaly_detection"
+        and minority_fraction is not None
+        and minority_fraction <= 0.20
+    )
+    target_semantics = _target_semantics(
+        task_type=task_type,
+        class_count=int(labels["class_count"]),
+        rare_event_supervised=rare_event_supervised,
+    )
+    problem_posture = _problem_posture(
+        task_type=task_type,
+        task_family="classification" if is_classification_task(task_type) else "regression",
+        class_count=int(labels["class_count"]),
+        rare_event_supervised=rare_event_supervised,
+    )
     return TaskProfile(
         target_signal=target_column,
         task_type=task_type,
         task_family="classification" if is_classification_task(task_type) else "regression",
+        data_mode=str(data_mode).strip().lower() or "steady_state",
+        target_semantics=target_semantics,
+        problem_posture=problem_posture,
+        rare_event_supervised=rare_event_supervised,
         override_applied=override_applied,
         row_count=int(labels["row_count"]),
         class_count=int(labels["class_count"]),
@@ -338,3 +371,36 @@ def _looks_integer_like(series: pd.Series) -> bool:
 def _looks_boolean_like(series: pd.Series) -> bool:
     lowered = {str(value).strip().lower() for value in series.dropna()}
     return bool(lowered) and lowered.issubset(_BOOLEAN_LABELS)
+
+
+def _minority_fraction(class_balance: dict[str, int], *, row_count: int) -> float | None:
+    if not class_balance or row_count <= 0:
+        return None
+    minimum = min(int(value) for value in class_balance.values())
+    return float(minimum) / float(row_count)
+
+
+def _target_semantics(*, task_type: str, class_count: int, rare_event_supervised: bool) -> str:
+    if not is_classification_task(task_type):
+        return "continuous_signal"
+    if rare_event_supervised and class_count <= 2:
+        return "rare_event_supervised_label"
+    if class_count <= 2:
+        return "binary_labeled_class"
+    return "multiclass_labeled_class"
+
+
+def _problem_posture(
+    *,
+    task_type: str,
+    task_family: str,
+    class_count: int,
+    rare_event_supervised: bool,
+) -> str:
+    if task_type == "anomaly_detection":
+        return "anomaly_detection"
+    if task_family != "classification":
+        return "regression"
+    if rare_event_supervised and class_count <= 2:
+        return "rare_event_supervised"
+    return "standard_classification"

@@ -59,6 +59,7 @@ class Plan:
     selected_route_title: str
     target_column: str
     task_type: str
+    task_profile: dict[str, Any]
     data_mode: str
     primary_metric: str
     secondary_metrics: list[str]

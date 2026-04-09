@@ -19,7 +19,7 @@ def _normalize_name(value: str) -> str:
 def _fetch_frame(dataset_id: int) -> tuple[pd.DataFrame, pd.DataFrame]:
     dataset = fetch_ucirepo(id=dataset_id)
     features = dataset.data.features.copy()
-    targets = dataset.data.targets.copy()
+    targets = dataset.data.targets.copy() if dataset.data.targets is not None else pd.DataFrame(index=features.index)
     return features, targets
 
 
@@ -80,6 +80,12 @@ def _sample_frame(
         sampled = pd.concat(groups, axis=0).sample(frac=1.0, random_state=42)
         return sampled.reset_index(drop=True)
     return frame.sample(n=max_rows, random_state=42).reset_index(drop=True)
+
+
+def _sample_temporal_frame(frame: pd.DataFrame, *, max_rows: int | None) -> pd.DataFrame:
+    if max_rows is None or len(frame) <= max_rows:
+        return frame.reset_index(drop=True)
+    return frame.iloc[:max_rows].reset_index(drop=True)
 
 
 def write_uci_concrete_strength_dataset(path: Path) -> Path:
@@ -172,5 +178,96 @@ def write_uci_dermatology_dataset(path: Path) -> Path:
     frame = pd.concat([features, targets], axis=1).copy()
     frame.columns = [_normalize_name(name) for name in frame.columns]
     frame = frame.rename(columns={"class": "dermatology_class"})
+    frame.to_csv(path, index=False)
+    return path
+
+
+def write_uci_appliances_energy_prediction_dataset(path: Path, *, max_rows: int = 4000) -> Path:
+    features, targets = _fetch_frame(374)
+    frame = features.copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    frame["timestamp"] = pd.to_datetime(frame["date"], errors="coerce", format="%Y-%m-%d%H:%M:%S")
+    frame = frame.drop(columns=["date"])
+    target = targets[["Appliances"]].copy()
+    target.columns = ["appliances_energy"]
+    frame = pd.concat([frame, target], axis=1)
+    frame = _sample_temporal_frame(frame, max_rows=max_rows)
+    frame["timestamp"] = frame["timestamp"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    frame.to_csv(path, index=False)
+    return path
+
+
+def write_uci_beijing_pm25_dataset(path: Path, *, max_rows: int = 6000) -> Path:
+    features, targets = _fetch_frame(381)
+    frame = features.copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    frame["timestamp"] = pd.to_datetime(
+        frame[["year", "month", "day", "hour"]].rename(
+            columns={"year": "year", "month": "month", "day": "day", "hour": "hour"}
+        ),
+        errors="coerce",
+    )
+    target = targets[["pm2.5"]].copy()
+    target.columns = ["pm25"]
+    frame = pd.concat([frame, target], axis=1)
+    frame = frame.drop(columns=["year", "month", "day", "hour"])
+    frame = _sample_temporal_frame(frame, max_rows=max_rows)
+    frame["timestamp"] = frame["timestamp"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    frame.to_csv(path, index=False)
+    return path
+
+
+def write_uci_household_power_consumption_dataset(path: Path, *, max_rows: int = 6000) -> Path:
+    features, _targets = _fetch_frame(235)
+    frame = features.copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    frame["timestamp"] = pd.to_datetime(
+        frame["date"].astype(str) + " " + frame["time"].astype(str),
+        errors="coerce",
+        format="%d/%m/%Y %H:%M:%S",
+    )
+    numeric_columns = [column for column in frame.columns if column not in {"date", "time", "timestamp"}]
+    for column in numeric_columns:
+        frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    frame = frame.rename(columns={"global_active_power": "household_power_target"})
+    frame = frame.drop(columns=["date", "time"])
+    frame = _sample_temporal_frame(frame, max_rows=max_rows)
+    frame["timestamp"] = frame["timestamp"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    frame.to_csv(path, index=False)
+    return path
+
+
+def write_uci_occupancy_detection_dataset(path: Path, *, max_rows: int = 5000) -> Path:
+    features, targets = _fetch_frame(357)
+    frame = features.copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    frame["timestamp"] = pd.to_datetime(frame["date"], errors="coerce")
+    frame = frame.drop(columns=["date"])
+    for column in [item for item in frame.columns if item != "timestamp"]:
+        frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    target = targets[["Occupancy"]].copy()
+    target.columns = ["occupancy_flag"]
+    frame = pd.concat([frame, target], axis=1)
+    frame = _sample_temporal_frame(frame, max_rows=max_rows)
+    frame["timestamp"] = frame["timestamp"].dt.strftime("%Y-%m-%d %H:%M:%S")
+    frame.to_csv(path, index=False)
+    return path
+
+
+def write_uci_room_occupancy_estimation_dataset(path: Path, *, max_rows: int = 5000) -> Path:
+    features, targets = _fetch_frame(864)
+    frame = features.copy()
+    frame.columns = [_normalize_name(name) for name in frame.columns]
+    frame["timestamp"] = pd.to_datetime(
+        frame["date"].astype(str) + " " + frame["time"].astype(str),
+        errors="coerce",
+        format="%Y/%m/%d %H:%M:%S",
+    )
+    frame = frame.drop(columns=["date", "time"])
+    target = targets[["Room_Occupancy_Count"]].copy()
+    target.columns = ["room_occupancy_count"]
+    frame = pd.concat([frame, target], axis=1)
+    frame = _sample_temporal_frame(frame, max_rows=max_rows)
+    frame["timestamp"] = frame["timestamp"].dt.strftime("%Y-%m-%d %H:%M:%S")
     frame.to_csv(path, index=False)
     return path

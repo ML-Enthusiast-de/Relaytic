@@ -90,6 +90,23 @@ def test_assess_task_profile_detects_string_binary_classification() -> None:
     assert profile.task_family == "classification"
 
 
+def test_assess_task_profile_keeps_labeled_anomaly_flag_supervised() -> None:
+    frame = pd.DataFrame(
+        {
+            "sensor_a": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+            "anomaly_flag": [0, 0, 0, 0, 1, 0],
+        }
+    )
+    profile = assess_task_profile(
+        frame=frame,
+        target_column="anomaly_flag",
+        data_mode="steady_state",
+    )
+    assert profile.task_type == "binary_classification"
+    assert profile.problem_posture == "rare_event_supervised"
+    assert profile.target_semantics == "rare_event_supervised_label"
+
+
 def test_assess_task_profile_respects_override() -> None:
     frame = pd.DataFrame(
         {

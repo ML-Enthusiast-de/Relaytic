@@ -92,7 +92,7 @@ class StrategistAgent:
         )
         primary_metric = _resolve_primary_metric(
             optimization_profile=optimization_profile,
-            task_type=task_profile.task_type,
+            task_profile=task_profile.to_dict(),
         )
         secondary_metrics = _resolve_secondary_metrics(
             optimization_profile=optimization_profile,
@@ -274,6 +274,7 @@ class StrategistAgent:
             selected_route_title=str(route["title"]),
             target_column=target_column,
             task_type=task_profile.task_type,
+            task_profile=task_profile.to_dict(),
             data_mode=str(dataset_profile.get("data_mode", "steady_state")),
             primary_metric=primary_metric,
             secondary_metrics=secondary_metrics,
@@ -565,13 +566,15 @@ def _select_route(
 def _resolve_primary_metric(
     *,
     optimization_profile: dict[str, Any],
-    task_type: str,
+    task_profile: dict[str, Any],
 ) -> str:
     candidate = str(optimization_profile.get("primary_metric", "auto")).strip().lower().replace("-", "_")
     if candidate and candidate != "auto":
         return candidate
+    task_type = str(task_profile.get("task_type", "")).strip()
+    rare_event_supervised = bool(task_profile.get("rare_event_supervised", False))
     if is_classification_task(task_type):
-        if task_type in {"fraud_detection", "anomaly_detection"}:
+        if task_type in {"fraud_detection", "anomaly_detection"} or rare_event_supervised:
             return "pr_auc"
         return "f1"
     return "mae"

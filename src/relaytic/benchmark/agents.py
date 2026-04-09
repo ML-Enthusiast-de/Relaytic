@@ -9,6 +9,7 @@ from typing import Any
 
 import numpy as np
 
+from relaytic.analytics import infer_benchmark_expected, read_task_contract_artifacts
 from relaytic.analytics.task_detection import assess_task_profile, is_classification_task
 from relaytic.ingestion import load_tabular_data
 from relaytic.modeling.evaluation import classification_metrics, regression_metrics
@@ -76,7 +77,15 @@ def run_benchmark_review(
         ],
     )
     generated_at = _utc_now()
-    benchmark_expected = _benchmark_expected(run_brief=run_brief, task_brief=task_brief)
+    task_contract_bundle = read_task_contract_artifacts(run_dir)
+    task_profile_contract = dict(task_contract_bundle.get("task_profile_contract", {}))
+    metric_contract = dict(task_contract_bundle.get("metric_contract", {}))
+    benchmark_mode_report = dict(task_contract_bundle.get("benchmark_mode_report", {}))
+    benchmark_expected = (
+        bool(benchmark_mode_report.get("benchmark_expected"))
+        if benchmark_mode_report
+        else infer_benchmark_expected(run_brief=run_brief, task_brief=task_brief)
+    )
     if not controls.enabled:
         bundle = _unavailable_bundle(
             controls=controls,
@@ -126,7 +135,7 @@ def run_benchmark_review(
         frame=frame,
         target_column=target_column,
         data_mode=str(plan.get("data_mode", "")).strip() or _infer_data_mode(frame=frame, timestamp_column=timestamp_column),
-        task_type_hint=_clean_text(plan.get("task_type")),
+        task_type_hint=_clean_text(task_profile_contract.get("task_type")) or _clean_text(plan.get("task_type")),
     )
     split = build_train_validation_test_split(
         n_rows=len(frame),
@@ -194,8 +203,8 @@ def run_benchmark_review(
         lagged=use_lagged_references,
     )
     comparison_metric = _resolve_comparison_metric(
-        primary_metric=_clean_text(plan.get("primary_metric")),
-        selection_metric=_clean_text(execution_summary.get("selection_metric")),
+        primary_metric=_clean_text(metric_contract.get("benchmark_comparison_metric")) or _clean_text(plan.get("primary_metric")),
+        selection_metric=_clean_text(metric_contract.get("selection_metric")) or _clean_text(execution_summary.get("selection_metric")),
         task_type=task_profile.task_type,
     )
     metric_direction = _metric_direction(comparison_metric)
@@ -889,20 +898,6 @@ def _near_parity(*, controls: BenchmarkControls, absolute_gap: float | None, rel
     if relative_gap is not None and float(relative_gap) <= float(controls.near_parity_relative_delta):
         return True
     return False
-
-
-def _benchmark_expected(*, run_brief: dict[str, Any], task_brief: dict[str, Any]) -> bool:
-    corpus = " ".join(
-        [
-            str(run_brief.get("objective", "")),
-            str(run_brief.get("success_criteria", "")),
-            str(task_brief.get("problem_statement", "")),
-            str(task_brief.get("success_criteria", "")),
-        ]
-    ).lower()
-    return any(token in corpus for token in ("benchmark", "baseline", "reference", "parity", "sota", "state of the art"))
-
-
 def _disabled_bundle(
     *,
     controls: BenchmarkControls,

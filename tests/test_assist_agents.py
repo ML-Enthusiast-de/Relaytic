@@ -41,6 +41,30 @@ def test_build_assist_audit_explanation_gives_agent_exact_model_choice_reasoning
     assert "benchmark_parity_report.json" in audit["evidence_refs"]
 
 
+def test_build_assist_audit_explanation_answers_task_semantics_questions() -> None:
+    audit = build_assist_audit_explanation(
+        message="why not anomaly detection?",
+        actor_type="user",
+        run_summary={
+            "decision": {"task_type": "binary_classification"},
+            "task_contract": {
+                "task_type": "binary_classification",
+                "problem_posture": "rare_event_supervised",
+                "benchmark_comparison_metric": "pr_auc",
+                "why_not_anomaly_detection": (
+                    "Relaytic kept this as supervised rare-event classification because the dataset contains explicit labeled outcomes."
+                ),
+            },
+            "benchmark_vs_deploy": {"deployment_readiness": "conditional"},
+            "benchmark": {"comparison_metric": "pr_auc"},
+        },
+    )
+
+    assert audit["question_type"] == "task_semantics"
+    assert "rare-event classification" in audit["answer"]
+    assert "task_profile_contract.json" in audit["evidence_refs"]
+
+
 def test_local_advisor_can_rewrite_human_audit_answer(monkeypatch, tmp_path: Path) -> None:
     import relaytic.intelligence as intelligence_pkg
     import relaytic.intelligence.backends as backends_pkg

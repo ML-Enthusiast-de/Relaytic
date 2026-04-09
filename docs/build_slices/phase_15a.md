@@ -2,18 +2,18 @@
 
 ## Status
 
-Planned.
+Shipped.
 
-Slice 15A is the next recommended target.
+Slice 15B is now the next recommended target.
 
 Delivered package boundaries:
 
 - extend `src/relaytic/analytics/`
 - extend `src/relaytic/planning/`
-- extend `src/relaytic/modeling/`
+- extend `src/relaytic/assist/`
 - extend `src/relaytic/benchmark/`
-- extend `src/relaytic/decision/`
 - extend `src/relaytic/runs/`
+- extend `tests/`
 
 Intended artifacts:
 
@@ -68,3 +68,11 @@ Slice 15A is acceptable only if:
 - one rare-event taxonomy test
 - one benchmark-vs-deploy split test
 - one assist explanation test for task semantics
+
+## Shipped Notes
+
+- planning now writes a canonical task-contract artifact family before route selection
+- run summary and assist now read the same task contract instead of reconstructing semantics from scattered artifacts
+- benchmark review now prefers the canonical task type and benchmark comparison metric when they exist
+- labeled anomaly-like targets now stay in supervised posture unless anomaly detection was explicitly forced
+- temporal benchmark scaffolding now exists in code and tests, not only in the docs/specs layer

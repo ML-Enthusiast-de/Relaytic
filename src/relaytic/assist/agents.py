@@ -641,6 +641,8 @@ def build_assist_audit_explanation(
     completion = dict(run_summary.get("completion", {}))
     benchmark = dict(run_summary.get("benchmark", {}))
     result_contract = dict(run_summary.get("result_contract", {}))
+    task_contract = dict(run_summary.get("task_contract", {}))
+    benchmark_vs_deploy = dict(run_summary.get("benchmark_vs_deploy", {}))
     next_step = dict(run_summary.get("next_step", {}))
     iteration = dict(run_summary.get("iteration", {}))
 
@@ -655,6 +657,20 @@ def build_assist_audit_explanation(
             f"Current recommended direction is `{_clean_text(result_contract.get('recommended_direction')) or _clean_text(result_contract.get('recommended_action')) or _clean_text(dict(result_contract.get('recommended_next_move', {})).get('direction')) or 'unknown'}` under the workspace contract.",
         ]
         evidence_refs = ["belief_revision_triggers.json", "result_contract.json", "next_run_plan.json"]
+    elif "task type" in normalized or ("why not" in normalized and "anomaly" in normalized):
+        question_type = "task_semantics"
+        reasons = [
+            f"Relaytic classified this target as `{_clean_text(task_contract.get('task_type')) or _clean_text(decision.get('task_type')) or 'unknown'}` with posture `{_clean_text(task_contract.get('problem_posture')) or 'unknown'}`.",
+            _clean_text(task_contract.get("why_not_anomaly_detection"))
+            or "Relaytic did not pick anomaly detection because this run has labeled target states and therefore keeps the problem in a supervised posture.",
+            f"Benchmark comparison uses `{_clean_text(task_contract.get('benchmark_comparison_metric')) or _clean_text(benchmark.get('comparison_metric')) or 'unknown'}` while deployment readiness is `{_clean_text(benchmark_vs_deploy.get('deployment_readiness')) or 'unknown'}`.",
+        ]
+        evidence_refs = [
+            "task_profile_contract.json",
+            "target_semantics_report.json",
+            "metric_contract.json",
+            "benchmark_vs_deploy_report.json",
+        ]
     elif "why not" in normalized and "rerun" in normalized:
         question_type = "why_not_rerun"
         reasons = [

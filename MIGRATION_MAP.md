@@ -218,6 +218,13 @@ Avoid introducing new references to:
 - upgraded the existing public commands `relaytic mission-control show`, `relaytic mission-control chat`, and `relaytic mission-control launch` so role-specific handbook discovery is part of onboarding instead of hidden repo knowledge
 - upgraded the checked-in Claude, Codex/OpenAI, and OpenClaw host notes so new agents are pointed to the same agent handbook before they start driving Relaytic
 
+### Slice 15A
+
+- extended the existing `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/benchmark/`, `src/relaytic/assist/`, and `src/relaytic/runs/` boundaries rather than introducing a separate task-governance package
+- introduced artifact boundaries for `task_profile_contract.json`, `target_semantics_report.json`, `metric_contract.json`, `benchmark_mode_report.json`, `deployment_readiness_report.json`, `benchmark_vs_deploy_report.json`, and `dataset_semantics_audit.json`
+- upgraded planning, benchmark review, run summary, and assist explanation surfaces so task semantics, metric choice, and benchmark-versus-deploy posture come from one canonical contract instead of being re-inferred later
+- expanded the benchmark/test boundary to include timestamped temporal benchmark dataset writers and optional temporal benchmark-pack tests without changing the current public ingestion surface
+
 ### Slice 11F
 
 - extended the existing `src/relaytic/mission_control/` boundary and `src/relaytic/ui/cli.py` rather than introducing a separate demo shell

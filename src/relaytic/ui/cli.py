@@ -9255,6 +9255,7 @@ def _run_planning_phase(
     runtime_surface: str = "cli",
     runtime_command: str | None = None,
 ) -> dict[str, Any]:
+    from relaytic.analytics import sync_task_contract_artifacts
     from relaytic.planning import write_planning_bundle
 
     root = Path(run_dir)
@@ -9331,6 +9332,13 @@ def _run_planning_phase(
             planning_bundle = execution.planning_bundle
             training_result = execution.training_result
         written = write_planning_bundle(root, bundle=planning_bundle)
+        task_contract_written = sync_task_contract_artifacts(
+            root,
+            mandate_bundle=_read_json_bundle(root, bundle="mandate"),
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            investigation_bundle=investigation_state["bundle"],
+            planning_bundle=planning_bundle.to_dict(),
+        )
         manifest_path = _refresh_planning_manifest(
             root,
             run_id=run_id,
@@ -9348,7 +9356,12 @@ def _run_planning_phase(
             run_dir=root,
             policy=foundation_state["resolved"].policy,
             stage_token=runtime_token,
-            output_artifacts=[*(str(value) for value in written.values()), *model_artifacts, str(manifest_path)],
+            output_artifacts=[
+                *(str(value) for value in written.values()),
+                *(str(value) for value in task_contract_written.values()),
+                *model_artifacts,
+                str(manifest_path),
+            ],
             summary="Relaytic built the Strategist plan and, when requested, executed the first Builder route in the same run directory.",
         )
         payload = {
@@ -9356,7 +9369,10 @@ def _run_planning_phase(
             "run_dir": str(root),
             "data_path": staged_data_path,
             "policy_resolved": str(foundation_state["policy_path"]),
-            "paths": {key: str(value) for key, value in written.items()},
+            "paths": {
+                **{key: str(value) for key, value in written.items()},
+                **{key: str(value) for key, value in task_contract_written.items()},
+            },
             "manifest_path": str(manifest_path),
             "plan": {
                 "selected_route_id": planning_bundle.plan.selected_route_id,
