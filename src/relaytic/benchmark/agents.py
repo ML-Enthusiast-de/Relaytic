@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import json
 from pathlib import Path
+from statistics import fmean, pstdev
 from typing import Any
 
 import numpy as np
@@ -19,14 +21,21 @@ from relaytic.modeling.splitters import build_train_validation_test_split
 
 from .incumbents import evaluate_incumbent
 from .models import (
+    BENCHMARK_ABLATION_MATRIX_SCHEMA_VERSION,
+    BENCHMARK_CLAIMS_REPORT_SCHEMA_VERSION,
     BENCHMARK_GAP_REPORT_SCHEMA_VERSION,
     BENCHMARK_PARITY_REPORT_SCHEMA_VERSION,
     BEAT_TARGET_CONTRACT_SCHEMA_VERSION,
     EXTERNAL_CHALLENGER_EVALUATION_SCHEMA_VERSION,
     EXTERNAL_CHALLENGER_MANIFEST_SCHEMA_VERSION,
     INCUMBENT_PARITY_REPORT_SCHEMA_VERSION,
+    PAPER_BENCHMARK_MANIFEST_SCHEMA_VERSION,
+    PAPER_BENCHMARK_TABLE_SCHEMA_VERSION,
     REFERENCE_APPROACH_MATRIX_SCHEMA_VERSION,
+    RERUN_VARIANCE_REPORT_SCHEMA_VERSION,
+    BenchmarkAblationMatrix,
     BenchmarkBundle,
+    BenchmarkClaimsReport,
     BenchmarkControls,
     BenchmarkGapReport,
     BenchmarkParityReport,
@@ -35,7 +44,10 @@ from .models import (
     ExternalChallengerEvaluation,
     ExternalChallengerManifest,
     IncumbentParityReport,
+    PaperBenchmarkManifest,
+    PaperBenchmarkTable,
     ReferenceApproachMatrix,
+    RerunVarianceReport,
     build_benchmark_controls_from_policy,
 )
 
@@ -325,6 +337,70 @@ def run_benchmark_review(
         summary=parity_summary,
         trace=trace,
     )
+    paper_manifest = _build_paper_benchmark_manifest(
+        run_dir=run_dir,
+        data_path=data_path,
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        context_bundle=context_bundle or {},
+        planning_bundle=planning_bundle,
+        task_profile=task_profile,
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        relaytic_reference=relaytic_reference,
+        reference_rows=reference_rows,
+        execution_summary=execution_summary,
+        benchmark_expected=benchmark_expected,
+    )
+    paper_table = _build_paper_benchmark_table(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        ranking=ranking,
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        relaytic_rank=relaytic_rank,
+    )
+    ablation_matrix = _build_benchmark_ablation_matrix(
+        run_dir=run_dir,
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        relaytic_reference=relaytic_reference,
+        reference_rows=reference_rows,
+        task_type=task_profile.task_type,
+        selected_model_family=_clean_text(relaytic_reference.get("model_family")),
+        data_mode=task_profile.data_mode,
+    )
+    rerun_variance_report = _build_rerun_variance_report(
+        run_dir=run_dir,
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        relaytic_reference=relaytic_reference,
+        task_type=task_profile.task_type,
+        target_column=target_column,
+        data_mode=task_profile.data_mode,
+        row_count=len(frame),
+        column_count=len(frame.columns),
+    )
+    benchmark_claims_report = _build_benchmark_claims_report(
+        run_dir=run_dir,
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        parity_report=parity_report,
+        gap_report=gap_report,
+        incumbent_parity=incumbent_outputs["parity"],
+        benchmark_expected=benchmark_expected,
+        paper_manifest=paper_manifest,
+        rerun_variance_report=rerun_variance_report,
+    )
     bundle = BenchmarkBundle(
         reference_approach_matrix=matrix,
         benchmark_gap_report=gap_report,
@@ -333,8 +409,430 @@ def run_benchmark_review(
         external_challenger_evaluation=incumbent_outputs["evaluation"],
         incumbent_parity_report=incumbent_outputs["parity"],
         beat_target_contract=incumbent_outputs["beat_target"],
+        paper_benchmark_manifest=paper_manifest,
+        paper_benchmark_table=paper_table,
+        benchmark_ablation_matrix=ablation_matrix,
+        rerun_variance_report=rerun_variance_report,
+        benchmark_claims_report=benchmark_claims_report,
     )
     return BenchmarkRunResult(bundle=bundle, review_markdown=render_benchmark_review_markdown(bundle.to_dict()))
+
+
+def _build_paper_benchmark_manifest(
+    *,
+    run_dir: str | Path,
+    data_path: str,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    context_bundle: dict[str, Any],
+    planning_bundle: dict[str, Any],
+    task_profile: Any,
+    comparison_metric: str,
+    metric_direction: str,
+    relaytic_reference: dict[str, Any],
+    reference_rows: list[dict[str, Any]],
+    execution_summary: dict[str, Any],
+    benchmark_expected: bool,
+) -> PaperBenchmarkManifest:
+    root = Path(run_dir)
+    data_origin = _bundle_item(context_bundle, "data_origin")
+    dataset_profile = _read_json_artifact(root / "dataset_profile.json")
+    architecture_router_report = _read_json_artifact(root / "architecture_router_report.json")
+    lagged_reference = _find_lagged_reference(reference_rows=reference_rows)
+    frame = _read_frame_or_empty(data_path)
+    horizon_type = _temporal_horizon_type(task_type=task_profile.task_type, data_mode=task_profile.data_mode)
+    timestamp_cadence_quality = None
+    if task_profile.data_mode == "time_series":
+        timestamp_cadence_quality = (
+            "timestamp_column_present"
+            if _clean_text(dataset_profile.get("timestamp_column"))
+            else "timestamp_not_materialized"
+        )
+    selected_hyperparameters = dict(execution_summary.get("selected_hyperparameters") or {})
+    if task_profile.data_mode == "time_series":
+        if architecture_router_report.get("sequence_shadow_ready"):
+            sequence_candidate_status = "shadow_ready"
+            sequence_candidate_reason = (
+                "Relaytic detected ordered temporal structure and keeps sequence-native families in shadow-only posture "
+                "until later promotion slices prove they beat lagged/tabular baselines."
+            )
+        else:
+            sequence_candidate_status = "not_live"
+            sequence_candidate_reason = (
+                _clean_text(architecture_router_report.get("sequence_rejection_reason"))
+                or "Relaytic did not find enough temporal evidence to justify sequence-family evaluation."
+            )
+    else:
+        sequence_candidate_status = "not_applicable"
+        sequence_candidate_reason = "Relaytic kept sequence-native families out of static-table benchmark claims."
+
+    return PaperBenchmarkManifest(
+        schema_version=PAPER_BENCHMARK_MANIFEST_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok",
+        dataset_label=Path(data_path).stem,
+        dataset_source_name=_clean_text(data_origin.get("source_name")) or Path(data_path).name,
+        dataset_source_type=_clean_text(data_origin.get("source_type")) or "local_snapshot",
+        source_url=_clean_text(data_origin.get("source_url")),
+        data_path=str(data_path),
+        task_type=task_profile.task_type,
+        data_mode=task_profile.data_mode,
+        target_column=str(planning_bundle.get("plan", {}).get("target_column") or ""),
+        row_count=int(len(frame)),
+        column_count=int(len(frame.columns)),
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        selected_model_family=_clean_text(relaytic_reference.get("model_family")),
+        selected_hyperparameters=selected_hyperparameters,
+        benchmark_expected=benchmark_expected,
+        horizon_type=horizon_type,
+        timestamp_cadence_quality=timestamp_cadence_quality,
+        lagged_baseline_family=_clean_text(lagged_reference.get("model_family")) if lagged_reference else None,
+        lagged_baseline_metric=_metric_value(lagged_reference.get("test_metric"), comparison_metric) if lagged_reference else None,
+        sequence_candidate_status=sequence_candidate_status,
+        sequence_candidate_reason=sequence_candidate_reason,
+        summary=(
+            f"Relaytic recorded a paper-facing benchmark manifest for `{Path(data_path).stem}` with selected family "
+            f"`{_clean_text(relaytic_reference.get('model_family')) or 'unknown'}` on `{comparison_metric}`."
+        ),
+        trace=trace,
+    )
+
+
+def _build_paper_benchmark_table(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    ranking: list[dict[str, Any]],
+    comparison_metric: str,
+    metric_direction: str,
+    relaytic_rank: int | None,
+) -> PaperBenchmarkTable:
+    rows = [
+        {
+            "rank": index + 1,
+            "role": _clean_text(item.get("role")) or "unknown",
+            "model_family": _clean_text(item.get("model_family")) or "unknown",
+            "validation_metric": item.get("validation_metric"),
+            "test_metric": item.get("test_metric"),
+            "selected": bool(item.get("role") == "relaytic"),
+        }
+        for index, item in enumerate(ranking)
+    ]
+    return PaperBenchmarkTable(
+        schema_version=PAPER_BENCHMARK_TABLE_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if rows else "not_available",
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        relaytic_rank=relaytic_rank,
+        reference_count=sum(1 for row in rows if row["role"] == "reference"),
+        rows=rows,
+        summary=(
+            f"Relaytic rendered a benchmark table with `{len(rows)}` ranked rows and current relaytic rank `{relaytic_rank}`."
+            if rows
+            else "Relaytic could not build a paper benchmark table because no ranked rows were available."
+        ),
+        trace=trace,
+    )
+
+
+def _build_benchmark_ablation_matrix(
+    *,
+    run_dir: str | Path,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    comparison_metric: str,
+    metric_direction: str,
+    relaytic_reference: dict[str, Any],
+    reference_rows: list[dict[str, Any]],
+    task_type: str,
+    selected_model_family: str | None,
+    data_mode: str,
+) -> BenchmarkAblationMatrix:
+    root = Path(run_dir)
+    ledger = _read_jsonl_artifact(root / "trial_ledger.jsonl")
+    rows: list[dict[str, Any]] = []
+    selected_metric = _metric_value(relaytic_reference.get("test_metric"), comparison_metric)
+    if selected_model_family:
+        selected_trial = next(
+            (
+                item for item in ledger
+                if _clean_text(item.get("family")) == selected_model_family
+                and _clean_text(item.get("variant_id")) == _clean_text(relaytic_reference.get("variant_id"))
+            ),
+            None,
+        )
+        if selected_trial is None:
+            selected_trial = _best_trial_for_family(ledger=ledger, family=selected_model_family, comparison_metric=comparison_metric, metric_direction=metric_direction)
+        if selected_trial:
+            rows.append(
+                _ablation_row(
+                    ablation_id="selected_route",
+                    label="Selected Relaytic route",
+                    role="selected_route",
+                    comparison_metric=comparison_metric,
+                    test_metric=_metric_value(selected_trial.get("test_metrics"), comparison_metric),
+                    validation_metric=_metric_value(selected_trial.get("validation_metrics"), comparison_metric),
+                    model_family=selected_model_family,
+                    variant_id=_clean_text(selected_trial.get("variant_id")),
+                    selected_metric=selected_metric,
+                )
+            )
+        anchor_trial = next(
+            (
+                item for item in ledger
+                if _clean_text(item.get("family")) == selected_model_family
+                and "anchor" in str(item.get("variant_id", ""))
+            ),
+            None,
+        )
+        if anchor_trial:
+            rows.append(
+                _ablation_row(
+                    ablation_id="selected_anchor",
+                    label="Default anchor for selected family",
+                    role="default_anchor",
+                    comparison_metric=comparison_metric,
+                    test_metric=_metric_value(anchor_trial.get("test_metrics"), comparison_metric),
+                    validation_metric=_metric_value(anchor_trial.get("validation_metrics"), comparison_metric),
+                    model_family=selected_model_family,
+                    variant_id=_clean_text(anchor_trial.get("variant_id")),
+                    selected_metric=selected_metric,
+                )
+            )
+    baseline_family = "sklearn_logistic_regression" if is_classification_task(task_type) else "sklearn_ridge"
+    baseline_reference = next((item for item in reference_rows if _clean_text(item.get("model_family")) == baseline_family), None)
+    if baseline_reference:
+        rows.append(
+            _ablation_row(
+                ablation_id="ordinary_baseline_reference",
+                label="Ordinary baseline reference",
+                role="baseline_reference",
+                comparison_metric=comparison_metric,
+                test_metric=_metric_value(baseline_reference.get("test_metric"), comparison_metric),
+                validation_metric=_metric_value(baseline_reference.get("validation_metric"), comparison_metric),
+                model_family=_clean_text(baseline_reference.get("model_family")),
+                variant_id=None,
+                selected_metric=selected_metric,
+            )
+        )
+    best_reference = _best_reference_row(reference_rows=reference_rows, comparison_metric=comparison_metric, metric_direction=metric_direction)
+    if best_reference:
+        rows.append(
+            _ablation_row(
+                ablation_id="best_reference",
+                label="Best same-contract reference",
+                role="best_reference",
+                comparison_metric=comparison_metric,
+                test_metric=_metric_value(best_reference.get("test_metric"), comparison_metric),
+                validation_metric=_metric_value(best_reference.get("validation_metric"), comparison_metric),
+                model_family=_clean_text(best_reference.get("model_family")),
+                variant_id=None,
+                selected_metric=selected_metric,
+            )
+        )
+    if data_mode == "time_series":
+        lagged_reference = _find_lagged_reference(reference_rows=reference_rows)
+        if lagged_reference:
+            rows.append(
+                _ablation_row(
+                    ablation_id="lagged_baseline_reference",
+                    label="Lagged temporal baseline",
+                    role="lagged_reference",
+                    comparison_metric=comparison_metric,
+                    test_metric=_metric_value(lagged_reference.get("test_metric"), comparison_metric),
+                    validation_metric=_metric_value(lagged_reference.get("validation_metric"), comparison_metric),
+                    model_family=_clean_text(lagged_reference.get("model_family")),
+                    variant_id=None,
+                    selected_metric=selected_metric,
+                )
+            )
+    return BenchmarkAblationMatrix(
+        schema_version=BENCHMARK_ABLATION_MATRIX_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if rows else "not_available",
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        rows=rows,
+        summary=(
+            f"Relaytic materialized `{len(rows)}` benchmark ablation row(s), including the selected route, baseline references, and available HPO anchor comparisons."
+            if rows
+            else "Relaytic could not build a benchmark ablation matrix for this run."
+        ),
+        trace=trace,
+    )
+
+
+def _build_rerun_variance_report(
+    *,
+    run_dir: str | Path,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    comparison_metric: str,
+    metric_direction: str,
+    relaytic_reference: dict[str, Any],
+    task_type: str,
+    target_column: str,
+    data_mode: str,
+    row_count: int,
+    column_count: int,
+) -> RerunVarianceReport:
+    current_metric = _metric_value(relaytic_reference.get("test_metric"), comparison_metric)
+    current_run_id = Path(run_dir).name
+    rows = [(current_run_id, current_metric)] if current_metric is not None else []
+    rows.extend(
+        _discover_matching_benchmark_runs(
+            current_run_dir=Path(run_dir),
+            comparison_metric=comparison_metric,
+            task_type=task_type,
+            target_column=target_column,
+            data_mode=data_mode,
+            row_count=row_count,
+            column_count=column_count,
+        )
+    )
+    deduped: list[tuple[str, float]] = []
+    seen_ids: set[str] = set()
+    for run_id, metric_value in rows:
+        if run_id in seen_ids:
+            continue
+        seen_ids.add(run_id)
+        deduped.append((run_id, metric_value))
+    values = [float(value) for _, value in deduped]
+    if len(values) <= 1:
+        stability_band = "single_run_only"
+        status = "single_run_only"
+        stddev_value = None
+        mean_value = values[0] if values else None
+        min_value = values[0] if values else None
+        max_value = values[0] if values else None
+        cv = None
+    else:
+        mean_value = float(fmean(values))
+        stddev_value = float(pstdev(values))
+        min_value = min(values)
+        max_value = max(values)
+        cv = abs(stddev_value / mean_value) if abs(mean_value) > 1e-12 else None
+        spread = abs(max_value - min_value)
+        if spread <= 0.01 or (cv is not None and cv <= 0.01):
+            stability_band = "stable"
+        elif spread <= 0.03 or (cv is not None and cv <= 0.05):
+            stability_band = "moderate_variance"
+        else:
+            stability_band = "volatile"
+        status = "ok"
+    return RerunVarianceReport(
+        schema_version=RERUN_VARIANCE_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status=status,
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        matching_run_count=len(deduped),
+        run_ids=[run_id for run_id, _ in deduped],
+        metric_values=values,
+        mean_metric_value=mean_value,
+        min_metric_value=min_value,
+        max_metric_value=max_value,
+        stddev_metric_value=stddev_value,
+        coefficient_of_variation=cv,
+        stability_band=stability_band,
+        summary=(
+            f"Relaytic compared `{len(deduped)}` matching benchmarked run(s) and classified rerun stability as `{stability_band}`."
+            if deduped
+            else "Relaytic could not find any benchmarked runs to measure rerun variance."
+        ),
+        trace=trace,
+    )
+
+
+def _build_benchmark_claims_report(
+    *,
+    run_dir: str | Path,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    parity_report: BenchmarkParityReport,
+    gap_report: BenchmarkGapReport,
+    incumbent_parity: IncumbentParityReport,
+    benchmark_expected: bool,
+    paper_manifest: PaperBenchmarkManifest,
+    rerun_variance_report: RerunVarianceReport,
+) -> BenchmarkClaimsReport:
+    root = Path(run_dir)
+    benchmark_vs_deploy_report = _read_json_artifact(root / "benchmark_vs_deploy_report.json")
+    deployment_readiness_report = _read_json_artifact(root / "deployment_readiness_report.json")
+    parity_status = _clean_text(parity_report.parity_status) or "unknown"
+    if parity_status == "meets_or_exceeds_reference":
+        competitiveness_claim = "competitive_against_current_same_contract_reference_set"
+    elif parity_status == "near_parity":
+        competitiveness_claim = "near_parity_against_current_same_contract_reference_set"
+    elif parity_status == "below_reference":
+        competitiveness_claim = "below_reference_on_current_same_contract_reference_set"
+    else:
+        competitiveness_claim = "reference_claim_not_available"
+    deployment_claim = (
+        _clean_text(benchmark_vs_deploy_report.get("deployment_readiness"))
+        or _clean_text(deployment_readiness_report.get("readiness_state"))
+        or "unknown"
+    )
+    below_reference = parity_status == "below_reference"
+    split_detected = bool(benchmark_vs_deploy_report.get("split_detected"))
+    claim_boundaries = [
+        "same-contract local benchmark comparison only",
+        "benchmark competitiveness and deployment readiness are reported separately",
+        "results reflect the current local reference set rather than a universal leaderboard",
+    ]
+    if benchmark_expected:
+        claim_boundaries.append("benchmarking was explicitly requested or inferred for this run posture")
+    if paper_manifest.data_mode == "time_series":
+        claim_boundaries.append("sequence-native families remain shadow-only unless temporal evidence justifies promotion")
+    weak_spots: list[str] = []
+    if below_reference:
+        weak_spots.append(gap_report.summary)
+    if rerun_variance_report.stability_band == "volatile":
+        weak_spots.append("rerun variance is still volatile across matching benchmarked runs")
+    if incumbent_parity.incumbent_stronger:
+        weak_spots.append("an incumbent or external challenger is currently stronger than Relaytic on the comparison metric")
+    not_claiming = [
+        "global state-of-the-art performance across tabular machine learning",
+        "automatic deployment readiness from benchmark wins alone",
+    ]
+    if paper_manifest.data_mode == "time_series":
+        not_claiming.append("live sequence-model superiority over lagged tabular baselines")
+    summary = (
+        f"Relaytic currently claims `{competitiveness_claim}` with deployment claim `{deployment_claim}`."
+    )
+    return BenchmarkClaimsReport(
+        schema_version=BENCHMARK_CLAIMS_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok",
+        competitiveness_claim=competitiveness_claim,
+        deployment_claim=deployment_claim,
+        below_reference=below_reference,
+        benchmark_vs_deploy_split=split_detected,
+        claim_boundaries=claim_boundaries,
+        weak_spots=weak_spots,
+        not_claiming=not_claiming,
+        why_below_reference=gap_report.summary if below_reference else None,
+        temporal_posture={
+            "horizon_type": paper_manifest.horizon_type,
+            "lagged_baseline_family": paper_manifest.lagged_baseline_family,
+            "sequence_candidate_status": paper_manifest.sequence_candidate_status,
+            "sequence_candidate_reason": paper_manifest.sequence_candidate_reason,
+        },
+        summary=summary,
+        trace=trace,
+    )
 
 
 def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -> str:
@@ -344,6 +842,9 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
     parity = dict(payload.get("benchmark_parity_report", {}))
     incumbent = dict(payload.get("incumbent_parity_report", {}))
     beat_target = dict(payload.get("beat_target_contract", {}))
+    paper_manifest = dict(payload.get("paper_benchmark_manifest", {}))
+    rerun_variance = dict(payload.get("rerun_variance_report", {}))
+    claims = dict(payload.get("benchmark_claims_report", {}))
     lines = [
         "# Relaytic Benchmark Review",
         "",
@@ -373,6 +874,38 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
                 f"- Test gap: `{gap.get('test_gap')}`",
                 f"- Near parity: `{gap.get('near_parity')}`",
                 f"- Relaytic beats best reference: `{gap.get('relaytic_beats_best_reference')}`",
+            ]
+        )
+    if paper_manifest:
+        lines.extend(
+            [
+                "",
+                "## Paper Surface",
+                f"- Dataset: `{paper_manifest.get('dataset_label') or 'unknown'}`",
+                f"- Task type: `{paper_manifest.get('task_type') or 'unknown'}`",
+                f"- Selected family: `{paper_manifest.get('selected_model_family') or 'unknown'}`",
+                f"- Horizon type: `{paper_manifest.get('horizon_type') or 'n/a'}`",
+                f"- Sequence candidate status: `{paper_manifest.get('sequence_candidate_status') or 'n/a'}`",
+            ]
+        )
+    if rerun_variance:
+        lines.extend(
+            [
+                "",
+                "## Rerun Variance",
+                f"- Matching run count: `{rerun_variance.get('matching_run_count')}`",
+                f"- Stability band: `{rerun_variance.get('stability_band')}`",
+                f"- Mean metric value: `{rerun_variance.get('mean_metric_value')}`",
+            ]
+        )
+    if claims:
+        lines.extend(
+            [
+                "",
+                "## Claim Boundary",
+                f"- Competitiveness claim: `{claims.get('competitiveness_claim')}`",
+                f"- Deployment claim: `{claims.get('deployment_claim')}`",
+                f"- Below reference: `{claims.get('below_reference')}`",
             ]
         )
     if incumbent:
@@ -1055,6 +1588,95 @@ def _unavailable_bundle(
         summary="Relaytic did not receive an explicit incumbent beat-target for this benchmark bundle.",
         trace=trace,
     )
+    paper_manifest = PaperBenchmarkManifest(
+        schema_version=PAPER_BENCHMARK_MANIFEST_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_available",
+        dataset_label="unknown",
+        dataset_source_name=None,
+        dataset_source_type=None,
+        source_url=None,
+        data_path="",
+        task_type="unknown",
+        data_mode="unknown",
+        target_column="",
+        row_count=0,
+        column_count=0,
+        comparison_metric="unknown",
+        metric_direction="higher_is_better",
+        selected_model_family=None,
+        selected_hyperparameters={},
+        benchmark_expected=benchmark_expected,
+        horizon_type=None,
+        timestamp_cadence_quality=None,
+        lagged_baseline_family=None,
+        lagged_baseline_metric=None,
+        sequence_candidate_status=None,
+        sequence_candidate_reason=None,
+        summary=summary,
+        trace=trace,
+    )
+    paper_table = PaperBenchmarkTable(
+        schema_version=PAPER_BENCHMARK_TABLE_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_available",
+        comparison_metric="unknown",
+        metric_direction="higher_is_better",
+        relaytic_rank=None,
+        reference_count=0,
+        rows=[],
+        summary=summary,
+        trace=trace,
+    )
+    ablation_matrix = BenchmarkAblationMatrix(
+        schema_version=BENCHMARK_ABLATION_MATRIX_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_available",
+        comparison_metric="unknown",
+        metric_direction="higher_is_better",
+        rows=[],
+        summary=summary,
+        trace=trace,
+    )
+    rerun_variance = RerunVarianceReport(
+        schema_version=RERUN_VARIANCE_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="single_run_only",
+        comparison_metric="unknown",
+        metric_direction="higher_is_better",
+        matching_run_count=0,
+        run_ids=[],
+        metric_values=[],
+        mean_metric_value=None,
+        min_metric_value=None,
+        max_metric_value=None,
+        stddev_metric_value=None,
+        coefficient_of_variation=None,
+        stability_band="single_run_only",
+        summary=summary,
+        trace=trace,
+    )
+    claims = BenchmarkClaimsReport(
+        schema_version=BENCHMARK_CLAIMS_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_available",
+        competitiveness_claim="reference_claim_not_available",
+        deployment_claim="unknown",
+        below_reference=False,
+        benchmark_vs_deploy_split=False,
+        claim_boundaries=["benchmark evidence unavailable"],
+        weak_spots=[summary],
+        not_claiming=["global state-of-the-art performance"],
+        why_below_reference=None,
+        temporal_posture={},
+        summary=summary,
+        trace=trace,
+    )
     return BenchmarkBundle(
         reference_approach_matrix=matrix,
         benchmark_gap_report=gap_report,
@@ -1063,7 +1685,190 @@ def _unavailable_bundle(
         external_challenger_evaluation=incumbent_evaluation,
         incumbent_parity_report=incumbent_parity,
         beat_target_contract=beat_target,
+        paper_benchmark_manifest=paper_manifest,
+        paper_benchmark_table=paper_table,
+        benchmark_ablation_matrix=ablation_matrix,
+        rerun_variance_report=rerun_variance,
+        benchmark_claims_report=claims,
     )
+
+
+def _read_json_artifact(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _read_jsonl_artifact(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    rows: list[dict[str, Any]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        text = line.strip()
+        if not text:
+            continue
+        try:
+            payload = json.loads(text)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict):
+            rows.append(payload)
+    return rows
+
+
+def _read_frame_or_empty(data_path: str) -> Any:
+    try:
+        return load_tabular_data(data_path).frame.copy()
+    except Exception:
+        import pandas as pd
+
+        return pd.DataFrame()
+
+
+def _best_trial_for_family(
+    *,
+    ledger: list[dict[str, Any]],
+    family: str,
+    comparison_metric: str,
+    metric_direction: str,
+) -> dict[str, Any] | None:
+    candidates = [item for item in ledger if _clean_text(item.get("family")) == family]
+    if not candidates:
+        return None
+    ordered = sorted(
+        candidates,
+        key=lambda item: _benchmark_metric_rank_key(
+            _metric_value(item.get("validation_metrics"), comparison_metric),
+            metric_direction=metric_direction,
+        ),
+    )
+    return ordered[0]
+
+
+def _ablation_row(
+    *,
+    ablation_id: str,
+    label: str,
+    role: str,
+    comparison_metric: str,
+    test_metric: float | None,
+    validation_metric: float | None,
+    model_family: str | None,
+    variant_id: str | None,
+    selected_metric: float | None,
+) -> dict[str, Any]:
+    delta_to_selected = None
+    if selected_metric is not None and test_metric is not None:
+        delta_to_selected = round(float(selected_metric) - float(test_metric), 6)
+    return {
+        "ablation_id": ablation_id,
+        "label": label,
+        "role": role,
+        "comparison_metric": comparison_metric,
+        "model_family": model_family,
+        "variant_id": variant_id,
+        "validation_metric": validation_metric,
+        "test_metric": test_metric,
+        "delta_to_selected": delta_to_selected,
+    }
+
+
+def _best_reference_row(
+    *,
+    reference_rows: list[dict[str, Any]],
+    comparison_metric: str,
+    metric_direction: str,
+) -> dict[str, Any] | None:
+    if not reference_rows:
+        return None
+    ordered = sorted(
+        reference_rows,
+        key=lambda item: _benchmark_metric_rank_key(
+            _metric_value(item.get("test_metric"), comparison_metric),
+            metric_direction=metric_direction,
+        ),
+    )
+    return ordered[0]
+
+
+def _benchmark_metric_rank_key(value: float | None, *, metric_direction: str) -> tuple[float, int]:
+    if value is None:
+        return (float("inf"), 1)
+    if metric_direction == "lower_is_better":
+        return (float(value), 0)
+    return (-float(value), 0)
+
+
+def _find_lagged_reference(*, reference_rows: list[dict[str, Any]]) -> dict[str, Any] | None:
+    return next(
+        (
+            item
+            for item in reference_rows
+            if str(item.get("model_family", "")).strip().startswith("sklearn_lagged_")
+            or "lagged" in str(item.get("model_family", "")).strip()
+        ),
+        None,
+    )
+
+
+def _find_lagged_baseline_reference(*, root: Path) -> dict[str, Any] | None:
+    matrix = _read_json_artifact(root / "reference_approach_matrix.json")
+    return _find_lagged_reference(reference_rows=list(matrix.get("references", [])))
+
+
+def _temporal_horizon_type(*, task_type: str, data_mode: str) -> str | None:
+    if data_mode != "time_series":
+        return None
+    if is_classification_task(task_type):
+        return "same_step_temporal_classification"
+    return "one_step_temporal_regression"
+
+
+def _discover_matching_benchmark_runs(
+    *,
+    current_run_dir: Path,
+    comparison_metric: str,
+    task_type: str,
+    target_column: str,
+    data_mode: str,
+    row_count: int,
+    column_count: int,
+) -> list[tuple[str, float]]:
+    parent = current_run_dir.parent
+    if not parent.exists():
+        return []
+    rows: list[tuple[str, float]] = []
+    for child in parent.iterdir():
+        if not child.is_dir() or child == current_run_dir:
+            continue
+        summary = _read_json_artifact(child / "run_summary.json")
+        matrix = _read_json_artifact(child / "reference_approach_matrix.json")
+        if not summary or not matrix:
+            continue
+        decision = dict(summary.get("decision", {}))
+        data = dict(summary.get("data", {}))
+        if _clean_text(decision.get("task_type")) != task_type:
+            continue
+        if _clean_text(decision.get("target_column")) != target_column:
+            continue
+        if _clean_text(data.get("data_mode")) != data_mode:
+            continue
+        if int(data.get("row_count", -1) or -1) != int(row_count):
+            continue
+        if int(data.get("column_count", -1) or -1) != int(column_count):
+            continue
+        relaytic_reference = dict(matrix.get("relaytic_reference", {}))
+        if _clean_text(matrix.get("comparison_metric")) != comparison_metric:
+            continue
+        metric_value = _metric_value(relaytic_reference.get("test_metric"), comparison_metric)
+        if metric_value is None:
+            continue
+        rows.append((str(summary.get("run_id") or child.name), float(metric_value)))
+    return rows
 
 
 def _bundle_item(bundle: dict[str, Any] | None, key: str) -> dict[str, Any]:

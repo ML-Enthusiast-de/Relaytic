@@ -113,6 +113,17 @@ Avoid introducing new references to:
 - introduced the checked-in workspace discovery mirror `skills/relaytic/SKILL.md` for OpenClaw-style hosts
 - upgraded `relaytic interoperability show` so host readiness is explicit instead of implied
 
+### Slice 15D
+
+- expanded the existing benchmark boundary without creating a new package by adding paper-facing benchmark artifacts under `src/relaytic/benchmark/`
+- introduced the public paper-benchmark artifact family:
+  - `paper_benchmark_manifest.json`
+  - `paper_benchmark_table.json`
+  - `benchmark_ablation_matrix.json`
+  - `rerun_variance_report.json`
+  - `benchmark_claims_report.json`
+- upgraded `relaytic benchmark run` and `relaytic benchmark show` so humans and external agents can inspect benchmark competitiveness claims, rerun variance, temporal benchmark posture, and benchmark-vs-deploy separation from one stable benchmark bundle
+
 ### Slice 09A
 
 - introduced the canonical package boundary `src/relaytic/memory/`
@@ -224,6 +235,20 @@ Avoid introducing new references to:
 - introduced artifact boundaries for `task_profile_contract.json`, `target_semantics_report.json`, `metric_contract.json`, `benchmark_mode_report.json`, `deployment_readiness_report.json`, `benchmark_vs_deploy_report.json`, and `dataset_semantics_audit.json`
 - upgraded planning, benchmark review, run summary, and assist explanation surfaces so task semantics, metric choice, and benchmark-versus-deploy posture come from one canonical contract instead of being re-inferred later
 - expanded the benchmark/test boundary to include timestamped temporal benchmark dataset writers and optional temporal benchmark-pack tests without changing the current public ingestion surface
+
+### Slice 15B
+
+- extended the existing `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/assist/`, and `src/relaytic/runs/` boundaries rather than introducing a separate architecture-selection package
+- introduced artifact boundaries for `architecture_registry.json`, `architecture_router_report.json`, `candidate_family_matrix.json`, `architecture_fit_report.json`, `family_capability_matrix.json`, and `architecture_ablation_report.json`
+- upgraded planning, memory-informed candidate ordering, run summary, and assist explanation surfaces so architecture choice is routed and auditable instead of hidden inside Builder defaults
+- expanded the trainable-model boundary to include histogram-gradient boosting and extra-trees regression/classification families plus optional CatBoost, XGBoost, LightGBM, and TabPFN adapter slots when those libraries are installed
+
+### Slice 15C
+
+- extended the existing `src/relaytic/modeling/`, `src/relaytic/runs/`, `src/relaytic/assist/`, and `src/relaytic/ui/` boundaries rather than introducing a separate HPO orchestration package
+- introduced artifact boundaries for `hpo_budget_contract.json`, `architecture_search_space.json`, `trial_ledger.jsonl`, `early_stopping_report.json`, `search_loop_scorecard.json`, `warm_start_transfer_report.json`, and `threshold_tuning_report.json`
+- upgraded the deterministic floor from shallow fixed family variants to bounded seeded search loops with explicit plateau stopping, wall-clock budgeting, threshold tuning, and warm-start reuse
+- upgraded run-summary, access-surface, and assist explanation surfaces so model-choice questions can cite HPO budgets, executed trials, stop reasons, and threshold policy instead of hand-waving over search behavior
 
 ### Slice 11F
 

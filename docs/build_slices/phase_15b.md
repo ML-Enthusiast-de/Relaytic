@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Shipped.
 
 Delivered package boundaries:
 
@@ -87,3 +87,33 @@ Slice 15B is acceptable only if:
 - one architecture-router test for multiclass data
 - one static-table `why not LSTM?` explanation test
 - one adapter-unavailable graceful-fallback test
+
+## Shipped Notes
+
+Slice 15B is now landed.
+
+It ships:
+
+- canonical architecture-routing artifacts from planning through run summary
+- widened built-in trainable families for histogram-gradient boosting and extra-trees regression/classification
+- optional CatBoost, XGBoost, LightGBM, and TabPFN adapter slots with graceful availability reporting
+- shared planner, memory, inference, assist, and summary integration so architecture choice is inspectable instead of hidden inside Builder defaults
+- explicit sequence-family shadow gating so static tables reject LSTM/transformer routing with an auditable explanation
+
+## Verification Snapshot
+
+Targeted slice verification passed:
+
+- `tests/test_architecture_routing.py`
+- `tests/test_model_training_candidates.py`
+- `tests/test_planning_agents.py`
+- `tests/test_assist_agents.py`
+- `tests/test_cli_slice15b.py`
+
+Direct slice wall result:
+
+- `27 passed`
+
+Broader adjacent validation also passed:
+
+- `43 passed`

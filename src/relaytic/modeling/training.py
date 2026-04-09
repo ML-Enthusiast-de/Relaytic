@@ -3,12 +3,21 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
+import json
 import math
 from pathlib import Path
+import time
 from typing import Any
 
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import (
+    ExtraTreesClassifier,
+    ExtraTreesRegressor,
+    HistGradientBoostingClassifier,
+    HistGradientBoostingRegressor,
+)
 
 from relaytic.analytics.task_detection import assess_task_profile, is_classification_task
 from relaytic.core.json_utils import write_json
@@ -25,8 +34,26 @@ from .classifiers import (
     BoostedTreeClassifierSurrogate,
     LogisticClassificationSurrogate,
 )
+from .estimator_adapters import (
+    PickledClassificationEstimatorSurrogate,
+    PickledRegressionEstimatorSurrogate,
+    build_classification_estimator_variants,
+    build_regression_estimator_variants,
+)
 from .evaluation import classification_metrics, regression_metrics
 from .feature_pipeline import prepare_split_safe_feature_frames
+from .hpo_loop import (
+    EARLY_STOPPING_REPORT_SCHEMA_VERSION,
+    SEARCH_LOOP_SCORECARD_SCHEMA_VERSION,
+    THRESHOLD_TUNING_REPORT_SCHEMA_VERSION,
+    TRIAL_LEDGER_RECORD_SCHEMA_VERSION,
+    WARM_START_TRANSFER_REPORT_SCHEMA_VERSION,
+    artifact_path as hpo_artifact_path,
+    build_architecture_search_space,
+    build_trial_plans,
+    derive_hpo_budget_contract,
+    load_warm_start_state,
+)
 from .normalization import MinMaxNormalizer
 from .performance_feedback import analyze_model_performance
 from .splitters import DatasetSplit, build_train_validation_test_split
@@ -50,17 +77,50 @@ class CandidateMetrics:
         return asdict(self)
 
 
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
 _MODEL_TIEBREAK = {
     "linear_ridge": 0,
     "lagged_linear": 1,
     "bagged_tree_ensemble": 2,
     "boosted_tree_ensemble": 3,
-    "lagged_tree_ensemble": 4,
+    "hist_gradient_boosting_ensemble": 4,
+    "extra_trees_ensemble": 5,
+    "catboost_ensemble": 6,
+    "xgboost_ensemble": 7,
+    "lightgbm_ensemble": 8,
+    "lagged_tree_ensemble": 9,
     "logistic_regression": 0,
     "lagged_logistic_regression": 1,
     "bagged_tree_classifier": 2,
     "boosted_tree_classifier": 3,
-    "lagged_tree_classifier": 4,
+    "hist_gradient_boosting_classifier": 4,
+    "extra_trees_classifier": 5,
+    "catboost_classifier": 6,
+    "xgboost_classifier": 7,
+    "lightgbm_classifier": 8,
+    "tabpfn_classifier": 9,
+    "lagged_tree_classifier": 10,
+}
+
+
+_REGRESSION_ADAPTER_FAMILIES = {
+    "hist_gradient_boosting_ensemble",
+    "extra_trees_ensemble",
+    "catboost_ensemble",
+    "xgboost_ensemble",
+    "lightgbm_ensemble",
+}
+
+_CLASSIFICATION_ADAPTER_FAMILIES = {
+    "hist_gradient_boosting_classifier",
+    "extra_trees_classifier",
+    "catboost_classifier",
+    "xgboost_classifier",
+    "lightgbm_classifier",
+    "tabpfn_classifier",
 }
 
 
@@ -107,15 +167,29 @@ def normalize_candidate_model_family(requested_model_family: str) -> str | None:
         "tree_ensemble": "bagged_tree_ensemble",
         "tree_ensemble_candidate": "bagged_tree_ensemble",
         "tree": "bagged_tree_ensemble",
-        "extra_trees": "bagged_tree_ensemble",
+        "extra_trees": "extra_trees_ensemble",
+        "extra_trees_ensemble": "extra_trees_ensemble",
         "boosted_tree_ensemble": "boosted_tree_ensemble",
         "boosted_tree": "boosted_tree_ensemble",
         "gradient_boosting": "boosted_tree_ensemble",
-        "hist_gradient_boosting": "boosted_tree_ensemble",
+        "hist_gradient_boosting": "hist_gradient_boosting_ensemble",
+        "hist_gradient_boosting_ensemble": "hist_gradient_boosting_ensemble",
         "gbdt": "boosted_tree_ensemble",
+        "catboost": "catboost_ensemble",
+        "catboost_ensemble": "catboost_ensemble",
+        "xgboost": "xgboost_ensemble",
+        "xgboost_ensemble": "xgboost_ensemble",
+        "lightgbm": "lightgbm_ensemble",
+        "lightgbm_ensemble": "lightgbm_ensemble",
         "boosted_tree_classifier": "boosted_tree_classifier",
         "gradient_boosting_classifier": "boosted_tree_classifier",
-        "hist_gradient_boosting_classifier": "boosted_tree_classifier",
+        "hist_gradient_boosting_classifier": "hist_gradient_boosting_classifier",
+        "extra_trees_classifier": "extra_trees_classifier",
+        "catboost_classifier": "catboost_classifier",
+        "xgboost_classifier": "xgboost_classifier",
+        "lightgbm_classifier": "lightgbm_classifier",
+        "tabpfn": "tabpfn_classifier",
+        "tabpfn_classifier": "tabpfn_classifier",
         "gbdt_classifier": "boosted_tree_classifier",
     }
     return aliases.get(normalized)
@@ -171,10 +245,13 @@ def train_surrogate_candidates(
             "lagged_linear/lagged/temporal_linear/arx, "
             "lagged_tree_classifier/temporal_tree_classifier, "
             "lagged_tree_ensemble/lagged_tree/lag_window_tree/temporal_tree, "
-            "bagged_tree_ensemble/tree/tree_ensemble/extra_trees, "
-            "boosted_tree_ensemble/gradient_boosting/hist_gradient_boosting, "
+            "bagged_tree_ensemble/tree/tree_ensemble, extra_trees/extra_trees_ensemble, "
+            "boosted_tree_ensemble/gradient_boosting, hist_gradient_boosting/hist_gradient_boosting_ensemble, "
             "bagged_tree_classifier/tree_classifier/classifier_tree, "
-            "boosted_tree_classifier/gradient_boosting_classifier."
+            "boosted_tree_classifier/gradient_boosting_classifier, "
+            "hist_gradient_boosting_classifier, extra_trees_classifier, "
+            "catboost/catboost_classifier, xgboost/xgboost_classifier, lightgbm/lightgbm_classifier, "
+            "tabpfn/tabpfn_classifier."
         )
     requested = _resolve_requested_for_task(
         requested=requested,
@@ -231,12 +308,44 @@ def train_surrogate_candidates(
             for name, part in prepared_frames.items()
         }
 
+    artifact_store = ArtifactStore()
+    if output_run_dir is not None:
+        run_dir = Path(output_run_dir)
+        run_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        run_dir = artifact_store.create_run_dir(run_id=run_id)
+
+    regression_hpo_families: list[str] = ["linear_ridge"]
+    if compare_against_baseline or requested == "bagged_tree_ensemble":
+        regression_hpo_families.append("bagged_tree_ensemble")
+    if compare_against_baseline or requested == "boosted_tree_ensemble":
+        regression_hpo_families.append("boosted_tree_ensemble")
+    if compare_against_baseline or requested in _REGRESSION_ADAPTER_FAMILIES:
+        regression_hpo_families.extend(
+            [
+                family
+                for family in ["hist_gradient_boosting_ensemble", "extra_trees_ensemble"]
+                if compare_against_baseline or requested == family
+            ]
+        )
+    hpo_context = _prepare_hpo_context(
+        run_dir=run_dir,
+        task_type=task_profile.task_type,
+        row_count=len(frame),
+        requested_family=requested,
+        preferred_candidate_order=preferred_candidate_order,
+        available_families=regression_hpo_families,
+    )
+
     rows_used_by_model: dict[str, int] = {}
     candidate_records: list[dict[str, Any]] = []
     linear_candidates = _fit_regression_linear_candidates(
         frames=prepared_frames,
         model_feature_columns=model_feature_columns,
         target_column=target_column,
+        hpo_context=hpo_context,
+        task_type=task_profile.task_type,
+        selection_metric=selection_metric,
     )
     for record in linear_candidates:
         rows_used_by_model["linear_ridge"] = int(record["rows_used"])
@@ -322,6 +431,9 @@ def train_surrogate_candidates(
             frames=prepared_frames,
             model_feature_columns=model_feature_columns,
             target_column=target_column,
+            hpo_context=hpo_context,
+            task_type=task_profile.task_type,
+            selection_metric=selection_metric,
         ):
             rows_used_by_model["bagged_tree_ensemble"] = int(record["rows_used"])
             candidate_records.append(record)
@@ -332,11 +444,31 @@ def train_surrogate_candidates(
             frames=prepared_frames,
             model_feature_columns=model_feature_columns,
             target_column=target_column,
+            hpo_context=hpo_context,
+            task_type=task_profile.task_type,
+            selection_metric=selection_metric,
         ):
             rows_used_by_model["boosted_tree_ensemble"] = int(record["rows_used"])
             candidate_records.append(record)
 
+    if compare_against_baseline or requested in _REGRESSION_ADAPTER_FAMILIES:
+        for record in _fit_regression_estimator_candidates(
+            frames=prepared_frames,
+            model_feature_columns=model_feature_columns,
+            target_column=target_column,
+            requested_family=None if compare_against_baseline else requested,
+            hpo_context=hpo_context,
+            task_type=task_profile.task_type,
+            selection_metric=selection_metric,
+        ):
+            rows_used_by_model[str(record["candidate"].model_family)] = int(record["rows_used"])
+            candidate_records.append(record)
+
     candidates = [dict(record).get("candidate") for record in candidate_records]
+    if requested in _REGRESSION_ADAPTER_FAMILIES and not any(
+        item.model_family == requested for item in candidates
+    ):
+        raise ValueError(f"Requested model family `{requested}` is not available on this machine.")
 
     best_by_validation = _select_best_candidate(
         candidates,
@@ -357,12 +489,6 @@ def train_surrogate_candidates(
         raise RuntimeError("Selected model object is unavailable.")
     selected_model_obj: Any = selected_record["model"]
 
-    artifact_store = ArtifactStore()
-    if output_run_dir is not None:
-        run_dir = Path(output_run_dir)
-        run_dir.mkdir(parents=True, exist_ok=True)
-    else:
-        run_dir = artifact_store.create_run_dir(run_id=run_id)
     normalizer_path: str | None = None
     if normalizer is not None:
         normalizer_path = str(artifact_store.save_normalizer(run_dir=run_dir, normalizer=normalizer))
@@ -429,6 +555,15 @@ def train_surrogate_candidates(
         notes=checkpoint_tag or "",
         tags=[checkpoint_tag] if checkpoint_tag else [],
     )
+    hpo_artifacts = _write_hpo_artifacts(
+        run_dir=run_dir,
+        hpo_context=hpo_context,
+        candidates=candidates,
+        selected_candidate=selected_candidate,
+        best_by_validation=best_by_validation,
+        task_type=task_profile.task_type,
+        threshold_policy=threshold_policy,
+    )
 
     return {
         "status": "ok",
@@ -462,6 +597,13 @@ def train_surrogate_candidates(
             "validation": selected_candidate.validation_metrics,
             "test": selected_candidate.test_metrics,
         },
+        "hpo": {
+            "budget_contract": dict(hpo_context.get("budget_contract") or {}),
+            "family_reports": list(hpo_context.get("family_reports") or []),
+            "trial_count": len(hpo_context.get("trial_ledger") or []),
+            "warm_start_used": bool(dict(hpo_context.get("warm_start_state") or {}).get("used")),
+        },
+        "hpo_artifacts": hpo_artifacts,
         "selection_metric": str(selection_metric or "").strip() or "auto",
         "preferred_candidate_order": list(preferred_candidate_order or []),
     }
@@ -476,6 +618,12 @@ def _resolve_requested_for_task(*, requested: str, task_type: str) -> str:
         "lagged_logistic_regression",
         "bagged_tree_classifier",
         "boosted_tree_classifier",
+        "hist_gradient_boosting_classifier",
+        "extra_trees_classifier",
+        "catboost_classifier",
+        "xgboost_classifier",
+        "lightgbm_classifier",
+        "tabpfn_classifier",
         "lagged_tree_classifier",
     }:
         return requested
@@ -487,6 +635,16 @@ def _resolve_requested_for_task(*, requested: str, task_type: str) -> str:
         return "bagged_tree_classifier"
     if requested == "boosted_tree_ensemble":
         return "boosted_tree_classifier"
+    if requested == "hist_gradient_boosting_ensemble":
+        return "hist_gradient_boosting_classifier"
+    if requested == "extra_trees_ensemble":
+        return "extra_trees_classifier"
+    if requested == "catboost_ensemble":
+        return "catboost_classifier"
+    if requested == "xgboost_ensemble":
+        return "xgboost_classifier"
+    if requested == "lightgbm_ensemble":
+        return "lightgbm_classifier"
     if requested == "lagged_tree_ensemble":
         return "lagged_tree_classifier"
     return requested
@@ -543,6 +701,35 @@ def _train_classification_candidates(
             for name, part in prepared_frames.items()
         }
 
+    artifact_store = ArtifactStore()
+    if output_run_dir is not None:
+        run_dir = Path(output_run_dir)
+        run_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        run_dir = artifact_store.create_run_dir(run_id=run_id)
+
+    classification_hpo_families: list[str] = ["logistic_regression"]
+    if compare_against_baseline or requested == "bagged_tree_classifier":
+        classification_hpo_families.append("bagged_tree_classifier")
+    if compare_against_baseline or requested == "boosted_tree_classifier":
+        classification_hpo_families.append("boosted_tree_classifier")
+    if compare_against_baseline or requested in _CLASSIFICATION_ADAPTER_FAMILIES:
+        classification_hpo_families.extend(
+            [
+                family
+                for family in ["hist_gradient_boosting_classifier", "extra_trees_classifier"]
+                if compare_against_baseline or requested == family
+            ]
+        )
+    hpo_context = _prepare_hpo_context(
+        run_dir=run_dir,
+        task_type=str(task_profile.task_type),
+        row_count=len(frame),
+        requested_family=requested,
+        preferred_candidate_order=preferred_candidate_order,
+        available_families=classification_hpo_families,
+    )
+
     lagged_horizon = _resolve_lag_horizon(
         data_mode="time_series" if split.data_mode == "time_series" else "steady_state",
         requested=requested,
@@ -564,6 +751,8 @@ def _train_classification_candidates(
         task_type=str(task_profile.task_type),
         threshold_policy=threshold_policy,
         decision_threshold=decision_threshold,
+        hpo_context=hpo_context,
+        selection_metric=selection_metric,
     ):
         rows_used_by_model["logistic_regression"] = int(record["rows_used"])
         classifier_thresholds["logistic_regression"] = float(
@@ -620,6 +809,8 @@ def _train_classification_candidates(
             task_type=str(task_profile.task_type),
             threshold_policy=threshold_policy,
             decision_threshold=decision_threshold,
+            hpo_context=hpo_context,
+            selection_metric=selection_metric,
         ):
             rows_used_by_model["bagged_tree_classifier"] = int(record["rows_used"])
             classifier_thresholds["bagged_tree_classifier"] = float(
@@ -636,9 +827,31 @@ def _train_classification_candidates(
             task_type=str(task_profile.task_type),
             threshold_policy=threshold_policy,
             decision_threshold=decision_threshold,
+            hpo_context=hpo_context,
+            selection_metric=selection_metric,
         ):
             rows_used_by_model["boosted_tree_classifier"] = int(record["rows_used"])
             classifier_thresholds["boosted_tree_classifier"] = float(
+                record["candidate"].train_metrics.get("decision_threshold", 0.5)
+            )
+            candidate_records.append(record)
+
+    class_count = int(task_profile.class_count or 0)
+    if compare_against_baseline or requested in _CLASSIFICATION_ADAPTER_FAMILIES:
+        for record in _fit_classification_estimator_candidates(
+            frames=prepared_frames,
+            model_feature_columns=model_feature_columns,
+            target_column=target_column,
+            task_type=str(task_profile.task_type),
+            threshold_policy=threshold_policy,
+            decision_threshold=decision_threshold,
+            class_count=class_count,
+            requested_family=None if compare_against_baseline else requested,
+            hpo_context=hpo_context,
+            selection_metric=selection_metric,
+        ):
+            rows_used_by_model[str(record["candidate"].model_family)] = int(record["rows_used"])
+            classifier_thresholds[str(record["candidate"].model_family)] = float(
                 record["candidate"].train_metrics.get("decision_threshold", 0.5)
             )
             candidate_records.append(record)
@@ -685,6 +898,10 @@ def _train_classification_candidates(
         )
 
     candidates = [dict(record).get("candidate") for record in candidate_records]
+    if requested in _CLASSIFICATION_ADAPTER_FAMILIES and not any(
+        item.model_family == requested for item in candidates
+    ):
+        raise ValueError(f"Requested model family `{requested}` is not available on this machine.")
 
     best_by_validation = _select_best_candidate(
         candidates,
@@ -705,12 +922,6 @@ def _train_classification_candidates(
         raise RuntimeError("Selected classifier model object is unavailable.")
     selected_model_obj: Any = selected_record["model"]
 
-    artifact_store = ArtifactStore()
-    if output_run_dir is not None:
-        run_dir = Path(output_run_dir)
-        run_dir.mkdir(parents=True, exist_ok=True)
-    else:
-        run_dir = artifact_store.create_run_dir(run_id=run_id)
     normalizer_path: str | None = None
     if normalizer is not None:
         normalizer_path = str(artifact_store.save_normalizer(run_dir=run_dir, normalizer=normalizer))
@@ -782,6 +993,15 @@ def _train_classification_candidates(
         notes=checkpoint_tag or "",
         tags=[checkpoint_tag] if checkpoint_tag else [],
     )
+    hpo_artifacts = _write_hpo_artifacts(
+        run_dir=run_dir,
+        hpo_context=hpo_context,
+        candidates=candidates,
+        selected_candidate=selected_candidate,
+        best_by_validation=best_by_validation,
+        task_type=str(task_profile.task_type),
+        threshold_policy=threshold_policy,
+    )
     return {
         "status": "ok",
         "data_mode": "time_series" if split.data_mode == "time_series" else "steady_state",
@@ -815,6 +1035,13 @@ def _train_classification_candidates(
             "validation": selected_candidate.validation_metrics,
             "test": selected_candidate.test_metrics,
         },
+        "hpo": {
+            "budget_contract": dict(hpo_context.get("budget_contract") or {}),
+            "family_reports": list(hpo_context.get("family_reports") or []),
+            "trial_count": len(hpo_context.get("trial_ledger") or []),
+            "warm_start_used": bool(dict(hpo_context.get("warm_start_state") or {}).get("used")),
+        },
+        "hpo_artifacts": hpo_artifacts,
         "selection_metric": str(selection_metric or "").strip() or "auto",
         "preferred_candidate_order": list(preferred_candidate_order or []),
     }
@@ -1963,6 +2190,255 @@ def _explicit_selection_metric_rank(
     return None
 
 
+def _prepare_hpo_context(
+    *,
+    run_dir: Path,
+    task_type: str,
+    row_count: int,
+    requested_family: str,
+    preferred_candidate_order: list[str] | None,
+    available_families: list[str],
+) -> dict[str, Any]:
+    budget_contract = derive_hpo_budget_contract(
+        run_dir=run_dir,
+        task_type=task_type,
+        row_count=row_count,
+        requested_family=requested_family,
+        preferred_candidate_order=preferred_candidate_order,
+        available_families=available_families,
+    )
+    architecture_search_space = build_architecture_search_space(
+        task_type=task_type,
+        selected_families=[str(item) for item in budget_contract.get("selected_families", [])],
+    )
+    warm_start_state = load_warm_start_state(
+        run_dir=run_dir,
+        selected_families=[str(item) for item in budget_contract.get("selected_families", [])],
+    )
+    trial_plans = build_trial_plans(
+        budget_contract=budget_contract,
+        architecture_search_space=architecture_search_space,
+        warm_start_state=warm_start_state,
+    )
+    deadline = time.monotonic() + float(budget_contract.get("max_wall_clock_seconds", 45) or 45)
+    return {
+        "budget_contract": budget_contract,
+        "architecture_search_space": architecture_search_space,
+        "warm_start_state": warm_start_state,
+        "trial_plans": trial_plans,
+        "deadline": deadline,
+        "family_reports": [],
+        "trial_ledger": [],
+    }
+
+
+def _fit_hpo_family_candidates(
+    *,
+    family: str,
+    trial_plans: list[dict[str, Any]],
+    build_model: Any,
+    build_candidate: Any,
+    task_type: str,
+    selection_metric: str | None,
+    budget_contract: dict[str, Any],
+    deadline: float,
+) -> tuple[list[dict[str, Any]], dict[str, Any], list[dict[str, Any]]]:
+    if not trial_plans:
+        return (
+            [],
+            {
+                "family": family,
+                "status": "not_selected",
+                "planned_trials": 0,
+                "executed_trials": 0,
+                "stop_reason": "not_selected_for_hpo",
+            },
+            [],
+        )
+
+    records: list[dict[str, Any]] = []
+    ledger: list[dict[str, Any]] = []
+    best_rank: tuple[float, ...] | None = None
+    best_trial_id: str | None = None
+    best_record: dict[str, Any] | None = None
+    plateau_count = 0
+    stop_reason = "trial_budget_exhausted"
+    min_trials_before_stop = int(budget_contract.get("min_trials_before_plateau_stop", 3) or 3)
+    plateau_patience = int(budget_contract.get("plateau_patience", 2) or 2)
+
+    for index, trial_plan in enumerate(trial_plans, start=1):
+        if time.monotonic() >= deadline:
+            stop_reason = "wall_clock_exhausted"
+            break
+        model = build_model(dict(trial_plan.get("hyperparameters") or {}))
+        candidate, rows_used = build_candidate(model, trial_plan)
+        rank = _candidate_validation_rank(
+            item=candidate,
+            task_type=task_type,
+            selection_metric=selection_metric,
+        )
+        improved_best = best_rank is None or rank < best_rank
+        if improved_best:
+            best_rank = rank
+            best_trial_id = str(trial_plan.get("trial_id", "")).strip() or None
+            best_record = {"candidate": candidate, "model": model, "rows_used": int(rows_used)}
+            plateau_count = 0
+        else:
+            plateau_count += 1
+        records.append({"candidate": candidate, "model": model, "rows_used": int(rows_used)})
+        ledger.append(
+            {
+                "schema_version": TRIAL_LEDGER_RECORD_SCHEMA_VERSION,
+                "trial_id": str(trial_plan.get("trial_id", "")).strip() or f"{family}_trial_{index:04d}",
+                "family": family,
+                "variant_id": str(trial_plan.get("variant_id", "")).strip() or f"{family}_variant_{index:04d}",
+                "source": str(trial_plan.get("source", "search_space")),
+                "hyperparameters": dict(candidate.hyperparameters or {}),
+                "validation_metrics": dict(candidate.validation_metrics),
+                "test_metrics": dict(candidate.test_metrics),
+                "decision_threshold": candidate.validation_metrics.get("decision_threshold"),
+                "improved_best": bool(improved_best),
+            }
+        )
+        if plateau_count >= plateau_patience and len(records) >= min_trials_before_stop:
+            stop_reason = "convergence_plateau"
+            break
+
+    if records and stop_reason == "trial_budget_exhausted" and len(records) < len(trial_plans):
+        stop_reason = "wall_clock_exhausted"
+
+    if best_record is None and records:
+        best_record = records[0]
+    return (
+        records,
+        {
+            "family": family,
+            "status": "ok" if records else "not_run",
+            "planned_trials": len(trial_plans),
+            "executed_trials": len(records),
+            "stop_reason": stop_reason,
+            "best_trial_id": best_trial_id,
+            "warm_start_used": any(str(item.get("source", "")) == "warm_start" for item in trial_plans[: max(len(records), 1)]),
+            "best_validation_metrics": dict(best_record["candidate"].validation_metrics) if best_record else {},
+        },
+        ledger,
+    )
+
+
+def _write_hpo_artifacts(
+    *,
+    run_dir: Path,
+    hpo_context: dict[str, Any],
+    candidates: list[CandidateMetrics],
+    selected_candidate: CandidateMetrics,
+    best_by_validation: CandidateMetrics,
+    task_type: str,
+    threshold_policy: str | None,
+) -> dict[str, str]:
+    budget_contract = dict(hpo_context.get("budget_contract") or {})
+    architecture_search_space = dict(hpo_context.get("architecture_search_space") or {})
+    warm_start_state = dict(hpo_context.get("warm_start_state") or {})
+    family_reports = list(hpo_context.get("family_reports") or [])
+    trial_ledger = list(hpo_context.get("trial_ledger") or [])
+
+    early_stopping_report = {
+        "schema_version": EARLY_STOPPING_REPORT_SCHEMA_VERSION,
+        "generated_at": _utc_now(),
+        "status": "ok" if family_reports else "not_applicable",
+        "family_count": len(family_reports),
+        "plateau_triggered_count": sum(1 for item in family_reports if str(item.get("stop_reason")) == "convergence_plateau"),
+        "wall_clock_exhausted_count": sum(1 for item in family_reports if str(item.get("stop_reason")) == "wall_clock_exhausted"),
+        "families": family_reports,
+        "summary": (
+            f"Relaytic stopped `{sum(1 for item in family_reports if str(item.get('stop_reason')) == 'convergence_plateau')}` family search loop(s) on convergence plateau."
+            if family_reports
+            else "No HPO families were selected for this run."
+        ),
+    }
+    search_loop_scorecard = {
+        "schema_version": SEARCH_LOOP_SCORECARD_SCHEMA_VERSION,
+        "generated_at": _utc_now(),
+        "status": "ok" if trial_ledger else "not_applicable",
+        "backend": str(budget_contract.get("backend", "deterministic_local_search")),
+        "selected_model_family": selected_candidate.model_family,
+        "selected_variant_id": selected_candidate.variant_id,
+        "best_validation_model_family": best_by_validation.model_family,
+        "best_validation_variant_id": best_by_validation.variant_id,
+        "total_trials_executed": len(trial_ledger),
+        "tuned_family_count": len(family_reports),
+        "family_reports": family_reports,
+        "warm_start_used": bool(warm_start_state.get("used")),
+        "stop_reasons": sorted({str(item.get("stop_reason", "")).strip() for item in family_reports if str(item.get("stop_reason", "")).strip()}),
+        "summary": (
+            f"Relaytic executed `{len(trial_ledger)}` bounded HPO trial(s) across `{len(family_reports)}` family loop(s) and selected `{selected_candidate.model_family}`."
+            if trial_ledger
+            else "Relaytic did not execute bounded HPO trials for this run."
+        ),
+    }
+    if is_classification_task(task_type):
+        threshold_tuning_report = {
+            "schema_version": THRESHOLD_TUNING_REPORT_SCHEMA_VERSION,
+            "generated_at": _utc_now(),
+            "status": "ok",
+            "task_type": task_type,
+            "threshold_policy": str(threshold_policy or "").strip() or "auto",
+            "selected_model_family": selected_candidate.model_family,
+            "selected_threshold": float(selected_candidate.test_metrics.get("decision_threshold", 0.5)),
+            "candidates": [
+                {
+                    "model_family": item.model_family,
+                    "variant_id": item.variant_id,
+                    "decision_threshold": float(item.validation_metrics.get("decision_threshold", item.test_metrics.get("decision_threshold", 0.5))),
+                    "calibration_status": str(dict(item.calibration or {}).get("status", "unknown")),
+                    "validation_pr_auc": item.validation_metrics.get("pr_auc"),
+                    "validation_f1": item.validation_metrics.get("f1"),
+                }
+                for item in candidates
+            ],
+            "summary": (
+                f"Relaytic tuned binary decision thresholds and calibration across `{len(candidates)}` candidate(s) and selected `{selected_candidate.model_family}` at threshold `{float(selected_candidate.test_metrics.get('decision_threshold', 0.5)):.2f}`."
+            ),
+        }
+    else:
+        threshold_tuning_report = {
+            "schema_version": THRESHOLD_TUNING_REPORT_SCHEMA_VERSION,
+            "generated_at": _utc_now(),
+            "status": "not_applicable",
+            "task_type": task_type,
+            "summary": "Threshold tuning is only applicable to classification and rare-event tasks.",
+        }
+
+    budget_path = write_json(hpo_artifact_path(run_dir, "hpo_budget_contract"), budget_contract, indent=2)
+    search_space_path = write_json(hpo_artifact_path(run_dir, "architecture_search_space"), architecture_search_space, indent=2)
+    warm_start_payload = {
+        "schema_version": WARM_START_TRANSFER_REPORT_SCHEMA_VERSION,
+        **warm_start_state,
+    }
+    warm_start_path = write_json(hpo_artifact_path(run_dir, "warm_start_transfer_report"), warm_start_payload, indent=2)
+    early_stop_path = write_json(hpo_artifact_path(run_dir, "early_stopping_report"), early_stopping_report, indent=2)
+    scorecard_path = write_json(hpo_artifact_path(run_dir, "search_loop_scorecard"), search_loop_scorecard, indent=2)
+    threshold_path = write_json(hpo_artifact_path(run_dir, "threshold_tuning_report"), threshold_tuning_report, indent=2)
+    ledger_path = _write_jsonl_records(hpo_artifact_path(run_dir, "trial_ledger"), trial_ledger)
+    return {
+        "hpo_budget_contract_path": str(budget_path),
+        "architecture_search_space_path": str(search_space_path),
+        "warm_start_transfer_report_path": str(warm_start_path),
+        "early_stopping_report_path": str(early_stop_path),
+        "search_loop_scorecard_path": str(scorecard_path),
+        "threshold_tuning_report_path": str(threshold_path),
+        "trial_ledger_path": str(ledger_path),
+    }
+
+
+def _write_jsonl_records(path: Path, records: list[dict[str, Any]]) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        for record in records:
+            handle.write(json.dumps(record, ensure_ascii=False, sort_keys=True))
+            handle.write("\n")
+    return path
+
+
 def _save_selected_model_state(*, model: Any, run_dir: Path, model_name: str) -> Path:
     filename = "model_state.json" if model_name == "linear_ridge" else f"{model_name}_state.json"
     path = Path(run_dir) / filename
@@ -2385,7 +2861,55 @@ def _fit_regression_linear_candidates(
     frames: dict[str, pd.DataFrame],
     model_feature_columns: list[str],
     target_column: str,
+    hpo_context: dict[str, Any],
+    task_type: str,
+    selection_metric: str | None,
 ) -> list[dict[str, Any]]:
+    trial_plans = list(dict(hpo_context.get("trial_plans") or {}).get("linear_ridge") or [])
+    if trial_plans:
+        def _build_model(params: dict[str, Any]) -> IncrementalLinearSurrogate:
+            return IncrementalLinearSurrogate(
+                feature_columns=model_feature_columns,
+                target_column=target_column,
+                ridge=float(params.get("ridge", 1e-4)),
+            )
+
+        def _build_candidate(model: Any, trial_plan: dict[str, Any]) -> tuple[CandidateMetrics, int]:
+            rows_used = int(model.fit_dataframe(frames["train"]))
+            hyperparameters = dict(trial_plan.get("hyperparameters") or {})
+            hyperparameters.update(
+                {
+                    "training_rows_used": int(rows_used),
+                    "training_feature_count": int(len(model_feature_columns)),
+                }
+            )
+            candidate = _candidate_metrics_from_model(
+                model_family="linear_ridge",
+                model=model,
+                frames=frames,
+                notes=(
+                    "Budgeted HPO ridge baseline with explicit search-space trial "
+                    f"`{trial_plan.get('trial_id', '')}`. Train rows used={rows_used}."
+                ),
+                variant_id=str(trial_plan.get("variant_id", "hpo_linear_ridge")),
+                hyperparameters=hyperparameters,
+            )
+            return candidate, rows_used
+
+        records, report, ledger = _fit_hpo_family_candidates(
+            family="linear_ridge",
+            trial_plans=trial_plans,
+            build_model=_build_model,
+            build_candidate=_build_candidate,
+            task_type=task_type,
+            selection_metric=selection_metric,
+            budget_contract=dict(hpo_context.get("budget_contract") or {}),
+            deadline=float(hpo_context.get("deadline", time.monotonic() + 30.0)),
+        )
+        hpo_context.setdefault("family_reports", []).append(report)
+        hpo_context.setdefault("trial_ledger", []).extend(ledger)
+        return records
+
     variants = [
         ("ridge_default", {"ridge": 1e-8}),
         ("ridge_regularized", {"ridge": 1e-4}),
@@ -2424,7 +2948,59 @@ def _fit_regression_tree_candidates(
     frames: dict[str, pd.DataFrame],
     model_feature_columns: list[str],
     target_column: str,
+    hpo_context: dict[str, Any],
+    task_type: str,
+    selection_metric: str | None,
 ) -> list[dict[str, Any]]:
+    trial_plans = list(dict(hpo_context.get("trial_plans") or {}).get(family) or [])
+    if trial_plans:
+        def _build_model(params: dict[str, Any]) -> Any:
+            model_class = BoostedTreeEnsembleSurrogate if family == "boosted_tree_ensemble" else BaggedTreeEnsembleSurrogate
+            return model_class(
+                feature_columns=model_feature_columns,
+                target_column=target_column,
+                n_estimators=int(params.get("n_estimators", 12)),
+                max_depth=int(params.get("max_depth", 4)),
+                min_leaf=int(params.get("min_leaf", 6)),
+                **({"learning_rate": float(params.get("learning_rate", 0.6))} if family == "boosted_tree_ensemble" else {}),
+            )
+
+        def _build_candidate(model: Any, trial_plan: dict[str, Any]) -> tuple[CandidateMetrics, int]:
+            rows_used = int(model.fit_dataframe(frames["train"]))
+            hyperparameters = dict(trial_plan.get("hyperparameters") or {})
+            hyperparameters.update(
+                {
+                    "training_rows_used": int(rows_used),
+                    "training_feature_count": int(len(model_feature_columns)),
+                }
+            )
+            candidate = _candidate_metrics_from_model(
+                model_family=family,
+                model=model,
+                frames=frames,
+                notes=(
+                    "Budgeted regression-tree HPO trial with explicit search-space exploration "
+                    f"`{trial_plan.get('trial_id', '')}`. Train rows used={rows_used}."
+                ),
+                variant_id=str(trial_plan.get("variant_id", f"hpo_{family}")),
+                hyperparameters=hyperparameters,
+            )
+            return candidate, rows_used
+
+        records, report, ledger = _fit_hpo_family_candidates(
+            family=family,
+            trial_plans=trial_plans,
+            build_model=_build_model,
+            build_candidate=_build_candidate,
+            task_type=task_type,
+            selection_metric=selection_metric,
+            budget_contract=dict(hpo_context.get("budget_contract") or {}),
+            deadline=float(hpo_context.get("deadline", time.monotonic() + 30.0)),
+        )
+        hpo_context.setdefault("family_reports", []).append(report)
+        hpo_context.setdefault("trial_ledger", []).extend(ledger)
+        return records
+
     if family == "boosted_tree_ensemble":
         variants = [
             ("boosted_fast", {"n_estimators": 16, "learning_rate": 0.45, "max_depth": 3, "min_leaf": 6}),
@@ -2474,7 +3050,60 @@ def _fit_logistic_candidates(
     task_type: str,
     threshold_policy: str | None,
     decision_threshold: float | None,
+    hpo_context: dict[str, Any],
+    selection_metric: str | None,
 ) -> list[dict[str, Any]]:
+    trial_plans = list(dict(hpo_context.get("trial_plans") or {}).get("logistic_regression") or [])
+    if trial_plans:
+        def _build_model(params: dict[str, Any]) -> LogisticClassificationSurrogate:
+            return LogisticClassificationSurrogate(
+                feature_columns=model_feature_columns,
+                target_column=target_column,
+                learning_rate=float(params.get("learning_rate", 0.25)),
+                epochs=int(params.get("epochs", 350)),
+                l2=float(params.get("l2", 1e-4)),
+            )
+
+        def _build_candidate(model: Any, trial_plan: dict[str, Any]) -> tuple[CandidateMetrics, int]:
+            rows_used = int(model.fit_dataframe(frames["train"]))
+            hyperparameters = dict(trial_plan.get("hyperparameters") or {})
+            hyperparameters.update(
+                {
+                    "training_rows_used": int(rows_used),
+                    "class_count": int(len(model.class_labels)),
+                    "training_feature_count": int(len(model_feature_columns)),
+                }
+            )
+            candidate = _classification_candidate_metrics_from_model(
+                model_family="logistic_regression",
+                model=model,
+                frames=frames,
+                task_type=task_type,
+                threshold_policy=threshold_policy,
+                decision_threshold=decision_threshold,
+                notes=(
+                    "Budgeted logistic HPO trial with validation threshold tuning and calibration "
+                    f"`{trial_plan.get('trial_id', '')}`. Train rows used={rows_used}."
+                ),
+                variant_id=str(trial_plan.get("variant_id", "hpo_logistic_regression")),
+                hyperparameters=hyperparameters,
+            )
+            return candidate, rows_used
+
+        records, report, ledger = _fit_hpo_family_candidates(
+            family="logistic_regression",
+            trial_plans=trial_plans,
+            build_model=_build_model,
+            build_candidate=_build_candidate,
+            task_type=task_type,
+            selection_metric=selection_metric,
+            budget_contract=dict(hpo_context.get("budget_contract") or {}),
+            deadline=float(hpo_context.get("deadline", time.monotonic() + 30.0)),
+        )
+        hpo_context.setdefault("family_reports", []).append(report)
+        hpo_context.setdefault("trial_ledger", []).extend(ledger)
+        return records
+
     variants = [
         ("logistic_default", {"learning_rate": 0.25, "epochs": 350, "l2": 1e-4}),
         ("logistic_stable", {"learning_rate": 0.15, "epochs": 500, "l2": 1e-3}),
@@ -2522,7 +3151,62 @@ def _fit_classifier_tree_candidates(
     task_type: str,
     threshold_policy: str | None,
     decision_threshold: float | None,
+    hpo_context: dict[str, Any],
+    selection_metric: str | None,
 ) -> list[dict[str, Any]]:
+    trial_plans = list(dict(hpo_context.get("trial_plans") or {}).get(family) or [])
+    if trial_plans:
+        def _build_model(params: dict[str, Any]) -> Any:
+            model_class = BoostedTreeClassifierSurrogate if family == "boosted_tree_classifier" else BaggedTreeClassifierSurrogate
+            return model_class(
+                feature_columns=model_feature_columns,
+                target_column=target_column,
+                n_estimators=int(params.get("n_estimators", 12)),
+                max_depth=int(params.get("max_depth", 4)),
+                min_leaf=int(params.get("min_leaf", 6)),
+                **({"learning_rate": float(params.get("learning_rate", 0.6))} if family == "boosted_tree_classifier" else {}),
+            )
+
+        def _build_candidate(model: Any, trial_plan: dict[str, Any]) -> tuple[CandidateMetrics, int]:
+            rows_used = int(model.fit_dataframe(frames["train"]))
+            hyperparameters = dict(trial_plan.get("hyperparameters") or {})
+            hyperparameters.update(
+                {
+                    "training_rows_used": int(rows_used),
+                    "class_count": int(len(model.class_labels)),
+                    "training_feature_count": int(len(model_feature_columns)),
+                }
+            )
+            candidate = _classification_candidate_metrics_from_model(
+                model_family=family,
+                model=model,
+                frames=frames,
+                task_type=task_type,
+                threshold_policy=threshold_policy,
+                decision_threshold=decision_threshold,
+                notes=(
+                    "Budgeted classifier-tree HPO trial with explicit threshold tuning "
+                    f"`{trial_plan.get('trial_id', '')}`. Train rows used={rows_used}."
+                ),
+                variant_id=str(trial_plan.get("variant_id", f"hpo_{family}")),
+                hyperparameters=hyperparameters,
+            )
+            return candidate, rows_used
+
+        records, report, ledger = _fit_hpo_family_candidates(
+            family=family,
+            trial_plans=trial_plans,
+            build_model=_build_model,
+            build_candidate=_build_candidate,
+            task_type=task_type,
+            selection_metric=selection_metric,
+            budget_contract=dict(hpo_context.get("budget_contract") or {}),
+            deadline=float(hpo_context.get("deadline", time.monotonic() + 30.0)),
+        )
+        hpo_context.setdefault("family_reports", []).append(report)
+        hpo_context.setdefault("trial_ledger", []).extend(ledger)
+        return records
+
     if family == "boosted_tree_classifier":
         variants = [
             ("boosted_classifier_fast", {"n_estimators": 16, "learning_rate": 0.45, "max_depth": 3, "min_leaf": 6}),
@@ -2563,6 +3247,242 @@ def _fit_classifier_tree_candidates(
                 "class_count": int(len(model.class_labels)),
                 "training_feature_count": int(len(model_feature_columns)),
             },
+        )
+        records.append({"candidate": candidate, "model": model, "rows_used": int(rows_used)})
+    return records
+
+
+def _fit_regression_estimator_candidates(
+    *,
+    frames: dict[str, pd.DataFrame],
+    model_feature_columns: list[str],
+    target_column: str,
+    requested_family: str | None,
+    hpo_context: dict[str, Any],
+    task_type: str,
+    selection_metric: str | None,
+) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for family in ["hist_gradient_boosting_ensemble", "extra_trees_ensemble"]:
+        if requested_family and family != requested_family:
+            continue
+        trial_plans = list(dict(hpo_context.get("trial_plans") or {}).get(family) or [])
+        if not trial_plans:
+            continue
+
+        def _build_model(params: dict[str, Any], *, selected_family: str = family) -> Any:
+            if selected_family == "hist_gradient_boosting_ensemble":
+                estimator = HistGradientBoostingRegressor(
+                    max_iter=int(params.get("max_iter", 180)),
+                    learning_rate=float(params.get("learning_rate", 0.08)),
+                    max_depth=int(params.get("max_depth", 6)),
+                    min_samples_leaf=int(params.get("min_samples_leaf", 20)),
+                    random_state=42,
+                )
+            else:
+                estimator = ExtraTreesRegressor(
+                    n_estimators=int(params.get("n_estimators", 220)),
+                    max_depth=None if params.get("max_depth") is None else int(params.get("max_depth")),
+                    min_samples_leaf=int(params.get("min_samples_leaf", 2)),
+                    random_state=42,
+                    n_jobs=1,
+                )
+            return PickledRegressionEstimatorSurrogate(
+                feature_columns=model_feature_columns,
+                target_column=target_column,
+                model_name=selected_family,
+                estimator=estimator,
+                hyperparameters=dict(params),
+            )
+
+        def _build_candidate(model: Any, trial_plan: dict[str, Any], *, selected_family: str = family) -> tuple[CandidateMetrics, int]:
+            rows_used = int(model.fit_dataframe(frames["train"]))
+            hyperparameters = dict(trial_plan.get("hyperparameters") or {})
+            hyperparameters.update(
+                {
+                    "training_rows_used": int(rows_used),
+                    "training_feature_count": int(len(model_feature_columns)),
+                }
+            )
+            candidate = _candidate_metrics_from_model(
+                model_family=selected_family,
+                model=model,
+                frames=frames,
+                notes=(
+                    "Budgeted estimator-family HPO trial from the Slice 15C search space "
+                    f"`{trial_plan.get('trial_id', '')}`. Train rows used={rows_used}."
+                ),
+                variant_id=str(trial_plan.get("variant_id", f"hpo_{selected_family}")),
+                hyperparameters=hyperparameters,
+            )
+            return candidate, rows_used
+
+        family_records, report, ledger = _fit_hpo_family_candidates(
+            family=family,
+            trial_plans=trial_plans,
+            build_model=_build_model,
+            build_candidate=_build_candidate,
+            task_type=task_type,
+            selection_metric=selection_metric,
+            budget_contract=dict(hpo_context.get("budget_contract") or {}),
+            deadline=float(hpo_context.get("deadline", time.monotonic() + 30.0)),
+        )
+        hpo_context.setdefault("family_reports", []).append(report)
+        hpo_context.setdefault("trial_ledger", []).extend(ledger)
+        records.extend(family_records)
+
+    for variant in build_regression_estimator_variants(
+        feature_columns=model_feature_columns,
+        target_column=target_column,
+    ):
+        family = str(variant["family"])
+        if family in {"hist_gradient_boosting_ensemble", "extra_trees_ensemble"}:
+            continue
+        if requested_family and family != requested_family:
+            continue
+        model = variant["model"]
+        rows_used = model.fit_dataframe(frames["train"])
+        hyperparameters = dict(variant.get("hyperparameters") or {})
+        hyperparameters.update(
+            {
+                "training_rows_used": int(rows_used),
+                "training_feature_count": int(len(model_feature_columns)),
+            }
+        )
+        candidate = _candidate_metrics_from_model(
+            model_family=family,
+            model=model,
+            frames=frames,
+            notes=(
+                "Expanded architecture candidate routed through the Slice 15B estimator registry with "
+                f"variant `{variant['variant_id']}`. Train rows used={rows_used}."
+            ),
+            variant_id=str(variant["variant_id"]),
+            hyperparameters=hyperparameters,
+        )
+        records.append({"candidate": candidate, "model": model, "rows_used": int(rows_used)})
+    return records
+
+
+def _fit_classification_estimator_candidates(
+    *,
+    frames: dict[str, pd.DataFrame],
+    model_feature_columns: list[str],
+    target_column: str,
+    task_type: str,
+    threshold_policy: str | None,
+    decision_threshold: float | None,
+    class_count: int,
+    requested_family: str | None,
+    hpo_context: dict[str, Any],
+    selection_metric: str | None,
+) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for family in ["hist_gradient_boosting_classifier", "extra_trees_classifier"]:
+        if requested_family and family != requested_family:
+            continue
+        trial_plans = list(dict(hpo_context.get("trial_plans") or {}).get(family) or [])
+        if not trial_plans:
+            continue
+
+        def _build_model(params: dict[str, Any], *, selected_family: str = family) -> Any:
+            if selected_family == "hist_gradient_boosting_classifier":
+                estimator = HistGradientBoostingClassifier(
+                    max_iter=int(params.get("max_iter", 220)),
+                    learning_rate=float(params.get("learning_rate", 0.08)),
+                    max_depth=int(params.get("max_depth", 6)),
+                    min_samples_leaf=int(params.get("min_samples_leaf", 18)),
+                    random_state=42,
+                )
+            else:
+                estimator = ExtraTreesClassifier(
+                    n_estimators=int(params.get("n_estimators", 220)),
+                    max_depth=None if params.get("max_depth") is None else int(params.get("max_depth")),
+                    min_samples_leaf=int(params.get("min_samples_leaf", 2)),
+                    random_state=42,
+                    n_jobs=1,
+                )
+            return PickledClassificationEstimatorSurrogate(
+                feature_columns=model_feature_columns,
+                target_column=target_column,
+                model_name=selected_family,
+                estimator=estimator,
+                hyperparameters=dict(params),
+            )
+
+        def _build_candidate(model: Any, trial_plan: dict[str, Any], *, selected_family: str = family) -> tuple[CandidateMetrics, int]:
+            rows_used = int(model.fit_dataframe(frames["train"]))
+            hyperparameters = dict(trial_plan.get("hyperparameters") or {})
+            hyperparameters.update(
+                {
+                    "training_rows_used": int(rows_used),
+                    "class_count": int(len(model.class_labels)),
+                    "training_feature_count": int(len(model_feature_columns)),
+                }
+            )
+            candidate = _classification_candidate_metrics_from_model(
+                model_family=selected_family,
+                model=model,
+                frames=frames,
+                task_type=task_type,
+                threshold_policy=threshold_policy,
+                decision_threshold=decision_threshold,
+                notes=(
+                    "Budgeted estimator-family HPO trial with threshold tuning and calibration "
+                    f"`{trial_plan.get('trial_id', '')}`. Train rows used={rows_used}."
+                ),
+                variant_id=str(trial_plan.get("variant_id", f"hpo_{selected_family}")),
+                hyperparameters=hyperparameters,
+            )
+            return candidate, rows_used
+
+        family_records, report, ledger = _fit_hpo_family_candidates(
+            family=family,
+            trial_plans=trial_plans,
+            build_model=_build_model,
+            build_candidate=_build_candidate,
+            task_type=task_type,
+            selection_metric=selection_metric,
+            budget_contract=dict(hpo_context.get("budget_contract") or {}),
+            deadline=float(hpo_context.get("deadline", time.monotonic() + 30.0)),
+        )
+        hpo_context.setdefault("family_reports", []).append(report)
+        hpo_context.setdefault("trial_ledger", []).extend(ledger)
+        records.extend(family_records)
+
+    for variant in build_classification_estimator_variants(
+        feature_columns=model_feature_columns,
+        target_column=target_column,
+        class_count=class_count,
+    ):
+        family = str(variant["family"])
+        if family in {"hist_gradient_boosting_classifier", "extra_trees_classifier"}:
+            continue
+        if requested_family and family != requested_family:
+            continue
+        model = variant["model"]
+        rows_used = model.fit_dataframe(frames["train"])
+        hyperparameters = dict(variant.get("hyperparameters") or {})
+        hyperparameters.update(
+            {
+                "training_rows_used": int(rows_used),
+                "class_count": int(len(model.class_labels)),
+                "training_feature_count": int(len(model_feature_columns)),
+            }
+        )
+        candidate = _classification_candidate_metrics_from_model(
+            model_family=family,
+            model=model,
+            frames=frames,
+            task_type=task_type,
+            threshold_policy=threshold_policy,
+            decision_threshold=decision_threshold,
+            notes=(
+                "Expanded architecture candidate routed through the Slice 15B estimator registry with "
+                f"variant `{variant['variant_id']}`. Train rows used={rows_used}."
+            ),
+            variant_id=str(variant["variant_id"]),
+            hyperparameters=hyperparameters,
         )
         records.append({"candidate": candidate, "model": model, "rows_used": int(rows_used)})
     return records

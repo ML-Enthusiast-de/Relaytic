@@ -63,6 +63,19 @@ from .task_contracts import (
     read_task_contract_artifacts,
     sync_task_contract_artifacts,
 )
+from .architecture_routing import (
+    ARCHITECTURE_ABLATION_REPORT_SCHEMA_VERSION,
+    ARCHITECTURE_FIT_REPORT_SCHEMA_VERSION,
+    ARCHITECTURE_REGISTRY_SCHEMA_VERSION,
+    ARCHITECTURE_ROUTER_REPORT_SCHEMA_VERSION,
+    ARCHITECTURE_ROUTING_FILENAMES,
+    CANDIDATE_FAMILY_MATRIX_SCHEMA_VERSION,
+    FAMILY_CAPABILITY_MATRIX_SCHEMA_VERSION,
+    build_architecture_routing_artifacts,
+    default_architecture_candidate_order,
+    read_architecture_routing_artifacts,
+    sync_architecture_routing_artifacts,
+)
 
 __all__ = [
     "CandidateSignal",
@@ -109,12 +122,23 @@ __all__ = [
     "recommend_model_strategies",
     "SUPPORTED_TASK_TYPES",
     "CLASSIFICATION_TASK_TYPES",
+    "ARCHITECTURE_ROUTING_FILENAMES",
+    "ARCHITECTURE_REGISTRY_SCHEMA_VERSION",
+    "ARCHITECTURE_ROUTER_REPORT_SCHEMA_VERSION",
+    "CANDIDATE_FAMILY_MATRIX_SCHEMA_VERSION",
+    "ARCHITECTURE_FIT_REPORT_SCHEMA_VERSION",
+    "FAMILY_CAPABILITY_MATRIX_SCHEMA_VERSION",
+    "ARCHITECTURE_ABLATION_REPORT_SCHEMA_VERSION",
     "assess_task_profile",
     "assess_task_profiles",
+    "build_architecture_routing_artifacts",
     "build_task_contract_artifacts",
+    "default_architecture_candidate_order",
     "infer_benchmark_expected",
     "is_classification_task",
     "normalize_task_type_hint",
+    "read_architecture_routing_artifacts",
     "read_task_contract_artifacts",
+    "sync_architecture_routing_artifacts",
     "sync_task_contract_artifacts",
 ]

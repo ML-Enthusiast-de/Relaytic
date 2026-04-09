@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from relaytic.analytics import build_architecture_routing_artifacts, default_architecture_candidate_order
 from relaytic.analytics.task_detection import assess_task_profile, is_classification_task
 from relaytic.ingestion import load_tabular_data
 from relaytic.modeling import train_surrogate_candidates
@@ -98,14 +99,15 @@ class StrategistAgent:
             optimization_profile=optimization_profile,
             primary_metric=primary_metric,
         )
-        candidate_order = _resolve_candidate_order(
+        baseline_candidate_order = _resolve_candidate_order(
             data_mode=str(dataset_profile.get("data_mode", "steady_state")),
             task_type=task_profile.task_type,
             optimization_profile=optimization_profile,
         )
-        candidate_order, memory_context = _apply_memory_route_priors(
-            candidate_order=candidate_order,
-            route_prior_context=_bundle_item(memory_bundle, "route_prior_context"),
+        route_prior_context = _bundle_item(memory_bundle, "route_prior_context")
+        _, memory_context = _apply_memory_route_priors(
+            candidate_order=baseline_candidate_order,
+            route_prior_context=route_prior_context,
         )
         feature_columns, feature_drop_reasons, feature_risk_flags = _select_feature_columns(
             frame=frame,
@@ -116,6 +118,27 @@ class StrategistAgent:
             timestamp_column=str(dataset_profile.get("timestamp_column") or "").strip() or None,
             controls=self.controls,
         )
+        architecture_bundle = build_architecture_routing_artifacts(
+            investigation_bundle=investigation_bundle,
+            planning_bundle={
+                "plan": {
+                    "task_profile": task_profile.to_dict(),
+                    "task_type": task_profile.task_type,
+                    "data_mode": str(dataset_profile.get("data_mode", "steady_state")),
+                    "feature_columns": list(feature_columns),
+                    "target_column": target_column,
+                    "timestamp_column": str(dataset_profile.get("timestamp_column") or "").strip() or None,
+                }
+            },
+            route_prior_context=route_prior_context,
+        )
+        architecture_router_report = dict(architecture_bundle.get("architecture_router_report") or {})
+        architecture_fit_report = dict(architecture_bundle.get("architecture_fit_report") or {})
+        candidate_order = [
+            str(item).strip()
+            for item in architecture_router_report.get("candidate_order", [])
+            if str(item).strip()
+        ] or list(memory_context.get("adjusted_candidate_order", [])) or list(baseline_candidate_order)
         threshold_policy = _resolve_threshold_policy(
             task_type=task_profile.task_type,
             primary_metric=primary_metric,
@@ -140,7 +163,7 @@ class StrategistAgent:
             "requested_model_family": "auto",
             "preferred_candidate_order": candidate_order,
             "baseline_preferred_candidate_order": list(
-                memory_context.get("baseline_candidate_order", candidate_order)
+                memory_context.get("baseline_candidate_order", baseline_candidate_order)
             ),
             "selection_metric": selection_metric,
             "primary_metric": primary_metric,
@@ -156,6 +179,20 @@ class StrategistAgent:
             "data_references": [str(data_path)],
             "feature_risk_flags": feature_risk_flags,
             "memory_route_prior_applied": bool(memory_context.get("changed", False)),
+            "architecture_primary_recommendation": _optional_str(
+                architecture_router_report.get("recommended_primary_family")
+            ),
+            "architecture_router_status": _optional_str(architecture_router_report.get("status")),
+            "architecture_sequence_shadow_ready": architecture_router_report.get("sequence_shadow_ready"),
+            "architecture_sequence_live_allowed": architecture_router_report.get("sequence_live_allowed"),
+            "architecture_sequence_rejection_reason": _optional_str(
+                architecture_router_report.get("sequence_rejection_reason")
+            ),
+            "architecture_fit_top_family": _optional_str(
+                dict(architecture_fit_report.get("fit_rows", [{}])[0]).get("family_id")
+            )
+            if isinstance(architecture_fit_report.get("fit_rows"), list) and architecture_fit_report.get("fit_rows")
+            else None,
         }
         guardrails = _dedupe_strings(
             _string_list(feature_strategy_profile.get("guardrails"))
@@ -615,42 +652,7 @@ def _resolve_candidate_order(
     ordered: list[str] = []
     for bias_name in bias_names:
         ordered.extend(_bias_to_models(bias_name=bias_name, task_type=task_type, data_mode=data_mode))
-    if data_mode == "time_series" and is_classification_task(task_type):
-        ordered.extend(
-            [
-                "lagged_logistic_regression",
-                "lagged_tree_classifier",
-                "logistic_regression",
-                "bagged_tree_classifier",
-                "boosted_tree_classifier",
-            ]
-        )
-    elif data_mode == "time_series":
-        ordered.extend(
-            [
-                "lagged_linear",
-                "lagged_tree_ensemble",
-                "linear_ridge",
-                "bagged_tree_ensemble",
-                "boosted_tree_ensemble",
-            ]
-        )
-    elif is_classification_task(task_type):
-        ordered.extend(
-            [
-                "logistic_regression",
-                "bagged_tree_classifier",
-                "boosted_tree_classifier",
-            ]
-        )
-    else:
-        ordered.extend(
-            [
-                "linear_ridge",
-                "bagged_tree_ensemble",
-                "boosted_tree_ensemble",
-            ]
-    )
+    ordered.extend(default_architecture_candidate_order(task_type=task_type, data_mode=data_mode))
     return _dedupe_strings(ordered)
 
 
@@ -703,6 +705,18 @@ def _bias_to_models(*, bias_name: str, task_type: str, data_mode: str) -> list[s
         return ["bagged_tree_classifier"] if is_classification_task(task_type) else ["bagged_tree_ensemble"]
     if normalized in {"tree_ensemble", "boosted_tree"}:
         return ["boosted_tree_classifier"] if is_classification_task(task_type) else ["boosted_tree_ensemble"]
+    if normalized in {"hist_gradient", "hist_gradient_boosting", "hgb"}:
+        return ["hist_gradient_boosting_classifier"] if is_classification_task(task_type) else ["hist_gradient_boosting_ensemble"]
+    if normalized == "extra_trees":
+        return ["extra_trees_classifier"] if is_classification_task(task_type) else ["extra_trees_ensemble"]
+    if normalized == "catboost":
+        return ["catboost_classifier"] if is_classification_task(task_type) else ["catboost_ensemble"]
+    if normalized == "xgboost":
+        return ["xgboost_classifier"] if is_classification_task(task_type) else ["xgboost_ensemble"]
+    if normalized == "lightgbm":
+        return ["lightgbm_classifier"] if is_classification_task(task_type) else ["lightgbm_ensemble"]
+    if normalized == "tabpfn" and is_classification_task(task_type):
+        return ["tabpfn_classifier"]
     if normalized == "boosted_tree_classifier":
         return ["boosted_tree_classifier"]
     if normalized == "lagged_linear":

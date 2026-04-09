@@ -19,6 +19,11 @@ BENCHMARK_FILENAMES = {
     "external_challenger_evaluation": "external_challenger_evaluation.json",
     "incumbent_parity_report": "incumbent_parity_report.json",
     "beat_target_contract": "beat_target_contract.json",
+    "paper_benchmark_manifest": "paper_benchmark_manifest.json",
+    "paper_benchmark_table": "paper_benchmark_table.json",
+    "benchmark_ablation_matrix": "benchmark_ablation_matrix.json",
+    "rerun_variance_report": "rerun_variance_report.json",
+    "benchmark_claims_report": "benchmark_claims_report.json",
 }
 
 

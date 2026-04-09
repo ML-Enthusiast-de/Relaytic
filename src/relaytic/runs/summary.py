@@ -37,7 +37,7 @@ def build_run_summary(
         USER_RESULT_REPORT_RELATIVE_PATH,
         read_handoff_bundle,
     )
-    from relaytic.analytics import read_task_contract_artifacts
+    from relaytic.analytics import read_architecture_routing_artifacts, read_task_contract_artifacts
     from relaytic.iteration import read_iteration_bundle
     from relaytic.events import read_event_bus_bundle
     from relaytic.permissions import read_permission_bundle
@@ -167,6 +167,11 @@ def build_run_summary(
             "external_challenger_evaluation": "external_challenger_evaluation.json",
             "incumbent_parity_report": "incumbent_parity_report.json",
             "beat_target_contract": "beat_target_contract.json",
+            "paper_benchmark_manifest": "paper_benchmark_manifest.json",
+            "paper_benchmark_table": "paper_benchmark_table.json",
+            "benchmark_ablation_matrix": "benchmark_ablation_matrix.json",
+            "rerun_variance_report": "rerun_variance_report.json",
+            "benchmark_claims_report": "benchmark_claims_report.json",
         },
     )
     task_contract_bundle = read_task_contract_artifacts(root)
@@ -305,6 +310,18 @@ def build_run_summary(
     permission_bundle = read_permission_bundle(root)
     daemon_bundle = read_daemon_bundle(root)
     remote_control_bundle = read_remote_control_bundle(root)
+    architecture_bundle = read_architecture_routing_artifacts(root)
+    hpo_bundle = _read_bundle(
+        root,
+        {
+            "hpo_budget_contract": "hpo_budget_contract.json",
+            "architecture_search_space": "architecture_search_space.json",
+            "early_stopping_report": "early_stopping_report.json",
+            "search_loop_scorecard": "search_loop_scorecard.json",
+            "warm_start_transfer_report": "warm_start_transfer_report.json",
+            "threshold_tuning_report": "threshold_tuning_report.json",
+        },
+    )
     lifecycle_bundle = _read_bundle(
         root,
         {
@@ -346,6 +363,19 @@ def build_run_summary(
     deployment_readiness_report = dict(task_contract_bundle.get("deployment_readiness_report", {})) if isinstance(task_contract_bundle.get("deployment_readiness_report"), dict) else {}
     benchmark_vs_deploy_report = dict(task_contract_bundle.get("benchmark_vs_deploy_report", {})) if isinstance(task_contract_bundle.get("benchmark_vs_deploy_report"), dict) else {}
     dataset_semantics_audit = dict(task_contract_bundle.get("dataset_semantics_audit", {})) if isinstance(task_contract_bundle.get("dataset_semantics_audit"), dict) else {}
+    architecture_registry = dict(architecture_bundle.get("architecture_registry", {})) if isinstance(architecture_bundle.get("architecture_registry"), dict) else {}
+    architecture_router_report = dict(architecture_bundle.get("architecture_router_report", {})) if isinstance(architecture_bundle.get("architecture_router_report"), dict) else {}
+    candidate_family_matrix = dict(architecture_bundle.get("candidate_family_matrix", {})) if isinstance(architecture_bundle.get("candidate_family_matrix"), dict) else {}
+    architecture_fit_report = dict(architecture_bundle.get("architecture_fit_report", {})) if isinstance(architecture_bundle.get("architecture_fit_report"), dict) else {}
+    family_capability_matrix = dict(architecture_bundle.get("family_capability_matrix", {})) if isinstance(architecture_bundle.get("family_capability_matrix"), dict) else {}
+    architecture_ablation_report = dict(architecture_bundle.get("architecture_ablation_report", {})) if isinstance(architecture_bundle.get("architecture_ablation_report"), dict) else {}
+    hpo_budget_contract = dict(hpo_bundle.get("hpo_budget_contract", {})) if isinstance(hpo_bundle.get("hpo_budget_contract"), dict) else {}
+    architecture_search_space = dict(hpo_bundle.get("architecture_search_space", {})) if isinstance(hpo_bundle.get("architecture_search_space"), dict) else {}
+    early_stopping_report = dict(hpo_bundle.get("early_stopping_report", {})) if isinstance(hpo_bundle.get("early_stopping_report"), dict) else {}
+    search_loop_scorecard = dict(hpo_bundle.get("search_loop_scorecard", {})) if isinstance(hpo_bundle.get("search_loop_scorecard"), dict) else {}
+    warm_start_transfer_report = dict(hpo_bundle.get("warm_start_transfer_report", {})) if isinstance(hpo_bundle.get("warm_start_transfer_report"), dict) else {}
+    threshold_tuning_report = dict(hpo_bundle.get("threshold_tuning_report", {})) if isinstance(hpo_bundle.get("threshold_tuning_report"), dict) else {}
+    trial_ledger = _read_jsonl(root / "trial_ledger.jsonl")
     experiment_registry = _bundle_item(evidence_bundle, "experiment_registry")
     challenger_report = _bundle_item(evidence_bundle, "challenger_report")
     ablation_report = _bundle_item(evidence_bundle, "ablation_report")
@@ -382,6 +412,11 @@ def build_run_summary(
     external_challenger_evaluation = _bundle_item(benchmark_bundle, "external_challenger_evaluation")
     incumbent_parity_report = _bundle_item(benchmark_bundle, "incumbent_parity_report")
     beat_target_contract = _bundle_item(benchmark_bundle, "beat_target_contract")
+    paper_benchmark_manifest = _bundle_item(benchmark_bundle, "paper_benchmark_manifest")
+    paper_benchmark_table = _bundle_item(benchmark_bundle, "paper_benchmark_table")
+    benchmark_ablation_matrix = _bundle_item(benchmark_bundle, "benchmark_ablation_matrix")
+    rerun_variance_report = _bundle_item(benchmark_bundle, "rerun_variance_report")
+    benchmark_claims_report = _bundle_item(benchmark_bundle, "benchmark_claims_report")
     decision_world_model = _bundle_item(decision_bundle, "decision_world_model")
     controller_policy = _bundle_item(decision_bundle, "controller_policy")
     handoff_controller_report = _bundle_item(decision_bundle, "handoff_controller_report")
@@ -723,7 +758,9 @@ def build_run_summary(
         },
         "benchmark": {
             "status": _clean_text(benchmark_parity_report.get("status")) or _clean_text(reference_approach_matrix.get("status")),
-            "parity_status": _clean_text(benchmark_parity_report.get("parity_status")),
+            "parity_status": _normalize_benchmark_parity_status(
+                _clean_text(benchmark_parity_report.get("parity_status"))
+            ),
             "recommended_action": _clean_text(benchmark_parity_report.get("recommended_action")),
             "comparison_metric": _clean_text(metric_contract.get("benchmark_comparison_metric"))
             or _clean_text(benchmark_parity_report.get("comparison_metric"))
@@ -748,6 +785,20 @@ def build_run_summary(
             "incumbent_test_gap": incumbent_parity_report.get("test_gap"),
             "incumbent_reduced_claim": incumbent_parity_report.get("reduced_claim"),
             "incumbent_evaluation_mode": _clean_text(external_challenger_evaluation.get("evaluation_mode")),
+            "paper_status": _clean_text(paper_benchmark_manifest.get("status")) or _clean_text(paper_benchmark_table.get("status")),
+            "competitiveness_claim": _clean_text(benchmark_claims_report.get("competitiveness_claim")),
+            "deployment_claim": _clean_text(benchmark_claims_report.get("deployment_claim")),
+            "below_reference": benchmark_claims_report.get("below_reference"),
+            "claim_boundary_count": len(benchmark_claims_report.get("claim_boundaries", []))
+            if isinstance(benchmark_claims_report.get("claim_boundaries"), list)
+            else 0,
+            "ablation_row_count": len(benchmark_ablation_matrix.get("rows", []))
+            if isinstance(benchmark_ablation_matrix.get("rows"), list)
+            else 0,
+            "rerun_match_count": int(rerun_variance_report.get("matching_run_count", 0) or 0),
+            "rerun_stability_band": _clean_text(rerun_variance_report.get("stability_band")),
+            "temporal_horizon_type": _clean_text(paper_benchmark_manifest.get("horizon_type")),
+            "sequence_candidate_status": _clean_text(paper_benchmark_manifest.get("sequence_candidate_status")),
         },
         "decision_lab": {
             "status": _clean_text(decision_world_model.get("status")),
@@ -891,6 +942,42 @@ def build_run_summary(
             "same_plan_across_profiles": execution_strategy_report.get("same_plan_across_profiles"),
             "max_trials": int(hpo_campaign_report.get("max_trials", 0) or 0),
         },
+        "hpo": {
+            "status": _clean_text(search_loop_scorecard.get("status")) or _clean_text(hpo_budget_contract.get("status")),
+            "backend": _clean_text(search_loop_scorecard.get("backend")) or _clean_text(hpo_budget_contract.get("backend")),
+            "selected_families": [
+                str(item)
+                for item in hpo_budget_contract.get("selected_families", [])
+                if str(item).strip()
+            ],
+            "planned_family_count": len(hpo_budget_contract.get("selected_families", []))
+            if isinstance(hpo_budget_contract.get("selected_families"), list)
+            else 0,
+            "search_space_family_count": int(architecture_search_space.get("family_count", 0) or 0),
+            "max_trials": int(hpo_budget_contract.get("max_trials", 0) or 0),
+            "executed_trial_count": int(search_loop_scorecard.get("total_trials_executed", 0) or len(trial_ledger)),
+            "tuned_family_count": int(
+                search_loop_scorecard.get("tuned_family_count", 0)
+                or early_stopping_report.get("family_count", 0)
+                or 0
+            ),
+            "warm_start_used": bool(warm_start_transfer_report.get("used")),
+            "imported_family_count": len(warm_start_transfer_report.get("imported_families", []))
+            if isinstance(warm_start_transfer_report.get("imported_families"), list)
+            else 0,
+            "plateau_triggered_count": int(early_stopping_report.get("plateau_triggered_count", 0) or 0),
+            "wall_clock_exhausted_count": int(early_stopping_report.get("wall_clock_exhausted_count", 0) or 0),
+            "threshold_policy": _clean_text(threshold_tuning_report.get("threshold_policy")),
+            "selected_threshold": threshold_tuning_report.get("selected_threshold"),
+            "stop_reasons": [
+                str(item)
+                for item in search_loop_scorecard.get("stop_reasons", [])
+                if str(item).strip()
+            ],
+            "summary": _clean_text(search_loop_scorecard.get("summary"))
+            or _clean_text(early_stopping_report.get("summary"))
+            or _clean_text(hpo_budget_contract.get("summary")),
+        },
         "handoff": {
             "status": _clean_text(run_handoff.get("status")),
             "headline": _clean_text(run_handoff.get("headline")),
@@ -981,9 +1068,46 @@ def build_run_summary(
             "benchmark_status": _clean_text(benchmark_vs_deploy_report.get("benchmark_status")),
             "deployment_readiness": _clean_text(benchmark_vs_deploy_report.get("deployment_readiness"))
             or _clean_text(deployment_readiness_report.get("readiness_state")),
-            "split_detected": benchmark_vs_deploy_report.get("split_detected"),
-            "summary": _clean_text(benchmark_vs_deploy_report.get("summary")),
+            "split_detected": bool(benchmark_vs_deploy_report.get("split_detected"))
+            or _infer_benchmark_deploy_split(
+                parity_status=_clean_text(benchmark_parity_report.get("parity_status")),
+                deployment_readiness=_clean_text(benchmark_vs_deploy_report.get("deployment_readiness"))
+                or _clean_text(deployment_readiness_report.get("readiness_state")),
+            ),
+            "summary": _benchmark_vs_deploy_summary(
+                summary=_clean_text(benchmark_vs_deploy_report.get("summary")),
+                parity_status=_clean_text(benchmark_parity_report.get("parity_status")),
+                deployment_readiness=_clean_text(benchmark_vs_deploy_report.get("deployment_readiness"))
+                or _clean_text(deployment_readiness_report.get("readiness_state")),
+            ),
             "benchmark_expected": benchmark_mode_report.get("benchmark_expected"),
+        },
+        "architecture": {
+            "status": _clean_text(architecture_router_report.get("status")) or _clean_text(architecture_registry.get("status")),
+            "recommended_primary_family": _clean_text(architecture_router_report.get("recommended_primary_family")),
+            "candidate_order": [str(item) for item in architecture_router_report.get("candidate_order", []) if str(item).strip()],
+            "baseline_candidate_order": [str(item) for item in architecture_router_report.get("baseline_candidate_order", []) if str(item).strip()],
+            "memory_adjusted_candidate_order": [str(item) for item in architecture_router_report.get("memory_adjusted_candidate_order", []) if str(item).strip()],
+            "benchmark_evidence_status": _clean_text(architecture_router_report.get("benchmark_evidence_status")),
+            "workspace_analog_status": _clean_text(architecture_router_report.get("workspace_analog_status")),
+            "workspace_analog_influence": architecture_router_report.get("workspace_analog_influence"),
+            "sequence_live_allowed": architecture_router_report.get("sequence_live_allowed"),
+            "sequence_shadow_ready": architecture_router_report.get("sequence_shadow_ready"),
+            "sequence_rejection_reason": _clean_text(architecture_router_report.get("sequence_rejection_reason")),
+            "top_selection_reason": _clean_text(architecture_router_report.get("top_selection_reason")),
+            "candidate_count": int(candidate_family_matrix.get("candidate_count", 0) or 0),
+            "available_family_count": int(architecture_registry.get("available_family_count", 0) or 0),
+            "fit_top_family": _clean_text(dict(architecture_fit_report.get("fit_rows", [{}])[0]).get("family_id"))
+            if isinstance(architecture_fit_report.get("fit_rows"), list) and architecture_fit_report.get("fit_rows")
+            else None,
+            "live_family_count": len([item for item in family_capability_matrix.get("families", []) if bool(dict(item).get("training_support"))])
+            if isinstance(family_capability_matrix.get("families"), list)
+            else 0,
+            "shadow_sequence_candidates": [
+                str(item)
+                for item in architecture_ablation_report.get("shadow_sequence_candidates", [])
+                if str(item).strip()
+            ],
         },
         "iteration": {
             "status": _clean_text(next_run_plan.get("status")),
@@ -1220,6 +1344,19 @@ def build_run_summary(
             "deployment_readiness_report_path": _path_if_exists(root / "deployment_readiness_report.json"),
             "benchmark_vs_deploy_report_path": _path_if_exists(root / "benchmark_vs_deploy_report.json"),
             "dataset_semantics_audit_path": _path_if_exists(root / "dataset_semantics_audit.json"),
+            "architecture_registry_path": _path_if_exists(root / "architecture_registry.json"),
+            "architecture_router_report_path": _path_if_exists(root / "architecture_router_report.json"),
+            "candidate_family_matrix_path": _path_if_exists(root / "candidate_family_matrix.json"),
+            "architecture_fit_report_path": _path_if_exists(root / "architecture_fit_report.json"),
+            "family_capability_matrix_path": _path_if_exists(root / "family_capability_matrix.json"),
+            "architecture_ablation_report_path": _path_if_exists(root / "architecture_ablation_report.json"),
+            "hpo_budget_contract_path": _path_if_exists(root / "hpo_budget_contract.json"),
+            "architecture_search_space_path": _path_if_exists(root / "architecture_search_space.json"),
+            "trial_ledger_path": _path_if_exists(root / "trial_ledger.jsonl"),
+            "early_stopping_report_path": _path_if_exists(root / "early_stopping_report.json"),
+            "search_loop_scorecard_path": _path_if_exists(root / "search_loop_scorecard.json"),
+            "warm_start_transfer_report_path": _path_if_exists(root / "warm_start_transfer_report.json"),
+            "threshold_tuning_report_path": _path_if_exists(root / "threshold_tuning_report.json"),
             "trajectory_constraint_report_path": _path_if_exists(root / "trajectory_constraint_report.json"),
             "feasible_region_map_path": _path_if_exists(root / "feasible_region_map.json"),
             "extrapolation_risk_report_path": _path_if_exists(root / "extrapolation_risk_report.json"),
@@ -1234,6 +1371,11 @@ def build_run_summary(
             "external_challenger_evaluation_path": _path_if_exists(root / "external_challenger_evaluation.json"),
             "incumbent_parity_report_path": _path_if_exists(root / "incumbent_parity_report.json"),
             "beat_target_contract_path": _path_if_exists(root / "beat_target_contract.json"),
+            "paper_benchmark_manifest_path": _path_if_exists(root / "paper_benchmark_manifest.json"),
+            "paper_benchmark_table_path": _path_if_exists(root / "paper_benchmark_table.json"),
+            "benchmark_ablation_matrix_path": _path_if_exists(root / "benchmark_ablation_matrix.json"),
+            "rerun_variance_report_path": _path_if_exists(root / "rerun_variance_report.json"),
+            "benchmark_claims_report_path": _path_if_exists(root / "benchmark_claims_report.json"),
             "decision_world_model_path": _path_if_exists(root / "decision_world_model.json"),
             "controller_policy_path": _path_if_exists(root / "controller_policy.json"),
             "value_of_more_data_report_path": _path_if_exists(root / "value_of_more_data_report.json"),
@@ -1921,7 +2063,7 @@ def materialize_run_summary(
         USER_RESULT_REPORT_RELATIVE_PATH,
         run_handoff_review,
     )
-    from relaytic.analytics import sync_task_contract_artifacts
+    from relaytic.analytics import sync_architecture_routing_artifacts, sync_task_contract_artifacts
     from relaytic.iteration import sync_iteration_from_run
     from relaytic.learnings import (
         default_learnings_state_dir,
@@ -1959,6 +2101,19 @@ def materialize_run_summary(
                 "review_gate_state": "review_gate_state.json",
             },
         ),
+    )
+    sync_architecture_routing_artifacts(
+        root,
+        investigation_bundle=_read_bundle(
+            root,
+            {
+                "dataset_profile": "dataset_profile.json",
+                "optimization_profile": "optimization_profile.json",
+            },
+        ),
+        planning_bundle=_read_bundle(root, {"plan": "plan.json"}),
+        route_prior_context=_read_bundle(root, {"route_prior_context": "route_prior_context.json"}).get("route_prior_context", {}),
+        benchmark_bundle=_read_bundle(root, {"benchmark_parity_report": "benchmark_parity_report.json"}),
     )
     try:
         policy_path = root / "policy_resolved.yaml"
@@ -2113,6 +2268,40 @@ def _clean_text(value: Any) -> str | None:
     if text.lower() in {"none", "null"}:
         return None
     return text
+
+
+def _normalize_benchmark_parity_status(value: str | None) -> str | None:
+    if value == "meets_or_exceeds_reference":
+        return "meets_or_beats_reference"
+    return value
+
+
+def _infer_benchmark_deploy_split(*, parity_status: str | None, deployment_readiness: str | None) -> bool:
+    normalized = _normalize_benchmark_parity_status(parity_status)
+    readiness = _clean_text(deployment_readiness)
+    if normalized not in {"meets_or_beats_reference", "near_parity"}:
+        return False
+    return readiness not in {None, "ready", "deploy_ready", "ready_now"}
+
+
+def _benchmark_vs_deploy_summary(
+    *,
+    summary: str | None,
+    parity_status: str | None,
+    deployment_readiness: str | None,
+) -> str | None:
+    text = _clean_text(summary)
+    if not _infer_benchmark_deploy_split(
+        parity_status=parity_status,
+        deployment_readiness=deployment_readiness,
+    ):
+        return text
+    reminder = "Offline benchmark wins do not masquerade as deploy-ready decisions."
+    if not text:
+        return reminder
+    if "deploy-ready" in text:
+        return text
+    return f"{text} {reminder}"
 
 
 def _first_learning_lesson(*, learnings_snapshot: dict[str, Any], learnings_state: dict[str, Any]) -> str | None:

@@ -10,6 +10,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from relaytic.analytics import default_architecture_candidate_order
+
 from .models import (
     ANALOG_RUN_CANDIDATES_SCHEMA_VERSION,
     CHALLENGER_PRIOR_SUGGESTIONS_SCHEMA_VERSION,
@@ -672,17 +674,26 @@ def _build_route_prior_context(
     analog_candidates: list[dict[str, Any]],
     controls: MemoryControls,
 ) -> dict[str, Any]:
+    current_task_type = _optional_str(current.get("task_type")) or "unknown"
     baseline_candidate_order = _default_candidate_order(
-        task_type=_optional_str(current.get("task_type")) or "unknown",
+        task_type=current_task_type,
         data_mode=_optional_str(current.get("data_mode")) or "steady_state",
     )
     family_scores: dict[str, float] = {}
     analog_ids: list[str] = []
     for item in analog_candidates:
+        snapshot = dict(item.get("snapshot", {}))
+        candidate_task_type = _optional_str(snapshot.get("task_type")) or "unknown"
+        compatibility = _route_prior_task_compatibility(
+            current_task_type=current_task_type,
+            candidate_task_type=candidate_task_type,
+        )
+        if compatibility <= 0.0:
+            continue
         family = _optional_str(dict(item.get("snapshot", {})).get("selected_model_family"))
         if not family:
             continue
-        family_scores[family] = family_scores.get(family, 0.0) + _memory_outcome_weight(item)
+        family_scores[family] = family_scores.get(family, 0.0) + round(_memory_outcome_weight(item) * compatibility, 4)
         analog_ids.append(str(item.get("run_id", "")))
         for update in dict(item.get("route_prior_updates") or {}).get("updates", []):
             update_family = _optional_str(dict(update).get("model_family"))
@@ -691,7 +702,7 @@ def _build_route_prior_context(
             bias = _optional_float(dict(update).get("bias"))
             if bias is None:
                 continue
-            family_scores[update_family] = family_scores.get(update_family, 0.0) + round(float(bias) * 2.0, 4)
+            family_scores[update_family] = family_scores.get(update_family, 0.0) + round(float(bias) * 2.0 * compatibility, 4)
     adjusted = _apply_family_bias(baseline_candidate_order=baseline_candidate_order, family_scores=family_scores)
     changed = adjusted != baseline_candidate_order
     status = "memory_influenced" if changed else ("retrieved_without_change" if analog_candidates else ("disabled" if not controls.enabled else "no_credible_analogs"))
@@ -877,13 +888,7 @@ def _workspace_recent_lesson(*, learnings_state: dict[str, Any], learnings_snaps
 
 
 def _default_candidate_order(*, task_type: str, data_mode: str) -> list[str]:
-    if data_mode == "time_series" and _is_classification_task(task_type):
-        return ["lagged_logistic_regression", "lagged_tree_classifier", "logistic_regression", "bagged_tree_classifier", "boosted_tree_classifier"]
-    if data_mode == "time_series":
-        return ["lagged_linear", "lagged_tree_ensemble", "linear_ridge", "bagged_tree_ensemble", "boosted_tree_ensemble"]
-    if _is_classification_task(task_type):
-        return ["logistic_regression", "bagged_tree_classifier", "boosted_tree_classifier"]
-    return ["linear_ridge", "bagged_tree_ensemble", "boosted_tree_ensemble"]
+    return default_architecture_candidate_order(task_type=task_type, data_mode=data_mode)
 
 
 def _apply_family_bias(*, baseline_candidate_order: list[str], family_scores: dict[str, float]) -> list[str]:
@@ -899,6 +904,31 @@ def _apply_family_bias(*, baseline_candidate_order: list[str], family_scores: di
         if name not in ranked and score > 0.0
     ]
     return _dedupe_strings(ranked + unseen)
+
+
+def _route_prior_task_compatibility(*, current_task_type: str, candidate_task_type: str) -> float:
+    current = _route_prior_task_group(current_task_type)
+    candidate = _route_prior_task_group(candidate_task_type)
+    if not current or not candidate:
+        return 0.0
+    if current == candidate:
+        return 1.0
+    return 0.0
+
+
+def _route_prior_task_group(task_type: str | None) -> str | None:
+    normalized = _optional_str(task_type)
+    if not normalized:
+        return None
+    if normalized == "multiclass_classification":
+        return "multiclass_classification"
+    if normalized in {"binary_classification", "fraud_detection", "anomaly_detection"}:
+        return "binary_like_classification"
+    if normalized == "regression":
+        return "regression"
+    if "classification" in normalized:
+        return "binary_like_classification"
+    return normalized
 
 
 def _memory_outcome_weight(candidate: dict[str, Any]) -> float:

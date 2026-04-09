@@ -42,11 +42,18 @@ def test_train_surrogate_candidates_tool_runs_split_safe_linear_and_tree(
     assert "lagged_linear" in families
     assert "bagged_tree_ensemble" in families
     assert "boosted_tree_ensemble" in families
+    assert "hist_gradient_boosting_ensemble" in families
+    assert "extra_trees_ensemble" in families
     assert payload["selected_model_family"] in {
         "linear_ridge",
         "lagged_linear",
         "bagged_tree_ensemble",
         "boosted_tree_ensemble",
+        "hist_gradient_boosting_ensemble",
+        "extra_trees_ensemble",
+        "catboost_ensemble",
+        "xgboost_ensemble",
+        "lightgbm_ensemble",
     }
     assert isinstance(payload["selected_hyperparameters"], dict)
     assert payload["selected_hyperparameters"]
@@ -275,10 +282,18 @@ def test_train_surrogate_candidates_supports_binary_classification_targets(
     assert "logistic_regression" in families
     assert "bagged_tree_classifier" in families
     assert "boosted_tree_classifier" in families
+    assert "hist_gradient_boosting_classifier" in families
+    assert "extra_trees_classifier" in families
     assert payload["selected_model_family"] in {
         "logistic_regression",
         "bagged_tree_classifier",
         "boosted_tree_classifier",
+        "hist_gradient_boosting_classifier",
+        "extra_trees_classifier",
+        "catboost_classifier",
+        "xgboost_classifier",
+        "lightgbm_classifier",
+        "tabpfn_classifier",
     }
     assert payload["selected_metrics"]["test"]["f1"] >= 0.70
     assert "r2" not in payload["selected_metrics"]["test"]
@@ -323,6 +338,12 @@ def test_train_surrogate_candidates_supports_fraud_detection_targets(
         "logistic_regression",
         "bagged_tree_classifier",
         "boosted_tree_classifier",
+        "hist_gradient_boosting_classifier",
+        "extra_trees_classifier",
+        "catboost_classifier",
+        "xgboost_classifier",
+        "lightgbm_classifier",
+        "tabpfn_classifier",
     }
     test_metrics = payload["selected_metrics"]["test"]
     assert test_metrics["recall"] >= 0.70
@@ -467,6 +488,88 @@ def test_train_surrogate_candidates_supports_boosted_tree_classifier(
     assert payload["selected_metrics"]["test"]["f1"] > 0.75
     analysis = payload["professional_analysis"]
     assert isinstance(analysis.get("high_error_regions"), list)
+
+
+def test_train_surrogate_candidates_supports_hist_gradient_boosting_regression(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    csv_path = tmp_path / "hist_gradient_regression.csv"
+    rows = ["x1,x2,y"]
+    for idx in range(220):
+        x1 = -1.0 + (2.0 * idx / 219.0)
+        x2 = (idx % 12) / 11.0
+        y = (x1 * x1) + (2.0 * x2) + (1.8 if x1 > 0.2 else -0.6)
+        rows.append(f"{x1:.5f},{x2:.5f},{y:.5f}")
+    csv_path.write_text("\n".join(rows), encoding="utf-8")
+
+    registry = build_default_registry()
+    result = registry.execute(
+        "train_surrogate_candidates",
+        {
+            "data_path": str(csv_path),
+            "target_column": "y",
+            "feature_columns": ["x1", "x2"],
+            "requested_model_family": "hist_gradient_boosting",
+            "run_id": "hist_gradient_regression_run",
+        },
+    )
+
+    assert result.status == "ok"
+    payload = result.output
+    assert payload["requested_model_family"] == "hist_gradient_boosting_ensemble"
+    assert payload["selected_model_family"] == "hist_gradient_boosting_ensemble"
+    assert payload["selected_hyperparameters"]["selected_variant_id"].startswith("hist_")
+    assert payload["selected_metrics"]["test"]["r2"] > 0.55
+    assert Path(payload["model_state_path"]).is_file()
+
+
+def test_train_surrogate_candidates_supports_extra_trees_multiclass_strings(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    csv_path = tmp_path / "extra_trees_multiclass.csv"
+    rows = ["length,width,color_score,bean_class"]
+    for idx in range(210):
+        if idx < 70:
+            length = 1.0 + (idx / 140.0)
+            width = 0.2 + ((idx % 7) / 100.0)
+            color = 0.1 + ((idx % 5) / 25.0)
+            label = "CALI"
+        elif idx < 140:
+            local = idx - 70
+            length = 2.0 + (local / 140.0)
+            width = 0.8 + ((local % 7) / 80.0)
+            color = 0.5 + ((local % 5) / 25.0)
+            label = "SIRA"
+        else:
+            local = idx - 140
+            length = 3.0 + (local / 140.0)
+            width = 1.5 + ((local % 7) / 60.0)
+            color = 0.9 + ((local % 5) / 20.0)
+            label = "DERMASON"
+        rows.append(f"{length:.5f},{width:.5f},{color:.5f},{label}")
+    csv_path.write_text("\n".join(rows), encoding="utf-8")
+
+    registry = build_default_registry()
+    result = registry.execute(
+        "train_surrogate_candidates",
+        {
+            "data_path": str(csv_path),
+            "target_column": "bean_class",
+            "feature_columns": ["length", "width", "color_score"],
+            "requested_model_family": "extra_trees_classifier",
+            "run_id": "extra_trees_multiclass_run",
+        },
+    )
+
+    assert result.status == "ok"
+    payload = result.output
+    assert payload["task_profile"]["task_type"] == "multiclass_classification"
+    assert payload["requested_model_family"] == "extra_trees_classifier"
+    assert payload["selected_model_family"] == "extra_trees_classifier"
+    assert payload["selected_hyperparameters"]["selected_variant_id"].startswith("extra_classifier_")
+    assert payload["selected_metrics"]["test"]["accuracy"] >= 0.80
 
 
 def test_train_surrogate_candidates_executes_categorical_features_missingness_and_calibration(

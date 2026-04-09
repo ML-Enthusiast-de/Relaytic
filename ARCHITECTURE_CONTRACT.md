@@ -62,7 +62,7 @@ Current canonical boundaries:
 
 Reserved future boundaries:
 
-- `src/relaytic/modeling/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, and `src/relaytic/runtime/` should absorb the Slice 15A through 15F model-competitiveness track so task contracts, architecture routing, HPO budgets, benchmark rigor, artifact reuse, and shadow-tested imported model families remain attached to the current modeling/search/benchmark substrate instead of forking into a disconnected parallel stack
+- `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, and `src/relaytic/runtime/` now absorb the shipped Slice 15A through Slice 15D task-contract, architecture-routing, bounded-HPO, and paper-grade benchmark responsibilities; the remaining Slice 15E through 15F model-competitiveness work should continue extending those same boundaries so artifact reuse and shadow-tested imported model families remain attached to the current modeling/search/benchmark substrate instead of forking into a disconnected parallel stack
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 
@@ -355,6 +355,25 @@ Current workspace and iteration artifact names:
 - `next_run_plan.json`
 - `focus_decision_record.json`
 - `data_expansion_candidates.json`
+
+Current task-contract artifact names:
+
+- `task_profile_contract.json`
+- `target_semantics_report.json`
+- `metric_contract.json`
+- `benchmark_mode_report.json`
+- `deployment_readiness_report.json`
+- `benchmark_vs_deploy_report.json`
+- `dataset_semantics_audit.json`
+
+Current architecture-routing artifact names:
+
+- `architecture_registry.json`
+- `architecture_router_report.json`
+- `candidate_family_matrix.json`
+- `architecture_fit_report.json`
+- `family_capability_matrix.json`
+- `architecture_ablation_report.json`
 
 Current trace and eval artifact names:
 

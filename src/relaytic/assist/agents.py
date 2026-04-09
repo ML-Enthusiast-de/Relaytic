@@ -643,6 +643,8 @@ def build_assist_audit_explanation(
     result_contract = dict(run_summary.get("result_contract", {}))
     task_contract = dict(run_summary.get("task_contract", {}))
     benchmark_vs_deploy = dict(run_summary.get("benchmark_vs_deploy", {}))
+    architecture = dict(run_summary.get("architecture", {}))
+    hpo = dict(run_summary.get("hpo", {}))
     next_step = dict(run_summary.get("next_step", {}))
     iteration = dict(run_summary.get("iteration", {}))
 
@@ -680,6 +682,19 @@ def build_assist_audit_explanation(
             f"The current constraint kind is `{_clean_text(feasibility.get('primary_constraint_kind')) or 'none'}` and review gate open = `{feasibility.get('gate_open')}`.",
         ]
         evidence_refs = ["counterfactual_region_report.json", "decision_constraint_report.json", "run_summary.json"]
+    elif "why not" in normalized and any(token in normalized for token in ("lstm", "transformer", "sequence")):
+        question_type = "why_not_sequence_model"
+        reasons = [
+            _clean_text(architecture.get("sequence_rejection_reason"))
+            or "Relaytic kept sequence-native families out of this live run because the task contract does not justify them yet.",
+            f"Recommended primary family is `{_clean_text(architecture.get('recommended_primary_family')) or _clean_text(decision.get('selected_model_family')) or 'unknown'}` with candidate order `{', '.join(architecture.get('candidate_order', [])[:4]) or 'unknown'}`.",
+            f"Sequence live allowed = `{architecture.get('sequence_live_allowed')}` and shadow ready = `{architecture.get('sequence_shadow_ready')}`.",
+        ]
+        evidence_refs = [
+            "architecture_router_report.json",
+            "candidate_family_matrix.json",
+            "architecture_fit_report.json",
+        ]
     elif "why not" in normalized:
         question_type = "why_not"
         reasons = [
@@ -692,9 +707,26 @@ def build_assist_audit_explanation(
         reasons = [
             f"Relaytic selected model family `{_clean_text(decision.get('selected_model_family')) or 'unknown'}` for the active route.",
             f"The route posture is `{_clean_text(decision.get('selected_route_title')) or _clean_text(decision.get('selected_route_id')) or 'unknown'}` with primary metric `{_clean_text(decision.get('primary_metric')) or 'unknown'}`.",
-            f"Benchmark parity is `{_clean_text(benchmark.get('parity_status')) or 'unknown'}` and the decision-lab next action is `{_clean_text(decision_lab.get('selected_next_action')) or 'unknown'}`.",
+            f"Architecture routing recommended `{_clean_text(architecture.get('recommended_primary_family')) or 'unknown'}` and benchmark parity is `{_clean_text(benchmark.get('parity_status')) or 'unknown'}`.",
         ]
-        evidence_refs = ["plan.json", "leaderboard.csv", "benchmark_parity_report.json", "decision_world_model.json"]
+        if int(hpo.get("executed_trial_count", 0) or 0) > 0:
+            reasons.append(
+                f"Bounded HPO executed `{int(hpo.get('executed_trial_count', 0) or 0)}` trial(s) across `{int(hpo.get('tuned_family_count', 0) or 0)}` tuned family loop(s), with stop reasons `{', '.join(str(item) for item in hpo.get('stop_reasons', []) if str(item).strip()) or 'not recorded'}`."
+            )
+        evidence_refs = [
+            "plan.json",
+            "architecture_router_report.json",
+            "candidate_family_matrix.json",
+            "benchmark_parity_report.json",
+        ]
+        if int(hpo.get("executed_trial_count", 0) or 0) > 0:
+            evidence_refs.extend(
+                [
+                    "hpo_budget_contract.json",
+                    "search_loop_scorecard.json",
+                    "threshold_tuning_report.json",
+                ]
+            )
     elif "why" in normalized and any(token in normalized for token in ("route", "choose", "happen", "selected")):
         question_type = "why_this_happened"
         reasons = [

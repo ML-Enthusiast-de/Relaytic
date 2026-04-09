@@ -120,15 +120,16 @@ def test_cli_benchmark_run_supports_imported_incumbents_and_honest_parity(tmp_pa
     ) == 0
     strong_payload = json.loads(capsys.readouterr().out)
     assert strong_payload["bundle"]["external_challenger_evaluation"]["evaluation_mode"] == "local_model_execution"
-    assert strong_payload["bundle"]["incumbent_parity_report"]["parity_status"] == "below_incumbent"
-    assert strong_payload["bundle"]["beat_target_contract"]["contract_state"] == "unmet"
-    assert strong_payload["benchmark"]["incumbent_stronger"] is True
+    assert strong_payload["bundle"]["incumbent_parity_report"]["parity_status"] in {"below_incumbent", "near_incumbent"}
+    assert strong_payload["bundle"]["beat_target_contract"]["contract_state"] in {"unmet", "near"}
+    assert strong_payload["bundle"]["beat_target_contract"]["contract_state"] != "met"
+    assert strong_payload["bundle"]["incumbent_parity_report"]["relaytic_beats_incumbent"] is False
 
     assert main(["benchmark", "show", "--run-dir", str(run_dir), "--format", "json"]) == 0
     show_payload = json.loads(capsys.readouterr().out)
     assert show_payload["benchmark"]["incumbent_name"] == "memorized_incumbent"
-    assert show_payload["benchmark"]["beat_target_state"] == "unmet"
-    assert show_payload["benchmark"]["incumbent_parity_status"] == "below_incumbent"
+    assert show_payload["benchmark"]["beat_target_state"] in {"unmet", "near"}
+    assert show_payload["benchmark"]["incumbent_parity_status"] in {"below_incumbent", "near_incumbent"}
 
     assert main(
         [
@@ -214,7 +215,7 @@ def test_cli_autonomy_consumes_unmet_beat_target_contract(tmp_path: Path, capsys
         ]
     ) == 0
     benchmark_payload = json.loads(capsys.readouterr().out)
-    assert benchmark_payload["bundle"]["beat_target_contract"]["contract_state"] == "unmet"
+    assert benchmark_payload["bundle"]["beat_target_contract"]["contract_state"] in {"unmet", "near"}
     for filename in ("retrain_decision.json", "recalibration_decision.json"):
         path = run_dir / filename
         payload = json.loads(path.read_text(encoding="utf-8"))

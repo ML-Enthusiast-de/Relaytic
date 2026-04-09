@@ -30,6 +30,11 @@ def test_build_assist_audit_explanation_gives_agent_exact_model_choice_reasoning
             },
             "decision_lab": {"selected_next_action": "search_more"},
             "benchmark": {"parity_status": "below_reference"},
+            "hpo": {
+                "executed_trial_count": 9,
+                "tuned_family_count": 2,
+                "stop_reasons": ["convergence_plateau"],
+            },
         },
     )
 
@@ -38,7 +43,9 @@ def test_build_assist_audit_explanation_gives_agent_exact_model_choice_reasoning
     assert audit["llm_enhanced"] is False
     assert "gradient_boosting" in audit["answer"]
     assert "roc_auc" in audit["answer"]
+    assert "9" in audit["answer"]
     assert "benchmark_parity_report.json" in audit["evidence_refs"]
+    assert "search_loop_scorecard.json" in audit["evidence_refs"]
 
 
 def test_build_assist_audit_explanation_answers_task_semantics_questions() -> None:
@@ -63,6 +70,33 @@ def test_build_assist_audit_explanation_answers_task_semantics_questions() -> No
     assert audit["question_type"] == "task_semantics"
     assert "rare-event classification" in audit["answer"]
     assert "task_profile_contract.json" in audit["evidence_refs"]
+
+
+def test_build_assist_audit_explanation_answers_why_not_lstm() -> None:
+    audit = build_assist_audit_explanation(
+        message="why not an lstm here?",
+        actor_type="user",
+        run_summary={
+            "decision": {"selected_model_family": "hist_gradient_boosting_classifier"},
+            "architecture": {
+                "recommended_primary_family": "hist_gradient_boosting_classifier",
+                "candidate_order": [
+                    "hist_gradient_boosting_classifier",
+                    "extra_trees_classifier",
+                    "bagged_tree_classifier",
+                ],
+                "sequence_live_allowed": False,
+                "sequence_shadow_ready": False,
+                "sequence_rejection_reason": (
+                    "Relaytic rejected sequence-family routing because the task contract does not prove ordered temporal structure."
+                ),
+            },
+        },
+    )
+
+    assert audit["question_type"] == "why_not_sequence_model"
+    assert "ordered temporal structure" in audit["answer"]
+    assert "architecture_router_report.json" in audit["evidence_refs"]
 
 
 def test_local_advisor_can_rewrite_human_audit_answer(monkeypatch, tmp_path: Path) -> None:

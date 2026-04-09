@@ -22,6 +22,10 @@ from .classifiers import (
     BoostedTreeClassifierSurrogate,
     LogisticClassificationSurrogate,
 )
+from .estimator_adapters import (
+    PickledClassificationEstimatorSurrogate,
+    PickledRegressionEstimatorSurrogate,
+)
 from .evaluation import classification_metrics, regression_metrics
 from .feature_pipeline import prepare_inference_feature_frame
 from .normalization import MinMaxNormalizer
@@ -40,6 +44,12 @@ _CLASSIFICATION_MODEL_NAMES = {
     "lagged_logistic_regression",
     "bagged_tree_classifier",
     "boosted_tree_classifier",
+    "hist_gradient_boosting_classifier",
+    "extra_trees_classifier",
+    "catboost_classifier",
+    "xgboost_classifier",
+    "lightgbm_classifier",
+    "tabpfn_classifier",
     "lagged_tree_classifier",
 }
 
@@ -445,6 +455,14 @@ def _load_model_from_state(*, state_path: str | Path, model_name_hint: str | Non
         model._bias = float(payload.get("bias", 0.0))
         model._estimators = list(payload.get("estimators", []))
         return model
+    if model_name in {
+        "hist_gradient_boosting_ensemble",
+        "extra_trees_ensemble",
+        "catboost_ensemble",
+        "xgboost_ensemble",
+        "lightgbm_ensemble",
+    }:
+        return PickledRegressionEstimatorSurrogate.from_state_dict(payload, state_path=state_path)
     if model_name == "lagged_linear":
         model = LaggedLinearSurrogate(
             feature_columns=[str(v) for v in payload.get("feature_columns", [])],
@@ -515,6 +533,15 @@ def _load_model_from_state(*, state_path: str | Path, model_name_hint: str | Non
         model.class_labels = [str(v) for v in payload.get("class_labels", [])]
         model._estimators = list(payload.get("estimators", []))
         return model
+    if model_name in {
+        "hist_gradient_boosting_classifier",
+        "extra_trees_classifier",
+        "catboost_classifier",
+        "xgboost_classifier",
+        "lightgbm_classifier",
+        "tabpfn_classifier",
+    }:
+        return PickledClassificationEstimatorSurrogate.from_state_dict(payload, state_path=state_path)
     if model_name == "lagged_logistic_regression":
         model = LaggedLogisticClassificationSurrogate(
             feature_columns=[str(v) for v in payload.get("feature_columns", [])],

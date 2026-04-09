@@ -14,6 +14,11 @@ EXTERNAL_CHALLENGER_MANIFEST_SCHEMA_VERSION = "relaytic.external_challenger_mani
 EXTERNAL_CHALLENGER_EVALUATION_SCHEMA_VERSION = "relaytic.external_challenger_evaluation.v1"
 INCUMBENT_PARITY_REPORT_SCHEMA_VERSION = "relaytic.incumbent_parity_report.v1"
 BEAT_TARGET_CONTRACT_SCHEMA_VERSION = "relaytic.beat_target_contract.v1"
+PAPER_BENCHMARK_MANIFEST_SCHEMA_VERSION = "relaytic.paper_benchmark_manifest.v1"
+PAPER_BENCHMARK_TABLE_SCHEMA_VERSION = "relaytic.paper_benchmark_table.v1"
+BENCHMARK_ABLATION_MATRIX_SCHEMA_VERSION = "relaytic.benchmark_ablation_matrix.v1"
+RERUN_VARIANCE_REPORT_SCHEMA_VERSION = "relaytic.rerun_variance_report.v1"
+BENCHMARK_CLAIMS_REPORT_SCHEMA_VERSION = "relaytic.benchmark_claims_report.v1"
 
 
 @dataclass(frozen=True)
@@ -230,6 +235,135 @@ class BeatTargetContract:
 
 
 @dataclass(frozen=True)
+class PaperBenchmarkManifest:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    dataset_label: str
+    dataset_source_name: str | None
+    dataset_source_type: str | None
+    source_url: str | None
+    data_path: str
+    task_type: str
+    data_mode: str
+    target_column: str
+    row_count: int
+    column_count: int
+    comparison_metric: str
+    metric_direction: str
+    selected_model_family: str | None
+    selected_hyperparameters: dict[str, Any]
+    benchmark_expected: bool
+    horizon_type: str | None
+    timestamp_cadence_quality: str | None
+    lagged_baseline_family: str | None
+    lagged_baseline_metric: float | None
+    sequence_candidate_status: str | None
+    sequence_candidate_reason: str | None
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class PaperBenchmarkTable:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    comparison_metric: str
+    metric_direction: str
+    relaytic_rank: int | None
+    reference_count: int
+    rows: list[dict[str, Any]]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BenchmarkAblationMatrix:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    comparison_metric: str
+    metric_direction: str
+    rows: list[dict[str, Any]]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class RerunVarianceReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    comparison_metric: str
+    metric_direction: str
+    matching_run_count: int
+    run_ids: list[str]
+    metric_values: list[float]
+    mean_metric_value: float | None
+    min_metric_value: float | None
+    max_metric_value: float | None
+    stddev_metric_value: float | None
+    coefficient_of_variation: float | None
+    stability_band: str
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BenchmarkClaimsReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    competitiveness_claim: str
+    deployment_claim: str
+    below_reference: bool
+    benchmark_vs_deploy_split: bool
+    claim_boundaries: list[str]
+    weak_spots: list[str]
+    not_claiming: list[str]
+    why_below_reference: str | None
+    temporal_posture: dict[str, Any]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class BenchmarkBundle:
     reference_approach_matrix: ReferenceApproachMatrix
     benchmark_gap_report: BenchmarkGapReport
@@ -238,6 +372,11 @@ class BenchmarkBundle:
     external_challenger_evaluation: ExternalChallengerEvaluation
     incumbent_parity_report: IncumbentParityReport
     beat_target_contract: BeatTargetContract
+    paper_benchmark_manifest: PaperBenchmarkManifest
+    paper_benchmark_table: PaperBenchmarkTable
+    benchmark_ablation_matrix: BenchmarkAblationMatrix
+    rerun_variance_report: RerunVarianceReport
+    benchmark_claims_report: BenchmarkClaimsReport
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -248,6 +387,11 @@ class BenchmarkBundle:
             "external_challenger_evaluation": self.external_challenger_evaluation.to_dict(),
             "incumbent_parity_report": self.incumbent_parity_report.to_dict(),
             "beat_target_contract": self.beat_target_contract.to_dict(),
+            "paper_benchmark_manifest": self.paper_benchmark_manifest.to_dict(),
+            "paper_benchmark_table": self.paper_benchmark_table.to_dict(),
+            "benchmark_ablation_matrix": self.benchmark_ablation_matrix.to_dict(),
+            "rerun_variance_report": self.rerun_variance_report.to_dict(),
+            "benchmark_claims_report": self.benchmark_claims_report.to_dict(),
         }
 
 

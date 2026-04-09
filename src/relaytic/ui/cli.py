@@ -5250,6 +5250,8 @@ def _run_search_phase(
         )
         summary_bundle = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
         surface_search = dict(summary_bundle["summary"].get("search", {}))
+        bundle_payload = benchmark_result.bundle.to_dict()
+        bundle_payload["benchmark_vs_deploy_report"] = read_task_contract_artifacts(root).get("benchmark_vs_deploy_report", {})
         return {
             "surface_payload": {
                 "status": "ok",
@@ -9255,7 +9257,7 @@ def _run_planning_phase(
     runtime_surface: str = "cli",
     runtime_command: str | None = None,
 ) -> dict[str, Any]:
-    from relaytic.analytics import sync_task_contract_artifacts
+    from relaytic.analytics import sync_architecture_routing_artifacts, sync_task_contract_artifacts
     from relaytic.planning import write_planning_bundle
 
     root = Path(run_dir)
@@ -9339,6 +9341,13 @@ def _run_planning_phase(
             investigation_bundle=investigation_state["bundle"],
             planning_bundle=planning_bundle.to_dict(),
         )
+        architecture_written = sync_architecture_routing_artifacts(
+            root,
+            investigation_bundle=investigation_state["bundle"],
+            planning_bundle=planning_bundle.to_dict(),
+            route_prior_context=dict(_read_json_bundle(root, bundle="memory").get("route_prior_context", {}) or {}),
+            benchmark_bundle=_read_json_bundle(root, bundle="benchmark"),
+        )
         manifest_path = _refresh_planning_manifest(
             root,
             run_id=run_id,
@@ -9359,6 +9368,7 @@ def _run_planning_phase(
             output_artifacts=[
                 *(str(value) for value in written.values()),
                 *(str(value) for value in task_contract_written.values()),
+                *(str(value) for value in architecture_written.values()),
                 *model_artifacts,
                 str(manifest_path),
             ],
@@ -9372,6 +9382,7 @@ def _run_planning_phase(
             "paths": {
                 **{key: str(value) for key, value in written.items()},
                 **{key: str(value) for key, value in task_contract_written.items()},
+                **{key: str(value) for key, value in architecture_written.items()},
             },
             "manifest_path": str(manifest_path),
             "plan": {
@@ -9978,6 +9989,7 @@ def _run_benchmark_phase(
     runtime_command: str | None = None,
 ) -> dict[str, Any]:
     from relaytic.benchmark import write_benchmark_bundle
+    from relaytic.analytics import read_task_contract_artifacts
 
     root = Path(run_dir)
     targets = _benchmark_output_paths(root)
@@ -10043,6 +10055,11 @@ def _run_benchmark_phase(
         gap = benchmark_result.bundle.benchmark_gap_report
         incumbent = benchmark_result.bundle.incumbent_parity_report
         beat_target = benchmark_result.bundle.beat_target_contract
+        paper_manifest = benchmark_result.bundle.paper_benchmark_manifest
+        rerun_variance = benchmark_result.bundle.rerun_variance_report
+        claims = benchmark_result.bundle.benchmark_claims_report
+        bundle_payload = benchmark_result.bundle.to_dict()
+        bundle_payload["benchmark_vs_deploy_report"] = read_task_contract_artifacts(root).get("benchmark_vs_deploy_report", {})
         return {
             "surface_payload": {
                 "status": "ok",
@@ -10063,8 +10080,14 @@ def _run_benchmark_phase(
                     "beat_target_state": beat_target.contract_state,
                     "relaytic_beats_incumbent": incumbent.relaytic_beats_incumbent,
                     "incumbent_stronger": incumbent.incumbent_stronger,
+                    "paper_status": paper_manifest.status,
+                    "rerun_match_count": rerun_variance.matching_run_count,
+                    "rerun_stability_band": rerun_variance.stability_band,
+                    "competitiveness_claim": claims.competitiveness_claim,
+                    "deployment_claim": claims.deployment_claim,
+                    "below_reference": claims.below_reference,
                 },
-                "bundle": benchmark_result.bundle.to_dict(),
+                "bundle": bundle_payload,
             },
             "human_output": benchmark_result.review_markdown,
         }
@@ -10079,6 +10102,8 @@ def _run_benchmark_phase(
 
 
 def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    from relaytic.analytics import read_task_contract_artifacts
+
     root = Path(run_dir)
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
@@ -10091,6 +10116,11 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     gap = dict(bundle.get("benchmark_gap_report", {}))
     incumbent = dict(bundle.get("incumbent_parity_report", {}))
     beat_target = dict(bundle.get("beat_target_contract", {}))
+    paper_manifest = dict(bundle.get("paper_benchmark_manifest", {}))
+    rerun_variance = dict(bundle.get("rerun_variance_report", {}))
+    claims = dict(bundle.get("benchmark_claims_report", {}))
+    bundle_payload = dict(bundle)
+    bundle_payload["benchmark_vs_deploy_report"] = read_task_contract_artifacts(root).get("benchmark_vs_deploy_report", {})
     return {
         "surface_payload": {
             "status": "ok",
@@ -10110,10 +10140,16 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "beat_target_state": beat_target.get("contract_state") or parity.get("beat_target_state"),
                 "relaytic_beats_incumbent": incumbent.get("relaytic_beats_incumbent"),
                 "incumbent_stronger": incumbent.get("incumbent_stronger"),
+                "paper_status": paper_manifest.get("status"),
+                "rerun_match_count": int(rerun_variance.get("matching_run_count", 0) or 0),
+                "rerun_stability_band": rerun_variance.get("stability_band"),
+                "competitiveness_claim": claims.get("competitiveness_claim"),
+                "deployment_claim": claims.get("deployment_claim"),
+                "below_reference": claims.get("below_reference"),
             },
-            "bundle": bundle,
+            "bundle": bundle_payload,
         },
-        "human_output": render_benchmark_review_markdown(bundle),
+        "human_output": render_benchmark_review_markdown(bundle_payload),
     }
 
 
@@ -12233,6 +12269,11 @@ def _benchmark_output_paths(run_dir: Path) -> dict[str, Path]:
         "external_challenger_evaluation": run_dir / "external_challenger_evaluation.json",
         "incumbent_parity_report": run_dir / "incumbent_parity_report.json",
         "beat_target_contract": run_dir / "beat_target_contract.json",
+        "paper_benchmark_manifest": run_dir / "paper_benchmark_manifest.json",
+        "paper_benchmark_table": run_dir / "paper_benchmark_table.json",
+        "benchmark_ablation_matrix": run_dir / "benchmark_ablation_matrix.json",
+        "rerun_variance_report": run_dir / "rerun_variance_report.json",
+        "benchmark_claims_report": run_dir / "benchmark_claims_report.json",
     }
 
 
@@ -12314,6 +12355,13 @@ def _evals_output_paths(run_dir: Path) -> dict[str, Path]:
 
 def _search_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
+        "hpo_budget_contract": run_dir / "hpo_budget_contract.json",
+        "architecture_search_space": run_dir / "architecture_search_space.json",
+        "trial_ledger": run_dir / "trial_ledger.jsonl",
+        "early_stopping_report": run_dir / "early_stopping_report.json",
+        "search_loop_scorecard": run_dir / "search_loop_scorecard.json",
+        "warm_start_transfer_report": run_dir / "warm_start_transfer_report.json",
+        "threshold_tuning_report": run_dir / "threshold_tuning_report.json",
         "search_controller_plan": run_dir / "search_controller_plan.json",
         "portfolio_search_trace": run_dir / "portfolio_search_trace.json",
         "hpo_campaign_report": run_dir / "hpo_campaign_report.json",
@@ -12489,6 +12537,13 @@ def _access_surface_output_paths(run_dir: Path) -> dict[str, Path]:
         "next_run_plan": workspace_dir / "next_run_plan.json",
         "focus_decision_record": run_dir / "focus_decision_record.json",
         "data_expansion_candidates": run_dir / "data_expansion_candidates.json",
+        "hpo_budget_contract": run_dir / "hpo_budget_contract.json",
+        "architecture_search_space": run_dir / "architecture_search_space.json",
+        "trial_ledger": run_dir / "trial_ledger.jsonl",
+        "early_stopping_report": run_dir / "early_stopping_report.json",
+        "search_loop_scorecard": run_dir / "search_loop_scorecard.json",
+        "warm_start_transfer_report": run_dir / "warm_start_transfer_report.json",
+        "threshold_tuning_report": run_dir / "threshold_tuning_report.json",
         "search_controller_plan": run_dir / "search_controller_plan.json",
         "portfolio_search_trace": run_dir / "portfolio_search_trace.json",
         "hpo_campaign_report": run_dir / "hpo_campaign_report.json",

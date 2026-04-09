@@ -2,14 +2,14 @@
 
 ## Status
 
-Planned.
+Shipped.
 
 Delivered package boundaries:
 
 - extend `src/relaytic/modeling/`
-- extend `src/relaytic/search/`
-- extend `src/relaytic/profiles/`
-- extend `src/relaytic/workspace/`
+- extend `src/relaytic/runs/`
+- extend `src/relaytic/assist/`
+- extend `src/relaytic/ui/`
 
 Intended artifacts:
 
@@ -26,6 +26,15 @@ Intended artifacts:
 Slice 15C replaces shallow fixed-variant search with explicit budgeted optimization loops.
 
 The current state uses a few hard-coded variants per family. That is useful as a deterministic floor, but it is not good enough for stronger benchmark performance.
+
+What landed:
+
+- bounded seeded HPO loops for the built-in linear, bagged-tree, boosted-tree, histogram-gradient-boosting, and extra-trees families
+- explicit budget contracts with total-trial caps, per-family caps, plateau patience, and wall-clock limits
+- persisted trial ledgers and search scorecards instead of opaque in-memory family sweeps
+- warm-start reuse from prior family-specific ledgers
+- first-class threshold-tuning artifacts for classification and rare-event routes
+- run-summary and assist visibility for HPO status, stop reasons, and threshold policy
 
 ## Load-Bearing Improvement
 

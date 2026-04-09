@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 Delivered package boundaries:
 
@@ -10,6 +10,12 @@ Delivered package boundaries:
 - extend `src/relaytic/evals/`
 - extend `src/relaytic/runs/`
 - extend `src/relaytic/ui/`
+
+Implemented highlights:
+
+- Relaytic now materializes paper-facing benchmark manifests, ranked tables, ablation matrices, rerun-variance reports, and claim-boundary reports directly from benchmark runs
+- benchmark surfaces now attach the canonical `benchmark_vs_deploy_report.json` instead of forcing humans or agents to reconcile benchmark competitiveness with deployment readiness manually
+- temporal benchmark posture is now recorded explicitly, including horizon type, lagged-baseline presence, and sequence-candidate status or reason
 
 Intended artifacts:
 
