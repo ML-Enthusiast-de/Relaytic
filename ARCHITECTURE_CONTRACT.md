@@ -65,6 +65,7 @@ Reserved future boundaries:
 - `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, and `src/relaytic/runtime/` now absorb the shipped Slice 15A through Slice 15D task-contract, architecture-routing, bounded-HPO, and paper-grade benchmark responsibilities; the remaining Slice 15E through 15F model-competitiveness work should continue extending those same boundaries so artifact reuse and shadow-tested imported model families remain attached to the current modeling/search/benchmark substrate instead of forking into a disconnected parallel stack
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+- Slice 18 should be a cross-cutting consolidation and remediation slice rather than a feature-expansion boundary; by default it should remove misleading or redundant packages, split oversized modules, and retire legacy surfaces instead of introducing a new permanent package
 
 Later slices may remove the shim only after `MIGRATION_MAP.md` and `IMPLEMENTATION_STATUS.md` are updated.
 
@@ -132,6 +133,7 @@ These files are required and must stay current:
 - `docs/build_slices/phase_16e.md`
 - `docs/build_slices/phase_16f.md`
 - `docs/build_slices/phase_17.md`
+- `docs/build_slices/phase_18.md`
 - `docs/specs/workspace_lifecycle.md`
 - `docs/specs/result_contract_schema.md`
 - `docs/specs/governed_learnings_schema.md`

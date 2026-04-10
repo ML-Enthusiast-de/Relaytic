@@ -473,6 +473,7 @@ The following boundaries are reserved for the next frontier slices so later impl
 
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
+- Slice 18 should avoid creating a new package boundary unless absolutely necessary; its job is to remove misleading, duplicated, or legacy boundaries, split oversized modules, retire compatibility shims when the removal criteria are met, and leave the public surface cleaner than before
 
 Implemented release-safety artifact names:
 - `release_safety_scan.json`

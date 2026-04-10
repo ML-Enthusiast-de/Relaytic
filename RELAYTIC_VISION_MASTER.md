@@ -5014,6 +5014,18 @@ At the end of each slice:
 - the final system emerges from additive slices that fit together cleanly
 - the architecture contract stays stable enough to prevent drift across slices
 
+### Endgame cleanup doctrine
+
+After the capability roadmap is complete, Relaytic should land one explicit final consolidation slice.
+
+That slice should:
+- remove misleading legacy structure and stale compatibility surfaces
+- split oversized modules that still reflect build-history accumulation rather than good boundaries
+- delete dead code and low-value wrappers
+- normalize public docs, CLI help, and host guidance so the final repo reads like one coherent product
+
+The goal is not cosmetic polishing. The goal is to ensure the finished repository looks intentional, professional, and maintainable instead of permanently carrying prototype-era construction scars.
+
 ---
 
 ## 41. Codex prompt to paste

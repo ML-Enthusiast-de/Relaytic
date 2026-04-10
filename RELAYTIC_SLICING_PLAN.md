@@ -240,6 +240,7 @@ Stable slice numbering stays the same, but the preferred execution order after S
 46. Slice 16E
 47. Slice 16F
 48. Slice 17
+49. Slice 18
 
 Why:
 
@@ -286,6 +287,7 @@ Why:
 - Slice 16E should come after the tool-focused academy slices because non-core specialist recruitment and retirement should reuse the same proof pipeline instead of becoming a second roster mechanism
 - Slice 16F should close the academy track by turning candidate, shadow, hunt, and promotion truth into one human- and agent-usable surface
 - Slice 17 should remain the optional late-stage representation-engine slice and should land after the academy track so Relaytic can first learn to evolve governed capabilities before it experiments with deeper latent representation engines
+- Slice 18 should land last as a deliberate consolidation/remediation pass so Relaytic can remove temporary compatibility layers, misleading structure, oversized modules, and stale prototype language after the capability work is complete
 
 ## Current execution state
 
@@ -302,6 +304,7 @@ Why:
 - next planned model-competitiveness follow-on after Slice 15D: Slice 15E
 - next planned academy follow-on after Slice 15F: Slice 16A
 - late optional representation follow-on after the academy track: Slice 17
+- final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
 - the canonical product-spec pack for Slice 12D, Slice 15, the model-competitiveness track, and the academy follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, academy, handoff, learnings, and external-agent continuation surfaces
 
@@ -2990,6 +2993,62 @@ Minimum proof:
 Innovation hook:
 
 - this is the long-range slice where Relaytic can start absorbing frontier self-supervised world-model ideas without abandoning its deterministic judgment core
+
+## Slice 18 - Endgame consolidation, legacy removal, and repo-quality hardening
+
+Goal:
+- remove misleading legacy structure
+- retire compatibility shims that are no longer justified
+- split oversized modules and helper grab-bags
+- leave the repo reading like one intentional product
+
+Load-bearing improvement:
+
+- Relaytic should finish the roadmap with one deliberate consolidation pass that removes temporary scaffolding, misleading folder structure, stale prototype language, dead code, and unjustified compatibility surfaces so the final repo is easier to trust, extend, and evaluate
+
+Human surface:
+
+- humans should see a cleaner, more coherent product surface with fewer duplicate concepts, fewer confusing entry points, and no stale legacy naming outside explicit historical notes
+
+Agent surface:
+
+- external agents should see one clear package map, one clear public CLI surface, fewer misleading wrappers, and more predictable artifact or module boundaries
+
+Intelligence source:
+
+- deterministic repo audits, public-surface inventory, import-graph review, dead-code checks, protocol-conformance checks, install-health checks, and explicit refactor scorecards rather than new modeling intelligence
+
+Fallback rule:
+
+- if a legacy surface still has active compatibility value, Relaytic must keep it temporarily but record the retention reason, owning slice, and removal condition explicitly instead of letting it drift indefinitely
+
+Required outputs:
+- `legacy_surface_audit.json`
+- `compatibility_removal_report.json`
+- `module_split_report.json`
+- `public_surface_inventory.json`
+- `dead_code_removal_report.json`
+- `repo_cleanup_scorecard.json`
+
+Required behavior:
+
+- remove or rename misleading top-level structures that no longer represent the real architecture
+- split oversized `agents.py` or similarly overloaded modules when the split improves clarity without inventing new abstraction theater
+- eliminate stale prototype or compatibility language from public docs, CLI help, and host bundles unless the history is intentionally documented
+- remove dead code, duplicate helpers, and thin wrappers that no longer carry real product value
+- preserve working public surfaces intentionally; no cleanup rewrite is allowed to silently break supported CLI, artifact, or integration contracts
+- finish with stronger tests, stronger docs, and a clearer repo map than before the slice started
+
+Minimum proof:
+
+- one explicit legacy or misleading package surface is removed or retired cleanly
+- one oversized module is split into clearer bounded files with tests preserved
+- one compatibility shim is either removed or given an explicit documented retention reason
+- one full repo-wide proof wall passes, including install health, git safety, and the broad pytest wall
+
+Final doctrine:
+
+- Slice 18 is not optional polish. It is the bounded cleanup pass that turns a long-lived build sequence into a professional finished repository.
 
 ## First four slices to build before anything fancy
 

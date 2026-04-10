@@ -17,6 +17,7 @@ This document tracks the operational state of the repository. It is an implement
 - latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, broader human-chaos coverage, and a prepared paper-grade benchmark/eval pack
 - next planned model-competitiveness follow-on after Slice 15D: 15E, execution DAG, freshness contracts, and artifact reuse
 - next planned academy follow-on after Slice 15F: 16A, capability registry and capability cards
+- final planned cleanup follow-on after Slice 17: 18, endgame consolidation, legacy removal, and repo-quality hardening
 - current public package: `relaytic`
 - current public CLI: `relaytic`
 - canonical future product-contract pack written under `docs/specs/` for workspace lifecycle, result contracts, governed learnings, mission-control behavior, compatibility migration, testing/proof burden, and flagship demos

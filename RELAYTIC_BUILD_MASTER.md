@@ -116,6 +116,7 @@ Start with:
 16E. non-core specialist recruitment and retirement
 16F. academy mission control and explainability surfaces
 17. representation engines, JEPA-style latent world models, and unlabeled local corpora
+18. endgame consolidation, legacy removal, and repo-quality hardening
 
 ## Preferred post-MVP execution order
 
@@ -169,6 +170,7 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 46. Slice 16E
 47. Slice 16F
 48. Slice 17
+49. Slice 18
 
 Reason:
 
@@ -216,6 +218,7 @@ Reason:
 - Slice 16E should come after the tool-focused academy slices because non-core specialist recruitment and retirement should reuse the same proof pipeline instead of becoming a second roster mechanism
 - Slice 16F should close the academy track by turning candidate, shadow, hunt, and promotion truth into one human- and agent-usable surface
 - Slice 17 should remain the optional late-stage representation-engine slice and should land after the academy track so Relaytic can first learn to evolve governed capabilities before it experiments with deeper latent representation engines
+- Slice 18 should land last as an explicit consolidation/remediation pass so Relaytic does not carry misleading legacy packages, stale compatibility shims, oversized modules, or prototype-era naming into its finished product state
 
 Current repo state:
 
@@ -231,6 +234,7 @@ Current repo state:
 - latest mission-control-and-proof slice: Slice 15
 - next planned model-competitiveness follow-on after Slice 15D: Slice 15E
 - next planned academy follow-on after Slice 15F: Slice 16A
+- final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces rather than leaving the UI stale until late polish
 - the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, academy, handoff, learnings, and external-agent continuation surfaces
 
@@ -300,7 +304,7 @@ If the goal is to turn the current implementation into something that looks genu
 
 Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.
 Slices 10, 10B, 10C, and 10A are the current category-shift unlocks that turned Relaytic from a governed inference lab into a more explicit decision-and-discovery system with skeptical steering. Slice 11A added real incumbent pressure, Slice 11B completed the first adoption unlock because humans and external agents can now launch, inspect, and demo the system from one coherent control surface, and Slice 11C made that surface legible enough to act as a real MVP cockpit instead of only a technical dashboard.
-Slices 15A through 15D are now shipped as the start of the model-competitiveness track. Slices 15E and 15F remain the future model-competitiveness follow-ons, Slices 16A through 16F are the future governed capability-evolution track after Slice 15F, and Slice 17 remains the long-range optional representation-engine bet after the academy track.
+Slices 15A through 15D are now shipped as the start of the model-competitiveness track. Slices 15E and 15F remain the future model-competitiveness follow-ons, Slices 16A through 16F are the future governed capability-evolution track after Slice 15F, Slice 17 remains the long-range optional representation-engine bet after the academy track, and Slice 18 is the planned endgame consolidation/remediation pass after all feature work.
 
 ## Source of truth precedence
 
