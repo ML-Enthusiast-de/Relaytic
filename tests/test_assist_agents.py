@@ -99,6 +99,27 @@ def test_build_assist_audit_explanation_answers_why_not_lstm() -> None:
     assert "architecture_router_report.json" in audit["evidence_refs"]
 
 
+def test_build_assist_audit_explanation_answers_why_not_imported_architecture() -> None:
+    audit = build_assist_audit_explanation(
+        message="why not tabpfn here?",
+        actor_type="user",
+        run_summary={
+            "decision": {"selected_model_family": "hist_gradient_boosting_classifier"},
+            "architecture": {"recommended_primary_family": "hist_gradient_boosting_classifier"},
+            "architecture_imports": {
+                "candidate_available_count": 1,
+                "candidate_available_families": ["tabpfn_classifier"],
+                "quarantined_count": 0,
+                "promotion_ready_count": 0,
+            },
+        },
+    )
+
+    assert audit["question_type"] == "why_not_imported_architecture"
+    assert "candidate-available" in audit["answer"]
+    assert "promotion_readiness_report.json" in audit["evidence_refs"]
+
+
 def test_local_advisor_can_rewrite_human_audit_answer(monkeypatch, tmp_path: Path) -> None:
     import relaytic.intelligence as intelligence_pkg
     import relaytic.intelligence.backends as backends_pkg

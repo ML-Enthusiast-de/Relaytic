@@ -137,7 +137,15 @@ def run_decision_review(
         profiles_bundle=profiles_bundle,
         control_bundle=control_bundle,
     )
-    compiler_report, challenger_templates, feature_hypotheses, benchmark_protocol = build_compiler_outputs(
+    (
+        compiler_report,
+        challenger_templates,
+        feature_hypotheses,
+        benchmark_protocol,
+        method_import_report,
+        architecture_candidate_registry,
+    ) = build_compiler_outputs(
+        run_dir=run_dir,
         policy=policy,
         planning_bundle=planning_bundle,
         investigation_bundle=investigation_bundle,
@@ -282,6 +290,8 @@ def run_decision_review(
         compiled_challenger_templates=challenger_templates,
         compiled_feature_hypotheses=feature_hypotheses,
         compiled_benchmark_protocol=benchmark_protocol,
+        method_import_report=method_import_report,
+        architecture_candidate_registry=architecture_candidate_registry,
     )
     return DecisionRunResult(
         bundle=bundle,
@@ -315,6 +325,7 @@ def render_decision_review_markdown(bundle: DecisionBundle | dict[str, Any]) -> 
     acquisition = dict(payload.get("data_acquisition_plan", {}))
     join_report = dict(payload.get("join_candidate_report", {}))
     compiler = dict(payload.get("method_compiler_report", {}))
+    method_import = dict(payload.get("method_import_report", {}))
     selected_next_action = (
         _clean_text(decision_constraints.get("feasible_selected_action"))
         or _clean_text(controller.get("selected_next_action"))
@@ -335,6 +346,7 @@ def render_decision_review_markdown(bundle: DecisionBundle | dict[str, Any]) -> 
         f"- Join candidates: `{join_report.get('candidate_count', 0)}`",
         f"- Compiled challengers: `{compiler.get('compiled_challenger_count', 0)}`",
         f"- Compiled features: `{compiler.get('compiled_feature_count', 0)}`",
+        f"- Imported architecture candidates: `{method_import.get('imported_family_count', 0)}`",
     ]
     if acquisition.get("recommended_source_id"):
         lines.append(f"- Recommended local source: `{acquisition.get('recommended_source_id')}`")

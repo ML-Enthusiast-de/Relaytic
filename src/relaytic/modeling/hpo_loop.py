@@ -399,7 +399,7 @@ def _all_parameter_combinations(parameters: dict[str, list[Any]]) -> list[dict[s
     values = [list(parameters[key]) for key in keys]
     combos: list[dict[str, Any]] = []
     for parts in itertools.product(*values):
-        combos.append({key: value for key, value in zip(keys, parts, strict=False)})
+        combos.append({key: value for key, value in zip(keys, parts)})
     return combos
 
 

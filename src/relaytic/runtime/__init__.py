@@ -1,5 +1,16 @@
 """Slice 09B runtime exports."""
 
+from .freshness import (
+    ARTIFACT_DEPENDENCY_GRAPH_SCHEMA_VERSION,
+    FRESHNESS_CONTRACT_SCHEMA_VERSION,
+    INVALIDATION_REPORT_SCHEMA_VERSION,
+    MATERIALIZATION_CACHE_INDEX_SCHEMA_VERSION,
+    RECOMPUTE_PLAN_SCHEMA_VERSION,
+    build_materialization_surface,
+    render_materialization_markdown,
+    stage_recompute_entry,
+    sync_materialization_runtime_artifacts,
+)
 from .gateway import (
     build_runtime_events_surface,
     build_runtime_surface,
@@ -31,12 +42,17 @@ from .models import (
 from .storage import EVENT_STREAM_FILENAME, RUNTIME_FILENAMES, append_event, read_event_stream, read_runtime_bundle, write_runtime_artifact
 
 __all__ = [
+    "ARTIFACT_DEPENDENCY_GRAPH_SCHEMA_VERSION",
     "CAPABILITY_PROFILES_SCHEMA_VERSION",
     "CONTEXT_INFLUENCE_REPORT_SCHEMA_VERSION",
     "DATA_ACCESS_AUDIT_SCHEMA_VERSION",
     "EVENT_STREAM_FILENAME",
+    "FRESHNESS_CONTRACT_SCHEMA_VERSION",
     "HOOK_EXECUTION_LOG_SCHEMA_VERSION",
+    "INVALIDATION_REPORT_SCHEMA_VERSION",
     "LAB_EVENT_SCHEMA_VERSION",
+    "MATERIALIZATION_CACHE_INDEX_SCHEMA_VERSION",
+    "RECOMPUTE_PLAN_SCHEMA_VERSION",
     "RUN_CHECKPOINT_MANIFEST_SCHEMA_VERSION",
     "RUNTIME_FILENAMES",
     "CapabilityProfile",
@@ -47,6 +63,7 @@ __all__ = [
     "RunCheckpointManifestArtifact",
     "RuntimeControls",
     "append_event",
+    "build_materialization_surface",
     "build_default_capability_profiles",
     "build_runtime_controls_from_policy",
     "build_runtime_events_surface",
@@ -58,7 +75,10 @@ __all__ = [
     "record_stage_completion",
     "record_stage_failure",
     "record_stage_start",
+    "render_materialization_markdown",
     "render_runtime_events_markdown",
     "render_runtime_markdown",
+    "stage_recompute_entry",
+    "sync_materialization_runtime_artifacts",
     "write_runtime_artifact",
 ]

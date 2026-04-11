@@ -172,6 +172,10 @@ def build_run_summary(
             "benchmark_ablation_matrix": "benchmark_ablation_matrix.json",
             "rerun_variance_report": "rerun_variance_report.json",
             "benchmark_claims_report": "benchmark_claims_report.json",
+            "shadow_trial_manifest": "shadow_trial_manifest.json",
+            "shadow_trial_scorecard": "shadow_trial_scorecard.json",
+            "candidate_quarantine": "candidate_quarantine.json",
+            "promotion_readiness_report": "promotion_readiness_report.json",
         },
     )
     task_contract_bundle = read_task_contract_artifacts(root)
@@ -200,6 +204,8 @@ def build_run_summary(
             "compiled_challenger_templates": "compiled_challenger_templates.json",
             "compiled_feature_hypotheses": "compiled_feature_hypotheses.json",
             "compiled_benchmark_protocol": "compiled_benchmark_protocol.json",
+            "method_import_report": "method_import_report.json",
+            "architecture_candidate_registry": "architecture_candidate_registry.json",
         },
     )
     dojo_bundle = _read_bundle(
@@ -304,6 +310,11 @@ def build_run_summary(
             "capability_profiles": "capability_profiles.json",
             "data_access_audit": "data_access_audit.json",
             "context_influence_report": "context_influence_report.json",
+            "artifact_dependency_graph": "artifact_dependency_graph.json",
+            "freshness_contract": "freshness_contract.json",
+            "recompute_plan": "recompute_plan.json",
+            "materialization_cache_index": "materialization_cache_index.json",
+            "invalidation_report": "invalidation_report.json",
         },
     )
     event_bus_bundle = read_event_bus_bundle(root)
@@ -417,6 +428,10 @@ def build_run_summary(
     benchmark_ablation_matrix = _bundle_item(benchmark_bundle, "benchmark_ablation_matrix")
     rerun_variance_report = _bundle_item(benchmark_bundle, "rerun_variance_report")
     benchmark_claims_report = _bundle_item(benchmark_bundle, "benchmark_claims_report")
+    shadow_trial_manifest = _bundle_item(benchmark_bundle, "shadow_trial_manifest")
+    shadow_trial_scorecard = _bundle_item(benchmark_bundle, "shadow_trial_scorecard")
+    candidate_quarantine = _bundle_item(benchmark_bundle, "candidate_quarantine")
+    promotion_readiness_report = _bundle_item(benchmark_bundle, "promotion_readiness_report")
     decision_world_model = _bundle_item(decision_bundle, "decision_world_model")
     controller_policy = _bundle_item(decision_bundle, "controller_policy")
     handoff_controller_report = _bundle_item(decision_bundle, "handoff_controller_report")
@@ -438,6 +453,8 @@ def build_run_summary(
     compiled_challenger_templates = _bundle_item(decision_bundle, "compiled_challenger_templates")
     compiled_feature_hypotheses = _bundle_item(decision_bundle, "compiled_feature_hypotheses")
     compiled_benchmark_protocol = _bundle_item(decision_bundle, "compiled_benchmark_protocol")
+    method_import_report = _bundle_item(decision_bundle, "method_import_report")
+    architecture_candidate_registry = _bundle_item(decision_bundle, "architecture_candidate_registry")
     dojo_session = _bundle_item(dojo_bundle, "dojo_session")
     dojo_hypotheses = _bundle_item(dojo_bundle, "dojo_hypotheses")
     dojo_results = _bundle_item(dojo_bundle, "dojo_results")
@@ -505,6 +522,10 @@ def build_run_summary(
     capability_profiles = _bundle_item(runtime_bundle, "capability_profiles")
     data_access_audit = _bundle_item(runtime_bundle, "data_access_audit")
     context_influence_report = _bundle_item(runtime_bundle, "context_influence_report")
+    artifact_dependency_graph = _bundle_item(runtime_bundle, "artifact_dependency_graph")
+    freshness_contract = _bundle_item(runtime_bundle, "freshness_contract")
+    recompute_plan = _bundle_item(runtime_bundle, "recompute_plan")
+    invalidation_report = _bundle_item(runtime_bundle, "invalidation_report")
     event_schema = dict(event_bus_bundle.get("event_schema", {})) if isinstance(event_bus_bundle.get("event_schema"), dict) else {}
     event_subscription_registry = dict(event_bus_bundle.get("event_subscription_registry", {})) if isinstance(event_bus_bundle.get("event_subscription_registry"), dict) else {}
     hook_registry = dict(event_bus_bundle.get("hook_registry", {})) if isinstance(event_bus_bundle.get("hook_registry"), dict) else {}
@@ -799,6 +820,10 @@ def build_run_summary(
             "rerun_stability_band": _clean_text(rerun_variance_report.get("stability_band")),
             "temporal_horizon_type": _clean_text(paper_benchmark_manifest.get("horizon_type")),
             "sequence_candidate_status": _clean_text(paper_benchmark_manifest.get("sequence_candidate_status")),
+            "imported_candidate_count": int(shadow_trial_manifest.get("candidate_count", 0) or 0),
+            "promotion_ready_count": int(promotion_readiness_report.get("promotion_ready_count", 0) or 0),
+            "candidate_available_count": int(promotion_readiness_report.get("candidate_available_count", 0) or 0),
+            "quarantined_candidate_count": int(candidate_quarantine.get("quarantined_count", 0) or 0),
         },
         "decision_lab": {
             "status": _clean_text(decision_world_model.get("status")),
@@ -820,6 +845,7 @@ def build_run_summary(
             "compiled_challenger_count": int(method_compiler_report.get("compiled_challenger_count", 0) or 0),
             "compiled_feature_count": int(method_compiler_report.get("compiled_feature_count", 0) or 0),
             "compiled_benchmark_change_count": int(method_compiler_report.get("compiled_benchmark_change_count", 0) or 0),
+            "imported_candidate_count": int(method_import_report.get("imported_family_count", 0) or 0),
             "changed_next_action": decision_usefulness_report.get("changed_next_action"),
             "changed_controller_path": decision_usefulness_report.get("changed_controller_path"),
             "baseline_action": _clean_text(handoff_controller_report.get("baseline_action")),
@@ -1109,6 +1135,49 @@ def build_run_summary(
                 if str(item).strip()
             ],
         },
+        "architecture_imports": {
+            "status": _clean_text(method_import_report.get("status")) or _clean_text(promotion_readiness_report.get("status")),
+            "imported_family_count": int(method_import_report.get("imported_family_count", 0) or 0),
+            "candidate_count": int(architecture_candidate_registry.get("candidate_count", 0) or 0),
+            "shadow_trial_count": len(shadow_trial_scorecard.get("rows", []))
+            if isinstance(shadow_trial_scorecard.get("rows"), list)
+            else 0,
+            "promotion_ready_count": int(promotion_readiness_report.get("promotion_ready_count", 0) or 0),
+            "candidate_available_count": int(promotion_readiness_report.get("candidate_available_count", 0) or 0),
+            "quarantined_count": int(candidate_quarantine.get("quarantined_count", 0) or 0),
+            "top_candidate_family": (
+                _clean_text(dict(architecture_candidate_registry.get("candidates", [{}])[0]).get("family_id"))
+                if isinstance(architecture_candidate_registry.get("candidates"), list)
+                and architecture_candidate_registry.get("candidates")
+                else None
+            ),
+            "top_promotion_state": (
+                _clean_text(dict(promotion_readiness_report.get("rows", [{}])[0]).get("promotion_state"))
+                if isinstance(promotion_readiness_report.get("rows"), list)
+                and promotion_readiness_report.get("rows")
+                else None
+            ),
+            "promotion_ready_families": [
+                str(item.get("family_id"))
+                for item in promotion_readiness_report.get("rows", [])
+                if isinstance(item, dict) and str(item.get("promotion_state")) == "promotion_ready" and str(item.get("family_id", "")).strip()
+            ][:5],
+            "candidate_available_families": [
+                str(item.get("family_id"))
+                for item in promotion_readiness_report.get("rows", [])
+                if isinstance(item, dict) and str(item.get("promotion_state")) == "candidate_available" and str(item.get("family_id", "")).strip()
+            ][:5],
+            "quarantined_families": [
+                str(item.get("family_id"))
+                for item in promotion_readiness_report.get("rows", [])
+                if isinstance(item, dict) and str(item.get("promotion_state")) == "quarantined" and str(item.get("family_id", "")).strip()
+            ][:5],
+            "shadow_only_families": [
+                str(item.get("family_id"))
+                for item in architecture_candidate_registry.get("candidates", [])
+                if isinstance(item, dict) and str(item.get("shadow_policy")) in {"shadow_only", "offline_replay_only"} and str(item.get("family_id", "")).strip()
+            ][:5],
+        },
         "iteration": {
             "status": _clean_text(next_run_plan.get("status")),
             "recommended_direction": _clean_text(next_run_plan.get("recommended_direction")),
@@ -1226,6 +1295,11 @@ def build_run_summary(
             "context_record_count": len(context_influence_report.get("stage_reports", []))
             if isinstance(context_influence_report.get("stage_reports"), list)
             else 0,
+            "fresh_stage_count": int(freshness_contract.get("fresh_stage_count", 0) or 0),
+            "recompute_stage_count": int(recompute_plan.get("recompute_stage_count", 0) or 0),
+            "invalidated_stage_count": int(invalidation_report.get("invalidated_stage_count", 0) or 0),
+            "next_recompute_stage": _clean_text(dict(recompute_plan.get("next_recommended_stage", {})).get("stage")),
+            "dependency_graph_node_count": int(artifact_dependency_graph.get("node_count", 0) or 0),
         },
         "event_bus": {
             "event_type_count": int(event_schema.get("event_type_count", 0) or 0),
@@ -1376,10 +1450,16 @@ def build_run_summary(
             "benchmark_ablation_matrix_path": _path_if_exists(root / "benchmark_ablation_matrix.json"),
             "rerun_variance_report_path": _path_if_exists(root / "rerun_variance_report.json"),
             "benchmark_claims_report_path": _path_if_exists(root / "benchmark_claims_report.json"),
+            "shadow_trial_manifest_path": _path_if_exists(root / "shadow_trial_manifest.json"),
+            "shadow_trial_scorecard_path": _path_if_exists(root / "shadow_trial_scorecard.json"),
+            "candidate_quarantine_path": _path_if_exists(root / "candidate_quarantine.json"),
+            "promotion_readiness_report_path": _path_if_exists(root / "promotion_readiness_report.json"),
             "decision_world_model_path": _path_if_exists(root / "decision_world_model.json"),
             "controller_policy_path": _path_if_exists(root / "controller_policy.json"),
             "value_of_more_data_report_path": _path_if_exists(root / "value_of_more_data_report.json"),
             "method_compiler_report_path": _path_if_exists(root / "method_compiler_report.json"),
+            "method_import_report_path": _path_if_exists(root / "method_import_report.json"),
+            "architecture_candidate_registry_path": _path_if_exists(root / "architecture_candidate_registry.json"),
             "source_graph_path": _path_if_exists(root / "source_graph.json"),
             "join_candidate_report_path": _path_if_exists(root / "join_candidate_report.json"),
             "dojo_session_path": _path_if_exists(root / "dojo_session.json"),
@@ -1448,6 +1528,11 @@ def build_run_summary(
             "intervention_memory_log_path": _path_if_exists(root / "intervention_memory_log.json"),
             "event_stream_path": _path_if_exists(root / "lab_event_stream.jsonl"),
             "capability_profiles_path": _path_if_exists(root / "capability_profiles.json"),
+            "artifact_dependency_graph_path": _path_if_exists(root / "artifact_dependency_graph.json"),
+            "freshness_contract_path": _path_if_exists(root / "freshness_contract.json"),
+            "recompute_plan_path": _path_if_exists(root / "recompute_plan.json"),
+            "materialization_cache_index_path": _path_if_exists(root / "materialization_cache_index.json"),
+            "invalidation_report_path": _path_if_exists(root / "invalidation_report.json"),
             "event_schema_path": _path_if_exists(root / "event_schema.json"),
             "event_subscription_registry_path": _path_if_exists(root / "event_subscription_registry.json"),
             "hook_registry_path": _path_if_exists(root / "hook_registry.json"),
@@ -1994,12 +2079,15 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Denied accesses: `{runtime.get('denied_access_count', 0)}`",
                 f"- Specialists tracked: `{runtime.get('active_specialist_count', 0)}`",
                 f"- Write hooks: `{runtime.get('write_hook_executed_count', 0)}` executed, `{runtime.get('write_hook_blocked_count', 0)}` blocked",
+                f"- Fresh stages: `{runtime.get('fresh_stage_count', 0)}`, recompute needed: `{runtime.get('recompute_stage_count', 0)}`",
             ]
         )
         if runtime.get("last_event_type"):
             lines.append(f"- Last event: `{runtime.get('last_event_type')}` via `{runtime.get('last_surface') or 'unknown'}`")
         if runtime.get("semantic_rowless_default") is not None:
             lines.append(f"- Rowless semantic default: `{runtime.get('semantic_rowless_default')}`")
+        if runtime.get("next_recompute_stage"):
+            lines.append(f"- Next recompute target: `{runtime.get('next_recompute_stage')}`")
     event_bus = dict(summary.get("event_bus", {}))
     if event_bus and any(value is not None for value in event_bus.values()):
         lines.extend(
@@ -2196,6 +2284,8 @@ def materialize_run_summary(
         ),
         encoding="utf-8",
     )
+    from relaytic.runtime import sync_materialization_runtime_artifacts
+
     summary = build_run_summary(
         run_dir=root,
         data_path=data_path,
@@ -2211,6 +2301,21 @@ def materialize_run_summary(
     )
     report_path = root / RUN_REPORT_RELATIVE_PATH
     report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(render_run_summary_markdown(summary), encoding="utf-8")
+    sync_materialization_runtime_artifacts(root)
+    summary = build_run_summary(
+        run_dir=root,
+        data_path=data_path,
+        request_source=request_source,
+        request_text=request_text,
+    )
+    summary_path = write_json(
+        root / RUN_SUMMARY_FILENAME,
+        summary,
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
     report_path.write_text(render_run_summary_markdown(summary), encoding="utf-8")
     return {
         "summary": summary,

@@ -15,6 +15,11 @@ RUNTIME_FILENAMES = {
     "capability_profiles": "capability_profiles.json",
     "data_access_audit": "data_access_audit.json",
     "context_influence_report": "context_influence_report.json",
+    "artifact_dependency_graph": "artifact_dependency_graph.json",
+    "freshness_contract": "freshness_contract.json",
+    "recompute_plan": "recompute_plan.json",
+    "materialization_cache_index": "materialization_cache_index.json",
+    "invalidation_report": "invalidation_report.json",
 }
 EVENT_STREAM_FILENAME = "lab_event_stream.jsonl"
 

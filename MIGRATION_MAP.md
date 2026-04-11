@@ -124,6 +124,12 @@ Avoid introducing new references to:
   - `benchmark_claims_report.json`
 - upgraded `relaytic benchmark run` and `relaytic benchmark show` so humans and external agents can inspect benchmark competitiveness claims, rerun variance, temporal benchmark posture, and benchmark-vs-deploy separation from one stable benchmark bundle
 
+### Slice 15E
+
+- expanded the existing runtime boundary under `src/relaytic/runtime/` with explicit dependency-graph, freshness-contract, recompute-plan, cache-index, and invalidation-report artifacts
+- introduced the public command `relaytic runtime reuse`
+- upgraded `relaytic benchmark run`, `relaytic completion review`, and trace replay materialization so they now consult one explicit freshness/recompute contract instead of relying on scattered file-exists checks
+
 ### Slice 09A
 
 - introduced the canonical package boundary `src/relaytic/memory/`

@@ -24,6 +24,10 @@ BENCHMARK_FILENAMES = {
     "benchmark_ablation_matrix": "benchmark_ablation_matrix.json",
     "rerun_variance_report": "rerun_variance_report.json",
     "benchmark_claims_report": "benchmark_claims_report.json",
+    "shadow_trial_manifest": "shadow_trial_manifest.json",
+    "shadow_trial_scorecard": "shadow_trial_scorecard.json",
+    "candidate_quarantine": "candidate_quarantine.json",
+    "promotion_readiness_report": "promotion_readiness_report.json",
 }
 
 

@@ -644,6 +644,7 @@ def build_assist_audit_explanation(
     task_contract = dict(run_summary.get("task_contract", {}))
     benchmark_vs_deploy = dict(run_summary.get("benchmark_vs_deploy", {}))
     architecture = dict(run_summary.get("architecture", {}))
+    architecture_imports = dict(run_summary.get("architecture_imports", {}))
     hpo = dict(run_summary.get("hpo", {}))
     next_step = dict(run_summary.get("next_step", {}))
     iteration = dict(run_summary.get("iteration", {}))
@@ -682,6 +683,22 @@ def build_assist_audit_explanation(
             f"The current constraint kind is `{_clean_text(feasibility.get('primary_constraint_kind')) or 'none'}` and review gate open = `{feasibility.get('gate_open')}`.",
         ]
         evidence_refs = ["counterfactual_region_report.json", "decision_constraint_report.json", "run_summary.json"]
+    elif "why not" in normalized and _extract_imported_architecture_name(normalized, architecture_imports):
+        requested_family = _extract_imported_architecture_name(normalized, architecture_imports)
+        question_type = "why_not_imported_architecture"
+        reasons = _build_imported_architecture_reasons(
+            requested_family=requested_family,
+            architecture_imports=architecture_imports,
+            architecture=architecture,
+            decision=decision,
+        )
+        evidence_refs = [
+            "method_import_report.json",
+            "architecture_candidate_registry.json",
+            "shadow_trial_scorecard.json",
+            "candidate_quarantine.json",
+            "promotion_readiness_report.json",
+        ]
     elif "why not" in normalized and any(token in normalized for token in ("lstm", "transformer", "sequence")):
         question_type = "why_not_sequence_model"
         reasons = [
@@ -756,6 +773,103 @@ def build_assist_audit_explanation(
         "actor_type": actor_type,
         "llm_enhanced": False,
     }
+
+
+def _extract_imported_architecture_name(normalized: str, architecture_imports: dict[str, Any]) -> str | None:
+    if int(architecture_imports.get("candidate_count", 0) or 0) <= 0 and int(architecture_imports.get("imported_family_count", 0) or 0) <= 0:
+        return None
+    known_families: list[str] = []
+    for key in (
+        "promotion_ready_families",
+        "candidate_available_families",
+        "quarantined_families",
+        "shadow_only_families",
+    ):
+        values = architecture_imports.get(key, [])
+        if isinstance(values, list):
+            known_families.extend(str(item) for item in values if str(item).strip())
+    top_candidate = _clean_text(architecture_imports.get("top_candidate_family"))
+    if top_candidate:
+        known_families.append(top_candidate)
+    known_families.extend(
+        [
+            "tabpfn_classifier",
+            "catboost_classifier",
+            "catboost_ensemble",
+            "xgboost_classifier",
+            "xgboost_ensemble",
+            "lightgbm_classifier",
+            "lightgbm_ensemble",
+            "sequence_lstm_candidate",
+            "temporal_transformer_candidate",
+        ]
+    )
+    for family in known_families:
+        if any(alias in normalized for alias in _imported_architecture_aliases(family)):
+            return family
+    return None
+
+
+def _build_imported_architecture_reasons(
+    *,
+    requested_family: str | None,
+    architecture_imports: dict[str, Any],
+    architecture: dict[str, Any],
+    decision: dict[str, Any],
+) -> list[str]:
+    family = _clean_text(requested_family) or "unknown"
+    promotion_ready = set(str(item) for item in architecture_imports.get("promotion_ready_families", []) if str(item).strip())
+    candidate_available = set(str(item) for item in architecture_imports.get("candidate_available_families", []) if str(item).strip())
+    quarantined = set(str(item) for item in architecture_imports.get("quarantined_families", []) if str(item).strip())
+    shadow_only = set(str(item) for item in architecture_imports.get("shadow_only_families", []) if str(item).strip())
+
+    if family in promotion_ready:
+        return [
+            f"Relaytic has `{family}` marked as promotion-ready, but imported architectures do not silently replace the live route.",
+            f"The current live family is `{_clean_text(decision.get('selected_model_family')) or _clean_text(architecture.get('recommended_primary_family')) or 'unknown'}` while imported candidates still require an explicit promotion step.",
+        ]
+    if family in candidate_available:
+        return [
+            f"Relaytic kept `{family}` as candidate-available rather than making it the default route immediately.",
+            "Replay and shadow evidence looked promising, but Relaytic still held the imported family behind a governed promotion boundary instead of swapping the live route silently.",
+        ]
+    if family in shadow_only:
+        return [
+            f"Relaytic kept `{family}` shadow-only because this imported family still needs replay or temporal proof before live use.",
+            _clean_text(architecture.get("sequence_rejection_reason"))
+            or "Imported sequence-style candidates stay behind lagged-tabular comparisons until the temporal proof is strong enough.",
+        ]
+    if family in quarantined or int(architecture_imports.get("quarantined_count", 0) or 0) > 0:
+        return [
+            f"Relaytic did not use `{family}` live because its imported-candidate evidence is still quarantined.",
+            "The current candidate either underperformed in shadow evaluation, lacked a local adapter, or did not clear the promotion-readiness bar.",
+        ]
+    return [
+        f"Relaytic did not use `{family}` live because there is not enough governed imported-candidate proof for it yet.",
+        f"The current live family is `{_clean_text(decision.get('selected_model_family')) or _clean_text(architecture.get('recommended_primary_family')) or 'unknown'}` and the imported-candidate track stays bounded by shadow and promotion gates.",
+    ]
+
+
+def _imported_architecture_aliases(family_id: str) -> set[str]:
+    mapping = {
+        "tabpfn_classifier": {"tabpfn", "tabpfn classifier", "tabpfn_classifier"},
+        "catboost_classifier": {"catboost", "catboost classifier", "catboost_classifier"},
+        "catboost_ensemble": {"catboost", "catboost regressor", "catboost_ensemble"},
+        "xgboost_classifier": {"xgboost", "xgboost classifier", "xgboost_classifier"},
+        "xgboost_ensemble": {"xgboost", "xgboost regressor", "xgboost_ensemble"},
+        "lightgbm_classifier": {"lightgbm", "lightgbm classifier", "lightgbm_classifier"},
+        "lightgbm_ensemble": {"lightgbm", "lightgbm regressor", "lightgbm_ensemble"},
+        "sequence_lstm_candidate": {"lstm", "sequence", "sequence model", "sequence_lstm_candidate"},
+        "temporal_transformer_candidate": {
+            "transformer",
+            "temporal transformer",
+            "temporal_transformer_candidate",
+            "tcn",
+        },
+    }
+    aliases = set(mapping.get(family_id, {family_id}))
+    aliases.add(family_id.replace("_", " "))
+    return aliases
 
 
 def _build_connection_response(*, bundle: dict[str, Any]) -> str:

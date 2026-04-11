@@ -551,9 +551,13 @@ def build_runtime_surface(*, run_dir: str | Path, event_limit: int | None = None
     checkpoint_manifest = dict(bundle.get("run_checkpoint_manifest", {}))
     data_access_audit = dict(bundle.get("data_access_audit", {}))
     capability_profiles = dict(bundle.get("capability_profiles", {}))
+    freshness_contract = dict(bundle.get("freshness_contract", {}))
+    recompute_plan = dict(bundle.get("recompute_plan", {}))
+    invalidation_report = dict(bundle.get("invalidation_report", {}))
     executions = list(hook_log.get("executions", []))
     write_hook_entries = [item for item in executions if str(item.get("hook_type", "")) == "write"]
     last_event = recent_events[-1] if recent_events else {}
+    next_recompute_stage = dict(recompute_plan.get("next_recommended_stage", {}))
     current_stage = _resolve_runtime_stage_label(
         root,
         latest_stage=str(checkpoint_manifest.get("latest_stage", "")).strip(),
@@ -572,6 +576,10 @@ def build_runtime_surface(*, run_dir: str | Path, event_limit: int | None = None
         "write_hook_executed_count": sum(1 for item in write_hook_entries if str(item.get("status", "")) == "executed"),
         "write_hook_blocked_count": sum(1 for item in write_hook_entries if str(item.get("status", "")) == "blocked_by_policy"),
         "semantic_rowless_default": bool(dict(capability_profiles.get("controls", {})).get("semantic_rowless_default", True)),
+        "fresh_stage_count": int(freshness_contract.get("fresh_stage_count", 0) or 0),
+        "recompute_stage_count": int(recompute_plan.get("recompute_stage_count", 0) or 0),
+        "invalidated_stage_count": int(invalidation_report.get("invalidated_stage_count", 0) or 0),
+        "next_recompute_stage": str(next_recompute_stage.get("stage", "")).strip() or None,
     }
     return {
         "status": "ok",
@@ -610,7 +618,10 @@ def render_runtime_markdown(payload: dict[str, Any]) -> str:
         f"- Denied accesses: `{runtime.get('denied_access_count', 0)}`",
         f"- Specialists: `{runtime.get('active_specialist_count', 0)}` capability profiles",
         f"- Write hooks: `{runtime.get('write_hook_executed_count', 0)}` executed, `{runtime.get('write_hook_blocked_count', 0)}` blocked",
+        f"- Fresh stages: `{runtime.get('fresh_stage_count', 0)}`, recompute needed: `{runtime.get('recompute_stage_count', 0)}`",
     ]
+    if runtime.get("next_recompute_stage"):
+        lines.append(f"- Next recompute target: `{runtime.get('next_recompute_stage')}`")
     if recent_events:
         lines.extend(["", "## Recent Events"])
         for item in recent_events[-8:]:

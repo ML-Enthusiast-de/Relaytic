@@ -11,13 +11,19 @@ from typing import Any
 
 import numpy as np
 
-from relaytic.analytics import infer_benchmark_expected, read_task_contract_artifacts
+from relaytic.analytics import (
+    infer_benchmark_expected,
+    read_architecture_routing_artifacts,
+    read_task_contract_artifacts,
+)
 from relaytic.analytics.task_detection import assess_task_profile, is_classification_task
+from relaytic.decision import read_decision_bundle
 from relaytic.ingestion import load_tabular_data
 from relaytic.modeling.evaluation import classification_metrics, regression_metrics
 from relaytic.modeling.feature_pipeline import prepare_split_safe_feature_frames
 from relaytic.modeling.normalization import MinMaxNormalizer
 from relaytic.modeling.splitters import build_train_validation_test_split
+from relaytic.modeling.training import train_surrogate_candidates
 
 from .incumbents import evaluate_incumbent
 from .models import (
@@ -26,16 +32,21 @@ from .models import (
     BENCHMARK_GAP_REPORT_SCHEMA_VERSION,
     BENCHMARK_PARITY_REPORT_SCHEMA_VERSION,
     BEAT_TARGET_CONTRACT_SCHEMA_VERSION,
+    CANDIDATE_QUARANTINE_SCHEMA_VERSION,
     EXTERNAL_CHALLENGER_EVALUATION_SCHEMA_VERSION,
     EXTERNAL_CHALLENGER_MANIFEST_SCHEMA_VERSION,
     INCUMBENT_PARITY_REPORT_SCHEMA_VERSION,
     PAPER_BENCHMARK_MANIFEST_SCHEMA_VERSION,
     PAPER_BENCHMARK_TABLE_SCHEMA_VERSION,
+    PROMOTION_READINESS_REPORT_SCHEMA_VERSION,
     REFERENCE_APPROACH_MATRIX_SCHEMA_VERSION,
     RERUN_VARIANCE_REPORT_SCHEMA_VERSION,
+    SHADOW_TRIAL_MANIFEST_SCHEMA_VERSION,
+    SHADOW_TRIAL_SCORECARD_SCHEMA_VERSION,
     BenchmarkAblationMatrix,
     BenchmarkBundle,
     BenchmarkClaimsReport,
+    CandidateQuarantine,
     BenchmarkControls,
     BenchmarkGapReport,
     BenchmarkParityReport,
@@ -46,8 +57,11 @@ from .models import (
     IncumbentParityReport,
     PaperBenchmarkManifest,
     PaperBenchmarkTable,
+    PromotionReadinessReport,
     ReferenceApproachMatrix,
     RerunVarianceReport,
+    ShadowTrialManifest,
+    ShadowTrialScorecard,
     build_benchmark_controls_from_policy,
 )
 
@@ -90,6 +104,8 @@ def run_benchmark_review(
     )
     generated_at = _utc_now()
     task_contract_bundle = read_task_contract_artifacts(run_dir)
+    decision_bundle = read_decision_bundle(run_dir)
+    architecture_bundle = read_architecture_routing_artifacts(run_dir)
     task_profile_contract = dict(task_contract_bundle.get("task_profile_contract", {}))
     metric_contract = dict(task_contract_bundle.get("metric_contract", {}))
     benchmark_mode_report = dict(task_contract_bundle.get("benchmark_mode_report", {}))
@@ -401,6 +417,28 @@ def run_benchmark_review(
         paper_manifest=paper_manifest,
         rerun_variance_report=rerun_variance_report,
     )
+    shadow_trial_manifest, shadow_trial_scorecard, candidate_quarantine, promotion_readiness_report = (
+        _build_shadow_trial_outputs(
+            run_dir=run_dir,
+            generated_at=generated_at,
+            controls=controls,
+            trace=trace,
+            frame=frame,
+            target_column=target_column,
+            feature_columns=feature_columns,
+            task_type=task_profile.task_type,
+            data_mode=task_profile.data_mode,
+            timestamp_column=timestamp_column,
+            builder_handoff=builder_handoff,
+            comparison_metric=comparison_metric,
+            metric_direction=metric_direction,
+            relaytic_reference=relaytic_reference,
+            best_reference=best_reference,
+            paper_manifest=paper_manifest,
+            decision_bundle=decision_bundle,
+            architecture_bundle=architecture_bundle,
+        )
+    )
     bundle = BenchmarkBundle(
         reference_approach_matrix=matrix,
         benchmark_gap_report=gap_report,
@@ -414,8 +452,420 @@ def run_benchmark_review(
         benchmark_ablation_matrix=ablation_matrix,
         rerun_variance_report=rerun_variance_report,
         benchmark_claims_report=benchmark_claims_report,
+        shadow_trial_manifest=shadow_trial_manifest,
+        shadow_trial_scorecard=shadow_trial_scorecard,
+        candidate_quarantine=candidate_quarantine,
+        promotion_readiness_report=promotion_readiness_report,
     )
     return BenchmarkRunResult(bundle=bundle, review_markdown=render_benchmark_review_markdown(bundle.to_dict()))
+
+
+def _build_shadow_trial_outputs(
+    *,
+    run_dir: str | Path,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    frame: Any,
+    target_column: str,
+    feature_columns: list[str],
+    task_type: str,
+    data_mode: str,
+    timestamp_column: str | None,
+    builder_handoff: dict[str, Any],
+    comparison_metric: str,
+    metric_direction: str,
+    relaytic_reference: dict[str, Any],
+    best_reference: dict[str, Any] | None,
+    paper_manifest: PaperBenchmarkManifest,
+    decision_bundle: dict[str, Any],
+    architecture_bundle: dict[str, Any],
+) -> tuple[ShadowTrialManifest, ShadowTrialScorecard, CandidateQuarantine, PromotionReadinessReport]:
+    method_import_report = dict(decision_bundle.get("method_import_report", {}))
+    candidate_registry = dict(decision_bundle.get("architecture_candidate_registry", {}))
+    imported_candidates = [
+        dict(item)
+        for item in candidate_registry.get("candidates", [])
+        if isinstance(item, dict) and _clean_text(item.get("family_id"))
+    ]
+    baseline_family = _clean_text(relaytic_reference.get("model_family")) or _clean_text(paper_manifest.selected_model_family)
+    baseline_metric_value = _metric_value(relaytic_reference.get("test_metric"), comparison_metric)
+    best_reference_family = _clean_text(best_reference.get("model_family")) if isinstance(best_reference, dict) else None
+    best_reference_metric_value = (
+        _metric_value(best_reference.get("test_metric"), comparison_metric)
+        if isinstance(best_reference, dict)
+        else None
+    )
+    max_candidates = max(1, min(len(imported_candidates), controls.max_reference_models + 1))
+    candidate_rows: list[dict[str, Any]] = []
+    quarantined_rows: list[dict[str, Any]] = []
+    promotion_rows: list[dict[str, Any]] = []
+    for candidate in imported_candidates[:max_candidates]:
+        family_id = _clean_text(candidate.get("family_id")) or "unknown"
+        shadow_row = _run_imported_family_shadow_trial(
+            run_dir=run_dir,
+            frame=frame,
+            target_column=target_column,
+            feature_columns=feature_columns,
+            task_type=task_type,
+            data_mode=data_mode,
+            timestamp_column=timestamp_column,
+            builder_handoff=builder_handoff,
+            comparison_metric=comparison_metric,
+            metric_direction=metric_direction,
+            baseline_family=baseline_family,
+            baseline_metric_value=baseline_metric_value,
+            best_reference_family=best_reference_family,
+            best_reference_metric_value=best_reference_metric_value,
+            paper_manifest=paper_manifest,
+            method_import_report=method_import_report,
+            architecture_bundle=architecture_bundle,
+            candidate=candidate,
+        )
+        candidate_rows.append(shadow_row)
+        promotion_rows.append(
+            {
+                "candidate_id": shadow_row["candidate_id"],
+                "family_id": family_id,
+                "promotion_state": shadow_row["promotion_state"],
+                "shadow_outcome": shadow_row["shadow_outcome"],
+                "candidate_metric_value": shadow_row.get("candidate_metric_value"),
+                "baseline_metric_value": shadow_row.get("baseline_metric_value"),
+                "reason_codes": list(shadow_row.get("reason_codes", [])),
+                "summary": shadow_row.get("summary"),
+            }
+        )
+        if shadow_row["promotion_state"] == "quarantined":
+            quarantined_rows.append(
+                {
+                    "candidate_id": shadow_row["candidate_id"],
+                    "family_id": family_id,
+                    "reason_codes": list(shadow_row.get("reason_codes", [])),
+                    "shadow_mode": shadow_row["shadow_mode"],
+                    "summary": shadow_row.get("summary"),
+                }
+            )
+    manifest = ShadowTrialManifest(
+        schema_version=SHADOW_TRIAL_MANIFEST_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if candidate_rows else "no_candidates",
+        candidate_count=len(imported_candidates),
+        runnable_candidate_count=sum(1 for item in candidate_rows if bool(item.get("training_executed"))),
+        replay_only_count=sum(1 for item in candidate_rows if str(item.get("shadow_mode")) == "offline_replay_only"),
+        temporal_candidate_count=sum(
+            1 for item in candidate_rows if bool(item.get("temporal_gate_required"))
+        ),
+        comparison_metric=comparison_metric,
+        baseline_family=baseline_family,
+        summary=(
+            f"Relaytic reviewed {len(candidate_rows)} imported architecture candidate(s) under replay or shadow proof."
+            if candidate_rows
+            else "Relaytic had no imported architecture candidates to shadow-test."
+        ),
+        trace=trace,
+    )
+    scorecard = ShadowTrialScorecard(
+        schema_version=SHADOW_TRIAL_SCORECARD_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if candidate_rows else "no_candidates",
+        comparison_metric=comparison_metric,
+        metric_direction=metric_direction,
+        rows=candidate_rows,
+        summary=(
+            f"Relaytic recorded shadow-trial outcomes for {len(candidate_rows)} imported architecture candidate(s)."
+            if candidate_rows
+            else "Relaytic did not record shadow-trial scorecards because no imported architecture candidates were available."
+        ),
+        trace=trace,
+    )
+    quarantine = CandidateQuarantine(
+        schema_version=CANDIDATE_QUARANTINE_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if candidate_rows else "no_candidates",
+        quarantined_count=len(quarantined_rows),
+        quarantined_candidates=quarantined_rows,
+        summary=(
+            f"Relaytic quarantined {len(quarantined_rows)} imported architecture candidate(s) after replay or shadow review."
+            if candidate_rows
+            else "Relaytic had no imported architecture candidates to quarantine."
+        ),
+        trace=trace,
+    )
+    promotion = PromotionReadinessReport(
+        schema_version=PROMOTION_READINESS_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if candidate_rows else "no_candidates",
+        promotion_ready_count=sum(1 for item in promotion_rows if item.get("promotion_state") == "promotion_ready"),
+        candidate_available_count=sum(1 for item in promotion_rows if item.get("promotion_state") == "candidate_available"),
+        quarantined_count=len(quarantined_rows),
+        rows=promotion_rows,
+        summary=(
+            f"Relaytic marked {sum(1 for item in promotion_rows if item.get('promotion_state') == 'promotion_ready')} imported family candidate(s) as promotion-ready."
+            if candidate_rows
+            else "Relaytic had no imported architecture candidates to review for promotion readiness."
+        ),
+        trace=trace,
+    )
+    return manifest, scorecard, quarantine, promotion
+
+
+def _run_imported_family_shadow_trial(
+    *,
+    run_dir: str | Path,
+    frame: Any,
+    target_column: str,
+    feature_columns: list[str],
+    task_type: str,
+    data_mode: str,
+    timestamp_column: str | None,
+    builder_handoff: dict[str, Any],
+    comparison_metric: str,
+    metric_direction: str,
+    baseline_family: str | None,
+    baseline_metric_value: float | None,
+    best_reference_family: str | None,
+    best_reference_metric_value: float | None,
+    paper_manifest: PaperBenchmarkManifest,
+    method_import_report: dict[str, Any],
+    architecture_bundle: dict[str, Any],
+    candidate: dict[str, Any],
+) -> dict[str, Any]:
+    family_id = _clean_text(candidate.get("family_id")) or "unknown"
+    candidate_id = _clean_text(candidate.get("candidate_id")) or f"architecture_candidate::{family_id}"
+    reason_codes: list[str] = []
+    architecture_report = dict(architecture_bundle.get("architecture_router_report", {}))
+    family_title = _clean_text(candidate.get("family_title")) or family_id
+    if candidate.get("research_disposition") == "rejected":
+        reason_codes.append("rejected_by_task_contract")
+        return {
+            "candidate_id": candidate_id,
+            "family_id": family_id,
+            "family_title": family_title,
+            "shadow_mode": "task_contract_rejected",
+            "training_executed": False,
+            "temporal_gate_required": bool(candidate.get("temporal_gate_required")),
+            "comparison_metric": comparison_metric,
+            "metric_direction": metric_direction,
+            "baseline_family": baseline_family,
+            "baseline_metric_value": baseline_metric_value,
+            "best_reference_family": best_reference_family,
+            "best_reference_metric_value": best_reference_metric_value,
+            "candidate_metric_value": None,
+            "delta_vs_selected": None,
+            "delta_vs_best_reference": None,
+            "shadow_outcome": "rejected",
+            "promotion_state": "quarantined",
+            "reason_codes": reason_codes,
+            "summary": "Relaytic kept this imported family quarantined because the current task contract already rejected it.",
+        }
+    if family_id in {"sequence_lstm_candidate", "temporal_transformer_candidate"}:
+        reason_codes.extend(
+            [
+                "temporal_sequence_candidate",
+                "lagged_baseline_required",
+                "shadow_first_before_live",
+            ]
+        )
+        if data_mode != "time_series":
+            reason_codes.append("not_time_series")
+        return {
+            "candidate_id": candidate_id,
+            "family_id": family_id,
+            "family_title": family_title,
+            "shadow_mode": "offline_replay_only",
+            "training_executed": False,
+            "temporal_gate_required": True,
+            "comparison_metric": comparison_metric,
+            "metric_direction": metric_direction,
+            "baseline_family": _normalize_shadow_baseline_family(_clean_text(paper_manifest.lagged_baseline_family) or baseline_family),
+            "baseline_metric_value": paper_manifest.lagged_baseline_metric,
+            "best_reference_family": best_reference_family,
+            "best_reference_metric_value": best_reference_metric_value,
+            "candidate_metric_value": None,
+            "delta_vs_selected": None,
+            "delta_vs_best_reference": None,
+            "shadow_outcome": "replay_only",
+            "promotion_state": "quarantined",
+            "reason_codes": reason_codes,
+            "summary": (
+                "Relaytic kept this temporal sequence candidate shadow-only until it proves value over lagged tabular baselines."
+            ),
+        }
+    if not bool(candidate.get("training_support")) or _clean_text(candidate.get("availability_status")) != "available":
+        reason_codes.append("adapter_unavailable")
+        return {
+            "candidate_id": candidate_id,
+            "family_id": family_id,
+            "family_title": family_title,
+            "shadow_mode": "offline_replay_only",
+            "training_executed": False,
+            "temporal_gate_required": bool(candidate.get("temporal_gate_required")),
+            "comparison_metric": comparison_metric,
+            "metric_direction": metric_direction,
+            "baseline_family": baseline_family,
+            "baseline_metric_value": baseline_metric_value,
+            "best_reference_family": best_reference_family,
+            "best_reference_metric_value": best_reference_metric_value,
+            "candidate_metric_value": None,
+            "delta_vs_selected": None,
+            "delta_vs_best_reference": None,
+            "shadow_outcome": "blocked_unavailable",
+            "promotion_state": "quarantined",
+            "reason_codes": reason_codes,
+            "summary": "Relaytic found research support for this family, but the required local adapter is not available.",
+        }
+    if family_id == baseline_family:
+        reason_codes.append("already_live_family")
+        return {
+            "candidate_id": candidate_id,
+            "family_id": family_id,
+            "family_title": family_title,
+            "shadow_mode": "current_route_replay",
+            "training_executed": False,
+            "temporal_gate_required": False,
+            "comparison_metric": comparison_metric,
+            "metric_direction": metric_direction,
+            "baseline_family": baseline_family,
+            "baseline_metric_value": baseline_metric_value,
+            "best_reference_family": best_reference_family,
+            "best_reference_metric_value": best_reference_metric_value,
+            "candidate_metric_value": baseline_metric_value,
+            "delta_vs_selected": 0.0,
+            "delta_vs_best_reference": _metric_delta(
+                candidate_value=baseline_metric_value,
+                baseline_value=best_reference_metric_value,
+                metric_direction=metric_direction,
+            ),
+            "shadow_outcome": "already_live",
+            "promotion_state": "candidate_available",
+            "reason_codes": reason_codes,
+            "summary": "Relaytic already used this imported family live, so its current benchmark evidence makes it candidate-available.",
+        }
+
+    try:
+        shadow_output_dir = Path(run_dir) / "shadow_trials" / _shadow_slug(family_id)
+        training = train_surrogate_candidates(
+            frame=frame,
+            target_column=target_column,
+            feature_columns=feature_columns,
+            requested_model_family=family_id,
+            timestamp_column=timestamp_column,
+            normalize=bool(builder_handoff.get("normalize", True)),
+            missing_data_strategy=str(builder_handoff.get("missing_data_strategy", "fill_median")),
+            fill_constant_value=None,
+            compare_against_baseline=False,
+            lag_horizon_samples=_optional_int(builder_handoff.get("lag_horizon_samples")),
+            threshold_policy=_clean_text(builder_handoff.get("threshold_policy")),
+            decision_threshold=_optional_float(builder_handoff.get("decision_threshold")),
+            task_type=task_type,
+            selection_metric=comparison_metric,
+            preferred_candidate_order=[family_id],
+            output_run_dir=shadow_output_dir,
+        )
+    except Exception as exc:
+        reason_codes.append("shadow_trial_failed")
+        return {
+            "candidate_id": candidate_id,
+            "family_id": family_id,
+            "family_title": family_title,
+            "shadow_mode": "shadow_trial_failed",
+            "training_executed": False,
+            "temporal_gate_required": False,
+            "comparison_metric": comparison_metric,
+            "metric_direction": metric_direction,
+            "baseline_family": baseline_family,
+            "baseline_metric_value": baseline_metric_value,
+            "best_reference_family": best_reference_family,
+            "best_reference_metric_value": best_reference_metric_value,
+            "candidate_metric_value": None,
+            "delta_vs_selected": None,
+            "delta_vs_best_reference": None,
+            "shadow_outcome": "failed",
+            "promotion_state": "quarantined",
+            "reason_codes": reason_codes,
+            "summary": f"Relaytic could not complete a same-split shadow trial for `{family_id}`: {type(exc).__name__}.",
+        }
+
+    candidate_metric_value = _metric_value(dict(training.get("selected_metrics", {})).get("test"), comparison_metric)
+    delta_vs_selected = _metric_delta(
+        candidate_value=candidate_metric_value,
+        baseline_value=baseline_metric_value,
+        metric_direction=metric_direction,
+    )
+    delta_vs_best_reference = _metric_delta(
+        candidate_value=candidate_metric_value,
+        baseline_value=best_reference_metric_value,
+        metric_direction=metric_direction,
+    )
+    in_router_top = family_id in [
+        str(item)
+        for item in architecture_report.get("candidate_order", [])[:3]
+        if str(item).strip()
+    ]
+    improved_selected = _metric_better(
+        candidate_value=candidate_metric_value,
+        baseline_value=baseline_metric_value,
+        metric_direction=metric_direction,
+        minimum_delta=0.0,
+    )
+    near_selected = _metric_near(
+        candidate_value=candidate_metric_value,
+        baseline_value=baseline_metric_value,
+        metric_direction=metric_direction,
+    )
+    competitive_to_reference = (
+        best_reference_metric_value is None
+        or _metric_better(
+            candidate_value=candidate_metric_value,
+            baseline_value=best_reference_metric_value,
+            metric_direction=metric_direction,
+            minimum_delta=0.0,
+        )
+        or _metric_near(
+            candidate_value=candidate_metric_value,
+            baseline_value=best_reference_metric_value,
+            metric_direction=metric_direction,
+        )
+    )
+    if improved_selected and competitive_to_reference and candidate.get("research_disposition") == "accepted":
+        promotion_state = "promotion_ready"
+        shadow_outcome = "stronger_than_current"
+        reason_codes.extend(["beats_selected_route", "research_supported", "same_split_shadow_pass"])
+    elif (improved_selected or near_selected or in_router_top) and candidate.get("research_disposition") in {"accepted", "advisory"}:
+        promotion_state = "candidate_available"
+        shadow_outcome = "promising"
+        reason_codes.extend(["near_selected_route", "shadow_signal_positive"])
+    else:
+        promotion_state = "quarantined"
+        shadow_outcome = "underperforming"
+        reason_codes.extend(["shadow_signal_weak"])
+    return {
+        "candidate_id": candidate_id,
+        "family_id": family_id,
+        "family_title": family_title,
+        "shadow_mode": "same_split_shadow_trial",
+        "training_executed": True,
+        "temporal_gate_required": False,
+        "comparison_metric": comparison_metric,
+        "metric_direction": metric_direction,
+        "baseline_family": baseline_family,
+        "baseline_metric_value": baseline_metric_value,
+        "best_reference_family": best_reference_family,
+        "best_reference_metric_value": best_reference_metric_value,
+        "candidate_metric_value": candidate_metric_value,
+        "delta_vs_selected": delta_vs_selected,
+        "delta_vs_best_reference": delta_vs_best_reference,
+        "shadow_outcome": shadow_outcome,
+        "promotion_state": promotion_state,
+        "reason_codes": reason_codes,
+        "summary": (
+            f"Relaytic shadow-tested `{family_id}` against `{baseline_family or 'current_route'}` under the same split and metric contract."
+        ),
+    }
 
 
 def _build_paper_benchmark_manifest(
@@ -845,6 +1295,10 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
     paper_manifest = dict(payload.get("paper_benchmark_manifest", {}))
     rerun_variance = dict(payload.get("rerun_variance_report", {}))
     claims = dict(payload.get("benchmark_claims_report", {}))
+    shadow_manifest = dict(payload.get("shadow_trial_manifest", {}))
+    shadow_scorecard = dict(payload.get("shadow_trial_scorecard", {}))
+    promotion = dict(payload.get("promotion_readiness_report", {}))
+    quarantine = dict(payload.get("candidate_quarantine", {}))
     lines = [
         "# Relaytic Benchmark Review",
         "",
@@ -908,6 +1362,26 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
                 f"- Below reference: `{claims.get('below_reference')}`",
             ]
         )
+    if shadow_manifest or promotion:
+        lines.extend(
+            [
+                "",
+                "## Imported Architecture Trials",
+                f"- Imported candidates: `{shadow_manifest.get('candidate_count', 0)}`",
+                f"- Runnable shadow trials: `{shadow_manifest.get('runnable_candidate_count', 0)}`",
+                f"- Promotion-ready: `{promotion.get('promotion_ready_count', 0)}`",
+                f"- Candidate-available: `{promotion.get('candidate_available_count', 0)}`",
+                f"- Quarantined: `{quarantine.get('quarantined_count', 0)}`",
+            ]
+        )
+    shadow_rows = list(shadow_scorecard.get("rows", []))
+    if shadow_rows:
+        lines.extend(["", "## Shadow Scorecard"])
+        for item in shadow_rows[:4]:
+            lines.append(
+                f"- `{item.get('family_id')}` outcome=`{item.get('shadow_outcome')}` "
+                f"promotion=`{item.get('promotion_state')}` metric=`{item.get('candidate_metric_value')}`"
+            )
     if incumbent:
         lines.extend(
             [
@@ -1677,6 +2151,53 @@ def _unavailable_bundle(
         summary=summary,
         trace=trace,
     )
+    shadow_manifest = ShadowTrialManifest(
+        schema_version=SHADOW_TRIAL_MANIFEST_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="no_candidates",
+        candidate_count=0,
+        runnable_candidate_count=0,
+        replay_only_count=0,
+        temporal_candidate_count=0,
+        comparison_metric="unknown",
+        baseline_family=None,
+        summary=summary,
+        trace=trace,
+    )
+    shadow_scorecard = ShadowTrialScorecard(
+        schema_version=SHADOW_TRIAL_SCORECARD_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="no_candidates",
+        comparison_metric="unknown",
+        metric_direction="higher_is_better",
+        rows=[],
+        summary=summary,
+        trace=trace,
+    )
+    candidate_quarantine = CandidateQuarantine(
+        schema_version=CANDIDATE_QUARANTINE_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="no_candidates",
+        quarantined_count=0,
+        quarantined_candidates=[],
+        summary=summary,
+        trace=trace,
+    )
+    promotion_report = PromotionReadinessReport(
+        schema_version=PROMOTION_READINESS_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="no_candidates",
+        promotion_ready_count=0,
+        candidate_available_count=0,
+        quarantined_count=0,
+        rows=[],
+        summary=summary,
+        trace=trace,
+    )
     return BenchmarkBundle(
         reference_approach_matrix=matrix,
         benchmark_gap_report=gap_report,
@@ -1690,6 +2211,10 @@ def _unavailable_bundle(
         benchmark_ablation_matrix=ablation_matrix,
         rerun_variance_report=rerun_variance,
         benchmark_claims_report=claims,
+        shadow_trial_manifest=shadow_manifest,
+        shadow_trial_scorecard=shadow_scorecard,
+        candidate_quarantine=candidate_quarantine,
+        promotion_readiness_report=promotion_report,
     )
 
 
@@ -1890,6 +2415,61 @@ def _optional_int(value: Any) -> int | None:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def _optional_float(value: Any) -> float | None:
+    try:
+        if value is None or str(value).strip() == "":
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _metric_delta(*, candidate_value: float | None, baseline_value: float | None, metric_direction: str) -> float | None:
+    if candidate_value is None or baseline_value is None:
+        return None
+    if metric_direction == "lower_is_better":
+        return float(baseline_value) - float(candidate_value)
+    return float(candidate_value) - float(baseline_value)
+
+
+def _metric_better(
+    *,
+    candidate_value: float | None,
+    baseline_value: float | None,
+    metric_direction: str,
+    minimum_delta: float,
+) -> bool:
+    delta = _metric_delta(
+        candidate_value=candidate_value,
+        baseline_value=baseline_value,
+        metric_direction=metric_direction,
+    )
+    return bool(delta is not None and delta > float(minimum_delta))
+
+
+def _metric_near(*, candidate_value: float | None, baseline_value: float | None, metric_direction: str) -> bool:
+    delta = _metric_delta(
+        candidate_value=candidate_value,
+        baseline_value=baseline_value,
+        metric_direction=metric_direction,
+    )
+    return bool(delta is not None and delta >= -0.02)
+
+
+def _shadow_slug(value: str) -> str:
+    cleaned = "".join(char if char.isalnum() else "_" for char in str(value or "").strip().lower())
+    return cleaned.strip("_") or "shadow_candidate"
+
+
+def _normalize_shadow_baseline_family(value: str | None) -> str | None:
+    family = _clean_text(value)
+    if not family:
+        return None
+    if family.startswith("sklearn_"):
+        family = family[len("sklearn_") :]
+    return family
 
 
 def _infer_data_mode(*, frame: Any, timestamp_column: str | None) -> str:

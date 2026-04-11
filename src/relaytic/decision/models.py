@@ -6,9 +6,11 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from relaytic.compiler.models import (
+    ArchitectureCandidateRegistry,
     CompiledBenchmarkProtocol,
     CompiledChallengerTemplates,
     CompiledFeatureHypotheses,
+    MethodImportReport,
     MethodCompilerReport,
 )
 from relaytic.data_fabric.models import DataAcquisitionPlan, JoinCandidateReport, SourceGraph
@@ -392,6 +394,8 @@ class DecisionBundle:
     compiled_challenger_templates: CompiledChallengerTemplates
     compiled_feature_hypotheses: CompiledFeatureHypotheses
     compiled_benchmark_protocol: CompiledBenchmarkProtocol
+    method_import_report: MethodImportReport
+    architecture_candidate_registry: ArchitectureCandidateRegistry
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -417,6 +421,8 @@ class DecisionBundle:
             "compiled_challenger_templates": self.compiled_challenger_templates.to_dict(),
             "compiled_feature_hypotheses": self.compiled_feature_hypotheses.to_dict(),
             "compiled_benchmark_protocol": self.compiled_benchmark_protocol.to_dict(),
+            "method_import_report": self.method_import_report.to_dict(),
+            "architecture_candidate_registry": self.architecture_candidate_registry.to_dict(),
         }
 
 

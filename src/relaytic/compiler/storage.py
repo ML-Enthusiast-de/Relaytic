@@ -9,9 +9,11 @@ from typing import Any
 from relaytic.core.json_utils import write_json
 
 from .models import (
+    ArchitectureCandidateRegistry,
     CompiledBenchmarkProtocol,
     CompiledChallengerTemplates,
     CompiledFeatureHypotheses,
+    MethodImportReport,
     MethodCompilerReport,
 )
 
@@ -21,6 +23,8 @@ COMPILER_FILENAMES = {
     "compiled_challenger_templates": "compiled_challenger_templates.json",
     "compiled_feature_hypotheses": "compiled_feature_hypotheses.json",
     "compiled_benchmark_protocol": "compiled_benchmark_protocol.json",
+    "method_import_report": "method_import_report.json",
+    "architecture_candidate_registry": "architecture_candidate_registry.json",
 }
 
 
@@ -31,6 +35,8 @@ def write_compiler_bundle(
     compiled_challenger_templates: CompiledChallengerTemplates,
     compiled_feature_hypotheses: CompiledFeatureHypotheses,
     compiled_benchmark_protocol: CompiledBenchmarkProtocol,
+    method_import_report: MethodImportReport,
+    architecture_candidate_registry: ArchitectureCandidateRegistry,
 ) -> dict[str, Path]:
     root = Path(run_dir)
     root.mkdir(parents=True, exist_ok=True)
@@ -39,6 +45,8 @@ def write_compiler_bundle(
         "compiled_challenger_templates": compiled_challenger_templates.to_dict(),
         "compiled_feature_hypotheses": compiled_feature_hypotheses.to_dict(),
         "compiled_benchmark_protocol": compiled_benchmark_protocol.to_dict(),
+        "method_import_report": method_import_report.to_dict(),
+        "architecture_candidate_registry": architecture_candidate_registry.to_dict(),
     }
     return {
         key: write_json(root / filename, payload[key], indent=2, ensure_ascii=False, sort_keys=True)

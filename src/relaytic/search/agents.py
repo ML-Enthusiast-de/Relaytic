@@ -80,6 +80,8 @@ def run_search_review(*, run_dir: str | Path, policy: dict[str, Any]) -> SearchR
     decision = dict(summary.get("decision", {}))
     decision_lab = dict(summary.get("decision_lab", {}))
     eval_state = dict(summary.get("evals", {}))
+    promotion_readiness = dict(summary.get("architecture_imports", {}))
+    shadow_scorecard = dict(benchmark_bundle.get("shadow_trial_scorecard", {}))
 
     beat_target_pressure = _beat_target_pressure(
         benchmark=benchmark,
@@ -143,6 +145,10 @@ def run_search_review(*, run_dir: str | Path, policy: dict[str, Any]) -> SearchR
         beat_target_pressure=beat_target_pressure,
         unresolved_count=unresolved_count,
         value_band=value_band,
+        imported_shadow_candidates=_imported_shadow_branches(
+            promotion_readiness=promotion_readiness,
+            shadow_scorecard=shadow_scorecard,
+        ),
     )
     widened_branches, pruned_branches = _bounded_branches(
         controls=controls,
@@ -403,6 +409,7 @@ def run_search_review(*, run_dir: str | Path, policy: dict[str, Any]) -> SearchR
                 planned_trial_count=planned_trial_count,
                 candidate_branches=candidate_branches,
                 widened_branches=widened_branches,
+                imported_shadow_candidate_count=int(promotion_readiness.get("candidate_count", 0) or 0),
                 trace_bundle=trace_bundle,
                 eval_bundle=eval_bundle,
             ),
@@ -562,6 +569,52 @@ def _planned_trials(*, controls: Any, selected_hpo_depth: str, remaining_trial_b
     return max(1, min(remaining_trial_budget, desired))
 
 
+def _imported_shadow_branches(
+    *,
+    promotion_readiness: dict[str, Any],
+    shadow_scorecard: dict[str, Any],
+) -> list[dict[str, Any]]:
+    rows = [
+        dict(item)
+        for item in shadow_scorecard.get("rows", [])
+        if isinstance(item, dict) and _clean_text(item.get("family_id"))
+    ]
+    candidates: list[dict[str, Any]] = []
+    for item in rows:
+        if str(item.get("promotion_state")) not in {"promotion_ready", "candidate_available"}:
+            continue
+        family = _clean_text(item.get("family_id"))
+        if not family:
+            continue
+        candidates.append(
+            {
+                "branch_id": f"imported_shadow::{family}",
+                "family": family,
+                "title": f"Imported shadow follow-up for `{family}`",
+                "reason": _clean_text(item.get("summary"))
+                or "Imported architecture evidence looked strong enough for bounded shadow follow-up.",
+            }
+        )
+    if candidates:
+        return candidates
+    available = promotion_readiness.get("candidate_available_families", [])
+    if not isinstance(available, list):
+        return []
+    for family in available:
+        text = str(family).strip()
+        if not text:
+            continue
+        candidates.append(
+            {
+                "branch_id": f"imported_shadow::{text}",
+                "family": text,
+                "title": f"Imported shadow follow-up for `{text}`",
+                "reason": "Imported architecture evidence is positive enough for bounded shadow follow-up.",
+            }
+        )
+    return candidates
+
+
 def _candidate_branches(
     *,
     controls: Any,
@@ -572,6 +625,7 @@ def _candidate_branches(
     beat_target_pressure: str,
     unresolved_count: int,
     value_band: str,
+    imported_shadow_candidates: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     route_id = _clean_text(decision.get("selected_route_id")) or "current_route"
     route_title = _clean_text(decision.get("selected_route_title")) or "Current route"
@@ -666,6 +720,22 @@ def _candidate_branches(
                 "route_id": route_id,
                 "title": "Portfolio backup branch",
                 "reason": "High unresolved load justifies one additional bounded alternate branch even without explicit incumbent pressure.",
+            }
+        )
+    for index, item in enumerate(imported_shadow_candidates[:2], start=1):
+        branch_id = _clean_text(item.get("branch_id")) or f"imported_shadow_{index}"
+        if any(existing.get("branch_id") == branch_id for existing in candidates):
+            continue
+        candidates.append(
+            {
+                "branch_id": branch_id,
+                "family": _clean_text(item.get("family")) or "imported_shadow_family",
+                "priority": 8 + index,
+                "kind": "imported_architecture_shadow",
+                "route_id": route_id,
+                "title": _clean_text(item.get("title")) or f"Imported shadow candidate {index}",
+                "reason": _clean_text(item.get("reason"))
+                or "Imported architecture evidence looks promising enough for bounded shadow follow-up, but not for silent live routing.",
             }
         )
     return candidates
@@ -772,10 +842,11 @@ def _proofs(
     planned_trial_count: int,
     candidate_branches: list[dict[str, Any]],
     widened_branches: list[dict[str, Any]],
+    imported_shadow_candidate_count: int,
     trace_bundle: dict[str, Any],
     eval_bundle: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    return [
+    proofs = [
         {
             "proof_id": "search_value_defined",
             "status": "pass",
@@ -811,6 +882,17 @@ def _proofs(
             "detail": f"Relaytic chose `{recommended_action}` instead of defaulting to deeper HPO as a reflex.",
         },
     ]
+    if imported_shadow_candidate_count > 0:
+        proofs.append(
+            {
+                "proof_id": "imported_architectures_stayed_gated",
+                "status": "pass",
+                "detail": (
+                    f"Relaytic kept `{imported_shadow_candidate_count}` imported architecture candidate(s) behind shadow or promotion gates instead of letting them become live defaults implicitly."
+                ),
+            }
+        )
+    return proofs
 
 
 def _summary_text(*, recommended_action: str, recommended_direction: str, value_band: str, planned_trial_count: int) -> str:

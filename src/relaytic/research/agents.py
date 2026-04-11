@@ -440,7 +440,7 @@ def _build_method_transfer_report(
             "url": source.get("url"),
             "year": source.get("year"),
         }
-        family = _suggest_model_family(text=text, task_type=task_type)
+        family = _suggest_model_family(text=text, task_type=task_type, time_aware=time_aware)
         if family:
             candidates.append(
                 {
@@ -791,14 +791,40 @@ def _positive_rate_band(value: Any) -> str:
     return "balanced"
 
 
-def _suggest_model_family(*, text: str, task_type: str) -> str | None:
+def _suggest_model_family(*, text: str, task_type: str, time_aware: bool) -> str | None:
     normalized = text.lower()
+    if time_aware and any(token in normalized for token in ("lstm", "recurrent neural network", "gru", "sequence model")):
+        return "sequence_lstm_candidate"
+    if time_aware and any(token in normalized for token in ("temporal transformer", "time series transformer", "tcn", "temporal convolution")):
+        return "temporal_transformer_candidate"
     if task_type == "regression":
+        if "catboost" in normalized:
+            return "catboost_ensemble"
+        if "xgboost" in normalized:
+            return "xgboost_ensemble"
+        if "lightgbm" in normalized:
+            return "lightgbm_ensemble"
+        if any(token in normalized for token in ("histogram gradient", "hist gradient", "histgradient")):
+            return "hist_gradient_boosting_ensemble"
+        if any(token in normalized for token in ("extra trees", "extremely randomized")):
+            return "extra_trees_ensemble"
         if any(token in normalized for token in ("gradient boosting", "xgboost", "lightgbm", "boosted tree")):
             return "boosted_tree_ensemble"
         if any(token in normalized for token in ("ridge", "linear regression", "elastic net")):
             return "linear_ridge"
         return None
+    if "tabpfn" in normalized and task_type in {"binary_classification", "multiclass_classification", "fraud_detection", "anomaly_detection"}:
+        return "tabpfn_classifier"
+    if "catboost" in normalized:
+        return "catboost_classifier"
+    if "xgboost" in normalized:
+        return "xgboost_classifier"
+    if "lightgbm" in normalized:
+        return "lightgbm_classifier"
+    if any(token in normalized for token in ("histogram gradient", "hist gradient", "histgradient")):
+        return "hist_gradient_boosting_classifier"
+    if any(token in normalized for token in ("extra trees", "extremely randomized")):
+        return "extra_trees_classifier"
     if any(token in normalized for token in ("gradient boosting", "xgboost", "lightgbm", "boosted tree")):
         return "boosted_tree_classifier"
     if any(token in normalized for token in ("logistic regression", "logit", "linear classifier")):
@@ -810,8 +836,30 @@ def _suggest_model_family(*, text: str, task_type: str) -> str | None:
 
 def _family_matches_task(*, value: str, task_type: str) -> bool:
     if task_type == "regression":
-        return value in {"linear_ridge", "boosted_tree_ensemble"}
-    return value in {"boosted_tree_classifier", "logistic_regression", "bagged_tree_classifier"}
+        return value in {
+            "linear_ridge",
+            "boosted_tree_ensemble",
+            "hist_gradient_boosting_ensemble",
+            "extra_trees_ensemble",
+            "catboost_ensemble",
+            "xgboost_ensemble",
+            "lightgbm_ensemble",
+            "sequence_lstm_candidate",
+            "temporal_transformer_candidate",
+        }
+    return value in {
+        "boosted_tree_classifier",
+        "logistic_regression",
+        "bagged_tree_classifier",
+        "hist_gradient_boosting_classifier",
+        "extra_trees_classifier",
+        "catboost_classifier",
+        "xgboost_classifier",
+        "lightgbm_classifier",
+        "tabpfn_classifier",
+        "sequence_lstm_candidate",
+        "temporal_transformer_candidate",
+    }
 
 
 def _benchmark_expected(*, run_brief: dict[str, Any], task_brief: dict[str, Any]) -> bool:

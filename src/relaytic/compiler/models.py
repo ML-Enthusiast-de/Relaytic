@@ -11,6 +11,8 @@ METHOD_COMPILER_REPORT_SCHEMA_VERSION = "relaytic.method_compiler_report.v1"
 COMPILED_CHALLENGER_TEMPLATES_SCHEMA_VERSION = "relaytic.compiled_challenger_templates.v1"
 COMPILED_FEATURE_HYPOTHESES_SCHEMA_VERSION = "relaytic.compiled_feature_hypotheses.v1"
 COMPILED_BENCHMARK_PROTOCOL_SCHEMA_VERSION = "relaytic.compiled_benchmark_protocol.v1"
+METHOD_IMPORT_REPORT_SCHEMA_VERSION = "relaytic.method_import_report.v1"
+ARCHITECTURE_CANDIDATE_REGISTRY_SCHEMA_VERSION = "relaytic.architecture_candidate_registry.v1"
 
 
 @dataclass(frozen=True)
@@ -98,6 +100,50 @@ class CompiledBenchmarkProtocol:
     controls: CompilerControls
     status: str
     protocol_updates: list[dict[str, Any]]
+    summary: str
+    trace: CompilerTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class MethodImportReport:
+    schema_version: str
+    generated_at: str
+    controls: CompilerControls
+    status: str
+    imported_family_count: int
+    accepted_family_count: int
+    advisory_family_count: int
+    rejected_family_count: int
+    shadow_only_count: int
+    unavailable_count: int
+    imported_families: list[dict[str, Any]]
+    summary: str
+    trace: CompilerTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ArchitectureCandidateRegistry:
+    schema_version: str
+    generated_at: str
+    controls: CompilerControls
+    status: str
+    candidate_count: int
+    shadow_only_count: int
+    unavailable_count: int
+    replay_only_count: int
+    candidates: list[dict[str, Any]]
     summary: str
     trace: CompilerTrace
 

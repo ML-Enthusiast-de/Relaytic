@@ -614,6 +614,12 @@ def build_runtime_events_surface(*args: Any, **kwargs: Any) -> Any:
     return _build_runtime_events_surface(*args, **kwargs)
 
 
+def build_materialization_surface(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.runtime import build_materialization_surface as _build_materialization_surface
+
+    return _build_materialization_surface(*args, **kwargs)
+
+
 def render_runtime_markdown(*args: Any, **kwargs: Any) -> Any:
     from relaytic.runtime import render_runtime_markdown as _render_runtime_markdown
 
@@ -624,6 +630,12 @@ def render_runtime_events_markdown(*args: Any, **kwargs: Any) -> Any:
     from relaytic.runtime import render_runtime_events_markdown as _render_runtime_events_markdown
 
     return _render_runtime_events_markdown(*args, **kwargs)
+
+
+def render_materialization_markdown(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.runtime import render_materialization_markdown as _render_materialization_markdown
+
+    return _render_materialization_markdown(*args, **kwargs)
 
 
 def record_runtime_stage_start(*args: Any, **kwargs: Any) -> Any:
@@ -648,6 +660,18 @@ def record_runtime_event(*args: Any, **kwargs: Any) -> Any:
     from relaytic.runtime import record_runtime_event as _record_runtime_event
 
     return _record_runtime_event(*args, **kwargs)
+
+
+def sync_materialization_runtime_artifacts(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.runtime import sync_materialization_runtime_artifacts as _sync_materialization_runtime_artifacts
+
+    return _sync_materialization_runtime_artifacts(*args, **kwargs)
+
+
+def stage_recompute_entry(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.runtime import stage_recompute_entry as _stage_recompute_entry
+
+    return _stage_recompute_entry(*args, **kwargs)
 
 
 def materialize_run_summary(*args: Any, **kwargs: Any) -> Any:
@@ -2192,6 +2216,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="How many recent runtime events to return.",
     )
     runtime_events.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    runtime_reuse = runtime_sub.add_parser(
+        "reuse",
+        help="Inspect Slice 15E dependency graphs, freshness contracts, and recompute plans.",
+    )
+    runtime_reuse.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    runtime_reuse.add_argument(
         "--format",
         choices=["human", "json", "both"],
         default="human",
@@ -3917,6 +3953,18 @@ def main(argv: list[str] | None = None) -> int:
         if args.runtime_command == "events":
             try:
                 payload = _show_runtime_events(run_dir=args.run_dir, limit=max(1, int(args.limit)))
+            except ValueError as exc:
+                parser.error(str(exc))
+                return 2
+            _emit_structured_surface_output(
+                payload=payload["surface_payload"],
+                human_text=payload["human_output"],
+                output_format=args.format,
+            )
+            return 0
+        if args.runtime_command == "reuse":
+            try:
+                payload = _show_runtime_reuse_surface(run_dir=args.run_dir)
             except ValueError as exc:
                 parser.error(str(exc))
                 return 2
@@ -7895,6 +7943,7 @@ def _show_runtime_surface(*, run_dir: str | Path, limit: int = 20) -> dict[str, 
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
     _ensure_runtime_present(root)
+    sync_materialization_runtime_artifacts(root)
     payload = build_runtime_surface(run_dir=root, event_limit=limit)
     return {
         "surface_payload": payload,
@@ -7911,6 +7960,18 @@ def _show_runtime_events(*, run_dir: str | Path, limit: int = 20) -> dict[str, A
     return {
         "surface_payload": payload,
         "human_output": render_runtime_events_markdown(payload),
+    }
+
+
+def _show_runtime_reuse_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    _ensure_runtime_present(root)
+    payload = build_materialization_surface(run_dir=root)
+    return {
+        "surface_payload": payload,
+        "human_output": render_materialization_markdown(payload),
     }
 
 
@@ -8526,7 +8587,7 @@ def _assist_replay_intake_context(*, root: Path) -> dict[str, Any]:
 def _ensure_completion_present(run_dir: str | Path) -> dict[str, Any]:
     root = Path(run_dir)
     bundle = _read_json_bundle(root, bundle="completion")
-    if bundle:
+    if bundle and bool(stage_recompute_entry(root, stage="completion").get("reusable", False)):
         return bundle
     evidence_bundle = _read_json_bundle(root, bundle="evidence")
     if not evidence_bundle:
@@ -9993,9 +10054,13 @@ def _run_benchmark_phase(
 
     root = Path(run_dir)
     targets = _benchmark_output_paths(root)
-    if not overwrite and all(path.exists() for path in targets.values()):
+    benchmark_stage = stage_recompute_entry(root, stage="benchmark")
+    if not overwrite and bool(benchmark_stage.get("reusable", False)):
         return _show_benchmark_surface(run_dir=root)
-    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    _ensure_paths_absent(
+        list(targets.values()),
+        overwrite=overwrite or str(benchmark_stage.get("status", "")).strip() != "fresh",
+    )
     foundation_state = _ensure_run_foundation_present(
         run_dir=root,
         config_path=config_path,
@@ -10051,6 +10116,7 @@ def _run_benchmark_phase(
             summary="Relaytic compared the selected route against same-contract strong reference approaches and recorded honest parity artifacts.",
         )
         materialize_run_summary(run_dir=root, data_path=resolved_data_path)
+        sync_materialization_runtime_artifacts(root)
         parity = benchmark_result.bundle.benchmark_parity_report
         gap = benchmark_result.bundle.benchmark_gap_report
         incumbent = benchmark_result.bundle.incumbent_parity_report
@@ -10058,6 +10124,9 @@ def _run_benchmark_phase(
         paper_manifest = benchmark_result.bundle.paper_benchmark_manifest
         rerun_variance = benchmark_result.bundle.rerun_variance_report
         claims = benchmark_result.bundle.benchmark_claims_report
+        shadow_manifest = benchmark_result.bundle.shadow_trial_manifest
+        promotion = benchmark_result.bundle.promotion_readiness_report
+        quarantine = benchmark_result.bundle.candidate_quarantine
         bundle_payload = benchmark_result.bundle.to_dict()
         bundle_payload["benchmark_vs_deploy_report"] = read_task_contract_artifacts(root).get("benchmark_vs_deploy_report", {})
         return {
@@ -10086,6 +10155,10 @@ def _run_benchmark_phase(
                     "competitiveness_claim": claims.competitiveness_claim,
                     "deployment_claim": claims.deployment_claim,
                     "below_reference": claims.below_reference,
+                    "imported_candidate_count": shadow_manifest.candidate_count,
+                    "promotion_ready_count": promotion.promotion_ready_count,
+                    "candidate_available_count": promotion.candidate_available_count,
+                    "quarantined_candidate_count": quarantine.quarantined_count,
                 },
                 "bundle": bundle_payload,
             },
@@ -10110,6 +10183,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle = _read_json_bundle(root, bundle="benchmark")
     if not bundle:
         raise ValueError(f"No Slice 11 benchmark artifacts found in {root}.")
+    sync_materialization_runtime_artifacts(root)
     materialize_run_summary(run_dir=root)
     manifest_path = _refresh_benchmark_manifest(root)
     parity = dict(bundle.get("benchmark_parity_report", {}))
@@ -10119,6 +10193,9 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     paper_manifest = dict(bundle.get("paper_benchmark_manifest", {}))
     rerun_variance = dict(bundle.get("rerun_variance_report", {}))
     claims = dict(bundle.get("benchmark_claims_report", {}))
+    shadow_manifest = dict(bundle.get("shadow_trial_manifest", {}))
+    promotion = dict(bundle.get("promotion_readiness_report", {}))
+    quarantine = dict(bundle.get("candidate_quarantine", {}))
     bundle_payload = dict(bundle)
     bundle_payload["benchmark_vs_deploy_report"] = read_task_contract_artifacts(root).get("benchmark_vs_deploy_report", {})
     return {
@@ -10146,6 +10223,10 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "competitiveness_claim": claims.get("competitiveness_claim"),
                 "deployment_claim": claims.get("deployment_claim"),
                 "below_reference": claims.get("below_reference"),
+                "imported_candidate_count": int(shadow_manifest.get("candidate_count", 0) or 0),
+                "promotion_ready_count": int(promotion.get("promotion_ready_count", 0) or 0),
+                "candidate_available_count": int(promotion.get("candidate_available_count", 0) or 0),
+                "quarantined_candidate_count": int(quarantine.get("quarantined_count", 0) or 0),
             },
             "bundle": bundle_payload,
         },
@@ -10254,6 +10335,8 @@ def _run_decision_phase(
                     "join_candidate_count": decision_result.bundle.join_candidate_report.candidate_count,
                     "compiled_challenger_count": decision_result.bundle.method_compiler_report.compiled_challenger_count,
                     "compiled_feature_count": decision_result.bundle.method_compiler_report.compiled_feature_count,
+                    "imported_candidate_count": decision_result.bundle.method_import_report.imported_family_count,
+                    "shadow_only_import_count": decision_result.bundle.method_import_report.shadow_only_count,
                 },
                 "feasibility": {
                     "trajectory_status": decision_result.bundle.trajectory_constraint_report.trajectory_status,
@@ -10302,6 +10385,7 @@ def _show_decision_surface(*, run_dir: str | Path) -> dict[str, Any]:
     value_report = dict(bundle.get("value_of_more_data_report", {}))
     join_report = dict(bundle.get("join_candidate_report", {}))
     compiler = dict(bundle.get("method_compiler_report", {}))
+    method_import = dict(bundle.get("method_import_report", {}))
     return {
         "surface_payload": {
             "status": "ok",
@@ -10321,6 +10405,8 @@ def _show_decision_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "join_candidate_count": int(join_report.get("candidate_count", 0) or 0),
                 "compiled_challenger_count": int(compiler.get("compiled_challenger_count", 0) or 0),
                 "compiled_feature_count": int(compiler.get("compiled_feature_count", 0) or 0),
+                "imported_candidate_count": int(method_import.get("imported_family_count", 0) or 0),
+                "shadow_only_import_count": int(method_import.get("shadow_only_count", 0) or 0),
             },
             "feasibility": {
                 "trajectory_status": trajectory.get("trajectory_status"),
@@ -10636,6 +10722,7 @@ def _materialize_trace_bundle(*, run_dir: Path, config_path: str | None) -> tupl
         effective_policy_source = config_path
     trace_result = run_trace_review(run_dir=run_dir, policy=effective_policy)
     written = write_trace_bundle(run_dir, bundle=trace_result.bundle)
+    sync_materialization_runtime_artifacts(run_dir)
     return trace_result.bundle.to_dict(), written, effective_policy_source
 
 
@@ -10647,7 +10734,13 @@ def _show_trace_surface(*, run_dir: str | Path, config_path: str | None = None) 
         raise ValueError(f"Run directory does not exist: {root}")
     bundle = _read_json_bundle(root, bundle="trace")
     effective_policy_source: str | Path | None = None
-    if not bundle or not isinstance(bundle.get("trace_model"), dict) or not bundle.get("trace_model"):
+    trace_stage = stage_recompute_entry(root, stage="trace")
+    if (
+        not bundle
+        or not isinstance(bundle.get("trace_model"), dict)
+        or not bundle.get("trace_model")
+        or not bool(trace_stage.get("reusable", False))
+    ):
         bundle, _, effective_policy_source = _materialize_trace_bundle(run_dir=root, config_path=config_path)
     summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     manifest_path = _refresh_trace_manifest(root, policy_source=effective_policy_source)
@@ -10685,7 +10778,13 @@ def _replay_trace_surface(*, run_dir: str | Path, config_path: str | None = None
         raise ValueError(f"Run directory does not exist: {root}")
     bundle = _read_json_bundle(root, bundle="trace")
     effective_policy_source: str | Path | None = None
-    if not bundle or not isinstance(bundle.get("decision_replay_report"), dict) or not bundle.get("decision_replay_report"):
+    trace_stage = stage_recompute_entry(root, stage="trace")
+    if (
+        not bundle
+        or not isinstance(bundle.get("decision_replay_report"), dict)
+        or not bundle.get("decision_replay_report")
+        or not bool(trace_stage.get("reusable", False))
+    ):
         bundle, _, effective_policy_source = _materialize_trace_bundle(run_dir=root, config_path=config_path)
     summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     manifest_path = _refresh_trace_manifest(root, policy_source=effective_policy_source)
@@ -11388,7 +11487,13 @@ def _run_completion_phase(
 
     root = Path(run_dir)
     targets = _completion_output_paths(root)
-    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    completion_stage = stage_recompute_entry(root, stage="completion")
+    if not overwrite and bool(completion_stage.get("reusable", False)):
+        return _show_completion_status(run_dir=root)
+    _ensure_paths_absent(
+        list(targets.values()),
+        overwrite=overwrite or str(completion_stage.get("status", "")).strip() != "fresh",
+    )
     foundation_state = _ensure_run_foundation_present(
         run_dir=root,
         config_path=config_path,
@@ -11526,6 +11631,7 @@ def _run_completion_phase(
             summary="Relaytic fused evidence, memory, and mandate state into an explicit governed completion decision.",
         )
         materialize_run_summary(run_dir=root)
+        sync_materialization_runtime_artifacts(root)
         decision = completion_result.bundle.completion_decision
         return {
             "surface_payload": {
@@ -11563,6 +11669,7 @@ def _show_completion_status(*, run_dir: str | Path) -> dict[str, Any]:
     if not completion_bundle:
         raise ValueError(f"No Slice 07 completion artifacts found or materializable in {root}.")
     summary_materialized = materialize_run_summary(run_dir=root)
+    sync_materialization_runtime_artifacts(root)
     manifest_path = _refresh_completion_manifest(root)
     human_output = render_completion_review_markdown(completion_bundle)
     decision = dict(completion_bundle.get("completion_decision", {}))
@@ -12274,6 +12381,10 @@ def _benchmark_output_paths(run_dir: Path) -> dict[str, Path]:
         "benchmark_ablation_matrix": run_dir / "benchmark_ablation_matrix.json",
         "rerun_variance_report": run_dir / "rerun_variance_report.json",
         "benchmark_claims_report": run_dir / "benchmark_claims_report.json",
+        "shadow_trial_manifest": run_dir / "shadow_trial_manifest.json",
+        "shadow_trial_scorecard": run_dir / "shadow_trial_scorecard.json",
+        "candidate_quarantine": run_dir / "candidate_quarantine.json",
+        "promotion_readiness_report": run_dir / "promotion_readiness_report.json",
     }
 
 
@@ -12301,6 +12412,8 @@ def _decision_output_paths(run_dir: Path) -> dict[str, Path]:
         "compiled_challenger_templates": run_dir / "compiled_challenger_templates.json",
         "compiled_feature_hypotheses": run_dir / "compiled_feature_hypotheses.json",
         "compiled_benchmark_protocol": run_dir / "compiled_benchmark_protocol.json",
+        "method_import_report": run_dir / "method_import_report.json",
+        "architecture_candidate_registry": run_dir / "architecture_candidate_registry.json",
     }
 
 

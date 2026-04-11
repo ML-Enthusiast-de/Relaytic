@@ -19,6 +19,10 @@ PAPER_BENCHMARK_TABLE_SCHEMA_VERSION = "relaytic.paper_benchmark_table.v1"
 BENCHMARK_ABLATION_MATRIX_SCHEMA_VERSION = "relaytic.benchmark_ablation_matrix.v1"
 RERUN_VARIANCE_REPORT_SCHEMA_VERSION = "relaytic.rerun_variance_report.v1"
 BENCHMARK_CLAIMS_REPORT_SCHEMA_VERSION = "relaytic.benchmark_claims_report.v1"
+SHADOW_TRIAL_MANIFEST_SCHEMA_VERSION = "relaytic.shadow_trial_manifest.v1"
+SHADOW_TRIAL_SCORECARD_SCHEMA_VERSION = "relaytic.shadow_trial_scorecard.v1"
+CANDIDATE_QUARANTINE_SCHEMA_VERSION = "relaytic.candidate_quarantine.v1"
+PROMOTION_READINESS_REPORT_SCHEMA_VERSION = "relaytic.promotion_readiness_report.v1"
 
 
 @dataclass(frozen=True)
@@ -364,6 +368,85 @@ class BenchmarkClaimsReport:
 
 
 @dataclass(frozen=True)
+class ShadowTrialManifest:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    candidate_count: int
+    runnable_candidate_count: int
+    replay_only_count: int
+    temporal_candidate_count: int
+    comparison_metric: str | None
+    baseline_family: str | None
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class ShadowTrialScorecard:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    comparison_metric: str | None
+    metric_direction: str | None
+    rows: list[dict[str, Any]]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class CandidateQuarantine:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    quarantined_count: int
+    quarantined_candidates: list[dict[str, Any]]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class PromotionReadinessReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    promotion_ready_count: int
+    candidate_available_count: int
+    quarantined_count: int
+    rows: list[dict[str, Any]]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class BenchmarkBundle:
     reference_approach_matrix: ReferenceApproachMatrix
     benchmark_gap_report: BenchmarkGapReport
@@ -377,6 +460,10 @@ class BenchmarkBundle:
     benchmark_ablation_matrix: BenchmarkAblationMatrix
     rerun_variance_report: RerunVarianceReport
     benchmark_claims_report: BenchmarkClaimsReport
+    shadow_trial_manifest: ShadowTrialManifest
+    shadow_trial_scorecard: ShadowTrialScorecard
+    candidate_quarantine: CandidateQuarantine
+    promotion_readiness_report: PromotionReadinessReport
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -392,6 +479,10 @@ class BenchmarkBundle:
             "benchmark_ablation_matrix": self.benchmark_ablation_matrix.to_dict(),
             "rerun_variance_report": self.rerun_variance_report.to_dict(),
             "benchmark_claims_report": self.benchmark_claims_report.to_dict(),
+            "shadow_trial_manifest": self.shadow_trial_manifest.to_dict(),
+            "shadow_trial_scorecard": self.shadow_trial_scorecard.to_dict(),
+            "candidate_quarantine": self.candidate_quarantine.to_dict(),
+            "promotion_readiness_report": self.promotion_readiness_report.to_dict(),
         }
 
 
