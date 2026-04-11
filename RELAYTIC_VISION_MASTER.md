@@ -227,6 +227,7 @@ They are:
 - a **richer data-understanding fabric** that can reason about nearby sources, join candidates, entity histories, and what additional data would reduce uncertainty most
 - a **remote supervision surface** that lets humans and external agents inspect, approve, deny, and hand off running workspaces without creating a second source of truth
 - a **mission-control surface** that shows branch structure, confidence map, intervention history, incumbent-versus-Relaytic state, what changed because of memory, intelligence, research, or feedback, and what Relaytic would do next
+- a **performance-recovery track** that fixes objective drift, strengthens first-class model families, enforces serious search-budget doctrine, restores temporal competitiveness, improves calibration and threshold decisions, and blocks unsafe paper claims before the academy begins
 - a **governed capability academy** that can discover, shadow-test, promote, demote, and retire tools or non-core specialists through seeded exploration, replayable proof, and explicit provider feedback instead of ad hoc capability growth
 - a **protocol-conformance harness** that proves CLI, MCP, mission control, and later richer UI shells expose the same control truth rather than drifting by surface
 - long-session, resume, and packaging regression packs that test the product the way a real frontier operator runtime gets used rather than only as a fast CLI
@@ -236,7 +237,7 @@ They are:
 
 These are the places where the project most needs to become stronger if it wants to look like the next big thing rather than a well-structured research product.
 
-One additional major opportunity after the mission-control and proof track is a **governed capability academy** where Relaytic can scout, shadow-test, promote, demote, and retire new tools or non-core specialists through replayable proof rather than ad hoc growth. That academy could later coexist with a **representation engine** for large unlabeled local corpora, event histories, and time-aware streams. JEPA-style latent predictive models are promising there because they could strengthen analog retrieval, anomaly precursors, temporal state understanding, and data-acquisition reasoning without becoming the authority path for metrics, calibration, or lifecycle decisions.
+Before the academy begins, Relaytic needs one explicit **performance-recovery track** that raises the modeling ceiling directly: stronger objective contracts, stronger family coverage, deeper portfolio search with real budgets, a real temporal engine, calibration and decision optimization, and paper-claim truth gates. Only after that should Relaytic move into a **governed capability academy** where it can scout, shadow-test, promote, demote, and retire new tools or non-core specialists through replayable proof rather than ad hoc growth. That academy could later coexist with a **representation engine** for large unlabeled local corpora, event histories, and time-aware streams. JEPA-style latent predictive models are promising there because they could strengthen analog retrieval, anomaly precursors, temporal state understanding, and data-acquisition reasoning without becoming the authority path for metrics, calibration, or lifecycle decisions.
 
 ## 1. Product definition
 

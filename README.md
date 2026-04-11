@@ -67,17 +67,26 @@ Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 16A**, because Relaytic now has a complete pre-academy model-competitiveness path through imported-architecture shadow trials, so the next meaningful jump is to generalize those governed candidate mechanics into first-class capability cards and registry truth.
+The next recommended build is **Slice 15G**, because the latest benchmark rerun made it clear that Relaytic still needs a second pre-academy performance-recovery track: objective drift, temporal split weakness, shallow budget doctrine, calibration gaps, and paper-claim truth gates all matter more right now than generic capability evolution.
 
-The model-competitiveness path through **Slice 15F** is now landed:
+The initial model-competitiveness path through **Slice 15F** is now landed:
 
 - Slice 15F research-imported architecture candidates with replay and shadow trials
 
-The broader **Relaytic Academy** then starts at **Slice 16A**, where Relaytic generalizes candidate, replay, shadow, promotion, hunt, and retirement ideas from model families into a governed capability-evolution system.
+The next required performance-recovery path is now:
+
+- Slice 15G objective contracts, split correctness, and metric-truth alignment
+- Slice 15H first-class competitive family stack
+- Slice 15I portfolio search engine and serious budget doctrine
+- Slice 15J temporal engine and time-aware competitiveness
+- Slice 15K calibration, thresholds, and decision optimization
+- Slice 15L benchmark truth hardening and paper-claim gates
+
+The broader **Relaytic Academy** then starts at **Slice 16A**, after Relaytic has a stronger modeling core and benchmark-truth gate rather than learning new capabilities on top of a still-limited performance ceiling.
 
 After the academy track and the optional representation-engine bet, the roadmap now ends with **Slice 18**, a deliberate consolidation/remediation slice that removes legacy compatibility surfaces, misleading duplicate structure, oversized modules, and stale prototype residue so the finished repo reads like one intentional product rather than a long-lived construction site.
 
-The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [temporal_benchmark_pack.md](docs/specs/temporal_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
+The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [temporal_benchmark_pack.md](docs/specs/temporal_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
 
 - machine-stable result contracts with confidence posture and belief-revision triggers so humans, agents, CLI, MCP, and later richer UI shells can all read the same conclusion differently without drifting
 - governed learnings with source, confidence, reaffirmation, invalidation, reset, and optional expiry semantics
@@ -87,7 +96,7 @@ The normative product-contract pack that now governs the shipped workspace layer
 - a stronger governed-learnings upgrade that migrates the shipped workspace learnings into typed, confidence-bearing, reaffirmable, invalidatable, and optionally expirable records
 - richer long-term memory with retention, compaction, pinning, and replay rules so specialists do not repeatedly forget the same lesson
 - a stronger search/HPO controller that goes beyond the shipped Slice 13 bounded search controller into deeper portfolio ecology, better stop-search proofs, and tighter daemon or resume integration
-- a model-competitiveness track that fixes task-taxonomy drift, expands the model registry, deepens HPO loops, separates benchmark mode from deployment mode, and lets research-imported architectures prove themselves through replay and shadow trials before they gain authority
+- a performance-recovery track that fixes objective drift, strengthens first-class family coverage, deepens portfolio search with serious budgets, restores temporal competitiveness, improves calibration and decision quality, and blocks unsafe benchmark claims before academy work begins
 - richer remote transports, notification freshness, and connector-aware supervision flows on top of the shipped remote-supervision surface
 - academy-aware operating surfaces that turn the shipped canonical trace and scorecards into polished replay, promotion, and change-attribution experiences
 - broader protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth as the surface area grows

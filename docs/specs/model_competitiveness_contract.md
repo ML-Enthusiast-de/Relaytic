@@ -4,6 +4,10 @@
 
 This document freezes the product contract for the model-competitiveness track that follows Slice 15 and precedes the broader academy work.
 
+The shipped Slice 15A through Slice 15F path established the first half of that track.
+
+The remaining performance-recovery and paper-competitiveness hardening work is now specified in [performance_recovery_contract.md](performance_recovery_contract.md) and should land as Slice 15G through Slice 15L before the academy begins.
+
 Relaytic should remain:
 
 - local-first

@@ -124,6 +124,9 @@ To reduce timeout risk, future CI should support at least:
 - `remote_supervision`
 - `mission_control`
 - `paper_benchmark_pack`
+- `performance_recovery`
+- `temporal_benchmark_pack`
+- `benchmark_truth`
 - `capability_academy`
 
 ## Minimum pass expectation by slice family
@@ -161,6 +164,17 @@ To reduce timeout risk, future CI should support at least:
 - demo-pack health checks
 - onboarding-success tests
 - workspace replay tests
+
+### Slice 15G through 15L family
+
+- objective-alignment tests
+- split-degeneracy and metric-materialization tests
+- family-eligibility and adapter-fallback tests
+- staged-search and budget-profile separation tests
+- temporal split-health and lagged-baseline tests
+- calibration and operating-point optimization tests
+- protocol-conformance and paper-claim-gate tests
+- no-toy-budget regression guards
 
 ### Slice 16 family
 

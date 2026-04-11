@@ -232,15 +232,21 @@ Stable slice numbering stays the same, but the preferred execution order after S
 38. Slice 15D
 39. Slice 15E
 40. Slice 15F
-41. Slice 16
-42. Slice 16A
-43. Slice 16B
-44. Slice 16C
-45. Slice 16D
-46. Slice 16E
-47. Slice 16F
-48. Slice 17
-49. Slice 18
+41. Slice 15G
+42. Slice 15H
+43. Slice 15I
+44. Slice 15J
+45. Slice 15K
+46. Slice 15L
+47. Slice 16
+48. Slice 16A
+49. Slice 16B
+50. Slice 16C
+51. Slice 16D
+52. Slice 16E
+53. Slice 16F
+54. Slice 17
+55. Slice 18
 
 Why:
 
@@ -278,8 +284,14 @@ Why:
 - Slice 14 should come after Slice 13C because real-world feasibility is stronger once Relaytic can account for permission posture, waiting approvals, and long-running work instead of treating constraints as static annotations
 - Slice 14A should come after Slice 14 because remote supervision is only credible once local feasibility, permission modes, and background resumability are already explicit
 - Slice 15 should close the loop with flagship demo packs, release readiness, remote supervision visibility, and human-supervision evaluation rather than treating UI polish as sufficient proof
-- Slices 15A through 15F are the model-competitiveness track and should land before the academy track so Relaytic strengthens task semantics, architecture routing, HPO depth, benchmark rigor, artifact reuse, and model-family shadow trials before broader capability evolution begins
-- Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-15F capability evolution has one coherent contract
+- Slices 15A through 15F are the initial model-competitiveness track and are now shipped, but the benchmark rerun proved Relaytic still needs a second performance-recovery track before the academy begins
+- Slice 15G should come next because objective drift, split degeneracy, and benchmark-metric mismatch can invalidate every later performance claim if they remain unresolved
+- Slice 15H should come after 15G because stronger family coverage only matters once Relaytic knows exactly what it is optimizing and how the benchmark is being judged
+- Slice 15I should come after 15H because deeper search is only worth paying for once the family set is competitive, and this slice must formalize the doctrine that test budgets and production budgets are separate
+- Slice 15J should come after 15I because serious temporal work needs the stronger search core, stronger family stack, and explicit objective contract instead of one-off lag hacks
+- Slice 15K should come after 15J because calibration, thresholding, abstention, and review-budget optimization should be built on corrected task contracts, corrected temporal evaluation, and a deeper family/search stack
+- Slice 15L should close the pre-academy recovery track by turning benchmark trust, trace identity, protocol conformance, leakage posture, and public-claim safety into one explicit gate
+- Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-15L capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
 - Slice 16C should come before hunt-heavy or roster-heavy work because promotion and quarantine logic must be deterministic before Relaytic starts scouting aggressively
@@ -288,12 +300,11 @@ Why:
 - Slice 16F should close the academy track by turning candidate, shadow, hunt, and promotion truth into one human- and agent-usable surface
 - Slice 17 should remain the optional late-stage representation-engine slice and should land after the academy track so Relaytic can first learn to evolve governed capabilities before it experiments with deeper latent representation engines
 - Slice 18 should land last as a deliberate consolidation/remediation pass so Relaytic can remove temporary compatibility layers, misleading structure, oversized modules, and stale prototype language after the capability work is complete
-- Slice 18 should land last as a deliberate consolidation/remediation pass so Relaytic can remove temporary compatibility layers, misleading structure, oversized modules, and stale prototype language after the capability work is complete
 
 ## Current execution state
 
 - implemented baseline: Slice 00 through Slice 15F, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, Slice 15 mission-control expansion, release-health visibility, demo packs, and human-factors proof, Slice 15A canonical task contracts, rare-event taxonomy cleanup, benchmark-vs-deploy separation, temporal benchmark scaffolding, Slice 15B model registry expansion, adaptive architecture routing, widened trainable families, and sequence-shadow gating, Slice 15C budgeted HPO, early stopping, warm-start reuse, threshold tuning, and deeper portfolio loops, Slice 15D paper-grade benchmark harness, rerun variance reporting, benchmark ablation matrices, temporal benchmark posture, explicit claim-boundary reporting, Slice 15E execution DAG, runtime freshness contracts, recompute planning, and artifact reuse, and Slice 15F research-imported architecture candidates, shadow trials, candidate quarantine, and promotion-readiness reporting
-- next execution target: Slice 16A
+- next execution target: Slice 15G
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -302,11 +313,11 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after Slice 15F: Slice 16A
+- next planned academy follow-on after Slice 15L: Slice 16A
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
-- the canonical product-spec pack for Slice 12D, Slice 15, the model-competitiveness track, and the academy follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, academy, handoff, learnings, and external-agent continuation surfaces
+- the canonical product-spec pack for Slice 12D, Slice 15, the model-competitiveness track, the performance-recovery track, and the academy follow-ons now lives under `docs/specs/` and should be treated as normative for future implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, performance recovery, academy, handoff, learnings, and external-agent continuation surfaces
 
 ## Slice 00 - Normalization and contract freeze
 
@@ -2621,6 +2632,146 @@ Minimum proof:
 - one externally sourced architecture remains shadow-only because proof is weak
 - one externally sourced architecture becomes promotion-ready after replay and shadow evidence
 - one explanation surface answers why a paper-inspired architecture was not yet used live
+
+## Slice 15G - Objective contracts, split correctness, and metric-truth alignment
+
+Goal:
+- canonical optimization-objective contract
+- split diagnostics and temporal fold health
+- benchmark metric-materialization truth
+- fail-closed benchmark prechecks
+
+Required outputs:
+- `optimization_objective_contract.json`
+- `objective_alignment_report.json`
+- `split_diagnostics_report.json`
+- `temporal_fold_health.json`
+- `metric_materialization_audit.json`
+- `benchmark_truth_precheck.json`
+
+Minimum proof:
+
+- one benchmark run aligns family-selection, calibration, threshold, benchmark, and deployment objectives explicitly
+- one temporal classification benchmark avoids zero-positive validation or test folds or is blocked explicitly
+- one benchmark bundle fails closed because the claimed comparison metric is unavailable
+- one explanation surface answers why Relaytic optimized one metric but reported another without contradiction
+
+## Slice 15H - First-class competitive family stack
+
+Goal:
+- stronger first-class family coverage
+- categorical-aware routing
+- multiclass and rare-event specialization
+- graceful optional-adapter activation
+
+Required outputs:
+- `family_registry_extension.json`
+- `family_readiness_report.json`
+- `family_eligibility_matrix.json`
+- `family_probe_policy.json`
+- `categorical_strategy_report.json`
+- `family_specialization_report.json`
+
+Minimum proof:
+
+- one mixed-type benchmark considers a categorical-aware family before generic numeric boosting when the adapter is available
+- one small-data classification case considers a small-data specialist family when available
+- one multiclass benchmark gets a materially broader eligible family set than the current path
+- one no-adapter environment still falls back cleanly to the deterministic floor
+
+## Slice 15I - Portfolio search engine and serious budget doctrine
+
+Goal:
+- staged probe/race/finalist search
+- serious search-budget doctrine
+- multi-fidelity pruning
+- explicit stop reasons
+
+Required outputs:
+- `search_budget_envelope.json`
+- `probe_stage_report.json`
+- `family_race_report.json`
+- `finalist_search_plan.json`
+- `multi_fidelity_pruning_report.json`
+- `portfolio_search_scorecard.json`
+- `search_stop_reason.json`
+
+Minimum proof:
+
+- one benchmark profile gives multiple materially different families non-trivial probe budgets before finalist selection
+- one finalist receives deeper follow-up budget than losing families
+- one low-budget profile still runs a staged search and reports which deeper work was skipped
+- one test profile can shrink budgets without mutating default operator or benchmark profile contracts
+
+## Slice 15J - Temporal engine and time-aware competitiveness
+
+Goal:
+- temporal structure detection
+- rolling and grouped temporal evaluation
+- strong lagged temporal baselines
+- honest sequence shadow trials
+
+Required outputs:
+- `temporal_structure_report.json`
+- `temporal_feature_ladder.json`
+- `rolling_cv_plan.json`
+- `temporal_split_guard_report.json`
+- `sequence_shadow_scorecard.json`
+- `temporal_baseline_ladder.json`
+- `temporal_metric_contract.json`
+
+Minimum proof:
+
+- one occupancy-style temporal classification benchmark retains positives in validation and test or is blocked explicitly
+- one temporal regression benchmark materializes its claimed comparison metric correctly
+- one temporal dataset shows a lagged baseline beating a naive non-temporal baseline
+- one sequence candidate is compared against a strong lagged baseline and remains shadow-only when it loses
+
+## Slice 15K - Calibration, thresholds, and decision optimization
+
+Goal:
+- calibration strategy selection
+- threshold search by objective family
+- review-budget-aware operating points
+- abstention-aware decision optimization
+
+Required outputs:
+- `calibration_strategy_report.json`
+- `operating_point_contract.json`
+- `threshold_search_report.json`
+- `decision_cost_profile.json`
+- `review_budget_optimization_report.json`
+- `abstention_policy_report.json`
+
+Minimum proof:
+
+- one rare-event task improves decision posture through threshold or calibration choice without changing the winning family
+- one calibration strategy wins for explicit evidence-based reasons
+- one review-budget-aware operating point differs from the best raw-score threshold
+- one explanation surface can answer why Relaytic chose this threshold and why not a rerun instead
+
+## Slice 15L - Benchmark truth hardening and paper-claim gates
+
+Goal:
+- trace-identity conformance
+- benchmark-truth audits
+- public-claim safety gates
+- paper-safe benchmark bundles
+
+Required outputs:
+- `trace_identity_conformance.json`
+- `benchmark_truth_audit.json`
+- `paper_claim_guard_report.json`
+- `eval_surface_parity_report.json`
+- `benchmark_release_gate.json`
+- `dataset_leakage_audit.json`
+
+Minimum proof:
+
+- one trace-identity drift class is eliminated across CLI and MCP
+- one benchmark bundle is blocked from paper-safe status because benchmark-truth or protocol gates fail
+- one degenerate temporal benchmark is blocked explicitly rather than silently reported
+- one clean benchmark bundle is marked safe to cite publicly
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

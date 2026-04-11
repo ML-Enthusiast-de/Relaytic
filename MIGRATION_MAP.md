@@ -489,6 +489,9 @@ Current Slice 12D artifact names:
 
 The following boundaries are reserved for the next frontier slices so later implementation can stay sharp without widening the legacy compatibility surface ad hoc:
 
+- `src/relaytic/modeling/families/`, if introduced during Slice 15H, for first-class family-owned trainers, search spaces, adapter shims, and specialization logic rather than one generic trainer path
+- `src/relaytic/modeling/portfolio/`, if introduced during Slice 15I, for staged family probing, racing, finalist search, pruning, and budget-envelope logic
+- `src/relaytic/temporal/`, if introduced during Slice 15J, for temporal-structure analysis, rolling/grouped split contracts, temporal feature ladders, and sequence-shadow evaluation
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should avoid creating a new package boundary unless absolutely necessary; its job is to remove misleading, duplicated, or legacy boundaries, split oversized modules, retire compatibility shims when the removal criteria are met, and leave the public surface cleaner than before
@@ -550,6 +553,44 @@ Implemented daemon, feasibility, remote-supervision, and mission-control proof a
 - `flagship_demo_scorecard.json`
 - `human_factors_eval_report.json`
 - `onboarding_success_report.json`
+- `optimization_objective_contract.json`
+- `objective_alignment_report.json`
+- `split_diagnostics_report.json`
+- `temporal_fold_health.json`
+- `metric_materialization_audit.json`
+- `benchmark_truth_precheck.json`
+- `family_registry_extension.json`
+- `family_readiness_report.json`
+- `family_eligibility_matrix.json`
+- `family_probe_policy.json`
+- `categorical_strategy_report.json`
+- `family_specialization_report.json`
+- `search_budget_envelope.json`
+- `probe_stage_report.json`
+- `family_race_report.json`
+- `finalist_search_plan.json`
+- `multi_fidelity_pruning_report.json`
+- `portfolio_search_scorecard.json`
+- `search_stop_reason.json`
+- `temporal_structure_report.json`
+- `temporal_feature_ladder.json`
+- `rolling_cv_plan.json`
+- `temporal_split_guard_report.json`
+- `sequence_shadow_scorecard.json`
+- `temporal_baseline_ladder.json`
+- `temporal_metric_contract.json`
+- `calibration_strategy_report.json`
+- `operating_point_contract.json`
+- `threshold_search_report.json`
+- `decision_cost_profile.json`
+- `review_budget_optimization_report.json`
+- `abstention_policy_report.json`
+- `trace_identity_conformance.json`
+- `benchmark_truth_audit.json`
+- `paper_claim_guard_report.json`
+- `eval_surface_parity_report.json`
+- `benchmark_release_gate.json`
+- `dataset_leakage_audit.json`
 - `capability_registry.json`
 - `capability_card_log.jsonl`
 - `capability_intake_record.json`

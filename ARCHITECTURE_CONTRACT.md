@@ -62,7 +62,7 @@ Current canonical boundaries:
 
 Reserved future boundaries:
 
-- `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15F task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, and replay/shadow-tested imported-model responsibilities; later academy work should keep extending those same boundaries until capability promotion graduates into the dedicated `capability_academy` package instead of forking a disconnected parallel stack
+- `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15F task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, and replay/shadow-tested imported-model responsibilities; the new Slice 15G through Slice 15L performance-recovery work should keep strengthening those same boundaries and may introduce focused subpackages such as `src/relaytic/modeling/families/`, `src/relaytic/modeling/portfolio/`, or `src/relaytic/temporal/` only if they sharpen responsibility instead of forking a disconnected parallel stack
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should be a cross-cutting consolidation and remediation slice rather than a feature-expansion boundary; by default it should remove misleading or redundant packages, split oversized modules, and retire legacy surfaces instead of introducing a new permanent package
@@ -125,6 +125,12 @@ These files are required and must stay current:
 - `docs/build_slices/phase_15d.md`
 - `docs/build_slices/phase_15e.md`
 - `docs/build_slices/phase_15f.md`
+- `docs/build_slices/phase_15g.md`
+- `docs/build_slices/phase_15h.md`
+- `docs/build_slices/phase_15i.md`
+- `docs/build_slices/phase_15j.md`
+- `docs/build_slices/phase_15k.md`
+- `docs/build_slices/phase_15l.md`
 - `docs/build_slices/phase_16.md`
 - `docs/build_slices/phase_16a.md`
 - `docs/build_slices/phase_16b.md`
@@ -138,6 +144,7 @@ These files are required and must stay current:
 - `docs/specs/result_contract_schema.md`
 - `docs/specs/governed_learnings_schema.md`
 - `docs/specs/model_competitiveness_contract.md`
+- `docs/specs/performance_recovery_contract.md`
 - `docs/specs/temporal_benchmark_pack.md`
 - `docs/specs/capability_academy_contract.md`
 - `docs/specs/mission_control_contract.md`
