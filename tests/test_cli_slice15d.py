@@ -1,17 +1,14 @@
 from __future__ import annotations
 
 import json
-from functools import partial
 from pathlib import Path
 
 import pytest
 
 pytest.importorskip("sklearn.datasets")
-pytest.importorskip("ucimlrepo")
 
 from relaytic.ui.cli import main
-from tests.domain_datasets import write_uci_occupancy_detection_dataset
-from tests.public_datasets import write_public_breast_cancer_dataset
+from tests.public_datasets import write_public_breast_cancer_dataset, write_public_temporal_occupancy_dataset
 
 
 def test_cli_slice15d_benchmark_run_materializes_paper_artifacts_for_public_binary_run(
@@ -101,7 +98,7 @@ def test_cli_slice15d_temporal_benchmark_manifest_records_temporal_posture(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     run_dir = tmp_path / "slice15d_temporal"
-    data_path = partial(write_uci_occupancy_detection_dataset, max_rows=1200)(tmp_path / "slice15d_occupancy.csv")
+    data_path = write_public_temporal_occupancy_dataset(tmp_path / "slice15d_occupancy.csv", max_rows=1200)
 
     assert main(
         [

@@ -776,7 +776,15 @@ def build_assist_audit_explanation(
 
 
 def _extract_imported_architecture_name(normalized: str, architecture_imports: dict[str, Any]) -> str | None:
-    if int(architecture_imports.get("candidate_count", 0) or 0) <= 0 and int(architecture_imports.get("imported_family_count", 0) or 0) <= 0:
+    visible_candidate_counts = (
+        int(architecture_imports.get("candidate_count", 0) or 0),
+        int(architecture_imports.get("imported_family_count", 0) or 0),
+        int(architecture_imports.get("promotion_ready_count", 0) or 0),
+        int(architecture_imports.get("candidate_available_count", 0) or 0),
+        int(architecture_imports.get("quarantined_count", 0) or 0),
+        int(architecture_imports.get("shadow_trial_count", 0) or 0),
+    )
+    if max(visible_candidate_counts, default=0) <= 0:
         return None
     known_families: list[str] = []
     for key in (

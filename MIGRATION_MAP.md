@@ -130,6 +130,18 @@ Avoid introducing new references to:
 - introduced the public command `relaytic runtime reuse`
 - upgraded `relaytic benchmark run`, `relaytic completion review`, and trace replay materialization so they now consult one explicit freshness/recompute contract instead of relying on scattered file-exists checks
 
+### Slice 15F
+
+- expanded the existing research/compiler/decision/benchmark/search boundaries without creating a second model-lab stack by adding imported-architecture provenance, candidate-registry, shadow-trial, quarantine, and promotion-readiness artifacts
+- introduced governed imported-architecture artifacts:
+  - `method_import_report.json`
+  - `architecture_candidate_registry.json`
+  - `shadow_trial_manifest.json`
+  - `shadow_trial_scorecard.json`
+  - `candidate_quarantine.json`
+  - `promotion_readiness_report.json`
+- upgraded `relaytic decision review`, `relaytic benchmark run`, `relaytic benchmark show`, `relaytic show`, `relaytic assist turn`, and search review so research-imported model families can stay replay-first, prove themselves in shadow mode, and remain clearly quarantined or promotion-ready without silently becoming live defaults
+
 ### Slice 09A
 
 - introduced the canonical package boundary `src/relaytic/memory/`

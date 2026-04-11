@@ -2,14 +2,17 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 Delivered package boundaries:
 
 - extend `src/relaytic/research/`
 - extend `src/relaytic/compiler/`
+- extend `src/relaytic/decision/`
 - extend `src/relaytic/benchmark/`
 - extend `src/relaytic/search/`
+- extend `src/relaytic/assist/`
+- extend `src/relaytic/runs/`
 
 Intended artifacts:
 
@@ -68,3 +71,21 @@ Slice 15F is acceptable only if:
 - one shadow-trial scorecard test
 - one quarantine-path test
 - one `why not this imported architecture?` explanation test
+
+## Implementation Notes
+
+Slice 15F now lands through the following shipped artifact families:
+
+- `method_import_report.json`
+- `architecture_candidate_registry.json`
+- `shadow_trial_manifest.json`
+- `shadow_trial_scorecard.json`
+- `candidate_quarantine.json`
+- `promotion_readiness_report.json`
+
+Relaytic can now:
+
+- translate accepted research signals into model-family candidate cards with provenance and local-adapter readiness
+- run real shadow trials for supported imported families on the same local benchmark split instead of treating imported architectures as prose-only ideas
+- keep temporal sequence candidates replay-first and quarantine-first until they beat lagged tabular baselines under explicit proof
+- answer human and agent questions such as `why not tabpfn here?` from the same imported-candidate registry and promotion-readiness state
