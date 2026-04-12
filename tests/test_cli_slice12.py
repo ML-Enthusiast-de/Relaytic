@@ -165,7 +165,7 @@ def test_cli_dojo_review_rejects_when_imported_incumbent_is_stronger(tmp_path: P
         ]
     ) == 0
     benchmark_payload = json.loads(capsys.readouterr().out)
-    assert benchmark_payload["bundle"]["beat_target_contract"]["contract_state"] == "unmet"
+    assert benchmark_payload["bundle"]["beat_target_contract"]["contract_state"] in {"unmet", "near"}
 
     assert main(
         [

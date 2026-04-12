@@ -5298,8 +5298,6 @@ def _run_search_phase(
         )
         summary_bundle = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
         surface_search = dict(summary_bundle["summary"].get("search", {}))
-        bundle_payload = benchmark_result.bundle.to_dict()
-        bundle_payload["benchmark_vs_deploy_report"] = read_task_contract_artifacts(root).get("benchmark_vs_deploy_report", {})
         return {
             "surface_payload": {
                 "status": "ok",
@@ -9397,6 +9395,7 @@ def _run_planning_phase(
         written = write_planning_bundle(root, bundle=planning_bundle)
         task_contract_written = sync_task_contract_artifacts(
             root,
+            data_path=staged_data_path,
             mandate_bundle=_read_json_bundle(root, bundle="mandate"),
             context_bundle=_read_json_bundle(root, bundle="context"),
             investigation_bundle=investigation_state["bundle"],
@@ -10127,8 +10126,9 @@ def _run_benchmark_phase(
         shadow_manifest = benchmark_result.bundle.shadow_trial_manifest
         promotion = benchmark_result.bundle.promotion_readiness_report
         quarantine = benchmark_result.bundle.candidate_quarantine
+        task_contract_bundle = read_task_contract_artifacts(root)
         bundle_payload = benchmark_result.bundle.to_dict()
-        bundle_payload["benchmark_vs_deploy_report"] = read_task_contract_artifacts(root).get("benchmark_vs_deploy_report", {})
+        bundle_payload.update(task_contract_bundle)
         return {
             "surface_payload": {
                 "status": "ok",
@@ -10159,6 +10159,11 @@ def _run_benchmark_phase(
                     "promotion_ready_count": promotion.promotion_ready_count,
                     "candidate_available_count": promotion.candidate_available_count,
                     "quarantined_candidate_count": quarantine.quarantined_count,
+                    "objective_alignment_status": task_contract_bundle.get("objective_alignment_report", {}).get("status"),
+                    "truth_precheck_status": task_contract_bundle.get("benchmark_truth_precheck", {}).get("status"),
+                    "safe_to_rank": task_contract_bundle.get("benchmark_truth_precheck", {}).get("safe_to_rank"),
+                    "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
+                    "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
                 },
                 "bundle": bundle_payload,
             },
@@ -10196,8 +10201,9 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     shadow_manifest = dict(bundle.get("shadow_trial_manifest", {}))
     promotion = dict(bundle.get("promotion_readiness_report", {}))
     quarantine = dict(bundle.get("candidate_quarantine", {}))
+    task_contract_bundle = read_task_contract_artifacts(root)
     bundle_payload = dict(bundle)
-    bundle_payload["benchmark_vs_deploy_report"] = read_task_contract_artifacts(root).get("benchmark_vs_deploy_report", {})
+    bundle_payload.update(task_contract_bundle)
     return {
         "surface_payload": {
             "status": "ok",
@@ -10227,6 +10233,11 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "promotion_ready_count": int(promotion.get("promotion_ready_count", 0) or 0),
                 "candidate_available_count": int(promotion.get("candidate_available_count", 0) or 0),
                 "quarantined_candidate_count": int(quarantine.get("quarantined_count", 0) or 0),
+                "objective_alignment_status": task_contract_bundle.get("objective_alignment_report", {}).get("status"),
+                "truth_precheck_status": task_contract_bundle.get("benchmark_truth_precheck", {}).get("status"),
+                "safe_to_rank": task_contract_bundle.get("benchmark_truth_precheck", {}).get("safe_to_rank"),
+                "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
+                "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
             },
             "bundle": bundle_payload,
         },
@@ -10734,12 +10745,10 @@ def _show_trace_surface(*, run_dir: str | Path, config_path: str | None = None) 
         raise ValueError(f"Run directory does not exist: {root}")
     bundle = _read_json_bundle(root, bundle="trace")
     effective_policy_source: str | Path | None = None
-    trace_stage = stage_recompute_entry(root, stage="trace")
     if (
         not bundle
         or not isinstance(bundle.get("trace_model"), dict)
         or not bundle.get("trace_model")
-        or not bool(trace_stage.get("reusable", False))
     ):
         bundle, _, effective_policy_source = _materialize_trace_bundle(run_dir=root, config_path=config_path)
     summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
@@ -10778,12 +10787,10 @@ def _replay_trace_surface(*, run_dir: str | Path, config_path: str | None = None
         raise ValueError(f"Run directory does not exist: {root}")
     bundle = _read_json_bundle(root, bundle="trace")
     effective_policy_source: str | Path | None = None
-    trace_stage = stage_recompute_entry(root, stage="trace")
     if (
         not bundle
         or not isinstance(bundle.get("decision_replay_report"), dict)
         or not bundle.get("decision_replay_report")
-        or not bool(trace_stage.get("reusable", False))
     ):
         bundle, _, effective_policy_source = _materialize_trace_bundle(run_dir=root, config_path=config_path)
     summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))

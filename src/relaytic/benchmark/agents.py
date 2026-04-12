@@ -109,6 +109,7 @@ def run_benchmark_review(
     task_profile_contract = dict(task_contract_bundle.get("task_profile_contract", {}))
     metric_contract = dict(task_contract_bundle.get("metric_contract", {}))
     benchmark_mode_report = dict(task_contract_bundle.get("benchmark_mode_report", {}))
+    benchmark_truth_precheck = dict(task_contract_bundle.get("benchmark_truth_precheck", {}))
     benchmark_expected = (
         bool(benchmark_mode_report.get("benchmark_expected"))
         if benchmark_mode_report
@@ -153,6 +154,26 @@ def run_benchmark_review(
             ),
             benchmark_expected=benchmark_expected,
             summary="Relaytic could not benchmark the run because scikit-learn references are unavailable.",
+        )
+        return BenchmarkRunResult(bundle=bundle, review_markdown=render_benchmark_review_markdown(bundle.to_dict()))
+    if benchmark_truth_precheck and benchmark_truth_precheck.get("safe_to_rank") is False:
+        bundle = _unavailable_bundle(
+            controls=controls,
+            generated_at=generated_at,
+            trace=BenchmarkTrace(
+                agent=trace.agent,
+                operating_mode=trace.operating_mode,
+                llm_used=False,
+                llm_status="not_requested",
+                deterministic_evidence=trace.deterministic_evidence,
+                advisory_notes=[
+                    str(item)
+                    for item in benchmark_truth_precheck.get("reason_codes", [])
+                    if str(item).strip()
+                ],
+            ),
+            benchmark_expected=benchmark_expected,
+            summary=str(benchmark_truth_precheck.get("summary") or "Relaytic blocked benchmark ranking because truth prechecks failed."),
         )
         return BenchmarkRunResult(bundle=bundle, review_markdown=render_benchmark_review_markdown(bundle.to_dict()))
 
@@ -1987,6 +2008,9 @@ def _unavailable_bundle(
         relaytic_family=None,
         reference_count=0,
         strong_reference_available=False,
+        incumbent_present=False,
+        incumbent_name=None,
+        beat_target_state=None,
         summary=summary,
         trace=trace,
     )

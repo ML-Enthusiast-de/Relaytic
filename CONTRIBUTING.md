@@ -18,10 +18,15 @@ Fastest local bootstrap:
 
 Run these before a PR:
 
-1. `python -m pytest -q`
-2. `python -m relaytic.ui.cli scan-git-safety`
-3. `relaytic --help`
-4. `git status --short`
+1. `python scripts/check_push_readiness.py --mode quick`
+2. `python -m pytest -q`
+3. `python -m relaytic.ui.cli scan-git-safety`
+4. `relaytic --help`
+5. `git status --short`
+
+If you touched MCP, runtime, or host-facing interoperability surfaces, also run:
+
+1. `python scripts/check_push_readiness.py --mode full`
 
 Confirm that `data/private/`, `reports/`, `artifacts/`, `models/`, `.env*`, and `.venv/` are clean or ignored.
 

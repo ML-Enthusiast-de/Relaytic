@@ -648,6 +648,8 @@ def build_assist_audit_explanation(
     hpo = dict(run_summary.get("hpo", {}))
     next_step = dict(run_summary.get("next_step", {}))
     iteration = dict(run_summary.get("iteration", {}))
+    objective_contract = dict(run_summary.get("objective_contract", {}))
+    split_health = dict(run_summary.get("split_health", {}))
 
     question_type = "general"
     reasons: list[str] = []
@@ -660,6 +662,20 @@ def build_assist_audit_explanation(
             f"Current recommended direction is `{_clean_text(result_contract.get('recommended_direction')) or _clean_text(result_contract.get('recommended_action')) or _clean_text(dict(result_contract.get('recommended_next_move', {})).get('direction')) or 'unknown'}` under the workspace contract.",
         ]
         evidence_refs = ["belief_revision_triggers.json", "result_contract.json", "next_run_plan.json"]
+    elif any(token in normalized for token in ("optimiz", "benchmark metric", "threshold metric", "selection metric", "why this metric")):
+        question_type = "objective_alignment"
+        reasons = [
+            f"Relaytic selected families on `{_clean_text(objective_contract.get('selection_metric')) or 'unknown'}`, compared benchmarks on `{_clean_text(objective_contract.get('benchmark_comparison_metric')) or _clean_text(benchmark.get('comparison_metric')) or 'unknown'}`, and makes deployment decisions on `{_clean_text(objective_contract.get('deployment_decision_metric')) or _clean_text(decision.get('primary_metric')) or 'unknown'}`.",
+            f"Calibration metric is `{_clean_text(objective_contract.get('calibration_metric')) or 'not_applicable'}` and threshold metric is `{_clean_text(objective_contract.get('threshold_metric')) or 'not_applicable'}`. Explicit metric split = `{objective_contract.get('explicit_metric_split')}`.",
+            f"Benchmark truth precheck is `{_clean_text(objective_contract.get('truth_precheck_status')) or 'unknown'}` with safe-to-rank = `{objective_contract.get('safe_to_rank')}`. Split health is `{_clean_text(split_health.get('temporal_fold_status')) or _clean_text(split_health.get('status')) or 'unknown'}`.",
+        ]
+        evidence_refs = [
+            "optimization_objective_contract.json",
+            "objective_alignment_report.json",
+            "metric_materialization_audit.json",
+            "split_diagnostics_report.json",
+            "benchmark_truth_precheck.json",
+        ]
     elif "task type" in normalized or ("why not" in normalized and "anomaly" in normalized):
         question_type = "task_semantics"
         reasons = [

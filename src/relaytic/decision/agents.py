@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from relaytic.core.benchmark_statuses import benchmark_meets_or_beats_reference
 from relaytic.compiler import build_compiler_outputs
 from relaytic.data_fabric import build_data_fabric_outputs
 
@@ -514,7 +515,7 @@ def _build_value_of_more_data_report(
     parity_status = _clean_text(benchmark_parity.get("parity_status"))
     benchmark_action = _clean_text(benchmark_parity.get("recommended_action"))
     more_search_value_band = "low"
-    if parity_status not in {"at_parity", "better_than_reference"} or benchmark_action in {
+    if not benchmark_meets_or_beats_reference(parity_status) or benchmark_action in {
         "broaden_search",
         "continue_experimentation",
         "benchmark_needed",
@@ -819,7 +820,7 @@ def _world_uncertainty(
     issues: list[str] = []
     if not benchmark_parity:
         issues.append("benchmark parity not yet established")
-    elif _clean_text(benchmark_parity.get("parity_status")) not in {"at_parity", "better_than_reference"}:
+    elif not benchmark_meets_or_beats_reference(_clean_text(benchmark_parity.get("parity_status"))):
         issues.append("benchmark parity remains open")
     issues.extend([str(item).strip() for item in semantic_uncertainty.get("unresolved_items", []) if str(item).strip()][:3])
     if not research_brief:

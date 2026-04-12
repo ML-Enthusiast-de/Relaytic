@@ -39,6 +39,7 @@ def test_cli_run_and_benchmark_show_materialize_reference_parity_for_public_bina
     assert benchmark["reference_count"] >= 2
     assert benchmark["parity_status"] in {
         "meets_or_exceeds_reference",
+        "meets_or_beats_reference",
         "near_parity",
         "below_reference",
         "reference_unavailable",

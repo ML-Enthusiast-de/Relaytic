@@ -72,6 +72,37 @@ def test_build_assist_audit_explanation_answers_task_semantics_questions() -> No
     assert "task_profile_contract.json" in audit["evidence_refs"]
 
 
+def test_build_assist_audit_explanation_answers_objective_alignment_questions() -> None:
+    audit = build_assist_audit_explanation(
+        message="why did you optimize one metric but benchmark another?",
+        actor_type="agent",
+        run_summary={
+            "objective_contract": {
+                "selection_metric": "log_loss",
+                "calibration_metric": "log_loss",
+                "threshold_metric": "pr_auc",
+                "benchmark_comparison_metric": "pr_auc",
+                "deployment_decision_metric": "roc_auc",
+                "explicit_metric_split": True,
+                "truth_precheck_status": "ok",
+                "safe_to_rank": True,
+            },
+            "split_health": {
+                "status": "ok",
+                "temporal_fold_status": "not_applicable",
+            },
+            "benchmark": {"comparison_metric": "pr_auc"},
+            "decision": {"primary_metric": "roc_auc"},
+        },
+    )
+
+    assert audit["question_type"] == "objective_alignment"
+    assert "log_loss" in audit["answer"]
+    assert "pr_auc" in audit["answer"]
+    assert "roc_auc" in audit["answer"]
+    assert "optimization_objective_contract.json" in audit["evidence_refs"]
+
+
 def test_build_assist_audit_explanation_answers_why_not_lstm() -> None:
     audit = build_assist_audit_explanation(
         message="why not an lstm here?",

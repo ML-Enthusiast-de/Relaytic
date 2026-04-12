@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from relaytic.core.benchmark_statuses import benchmark_meets_or_beats_reference
 from relaytic.analytics import read_architecture_routing_artifacts
 
 from .models import (
@@ -315,7 +316,7 @@ def _compile_benchmark_protocol(
     accepted_candidates: list[dict[str, Any]],
 ) -> CompiledBenchmarkProtocol:
     updates: list[dict[str, Any]] = []
-    if _clean_text(benchmark_parity.get("parity_status")) not in {"at_parity", "better_than_reference"}:
+    if not benchmark_meets_or_beats_reference(_clean_text(benchmark_parity.get("parity_status"))):
         updates.append(
             {
                 "update_id": "benchmark_gap_followup",

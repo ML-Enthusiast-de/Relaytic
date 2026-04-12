@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from relaytic.core.benchmark_statuses import benchmark_is_reference_competitive, normalize_benchmark_parity_status
 from relaytic.core.json_utils import write_json
 
 
@@ -374,6 +375,12 @@ def build_run_summary(
     deployment_readiness_report = dict(task_contract_bundle.get("deployment_readiness_report", {})) if isinstance(task_contract_bundle.get("deployment_readiness_report"), dict) else {}
     benchmark_vs_deploy_report = dict(task_contract_bundle.get("benchmark_vs_deploy_report", {})) if isinstance(task_contract_bundle.get("benchmark_vs_deploy_report"), dict) else {}
     dataset_semantics_audit = dict(task_contract_bundle.get("dataset_semantics_audit", {})) if isinstance(task_contract_bundle.get("dataset_semantics_audit"), dict) else {}
+    optimization_objective_contract = dict(task_contract_bundle.get("optimization_objective_contract", {})) if isinstance(task_contract_bundle.get("optimization_objective_contract"), dict) else {}
+    objective_alignment_report = dict(task_contract_bundle.get("objective_alignment_report", {})) if isinstance(task_contract_bundle.get("objective_alignment_report"), dict) else {}
+    split_diagnostics_report = dict(task_contract_bundle.get("split_diagnostics_report", {})) if isinstance(task_contract_bundle.get("split_diagnostics_report"), dict) else {}
+    temporal_fold_health = dict(task_contract_bundle.get("temporal_fold_health", {})) if isinstance(task_contract_bundle.get("temporal_fold_health"), dict) else {}
+    metric_materialization_audit = dict(task_contract_bundle.get("metric_materialization_audit", {})) if isinstance(task_contract_bundle.get("metric_materialization_audit"), dict) else {}
+    benchmark_truth_precheck = dict(task_contract_bundle.get("benchmark_truth_precheck", {})) if isinstance(task_contract_bundle.get("benchmark_truth_precheck"), dict) else {}
     architecture_registry = dict(architecture_bundle.get("architecture_registry", {})) if isinstance(architecture_bundle.get("architecture_registry"), dict) else {}
     architecture_router_report = dict(architecture_bundle.get("architecture_router_report", {})) if isinstance(architecture_bundle.get("architecture_router_report"), dict) else {}
     candidate_family_matrix = dict(architecture_bundle.get("candidate_family_matrix", {})) if isinstance(architecture_bundle.get("candidate_family_matrix"), dict) else {}
@@ -1089,6 +1096,35 @@ def build_run_summary(
             or _clean_text(task_profile_contract.get("why_not_anomaly_detection")),
             "multiclass_string_labels_preserved": dataset_semantics_audit.get("multiclass_string_labels_preserved"),
         },
+        "objective_contract": {
+            "status": _clean_text(objective_alignment_report.get("status")) or _clean_text(optimization_objective_contract.get("status")),
+            "selection_metric": _clean_text(optimization_objective_contract.get("family_selection_metric")),
+            "calibration_metric": _clean_text(optimization_objective_contract.get("calibration_metric")),
+            "threshold_metric": _clean_text(optimization_objective_contract.get("threshold_metric")),
+            "benchmark_comparison_metric": _clean_text(optimization_objective_contract.get("benchmark_comparison_metric")),
+            "deployment_decision_metric": _clean_text(optimization_objective_contract.get("deployment_decision_metric")),
+            "explicit_metric_split": optimization_objective_contract.get("explicit_metric_split"),
+            "benchmark_metric_materialized_in_execution": metric_materialization_audit.get("benchmark_metric_materialized_in_execution"),
+            "benchmark_metric_materialized_in_benchmark_rows": metric_materialization_audit.get("benchmark_metric_materialized_in_benchmark_rows"),
+            "truth_precheck_status": _clean_text(benchmark_truth_precheck.get("status")),
+            "safe_to_rank": benchmark_truth_precheck.get("safe_to_rank"),
+            "summary": _clean_text(objective_alignment_report.get("summary")) or _clean_text(optimization_objective_contract.get("summary")),
+        },
+        "split_health": {
+            "status": _clean_text(split_diagnostics_report.get("status")),
+            "split_strategy": _clean_text(split_diagnostics_report.get("split_strategy")),
+            "data_mode": _clean_text(split_diagnostics_report.get("data_mode")),
+            "train_size": split_diagnostics_report.get("train_size"),
+            "validation_size": split_diagnostics_report.get("validation_size"),
+            "test_size": split_diagnostics_report.get("test_size"),
+            "validation_positive_count": split_diagnostics_report.get("validation_positive_count"),
+            "test_positive_count": split_diagnostics_report.get("test_positive_count"),
+            "zero_positive_validation": split_diagnostics_report.get("zero_positive_validation"),
+            "zero_positive_test": split_diagnostics_report.get("zero_positive_test"),
+            "temporal_fold_status": _clean_text(temporal_fold_health.get("status")),
+            "safe_for_benchmarking": benchmark_truth_precheck.get("safe_to_rank"),
+            "summary": _clean_text(temporal_fold_health.get("summary")) or _clean_text(split_diagnostics_report.get("summary")),
+        },
         "benchmark_vs_deploy": {
             "status": _clean_text(benchmark_vs_deploy_report.get("status")),
             "benchmark_status": _clean_text(benchmark_vs_deploy_report.get("benchmark_status")),
@@ -1417,8 +1453,14 @@ def build_run_summary(
             "benchmark_mode_report_path": _path_if_exists(root / "benchmark_mode_report.json"),
             "deployment_readiness_report_path": _path_if_exists(root / "deployment_readiness_report.json"),
             "benchmark_vs_deploy_report_path": _path_if_exists(root / "benchmark_vs_deploy_report.json"),
-            "dataset_semantics_audit_path": _path_if_exists(root / "dataset_semantics_audit.json"),
-            "architecture_registry_path": _path_if_exists(root / "architecture_registry.json"),
+                "dataset_semantics_audit_path": _path_if_exists(root / "dataset_semantics_audit.json"),
+                "optimization_objective_contract_path": _path_if_exists(root / "optimization_objective_contract.json"),
+                "objective_alignment_report_path": _path_if_exists(root / "objective_alignment_report.json"),
+                "split_diagnostics_report_path": _path_if_exists(root / "split_diagnostics_report.json"),
+                "temporal_fold_health_path": _path_if_exists(root / "temporal_fold_health.json"),
+                "metric_materialization_audit_path": _path_if_exists(root / "metric_materialization_audit.json"),
+                "benchmark_truth_precheck_path": _path_if_exists(root / "benchmark_truth_precheck.json"),
+                "architecture_registry_path": _path_if_exists(root / "architecture_registry.json"),
             "architecture_router_report_path": _path_if_exists(root / "architecture_router_report.json"),
             "candidate_family_matrix_path": _path_if_exists(root / "candidate_family_matrix.json"),
             "architecture_fit_report_path": _path_if_exists(root / "architecture_fit_report.json"),
@@ -2176,11 +2218,18 @@ def materialize_run_summary(
     )
     sync_task_contract_artifacts(
         root,
+        data_path=data_path or _path_if_exists(root / "data.csv") or _clean_text(dict(base_summary.get("data", {})).get("data_path")),
         mandate_bundle=_read_bundle(root, {"run_brief": "run_brief.json"}),
         context_bundle=_read_bundle(root, {"task_brief": "task_brief.json"}),
         investigation_bundle=_read_bundle(root, {"dataset_profile": "dataset_profile.json"}),
         planning_bundle=_read_bundle(root, {"plan": "plan.json"}),
-        benchmark_bundle=_read_bundle(root, {"benchmark_parity_report": "benchmark_parity_report.json"}),
+        benchmark_bundle=_read_bundle(
+            root,
+            {
+                "benchmark_parity_report": "benchmark_parity_report.json",
+                "reference_approach_matrix": "reference_approach_matrix.json",
+            },
+        ),
         decision_bundle=_read_bundle(
             root,
             {
@@ -2376,15 +2425,12 @@ def _clean_text(value: Any) -> str | None:
 
 
 def _normalize_benchmark_parity_status(value: str | None) -> str | None:
-    if value == "meets_or_exceeds_reference":
-        return "meets_or_beats_reference"
-    return value
+    return normalize_benchmark_parity_status(value)
 
 
 def _infer_benchmark_deploy_split(*, parity_status: str | None, deployment_readiness: str | None) -> bool:
-    normalized = _normalize_benchmark_parity_status(parity_status)
     readiness = _clean_text(deployment_readiness)
-    if normalized not in {"meets_or_beats_reference", "near_parity"}:
+    if not benchmark_is_reference_competitive(parity_status, include_near=True):
         return False
     return readiness not in {None, "ready", "deploy_ready", "ready_now"}
 
@@ -2678,11 +2724,18 @@ def _resolve_next_step_resolution(
     belief_update: dict[str, Any],
     marginal_value: dict[str, Any],
 ) -> dict[str, Any]:
+    feedback_action = _clean_text(feedback_effect_report.get("primary_recommended_action"))
+    if feedback_action and int(feedback_effect_report.get("accepted_feedback_count", 0) or 0) > 0:
+        return {
+            "recommended_action": feedback_action,
+            "rationale": _clean_text(feedback_effect_report.get("summary")) or _clean_text(marginal_value.get("rationale")),
+            "source": "feedback_effect_report",
+        }
     latest_candidates = [
         {
             "source": "feedback_effect_report",
             "generated_at": _parse_generated_at(feedback_effect_report),
-            "action": _clean_text(feedback_effect_report.get("primary_recommended_action")),
+            "action": feedback_action,
             "rationale": _clean_text(feedback_effect_report.get("summary")),
         },
         {

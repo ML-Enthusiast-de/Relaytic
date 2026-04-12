@@ -8,6 +8,8 @@ import hashlib
 from pathlib import Path
 from typing import Any
 
+from relaytic.core.benchmark_statuses import benchmark_is_reference_competitive
+
 from .models import (
     BELIEF_REVISION_TRIGGERS_SCHEMA_VERSION,
     CONFIDENCE_POSTURE_SCHEMA_VERSION,
@@ -543,7 +545,11 @@ def _current_beliefs(*, summary_payload: dict[str, Any], handoff_bundle: dict[st
             "scope": "current_run",
             "support_level": _support_level(summary_payload),
             "supporting_evidence_refs": ["run_summary.json", "completion_decision.json", "audit_report.json"],
-            "counterevidence_refs": ["benchmark_gap_report.json"] if _clean_text(benchmark.get("parity_status")) not in {None, "pass", "near_parity"} else [],
+            "counterevidence_refs": (
+                []
+                if benchmark_is_reference_competitive(_clean_text(benchmark.get("parity_status")), include_near=True)
+                else ["benchmark_gap_report.json"]
+            ),
             "applies_if": ["the current objective and dataset relation remain materially the same"],
         },
         {

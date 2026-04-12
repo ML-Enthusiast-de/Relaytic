@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from relaytic.core.benchmark_statuses import benchmark_is_reference_competitive
+
 from .models import (
     BUDGET_CONSUMPTION_REPORT_SCHEMA_VERSION,
     BUDGET_CONTRACT_SCHEMA_VERSION,
@@ -381,7 +383,7 @@ def _build_quality_gate_report(
             else:
                 passed_gates.append(f"metric:{key}")
         if quality_contract.benchmark_required:
-            if benchmark_status in {"at_parity", "better_than_reference", "near_parity"}:
+            if benchmark_is_reference_competitive(benchmark_status, include_near=True):
                 passed_gates.append("benchmark")
             else:
                 failed_gates.append("benchmark")
@@ -568,7 +570,7 @@ def _task_type(*, plan: dict[str, Any], task_brief: dict[str, Any]) -> str:
 def _quality_state_from_gates(*, unmet: list[dict[str, Any]], readiness_level: str, benchmark_status: str) -> str:
     if unmet:
         return "below_contract"
-    if readiness_level == "strong" and benchmark_status in {"at_parity", "better_than_reference", "near_parity"}:
+    if readiness_level == "strong" and benchmark_is_reference_competitive(benchmark_status, include_near=True):
         return "strong"
     if readiness_level in {"strong", "conditional"}:
         return "acceptable"

@@ -2,9 +2,7 @@
 
 ## Status
 
-Planned.
-
-Slice 15G is now the next recommended target.
+Implemented.
 
 Delivered package boundaries:
 

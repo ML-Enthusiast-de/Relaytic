@@ -142,6 +142,12 @@ Avoid introducing new references to:
   - `promotion_readiness_report.json`
 - upgraded `relaytic decision review`, `relaytic benchmark run`, `relaytic benchmark show`, `relaytic show`, `relaytic assist turn`, and search review so research-imported model families can stay replay-first, prove themselves in shadow mode, and remain clearly quarantined or promotion-ready without silently becoming live defaults
 
+### Slice 15G
+
+- extended the existing `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/benchmark/`, `src/relaytic/runs/`, and `src/relaytic/assist/` boundaries rather than introducing a separate benchmark-governance package
+- introduced artifact boundaries for `optimization_objective_contract.json`, `objective_alignment_report.json`, `split_diagnostics_report.json`, `temporal_fold_health.json`, `metric_materialization_audit.json`, and `benchmark_truth_precheck.json`
+- upgraded planning, benchmark review, run summary, and assist explanation surfaces so one canonical objective contract, one split-health report, and one truth precheck decide whether a benchmark is safe to rank instead of letting metric drift or degenerate temporal folds pass silently
+
 ### Slice 09A
 
 - introduced the canonical package boundary `src/relaytic/memory/`
