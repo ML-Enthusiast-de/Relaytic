@@ -5038,7 +5038,7 @@ def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
     _ensure_lifecycle_present(root)
     existing_summary = read_run_summary(root)
     request = dict(existing_summary.get("request", {})) if isinstance(existing_summary, dict) else {}
-    summary_materialized = materialize_run_summary(
+    summary_materialized = _load_or_materialize_summary(
         run_dir=root,
         data_path=dict(existing_summary.get("data", {})).get("data_path") if isinstance(existing_summary, dict) else None,
         request_source=str(request.get("source", "")).strip() or None,
@@ -5058,11 +5058,37 @@ def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def _load_or_materialize_summary(
+    *,
+    run_dir: str | Path,
+    data_path: str | Path | None = None,
+    request_source: str | None = None,
+    request_text: str | None = None,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    summary_path = root / "run_summary.json"
+    report_path = root / "reports" / "summary.md"
+    existing_summary = read_run_summary(root)
+    if summary_path.exists() and report_path.exists() and isinstance(existing_summary, dict) and existing_summary:
+        return {
+            "summary": existing_summary,
+            "summary_path": summary_path,
+            "report_path": report_path,
+            "report_markdown": report_path.read_text(encoding="utf-8"),
+        }
+    return materialize_run_summary(
+        run_dir=root,
+        data_path=data_path,
+        request_source=request_source,
+        request_text=request_text,
+    )
+
+
 def _show_handoff_surface(*, run_dir: str | Path, audience: str = "both") -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
-    summary_materialized = materialize_run_summary(run_dir=root)
+    summary_materialized = _load_or_materialize_summary(run_dir=root)
     summary = dict(summary_materialized["summary"])
     bundle = read_handoff_bundle(root)
     if not bundle:
@@ -5196,7 +5222,7 @@ def _show_workspace_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle = read_workspace_bundle_for_run(root)
     result_contract_bundle = read_result_contract_artifacts(root)
     next_run_plan = read_iteration_bundle(workspace_dir=default_workspace_dir(run_dir=root), run_dir=root).get("next_run_plan", {})
-    summary_bundle = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    summary_bundle = _load_or_materialize_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     if not bundle and not result_contract_bundle:
         raise ValueError(f"No workspace continuity artifacts found in {root}.")
     human_output = render_workspace_review_markdown(
@@ -5330,7 +5356,7 @@ def _show_search_surface(*, run_dir: str | Path, config_path: str | None = None)
     effective_policy_source: str | Path | None = None
     if not bundle or not isinstance(bundle.get("search_controller_plan"), dict) or not bundle.get("search_controller_plan"):
         bundle, _, effective_policy_source = _materialize_search_bundle(run_dir=root, config_path=config_path)
-    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    summary_materialized = _load_or_materialize_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     manifest_path = _refresh_search_manifest(root, policy_source=effective_policy_source)
     return {
         "surface_payload": {
@@ -5446,7 +5472,7 @@ def _show_daemon_surface(*, run_dir: str | Path, config_path: str | None = None)
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
     bundle, _, effective_policy_source = _materialize_daemon_bundle(run_dir=root, config_path=config_path)
-    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    summary_materialized = _load_or_materialize_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     manifest_path = _refresh_daemon_manifest(root, policy_source=effective_policy_source)
     return {
         "surface_payload": {
@@ -8252,7 +8278,7 @@ def _materialize_assist_surface(
     )
     existing_summary = read_run_summary(root)
     request = dict(existing_summary.get("request", {})) if isinstance(existing_summary, dict) else {}
-    summary_materialized = materialize_run_summary(
+    summary_materialized = _load_or_materialize_summary(
         run_dir=root,
         data_path=_resolve_run_data_path(root),
         request_source=str(request.get("source", "")).strip() or None,
@@ -10189,7 +10215,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     if not bundle:
         raise ValueError(f"No Slice 11 benchmark artifacts found in {root}.")
     sync_materialization_runtime_artifacts(root)
-    materialize_run_summary(run_dir=root)
+    _load_or_materialize_summary(run_dir=root)
     manifest_path = _refresh_benchmark_manifest(root)
     parity = dict(bundle.get("benchmark_parity_report", {}))
     gap = dict(bundle.get("benchmark_gap_report", {}))
@@ -10751,7 +10777,7 @@ def _show_trace_surface(*, run_dir: str | Path, config_path: str | None = None) 
         or not bundle.get("trace_model")
     ):
         bundle, _, effective_policy_source = _materialize_trace_bundle(run_dir=root, config_path=config_path)
-    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    summary_materialized = _load_or_materialize_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     manifest_path = _refresh_trace_manifest(root, policy_source=effective_policy_source)
     trace_model = dict(bundle.get("trace_model", {}))
     adjudication = dict(bundle.get("adjudication_scorecard", {}))
@@ -10934,7 +10960,7 @@ def _show_evals_surface(*, run_dir: str | Path, config_path: str | None = None) 
             "surface_payload": payload["surface_payload"],
             "human_output": payload["human_output"],
         }
-    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    summary_materialized = _load_or_materialize_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     manifest_path = _refresh_evals_manifest(root)
     matrix = dict(bundle.get("agent_eval_matrix", {}))
     protocol = dict(bundle.get("protocol_conformance_report", {}))
@@ -11131,7 +11157,7 @@ def _show_feedback_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle = _read_json_bundle(root, bundle="feedback")
     if not bundle:
         raise ValueError(f"No Slice 10 feedback artifacts found in {root}.")
-    materialize_run_summary(run_dir=root)
+    _load_or_materialize_summary(run_dir=root)
     manifest_path = _refresh_feedback_manifest(root)
     validation = dict(bundle.get("feedback_validation", {}))
     effect = dict(bundle.get("feedback_effect_report", {}))

@@ -1,37 +1,43 @@
-"""Run the highest-risk Relaytic regression shards before pushing."""
+"""Run tiered Relaytic regression walls before pushing."""
 
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import subprocess
 import sys
 from pathlib import Path
 
 
-_QUICK_SHARDS = (
+_QUICK_GROUPS = (
     [
-        "tests/test_cli_slice09b.py::test_cli_runtime_surfaces_materialize_for_public_binary_run",
-        "tests/test_cli_slice09d.py::test_cli_research_slice_materializes_and_influences_autonomy_on_public_dataset",
-        "tests/test_cli_slice09e.py::test_cli_assist_show_turn_and_takeover_work_on_public_dataset",
-        "tests/test_cli_slice10.py::test_cli_feedback_add_show_and_rollback_work_on_public_run",
+        "-m",
+        "smoke",
+        "tests/test_push_smoke.py",
     ],
     [
-        "tests/test_cli_slice11.py::test_cli_run_and_benchmark_show_materialize_reference_parity_for_public_binary_run",
-        "tests/test_cli_slice11a.py::test_cli_autonomy_consumes_unmet_beat_target_contract",
-        "tests/test_cli_slice12.py::test_cli_dojo_review_rejects_when_imported_incumbent_is_stronger",
-        "tests/test_cli_slice12b.py::test_cli_trace_and_evals_surfaces_materialize_for_public_dataset",
-    ],
-    [
-        "tests/test_cli_slice13.py::test_cli_search_slice_materializes_and_surfaces_search_controller_artifacts",
-        "tests/test_cli_slice13c.py::test_cli_daemon_slice_materializes_and_resumes_background_search",
-        "tests/test_domain_datasets.py::test_write_uci_bank_marketing_dataset_honors_requested_max_rows",
-        "tests/test_external_agent_readiness.py::test_external_agent_wrappers_support_a_real_run_and_proof_flow",
+        "tests/test_architecture_routing.py",
+        "tests/test_assist_agents.py",
     ],
 )
 
-_FULL_ONLY_SHARDS = (
-    ["tests/test_interoperability_mcp.py::test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset"],
+_PREPUSH_ONLY_GROUPS = (
+    [
+        "-m",
+        "prepush",
+        "tests/test_push_prepush.py",
+        "tests/test_hpo_loop.py",
+        "tests/test_model_training_candidates.py",
+        "tests/test_planning_agents.py",
+        "tests/test_cli_slice15h.py",
+    ],
+)
+
+_FULL_ONLY_GROUPS = (
+    [
+        "tests/test_domain_datasets.py::test_write_uci_bank_marketing_dataset_honors_requested_max_rows",
+        "tests/test_external_agent_readiness.py::test_external_agent_wrappers_support_a_real_run_and_proof_flow",
+        "tests/test_interoperability_mcp.py::test_streamable_http_mcp_can_run_relaytic_end_to_end_on_public_dataset",
+    ],
 )
 
 
@@ -50,53 +56,41 @@ def _preferred_python(root: Path) -> Path:
     return Path(sys.executable)
 
 
-def _run_shard(python: Path, root: Path, shard: list[str]) -> int:
-    command = [str(python), "-m", "pytest", *shard, "-q"]
+def _run_group(python: Path, root: Path, args: list[str]) -> int:
+    command = [str(python), "-m", "pytest", "-q", "--maxfail=1", *args]
     print(f"[push-readiness] running: {' '.join(command)}", flush=True)
     completed = subprocess.run(command, cwd=root)
     return int(completed.returncode)
 
 
-def _run_parallel_quick_shards(python: Path, root: Path, shards: list[list[str]]) -> int:
-    with ThreadPoolExecutor(max_workers=min(3, max(1, len(shards)))) as pool:
-        future_map = {
-            pool.submit(_run_shard, python, root, list(shard)): list(shard)
-            for shard in shards
-        }
-        for future in as_completed(future_map):
-            returncode = int(future.result())
-            if returncode != 0:
-                print("[push-readiness] failed shard above. Stop and fix before push.", flush=True)
-                return returncode
-    print("[push-readiness] all selected shards passed.", flush=True)
-    return 0
-
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run Relaytic pre-push regression shards.")
+    parser = argparse.ArgumentParser(description="Run Relaytic pre-push regression walls.")
     parser.add_argument(
         "--mode",
-        choices=("quick", "full"),
+        choices=("quick", "prepush", "full"),
         default="quick",
-        help="`quick` runs the highest-risk local shards; `full` adds the MCP end-to-end shard.",
+        help=(
+            "`quick` runs the fast local smoke wall, `prepush` adds the broader local regression wall, "
+            "and `full` adds the heavyweight network/MCP/agent checks."
+        ),
     )
     args = parser.parse_args()
 
     root = _repo_root()
     python = _preferred_python(root)
-    shards = list(_QUICK_SHARDS)
+    groups = list(_QUICK_GROUPS)
+    if args.mode in {"prepush", "full"}:
+        groups.extend(_PREPUSH_ONLY_GROUPS)
     if args.mode == "full":
-        shards.extend(_FULL_ONLY_SHARDS)
-    else:
-        return _run_parallel_quick_shards(python, root, [list(shard) for shard in shards])
+        groups.extend(_FULL_ONLY_GROUPS)
 
-    for shard in shards:
-        returncode = _run_shard(python, root, list(shard))
+    for group in groups:
+        returncode = _run_group(python, root, list(group))
         if returncode != 0:
-            print("[push-readiness] failed shard above. Stop and fix before push.", flush=True)
+            print("[push-readiness] failed group above. Stop and fix before push.", flush=True)
             return returncode
 
-    print("[push-readiness] all selected shards passed.", flush=True)
+    print("[push-readiness] all selected groups passed.", flush=True)
     return 0
 
 

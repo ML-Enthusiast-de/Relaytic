@@ -87,3 +87,12 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "relaytic.agents.prompts" = ["*.txt"]
+
+[tool.pytest.ini_options]
+markers = [
+  "smoke: fastest local confidence wall for frequent development and pre-push checks",
+  "prepush: broader local wall that is still intended to finish comfortably on a developer machine",
+  "slow: heavyweight end-to-end or long-running test",
+  "network: test may fetch remote public data or otherwise depend on network conditions",
+  "mcp: test exercises MCP transports or server processes",
+]

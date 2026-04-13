@@ -476,13 +476,19 @@ Run the test suite:
 python -m pytest -q
 ```
 
-Run the pre-push high-risk shard wall before you push:
+Run the fast local smoke wall during normal development:
 
 ```bash
 python scripts/check_push_readiness.py --mode quick
 ```
 
-Use the full pre-push wall when you touched MCP or host-facing interoperability:
+Run the broader local pre-push wall before you actually push:
+
+```bash
+python scripts/check_push_readiness.py --mode prepush
+```
+
+Use the full wall only when you touched MCP, runtime transport, network-backed dataset flows, or host-facing interoperability:
 
 ```bash
 python scripts/check_push_readiness.py --mode full

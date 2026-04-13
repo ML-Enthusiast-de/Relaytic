@@ -19,14 +19,16 @@ Fastest local bootstrap:
 Run these before a PR:
 
 1. `python scripts/check_push_readiness.py --mode quick`
-2. `python -m pytest -q`
+2. `python scripts/check_push_readiness.py --mode prepush`
 3. `python -m relaytic.ui.cli scan-git-safety`
 4. `relaytic --help`
 5. `git status --short`
 
-If you touched MCP, runtime, or host-facing interoperability surfaces, also run:
+Use the full wall only when you touched MCP, runtime transport, network-backed dataset fetches, or host-facing interoperability:
 
 1. `python scripts/check_push_readiness.py --mode full`
+
+Use `python -m pytest -q` for the full local suite when you intentionally want the highest confidence wall or are preparing a broader release sweep.
 
 Confirm that `data/private/`, `reports/`, `artifacts/`, `models/`, `.env*`, and `.venv/` are clean or ignored.
 
