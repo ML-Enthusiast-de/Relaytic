@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib
 import importlib.util
+from importlib import metadata as importlib_metadata
 import pickle
 from pathlib import Path
 from typing import Any
@@ -20,6 +21,17 @@ from sklearn.ensemble import (
 from relaytic.core.json_utils import write_json
 
 from .evaluation import classification_metrics, regression_metrics
+
+
+FAMILY_ADAPTER_MODULES = {
+    "catboost_classifier": "catboost",
+    "catboost_ensemble": "catboost",
+    "xgboost_classifier": "xgboost",
+    "xgboost_ensemble": "xgboost",
+    "lightgbm_classifier": "lightgbm",
+    "lightgbm_ensemble": "lightgbm",
+    "tabpfn_classifier": "tabpfn",
+}
 
 
 class PickledRegressionEstimatorSurrogate:
@@ -189,6 +201,199 @@ class PickledClassificationEstimatorSurrogate:
             hyperparameters=dict(payload.get("hyperparameters") or {}),
             class_labels=[str(item) for item in payload.get("class_labels", []) if str(item).strip()],
         )
+
+
+def family_adapter_module(family_id: str) -> str | None:
+    return FAMILY_ADAPTER_MODULES.get(str(family_id).strip())
+
+
+def family_adapter_available(family_id: str) -> bool:
+    module_name = family_adapter_module(family_id)
+    if not module_name:
+        return True
+    return importlib.util.find_spec(module_name) is not None
+
+
+def family_adapter_version(family_id: str) -> str | None:
+    module_name = family_adapter_module(family_id)
+    if not module_name:
+        return None
+    try:
+        return importlib_metadata.version(module_name)
+    except importlib_metadata.PackageNotFoundError:
+        return None
+
+
+def build_regression_estimator_surrogate(
+    *,
+    family: str,
+    feature_columns: list[str],
+    target_column: str,
+    hyperparameters: dict[str, Any] | None = None,
+) -> PickledRegressionEstimatorSurrogate:
+    params = dict(hyperparameters or {})
+    if family == "hist_gradient_boosting_ensemble":
+        estimator = HistGradientBoostingRegressor(
+            max_iter=int(params.get("max_iter", 180)),
+            learning_rate=float(params.get("learning_rate", 0.08)),
+            max_depth=int(params.get("max_depth", 6)),
+            min_samples_leaf=int(params.get("min_samples_leaf", 20)),
+            random_state=42,
+        )
+    elif family == "extra_trees_ensemble":
+        estimator = ExtraTreesRegressor(
+            n_estimators=int(params.get("n_estimators", 220)),
+            max_depth=None if params.get("max_depth") is None else int(params.get("max_depth")),
+            min_samples_leaf=int(params.get("min_samples_leaf", 2)),
+            random_state=42,
+            n_jobs=1,
+        )
+    elif family == "catboost_ensemble":
+        if not family_adapter_available(family):
+            raise ValueError("CatBoost is not available on this machine.")
+        from catboost import CatBoostRegressor
+
+        params = {
+            "depth": int(params.get("depth", 6)),
+            "iterations": int(params.get("iterations", 220)),
+            "learning_rate": float(params.get("learning_rate", 0.06)),
+            "loss_function": str(params.get("loss_function", "RMSE")),
+            "verbose": False,
+        }
+        estimator = CatBoostRegressor(**params)
+    elif family == "xgboost_ensemble":
+        if not family_adapter_available(family):
+            raise ValueError("XGBoost is not available on this machine.")
+        from xgboost import XGBRegressor
+
+        params = {
+            "n_estimators": int(params.get("n_estimators", 240)),
+            "max_depth": int(params.get("max_depth", 6)),
+            "learning_rate": float(params.get("learning_rate", 0.06)),
+            "subsample": float(params.get("subsample", 0.9)),
+            "colsample_bytree": float(params.get("colsample_bytree", 0.9)),
+            "objective": "reg:squarederror",
+            "random_state": 42,
+            "n_jobs": 1,
+        }
+        estimator = XGBRegressor(**params)
+    elif family == "lightgbm_ensemble":
+        if not family_adapter_available(family):
+            raise ValueError("LightGBM is not available on this machine.")
+        from lightgbm import LGBMRegressor
+
+        params = {
+            "n_estimators": int(params.get("n_estimators", 240)),
+            "learning_rate": float(params.get("learning_rate", 0.06)),
+            "num_leaves": int(params.get("num_leaves", 31)),
+            "min_child_samples": int(params.get("min_child_samples", 20)),
+            "random_state": 42,
+            "n_jobs": 1,
+        }
+        estimator = LGBMRegressor(**params)
+    else:
+        raise ValueError(f"Unsupported regression estimator family `{family}`.")
+    return PickledRegressionEstimatorSurrogate(
+        feature_columns=feature_columns,
+        target_column=target_column,
+        model_name=family,
+        estimator=estimator,
+        hyperparameters=dict(params),
+    )
+
+
+def build_classification_estimator_surrogate(
+    *,
+    family: str,
+    feature_columns: list[str],
+    target_column: str,
+    hyperparameters: dict[str, Any] | None = None,
+    class_count: int | None = None,
+) -> PickledClassificationEstimatorSurrogate:
+    params = dict(hyperparameters or {})
+    if family == "hist_gradient_boosting_classifier":
+        estimator = HistGradientBoostingClassifier(
+            max_iter=int(params.get("max_iter", 220)),
+            learning_rate=float(params.get("learning_rate", 0.08)),
+            max_depth=int(params.get("max_depth", 6)),
+            min_samples_leaf=int(params.get("min_samples_leaf", 18)),
+            random_state=42,
+        )
+    elif family == "extra_trees_classifier":
+        estimator = ExtraTreesClassifier(
+            n_estimators=int(params.get("n_estimators", 220)),
+            max_depth=None if params.get("max_depth") is None else int(params.get("max_depth")),
+            min_samples_leaf=int(params.get("min_samples_leaf", 2)),
+            random_state=42,
+            n_jobs=1,
+        )
+    elif family == "catboost_classifier":
+        if not family_adapter_available(family):
+            raise ValueError("CatBoost is not available on this machine.")
+        from catboost import CatBoostClassifier
+
+        params = {
+            "depth": int(params.get("depth", 6)),
+            "iterations": int(params.get("iterations", 220)),
+            "learning_rate": float(params.get("learning_rate", 0.06)),
+            "loss_function": str(params.get("loss_function", "MultiClass" if (class_count or 2) > 2 else "Logloss")),
+            "verbose": False,
+        }
+        estimator = CatBoostClassifier(**params)
+    elif family == "xgboost_classifier":
+        if not family_adapter_available(family):
+            raise ValueError("XGBoost is not available on this machine.")
+        from xgboost import XGBClassifier
+
+        params = {
+            "n_estimators": int(params.get("n_estimators", 240)),
+            "max_depth": int(params.get("max_depth", 6)),
+            "learning_rate": float(params.get("learning_rate", 0.06)),
+            "subsample": float(params.get("subsample", 0.9)),
+            "colsample_bytree": float(params.get("colsample_bytree", 0.9)),
+            "random_state": 42,
+            "n_jobs": 1,
+            "eval_metric": str(params.get("eval_metric", "mlogloss" if (class_count or 2) > 2 else "logloss")),
+            "objective": str(params.get("objective", "multi:softprob" if (class_count or 2) > 2 else "binary:logistic")),
+        }
+        if (class_count or 2) > 2:
+            params["num_class"] = int(params.get("num_class", class_count or 2))
+        estimator = XGBClassifier(**params)
+    elif family == "lightgbm_classifier":
+        if not family_adapter_available(family):
+            raise ValueError("LightGBM is not available on this machine.")
+        from lightgbm import LGBMClassifier
+
+        params = {
+            "n_estimators": int(params.get("n_estimators", 240)),
+            "learning_rate": float(params.get("learning_rate", 0.06)),
+            "num_leaves": int(params.get("num_leaves", 31)),
+            "min_child_samples": int(params.get("min_child_samples", 20)),
+            "random_state": 42,
+            "n_jobs": 1,
+        }
+        if (class_count or 2) > 2:
+            params["objective"] = str(params.get("objective", "multiclass"))
+            params["num_class"] = int(params.get("num_class", class_count or 2))
+        estimator = LGBMClassifier(**params)
+    elif family == "tabpfn_classifier":
+        if not family_adapter_available(family):
+            raise ValueError("TabPFN is not available on this machine.")
+        module = importlib.import_module("tabpfn")
+        classifier_cls = getattr(module, "TabPFNClassifier", None)
+        if classifier_cls is None:
+            raise ValueError("TabPFNClassifier is not available in the installed tabpfn package.")
+        params = {"device": str(params.get("device", "cpu"))}
+        estimator = classifier_cls(**params)
+    else:
+        raise ValueError(f"Unsupported classification estimator family `{family}`.")
+    return PickledClassificationEstimatorSurrogate(
+        feature_columns=feature_columns,
+        target_column=target_column,
+        model_name=family,
+        estimator=estimator,
+        hyperparameters=dict(params),
+    )
 
 
 def build_regression_estimator_variants(
@@ -443,7 +648,7 @@ def _optional_regression_variants(
     target_column: str,
 ) -> list[dict[str, Any]]:
     variants: list[dict[str, Any]] = []
-    if importlib.util.find_spec("catboost") is not None:
+    if family_adapter_available("catboost_ensemble"):
         from catboost import CatBoostRegressor
 
         params = {"depth": 6, "iterations": 220, "learning_rate": 0.06, "loss_function": "RMSE", "verbose": False}
@@ -457,7 +662,7 @@ def _optional_regression_variants(
                 hyperparameters=params,
             )
         )
-    if importlib.util.find_spec("xgboost") is not None:
+    if family_adapter_available("xgboost_ensemble"):
         from xgboost import XGBRegressor
 
         params = {
@@ -480,7 +685,7 @@ def _optional_regression_variants(
                 hyperparameters=params,
             )
         )
-    if importlib.util.find_spec("lightgbm") is not None:
+    if family_adapter_available("lightgbm_ensemble"):
         from lightgbm import LGBMRegressor
 
         params = {"n_estimators": 240, "learning_rate": 0.06, "num_leaves": 31, "random_state": 42, "n_jobs": 1}
@@ -504,7 +709,7 @@ def _optional_classification_variants(
     class_count: int | None,
 ) -> list[dict[str, Any]]:
     variants: list[dict[str, Any]] = []
-    if importlib.util.find_spec("catboost") is not None:
+    if family_adapter_available("catboost_classifier"):
         from catboost import CatBoostClassifier
 
         params = {"depth": 6, "iterations": 220, "learning_rate": 0.06, "loss_function": "MultiClass" if (class_count or 2) > 2 else "Logloss", "verbose": False}
@@ -518,7 +723,7 @@ def _optional_classification_variants(
                 hyperparameters=params,
             )
         )
-    if importlib.util.find_spec("xgboost") is not None:
+    if family_adapter_available("xgboost_classifier"):
         from xgboost import XGBClassifier
 
         params = {
@@ -541,7 +746,7 @@ def _optional_classification_variants(
                 hyperparameters=params,
             )
         )
-    if importlib.util.find_spec("lightgbm") is not None:
+    if family_adapter_available("lightgbm_classifier"):
         from lightgbm import LGBMClassifier
 
         params = {"n_estimators": 240, "learning_rate": 0.06, "num_leaves": 31, "random_state": 42, "n_jobs": 1}
@@ -569,7 +774,7 @@ def _optional_tabpfn_classifier(
     feature_columns: list[str],
     target_column: str,
 ) -> dict[str, Any] | None:
-    if importlib.util.find_spec("tabpfn") is None:
+    if not family_adapter_available("tabpfn_classifier"):
         return None
     try:
         module = importlib.import_module("tabpfn")
@@ -639,4 +844,3 @@ def _minority_label(values: list[str]) -> str | None:
     if counts.empty:
         return None
     return str(counts.sort_values(kind="stable").index[0])
-

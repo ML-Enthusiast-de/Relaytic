@@ -644,6 +644,7 @@ def build_assist_audit_explanation(
     task_contract = dict(run_summary.get("task_contract", {}))
     benchmark_vs_deploy = dict(run_summary.get("benchmark_vs_deploy", {}))
     architecture = dict(run_summary.get("architecture", {}))
+    family_stack = dict(run_summary.get("family_stack", {}))
     architecture_imports = dict(run_summary.get("architecture_imports", {}))
     hpo = dict(run_summary.get("hpo", {}))
     next_step = dict(run_summary.get("next_step", {}))
@@ -728,6 +729,36 @@ def build_assist_audit_explanation(
             "candidate_family_matrix.json",
             "architecture_fit_report.json",
         ]
+    elif (
+        "eligible famil" in normalized
+        or "family eligib" in normalized
+        or "categorical strategy" in normalized
+        or (
+            "why not" in normalized
+            and any(token in normalized for token in ("catboost", "xgboost", "lightgbm", "tabpfn"))
+        )
+    ):
+        question_type = "family_eligibility"
+        requested_family = _extract_family_stack_family(normalized)
+        blocked_reasons = dict(family_stack.get("blocked_reasons_by_family", {}))
+        reasons = [
+            f"Relaytic marked `{int(family_stack.get('eligible_family_count', 0) or 0)}` family/families as eligible and `{int(family_stack.get('adapter_ready_family_count', 0) or 0)}` adapter-backed family/families as ready.",
+            f"Categorical strategy is `{_clean_text(family_stack.get('categorical_strategy')) or 'unknown'}` and probe tier one is `{', '.join(str(item) for item in family_stack.get('probe_tier_one_families', []) if str(item).strip()) or 'unknown'}`.",
+        ]
+        if requested_family:
+            if requested_family in {str(item) for item in family_stack.get("eligible_families", []) if str(item).strip()}:
+                reasons.append(f"`{requested_family}` stayed eligible in the current family stack and was considered by the router.")
+            elif requested_family in blocked_reasons:
+                reasons.append(f"`{requested_family}` was not live-eligible because: {blocked_reasons[requested_family]}")
+            else:
+                reasons.append(f"`{requested_family}` was not part of the current live-eligible family set on this run.")
+        evidence_refs = [
+            "family_readiness_report.json",
+            "family_eligibility_matrix.json",
+            "family_probe_policy.json",
+            "categorical_strategy_report.json",
+            "family_specialization_report.json",
+        ]
     elif "why not" in normalized:
         question_type = "why_not"
         reasons = [
@@ -789,6 +820,22 @@ def build_assist_audit_explanation(
         "actor_type": actor_type,
         "llm_enhanced": False,
     }
+
+
+def _extract_family_stack_family(normalized: str) -> str | None:
+    aliases = {
+        "catboost_classifier": {"catboost", "catboost classifier", "catboost_classifier"},
+        "catboost_ensemble": {"catboost regressor", "catboost_ensemble"},
+        "xgboost_classifier": {"xgboost", "xgboost classifier", "xgboost_classifier"},
+        "xgboost_ensemble": {"xgboost regressor", "xgboost_ensemble"},
+        "lightgbm_classifier": {"lightgbm", "lightgbm classifier", "lightgbm_classifier"},
+        "lightgbm_ensemble": {"lightgbm regressor", "lightgbm_ensemble"},
+        "tabpfn_classifier": {"tabpfn", "tabpfn classifier", "tabpfn_classifier"},
+    }
+    for family, family_aliases in aliases.items():
+        if any(alias in normalized for alias in family_aliases):
+            return family
+    return None
 
 
 def _extract_imported_architecture_name(normalized: str, architecture_imports: dict[str, Any]) -> str | None:

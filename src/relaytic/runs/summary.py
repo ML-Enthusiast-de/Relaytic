@@ -387,6 +387,12 @@ def build_run_summary(
     architecture_fit_report = dict(architecture_bundle.get("architecture_fit_report", {})) if isinstance(architecture_bundle.get("architecture_fit_report"), dict) else {}
     family_capability_matrix = dict(architecture_bundle.get("family_capability_matrix", {})) if isinstance(architecture_bundle.get("family_capability_matrix"), dict) else {}
     architecture_ablation_report = dict(architecture_bundle.get("architecture_ablation_report", {})) if isinstance(architecture_bundle.get("architecture_ablation_report"), dict) else {}
+    family_registry_extension = dict(architecture_bundle.get("family_registry_extension", {})) if isinstance(architecture_bundle.get("family_registry_extension"), dict) else {}
+    family_readiness_report = dict(architecture_bundle.get("family_readiness_report", {})) if isinstance(architecture_bundle.get("family_readiness_report"), dict) else {}
+    family_eligibility_matrix = dict(architecture_bundle.get("family_eligibility_matrix", {})) if isinstance(architecture_bundle.get("family_eligibility_matrix"), dict) else {}
+    family_probe_policy = dict(architecture_bundle.get("family_probe_policy", {})) if isinstance(architecture_bundle.get("family_probe_policy"), dict) else {}
+    categorical_strategy_report = dict(architecture_bundle.get("categorical_strategy_report", {})) if isinstance(architecture_bundle.get("categorical_strategy_report"), dict) else {}
+    family_specialization_report = dict(architecture_bundle.get("family_specialization_report", {})) if isinstance(architecture_bundle.get("family_specialization_report"), dict) else {}
     hpo_budget_contract = dict(hpo_bundle.get("hpo_budget_contract", {})) if isinstance(hpo_bundle.get("hpo_budget_contract"), dict) else {}
     architecture_search_space = dict(hpo_bundle.get("architecture_search_space", {})) if isinstance(hpo_bundle.get("architecture_search_space"), dict) else {}
     early_stopping_report = dict(hpo_bundle.get("early_stopping_report", {})) if isinstance(hpo_bundle.get("early_stopping_report"), dict) else {}
@@ -1171,6 +1177,41 @@ def build_run_summary(
                 if str(item).strip()
             ],
         },
+        "family_stack": {
+            "status": _clean_text(family_registry_extension.get("status")) or _clean_text(family_eligibility_matrix.get("status")),
+            "eligible_family_count": int(family_registry_extension.get("eligible_family_count", 0) or family_eligibility_matrix.get("eligible_family_count", 0) or 0),
+            "adapter_ready_family_count": int(family_registry_extension.get("adapter_ready_family_count", 0) or family_readiness_report.get("adapter_ready_family_count", 0) or 0),
+            "categorical_strategy": _clean_text(categorical_strategy_report.get("selected_strategy")),
+            "categorical_priority_families": [
+                str(item)
+                for item in family_specialization_report.get("categorical_priority_families", [])
+                if str(item).strip()
+            ],
+            "small_data_specialist_families": [
+                str(item)
+                for item in family_specialization_report.get("small_data_specialist_families", [])
+                if str(item).strip()
+            ],
+            "multiclass_widening_active": family_specialization_report.get("multiclass_widening_active"),
+            "rare_event_policy_active": family_specialization_report.get("rare_event_policy_active"),
+            "probe_tier_one_families": [
+                str(item)
+                for item in family_probe_policy.get("tier_one_families", [])
+                if str(item).strip()
+            ],
+            "eligible_families": [
+                str(item.get("family_id"))
+                for item in family_eligibility_matrix.get("rows", [])
+                if isinstance(item, dict) and item.get("eligible") and str(item.get("family_id", "")).strip()
+            ],
+            "blocked_reasons_by_family": {
+                str(item.get("family_id")): _clean_text(item.get("block_reason"))
+                for item in family_eligibility_matrix.get("rows", [])
+                if isinstance(item, dict)
+                and str(item.get("family_id", "")).strip()
+                and _clean_text(item.get("block_reason"))
+            },
+        },
         "architecture_imports": {
             "status": _clean_text(method_import_report.get("status")) or _clean_text(promotion_readiness_report.get("status")),
             "imported_family_count": int(method_import_report.get("imported_family_count", 0) or 0),
@@ -1466,6 +1507,12 @@ def build_run_summary(
             "architecture_fit_report_path": _path_if_exists(root / "architecture_fit_report.json"),
             "family_capability_matrix_path": _path_if_exists(root / "family_capability_matrix.json"),
             "architecture_ablation_report_path": _path_if_exists(root / "architecture_ablation_report.json"),
+            "family_registry_extension_path": _path_if_exists(root / "family_registry_extension.json"),
+            "family_readiness_report_path": _path_if_exists(root / "family_readiness_report.json"),
+            "family_eligibility_matrix_path": _path_if_exists(root / "family_eligibility_matrix.json"),
+            "family_probe_policy_path": _path_if_exists(root / "family_probe_policy.json"),
+            "categorical_strategy_report_path": _path_if_exists(root / "categorical_strategy_report.json"),
+            "family_specialization_report_path": _path_if_exists(root / "family_specialization_report.json"),
             "hpo_budget_contract_path": _path_if_exists(root / "hpo_budget_contract.json"),
             "architecture_search_space_path": _path_if_exists(root / "architecture_search_space.json"),
             "trial_ledger_path": _path_if_exists(root / "trial_ledger.jsonl"),

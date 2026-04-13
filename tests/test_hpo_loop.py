@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 
 from relaytic.modeling import train_surrogate_candidates
+from relaytic.modeling.hpo_loop import build_architecture_search_space, derive_hpo_budget_contract
 from relaytic.modeling.training import CandidateMetrics, _fit_hpo_family_candidates
 
 
@@ -126,6 +127,43 @@ def test_train_surrogate_candidates_warm_starts_from_prior_trial_ledger(tmp_path
     warm_start_report = json.loads((run_dir / "warm_start_transfer_report.json").read_text(encoding="utf-8"))
     assert warm_start_report["used"] is True
     assert "logistic_regression" in warm_start_report["imported_families"]
+
+
+def test_hpo_budget_contract_and_search_space_include_first_class_optional_families(
+    tmp_path: Path,
+) -> None:
+    budget_contract = derive_hpo_budget_contract(
+        run_dir=tmp_path,
+        task_type="multiclass_classification",
+        row_count=900,
+        requested_family="auto",
+        preferred_candidate_order=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "xgboost_classifier",
+            "lightgbm_classifier",
+            "extra_trees_classifier",
+        ],
+        available_families=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "xgboost_classifier",
+            "lightgbm_classifier",
+            "extra_trees_classifier",
+        ],
+    )
+    search_space = build_architecture_search_space(
+        task_type="multiclass_classification",
+        selected_families=[str(item) for item in budget_contract["selected_families"]],
+    )
+
+    assert budget_contract["selected_families"][0] == "catboost_classifier"
+    assert set(search_space["families"][0].keys()) >= {"family", "parameters", "default_anchor"}
+    assert {
+        "catboost_classifier",
+        "hist_gradient_boosting_classifier",
+        "xgboost_classifier",
+    }.issubset({str(item["family"]) for item in search_space["families"]})
 
 
 def _binary_frame(*, row_count: int) -> pd.DataFrame:

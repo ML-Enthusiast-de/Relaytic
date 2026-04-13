@@ -35,10 +35,16 @@ SEARCHABLE_FAMILIES = {
     "boosted_tree_ensemble",
     "hist_gradient_boosting_ensemble",
     "extra_trees_ensemble",
+    "catboost_ensemble",
+    "xgboost_ensemble",
+    "lightgbm_ensemble",
     "bagged_tree_classifier",
     "boosted_tree_classifier",
     "hist_gradient_boosting_classifier",
     "extra_trees_classifier",
+    "catboost_classifier",
+    "xgboost_classifier",
+    "lightgbm_classifier",
 }
 
 
@@ -300,11 +306,47 @@ def _select_hpo_families(
     ordered = [family for family in preferred_candidate_order if family in available]
     if not ordered:
         if task_type in {"binary_classification", "fraud_detection", "anomaly_detection"}:
-            ordered = [family for family in ["logistic_regression", "hist_gradient_boosting_classifier", "extra_trees_classifier", "boosted_tree_classifier"] if family in available]
+            ordered = [
+                family
+                for family in [
+                    "logistic_regression",
+                    "catboost_classifier",
+                    "hist_gradient_boosting_classifier",
+                    "extra_trees_classifier",
+                    "xgboost_classifier",
+                    "lightgbm_classifier",
+                    "boosted_tree_classifier",
+                ]
+                if family in available
+            ]
         elif task_type == "multiclass_classification":
-            ordered = [family for family in ["hist_gradient_boosting_classifier", "extra_trees_classifier", "boosted_tree_classifier", "bagged_tree_classifier"] if family in available]
+            ordered = [
+                family
+                for family in [
+                    "catboost_classifier",
+                    "hist_gradient_boosting_classifier",
+                    "extra_trees_classifier",
+                    "xgboost_classifier",
+                    "lightgbm_classifier",
+                    "boosted_tree_classifier",
+                    "bagged_tree_classifier",
+                ]
+                if family in available
+            ]
         else:
-            ordered = [family for family in ["hist_gradient_boosting_ensemble", "extra_trees_ensemble", "boosted_tree_ensemble", "linear_ridge"] if family in available]
+            ordered = [
+                family
+                for family in [
+                    "catboost_ensemble",
+                    "hist_gradient_boosting_ensemble",
+                    "extra_trees_ensemble",
+                    "xgboost_ensemble",
+                    "lightgbm_ensemble",
+                    "boosted_tree_ensemble",
+                    "linear_ridge",
+                ]
+                if family in available
+            ]
     return ordered[:3]
 
 
@@ -356,6 +398,44 @@ def _family_search_space(*, family: str) -> dict[str, Any] | None:
                 "min_samples_leaf": [1, 2, 3, 4, 6, 8],
             },
         },
+        "catboost_ensemble": {
+            "default_anchor": {"depth": 6, "iterations": 220, "learning_rate": 0.06},
+            "parameters": {
+                "depth": [4, 6, 8],
+                "iterations": [160, 220, 320],
+                "learning_rate": [0.03, 0.06, 0.10],
+            },
+        },
+        "xgboost_ensemble": {
+            "default_anchor": {
+                "n_estimators": 240,
+                "max_depth": 6,
+                "learning_rate": 0.06,
+                "subsample": 0.9,
+                "colsample_bytree": 0.9,
+            },
+            "parameters": {
+                "n_estimators": [160, 240, 320],
+                "max_depth": [4, 6, 8],
+                "learning_rate": [0.03, 0.06, 0.10],
+                "subsample": [0.8, 0.9, 1.0],
+                "colsample_bytree": [0.8, 0.9, 1.0],
+            },
+        },
+        "lightgbm_ensemble": {
+            "default_anchor": {
+                "n_estimators": 240,
+                "learning_rate": 0.06,
+                "num_leaves": 31,
+                "min_child_samples": 20,
+            },
+            "parameters": {
+                "n_estimators": [160, 240, 320],
+                "learning_rate": [0.03, 0.06, 0.10],
+                "num_leaves": [31, 63, 127],
+                "min_child_samples": [10, 20, 30],
+            },
+        },
         "bagged_tree_classifier": {
             "default_anchor": {"n_estimators": 12, "max_depth": 4, "min_leaf": 6},
             "parameters": {
@@ -388,6 +468,44 @@ def _family_search_space(*, family: str) -> dict[str, Any] | None:
                 "n_estimators": [80, 120, 160, 220, 300],
                 "max_depth": [None, 8, 12, 18, 24],
                 "min_samples_leaf": [1, 2, 3, 4, 6, 8],
+            },
+        },
+        "catboost_classifier": {
+            "default_anchor": {"depth": 6, "iterations": 220, "learning_rate": 0.06},
+            "parameters": {
+                "depth": [4, 6, 8],
+                "iterations": [160, 220, 320],
+                "learning_rate": [0.03, 0.06, 0.10],
+            },
+        },
+        "xgboost_classifier": {
+            "default_anchor": {
+                "n_estimators": 240,
+                "max_depth": 6,
+                "learning_rate": 0.06,
+                "subsample": 0.9,
+                "colsample_bytree": 0.9,
+            },
+            "parameters": {
+                "n_estimators": [160, 240, 320],
+                "max_depth": [4, 6, 8],
+                "learning_rate": [0.03, 0.06, 0.10],
+                "subsample": [0.8, 0.9, 1.0],
+                "colsample_bytree": [0.8, 0.9, 1.0],
+            },
+        },
+        "lightgbm_classifier": {
+            "default_anchor": {
+                "n_estimators": 240,
+                "learning_rate": 0.06,
+                "num_leaves": 31,
+                "min_child_samples": 20,
+            },
+            "parameters": {
+                "n_estimators": [160, 240, 320],
+                "learning_rate": [0.03, 0.06, 0.10],
+                "num_leaves": [31, 63, 127],
+                "min_child_samples": [10, 20, 30],
             },
         },
     }
@@ -431,10 +549,16 @@ def _family_variant_prefix(family: str) -> str:
         "boosted_tree_ensemble": "boosted",
         "hist_gradient_boosting_ensemble": "hist",
         "extra_trees_ensemble": "extra",
+        "catboost_ensemble": "catboost",
+        "xgboost_ensemble": "xgboost",
+        "lightgbm_ensemble": "lightgbm",
         "bagged_tree_classifier": "bagged_classifier",
         "boosted_tree_classifier": "boosted_classifier",
         "hist_gradient_boosting_classifier": "hist_classifier",
         "extra_trees_classifier": "extra_classifier",
+        "catboost_classifier": "catboost_classifier",
+        "xgboost_classifier": "xgboost_classifier",
+        "lightgbm_classifier": "lightgbm_classifier",
     }
     return mapping.get(family, family.replace("_ensemble", "").replace("_classifier", "_classifier"))
 

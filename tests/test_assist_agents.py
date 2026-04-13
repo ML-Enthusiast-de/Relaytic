@@ -151,6 +151,40 @@ def test_build_assist_audit_explanation_answers_why_not_imported_architecture() 
     assert "promotion_readiness_report.json" in audit["evidence_refs"]
 
 
+def test_build_assist_audit_explanation_answers_family_eligibility_questions() -> None:
+    audit = build_assist_audit_explanation(
+        message="why not catboost here and what families were eligible?",
+        actor_type="agent",
+        run_summary={
+            "family_stack": {
+                "eligible_family_count": 5,
+                "adapter_ready_family_count": 2,
+                "categorical_strategy": "encoded_numeric_fallback",
+                "probe_tier_one_families": [
+                    "hist_gradient_boosting_classifier",
+                    "extra_trees_classifier",
+                    "boosted_tree_classifier",
+                ],
+                "eligible_families": [
+                    "hist_gradient_boosting_classifier",
+                    "extra_trees_classifier",
+                    "boosted_tree_classifier",
+                    "logistic_regression",
+                    "xgboost_classifier",
+                ],
+                "blocked_reasons_by_family": {
+                    "catboost_classifier": "Optional adapter `catboost` is unavailable on this machine, so Relaytic will fall back cleanly."
+                },
+            }
+        },
+    )
+
+    assert audit["question_type"] == "family_eligibility"
+    assert "encoded_numeric_fallback" in audit["answer"]
+    assert "catboost_classifier" in audit["answer"]
+    assert "family_eligibility_matrix.json" in audit["evidence_refs"]
+
+
 def test_local_advisor_can_rewrite_human_audit_answer(monkeypatch, tmp_path: Path) -> None:
     import relaytic.intelligence as intelligence_pkg
     import relaytic.intelligence.backends as backends_pkg

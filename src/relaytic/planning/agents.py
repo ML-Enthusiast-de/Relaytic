@@ -134,6 +134,9 @@ class StrategistAgent:
         )
         architecture_router_report = dict(architecture_bundle.get("architecture_router_report") or {})
         architecture_fit_report = dict(architecture_bundle.get("architecture_fit_report") or {})
+        categorical_strategy_report = dict(architecture_bundle.get("categorical_strategy_report") or {})
+        family_probe_policy = dict(architecture_bundle.get("family_probe_policy") or {})
+        family_specialization_report = dict(architecture_bundle.get("family_specialization_report") or {})
         candidate_order = [
             str(item).strip()
             for item in architecture_router_report.get("candidate_order", [])
@@ -193,6 +196,17 @@ class StrategistAgent:
             )
             if isinstance(architecture_fit_report.get("fit_rows"), list) and architecture_fit_report.get("fit_rows")
             else None,
+            "architecture_categorical_strategy": _optional_str(
+                categorical_strategy_report.get("selected_strategy")
+            ),
+            "architecture_probe_tier_one_families": [
+                str(item)
+                for item in family_probe_policy.get("tier_one_families", [])
+                if str(item).strip()
+            ],
+            "architecture_eligible_family_count": int(
+                family_specialization_report.get("eligible_family_count", len(candidate_order)) or len(candidate_order)
+            ),
         }
         guardrails = _dedupe_strings(
             _string_list(feature_strategy_profile.get("guardrails"))

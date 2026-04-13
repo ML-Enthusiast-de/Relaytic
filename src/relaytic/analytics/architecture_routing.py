@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-import importlib.util
 import json
 from pathlib import Path
 from typing import Any
 
 from relaytic.core.json_utils import write_json
+from relaytic.modeling.estimator_adapters import (
+    family_adapter_available,
+    family_adapter_module,
+    family_adapter_version,
+)
 
 from .task_detection import is_classification_task
 
@@ -19,6 +23,12 @@ CANDIDATE_FAMILY_MATRIX_SCHEMA_VERSION = "relaytic.candidate_family_matrix.v1"
 ARCHITECTURE_FIT_REPORT_SCHEMA_VERSION = "relaytic.architecture_fit_report.v1"
 FAMILY_CAPABILITY_MATRIX_SCHEMA_VERSION = "relaytic.family_capability_matrix.v1"
 ARCHITECTURE_ABLATION_REPORT_SCHEMA_VERSION = "relaytic.architecture_ablation_report.v1"
+FAMILY_REGISTRY_EXTENSION_SCHEMA_VERSION = "relaytic.family_registry_extension.v1"
+FAMILY_READINESS_REPORT_SCHEMA_VERSION = "relaytic.family_readiness_report.v1"
+FAMILY_ELIGIBILITY_MATRIX_SCHEMA_VERSION = "relaytic.family_eligibility_matrix.v1"
+FAMILY_PROBE_POLICY_SCHEMA_VERSION = "relaytic.family_probe_policy.v1"
+CATEGORICAL_STRATEGY_REPORT_SCHEMA_VERSION = "relaytic.categorical_strategy_report.v1"
+FAMILY_SPECIALIZATION_REPORT_SCHEMA_VERSION = "relaytic.family_specialization_report.v1"
 
 
 ARCHITECTURE_ROUTING_FILENAMES = {
@@ -28,17 +38,32 @@ ARCHITECTURE_ROUTING_FILENAMES = {
     "architecture_fit_report": "architecture_fit_report.json",
     "family_capability_matrix": "family_capability_matrix.json",
     "architecture_ablation_report": "architecture_ablation_report.json",
+    "family_registry_extension": "family_registry_extension.json",
+    "family_readiness_report": "family_readiness_report.json",
+    "family_eligibility_matrix": "family_eligibility_matrix.json",
+    "family_probe_policy": "family_probe_policy.json",
+    "categorical_strategy_report": "categorical_strategy_report.json",
+    "family_specialization_report": "family_specialization_report.json",
 }
 
 
-_OPTIONAL_ADAPTER_MODULES = {
-    "catboost_classifier": "catboost",
-    "catboost_ensemble": "catboost",
-    "xgboost_classifier": "xgboost",
-    "xgboost_ensemble": "xgboost",
-    "lightgbm_classifier": "lightgbm",
-    "lightgbm_ensemble": "lightgbm",
-    "tabpfn_classifier": "tabpfn",
+SEARCHABLE_FAMILY_STACK = {
+    "linear_ridge",
+    "logistic_regression",
+    "bagged_tree_ensemble",
+    "boosted_tree_ensemble",
+    "hist_gradient_boosting_ensemble",
+    "extra_trees_ensemble",
+    "catboost_ensemble",
+    "xgboost_ensemble",
+    "lightgbm_ensemble",
+    "bagged_tree_classifier",
+    "boosted_tree_classifier",
+    "hist_gradient_boosting_classifier",
+    "extra_trees_classifier",
+    "catboost_classifier",
+    "xgboost_classifier",
+    "lightgbm_classifier",
 }
 
 
@@ -393,6 +418,149 @@ def build_architecture_routing_artifacts(
             sequence_shadow_ready=sequence_shadow_ready,
         ),
     }
+    fit_row_by_family = {
+        str(item.get("family_id", "")).strip(): dict(item)
+        for item in fit_rows
+        if str(item.get("family_id", "")).strip()
+    }
+    categorical_strategy_report = _build_categorical_strategy_report(
+        generated_at=generated_at,
+        task_type=task_type,
+        categorical_columns=categorical_columns,
+        categorical_ratio=categorical_ratio,
+        candidate_order=candidate_order,
+        registry_rows=registry_rows,
+        class_count=class_count,
+    )
+    family_probe_policy = _build_family_probe_policy(
+        generated_at=generated_at,
+        candidate_order=candidate_order,
+        task_type=task_type,
+        categorical_strategy=str(categorical_strategy_report.get("selected_strategy") or ""),
+        registry_rows=registry_rows,
+    )
+    family_specialization_report = _build_family_specialization_report(
+        generated_at=generated_at,
+        task_type=task_type,
+        row_count=row_count,
+        feature_count=feature_count,
+        categorical_ratio=categorical_ratio,
+        class_count=class_count,
+        minority_fraction=minority_fraction,
+        candidate_order=candidate_order,
+    )
+    family_readiness_report = {
+        "schema_version": FAMILY_READINESS_REPORT_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "ok",
+        "adapter_ready_family_count": sum(
+            1
+            for row in registry_rows
+            if row.get("family_role") == "optional_adapter" and row.get("availability_status") == "available"
+        ),
+        "rows": [
+            {
+                "family_id": row["family_id"],
+                "family_title": row["family_title"],
+                "family_role": row["family_role"],
+                "availability_status": row["availability_status"],
+                "adapter_module": row.get("adapter_module"),
+                "adapter_version": row.get("adapter_version"),
+                "training_support": row["training_support"],
+                "inference_support": row["inference_support"],
+                "live_candidate": row["live_candidate"],
+                "readiness_reason": _family_readiness_reason(row=row),
+            }
+            for row in registry_rows
+        ],
+    }
+    family_eligibility_matrix = {
+        "schema_version": FAMILY_ELIGIBILITY_MATRIX_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "ok" if registry_rows else "partial",
+        "eligible_family_count": len(candidate_order),
+        "rows": [
+            {
+                "family_id": row["family_id"],
+                "family_title": row["family_title"],
+                "family_role": row["family_role"],
+                "availability_status": row["availability_status"],
+                "eligible": row["family_id"] in candidate_order,
+                "live_candidate": row["live_candidate"],
+                "searchable": bool(row["training_support"]) and row["family_id"] in SEARCHABLE_FAMILY_STACK,
+                "probe_tier": _family_probe_tier(
+                    family_id=row["family_id"],
+                    tier_one=[str(item) for item in family_probe_policy.get("tier_one_families", []) if str(item).strip()],
+                    tier_two=[str(item) for item in family_probe_policy.get("tier_two_families", []) if str(item).strip()],
+                ),
+                "categorical_priority": row["family_id"] in {
+                    str(item)
+                    for item in family_specialization_report.get("categorical_priority_families", [])
+                    if str(item).strip()
+                },
+                "small_data_specialist": row["family_id"] in {
+                    str(item)
+                    for item in family_specialization_report.get("small_data_specialist_families", [])
+                    if str(item).strip()
+                },
+                "multiclass_specialist": bool(class_count >= 3 and row["family_id"] in {
+                    "hist_gradient_boosting_classifier",
+                    "extra_trees_classifier",
+                    "catboost_classifier",
+                    "xgboost_classifier",
+                    "lightgbm_classifier",
+                    "tabpfn_classifier",
+                }),
+                "rare_event_specialist": bool(
+                    ((minority_fraction is not None and minority_fraction <= 0.20) or task_type in {"fraud_detection", "anomaly_detection"})
+                    and row["family_id"] in {
+                        "boosted_tree_classifier",
+                        "hist_gradient_boosting_classifier",
+                        "catboost_classifier",
+                        "xgboost_classifier",
+                        "lightgbm_classifier",
+                        "lagged_tree_classifier",
+                    }
+                ),
+                "block_reason": _clean_text(dict(fit_row_by_family.get(row["family_id"], {})).get("exclusion_reason"))
+                or (None if row["family_id"] in candidate_order else _family_readiness_reason(row=row)),
+            }
+            for row in registry_rows
+        ],
+    }
+    family_registry_extension = {
+        "schema_version": FAMILY_REGISTRY_EXTENSION_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "ok",
+        "task_type": task_type,
+        "data_mode": data_mode,
+        "first_class_builtin_families": [
+            row["family_id"]
+            for row in registry_rows
+            if row.get("family_role") == "deterministic_builtin" and row.get("training_support")
+        ],
+        "first_class_optional_adapter_families": [
+            row["family_id"]
+            for row in registry_rows
+            if row.get("family_role") == "optional_adapter" and row.get("availability_status") == "available"
+        ],
+        "shadow_candidate_families": [
+            row["family_id"]
+            for row in registry_rows
+            if row.get("family_role") == "shadow_candidate"
+        ],
+        "eligible_family_count": len(candidate_order),
+        "adapter_ready_family_count": int(family_readiness_report.get("adapter_ready_family_count", 0) or 0),
+        "searchable_family_count": sum(
+            1
+            for row in registry_rows
+            if bool(row.get("training_support")) and row.get("family_id") in SEARCHABLE_FAMILY_STACK
+        ),
+        "summary": (
+            f"Relaytic widened the first-class family stack to `{len(candidate_order)}` eligible live family/families "
+            f"with categorical strategy `{categorical_strategy_report.get('selected_strategy')}`."
+        ),
+    }
     return {
         "architecture_registry": architecture_registry,
         "architecture_router_report": architecture_router_report,
@@ -400,6 +568,12 @@ def build_architecture_routing_artifacts(
         "architecture_fit_report": architecture_fit_report,
         "family_capability_matrix": family_capability_matrix,
         "architecture_ablation_report": architecture_ablation_report,
+        "family_registry_extension": family_registry_extension,
+        "family_readiness_report": family_readiness_report,
+        "family_eligibility_matrix": family_eligibility_matrix,
+        "family_probe_policy": family_probe_policy,
+        "categorical_strategy_report": categorical_strategy_report,
+        "family_specialization_report": family_specialization_report,
     }
 
 
@@ -462,8 +636,9 @@ def _availability_status(*, family_id: str, sequence_shadow_ready: bool) -> dict
             "inference_support": False,
             "live_candidate": False,
             "adapter_module": None,
+            "adapter_version": None,
         }
-    adapter_module = _OPTIONAL_ADAPTER_MODULES.get(family_id)
+    adapter_module = family_adapter_module(family_id)
     if adapter_module is None:
         return {
             "availability_status": "available",
@@ -471,14 +646,16 @@ def _availability_status(*, family_id: str, sequence_shadow_ready: bool) -> dict
             "inference_support": True,
             "live_candidate": True,
             "adapter_module": None,
+            "adapter_version": None,
         }
-    available = importlib.util.find_spec(adapter_module) is not None
+    available = family_adapter_available(family_id)
     return {
         "availability_status": "available" if available else "unavailable",
         "training_support": available,
         "inference_support": available,
         "live_candidate": available,
         "adapter_module": adapter_module,
+        "adapter_version": family_adapter_version(family_id) if available else None,
     }
 
 
@@ -512,6 +689,12 @@ def _score_family(
     if data_mode != "time_series" and row["time_series_level"] == "sequence":
         return -500.0, ["Sequence family rejected for a static table."], {"sequence_static_penalty": -500.0}, (
             "Relaytic rejected this sequence family because the task contract does not prove ordered temporal structure."
+        )
+    if family_id == "tabpfn_classifier" and (
+        data_mode == "time_series" or row_count > 3000 or feature_count > 128 or (class_count and class_count > 10)
+    ):
+        return -220.0, ["TabPFN live routing deferred to a better small-data fit window."], {"tabpfn_fit_window_penalty": -220.0}, (
+            "Relaytic kept TabPFN out of the live candidate set because the current task is outside the preferred small-data static classification window."
         )
     score = _factor(factor_scores, "task_base", _base_score(family_id=family_id, task_type=task_type, data_mode=data_mode))
     if row_count <= 400 and family_id in {"linear_ridge", "logistic_regression"}:
@@ -738,6 +921,148 @@ def _ablation_summary(
     return (
         f"Relaytic widened the static-table family set beyond the old tree defaults and currently leans toward `{recommended_primary_family or 'no live family'}`."
     )
+
+
+def _build_categorical_strategy_report(
+    *,
+    generated_at: str,
+    task_type: str,
+    categorical_columns: list[str],
+    categorical_ratio: float,
+    candidate_order: list[str],
+    registry_rows: list[dict[str, Any]],
+    class_count: int,
+) -> dict[str, Any]:
+    relevant_catboost_family = "catboost_classifier" if is_classification_task(task_type) else "catboost_ensemble"
+    relevant_hist_family = "hist_gradient_boosting_classifier" if is_classification_task(task_type) else "hist_gradient_boosting_ensemble"
+    relevant_extra_family = "extra_trees_classifier" if is_classification_task(task_type) else "extra_trees_ensemble"
+    available_families = {str(row.get("family_id")) for row in registry_rows if row.get("availability_status") == "available"}
+    if categorical_ratio >= 0.22 and relevant_catboost_family in available_families:
+        selected_strategy = "categorical_native_preferred"
+        summary = "Relaytic prefers a categorical-native family because the dataset is materially mixed-type and the adapter is available."
+    elif categorical_columns:
+        selected_strategy = "encoded_numeric_fallback"
+        summary = "Relaytic detected categorical structure but is falling back to generic non-linear families because no categorical-native live family is available."
+    else:
+        selected_strategy = "numeric_or_low_categorical"
+        summary = "Relaytic sees a mostly numeric table, so it stays with the general tabular family ladder."
+    return {
+        "schema_version": CATEGORICAL_STRATEGY_REPORT_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "ok",
+        "selected_strategy": selected_strategy,
+        "categorical_column_count": len(categorical_columns),
+        "categorical_ratio": round(categorical_ratio, 4),
+        "categorical_native_family": relevant_catboost_family if relevant_catboost_family in available_families else None,
+        "general_fallback_families": [
+            family
+            for family in [relevant_hist_family, relevant_extra_family]
+            if family in candidate_order or family in available_families
+        ],
+        "multiclass_context": bool(class_count >= 3),
+        "summary": summary,
+    }
+
+
+def _build_family_probe_policy(
+    *,
+    generated_at: str,
+    candidate_order: list[str],
+    task_type: str,
+    categorical_strategy: str,
+    registry_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    tier_one = [str(item) for item in candidate_order[:4] if str(item).strip()]
+    tier_two = [str(item) for item in candidate_order[4:7] if str(item).strip()]
+    deterministic_floor = [
+        row["family_id"]
+        for row in registry_rows
+        if row.get("family_role") == "deterministic_builtin" and row.get("training_support")
+    ]
+    return {
+        "schema_version": FAMILY_PROBE_POLICY_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "ok" if candidate_order else "partial",
+        "task_type": task_type,
+        "categorical_strategy": categorical_strategy,
+        "tier_one_families": tier_one,
+        "tier_two_families": tier_two,
+        "deterministic_floor_families": deterministic_floor[:6],
+        "searchable_probe_families": [
+            family
+            for family in candidate_order
+            if family in SEARCHABLE_FAMILY_STACK
+        ][:6],
+        "summary": (
+            f"Relaytic will probe `{len(tier_one)}` tier-one family/families first and keep `{len(deterministic_floor[:6])}` deterministic floor family/families available for fallback."
+        ),
+    }
+
+
+def _build_family_specialization_report(
+    *,
+    generated_at: str,
+    task_type: str,
+    row_count: int,
+    feature_count: int,
+    categorical_ratio: float,
+    class_count: int,
+    minority_fraction: float | None,
+    candidate_order: list[str],
+) -> dict[str, Any]:
+    categorical_priority_families = [
+        family
+        for family in candidate_order
+        if family in {"catboost_classifier", "catboost_ensemble"}
+    ][:2] if categorical_ratio >= 0.22 else []
+    small_data_specialist_families = [
+        family
+        for family in candidate_order
+        if family == "tabpfn_classifier"
+    ][:1] if is_classification_task(task_type) and row_count <= 3000 and feature_count <= 128 else []
+    rare_event_policy_active = bool(
+        (minority_fraction is not None and minority_fraction <= 0.20)
+        or task_type in {"fraud_detection", "anomaly_detection"}
+    )
+    return {
+        "schema_version": FAMILY_SPECIALIZATION_REPORT_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "ok",
+        "multiclass_widening_active": bool(is_classification_task(task_type) and class_count >= 3),
+        "rare_event_policy_active": rare_event_policy_active,
+        "categorical_priority_families": categorical_priority_families,
+        "small_data_specialist_families": small_data_specialist_families,
+        "eligible_family_count": len(candidate_order),
+        "summary": (
+            f"Relaytic specialization flags: multiclass widening={is_classification_task(task_type) and class_count >= 3}, "
+            f"rare-event policy={rare_event_policy_active}, categorical-priority={bool(categorical_priority_families)}, "
+            f"small-data specialist={bool(small_data_specialist_families)}."
+        ),
+    }
+
+
+def _family_readiness_reason(*, row: dict[str, Any]) -> str:
+    family_id = str(row.get("family_id", "")).strip()
+    availability_status = str(row.get("availability_status", "")).strip()
+    if family_id in {"sequence_lstm_candidate", "temporal_transformer_candidate"}:
+        if availability_status == "shadow_only":
+            return "Sequence-native family is shadow-ready but intentionally excluded from the live router."
+        return "Sequence-native family is not ready for live routing on this task."
+    if row.get("family_role") == "optional_adapter":
+        module_name = _clean_text(row.get("adapter_module")) or "unknown_adapter"
+        if availability_status == "available":
+            version = _clean_text(row.get("adapter_version"))
+            return f"Optional adapter `{module_name}` is available{f' at version `{version}`' if version else ''}."
+        return f"Optional adapter `{module_name}` is unavailable on this machine, so Relaytic will fall back cleanly."
+    return "Deterministic local family is available without an external adapter."
+
+
+def _family_probe_tier(*, family_id: str, tier_one: list[str], tier_two: list[str]) -> str:
+    if family_id in tier_one:
+        return "tier_one"
+    if family_id in tier_two:
+        return "tier_two"
+    return "excluded"
 
 
 def _mean_missingness(dataset_profile: dict[str, Any]) -> float:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import relaytic.analytics.architecture_routing as routing_module
 from relaytic.analytics import build_architecture_routing_artifacts
 
 
@@ -233,3 +234,160 @@ def test_architecture_router_keeps_multiclass_task_fit_ahead_of_memory_bias() ->
         "lightgbm_classifier",
         "tabpfn_classifier",
     }
+
+
+def test_family_stack_prefers_categorical_native_when_adapter_available(monkeypatch) -> None:
+    def _available(family_id: str) -> bool:
+        if family_id.startswith("catboost"):
+            return True
+        if family_id.startswith(("xgboost", "lightgbm", "tabpfn")):
+            return False
+        return True
+
+    monkeypatch.setattr(routing_module, "family_adapter_available", _available)
+    monkeypatch.setattr(routing_module, "family_adapter_version", lambda family_id: "1.2.3" if family_id.startswith("catboost") else None)
+
+    artifacts = build_architecture_routing_artifacts(
+        investigation_bundle={
+            "dataset_profile": {
+                "row_count": 720,
+                "column_count": 7,
+                "data_mode": "steady_state",
+                "numeric_columns": ["amount", "score", "tenure"],
+                "categorical_columns": ["segment", "region"],
+            },
+            "optimization_profile": {},
+        },
+        planning_bundle={
+            "plan": {
+                "task_profile": {
+                    "task_type": "binary_classification",
+                    "data_mode": "steady_state",
+                    "row_count": 720,
+                    "class_count": 2,
+                    "minority_class_fraction": 0.18,
+                },
+                "feature_columns": ["amount", "score", "tenure", "segment", "region"],
+                "target_column": "accepted",
+            }
+        },
+    )
+
+    categorical = artifacts["categorical_strategy_report"]
+    router = artifacts["architecture_router_report"]
+    readiness_rows = {
+        row["family_id"]: row
+        for row in artifacts["family_readiness_report"]["rows"]
+    }
+
+    assert categorical["selected_strategy"] == "categorical_native_preferred"
+    assert router["candidate_order"].index("catboost_classifier") < router["candidate_order"].index("hist_gradient_boosting_classifier")
+    assert readiness_rows["catboost_classifier"]["adapter_version"] == "1.2.3"
+
+
+def test_family_stack_falls_back_cleanly_without_optional_adapters(monkeypatch) -> None:
+    monkeypatch.setattr(
+        routing_module,
+        "family_adapter_available",
+        lambda family_id: not family_id.startswith(("catboost", "xgboost", "lightgbm", "tabpfn")),
+    )
+    monkeypatch.setattr(routing_module, "family_adapter_version", lambda _family_id: None)
+
+    artifacts = build_architecture_routing_artifacts(
+        investigation_bundle={
+            "dataset_profile": {
+                "row_count": 540,
+                "column_count": 6,
+                "data_mode": "steady_state",
+                "numeric_columns": ["amount", "score", "tenure"],
+                "categorical_columns": ["segment"],
+            },
+            "optimization_profile": {},
+        },
+        planning_bundle={
+            "plan": {
+                "task_profile": {
+                    "task_type": "binary_classification",
+                    "data_mode": "steady_state",
+                    "row_count": 540,
+                    "class_count": 2,
+                    "minority_class_fraction": 0.24,
+                },
+                "feature_columns": ["amount", "score", "tenure", "segment"],
+                "target_column": "accepted",
+            }
+        },
+    )
+
+    categorical = artifacts["categorical_strategy_report"]
+    readiness_rows = {
+        row["family_id"]: row
+        for row in artifacts["family_readiness_report"]["rows"]
+    }
+    eligibility_rows = {
+        row["family_id"]: row
+        for row in artifacts["family_eligibility_matrix"]["rows"]
+    }
+
+    assert categorical["selected_strategy"] == "encoded_numeric_fallback"
+    assert readiness_rows["catboost_classifier"]["availability_status"] == "unavailable"
+    assert eligibility_rows["catboost_classifier"]["eligible"] is False
+    assert artifacts["architecture_router_report"]["candidate_order"][0] in {
+        "hist_gradient_boosting_classifier",
+        "extra_trees_classifier",
+        "boosted_tree_classifier",
+        "logistic_regression",
+    }
+
+
+def test_family_stack_widens_multiclass_eligibility(monkeypatch) -> None:
+    monkeypatch.setattr(
+        routing_module,
+        "family_adapter_available",
+        lambda family_id: family_id not in {"sequence_lstm_candidate", "temporal_transformer_candidate"},
+    )
+    monkeypatch.setattr(routing_module, "family_adapter_version", lambda _family_id: "test-version")
+
+    artifacts = build_architecture_routing_artifacts(
+        investigation_bundle={
+            "dataset_profile": {
+                "row_count": 480,
+                "column_count": 9,
+                "data_mode": "steady_state",
+                "numeric_columns": ["length", "width", "density", "roundness"],
+                "categorical_columns": ["farm", "color_band"],
+            },
+            "optimization_profile": {},
+        },
+        planning_bundle={
+            "plan": {
+                "task_profile": {
+                    "task_type": "multiclass_classification",
+                    "data_mode": "steady_state",
+                    "row_count": 480,
+                    "class_count": 4,
+                    "minority_class_fraction": 0.16,
+                },
+                "feature_columns": ["length", "width", "density", "roundness", "farm", "color_band"],
+                "target_column": "bean_class",
+            }
+        },
+    )
+
+    specialization = artifacts["family_specialization_report"]
+    eligible_rows = {
+        row["family_id"]: row
+        for row in artifacts["family_eligibility_matrix"]["rows"]
+        if row["eligible"]
+    }
+
+    assert specialization["multiclass_widening_active"] is True
+    assert {
+        "hist_gradient_boosting_classifier",
+        "extra_trees_classifier",
+        "catboost_classifier",
+        "xgboost_classifier",
+        "lightgbm_classifier",
+        "tabpfn_classifier",
+    }.issubset(set(eligible_rows))
+    assert artifacts["family_eligibility_matrix"]["eligible_family_count"] >= 6

@@ -12,12 +12,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import (
-    ExtraTreesClassifier,
-    ExtraTreesRegressor,
-    HistGradientBoostingClassifier,
-    HistGradientBoostingRegressor,
-)
 
 from relaytic.analytics.task_detection import assess_task_profile, is_classification_task
 from relaytic.core.json_utils import write_json
@@ -35,10 +29,11 @@ from .classifiers import (
     LogisticClassificationSurrogate,
 )
 from .estimator_adapters import (
-    PickledClassificationEstimatorSurrogate,
-    PickledRegressionEstimatorSurrogate,
+    build_classification_estimator_surrogate,
     build_classification_estimator_variants,
+    build_regression_estimator_surrogate,
     build_regression_estimator_variants,
+    family_adapter_available,
 )
 from .evaluation import classification_metrics, regression_metrics
 from .feature_pipeline import prepare_split_safe_feature_frames
@@ -122,6 +117,24 @@ _CLASSIFICATION_ADAPTER_FAMILIES = {
     "lightgbm_classifier",
     "tabpfn_classifier",
 }
+
+
+def _ordered_available_hpo_families(
+    *,
+    preferred_candidate_order: list[str] | None,
+    candidate_pool: list[str],
+) -> list[str]:
+    ordered: list[str] = []
+    for family in list(preferred_candidate_order or []) + list(candidate_pool):
+        normalized = str(family).strip()
+        if not normalized or normalized in ordered:
+            continue
+        if normalized not in candidate_pool:
+            continue
+        if not family_adapter_available(normalized):
+            continue
+        ordered.append(normalized)
+    return ordered
 
 
 def normalize_candidate_model_family(requested_model_family: str) -> str | None:
@@ -315,19 +328,29 @@ def train_surrogate_candidates(
     else:
         run_dir = artifact_store.create_run_dir(run_id=run_id)
 
-    regression_hpo_families: list[str] = ["linear_ridge"]
+    regression_hpo_family_pool: list[str] = ["linear_ridge"]
     if compare_against_baseline or requested == "bagged_tree_ensemble":
-        regression_hpo_families.append("bagged_tree_ensemble")
+        regression_hpo_family_pool.append("bagged_tree_ensemble")
     if compare_against_baseline or requested == "boosted_tree_ensemble":
-        regression_hpo_families.append("boosted_tree_ensemble")
+        regression_hpo_family_pool.append("boosted_tree_ensemble")
     if compare_against_baseline or requested in _REGRESSION_ADAPTER_FAMILIES:
-        regression_hpo_families.extend(
+        regression_hpo_family_pool.extend(
             [
                 family
-                for family in ["hist_gradient_boosting_ensemble", "extra_trees_ensemble"]
+                for family in [
+                    "hist_gradient_boosting_ensemble",
+                    "extra_trees_ensemble",
+                    "catboost_ensemble",
+                    "xgboost_ensemble",
+                    "lightgbm_ensemble",
+                ]
                 if compare_against_baseline or requested == family
             ]
         )
+    regression_hpo_families = _ordered_available_hpo_families(
+        preferred_candidate_order=preferred_candidate_order,
+        candidate_pool=regression_hpo_family_pool,
+    )
     hpo_context = _prepare_hpo_context(
         run_dir=run_dir,
         task_type=task_profile.task_type,
@@ -708,19 +731,30 @@ def _train_classification_candidates(
     else:
         run_dir = artifact_store.create_run_dir(run_id=run_id)
 
-    classification_hpo_families: list[str] = ["logistic_regression"]
+    classification_hpo_family_pool: list[str] = ["logistic_regression"]
     if compare_against_baseline or requested == "bagged_tree_classifier":
-        classification_hpo_families.append("bagged_tree_classifier")
+        classification_hpo_family_pool.append("bagged_tree_classifier")
     if compare_against_baseline or requested == "boosted_tree_classifier":
-        classification_hpo_families.append("boosted_tree_classifier")
+        classification_hpo_family_pool.append("boosted_tree_classifier")
     if compare_against_baseline or requested in _CLASSIFICATION_ADAPTER_FAMILIES:
-        classification_hpo_families.extend(
+        classification_hpo_family_pool.extend(
             [
                 family
-                for family in ["hist_gradient_boosting_classifier", "extra_trees_classifier"]
+                for family in [
+                    "hist_gradient_boosting_classifier",
+                    "extra_trees_classifier",
+                    "catboost_classifier",
+                    "xgboost_classifier",
+                    "lightgbm_classifier",
+                    "tabpfn_classifier",
+                ]
                 if compare_against_baseline or requested == family
             ]
         )
+    classification_hpo_families = _ordered_available_hpo_families(
+        preferred_candidate_order=preferred_candidate_order,
+        candidate_pool=classification_hpo_family_pool,
+    )
     hpo_context = _prepare_hpo_context(
         run_dir=run_dir,
         task_type=str(task_profile.task_type),
@@ -3263,7 +3297,17 @@ def _fit_regression_estimator_candidates(
     selection_metric: str | None,
 ) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
-    for family in ["hist_gradient_boosting_ensemble", "extra_trees_ensemble"]:
+    planned_families = {
+        str(key).strip()
+        for key in dict(hpo_context.get("trial_plans") or {}).keys()
+        if str(key).strip()
+    }
+    hpo_families = [
+        family
+        for family in [str(item).strip() for item in dict(hpo_context.get("budget_contract") or {}).get("selected_families", [])]
+        if family in _REGRESSION_ADAPTER_FAMILIES
+    ]
+    for family in hpo_families:
         if requested_family and family != requested_family:
             continue
         trial_plans = list(dict(hpo_context.get("trial_plans") or {}).get(family) or [])
@@ -3271,27 +3315,10 @@ def _fit_regression_estimator_candidates(
             continue
 
         def _build_model(params: dict[str, Any], *, selected_family: str = family) -> Any:
-            if selected_family == "hist_gradient_boosting_ensemble":
-                estimator = HistGradientBoostingRegressor(
-                    max_iter=int(params.get("max_iter", 180)),
-                    learning_rate=float(params.get("learning_rate", 0.08)),
-                    max_depth=int(params.get("max_depth", 6)),
-                    min_samples_leaf=int(params.get("min_samples_leaf", 20)),
-                    random_state=42,
-                )
-            else:
-                estimator = ExtraTreesRegressor(
-                    n_estimators=int(params.get("n_estimators", 220)),
-                    max_depth=None if params.get("max_depth") is None else int(params.get("max_depth")),
-                    min_samples_leaf=int(params.get("min_samples_leaf", 2)),
-                    random_state=42,
-                    n_jobs=1,
-                )
-            return PickledRegressionEstimatorSurrogate(
+            return build_regression_estimator_surrogate(
+                family=selected_family,
                 feature_columns=model_feature_columns,
                 target_column=target_column,
-                model_name=selected_family,
-                estimator=estimator,
                 hyperparameters=dict(params),
             )
 
@@ -3336,7 +3363,7 @@ def _fit_regression_estimator_candidates(
         target_column=target_column,
     ):
         family = str(variant["family"])
-        if family in {"hist_gradient_boosting_ensemble", "extra_trees_ensemble"}:
+        if family in planned_families:
             continue
         if requested_family and family != requested_family:
             continue
@@ -3378,7 +3405,17 @@ def _fit_classification_estimator_candidates(
     selection_metric: str | None,
 ) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
-    for family in ["hist_gradient_boosting_classifier", "extra_trees_classifier"]:
+    planned_families = {
+        str(key).strip()
+        for key in dict(hpo_context.get("trial_plans") or {}).keys()
+        if str(key).strip()
+    }
+    hpo_families = [
+        family
+        for family in [str(item).strip() for item in dict(hpo_context.get("budget_contract") or {}).get("selected_families", [])]
+        if family in _CLASSIFICATION_ADAPTER_FAMILIES
+    ]
+    for family in hpo_families:
         if requested_family and family != requested_family:
             continue
         trial_plans = list(dict(hpo_context.get("trial_plans") or {}).get(family) or [])
@@ -3386,28 +3423,12 @@ def _fit_classification_estimator_candidates(
             continue
 
         def _build_model(params: dict[str, Any], *, selected_family: str = family) -> Any:
-            if selected_family == "hist_gradient_boosting_classifier":
-                estimator = HistGradientBoostingClassifier(
-                    max_iter=int(params.get("max_iter", 220)),
-                    learning_rate=float(params.get("learning_rate", 0.08)),
-                    max_depth=int(params.get("max_depth", 6)),
-                    min_samples_leaf=int(params.get("min_samples_leaf", 18)),
-                    random_state=42,
-                )
-            else:
-                estimator = ExtraTreesClassifier(
-                    n_estimators=int(params.get("n_estimators", 220)),
-                    max_depth=None if params.get("max_depth") is None else int(params.get("max_depth")),
-                    min_samples_leaf=int(params.get("min_samples_leaf", 2)),
-                    random_state=42,
-                    n_jobs=1,
-                )
-            return PickledClassificationEstimatorSurrogate(
+            return build_classification_estimator_surrogate(
+                family=selected_family,
                 feature_columns=model_feature_columns,
                 target_column=target_column,
-                model_name=selected_family,
-                estimator=estimator,
                 hyperparameters=dict(params),
+                class_count=class_count,
             )
 
         def _build_candidate(model: Any, trial_plan: dict[str, Any], *, selected_family: str = family) -> tuple[CandidateMetrics, int]:
@@ -3456,7 +3477,7 @@ def _fit_classification_estimator_candidates(
         class_count=class_count,
     ):
         family = str(variant["family"])
-        if family in {"hist_gradient_boosting_classifier", "extra_trees_classifier"}:
+        if family in planned_families:
             continue
         if requested_family and family != requested_family:
             continue
