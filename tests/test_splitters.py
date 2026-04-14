@@ -10,7 +10,10 @@ def test_build_train_validation_test_split_keeps_time_series_order() -> None:
         task_type="binary_classification",
         stratify_labels=[0, 1] * 20,
     )
-    assert split.strategy == "blocked_time_order_70_15_15"
+    assert split.strategy in {
+        "blocked_time_order_70_15_15",
+        "blocked_time_order_event_preserving_70_15_15",
+    }
     assert int(split.train_indices.max()) < int(split.validation_indices.min())
     assert int(split.validation_indices.max()) < int(split.test_indices.min())
 

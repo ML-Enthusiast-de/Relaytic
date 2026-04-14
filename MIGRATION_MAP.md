@@ -154,6 +154,12 @@ Avoid introducing new references to:
 - introduced artifact boundaries for `temporal_structure_report.json`, `temporal_feature_ladder.json`, `rolling_cv_plan.json`, `temporal_split_guard_report.json`, `sequence_shadow_scorecard.json`, `temporal_baseline_ladder.json`, and `temporal_metric_contract.json`
 - upgraded temporal splitters, lagged feature generation, benchmark review, run summary, and benchmark CLI surfaces so ordered temporal structure is explicit, blocked time splits preserve future events when possible, lagged baselines are compared honestly against ordinary baselines, temporal comparison metrics are alias-safe, and sequence candidates remain shadow-only until they beat strong lagged baselines
 
+### Slice 15K
+
+- extended the existing `src/relaytic/modeling/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, and `src/relaytic/benchmark/` boundaries rather than introducing a separate post-processing or threshold-only package
+- introduced artifact boundaries for `calibration_strategy_report.json`, `operating_point_contract.json`, `threshold_search_report.json`, `decision_cost_profile.json`, `review_budget_optimization_report.json`, and `abstention_policy_report.json`
+- upgraded training, run summary, assist explanations, and benchmark CLI surfaces so calibration choice, threshold search, review-budget posture, and abstention posture are persisted from one canonical operating-point contract instead of being reconstructed differently per surface
+
 ### Slice 09A
 
 - introduced the canonical package boundary `src/relaytic/memory/`

@@ -103,6 +103,38 @@ def test_build_assist_audit_explanation_answers_objective_alignment_questions() 
     assert "optimization_objective_contract.json" in audit["evidence_refs"]
 
 
+def test_build_assist_audit_explanation_answers_operating_point_questions() -> None:
+    audit = build_assist_audit_explanation(
+        message="why this threshold and calibration?",
+        actor_type="user",
+        run_summary={
+            "hpo": {
+                "threshold_policy": "favor_pr_auc",
+                "selected_calibration_method": "platt_scaling",
+            },
+            "operating_point": {
+                "selected_threshold": 0.6,
+                "threshold_policy": "favor_pr_auc",
+                "raw_best_threshold": 0.5,
+                "review_budget_threshold": 0.6,
+                "selected_calibration_method": "platt_scaling",
+                "decision_cost_profile_kind": "rare_event_review_queue",
+                "review_budget_changed_threshold": True,
+                "selection_reason": "Relaytic selected the review-budget-aware threshold to cut operator overload.",
+                "abstention_state": "review_band",
+                "abstain_low": 0.52,
+                "abstain_high": 0.68,
+            },
+        },
+    )
+
+    assert audit["question_type"] == "operating_point"
+    assert "0.6" in audit["answer"]
+    assert "platt_scaling" in audit["answer"]
+    assert "review-budget-aware threshold" in audit["answer"]
+    assert "operating_point_contract.json" in audit["evidence_refs"]
+
+
 def test_build_assist_audit_explanation_answers_why_not_lstm() -> None:
     audit = build_assist_audit_explanation(
         message="why not an lstm here?",

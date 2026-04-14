@@ -110,3 +110,40 @@ def write_public_temporal_energy_dataset(path: Path, *, max_rows: int = 1600) ->
     )
     frame.to_csv(path, index=False)
     return path
+
+
+def write_public_review_queue_dataset(path: Path, *, max_rows: int = 480) -> Path:
+    """Write a deterministic imbalanced binary dataset for calibration and review-budget tests."""
+    rows: list[dict[str, float | int]] = []
+    count = max(120, int(max_rows))
+    for index in range(count):
+        utilization = 0.18 + ((index * 7) % 100) / 140.0
+        delinquency = 0.12 + ((index * 5 + 11) % 100) / 155.0
+        payment_gap = 0.10 + ((index * 9 + 3) % 100) / 160.0
+        support_calls = (index % 6) / 6.0
+        account_age = 1.0 - (((index * 4 + 17) % 100) / 140.0)
+        review_pressure = ((index // 7) % 5) / 5.0
+        overlap_noise = ((index % 9) - 4) / 40.0
+        risk_score = (
+            0.85 * utilization
+            + 0.90 * delinquency
+            + 0.95 * payment_gap
+            + 0.35 * support_calls
+            + 0.20 * review_pressure
+            - 0.55 * account_age
+            + overlap_noise
+        )
+        label = 1 if risk_score >= 0.98 or index % 29 == 0 else 0
+        rows.append(
+            {
+                "utilization_norm": round(utilization, 6),
+                "delinquency_index": round(delinquency, 6),
+                "payment_gap_ratio": round(payment_gap, 6),
+                "support_call_rate": round(support_calls, 6),
+                "account_age_norm": round(account_age, 6),
+                "review_pressure": round(review_pressure, 6),
+                "default_flag": int(label),
+            }
+        )
+    pd.DataFrame(rows).to_csv(path, index=False)
+    return path

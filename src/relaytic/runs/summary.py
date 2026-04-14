@@ -339,6 +339,17 @@ def build_run_summary(
             "threshold_tuning_report": "threshold_tuning_report.json",
         },
     )
+    operating_point_bundle = _read_bundle(
+        root,
+        {
+            "calibration_strategy_report": "calibration_strategy_report.json",
+            "operating_point_contract": "operating_point_contract.json",
+            "threshold_search_report": "threshold_search_report.json",
+            "decision_cost_profile": "decision_cost_profile.json",
+            "review_budget_optimization_report": "review_budget_optimization_report.json",
+            "abstention_policy_report": "abstention_policy_report.json",
+        },
+    )
     lifecycle_bundle = _read_bundle(
         root,
         {
@@ -411,6 +422,12 @@ def build_run_summary(
     search_loop_scorecard = dict(hpo_bundle.get("search_loop_scorecard", {})) if isinstance(hpo_bundle.get("search_loop_scorecard"), dict) else {}
     warm_start_transfer_report = dict(hpo_bundle.get("warm_start_transfer_report", {})) if isinstance(hpo_bundle.get("warm_start_transfer_report"), dict) else {}
     threshold_tuning_report = dict(hpo_bundle.get("threshold_tuning_report", {})) if isinstance(hpo_bundle.get("threshold_tuning_report"), dict) else {}
+    calibration_strategy_report = dict(operating_point_bundle.get("calibration_strategy_report", {})) if isinstance(operating_point_bundle.get("calibration_strategy_report"), dict) else {}
+    operating_point_contract = dict(operating_point_bundle.get("operating_point_contract", {})) if isinstance(operating_point_bundle.get("operating_point_contract"), dict) else {}
+    threshold_search_report = dict(operating_point_bundle.get("threshold_search_report", {})) if isinstance(operating_point_bundle.get("threshold_search_report"), dict) else {}
+    decision_cost_profile = dict(operating_point_bundle.get("decision_cost_profile", {})) if isinstance(operating_point_bundle.get("decision_cost_profile"), dict) else {}
+    review_budget_optimization_report = dict(operating_point_bundle.get("review_budget_optimization_report", {})) if isinstance(operating_point_bundle.get("review_budget_optimization_report"), dict) else {}
+    abstention_policy_report = dict(operating_point_bundle.get("abstention_policy_report", {})) if isinstance(operating_point_bundle.get("abstention_policy_report"), dict) else {}
     trial_ledger = _read_jsonl(root / "trial_ledger.jsonl")
     experiment_registry = _bundle_item(evidence_bundle, "experiment_registry")
     challenger_report = _bundle_item(evidence_bundle, "challenger_report")
@@ -1039,6 +1056,7 @@ def build_run_summary(
             "wall_clock_exhausted_count": int(early_stopping_report.get("wall_clock_exhausted_count", 0) or 0),
             "threshold_policy": _clean_text(threshold_tuning_report.get("threshold_policy")),
             "selected_threshold": threshold_tuning_report.get("selected_threshold"),
+            "selected_calibration_method": _clean_text(calibration_strategy_report.get("selected_method")),
             "stop_reasons": [
                 str(item)
                 for item in search_loop_scorecard.get("stop_reasons", [])
@@ -1047,6 +1065,42 @@ def build_run_summary(
             "summary": _clean_text(search_loop_scorecard.get("summary"))
             or _clean_text(early_stopping_report.get("summary"))
             or _clean_text(hpo_budget_contract.get("summary")),
+        },
+        "operating_point": {
+            "status": _clean_text(operating_point_contract.get("status")) or _clean_text(calibration_strategy_report.get("status")),
+            "selected_threshold": operating_point_contract.get("selected_threshold"),
+            "threshold_policy": _clean_text(operating_point_contract.get("threshold_policy"))
+            or _clean_text(threshold_tuning_report.get("threshold_policy")),
+            "raw_best_threshold": operating_point_contract.get("raw_best_threshold")
+            or threshold_search_report.get("raw_best_threshold"),
+            "review_budget_threshold": operating_point_contract.get("review_budget_threshold")
+            or review_budget_optimization_report.get("review_budget_threshold"),
+            "review_budget_fraction": operating_point_contract.get("review_budget_fraction")
+            or review_budget_optimization_report.get("review_budget_fraction"),
+            "selected_review_fraction": operating_point_contract.get("selected_review_fraction")
+            or review_budget_optimization_report.get("selected_review_fraction"),
+            "selected_reason_codes": [
+                str(item)
+                for item in operating_point_contract.get("selected_reason_codes", [])
+                if str(item).strip()
+            ],
+            "selection_reason": _clean_text(operating_point_contract.get("selection_reason"))
+            or _clean_text(review_budget_optimization_report.get("summary")),
+            "selected_calibration_method": _clean_text(calibration_strategy_report.get("selected_method")),
+            "calibration_selection_metric": _clean_text(calibration_strategy_report.get("selection_metric")),
+            "calibration_selection_reason": _clean_text(calibration_strategy_report.get("selection_reason")),
+            "decision_cost_profile_kind": _clean_text(decision_cost_profile.get("profile_kind"))
+            or _clean_text(dict(operating_point_contract.get("decision_cost_profile", {})).get("profile_kind")),
+            "review_budget_changed_threshold": review_budget_optimization_report.get("review_budget_changed_threshold"),
+            "abstention_state": _clean_text(abstention_policy_report.get("abstention_state"))
+            or _clean_text(operating_point_contract.get("abstention_state")),
+            "abstain_low": abstention_policy_report.get("abstain_low"),
+            "abstain_high": abstention_policy_report.get("abstain_high"),
+            "threshold_candidate_count": len(threshold_search_report.get("threshold_candidates", []))
+            if isinstance(threshold_search_report.get("threshold_candidates"), list)
+            else 0,
+            "summary": _clean_text(operating_point_contract.get("summary"))
+            or _clean_text(calibration_strategy_report.get("summary")),
         },
         "handoff": {
             "status": _clean_text(run_handoff.get("status")),
@@ -1579,6 +1633,12 @@ def build_run_summary(
             "search_loop_scorecard_path": _path_if_exists(root / "search_loop_scorecard.json"),
             "warm_start_transfer_report_path": _path_if_exists(root / "warm_start_transfer_report.json"),
             "threshold_tuning_report_path": _path_if_exists(root / "threshold_tuning_report.json"),
+            "calibration_strategy_report_path": _path_if_exists(root / "calibration_strategy_report.json"),
+            "operating_point_contract_path": _path_if_exists(root / "operating_point_contract.json"),
+            "threshold_search_report_path": _path_if_exists(root / "threshold_search_report.json"),
+            "decision_cost_profile_path": _path_if_exists(root / "decision_cost_profile.json"),
+            "review_budget_optimization_report_path": _path_if_exists(root / "review_budget_optimization_report.json"),
+            "abstention_policy_report_path": _path_if_exists(root / "abstention_policy_report.json"),
             "trajectory_constraint_report_path": _path_if_exists(root / "trajectory_constraint_report.json"),
             "feasible_region_map_path": _path_if_exists(root / "feasible_region_map.json"),
             "extrapolation_risk_report_path": _path_if_exists(root / "extrapolation_risk_report.json"),

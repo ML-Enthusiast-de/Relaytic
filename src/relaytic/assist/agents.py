@@ -647,6 +647,7 @@ def build_assist_audit_explanation(
     family_stack = dict(run_summary.get("family_stack", {}))
     architecture_imports = dict(run_summary.get("architecture_imports", {}))
     hpo = dict(run_summary.get("hpo", {}))
+    operating_point = dict(run_summary.get("operating_point", {}))
     next_step = dict(run_summary.get("next_step", {}))
     iteration = dict(run_summary.get("iteration", {}))
     objective_contract = dict(run_summary.get("objective_contract", {}))
@@ -700,6 +701,42 @@ def build_assist_audit_explanation(
             f"The current constraint kind is `{_clean_text(feasibility.get('primary_constraint_kind')) or 'none'}` and review gate open = `{feasibility.get('gate_open')}`.",
         ]
         evidence_refs = ["counterfactual_region_report.json", "decision_constraint_report.json", "run_summary.json"]
+    elif any(
+        token in normalized
+        for token in (
+            "threshold",
+            "operating point",
+            "operating-point",
+            "calibration",
+            "review budget",
+            "abstain",
+            "abstention",
+        )
+    ):
+        question_type = "operating_point"
+        threshold_reason = _clean_text(operating_point.get("selection_reason")) or (
+            f"Raw best threshold was `{operating_point.get('raw_best_threshold')}` while the review-budget threshold was `{operating_point.get('review_budget_threshold')}`. "
+            f"Review-budget changed threshold = `{operating_point.get('review_budget_changed_threshold')}`."
+        )
+        reasons = [
+            f"Relaytic selected threshold `{operating_point.get('selected_threshold')}` under policy `{_clean_text(operating_point.get('threshold_policy')) or _clean_text(hpo.get('threshold_policy')) or 'auto'}`.",
+            (
+                f"Calibration method is `{_clean_text(operating_point.get('selected_calibration_method')) or _clean_text(hpo.get('selected_calibration_method')) or 'none'}` and the review-budget profile is `{_clean_text(operating_point.get('decision_cost_profile_kind')) or 'unknown'}`. "
+                f"{threshold_reason}"
+            ).strip(),
+        ]
+        if _clean_text(operating_point.get("abstention_state")) and _clean_text(operating_point.get("abstention_state")) != "none":
+            reasons.append(
+                f"Abstention posture is `{_clean_text(operating_point.get('abstention_state'))}` with band `{operating_point.get('abstain_low')}` to `{operating_point.get('abstain_high')}`."
+            )
+        evidence_refs = [
+            "calibration_strategy_report.json",
+            "operating_point_contract.json",
+            "threshold_search_report.json",
+            "decision_cost_profile.json",
+            "review_budget_optimization_report.json",
+            "abstention_policy_report.json",
+        ]
     elif "why not" in normalized and _extract_imported_architecture_name(normalized, architecture_imports):
         requested_family = _extract_imported_architecture_name(normalized, architecture_imports)
         question_type = "why_not_imported_architecture"

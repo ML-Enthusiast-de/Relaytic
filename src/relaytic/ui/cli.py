@@ -10173,9 +10173,22 @@ def _run_benchmark_phase(
 
         task_contract_bundle = read_task_contract_artifacts(root)
         temporal_bundle = read_temporal_engine_artifacts(root)
+        operating_point_bundle = {
+            key: json.loads((root / filename).read_text(encoding="utf-8"))
+            for key, filename in {
+                "calibration_strategy_report": "calibration_strategy_report.json",
+                "operating_point_contract": "operating_point_contract.json",
+                "threshold_search_report": "threshold_search_report.json",
+                "decision_cost_profile": "decision_cost_profile.json",
+                "review_budget_optimization_report": "review_budget_optimization_report.json",
+                "abstention_policy_report": "abstention_policy_report.json",
+            }.items()
+            if (root / filename).exists()
+        }
         bundle_payload = benchmark_result.bundle.to_dict()
         bundle_payload.update(task_contract_bundle)
         bundle_payload.update(temporal_bundle)
+        bundle_payload.update(operating_point_bundle)
         return {
             "surface_payload": {
                 "status": "ok",
@@ -10211,6 +10224,8 @@ def _run_benchmark_phase(
                     "safe_to_rank": task_contract_bundle.get("benchmark_truth_precheck", {}).get("safe_to_rank"),
                     "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                     "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
+                    "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),
+                    "selected_calibration_method": operating_point_bundle.get("calibration_strategy_report", {}).get("selected_method"),
                 },
                 "bundle": bundle_payload,
             },
@@ -10252,9 +10267,22 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
 
     task_contract_bundle = read_task_contract_artifacts(root)
     temporal_bundle = read_temporal_engine_artifacts(root)
+    operating_point_bundle = {
+        key: json.loads((root / filename).read_text(encoding="utf-8"))
+        for key, filename in {
+            "calibration_strategy_report": "calibration_strategy_report.json",
+            "operating_point_contract": "operating_point_contract.json",
+            "threshold_search_report": "threshold_search_report.json",
+            "decision_cost_profile": "decision_cost_profile.json",
+            "review_budget_optimization_report": "review_budget_optimization_report.json",
+            "abstention_policy_report": "abstention_policy_report.json",
+        }.items()
+        if (root / filename).exists()
+    }
     bundle_payload = dict(bundle)
     bundle_payload.update(task_contract_bundle)
     bundle_payload.update(temporal_bundle)
+    bundle_payload.update(operating_point_bundle)
     return {
         "surface_payload": {
             "status": "ok",
@@ -10289,6 +10317,8 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "safe_to_rank": task_contract_bundle.get("benchmark_truth_precheck", {}).get("safe_to_rank"),
                 "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                 "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
+                "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),
+                "selected_calibration_method": operating_point_bundle.get("calibration_strategy_report", {}).get("selected_method"),
             },
             "bundle": bundle_payload,
         },

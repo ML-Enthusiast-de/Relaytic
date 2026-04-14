@@ -18,9 +18,9 @@ from relaytic.core.json_utils import write_json
 from relaytic.persistence.artifact_store import ArtifactStore
 from .baselines import IncrementalLinearSurrogate
 from .calibration import (
-    apply_binary_platt_calibrator,
-    fit_binary_platt_calibrator,
+    apply_binary_calibrator,
     fit_regression_residual_interval,
+    select_binary_calibration_strategy,
 )
 from .checkpoints import ModelCheckpointStore
 from .classifiers import (
@@ -67,6 +67,7 @@ class CandidateMetrics:
     variant_id: str | None = None
     hyperparameters: dict[str, Any] | None = None
     calibration: dict[str, Any] | None = None
+    operating_point: dict[str, Any] | None = None
     uncertainty: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -1018,6 +1019,7 @@ def _train_classification_candidates(
             "decision_thresholds": classifier_thresholds,
             "threshold_policy": str(threshold_policy or "").strip() or "auto",
             "calibration": dict(selected_candidate.calibration or {}),
+            "operating_point": dict(selected_candidate.operating_point or {}),
             "uncertainty": dict(selected_candidate.uncertainty or {}),
             "lag_horizon_samples": int(lagged_horizon) if lagged_horizon is not None else 0,
             "professional_analysis": professional_analysis,
@@ -1073,6 +1075,7 @@ def _train_classification_candidates(
         "rows_used_by_model": rows_used_by_model,
         "professional_analysis": professional_analysis,
         "calibration": dict(selected_candidate.calibration or {}),
+        "operating_point": dict(selected_candidate.operating_point or {}),
         "uncertainty": dict(selected_candidate.uncertainty or {}),
         "selected_metrics": {
             "train": _materialize_temporal_metric_aliases(
@@ -1784,7 +1787,7 @@ def _classification_candidate_metrics_from_model(
         class_labels=class_labels,
         calibration=calibration,
     )
-    decision_threshold = _select_binary_decision_threshold(
+    operating_point = _build_binary_operating_point(
         probabilities=validation_probabilities,
         y_true=validation_true,
         class_labels=class_labels,
@@ -1793,6 +1796,7 @@ def _classification_candidate_metrics_from_model(
         threshold_policy=threshold_policy,
         explicit_threshold=decision_threshold,
     )
+    decision_threshold = float(operating_point.get("selected_threshold", 0.5))
     train_metrics = _classification_metrics_from_probabilities(
         y_true=train_true,
         probabilities=train_probabilities,
@@ -1825,6 +1829,7 @@ def _classification_candidate_metrics_from_model(
         variant_id=variant_id,
         hyperparameters=hyperparameters,
         calibration=calibration,
+        operating_point=operating_point,
         uncertainty=_classification_uncertainty_payload(
             probabilities=validation_probabilities,
             class_labels=class_labels,
@@ -1894,7 +1899,7 @@ def _classification_candidate_metrics_with_context(
         class_labels=class_labels,
         calibration=calibration,
     )
-    resolved_threshold = _select_binary_decision_threshold(
+    operating_point = _build_binary_operating_point(
         probabilities=validation_probabilities,
         y_true=validation_true,
         class_labels=class_labels,
@@ -1903,6 +1908,7 @@ def _classification_candidate_metrics_with_context(
         threshold_policy=threshold_policy,
         explicit_threshold=decision_threshold,
     )
+    resolved_threshold = float(operating_point.get("selected_threshold", 0.5))
     train_metrics = _classification_metrics_from_probabilities(
         y_true=train_true,
         probabilities=train_probabilities,
@@ -1935,6 +1941,7 @@ def _classification_candidate_metrics_with_context(
         variant_id=variant_id,
         hyperparameters=hyperparameters,
         calibration=calibration,
+        operating_point=operating_point,
         uncertainty=_classification_uncertainty_payload(
             probabilities=validation_probabilities,
             class_labels=class_labels,
@@ -2008,6 +2015,220 @@ def _minority_label_token(*, frame: pd.DataFrame, target_column: str) -> str | N
     return str(counts.sort_values(kind="stable").index[0])
 
 
+def _default_decision_cost_profile(
+    *,
+    task_type: str,
+    positive_rate: float | None,
+) -> dict[str, Any]:
+    normalized_task = str(task_type or "").strip().lower()
+    rate = float(positive_rate or 0.0)
+    if normalized_task in {"fraud_detection", "anomaly_detection"}:
+        return {
+            "profile_kind": "rare_event_review_queue",
+            "false_negative_cost": 6.0,
+            "false_positive_cost": 1.5,
+            "review_budget_fraction": 0.10 if rate <= 0.0 else float(max(0.06, min(0.16, rate * 2.5))),
+            "abstention_band": 0.08,
+            "selection_mode": "review_budget_aware",
+        }
+    if normalized_task == "binary_classification":
+        return {
+            "profile_kind": "binary_review_queue",
+            "false_negative_cost": 2.5,
+            "false_positive_cost": 1.0,
+            "review_budget_fraction": 0.20 if rate <= 0.0 else float(max(0.10, min(0.25, rate * 1.5))),
+            "abstention_band": 0.05,
+            "selection_mode": "balanced",
+        }
+    return {
+        "profile_kind": "generic_binary",
+        "false_negative_cost": 2.0,
+        "false_positive_cost": 1.0,
+        "review_budget_fraction": 0.20,
+        "abstention_band": 0.05,
+        "selection_mode": "balanced",
+    }
+
+
+def _operating_point_rank(
+    *,
+    metrics: dict[str, float],
+    task_type: str,
+    threshold_policy: str | None,
+) -> tuple[float, ...]:
+    normalized_policy = str(threshold_policy or "").strip().lower() or "auto"
+    if normalized_policy == "favor_recall":
+        return (
+            -float(metrics.get("recall", 0.0)),
+            -float(metrics.get("f1", 0.0)),
+            -float(metrics.get("pr_auc", 0.0)),
+            -float(metrics.get("precision", 0.0)),
+            float(metrics.get("log_loss", float("inf"))),
+        )
+    if normalized_policy == "favor_precision":
+        return (
+            -float(metrics.get("precision", 0.0)),
+            -float(metrics.get("f1", 0.0)),
+            -float(metrics.get("recall", 0.0)),
+            -float(metrics.get("pr_auc", 0.0)),
+            float(metrics.get("log_loss", float("inf"))),
+        )
+    if normalized_policy == "favor_pr_auc":
+        return (
+            -float(metrics.get("pr_auc", 0.0)),
+            -float(metrics.get("recall", 0.0)),
+            -float(metrics.get("f1", 0.0)),
+            -float(metrics.get("precision", 0.0)),
+            float(metrics.get("log_loss", float("inf"))),
+        )
+    if normalized_policy == "favor_f1":
+        return (
+            -float(metrics.get("f1", 0.0)),
+            -float(metrics.get("recall", 0.0)),
+            -float(metrics.get("precision", 0.0)),
+            -float(metrics.get("pr_auc", 0.0)),
+            float(metrics.get("log_loss", float("inf"))),
+        )
+    if str(task_type).strip().lower() in {"fraud_detection", "anomaly_detection"}:
+        return (
+            -float(metrics.get("recall", 0.0)),
+            -float(metrics.get("pr_auc", 0.0)),
+            -float(metrics.get("f1", 0.0)),
+            -float(metrics.get("precision", 0.0)),
+            float(metrics.get("log_loss", float("inf"))),
+        )
+    return (
+        -float(metrics.get("f1", 0.0)),
+        -float(metrics.get("accuracy", 0.0)),
+        -float(metrics.get("precision", 0.0)),
+        -float(metrics.get("recall", 0.0)),
+        float(metrics.get("log_loss", float("inf"))),
+    )
+
+
+def _build_binary_operating_point(
+    *,
+    probabilities: np.ndarray,
+    y_true: list[str],
+    class_labels: list[str],
+    positive_label: str | None,
+    task_type: str,
+    threshold_policy: str | None,
+    explicit_threshold: float | None,
+) -> dict[str, Any]:
+    if len(class_labels) != 2 or not positive_label:
+        return {
+            "status": "not_applicable",
+            "selected_threshold": 0.5,
+            "summary": "Operating-point optimization is only applicable to binary classification tasks.",
+        }
+    positive_index = class_labels.index(str(positive_label))
+    positive_scores = np.asarray(probabilities, dtype=float)[:, positive_index]
+    observed_positive_rate = float(np.mean(np.asarray([str(item) for item in y_true], dtype=object) == str(positive_label)))
+    decision_cost_profile = _default_decision_cost_profile(task_type=task_type, positive_rate=observed_positive_rate)
+    thresholds = [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.60, 0.70, 0.80, 0.90]
+    candidate_rows: list[dict[str, Any]] = []
+    raw_best_row: dict[str, Any] | None = None
+    raw_best_rank: tuple[float, ...] | None = None
+    review_budget_row: dict[str, Any] | None = None
+    review_budget_rank: tuple[float, float, float] | None = None
+    for threshold in thresholds:
+        metrics = classification_metrics(
+            y_true=y_true,
+            probabilities=probabilities,
+            class_labels=class_labels,
+            positive_label=positive_label,
+            decision_threshold=threshold,
+        ).to_dict()
+        predicted_positive_fraction = float(np.mean(positive_scores >= float(threshold)))
+        precision = float(metrics.get("precision", 0.0) or 0.0)
+        recall = float(metrics.get("recall", 0.0) or 0.0)
+        fp_cost = float(decision_cost_profile["false_positive_cost"])
+        fn_cost = float(decision_cost_profile["false_negative_cost"])
+        estimated_decision_cost = (fp_cost * (1.0 - precision) * max(predicted_positive_fraction, 1e-9)) + (
+            fn_cost * (1.0 - recall) * max(observed_positive_rate, 1e-9)
+        )
+        estimated_decision_utility = float(1.0 - estimated_decision_cost)
+        row = {
+            "threshold": float(threshold),
+            "predicted_positive_fraction": predicted_positive_fraction,
+            "estimated_review_fraction": predicted_positive_fraction,
+            "estimated_decision_cost": float(estimated_decision_cost),
+            "estimated_decision_utility": estimated_decision_utility,
+            **{str(key): float(value) for key, value in metrics.items()},
+        }
+        candidate_rows.append(row)
+        rank = _operating_point_rank(
+            metrics=row,
+            task_type=task_type,
+            threshold_policy=threshold_policy,
+        )
+        if raw_best_rank is None or rank < raw_best_rank:
+            raw_best_rank = rank
+            raw_best_row = row
+        budget = float(decision_cost_profile["review_budget_fraction"])
+        overload = max(0.0, predicted_positive_fraction - budget)
+        budget_rank = (
+            overload,
+            -estimated_decision_utility,
+            float(metrics.get("log_loss", float("inf"))),
+        )
+        if review_budget_rank is None or budget_rank < review_budget_rank:
+            review_budget_rank = budget_rank
+            review_budget_row = row
+
+    if explicit_threshold is not None:
+        explicit_value = float(max(0.01, min(0.99, explicit_threshold)))
+        selected_row = next((row for row in candidate_rows if abs(float(row["threshold"]) - explicit_value) < 1e-9), None)
+        if selected_row is None:
+            selected_row = dict(raw_best_row or candidate_rows[0])
+            selected_row["threshold"] = explicit_value
+        selected_reason_codes = ["explicit_threshold_override"]
+        selection_reason = f"Relaytic honored the explicit threshold override `{explicit_value:.2f}`."
+    else:
+        raw_best_row = raw_best_row or candidate_rows[0]
+        review_budget_row = review_budget_row or raw_best_row
+        selected_row = raw_best_row
+        selected_reason_codes = ["raw_metric_optimum"]
+        if (
+            str(task_type).strip().lower() in {"fraud_detection", "anomaly_detection", "binary_classification"}
+            and review_budget_row is not None
+            and float(review_budget_row["threshold"]) != float(raw_best_row["threshold"])
+            and float(review_budget_row["predicted_positive_fraction"]) <= float(decision_cost_profile["review_budget_fraction"]) + 1e-9
+        ):
+            selected_row = review_budget_row
+            selected_reason_codes = ["review_budget_aware_optimum"]
+        selection_reason = (
+            f"Relaytic compared raw threshold quality against review-budget-aware decision utility and selected "
+            f"`{float(selected_row['threshold']):.2f}`."
+        )
+
+    abstention_band = float(decision_cost_profile["abstention_band"])
+    selected_threshold = float(selected_row["threshold"])
+    abstain_low = float(max(0.01, selected_threshold - abstention_band))
+    abstain_high = float(min(0.99, selected_threshold + abstention_band))
+    return {
+        "status": "ok",
+        "selected_threshold": selected_threshold,
+        "threshold_policy": str(threshold_policy or "").strip() or "auto",
+        "raw_best_threshold": float((raw_best_row or selected_row)["threshold"]),
+        "review_budget_threshold": float((review_budget_row or selected_row)["threshold"]),
+        "review_budget_fraction": float(decision_cost_profile["review_budget_fraction"]),
+        "selected_review_fraction": float(selected_row["predicted_positive_fraction"]),
+        "decision_cost_profile": decision_cost_profile,
+        "threshold_candidates": candidate_rows,
+        "selected_reason_codes": selected_reason_codes,
+        "selection_reason": selection_reason,
+        "abstention_state": "review_band" if abstain_high > abstain_low else "none",
+        "abstain_low": abstain_low,
+        "abstain_high": abstain_high,
+        "summary": (
+            f"Relaytic selected threshold `{selected_threshold:.2f}` with estimated review load "
+            f"`{float(selected_row['predicted_positive_fraction']):.3f}` under `{decision_cost_profile['profile_kind']}`."
+        ),
+    }
+
+
 def _select_binary_decision_threshold(
     *,
     probabilities: np.ndarray,
@@ -2018,74 +2239,16 @@ def _select_binary_decision_threshold(
     threshold_policy: str | None,
     explicit_threshold: float | None,
 ) -> float:
-    if len(class_labels) != 2 or not positive_label:
-        return 0.5
-    if explicit_threshold is not None:
-        return float(max(0.01, min(0.99, explicit_threshold)))
-    thresholds = [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50]
-    best_threshold = 0.5
-    best_rank: tuple[float, ...] | None = None
-    normalized_policy = str(threshold_policy or "").strip().lower() or "auto"
-    for threshold in thresholds:
-        metrics = classification_metrics(
-            y_true=y_true,
-            probabilities=probabilities,
-            class_labels=class_labels,
-            positive_label=positive_label,
-            decision_threshold=threshold,
-        ).to_dict()
-        if normalized_policy == "favor_recall":
-            rank = (
-                -float(metrics.get("recall", 0.0)),
-                -float(metrics.get("f1", 0.0)),
-                -float(metrics.get("pr_auc", 0.0)),
-                -float(metrics.get("precision", 0.0)),
-                float(metrics.get("log_loss", float("inf"))),
-            )
-        elif normalized_policy == "favor_precision":
-            rank = (
-                -float(metrics.get("precision", 0.0)),
-                -float(metrics.get("f1", 0.0)),
-                -float(metrics.get("recall", 0.0)),
-                -float(metrics.get("pr_auc", 0.0)),
-                float(metrics.get("log_loss", float("inf"))),
-            )
-        elif normalized_policy == "favor_pr_auc":
-            rank = (
-                -float(metrics.get("pr_auc", 0.0)),
-                -float(metrics.get("recall", 0.0)),
-                -float(metrics.get("f1", 0.0)),
-                -float(metrics.get("precision", 0.0)),
-                float(metrics.get("log_loss", float("inf"))),
-            )
-        elif normalized_policy == "favor_f1":
-            rank = (
-                -float(metrics.get("f1", 0.0)),
-                -float(metrics.get("recall", 0.0)),
-                -float(metrics.get("precision", 0.0)),
-                -float(metrics.get("pr_auc", 0.0)),
-                float(metrics.get("log_loss", float("inf"))),
-            )
-        elif task_type in {"fraud_detection", "anomaly_detection"}:
-            rank = (
-                -float(metrics.get("recall", 0.0)),
-                -float(metrics.get("pr_auc", 0.0)),
-                -float(metrics.get("f1", 0.0)),
-                -float(metrics.get("precision", 0.0)),
-                float(metrics.get("log_loss", float("inf"))),
-            )
-        else:
-            rank = (
-                -float(metrics.get("f1", 0.0)),
-                -float(metrics.get("accuracy", 0.0)),
-                -float(metrics.get("precision", 0.0)),
-                -float(metrics.get("recall", 0.0)),
-                float(metrics.get("log_loss", float("inf"))),
-            )
-        if best_rank is None or rank < best_rank:
-            best_rank = rank
-            best_threshold = float(threshold)
-    return best_threshold
+    operating_point = _build_binary_operating_point(
+        probabilities=probabilities,
+        y_true=y_true,
+        class_labels=class_labels,
+        positive_label=positive_label,
+        task_type=task_type,
+        threshold_policy=threshold_policy,
+        explicit_threshold=explicit_threshold,
+    )
+    return float(operating_point.get("selected_threshold", 0.5))
 
 
 def _classification_metrics_from_probabilities(
@@ -2468,6 +2631,10 @@ def _write_hpo_artifacts(
         ),
     }
     if is_classification_task(task_type):
+        selected_calibration = dict(selected_candidate.calibration or {})
+        selected_operating_point = dict(selected_candidate.operating_point or {})
+        decision_cost_profile = dict(selected_operating_point.get("decision_cost_profile") or {})
+        threshold_candidates = list(selected_operating_point.get("threshold_candidates") or [])
         threshold_tuning_report = {
             "schema_version": THRESHOLD_TUNING_REPORT_SCHEMA_VERSION,
             "generated_at": _utc_now(),
@@ -2476,19 +2643,139 @@ def _write_hpo_artifacts(
             "threshold_policy": str(threshold_policy or "").strip() or "auto",
             "selected_model_family": selected_candidate.model_family,
             "selected_threshold": float(selected_candidate.test_metrics.get("decision_threshold", 0.5)),
+            "selected_reason_codes": [
+                str(item)
+                for item in selected_operating_point.get("selected_reason_codes", [])
+                if str(item).strip()
+            ],
+            "selection_reason": str(selected_operating_point.get("selection_reason", "")).strip(),
+            "raw_best_threshold": selected_operating_point.get("raw_best_threshold"),
+            "review_budget_threshold": selected_operating_point.get("review_budget_threshold"),
+            "review_budget_fraction": selected_operating_point.get("review_budget_fraction"),
+            "abstention_state": str(selected_operating_point.get("abstention_state", "")).strip() or "none",
             "candidates": [
                 {
                     "model_family": item.model_family,
                     "variant_id": item.variant_id,
                     "decision_threshold": float(item.validation_metrics.get("decision_threshold", item.test_metrics.get("decision_threshold", 0.5))),
                     "calibration_status": str(dict(item.calibration or {}).get("status", "unknown")),
+                    "calibration_method": str(dict(item.calibration or {}).get("selected_method") or dict(item.calibration or {}).get("method") or "none"),
                     "validation_pr_auc": item.validation_metrics.get("pr_auc"),
                     "validation_f1": item.validation_metrics.get("f1"),
+                    "selection_reason_codes": [
+                        str(code)
+                        for code in dict(item.operating_point or {}).get("selected_reason_codes", [])
+                        if str(code).strip()
+                    ],
                 }
                 for item in candidates
             ],
             "summary": (
                 f"Relaytic tuned binary decision thresholds and calibration across `{len(candidates)}` candidate(s) and selected `{selected_candidate.model_family}` at threshold `{float(selected_candidate.test_metrics.get('decision_threshold', 0.5)):.2f}`."
+            ),
+        }
+        calibration_strategy_report = {
+            "schema_version": "relaytic.calibration_strategy_report.v1",
+            "generated_at": _utc_now(),
+            "status": "ok" if selected_calibration else "not_applicable",
+            "task_type": task_type,
+            "selected_model_family": selected_candidate.model_family,
+            "selected_method": str(selected_calibration.get("selected_method") or selected_calibration.get("method") or "none"),
+            "selection_metric": str(selected_calibration.get("selection_metric", "validation_log_loss_then_ece")).strip(),
+            "selection_reason": str(selected_calibration.get("selection_reason", "")).strip(),
+            "selected_validation_metrics": dict(selected_calibration.get("selected_validation_metrics") or {}),
+            "candidates": list(selected_calibration.get("candidates") or []),
+            "summary": (
+                str(selected_calibration.get("selection_reason", "")).strip()
+                or "Relaytic did not record a calibration strategy selection for this run."
+            ),
+        }
+        operating_point_contract = {
+            "schema_version": "relaytic.operating_point_contract.v1",
+            "generated_at": _utc_now(),
+            "status": "ok" if selected_operating_point else "not_applicable",
+            "task_type": task_type,
+            "selected_model_family": selected_candidate.model_family,
+            "threshold_policy": str(selected_operating_point.get("threshold_policy") or threshold_policy or "auto").strip(),
+            "selected_threshold": selected_operating_point.get("selected_threshold"),
+            "selected_reason_codes": [
+                str(item)
+                for item in selected_operating_point.get("selected_reason_codes", [])
+                if str(item).strip()
+            ],
+            "selection_reason": str(selected_operating_point.get("selection_reason", "")).strip(),
+            "raw_best_threshold": selected_operating_point.get("raw_best_threshold"),
+            "review_budget_threshold": selected_operating_point.get("review_budget_threshold"),
+            "review_budget_fraction": selected_operating_point.get("review_budget_fraction"),
+            "selected_review_fraction": selected_operating_point.get("selected_review_fraction"),
+            "decision_cost_profile": decision_cost_profile,
+            "abstention_state": str(selected_operating_point.get("abstention_state", "")).strip() or "none",
+            "summary": str(selected_operating_point.get("summary", "")).strip(),
+        }
+        threshold_search_report = {
+            "schema_version": "relaytic.threshold_search_report.v1",
+            "generated_at": _utc_now(),
+            "status": "ok" if threshold_candidates else "not_applicable",
+            "task_type": task_type,
+            "selected_model_family": selected_candidate.model_family,
+            "selected_threshold": selected_operating_point.get("selected_threshold"),
+            "raw_best_threshold": selected_operating_point.get("raw_best_threshold"),
+            "review_budget_threshold": selected_operating_point.get("review_budget_threshold"),
+            "threshold_candidates": threshold_candidates,
+            "summary": (
+                f"Relaytic evaluated `{len(threshold_candidates)}` threshold candidate(s) for `{selected_candidate.model_family}`."
+                if threshold_candidates
+                else "Relaytic did not materialize threshold candidate rows for this run."
+            ),
+        }
+        decision_cost_profile_report = {
+            "schema_version": "relaytic.decision_cost_profile.v1",
+            "generated_at": _utc_now(),
+            "status": "ok" if decision_cost_profile else "not_applicable",
+            "task_type": task_type,
+            "selected_model_family": selected_candidate.model_family,
+            **decision_cost_profile,
+            "summary": (
+                f"Relaytic optimized this binary route under `{decision_cost_profile.get('profile_kind', 'unknown')}` with review budget `{float(decision_cost_profile.get('review_budget_fraction', 0.0) or 0.0):.3f}`."
+                if decision_cost_profile
+                else "Relaytic did not materialize a decision-cost profile for this run."
+            ),
+        }
+        review_budget_optimization_report = {
+            "schema_version": "relaytic.review_budget_optimization_report.v1",
+            "generated_at": _utc_now(),
+            "status": "ok" if selected_operating_point else "not_applicable",
+            "task_type": task_type,
+            "selected_model_family": selected_candidate.model_family,
+            "selected_threshold": selected_operating_point.get("selected_threshold"),
+            "raw_best_threshold": selected_operating_point.get("raw_best_threshold"),
+            "review_budget_threshold": selected_operating_point.get("review_budget_threshold"),
+            "review_budget_fraction": selected_operating_point.get("review_budget_fraction"),
+            "selected_review_fraction": selected_operating_point.get("selected_review_fraction"),
+            "review_budget_changed_threshold": bool(
+                _is_number(selected_operating_point.get("raw_best_threshold"))
+                and _is_number(selected_operating_point.get("review_budget_threshold"))
+                and abs(float(selected_operating_point.get("raw_best_threshold")) - float(selected_operating_point.get("review_budget_threshold"))) > 1e-9
+            ),
+            "summary": (
+                f"Relaytic selected threshold `{float(selected_operating_point.get('selected_threshold', 0.5)):.2f}` with estimated review load `{float(selected_operating_point.get('selected_review_fraction', 0.0) or 0.0):.3f}`."
+                if selected_operating_point
+                else "Relaytic did not materialize a review-budget optimization report for this run."
+            ),
+        }
+        abstention_policy_report = {
+            "schema_version": "relaytic.abstention_policy_report.v1",
+            "generated_at": _utc_now(),
+            "status": "ok" if selected_operating_point else "not_applicable",
+            "task_type": task_type,
+            "selected_model_family": selected_candidate.model_family,
+            "abstention_state": str(selected_operating_point.get("abstention_state", "")).strip() or "none",
+            "abstain_low": selected_operating_point.get("abstain_low"),
+            "abstain_high": selected_operating_point.get("abstain_high"),
+            "summary": (
+                f"Relaytic left an abstention/review band between `{float(selected_operating_point.get('abstain_low', 0.0) or 0.0):.2f}` and `{float(selected_operating_point.get('abstain_high', 0.0) or 0.0):.2f}`."
+                if str(selected_operating_point.get("abstention_state", "")).strip() == "review_band"
+                else "Relaytic did not leave an abstention band for this operating point."
             ),
         }
     else:
@@ -2498,6 +2785,48 @@ def _write_hpo_artifacts(
             "status": "not_applicable",
             "task_type": task_type,
             "summary": "Threshold tuning is only applicable to classification and rare-event tasks.",
+        }
+        calibration_strategy_report = {
+            "schema_version": "relaytic.calibration_strategy_report.v1",
+            "generated_at": _utc_now(),
+            "status": "not_applicable",
+            "task_type": task_type,
+            "summary": "Calibration strategy selection is only applicable to classification tasks.",
+        }
+        operating_point_contract = {
+            "schema_version": "relaytic.operating_point_contract.v1",
+            "generated_at": _utc_now(),
+            "status": "not_applicable",
+            "task_type": task_type,
+            "summary": "Operating-point optimization is only applicable to classification tasks.",
+        }
+        threshold_search_report = {
+            "schema_version": "relaytic.threshold_search_report.v1",
+            "generated_at": _utc_now(),
+            "status": "not_applicable",
+            "task_type": task_type,
+            "summary": "Threshold search is only applicable to classification tasks.",
+        }
+        decision_cost_profile_report = {
+            "schema_version": "relaytic.decision_cost_profile.v1",
+            "generated_at": _utc_now(),
+            "status": "not_applicable",
+            "task_type": task_type,
+            "summary": "Decision-cost profiles are only applicable to classification tasks.",
+        }
+        review_budget_optimization_report = {
+            "schema_version": "relaytic.review_budget_optimization_report.v1",
+            "generated_at": _utc_now(),
+            "status": "not_applicable",
+            "task_type": task_type,
+            "summary": "Review-budget optimization is only applicable to classification tasks.",
+        }
+        abstention_policy_report = {
+            "schema_version": "relaytic.abstention_policy_report.v1",
+            "generated_at": _utc_now(),
+            "status": "not_applicable",
+            "task_type": task_type,
+            "summary": "Abstention posture is only applicable to classification tasks.",
         }
 
     budget_path = write_json(hpo_artifact_path(run_dir, "hpo_budget_contract"), budget_contract, indent=2)
@@ -2510,6 +2839,16 @@ def _write_hpo_artifacts(
     early_stop_path = write_json(hpo_artifact_path(run_dir, "early_stopping_report"), early_stopping_report, indent=2)
     scorecard_path = write_json(hpo_artifact_path(run_dir, "search_loop_scorecard"), search_loop_scorecard, indent=2)
     threshold_path = write_json(hpo_artifact_path(run_dir, "threshold_tuning_report"), threshold_tuning_report, indent=2)
+    calibration_strategy_path = write_json(run_dir / "calibration_strategy_report.json", calibration_strategy_report, indent=2)
+    operating_point_contract_path = write_json(run_dir / "operating_point_contract.json", operating_point_contract, indent=2)
+    threshold_search_path = write_json(run_dir / "threshold_search_report.json", threshold_search_report, indent=2)
+    decision_cost_profile_path = write_json(run_dir / "decision_cost_profile.json", decision_cost_profile_report, indent=2)
+    review_budget_optimization_path = write_json(
+        run_dir / "review_budget_optimization_report.json",
+        review_budget_optimization_report,
+        indent=2,
+    )
+    abstention_policy_path = write_json(run_dir / "abstention_policy_report.json", abstention_policy_report, indent=2)
     ledger_path = _write_jsonl_records(hpo_artifact_path(run_dir, "trial_ledger"), trial_ledger)
     return {
         "hpo_budget_contract_path": str(budget_path),
@@ -2518,6 +2857,12 @@ def _write_hpo_artifacts(
         "early_stopping_report_path": str(early_stop_path),
         "search_loop_scorecard_path": str(scorecard_path),
         "threshold_tuning_report_path": str(threshold_path),
+        "calibration_strategy_report_path": str(calibration_strategy_path),
+        "operating_point_contract_path": str(operating_point_contract_path),
+        "threshold_search_report_path": str(threshold_search_path),
+        "decision_cost_profile_path": str(decision_cost_profile_path),
+        "review_budget_optimization_report_path": str(review_budget_optimization_path),
+        "abstention_policy_report_path": str(abstention_policy_path),
         "trial_ledger_path": str(ledger_path),
     }
 
@@ -3576,10 +3921,10 @@ def _fit_candidate_calibration(
 ) -> dict[str, Any]:
     if len(class_labels) != 2 or not positive_label or positive_label not in class_labels:
         return {"status": "identity", "method": "none"}
-    pos_idx = class_labels.index(str(positive_label))
-    return fit_binary_platt_calibrator(
+    return select_binary_calibration_strategy(
         y_true=y_true,
-        positive_scores=np.asarray(probabilities, dtype=float)[:, pos_idx],
+        probabilities=np.asarray(probabilities, dtype=float),
+        class_labels=list(class_labels),
         positive_label=str(positive_label),
     )
 
@@ -3590,7 +3935,7 @@ def _apply_candidate_calibration(
     class_labels: list[str],
     calibration: dict[str, Any] | None,
 ) -> np.ndarray:
-    return apply_binary_platt_calibrator(
+    return apply_binary_calibrator(
         probabilities=np.asarray(probabilities, dtype=float),
         class_labels=list(class_labels),
         calibrator=calibration,
