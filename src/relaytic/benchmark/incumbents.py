@@ -1155,6 +1155,13 @@ def _select_binary_threshold(
 def _metric_value(metrics: dict[str, Any], metric: str) -> float | None:
     value = metrics.get(metric)
     if value is None:
+        alias = {
+            "stability_adjusted_mae": "mae",
+            "mae_per_latency": "mae",
+        }.get(str(metric or "").strip().lower())
+        if alias:
+            value = metrics.get(alias)
+    if value is None:
         return None
     try:
         return float(value)

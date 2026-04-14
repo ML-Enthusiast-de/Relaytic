@@ -926,6 +926,13 @@ def _metric_value_present(metrics: dict[str, Any], metric_name: str) -> bool:
     if not isinstance(metrics, dict):
         return False
     value = metrics.get(metric_name)
+    if value is None:
+        alias = {
+            "stability_adjusted_mae": "mae",
+            "mae_per_latency": "mae",
+        }.get(str(metric_name or "").strip().lower())
+        if alias:
+            value = metrics.get(alias)
     return value is not None
 
 

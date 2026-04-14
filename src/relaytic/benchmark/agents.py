@@ -227,30 +227,51 @@ def run_benchmark_review(
         }
 
     lag_horizon = _optional_int(builder_handoff.get("lag_horizon_samples"))
+    if lag_horizon is None:
+        lag_horizon = _optional_int(execution_summary.get("lag_horizon_samples"))
+    if lag_horizon is None and task_profile.data_mode == "time_series":
+        lag_horizon = 3
     use_lagged_references = bool(
         controls.allow_time_series_references
         and lag_horizon
         and lag_horizon > 0
-        and (
-            str(plan.get("data_mode", "")).strip() == "time_series"
-            or str(execution_summary.get("selected_model_family", "")).strip().startswith("lagged_")
-        )
+        and task_profile.data_mode == "time_series"
     )
-    design = _prepare_reference_design(
+    ordinary_design = _prepare_reference_design(
         prepared_frames=prepared_frames,
         target_column=target_column,
         feature_columns=model_feature_columns,
-        lag_horizon=lag_horizon if use_lagged_references else None,
+        lag_horizon=None,
     )
     reference_rows = _run_reference_matrix(
         controls=controls,
         task_type=task_profile.task_type,
+        data_mode=task_profile.data_mode,
         target_column=target_column,
-        frames=design["frames"],
-        feature_columns=design["feature_columns"],
+        frames=ordinary_design["frames"],
+        feature_columns=ordinary_design["feature_columns"],
         threshold_policy=_clean_text(builder_handoff.get("threshold_policy")) or "auto",
-        lagged=use_lagged_references,
+        lagged=False,
     )
+    if use_lagged_references:
+        lagged_design = _prepare_reference_design(
+            prepared_frames=prepared_frames,
+            target_column=target_column,
+            feature_columns=model_feature_columns,
+            lag_horizon=lag_horizon,
+        )
+        reference_rows.extend(
+            _run_reference_matrix(
+                controls=controls,
+                task_type=task_profile.task_type,
+                data_mode=task_profile.data_mode,
+                target_column=target_column,
+                frames=lagged_design["frames"],
+                feature_columns=lagged_design["feature_columns"],
+                threshold_policy=_clean_text(builder_handoff.get("threshold_policy")) or "auto",
+                lagged=True,
+            )
+        )
     comparison_metric = _resolve_comparison_metric(
         primary_metric=_clean_text(metric_contract.get("benchmark_comparison_metric")) or _clean_text(plan.get("primary_metric")),
         selection_metric=_clean_text(metric_contract.get("selection_metric")) or _clean_text(execution_summary.get("selection_metric")),
@@ -264,6 +285,7 @@ def run_benchmark_review(
         metric_direction=metric_direction,
         preprocessing=preprocessing,
         use_lagged_references=use_lagged_references,
+        data_mode=task_profile.data_mode,
     )
     ranking = _rank_rows(
         comparison_metric=comparison_metric,
@@ -1481,6 +1503,7 @@ def _run_reference_matrix(
     *,
     controls: BenchmarkControls,
     task_type: str,
+    data_mode: str,
     target_column: str,
     frames: dict[str, Any],
     feature_columns: list[str],
@@ -1494,6 +1517,7 @@ def _run_reference_matrix(
             _fit_reference_candidate(
                 spec=spec,
                 task_type=task_type,
+                data_mode=data_mode,
                 target_column=target_column,
                 frames=frames,
                 feature_columns=feature_columns,
@@ -1507,6 +1531,7 @@ def _fit_reference_candidate(
     *,
     spec: dict[str, Any],
     task_type: str,
+    data_mode: str,
     target_column: str,
     frames: dict[str, Any],
     feature_columns: list[str],
@@ -1579,9 +1604,18 @@ def _fit_reference_candidate(
         "model_family": spec["name"],
         "library": "scikit-learn",
         "task_type": task_type,
-        "train_metric": regression_metrics(y_true=train_y, y_pred=train_pred).to_dict(),
-        "validation_metric": regression_metrics(y_true=validation_y, y_pred=validation_pred).to_dict(),
-        "test_metric": regression_metrics(y_true=test_y, y_pred=test_pred).to_dict(),
+        "train_metric": _materialize_temporal_metric_aliases(
+            metrics=regression_metrics(y_true=train_y, y_pred=train_pred).to_dict(),
+            data_mode=data_mode,
+        ),
+        "validation_metric": _materialize_temporal_metric_aliases(
+            metrics=regression_metrics(y_true=validation_y, y_pred=validation_pred).to_dict(),
+            data_mode=data_mode,
+        ),
+        "test_metric": _materialize_temporal_metric_aliases(
+            metrics=regression_metrics(y_true=test_y, y_pred=test_pred).to_dict(),
+            data_mode=data_mode,
+        ),
         "notes": spec["notes"],
     }
 
@@ -1650,6 +1684,7 @@ def _relaytic_reference_row(
     metric_direction: str,
     preprocessing: dict[str, Any],
     use_lagged_references: bool,
+    data_mode: str,
 ) -> dict[str, Any]:
     selected_metrics = dict(execution_summary.get("selected_metrics") or {})
     return {
@@ -1657,9 +1692,18 @@ def _relaytic_reference_row(
         "model_family": _clean_text(execution_summary.get("selected_model_family")),
         "comparison_metric": comparison_metric,
         "metric_direction": metric_direction,
-        "train_metric": dict(selected_metrics.get("train") or {}),
-        "validation_metric": dict(selected_metrics.get("validation") or {}),
-        "test_metric": dict(selected_metrics.get("test") or {}),
+        "train_metric": _materialize_temporal_metric_aliases(
+            metrics=dict(selected_metrics.get("train") or {}),
+            data_mode=data_mode,
+        ),
+        "validation_metric": _materialize_temporal_metric_aliases(
+            metrics=dict(selected_metrics.get("validation") or {}),
+            data_mode=data_mode,
+        ),
+        "test_metric": _materialize_temporal_metric_aliases(
+            metrics=dict(selected_metrics.get("test") or {}),
+            data_mode=data_mode,
+        ),
         "primary_metric": _clean_text(plan.get("primary_metric")),
         "selection_metric": _clean_text(execution_summary.get("selection_metric")),
         "feature_engineering_summary": dict(preprocessing.get("feature_engineering_summary", {})),
@@ -1873,7 +1917,16 @@ def _resolve_comparison_metric(*, primary_metric: str | None, selection_metric: 
 
 def _metric_direction(metric: str) -> str:
     lowered = str(metric or "").strip().lower()
-    if lowered in {"mae", "rmse", "mape", "log_loss", "brier_score", "expected_calibration_error"}:
+    if lowered in {
+        "mae",
+        "rmse",
+        "mape",
+        "log_loss",
+        "brier_score",
+        "expected_calibration_error",
+        "stability_adjusted_mae",
+        "mae_per_latency",
+    }:
         return "lower_is_better"
     return "higher_is_better"
 
@@ -1881,11 +1934,30 @@ def _metric_direction(metric: str) -> str:
 def _metric_value(metrics: dict[str, Any], metric: str) -> float | None:
     value = metrics.get(metric)
     if value is None:
+        alias = _metric_alias(metric)
+        value = metrics.get(alias)
+    if value is None:
         return None
     try:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _metric_alias(metric: str) -> str:
+    normalized = str(metric or "").strip().lower()
+    return {
+        "stability_adjusted_mae": "mae",
+        "mae_per_latency": "mae",
+    }.get(normalized, normalized)
+
+
+def _materialize_temporal_metric_aliases(*, metrics: dict[str, Any], data_mode: str) -> dict[str, Any]:
+    payload = dict(metrics)
+    if str(data_mode).strip().lower() == "time_series" and "mae" in payload:
+        payload.setdefault("stability_adjusted_mae", payload["mae"])
+        payload.setdefault("mae_per_latency", payload["mae"])
+    return payload
 
 
 def _sort_key(*, metrics: dict[str, Any], metric: str, direction: str, model_family: str, role: str) -> tuple[Any, ...]:

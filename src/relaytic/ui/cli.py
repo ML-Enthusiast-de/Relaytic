@@ -9342,7 +9342,13 @@ def _run_planning_phase(
     runtime_surface: str = "cli",
     runtime_command: str | None = None,
 ) -> dict[str, Any]:
-    from relaytic.analytics import sync_architecture_routing_artifacts, sync_task_contract_artifacts
+    from relaytic.analytics import (
+        read_architecture_routing_artifacts,
+        read_task_contract_artifacts,
+        sync_architecture_routing_artifacts,
+        sync_task_contract_artifacts,
+        sync_temporal_engine_artifacts,
+    )
     from relaytic.planning import write_planning_bundle
 
     root = Path(run_dir)
@@ -9434,6 +9440,15 @@ def _run_planning_phase(
             route_prior_context=dict(_read_json_bundle(root, bundle="memory").get("route_prior_context", {}) or {}),
             benchmark_bundle=_read_json_bundle(root, bundle="benchmark"),
         )
+        temporal_written = sync_temporal_engine_artifacts(
+            root,
+            data_path=staged_data_path,
+            investigation_bundle=investigation_state["bundle"],
+            planning_bundle=planning_bundle.to_dict(),
+            benchmark_bundle=_read_json_bundle(root, bundle="benchmark"),
+            architecture_bundle=read_architecture_routing_artifacts(root),
+            task_contract_bundle=read_task_contract_artifacts(root),
+        )
         manifest_path = _refresh_planning_manifest(
             root,
             run_id=run_id,
@@ -9455,6 +9470,7 @@ def _run_planning_phase(
                 *(str(value) for value in written.values()),
                 *(str(value) for value in task_contract_written.values()),
                 *(str(value) for value in architecture_written.values()),
+                *(str(value) for value in temporal_written.values()),
                 *model_artifacts,
                 str(manifest_path),
             ],
@@ -9469,6 +9485,7 @@ def _run_planning_phase(
                 **{key: str(value) for key, value in written.items()},
                 **{key: str(value) for key, value in task_contract_written.items()},
                 **{key: str(value) for key, value in architecture_written.items()},
+                **{key: str(value) for key, value in temporal_written.items()},
             },
             "manifest_path": str(manifest_path),
             "plan": {
@@ -10152,9 +10169,13 @@ def _run_benchmark_phase(
         shadow_manifest = benchmark_result.bundle.shadow_trial_manifest
         promotion = benchmark_result.bundle.promotion_readiness_report
         quarantine = benchmark_result.bundle.candidate_quarantine
+        from relaytic.analytics import read_temporal_engine_artifacts
+
         task_contract_bundle = read_task_contract_artifacts(root)
+        temporal_bundle = read_temporal_engine_artifacts(root)
         bundle_payload = benchmark_result.bundle.to_dict()
         bundle_payload.update(task_contract_bundle)
+        bundle_payload.update(temporal_bundle)
         return {
             "surface_payload": {
                 "status": "ok",
@@ -10227,9 +10248,13 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     shadow_manifest = dict(bundle.get("shadow_trial_manifest", {}))
     promotion = dict(bundle.get("promotion_readiness_report", {}))
     quarantine = dict(bundle.get("candidate_quarantine", {}))
+    from relaytic.analytics import read_temporal_engine_artifacts
+
     task_contract_bundle = read_task_contract_artifacts(root)
+    temporal_bundle = read_temporal_engine_artifacts(root)
     bundle_payload = dict(bundle)
     bundle_payload.update(task_contract_bundle)
+    bundle_payload.update(temporal_bundle)
     return {
         "surface_payload": {
             "status": "ok",

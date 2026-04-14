@@ -148,6 +148,12 @@ Avoid introducing new references to:
 - introduced artifact boundaries for `optimization_objective_contract.json`, `objective_alignment_report.json`, `split_diagnostics_report.json`, `temporal_fold_health.json`, `metric_materialization_audit.json`, and `benchmark_truth_precheck.json`
 - upgraded planning, benchmark review, run summary, and assist explanation surfaces so one canonical objective contract, one split-health report, and one truth precheck decide whether a benchmark is safe to rank instead of letting metric drift or degenerate temporal folds pass silently
 
+### Slice 15J
+
+- extended the existing `src/relaytic/analytics/`, `src/relaytic/modeling/`, `src/relaytic/benchmark/`, `src/relaytic/runs/`, and `src/relaytic/ui/` boundaries rather than introducing a separate temporal runtime package
+- introduced artifact boundaries for `temporal_structure_report.json`, `temporal_feature_ladder.json`, `rolling_cv_plan.json`, `temporal_split_guard_report.json`, `sequence_shadow_scorecard.json`, `temporal_baseline_ladder.json`, and `temporal_metric_contract.json`
+- upgraded temporal splitters, lagged feature generation, benchmark review, run summary, and benchmark CLI surfaces so ordered temporal structure is explicit, blocked time splits preserve future events when possible, lagged baselines are compared honestly against ordinary baselines, temporal comparison metrics are alias-safe, and sequence candidates remain shadow-only until they beat strong lagged baselines
+
 ### Slice 09A
 
 - introduced the canonical package boundary `src/relaytic/memory/`
@@ -497,7 +503,7 @@ The following boundaries are reserved for the next frontier slices so later impl
 
 - `src/relaytic/modeling/families/`, if introduced during Slice 15H, for first-class family-owned trainers, search spaces, adapter shims, and specialization logic rather than one generic trainer path
 - `src/relaytic/modeling/portfolio/`, if introduced during Slice 15I, for staged family probing, racing, finalist search, pruning, and budget-envelope logic
-- `src/relaytic/temporal/`, if introduced during Slice 15J, for temporal-structure analysis, rolling/grouped split contracts, temporal feature ladders, and sequence-shadow evaluation
+- `src/relaytic/temporal/`, if introduced after Slice 15J, for deeper temporal family ownership beyond the currently shipped temporal-engine surfaces in `src/relaytic/analytics/`, `src/relaytic/modeling/`, and `src/relaytic/benchmark/`
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should avoid creating a new package boundary unless absolutely necessary; its job is to remove misleading, duplicated, or legacy boundaries, split oversized modules, retire compatibility shims when the removal criteria are met, and leave the public surface cleaner than before

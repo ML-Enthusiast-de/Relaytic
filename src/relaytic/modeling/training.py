@@ -617,9 +617,18 @@ def train_surrogate_candidates(
         "professional_analysis": professional_analysis,
         "uncertainty": regression_uncertainty,
         "selected_metrics": {
-            "train": selected_candidate.train_metrics,
-            "validation": selected_candidate.validation_metrics,
-            "test": selected_candidate.test_metrics,
+            "train": _materialize_temporal_metric_aliases(
+                metrics=selected_candidate.train_metrics,
+                data_mode=data_mode,
+            ),
+            "validation": _materialize_temporal_metric_aliases(
+                metrics=selected_candidate.validation_metrics,
+                data_mode=data_mode,
+            ),
+            "test": _materialize_temporal_metric_aliases(
+                metrics=selected_candidate.test_metrics,
+                data_mode=data_mode,
+            ),
         },
         "hpo": {
             "budget_contract": dict(hpo_context.get("budget_contract") or {}),
@@ -1066,9 +1075,18 @@ def _train_classification_candidates(
         "calibration": dict(selected_candidate.calibration or {}),
         "uncertainty": dict(selected_candidate.uncertainty or {}),
         "selected_metrics": {
-            "train": selected_candidate.train_metrics,
-            "validation": selected_candidate.validation_metrics,
-            "test": selected_candidate.test_metrics,
+            "train": _materialize_temporal_metric_aliases(
+                metrics=selected_candidate.train_metrics,
+                data_mode="time_series" if split.data_mode == "time_series" else "steady_state",
+            ),
+            "validation": _materialize_temporal_metric_aliases(
+                metrics=selected_candidate.validation_metrics,
+                data_mode="time_series" if split.data_mode == "time_series" else "steady_state",
+            ),
+            "test": _materialize_temporal_metric_aliases(
+                metrics=selected_candidate.test_metrics,
+                data_mode="time_series" if split.data_mode == "time_series" else "steady_state",
+            ),
         },
         "hpo": {
             "budget_contract": dict(hpo_context.get("budget_contract") or {}),
@@ -1298,6 +1316,7 @@ class LaggedLinearSurrogate:
             feature_columns=self.feature_columns,
             target_column=self.target_column,
             lag_horizon=self.lag_horizon,
+            expected_feature_columns=self._lagged_feature_columns,
         )
         if lagged.shape[0] == 0:
             raise ValueError("No valid rows available after lagged feature construction.")
@@ -1359,6 +1378,7 @@ class LaggedLinearSurrogate:
             target_column=self.target_column,
             lag_horizon=self.lag_horizon,
             context_frame=context_frame,
+            expected_feature_columns=self._lagged_feature_columns,
         )
 
     def _require_delegate(self) -> IncrementalLinearSurrogate:
@@ -1402,6 +1422,7 @@ class LaggedTreeEnsembleSurrogate:
             feature_columns=self.feature_columns,
             target_column=self.target_column,
             lag_horizon=self.lag_horizon,
+            expected_feature_columns=self._lagged_feature_columns,
         )
         if lagged.shape[0] == 0:
             raise ValueError("No valid rows available after lagged feature construction.")
@@ -1467,6 +1488,7 @@ class LaggedTreeEnsembleSurrogate:
             target_column=self.target_column,
             lag_horizon=self.lag_horizon,
             context_frame=context_frame,
+            expected_feature_columns=self._lagged_feature_columns,
         )
 
     def _require_delegate(self) -> BaggedTreeEnsembleSurrogate:
@@ -1574,6 +1596,7 @@ class LaggedLogisticClassificationSurrogate:
             target_column=self.target_column,
             lag_horizon=self.lag_horizon,
             context_frame=context_frame,
+            expected_feature_columns=self._lagged_feature_columns,
         )
 
     def _require_delegate(self) -> LogisticClassificationSurrogate:
@@ -1681,6 +1704,7 @@ class LaggedTreeClassifierSurrogate:
             target_column=self.target_column,
             lag_horizon=self.lag_horizon,
             context_frame=context_frame,
+            expected_feature_columns=self._lagged_feature_columns,
         )
 
     def _require_delegate(self) -> BaggedTreeClassifierSurrogate:
@@ -3678,10 +3702,18 @@ def _prepare_xy(
 
 def _lagged_feature_names(*, feature_columns: list[str], lag_horizon: int) -> list[str]:
     names: list[str] = []
+    rolling_window = _temporal_rolling_window(lag_horizon=lag_horizon)
     for col in feature_columns:
         names.append(f"{col}__t")
         for lag in range(1, int(lag_horizon) + 1):
             names.append(f"{col}__lag{lag}")
+        names.append(f"{col}__delta1")
+        names.append(f"{col}__rolling_mean{rolling_window}")
+        names.append(f"{col}__rolling_std{rolling_window}")
+        names.append(f"{col}__rolling_min{rolling_window}")
+        names.append(f"{col}__rolling_max{rolling_window}")
+        if int(lag_horizon) > 1:
+            names.append(f"{col}__seasonal_delta{int(lag_horizon)}")
     return names
 
 
@@ -3692,6 +3724,7 @@ def _build_lagged_design_frame(
     target_column: str,
     lag_horizon: int,
     context_frame: pd.DataFrame | None = None,
+    expected_feature_columns: list[str] | None = None,
 ) -> pd.DataFrame:
     required = list(feature_columns) + [target_column]
     _require_columns(frame, required)
@@ -3707,18 +3740,42 @@ def _build_lagged_design_frame(
         combined = frame[required].copy().reset_index(drop=True)
 
     out_columns: dict[str, pd.Series] = {}
+    rolling_window = _temporal_rolling_window(lag_horizon=lag_horizon)
     for col in feature_columns:
         numeric = pd.to_numeric(combined[col], errors="coerce")
         out_columns[f"{col}__t"] = numeric
         for lag in range(1, int(lag_horizon) + 1):
             out_columns[f"{col}__lag{lag}"] = numeric.shift(lag)
+        out_columns[f"{col}__delta1"] = numeric.diff(1)
+        rolling = numeric.rolling(window=rolling_window, min_periods=rolling_window)
+        out_columns[f"{col}__rolling_mean{rolling_window}"] = rolling.mean()
+        out_columns[f"{col}__rolling_std{rolling_window}"] = rolling.std()
+        out_columns[f"{col}__rolling_min{rolling_window}"] = rolling.min()
+        out_columns[f"{col}__rolling_max{rolling_window}"] = rolling.max()
+        if int(lag_horizon) > 1:
+            out_columns[f"{col}__seasonal_delta{int(lag_horizon)}"] = numeric - numeric.shift(int(lag_horizon))
     out_columns[target_column] = pd.to_numeric(combined[target_column], errors="coerce")
     out_columns["_is_current"] = pd.Series(False, index=combined.index)
     out = pd.DataFrame(out_columns, index=combined.index)
     out.loc[context_len:, "_is_current"] = True
     out = out.dropna()
     out = out[out["_is_current"]].drop(columns=["_is_current"]).reset_index(drop=True)
+    if expected_feature_columns:
+        ordered = [column for column in expected_feature_columns if column in out.columns]
+        out = out[ordered + [target_column]]
     return out
+
+
+def _temporal_rolling_window(*, lag_horizon: int) -> int:
+    return max(2, min(int(lag_horizon) + 1, 4))
+
+
+def _materialize_temporal_metric_aliases(*, metrics: dict[str, float], data_mode: str) -> dict[str, float]:
+    payload = {str(key): float(value) for key, value in dict(metrics).items()}
+    if str(data_mode).strip().lower() == "time_series" and "mae" in payload:
+        payload.setdefault("stability_adjusted_mae", float(payload["mae"]))
+        payload.setdefault("mae_per_latency", float(payload["mae"]))
+    return payload
 
 
 def _prepare_feature_matrix(*, frame: pd.DataFrame, feature_columns: list[str]) -> np.ndarray:

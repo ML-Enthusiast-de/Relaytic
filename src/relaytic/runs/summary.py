@@ -38,7 +38,11 @@ def build_run_summary(
         USER_RESULT_REPORT_RELATIVE_PATH,
         read_handoff_bundle,
     )
-    from relaytic.analytics import read_architecture_routing_artifacts, read_task_contract_artifacts
+    from relaytic.analytics import (
+        read_architecture_routing_artifacts,
+        read_task_contract_artifacts,
+        read_temporal_engine_artifacts,
+    )
     from relaytic.iteration import read_iteration_bundle
     from relaytic.events import read_event_bus_bundle
     from relaytic.permissions import read_permission_bundle
@@ -323,6 +327,7 @@ def build_run_summary(
     daemon_bundle = read_daemon_bundle(root)
     remote_control_bundle = read_remote_control_bundle(root)
     architecture_bundle = read_architecture_routing_artifacts(root)
+    temporal_bundle = read_temporal_engine_artifacts(root)
     hpo_bundle = _read_bundle(
         root,
         {
@@ -381,6 +386,13 @@ def build_run_summary(
     temporal_fold_health = dict(task_contract_bundle.get("temporal_fold_health", {})) if isinstance(task_contract_bundle.get("temporal_fold_health"), dict) else {}
     metric_materialization_audit = dict(task_contract_bundle.get("metric_materialization_audit", {})) if isinstance(task_contract_bundle.get("metric_materialization_audit"), dict) else {}
     benchmark_truth_precheck = dict(task_contract_bundle.get("benchmark_truth_precheck", {})) if isinstance(task_contract_bundle.get("benchmark_truth_precheck"), dict) else {}
+    temporal_structure_report = dict(temporal_bundle.get("temporal_structure_report", {})) if isinstance(temporal_bundle.get("temporal_structure_report"), dict) else {}
+    temporal_feature_ladder = dict(temporal_bundle.get("temporal_feature_ladder", {})) if isinstance(temporal_bundle.get("temporal_feature_ladder"), dict) else {}
+    rolling_cv_plan = dict(temporal_bundle.get("rolling_cv_plan", {})) if isinstance(temporal_bundle.get("rolling_cv_plan"), dict) else {}
+    temporal_split_guard_report = dict(temporal_bundle.get("temporal_split_guard_report", {})) if isinstance(temporal_bundle.get("temporal_split_guard_report"), dict) else {}
+    sequence_shadow_scorecard = dict(temporal_bundle.get("sequence_shadow_scorecard", {})) if isinstance(temporal_bundle.get("sequence_shadow_scorecard"), dict) else {}
+    temporal_baseline_ladder = dict(temporal_bundle.get("temporal_baseline_ladder", {})) if isinstance(temporal_bundle.get("temporal_baseline_ladder"), dict) else {}
+    temporal_metric_contract = dict(temporal_bundle.get("temporal_metric_contract", {})) if isinstance(temporal_bundle.get("temporal_metric_contract"), dict) else {}
     architecture_registry = dict(architecture_bundle.get("architecture_registry", {})) if isinstance(architecture_bundle.get("architecture_registry"), dict) else {}
     architecture_router_report = dict(architecture_bundle.get("architecture_router_report", {})) if isinstance(architecture_bundle.get("architecture_router_report"), dict) else {}
     candidate_family_matrix = dict(architecture_bundle.get("candidate_family_matrix", {})) if isinstance(architecture_bundle.get("candidate_family_matrix"), dict) else {}
@@ -1150,6 +1162,27 @@ def build_run_summary(
             "safe_for_benchmarking": benchmark_truth_precheck.get("safe_to_rank"),
             "summary": _clean_text(temporal_fold_health.get("summary")) or _clean_text(split_diagnostics_report.get("summary")),
         },
+        "temporal": {
+            "status": _clean_text(temporal_structure_report.get("status")),
+            "ordered_temporal_structure": temporal_structure_report.get("ordered_temporal_structure"),
+            "timestamp_column": _clean_text(temporal_structure_report.get("timestamp_column")) or _clean_text(task_profile_contract.get("timestamp_column")),
+            "regular_cadence": temporal_structure_report.get("regular_cadence"),
+            "lag_horizon_samples": temporal_feature_ladder.get("lag_horizon_samples"),
+            "rolling_window_samples": temporal_feature_ladder.get("rolling_window_samples"),
+            "materialized_feature_families": [
+                str(item) for item in temporal_feature_ladder.get("materialized_feature_families", []) if str(item).strip()
+            ],
+            "split_guard_state": _clean_text(temporal_split_guard_report.get("guard_state")),
+            "rolling_cv_strategy": _clean_text(rolling_cv_plan.get("recommended_strategy")),
+            "lagged_beats_ordinary": temporal_baseline_ladder.get("lagged_beats_ordinary"),
+            "baseline_comparison_metric": _clean_text(temporal_baseline_ladder.get("comparison_metric")),
+            "sequence_shadow_rows": len(sequence_shadow_scorecard.get("rows", []))
+            if isinstance(sequence_shadow_scorecard.get("rows"), list)
+            else 0,
+            "temporal_metric_status": _clean_text(temporal_metric_contract.get("status")),
+            "summary": _clean_text(temporal_split_guard_report.get("summary"))
+            or _clean_text(temporal_structure_report.get("summary")),
+        },
         "benchmark_vs_deploy": {
             "status": _clean_text(benchmark_vs_deploy_report.get("status")),
             "benchmark_status": _clean_text(benchmark_vs_deploy_report.get("benchmark_status")),
@@ -1520,6 +1553,13 @@ def build_run_summary(
                 "temporal_fold_health_path": _path_if_exists(root / "temporal_fold_health.json"),
                 "metric_materialization_audit_path": _path_if_exists(root / "metric_materialization_audit.json"),
                 "benchmark_truth_precheck_path": _path_if_exists(root / "benchmark_truth_precheck.json"),
+                "temporal_structure_report_path": _path_if_exists(root / "temporal_structure_report.json"),
+                "temporal_feature_ladder_path": _path_if_exists(root / "temporal_feature_ladder.json"),
+                "rolling_cv_plan_path": _path_if_exists(root / "rolling_cv_plan.json"),
+                "temporal_split_guard_report_path": _path_if_exists(root / "temporal_split_guard_report.json"),
+                "sequence_shadow_scorecard_path": _path_if_exists(root / "sequence_shadow_scorecard.json"),
+                "temporal_baseline_ladder_path": _path_if_exists(root / "temporal_baseline_ladder.json"),
+                "temporal_metric_contract_path": _path_if_exists(root / "temporal_metric_contract.json"),
                 "architecture_registry_path": _path_if_exists(root / "architecture_registry.json"),
             "architecture_router_report_path": _path_if_exists(root / "architecture_router_report.json"),
             "candidate_family_matrix_path": _path_if_exists(root / "candidate_family_matrix.json"),
@@ -2259,7 +2299,12 @@ def materialize_run_summary(
         USER_RESULT_REPORT_RELATIVE_PATH,
         run_handoff_review,
     )
-    from relaytic.analytics import sync_architecture_routing_artifacts, sync_task_contract_artifacts
+    from relaytic.analytics import (
+        read_task_contract_artifacts,
+        sync_architecture_routing_artifacts,
+        sync_task_contract_artifacts,
+        sync_temporal_engine_artifacts,
+    )
     from relaytic.iteration import sync_iteration_from_run
     from relaytic.learnings import (
         default_learnings_state_dir,
@@ -2317,6 +2362,28 @@ def materialize_run_summary(
         planning_bundle=_read_bundle(root, {"plan": "plan.json"}),
         route_prior_context=_read_bundle(root, {"route_prior_context": "route_prior_context.json"}).get("route_prior_context", {}),
         benchmark_bundle=_read_bundle(root, {"benchmark_parity_report": "benchmark_parity_report.json"}),
+    )
+    sync_temporal_engine_artifacts(
+        root,
+        data_path=data_path or _path_if_exists(root / "data.csv") or _clean_text(dict(base_summary.get("data", {})).get("data_path")),
+        investigation_bundle=_read_bundle(root, {"dataset_profile": "dataset_profile.json"}),
+        planning_bundle=_read_bundle(root, {"plan": "plan.json"}),
+        benchmark_bundle=_read_bundle(
+            root,
+            {
+                "reference_approach_matrix": "reference_approach_matrix.json",
+                "benchmark_ablation_matrix": "benchmark_ablation_matrix.json",
+                "shadow_trial_scorecard": "shadow_trial_scorecard.json",
+            },
+        ),
+        architecture_bundle=_read_bundle(
+            root,
+            {
+                "architecture_router_report": "architecture_router_report.json",
+                "architecture_ablation_report": "architecture_ablation_report.json",
+            },
+        ),
+        task_contract_bundle=read_task_contract_artifacts(root),
     )
     try:
         policy_path = root / "policy_resolved.yaml"

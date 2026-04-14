@@ -40,7 +40,7 @@ def build_train_validation_test_split(
         raise ValueError("At least 12 rows are required for train/validation/test split.")
     mode = data_mode.strip().lower()
     if mode == "time_series":
-        return _build_time_series_split(n_rows=n_rows)
+        return _build_time_series_split(n_rows=n_rows, stratify_labels=stratify_labels)
     if str(task_type).strip() in {
         "binary_classification",
         "multiclass_classification",
@@ -56,7 +56,38 @@ def build_train_validation_test_split(
     return _build_steady_state_split(n_rows=n_rows)
 
 
-def _build_time_series_split(*, n_rows: int) -> DatasetSplit:
+def _build_time_series_split(
+    *,
+    n_rows: int,
+    stratify_labels: Sequence[Any] | np.ndarray | None = None,
+) -> DatasetSplit:
+    train_end, val_end = _default_time_series_boundaries(n_rows=n_rows)
+    if stratify_labels is not None:
+        adjusted = _event_preserving_time_series_boundaries(
+            n_rows=n_rows,
+            stratify_labels=stratify_labels,
+            default_train_end=train_end,
+            default_val_end=val_end,
+        )
+        if adjusted is not None:
+            train_end, val_end = adjusted
+            return DatasetSplit(
+                train_indices=np.arange(0, train_end, dtype=int),
+                validation_indices=np.arange(train_end, val_end, dtype=int),
+                test_indices=np.arange(val_end, n_rows, dtype=int),
+                strategy="blocked_time_order_event_preserving_70_15_15",
+                data_mode="time_series",
+            )
+    return DatasetSplit(
+        train_indices=np.arange(0, train_end, dtype=int),
+        validation_indices=np.arange(train_end, val_end, dtype=int),
+        test_indices=np.arange(val_end, n_rows, dtype=int),
+        strategy="blocked_time_order_70_15_15",
+        data_mode="time_series",
+    )
+
+
+def _default_time_series_boundaries(*, n_rows: int) -> tuple[int, int]:
     train_end = max(6, int(round(n_rows * 0.70)))
     val_end = max(train_end + 2, int(round(n_rows * 0.85)))
     train_end = min(train_end, n_rows - 4)
@@ -66,13 +97,69 @@ def _build_time_series_split(*, n_rows: int) -> DatasetSplit:
         val_end = n_rows - 2
     if train_end < 6 or (val_end - train_end) < 2 or (n_rows - val_end) < 2:
         raise ValueError("Unable to create a valid time-series split with current row count.")
-    return DatasetSplit(
-        train_indices=np.arange(0, train_end, dtype=int),
-        validation_indices=np.arange(train_end, val_end, dtype=int),
-        test_indices=np.arange(val_end, n_rows, dtype=int),
-        strategy="blocked_time_order_70_15_15",
-        data_mode="time_series",
+    return train_end, val_end
+
+
+def _event_preserving_time_series_boundaries(
+    *,
+    n_rows: int,
+    stratify_labels: Sequence[Any] | np.ndarray,
+    default_train_end: int,
+    default_val_end: int,
+) -> tuple[int, int] | None:
+    labels = np.asarray(list(stratify_labels), dtype=object)
+    if labels.shape[0] != n_rows:
+        raise ValueError("stratify_labels length must match n_rows.")
+    normalized = np.asarray([str(item) for item in labels.tolist()], dtype=object)
+    unique_labels, inverse = np.unique(normalized, return_inverse=True)
+    if unique_labels.size < 2:
+        return None
+
+    label_totals = np.bincount(inverse, minlength=int(unique_labels.size))
+    required_indices = np.where(label_totals >= 3)[0]
+    if required_indices.size == 0:
+        return None
+
+    prefix = np.zeros((n_rows + 1, int(unique_labels.size)), dtype=int)
+    for idx, class_index in enumerate(inverse.tolist(), start=1):
+        prefix[idx] = prefix[idx - 1]
+        prefix[idx, int(class_index)] += 1
+
+    def _slice_counts(start: int, end: int) -> np.ndarray:
+        return prefix[end] - prefix[start]
+
+    def _covers_required_labels(start: int, end: int) -> bool:
+        counts = _slice_counts(start, end)
+        return bool(np.all(counts[required_indices] > 0))
+
+    search_radius = max(12, min(256, int(round(n_rows * 0.20))))
+    train_candidates = range(
+        max(6, default_train_end - search_radius),
+        min(n_rows - 4, default_train_end + search_radius) + 1,
     )
+    val_floor = max(8, default_val_end - search_radius)
+    val_ceiling = min(n_rows - 2, default_val_end + search_radius)
+
+    best_candidate: tuple[int, int] | None = None
+    best_score: tuple[int, int] | None = None
+    for train_end in train_candidates:
+        for val_end in range(max(train_end + 2, val_floor), val_ceiling + 1):
+            if (val_end - train_end) < 2 or (n_rows - val_end) < 2:
+                continue
+            if not _covers_required_labels(0, train_end):
+                continue
+            if not _covers_required_labels(train_end, val_end):
+                continue
+            if not _covers_required_labels(val_end, n_rows):
+                continue
+            score = (
+                abs(train_end - default_train_end) + abs(val_end - default_val_end),
+                abs((val_end - train_end) - max(2, int(round(n_rows * 0.15)))),
+            )
+            if best_score is None or score < best_score:
+                best_score = score
+                best_candidate = (train_end, val_end)
+    return best_candidate
 
 
 def _build_steady_state_split(*, n_rows: int) -> DatasetSplit:
