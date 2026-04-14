@@ -496,6 +496,12 @@ def build_run_summary(
     distributed_run_plan = _bundle_item(search_bundle, "distributed_run_plan")
     execution_strategy_report = _bundle_item(search_bundle, "execution_strategy_report")
     search_value_report = _bundle_item(search_bundle, "search_value_report")
+    search_budget_envelope = _bundle_item(search_bundle, "search_budget_envelope")
+    probe_stage_report = _bundle_item(search_bundle, "probe_stage_report")
+    family_race_report = _bundle_item(search_bundle, "family_race_report")
+    finalist_search_plan = _bundle_item(search_bundle, "finalist_search_plan")
+    portfolio_search_scorecard = _bundle_item(search_bundle, "portfolio_search_scorecard")
+    search_stop_reason = _bundle_item(search_bundle, "search_stop_reason")
     run_handoff = dict(handoff_bundle.get("run_handoff", {})) if isinstance(handoff_bundle.get("run_handoff"), dict) else {}
     next_run_options = dict(handoff_bundle.get("next_run_options", {})) if isinstance(handoff_bundle.get("next_run_options"), dict) else {}
     next_run_focus = dict(handoff_bundle.get("next_run_focus", {})) if isinstance(handoff_bundle.get("next_run_focus"), dict) else {}
@@ -980,6 +986,19 @@ def build_run_summary(
             "execution_mode": _clean_text(distributed_run_plan.get("execution_mode")),
             "same_plan_across_profiles": execution_strategy_report.get("same_plan_across_profiles"),
             "max_trials": int(hpo_campaign_report.get("max_trials", 0) or 0),
+            "budget_profile": _clean_text(dict(search_budget_envelope.get("controls", {})).get("budget_profile")),
+            "probe_family_count": int(portfolio_search_scorecard.get("probe_family_count", 0) or 0),
+            "race_family_count": int(portfolio_search_scorecard.get("race_family_count", 0) or 0),
+            "finalist_count": int(portfolio_search_scorecard.get("finalist_count", 0) or 0),
+            "calibration_budget": int(finalist_search_plan.get("calibration_budget", 0) or 0),
+            "stop_reason_kind": _clean_text(search_stop_reason.get("reason_kind")),
+            "skipped_deeper_work_count": int(portfolio_search_scorecard.get("skipped_deeper_work_count", 0) or 0),
+            "probe_promoted_family_count": len(probe_stage_report.get("promoted_families", []))
+            if isinstance(probe_stage_report.get("promoted_families"), list)
+            else 0,
+            "race_finalist_count": len(family_race_report.get("finalists", []))
+            if isinstance(family_race_report.get("finalists"), list)
+            else 0,
         },
         "hpo": {
             "status": _clean_text(search_loop_scorecard.get("status")) or _clean_text(hpo_budget_contract.get("status")),

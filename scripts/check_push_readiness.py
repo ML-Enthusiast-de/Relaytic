@@ -26,9 +26,11 @@ _PREPUSH_ONLY_GROUPS = (
         "prepush",
         "tests/test_push_prepush.py",
         "tests/test_hpo_loop.py",
+        "tests/test_search_agents.py",
         "tests/test_model_training_candidates.py",
         "tests/test_planning_agents.py",
         "tests/test_cli_slice15h.py",
+        "tests/test_cli_slice15i.py",
     ],
 )
 

@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -16,6 +17,8 @@ for module_name in list(sys.modules):
     if module_name == "corr2surrogate" or module_name.startswith("corr2surrogate."):
         sys.modules.pop(module_name, None)
 
+os.environ.setdefault("RELAYTIC_SEARCH_BUDGET_PROFILE", "test")
+
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
@@ -33,7 +36,9 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
                 "tests/test_hpo_loop.py",
                 "tests/test_model_training_candidates.py",
                 "tests/test_planning_agents.py",
+                "tests/test_search_agents.py",
                 "tests/test_cli_slice15h.py",
+                "tests/test_cli_slice15i.py",
             )
         ):
             item.add_marker(pytest.mark.prepush)

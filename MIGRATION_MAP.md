@@ -455,7 +455,7 @@ Shipped artifact names:
 
 - `src/relaytic/workspace/` now owns Slice 12D workspace state, multi-run lineage, focus history, workspace memory policy, and workspace-backed continuity views
 - `src/relaytic/iteration/` now owns Slice 12D next-run planning, focus-decision records, and data-expansion candidates
-- `src/relaytic/search/` now owns Slice 13 search-controller plans, portfolio search traces, HPO campaign reports, execution-strategy selection, and explicit value-of-search artifacts
+- `src/relaytic/search/` now owns Slice 13 search-controller plans, portfolio search traces, HPO campaign reports, execution-strategy selection, explicit value-of-search artifacts, and Slice 15I staged search-budget envelopes, probe/race/finalist reports, pruning reports, scorecards, and stop-reason artifacts
 
 Existing Slice 12C handoff and learnings commands remain part of the public compatibility surface. Under Slice 12D they now behave as compatibility-preserving views over workspace-backed truth rather than isolated per-run truth sources.
 

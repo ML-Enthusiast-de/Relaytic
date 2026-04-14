@@ -45,6 +45,7 @@ from .hpo_loop import (
     WARM_START_TRANSFER_REPORT_SCHEMA_VERSION,
     artifact_path as hpo_artifact_path,
     build_architecture_search_space,
+    build_portfolio_search_plan,
     build_trial_plans,
     derive_hpo_budget_contract,
     load_warm_start_state,
@@ -2249,16 +2250,23 @@ def _prepare_hpo_context(
         run_dir=run_dir,
         selected_families=[str(item) for item in budget_contract.get("selected_families", [])],
     )
+    portfolio_plan = build_portfolio_search_plan(
+        budget_contract=budget_contract,
+        architecture_search_space=architecture_search_space,
+        warm_start_state=warm_start_state,
+    )
     trial_plans = build_trial_plans(
         budget_contract=budget_contract,
         architecture_search_space=architecture_search_space,
         warm_start_state=warm_start_state,
+        portfolio_plan=portfolio_plan,
     )
     deadline = time.monotonic() + float(budget_contract.get("max_wall_clock_seconds", 45) or 45)
     return {
         "budget_contract": budget_contract,
         "architecture_search_space": architecture_search_space,
         "warm_start_state": warm_start_state,
+        "portfolio_plan": portfolio_plan,
         "trial_plans": trial_plans,
         "deadline": deadline,
         "family_reports": [],
@@ -2326,6 +2334,7 @@ def _fit_hpo_family_candidates(
                 "trial_id": str(trial_plan.get("trial_id", "")).strip() or f"{family}_trial_{index:04d}",
                 "family": family,
                 "variant_id": str(trial_plan.get("variant_id", "")).strip() or f"{family}_variant_{index:04d}",
+                "stage": str(trial_plan.get("stage", "probe")),
                 "source": str(trial_plan.get("source", "search_space")),
                 "hyperparameters": dict(candidate.hyperparameters or {}),
                 "validation_metrics": dict(candidate.validation_metrics),
@@ -2353,6 +2362,16 @@ def _fit_hpo_family_candidates(
             "stop_reason": stop_reason,
             "best_trial_id": best_trial_id,
             "warm_start_used": any(str(item.get("source", "")) == "warm_start" for item in trial_plans[: max(len(records), 1)]),
+            "stages_planned": [
+                str(item.get("stage", "probe"))
+                for item in trial_plans
+                if str(item.get("stage", "probe")).strip()
+            ],
+            "stages_executed": [
+                str(item.get("stage", "probe"))
+                for item in trial_plans[: len(records)]
+                if str(item.get("stage", "probe")).strip()
+            ],
             "best_validation_metrics": dict(best_record["candidate"].validation_metrics) if best_record else {},
         },
         ledger,
@@ -2372,6 +2391,7 @@ def _write_hpo_artifacts(
     budget_contract = dict(hpo_context.get("budget_contract") or {})
     architecture_search_space = dict(hpo_context.get("architecture_search_space") or {})
     warm_start_state = dict(hpo_context.get("warm_start_state") or {})
+    portfolio_plan = dict(hpo_context.get("portfolio_plan") or {})
     family_reports = list(hpo_context.get("family_reports") or [])
     trial_ledger = list(hpo_context.get("trial_ledger") or [])
 
@@ -2398,10 +2418,24 @@ def _write_hpo_artifacts(
         "selected_variant_id": selected_candidate.variant_id,
         "best_validation_model_family": best_by_validation.model_family,
         "best_validation_variant_id": best_by_validation.variant_id,
+        "budget_profile": str(budget_contract.get("budget_profile", "operator")),
         "total_trials_executed": len(trial_ledger),
         "tuned_family_count": len(family_reports),
+        "probe_family_count": len(portfolio_plan.get("families", [])) if isinstance(portfolio_plan.get("families"), list) else 0,
+        "race_family_count": len(portfolio_plan.get("racing_families", [])) if isinstance(portfolio_plan.get("racing_families"), list) else 0,
+        "finalist_count": len(portfolio_plan.get("finalists", [])) if isinstance(portfolio_plan.get("finalists"), list) else 0,
         "family_reports": family_reports,
         "warm_start_used": bool(warm_start_state.get("used")),
+        "warm_start_influenced_families": [
+            str(item)
+            for item in portfolio_plan.get("warm_start_influenced_families", [])
+            if str(item).strip()
+        ],
+        "skipped_deeper_work": [
+            str(item)
+            for item in portfolio_plan.get("skipped_deeper_work", [])
+            if str(item).strip()
+        ],
         "stop_reasons": sorted({str(item.get("stop_reason", "")).strip() for item in family_reports if str(item.get("stop_reason", "")).strip()}),
         "summary": (
             f"Relaytic executed `{len(trial_ledger)}` bounded HPO trial(s) across `{len(family_reports)}` family loop(s) and selected `{selected_candidate.model_family}`."

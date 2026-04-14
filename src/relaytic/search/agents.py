@@ -23,25 +23,39 @@ from .models import (
     DISTRIBUTED_RUN_PLAN_SCHEMA_VERSION,
     EXECUTION_BACKEND_PROFILE_SCHEMA_VERSION,
     EXECUTION_STRATEGY_REPORT_SCHEMA_VERSION,
+    FAMILY_RACE_REPORT_SCHEMA_VERSION,
+    FINALIST_SEARCH_PLAN_SCHEMA_VERSION,
     HPO_CAMPAIGN_REPORT_SCHEMA_VERSION,
+    MULTI_FIDELITY_PRUNING_REPORT_SCHEMA_VERSION,
     PORTFOLIO_SEARCH_TRACE_SCHEMA_VERSION,
+    PORTFOLIO_SEARCH_SCORECARD_SCHEMA_VERSION,
+    PROBE_STAGE_REPORT_SCHEMA_VERSION,
     SCHEDULER_JOB_MAP_SCHEMA_VERSION,
+    SEARCH_BUDGET_ENVELOPE_SCHEMA_VERSION,
     SEARCH_CONTROLLER_EVAL_REPORT_SCHEMA_VERSION,
     SEARCH_CONTROLLER_PLAN_SCHEMA_VERSION,
     SEARCH_DECISION_LEDGER_SCHEMA_VERSION,
+    SEARCH_STOP_REASON_SCHEMA_VERSION,
     SEARCH_VALUE_REPORT_SCHEMA_VERSION,
     CheckpointStateArtifact,
     DeviceAllocationArtifact,
     DistributedRunPlanArtifact,
     ExecutionBackendProfileArtifact,
     ExecutionStrategyReportArtifact,
+    FamilyRaceReportArtifact,
+    FinalistSearchPlanArtifact,
     HpoCampaignReportArtifact,
+    MultiFidelityPruningReportArtifact,
     PortfolioSearchTraceArtifact,
+    PortfolioSearchScorecardArtifact,
+    ProbeStageReportArtifact,
     SchedulerJobMapArtifact,
     SearchBundle,
+    SearchBudgetEnvelopeArtifact,
     SearchControllerEvalReportArtifact,
     SearchControllerPlanArtifact,
     SearchDecisionLedgerArtifact,
+    SearchStopReasonArtifact,
     SearchTrace,
     SearchValueReportArtifact,
     build_search_controls_from_policy,
@@ -155,6 +169,12 @@ def run_search_review(*, run_dir: str | Path, policy: dict[str, Any]) -> SearchR
         candidate_branches=candidate_branches,
         value_band=value_band,
     )
+    family_candidates = _portfolio_family_candidates(
+        controls=controls,
+        planning_bundle=planning_bundle,
+        decision=decision,
+        candidate_branches=candidate_branches,
+    )
     profile_candidates = _profile_candidates(controls=controls)
     selected_execution_profile = _selected_execution_profile(
         controls=controls,
@@ -173,6 +193,14 @@ def run_search_review(*, run_dir: str | Path, policy: dict[str, Any]) -> SearchR
         recommended_action=recommended_action,
         stop_search_explicit=stop_search_explicit,
         widened_branch_count=len(widened_branches),
+    )
+    staged_portfolio = _staged_portfolio_plan(
+        controls=controls,
+        family_candidates=family_candidates,
+        selected_hpo_depth=selected_hpo_depth,
+        planned_trial_count=planned_trial_count,
+        stop_search_explicit=stop_search_explicit,
+        recommended_direction=recommended_direction,
     )
     execution_mode = "distributed_local" if distributed_jobs else "local_single_node"
     selected_strategy = "stop_search" if stop_search_explicit else ("distributed_local" if distributed_jobs else "local_bounded_search")
@@ -416,6 +444,101 @@ def run_search_review(*, run_dir: str | Path, policy: dict[str, Any]) -> SearchR
             summary="Relaytic recorded explicit proof points showing why the current search plan widened, tuned, or stopped instead of searching blindly.",
             trace=trace,
         ),
+        search_budget_envelope=SearchBudgetEnvelopeArtifact(
+            schema_version=SEARCH_BUDGET_ENVELOPE_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ok",
+            workspace_id=workspace_id,
+            run_id=run_id,
+            selected_hpo_depth=selected_hpo_depth,
+            remaining_trial_budget=remaining_trial_budget,
+            planned_trial_count=planned_trial_count,
+            probe_trials_per_family=controls.probe_trials_per_family,
+            race_trials_per_family=controls.race_trials_per_family,
+            finalist_followup_trials=controls.finalist_followup_trials,
+            post_fit_trials=controls.post_fit_trials,
+            skipped_deeper_work=[str(item) for item in staged_portfolio["skipped_deeper_work"]],
+            summary=staged_portfolio["budget_summary"],
+            trace=trace,
+        ),
+        probe_stage_report=ProbeStageReportArtifact(
+            schema_version=PROBE_STAGE_REPORT_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ok" if staged_portfolio["families"] else "not_applicable",
+            workspace_id=workspace_id,
+            run_id=run_id,
+            candidate_families=[dict(item) for item in staged_portfolio["families"]],
+            promoted_families=[str(item) for item in staged_portfolio["racing_families"]],
+            skipped_families=[str(item["family"]) for item in staged_portfolio["pruned_families"]],
+            summary=staged_portfolio["probe_summary"],
+            trace=trace,
+        ),
+        family_race_report=FamilyRaceReportArtifact(
+            schema_version=FAMILY_RACE_REPORT_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ok" if staged_portfolio["racing_families"] else "not_applicable",
+            workspace_id=workspace_id,
+            run_id=run_id,
+            racing_families=[dict(item) for item in staged_portfolio["racing_family_rows"]],
+            finalists=[str(item) for item in staged_portfolio["finalists"]],
+            summary=staged_portfolio["race_summary"],
+            trace=trace,
+        ),
+        finalist_search_plan=FinalistSearchPlanArtifact(
+            schema_version=FINALIST_SEARCH_PLAN_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ok" if staged_portfolio["finalist_rows"] else "not_applicable",
+            workspace_id=workspace_id,
+            run_id=run_id,
+            finalists=[dict(item) for item in staged_portfolio["finalist_rows"]],
+            calibration_budget=int(staged_portfolio["calibration_budget"]),
+            skipped_work=[str(item) for item in staged_portfolio["skipped_deeper_work"]],
+            summary=staged_portfolio["finalist_summary"],
+            trace=trace,
+        ),
+        multi_fidelity_pruning_report=MultiFidelityPruningReportArtifact(
+            schema_version=MULTI_FIDELITY_PRUNING_REPORT_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ok" if staged_portfolio["pruned_families"] else "not_applicable",
+            workspace_id=workspace_id,
+            run_id=run_id,
+            pruned_families=[dict(item) for item in staged_portfolio["pruned_families"]],
+            summary=staged_portfolio["pruning_summary"],
+            trace=trace,
+        ),
+        portfolio_search_scorecard=PortfolioSearchScorecardArtifact(
+            schema_version=PORTFOLIO_SEARCH_SCORECARD_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ok" if staged_portfolio["families"] else "not_applicable",
+            workspace_id=workspace_id,
+            run_id=run_id,
+            probe_family_count=len(staged_portfolio["families"]),
+            race_family_count=len(staged_portfolio["racing_families"]),
+            finalist_count=len(staged_portfolio["finalists"]),
+            skipped_deeper_work_count=len(staged_portfolio["skipped_deeper_work"]),
+            summary=staged_portfolio["scorecard_summary"],
+            trace=trace,
+        ),
+        search_stop_reason=SearchStopReasonArtifact(
+            schema_version=SEARCH_STOP_REASON_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ok",
+            workspace_id=workspace_id,
+            run_id=run_id,
+            stop_reason=staged_portfolio["stop_reason"],
+            reason_kind=staged_portfolio["stop_reason_kind"],
+            search_stopped=stop_search_explicit,
+            detail=staged_portfolio["stop_detail"],
+            summary=staged_portfolio["stop_summary"],
+            trace=trace,
+        ),
     )
     return SearchRunResult(bundle=bundle, review_markdown=render_search_review_markdown(bundle.to_dict()))
 
@@ -427,6 +550,9 @@ def render_search_review_markdown(bundle: dict[str, Any]) -> str:
     execution = dict(bundle.get("execution_strategy_report", {}))
     checkpoint = dict(bundle.get("checkpoint_state", {}))
     eval_report = dict(bundle.get("search_controller_eval_report", {}))
+    budget_envelope = dict(bundle.get("search_budget_envelope", {}))
+    scorecard = dict(bundle.get("portfolio_search_scorecard", {}))
+    stop_reason = dict(bundle.get("search_stop_reason", {}))
     lines = [
         "# Relaytic Search Controller Review",
         "",
@@ -443,6 +569,7 @@ def render_search_review_markdown(bundle: dict[str, Any]) -> str:
         f"- Planned trials: `{plan.get('planned_trial_count', 0)}`",
         f"- HPO depth: `{plan.get('selected_hpo_depth') or 'off'}`",
         f"- Execution profile: `{plan.get('selected_execution_profile') or 'unknown'}`",
+        f"- Budget profile: `{dict(plan.get('controls', {})).get('budget_profile') or dict(budget_envelope.get('controls', {})).get('budget_profile') or 'unknown'}`",
     ]
     reasons = [str(item).strip() for item in value.get("reasons", []) if str(item).strip()]
     if reasons:
@@ -456,6 +583,9 @@ def render_search_review_markdown(bundle: dict[str, Any]) -> str:
             f"- Candidate branches: `{portfolio.get('candidate_count', 0)}`",
             f"- Widened branches: `{portfolio.get('widened_branch_count', 0)}`",
             f"- Pruned branches: `{portfolio.get('pruned_branch_count', 0)}`",
+            f"- Probe families: `{scorecard.get('probe_family_count', 0)}`",
+            f"- Race families: `{scorecard.get('race_family_count', 0)}`",
+            f"- Finalists: `{scorecard.get('finalist_count', 0)}`",
             "",
             "## Execution",
             f"- Strategy: `{execution.get('selected_strategy') or 'unknown'}`",
@@ -466,6 +596,7 @@ def render_search_review_markdown(bundle: dict[str, Any]) -> str:
             "## Proof",
             f"- Proof checks: `{len(eval_report.get('proofs', []))}`",
             f"- Failed checks: `{eval_report.get('failed_count', 0)}`",
+            f"- Stop reason: `{stop_reason.get('reason_kind') or 'unknown'}`",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
@@ -739,6 +870,209 @@ def _candidate_branches(
             }
         )
     return candidates
+
+
+def _portfolio_family_candidates(
+    *,
+    controls: Any,
+    planning_bundle: dict[str, Any],
+    decision: dict[str, Any],
+    candidate_branches: list[dict[str, Any]],
+) -> list[str]:
+    plan = dict(planning_bundle.get("plan", {})) if isinstance(planning_bundle.get("plan"), dict) else {}
+    builder_handoff = dict(plan.get("builder_handoff", {})) if isinstance(plan.get("builder_handoff"), dict) else {}
+    ordered: list[str] = []
+    for family in builder_handoff.get("preferred_candidate_order", []):
+        text = str(family).strip()
+        if text and text not in ordered:
+            ordered.append(text)
+    selected_family = _clean_text(decision.get("selected_model_family"))
+    if selected_family and selected_family not in ordered:
+        ordered.insert(0, selected_family)
+    for item in candidate_branches:
+        family = _clean_text(item.get("family"))
+        if family and family not in ordered:
+            ordered.append(family)
+    family_cap = max(3, controls.max_search_branches + 1)
+    return ordered[:family_cap]
+
+
+def _staged_portfolio_plan(
+    *,
+    controls: Any,
+    family_candidates: list[str],
+    selected_hpo_depth: str,
+    planned_trial_count: int,
+    stop_search_explicit: bool,
+    recommended_direction: str,
+) -> dict[str, Any]:
+    allocations: dict[str, dict[str, Any]] = {
+        family: {
+            "family": family,
+            "probe_trials": 0,
+            "race_trials": 0,
+            "finalist_followup_trials": 0,
+            "post_fit_trials": 0,
+            "stage_slots": [],
+        }
+        for family in family_candidates
+    }
+    if stop_search_explicit or planned_trial_count <= 0 or not family_candidates:
+        reason_kind = "infeasible_remaining_value" if recommended_direction in {"add_data", "new_dataset"} else "dominance"
+        detail = (
+            "Search stopped because another workspace move is worth more than additional search on the current snapshot."
+            if reason_kind == "infeasible_remaining_value"
+            else "Search stopped because the current evidence posture does not justify more budget on the same frontier."
+        )
+        return {
+            "families": [],
+            "racing_families": [],
+            "racing_family_rows": [],
+            "finalists": [],
+            "finalist_rows": [],
+            "pruned_families": [],
+            "skipped_deeper_work": [detail],
+            "calibration_budget": 0,
+            "budget_summary": detail,
+            "probe_summary": detail,
+            "race_summary": detail,
+            "finalist_summary": detail,
+            "pruning_summary": detail,
+            "scorecard_summary": detail,
+            "stop_reason": reason_kind,
+            "stop_reason_kind": reason_kind,
+            "stop_detail": detail,
+            "stop_summary": detail,
+        }
+
+    if controls.budget_profile in {"test", "low_budget"}:
+        race_family_count = min(len(family_candidates), 2)
+        finalist_count = 1
+    else:
+        race_family_count = min(len(family_candidates), 3)
+        finalist_count = min(race_family_count, 1 if selected_hpo_depth == "light" else 2)
+    racing_families = family_candidates[:race_family_count]
+    finalists = racing_families[:finalist_count]
+
+    remaining = int(max(planned_trial_count, 0))
+    remaining = _allocate_stage_budget(
+        family_rows=allocations,
+        families=family_candidates,
+        stage_name="probe",
+        trials_per_family=controls.probe_trials_per_family,
+        remaining=remaining,
+    )
+    remaining = _allocate_stage_budget(
+        family_rows=allocations,
+        families=racing_families,
+        stage_name="race",
+        trials_per_family=controls.race_trials_per_family if selected_hpo_depth in {"medium", "deep"} else 0,
+        remaining=remaining,
+    )
+    remaining = _allocate_stage_budget(
+        family_rows=allocations,
+        families=finalists,
+        stage_name="finalist",
+        trials_per_family=controls.finalist_followup_trials if selected_hpo_depth == "deep" else max(1, controls.finalist_followup_trials // 2),
+        remaining=remaining,
+    )
+
+    pruned_families: list[dict[str, Any]] = []
+    racing_rows: list[dict[str, Any]] = []
+    finalist_rows: list[dict[str, Any]] = []
+    family_rows: list[dict[str, Any]] = []
+    skipped_deeper_work: list[str] = []
+    for index, family in enumerate(family_candidates, start=1):
+        row = dict(allocations[family])
+        row["rank"] = index
+        row["total_trials"] = len(row["stage_slots"])
+        if family in finalists:
+            row["promotion_reason"] = "race_survivor"
+            row["prune_reason"] = None
+            row["post_fit_trials"] = controls.post_fit_trials
+            finalist_rows.append(dict(row))
+        elif family in racing_families:
+            row["promotion_reason"] = "probe_survivor"
+            row["prune_reason"] = "outscored_by_finalist_priority"
+            pruned_families.append(dict(row))
+            skipped_deeper_work.append(f"`{family}` reached the family race but lost finalist follow-up budget.")
+        else:
+            row["promotion_reason"] = "probe_candidate"
+            row["prune_reason"] = "probe_budget_priority"
+            pruned_families.append(dict(row))
+            skipped_deeper_work.append(f"`{family}` stayed in the probe stage because deeper budget was reserved for stronger candidates.")
+        if family in racing_families:
+            racing_rows.append(dict(row))
+        family_rows.append(row)
+
+    if remaining > 0:
+        skipped_deeper_work.append(f"`{remaining}` planned trial slot(s) stayed unspent because the staged search frontier was bounded.")
+    if controls.budget_profile in {"test", "low_budget"}:
+        skipped_deeper_work.append(
+            f"Relaytic used the explicit `{controls.budget_profile}` budget profile, so deeper family work was intentionally skipped."
+        )
+
+    stop_reason_kind = "continue_search"
+    stop_reason = "continue_search"
+    stop_detail = "Relaytic kept search open with explicit probe, race, and finalist budgets."
+    if remaining <= 0:
+        stop_reason_kind = "budget"
+        stop_reason = "budget_envelope_exhausted"
+        stop_detail = "Relaytic exhausted the staged portfolio budget envelope for this search pass."
+    elif selected_hpo_depth == "light":
+        stop_reason_kind = "plateau"
+        stop_reason = "shallow_frontier_plateau"
+        stop_detail = "Relaytic kept the search shallow because the current value band did not justify deeper finalist loops."
+
+    return {
+        "families": family_rows,
+        "racing_families": racing_families,
+        "racing_family_rows": racing_rows,
+        "finalists": finalists,
+        "finalist_rows": finalist_rows,
+        "pruned_families": pruned_families,
+        "skipped_deeper_work": skipped_deeper_work,
+        "calibration_budget": controls.post_fit_trials * len(finalists),
+        "budget_summary": (
+            f"Relaytic used the `{controls.budget_profile}` budget profile with `{planned_trial_count}` planned trial(s): "
+            f"probe `{len(family_rows)}`, race `{len(racing_rows)}`, finalists `{len(finalist_rows)}`."
+        ),
+        "probe_summary": f"Relaytic probed `{len(family_rows)}` candidate family(s) before pruning to `{len(racing_rows)}` race survivor(s).",
+        "race_summary": f"Relaytic raced `{len(racing_rows)}` family(s) and promoted `{len(finalist_rows)}` finalist(s).",
+        "finalist_summary": f"Relaytic reserved deeper follow-up for `{len(finalist_rows)}` finalist(s) plus `{controls.post_fit_trials * len(finalists)}` post-fit calibration slot(s).",
+        "pruning_summary": (
+            f"Relaytic pruned `{len(pruned_families)}` family(s) with explicit staged-search reasons."
+            if pruned_families
+            else "Relaytic did not prune any family from the staged frontier."
+        ),
+        "scorecard_summary": (
+            f"Relaytic staged search across `{len(family_rows)}` family(s), raced `{len(racing_rows)}`, and kept `{len(finalist_rows)}` finalist(s)."
+        ),
+        "stop_reason": stop_reason,
+        "stop_reason_kind": stop_reason_kind,
+        "stop_detail": stop_detail,
+        "stop_summary": stop_detail,
+    }
+
+
+def _allocate_stage_budget(
+    *,
+    family_rows: dict[str, dict[str, Any]],
+    families: list[str],
+    stage_name: str,
+    trials_per_family: int,
+    remaining: int,
+) -> int:
+    for _ in range(max(0, trials_per_family)):
+        for family in families:
+            if remaining <= 0:
+                return 0
+            row = family_rows[family]
+            key = f"{stage_name}_trials" if stage_name != "finalist" else "finalist_followup_trials"
+            row[key] = int(row.get(key, 0) or 0) + 1
+            row.setdefault("stage_slots", []).append(stage_name)
+            remaining -= 1
+    return remaining
 
 
 def _bounded_branches(*, controls: Any, candidate_branches: list[dict[str, Any]], value_band: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:

@@ -9,6 +9,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from relaytic.core.search_budget_profiles import get_search_budget_profile, resolve_search_budget_profile
+
 
 HPO_BUDGET_CONTRACT_SCHEMA_VERSION = "relaytic.hpo_budget_contract.v1"
 ARCHITECTURE_SEARCH_SPACE_SCHEMA_VERSION = "relaytic.architecture_search_space.v1"
@@ -53,6 +55,7 @@ class TrialPlan:
     trial_id: str
     family: str
     variant_id: str
+    stage: str
     source: str
     family_loop_index: int
     hyperparameters: dict[str, Any]
@@ -62,6 +65,7 @@ class TrialPlan:
             "trial_id": self.trial_id,
             "family": self.family,
             "variant_id": self.variant_id,
+            "stage": self.stage,
             "source": self.source,
             "family_loop_index": self.family_loop_index,
             "hyperparameters": dict(self.hyperparameters),
@@ -76,37 +80,53 @@ def derive_hpo_budget_contract(
     requested_family: str,
     preferred_candidate_order: list[str] | None,
     available_families: list[str],
+    search_budget_profile: str | None = None,
 ) -> dict[str, Any]:
     root = Path(run_dir)
     preferred = [str(item).strip() for item in preferred_candidate_order or [] if str(item).strip()]
+    budget_profile = _resolve_hpo_budget_profile(search_budget_profile)
     selected_families = _select_hpo_families(
         requested_family=requested_family,
         preferred_candidate_order=preferred,
         available_families=available_families,
         task_type=task_type,
+        budget_profile=budget_profile,
     )
-    budget_cap = _read_budget_max_trials(root)
-    if row_count <= 600:
-        default_trials = 12
-        default_seconds = 40
-    elif row_count <= 4000:
-        default_trials = 10
-        default_seconds = 55
-    else:
-        default_trials = 8
-        default_seconds = 70
-    if task_type in {"multiclass_classification", "fraud_detection", "anomaly_detection"}:
-        default_trials += 2
-    max_trials = min(budget_cap, default_trials)
+    profile_contract = get_search_budget_profile(budget_profile)
     family_count = max(1, len(selected_families))
-    per_family_trial_cap = max(3, min(6, max_trials // family_count if family_count else max_trials))
-    max_family_loops = min(max(1, family_count), 3 if task_type in {"multiclass_classification", "fraud_detection", "anomaly_detection"} else 2)
+    race_family_count = _race_family_count(profile=budget_profile, family_count=family_count)
+    finalist_family_count = _finalist_family_count(profile=budget_profile, family_count=family_count)
+    probe_trials_per_family = int(profile_contract["probe_trials_per_family"])
+    race_trials_per_family = int(profile_contract["race_trials_per_family"])
+    finalist_followup_trials = int(profile_contract["finalist_followup_trials"])
+    post_fit_trials = int(profile_contract["post_fit_trials"])
+    stage_target_trials = (
+        family_count * probe_trials_per_family
+        + race_family_count * race_trials_per_family
+        + finalist_family_count * finalist_followup_trials
+    )
+    profile_max_trials = int(profile_contract["max_trials"])
+    budget_cap = _read_budget_max_trials(root, fallback=profile_max_trials)
+    max_trials = min(budget_cap, profile_max_trials, stage_target_trials)
+    if max_trials < family_count:
+        max_trials = family_count
+    default_seconds = _max_wall_clock_seconds(profile=budget_profile, row_count=row_count, task_type=task_type)
+    family_count = max(1, len(selected_families))
+    per_family_trial_cap = max(
+        1,
+        min(
+            probe_trials_per_family + race_trials_per_family + finalist_followup_trials,
+            max_trials,
+        ),
+    )
+    max_family_loops = max(2, min(family_count, 4))
     payload = {
         "schema_version": HPO_BUDGET_CONTRACT_SCHEMA_VERSION,
         "generated_at": _utc_now(),
         "status": "ok",
         "backend": "deterministic_local_search",
         "seed": 42,
+        "budget_profile": budget_profile,
         "task_type": str(task_type),
         "row_count": int(max(row_count, 0)),
         "requested_family": str(requested_family or "auto"),
@@ -115,13 +135,21 @@ def derive_hpo_budget_contract(
         "max_wall_clock_seconds": int(default_seconds),
         "per_family_trial_cap": int(per_family_trial_cap),
         "max_family_loops": int(max_family_loops),
-        "plateau_patience": 2,
+        "probe_trials_per_family": probe_trials_per_family,
+        "race_trials_per_family": race_trials_per_family,
+        "finalist_followup_trials": finalist_followup_trials,
+        "post_fit_trials": post_fit_trials,
+        "probe_family_count": family_count,
+        "race_family_count": race_family_count,
+        "finalist_family_count": finalist_family_count,
+        "stage_trial_target": int(stage_target_trials),
+        "plateau_patience": 1 if budget_profile == "test" else 2,
         "min_trials_before_plateau_stop": 3,
         "min_improvement_delta": 0.0005,
         "warm_start_enabled": True,
         "summary": (
-            f"Relaytic will tune `{len(selected_families)}` family(s) with up to `{max_trials}` total trial(s), "
-            f"`{per_family_trial_cap}` trial(s) per family, and `{default_seconds}` wall-clock second(s)."
+            f"Relaytic will run staged portfolio search with `{budget_profile}` budget: probe `{family_count}` family(s), "
+            f"race `{race_family_count}`, deepen `{finalist_family_count}`, and spend up to `{max_trials}` total model trial(s)."
         ),
     }
     return payload
@@ -216,18 +244,20 @@ def build_trial_plans(
     budget_contract: dict[str, Any],
     architecture_search_space: dict[str, Any],
     warm_start_state: dict[str, Any],
+    portfolio_plan: dict[str, Any] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     plans: dict[str, list[dict[str, Any]]] = {}
-    total_trial_cap = int(budget_contract.get("max_trials", 0) or 0)
-    per_family_cap = int(budget_contract.get("per_family_trial_cap", 0) or 0)
     seed = int(budget_contract.get("seed", 42) or 42)
-    used_total = 0
-    for family_index, family_payload in enumerate(architecture_search_space.get("families", [])):
-        family = str(family_payload.get("family", "")).strip()
-        if not family:
+    effective_portfolio_plan = portfolio_plan or build_portfolio_search_plan(
+        budget_contract=budget_contract,
+        architecture_search_space=architecture_search_space,
+        warm_start_state=warm_start_state,
+    )
+    for family_index, family_row in enumerate(effective_portfolio_plan.get("families", [])):
+        family = str(family_row.get("family", "")).strip()
+        stage_slots = [str(item) for item in family_row.get("stage_slots", []) if str(item).strip()]
+        if not family or not stage_slots:
             continue
-        if used_total >= total_trial_cap:
-            break
         search_space = _family_search_space(family=family)
         if not search_space:
             continue
@@ -235,28 +265,35 @@ def build_trial_plans(
         warm_prior = dict(dict(warm_start_state.get("best_priors") or {}).get(family) or {})
         family_trials: list[TrialPlan] = []
         seen: set[str] = set()
-        if warm_prior:
+        if warm_prior and stage_slots:
             warm_params = _normalize_hyperparameters(warm_prior.get("hyperparameters"))
             if warm_params:
+                current_stage = stage_slots.pop(0)
                 family_trials.append(
                     TrialPlan(
                         trial_id=f"{family}_trial_0001",
                         family=family,
                         variant_id=f"{variant_prefix}_warm_start",
+                        stage=current_stage,
                         source="warm_start",
                         family_loop_index=family_index,
                         hyperparameters=warm_params,
                     )
                 )
                 seen.add(_canonical_hyperparameters(warm_params))
+        if not stage_slots:
+            plans[family] = [item.to_dict() for item in family_trials]
+            continue
         anchor = dict(search_space["default_anchor"])
         anchor_key = _canonical_hyperparameters(anchor)
         if anchor_key not in seen:
+            current_stage = stage_slots.pop(0)
             family_trials.append(
                 TrialPlan(
                     trial_id=f"{family}_trial_{len(family_trials) + 1:04d}",
                     family=family,
                     variant_id=f"{variant_prefix}_anchor",
+                    stage=current_stage,
                     source="default_anchor",
                     family_loop_index=family_index,
                     hyperparameters=anchor,
@@ -267,26 +304,112 @@ def build_trial_plans(
         rng = _stable_rng(seed + family_index * 17)
         rng.shuffle(combinations)
         for params in combinations:
-            if len(family_trials) >= per_family_cap or used_total + len(family_trials) >= total_trial_cap:
+            if not stage_slots:
                 break
             normalized = _normalize_hyperparameters(params)
             key = _canonical_hyperparameters(normalized)
             if key in seen:
                 continue
+            current_stage = stage_slots.pop(0)
             family_trials.append(
                 TrialPlan(
                     trial_id=f"{family}_trial_{len(family_trials) + 1:04d}",
                     family=family,
                     variant_id=f"{variant_prefix}_search_{len(family_trials):04d}",
+                    stage=current_stage,
                     source="search_space",
                     family_loop_index=family_index,
                     hyperparameters=normalized,
                 )
             )
             seen.add(key)
-        plans[family] = [item.to_dict() for item in family_trials[:per_family_cap]]
-        used_total += len(plans[family])
+        plans[family] = [item.to_dict() for item in family_trials]
     return plans
+
+
+def build_portfolio_search_plan(
+    *,
+    budget_contract: dict[str, Any],
+    architecture_search_space: dict[str, Any],
+    warm_start_state: dict[str, Any],
+) -> dict[str, Any]:
+    selected_families = [
+        str(item.get("family", "")).strip()
+        for item in architecture_search_space.get("families", [])
+        if isinstance(item, dict) and str(item.get("family", "")).strip()
+    ]
+    warm_priors = dict(warm_start_state.get("best_priors") or {})
+    ranked = sorted(
+        (
+            (
+                index - (0.25 if family in warm_priors else 0.0),
+                family,
+            )
+            for index, family in enumerate(selected_families)
+        ),
+        key=lambda item: (item[0], item[1]),
+    )
+    ordered_families = [family for _, family in ranked]
+    race_family_count = min(len(ordered_families), int(budget_contract.get("race_family_count", 0) or 0))
+    finalist_family_count = min(race_family_count, int(budget_contract.get("finalist_family_count", 0) or 0))
+    racing_families = ordered_families[:race_family_count]
+    finalists = racing_families[:finalist_family_count]
+    probe_trials_per_family = int(budget_contract.get("probe_trials_per_family", 1) or 1)
+    race_trials_per_family = int(budget_contract.get("race_trials_per_family", 0) or 0)
+    finalist_followup_trials = int(budget_contract.get("finalist_followup_trials", 0) or 0)
+    post_fit_trials = int(budget_contract.get("post_fit_trials", 0) or 0)
+    budget_profile = str(budget_contract.get("budget_profile", "operator") or "operator")
+
+    families: list[dict[str, Any]] = []
+    skipped_deeper_work: list[str] = []
+    for index, family in enumerate(ordered_families, start=1):
+        stage_slots = ["probe"] * probe_trials_per_family
+        promotion_reason = "selected_by_probe_order"
+        prune_reason = None
+        if family in racing_families:
+            stage_slots.extend(["race"] * race_trials_per_family)
+            promotion_reason = "probe_survivor"
+        else:
+            prune_reason = "probe_budget_priority"
+            skipped_deeper_work.append(f"`{family}` stopped after probe because deeper budget was reserved for higher-priority families.")
+        if family in finalists:
+            stage_slots.extend(["finalist"] * finalist_followup_trials)
+            promotion_reason = "race_survivor"
+        elif family in racing_families:
+            prune_reason = "outscored_by_finalist_priority"
+            skipped_deeper_work.append(f"`{family}` raced but did not receive finalist follow-up budget.")
+        if budget_profile in {"test", "low_budget"} and family not in finalists:
+            skipped_deeper_work.append(f"`{family}` stayed on the lean `{budget_profile}` profile and skipped deeper finalist work.")
+        families.append(
+            {
+                "family": family,
+                "rank": index,
+                "warm_start_hint": family in warm_priors,
+                "probe_trials": probe_trials_per_family,
+                "race_trials": race_trials_per_family if family in racing_families else 0,
+                "finalist_followup_trials": finalist_followup_trials if family in finalists else 0,
+                "post_fit_trials": post_fit_trials if family in finalists else 0,
+                "promotion_reason": promotion_reason,
+                "prune_reason": prune_reason,
+                "stage_slots": stage_slots,
+                "stage_trial_count": len(stage_slots),
+            }
+        )
+
+    return {
+        "status": "ok" if families else "not_applicable",
+        "budget_profile": budget_profile,
+        "families": families,
+        "racing_families": racing_families,
+        "finalists": finalists,
+        "warm_start_influenced_families": [family for family in ordered_families if family in warm_priors],
+        "skipped_deeper_work": skipped_deeper_work,
+        "summary": (
+            f"Relaytic staged search across `{len(families)}` family(s), raced `{len(racing_families)}`, and kept `{len(finalists)}` finalist(s)."
+            if families
+            else "Relaytic found no staged portfolio search work to plan."
+        ),
+    }
 
 
 def artifact_path(run_dir: str | Path, key: str) -> Path:
@@ -299,6 +422,7 @@ def _select_hpo_families(
     preferred_candidate_order: list[str],
     available_families: list[str],
     task_type: str,
+    budget_profile: str,
 ) -> list[str]:
     available = [str(item).strip() for item in available_families if str(item).strip() in SEARCHABLE_FAMILIES]
     if requested_family != "auto" and requested_family in available:
@@ -347,7 +471,8 @@ def _select_hpo_families(
                 ]
                 if family in available
             ]
-    return ordered[:3]
+    family_cap = 2 if budget_profile == "test" else (3 if budget_profile == "low_budget" else 4)
+    return ordered[:family_cap]
 
 
 def _family_search_space(*, family: str) -> dict[str, Any] | None:
@@ -563,18 +688,18 @@ def _family_variant_prefix(family: str) -> str:
     return mapping.get(family, family.replace("_ensemble", "").replace("_classifier", "_classifier"))
 
 
-def _read_budget_max_trials(root: Path) -> int:
+def _read_budget_max_trials(root: Path, *, fallback: int) -> int:
     budget_path = root / "budget_contract.json"
     if not budget_path.exists():
-        return 18
+        return fallback
     try:
         payload = json.loads(budget_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
-        return 18
+        return fallback
     try:
-        return max(6, min(32, int(payload.get("max_trials", 18) or 18)))
+        return max(6, min(2000, int(payload.get("max_trials", fallback) or fallback)))
     except (TypeError, ValueError):
-        return 18
+        return fallback
 
 
 def _rank_key(metrics: Any) -> tuple[float, ...]:
@@ -596,6 +721,48 @@ def _stable_rng(seed: int) -> Any:
     import random
 
     return random.Random(seed)
+
+
+def _resolve_hpo_budget_profile(search_budget_profile: str | None) -> str:
+    if search_budget_profile:
+        configured = str(search_budget_profile).strip().lower()
+        if configured in {"operator", "benchmark", "low_budget", "test"}:
+            return configured
+    return resolve_search_budget_profile({}, default="operator")
+
+
+def _race_family_count(*, profile: str, family_count: int) -> int:
+    if family_count <= 1:
+        return family_count
+    if profile == "test":
+        return min(family_count, 2)
+    if profile == "low_budget":
+        return min(family_count, 2)
+    if profile == "benchmark":
+        return min(family_count, 3)
+    return min(family_count, 3)
+
+
+def _finalist_family_count(*, profile: str, family_count: int) -> int:
+    if family_count <= 1:
+        return family_count
+    if profile in {"test", "low_budget"}:
+        return 1
+    return min(family_count, 2)
+
+
+def _max_wall_clock_seconds(*, profile: str, row_count: int, task_type: str) -> int:
+    base = {
+        "test": 25,
+        "low_budget": 50,
+        "operator": 110,
+        "benchmark": 180,
+    }.get(profile, 110)
+    if row_count > 5000:
+        base += 25
+    if task_type in {"multiclass_classification", "fraud_detection", "anomaly_detection"}:
+        base += 10
+    return base
 
 
 def _utc_now() -> str:

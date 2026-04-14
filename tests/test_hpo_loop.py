@@ -6,7 +6,11 @@ from pathlib import Path
 import pandas as pd
 
 from relaytic.modeling import train_surrogate_candidates
-from relaytic.modeling.hpo_loop import build_architecture_search_space, derive_hpo_budget_contract
+from relaytic.modeling.hpo_loop import (
+    build_architecture_search_space,
+    build_portfolio_search_plan,
+    derive_hpo_budget_contract,
+)
 from relaytic.modeling.training import CandidateMetrics, _fit_hpo_family_candidates
 
 
@@ -151,12 +155,14 @@ def test_hpo_budget_contract_and_search_space_include_first_class_optional_famil
             "lightgbm_classifier",
             "extra_trees_classifier",
         ],
+        search_budget_profile="benchmark",
     )
     search_space = build_architecture_search_space(
         task_type="multiclass_classification",
         selected_families=[str(item) for item in budget_contract["selected_families"]],
     )
 
+    assert budget_contract["budget_profile"] == "benchmark"
     assert budget_contract["selected_families"][0] == "catboost_classifier"
     assert set(search_space["families"][0].keys()) >= {"family", "parameters", "default_anchor"}
     assert {
@@ -164,6 +170,98 @@ def test_hpo_budget_contract_and_search_space_include_first_class_optional_famil
         "hist_gradient_boosting_classifier",
         "xgboost_classifier",
     }.issubset({str(item["family"]) for item in search_space["families"]})
+
+
+def test_hpo_budget_profiles_keep_test_budgets_separate_from_benchmark_contracts(tmp_path: Path) -> None:
+    benchmark_contract = derive_hpo_budget_contract(
+        run_dir=tmp_path / "benchmark_profile",
+        task_type="binary_classification",
+        row_count=800,
+        requested_family="auto",
+        preferred_candidate_order=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "extra_trees_classifier",
+            "lightgbm_classifier",
+        ],
+        available_families=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "extra_trees_classifier",
+            "lightgbm_classifier",
+        ],
+        search_budget_profile="benchmark",
+    )
+    test_contract = derive_hpo_budget_contract(
+        run_dir=tmp_path / "test_profile",
+        task_type="binary_classification",
+        row_count=800,
+        requested_family="auto",
+        preferred_candidate_order=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "extra_trees_classifier",
+            "lightgbm_classifier",
+        ],
+        available_families=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "extra_trees_classifier",
+            "lightgbm_classifier",
+        ],
+        search_budget_profile="test",
+    )
+
+    assert benchmark_contract["budget_profile"] == "benchmark"
+    assert test_contract["budget_profile"] == "test"
+    assert benchmark_contract["max_trials"] > test_contract["max_trials"]
+    assert benchmark_contract["probe_trials_per_family"] > test_contract["probe_trials_per_family"]
+    assert benchmark_contract["selected_families"] != []
+    assert len(benchmark_contract["selected_families"]) >= len(test_contract["selected_families"])
+
+
+def test_portfolio_search_plan_reports_warm_start_influence_without_hiding_stage_evidence(tmp_path: Path) -> None:
+    budget_contract = derive_hpo_budget_contract(
+        run_dir=tmp_path,
+        task_type="binary_classification",
+        row_count=600,
+        requested_family="auto",
+        preferred_candidate_order=[
+            "hist_gradient_boosting_classifier",
+            "extra_trees_classifier",
+            "logistic_regression",
+        ],
+        available_families=[
+            "hist_gradient_boosting_classifier",
+            "extra_trees_classifier",
+            "logistic_regression",
+        ],
+        search_budget_profile="operator",
+    )
+    search_space = build_architecture_search_space(
+        task_type="binary_classification",
+        selected_families=[str(item) for item in budget_contract["selected_families"]],
+    )
+    warm_start_state = {
+        "best_priors": {
+            "extra_trees_classifier": {
+                "hyperparameters": {"n_estimators": 20, "max_depth": 5, "min_leaf": 3},
+                "validation_metrics": {"pr_auc": 0.82, "f1": 0.74},
+            }
+        }
+    }
+
+    portfolio_plan = build_portfolio_search_plan(
+        budget_contract=budget_contract,
+        architecture_search_space=search_space,
+        warm_start_state=warm_start_state,
+    )
+
+    assert portfolio_plan["status"] == "ok"
+    assert "extra_trees_classifier" in portfolio_plan["warm_start_influenced_families"]
+    assert len(portfolio_plan["families"]) >= 2
+    assert len(portfolio_plan["racing_families"]) >= 1
+    assert len(portfolio_plan["finalists"]) >= 1
 
 
 def _binary_frame(*, row_count: int) -> pd.DataFrame:

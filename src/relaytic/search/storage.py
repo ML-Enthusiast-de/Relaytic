@@ -24,6 +24,13 @@ SEARCH_FILENAMES = {
     "execution_strategy_report": "execution_strategy_report.json",
     "search_value_report": "search_value_report.json",
     "search_controller_eval_report": "search_controller_eval_report.json",
+    "search_budget_envelope": "search_budget_envelope.json",
+    "probe_stage_report": "probe_stage_report.json",
+    "family_race_report": "family_race_report.json",
+    "finalist_search_plan": "finalist_search_plan.json",
+    "multi_fidelity_pruning_report": "multi_fidelity_pruning_report.json",
+    "portfolio_search_scorecard": "portfolio_search_scorecard.json",
+    "search_stop_reason": "search_stop_reason.json",
 }
 
 
