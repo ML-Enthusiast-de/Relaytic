@@ -12,6 +12,8 @@ SECURITY_EVAL_REPORT_SCHEMA_VERSION = "relaytic.security_eval_report.v1"
 RED_TEAM_REPORT_SCHEMA_VERSION = "relaytic.red_team_report.v1"
 PROTOCOL_CONFORMANCE_REPORT_SCHEMA_VERSION = "relaytic.protocol_conformance_report.v1"
 HOST_SURFACE_MATRIX_SCHEMA_VERSION = "relaytic.host_surface_matrix.v1"
+TRACE_IDENTITY_CONFORMANCE_SCHEMA_VERSION = "relaytic.trace_identity_conformance.v1"
+EVAL_SURFACE_PARITY_REPORT_SCHEMA_VERSION = "relaytic.eval_surface_parity_report.v1"
 
 
 @dataclass(frozen=True)
@@ -158,12 +160,54 @@ class HostSurfaceMatrixArtifact:
 
 
 @dataclass(frozen=True)
+class TraceIdentityConformanceArtifact:
+    schema_version: str
+    generated_at: str
+    controls: EvalControls
+    status: str
+    canonical_winning_claim_id: str | None
+    canonical_winning_action: str | None
+    compared_surfaces: list[str]
+    mismatch_count: int
+    mismatches: list[dict[str, Any]]
+    summary: str
+    trace: EvalTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class EvalSurfaceParityReportArtifact:
+    schema_version: str
+    generated_at: str
+    controls: EvalControls
+    status: str
+    compared_fields: list[str]
+    mismatch_count: int
+    mismatches: list[dict[str, Any]]
+    summary: str
+    trace: EvalTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class EvalBundle:
     agent_eval_matrix: AgentEvalMatrixArtifact
     security_eval_report: SecurityEvalReportArtifact
     red_team_report: RedTeamReportArtifact
     protocol_conformance_report: ProtocolConformanceReportArtifact
     host_surface_matrix: HostSurfaceMatrixArtifact
+    trace_identity_conformance: TraceIdentityConformanceArtifact
+    eval_surface_parity_report: EvalSurfaceParityReportArtifact
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -172,4 +216,6 @@ class EvalBundle:
             "red_team_report": self.red_team_report.to_dict(),
             "protocol_conformance_report": self.protocol_conformance_report.to_dict(),
             "host_surface_matrix": self.host_surface_matrix.to_dict(),
+            "trace_identity_conformance": self.trace_identity_conformance.to_dict(),
+            "eval_surface_parity_report": self.eval_surface_parity_report.to_dict(),
         }

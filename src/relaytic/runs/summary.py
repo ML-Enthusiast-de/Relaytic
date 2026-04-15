@@ -177,6 +177,10 @@ def build_run_summary(
             "benchmark_ablation_matrix": "benchmark_ablation_matrix.json",
             "rerun_variance_report": "rerun_variance_report.json",
             "benchmark_claims_report": "benchmark_claims_report.json",
+            "benchmark_truth_audit": "benchmark_truth_audit.json",
+            "paper_claim_guard_report": "paper_claim_guard_report.json",
+            "benchmark_release_gate": "benchmark_release_gate.json",
+            "dataset_leakage_audit": "dataset_leakage_audit.json",
             "shadow_trial_manifest": "shadow_trial_manifest.json",
             "shadow_trial_scorecard": "shadow_trial_scorecard.json",
             "candidate_quarantine": "candidate_quarantine.json",
@@ -256,6 +260,8 @@ def build_run_summary(
             "red_team_report": "red_team_report.json",
             "protocol_conformance_report": "protocol_conformance_report.json",
             "host_surface_matrix": "host_surface_matrix.json",
+            "trace_identity_conformance": "trace_identity_conformance.json",
+            "eval_surface_parity_report": "eval_surface_parity_report.json",
         },
     )
     search_bundle = read_search_bundle(root)
@@ -470,6 +476,10 @@ def build_run_summary(
     benchmark_ablation_matrix = _bundle_item(benchmark_bundle, "benchmark_ablation_matrix")
     rerun_variance_report = _bundle_item(benchmark_bundle, "rerun_variance_report")
     benchmark_claims_report = _bundle_item(benchmark_bundle, "benchmark_claims_report")
+    benchmark_truth_audit = _bundle_item(benchmark_bundle, "benchmark_truth_audit")
+    paper_claim_guard_report = _bundle_item(benchmark_bundle, "paper_claim_guard_report")
+    benchmark_release_gate = _bundle_item(benchmark_bundle, "benchmark_release_gate")
+    dataset_leakage_audit = _bundle_item(benchmark_bundle, "dataset_leakage_audit")
     shadow_trial_manifest = _bundle_item(benchmark_bundle, "shadow_trial_manifest")
     shadow_trial_scorecard = _bundle_item(benchmark_bundle, "shadow_trial_scorecard")
     candidate_quarantine = _bundle_item(benchmark_bundle, "candidate_quarantine")
@@ -518,6 +528,8 @@ def build_run_summary(
     red_team_report = _bundle_item(evals_bundle, "red_team_report")
     protocol_conformance_report = _bundle_item(evals_bundle, "protocol_conformance_report")
     host_surface_matrix = _bundle_item(evals_bundle, "host_surface_matrix")
+    trace_identity_conformance = _bundle_item(evals_bundle, "trace_identity_conformance")
+    eval_surface_parity_report = _bundle_item(evals_bundle, "eval_surface_parity_report")
     search_controller_plan = _bundle_item(search_bundle, "search_controller_plan")
     portfolio_search_trace = _bundle_item(search_bundle, "portfolio_search_trace")
     hpo_campaign_report = _bundle_item(search_bundle, "hpo_campaign_report")
@@ -855,11 +867,17 @@ def build_run_summary(
             "incumbent_reduced_claim": incumbent_parity_report.get("reduced_claim"),
             "incumbent_evaluation_mode": _clean_text(external_challenger_evaluation.get("evaluation_mode")),
             "paper_status": _clean_text(paper_benchmark_manifest.get("status")) or _clean_text(paper_benchmark_table.get("status")),
+            "claim_gate_status": _clean_text(benchmark_release_gate.get("status")) or _clean_text(paper_claim_guard_report.get("status")),
+            "safe_to_cite_publicly": benchmark_release_gate.get("safe_to_cite_publicly"),
+            "demo_safe": benchmark_release_gate.get("demo_safe"),
             "competitiveness_claim": _clean_text(benchmark_claims_report.get("competitiveness_claim")),
             "deployment_claim": _clean_text(benchmark_claims_report.get("deployment_claim")),
             "below_reference": benchmark_claims_report.get("below_reference"),
             "claim_boundary_count": len(benchmark_claims_report.get("claim_boundaries", []))
             if isinstance(benchmark_claims_report.get("claim_boundaries"), list)
+            else 0,
+            "blocked_reason_count": len(benchmark_release_gate.get("blocked_reason_codes", []))
+            if isinstance(benchmark_release_gate.get("blocked_reason_codes"), list)
             else 0,
             "ablation_row_count": len(benchmark_ablation_matrix.get("rows", []))
             if isinstance(benchmark_ablation_matrix.get("rows"), list)
@@ -868,6 +886,8 @@ def build_run_summary(
             "rerun_stability_band": _clean_text(rerun_variance_report.get("stability_band")),
             "temporal_horizon_type": _clean_text(paper_benchmark_manifest.get("horizon_type")),
             "sequence_candidate_status": _clean_text(paper_benchmark_manifest.get("sequence_candidate_status")),
+            "truth_audit_status": _clean_text(benchmark_truth_audit.get("status")),
+            "leakage_status": _clean_text(dataset_leakage_audit.get("status")),
             "imported_candidate_count": int(shadow_trial_manifest.get("candidate_count", 0) or 0),
             "promotion_ready_count": int(promotion_readiness_report.get("promotion_ready_count", 0) or 0),
             "candidate_available_count": int(promotion_readiness_report.get("candidate_available_count", 0) or 0),
@@ -989,6 +1009,10 @@ def build_run_summary(
             "security_open_finding_count": int(security_eval_report.get("open_finding_count", 0) or 0),
             "red_team_status": _clean_text(red_team_report.get("status")),
             "red_team_finding_count": int(red_team_report.get("finding_count", 0) or 0),
+            "trace_identity_status": _clean_text(trace_identity_conformance.get("status")),
+            "trace_identity_mismatch_count": int(trace_identity_conformance.get("mismatch_count", 0) or 0),
+            "surface_parity_status": _clean_text(eval_surface_parity_report.get("status")),
+            "surface_parity_mismatch_count": int(eval_surface_parity_report.get("mismatch_count", 0) or 0),
             "surface_count": len(host_surface_matrix.get("surfaces", []))
             if isinstance(host_surface_matrix.get("surfaces"), list)
             else 0,
@@ -1658,6 +1682,10 @@ def build_run_summary(
             "benchmark_ablation_matrix_path": _path_if_exists(root / "benchmark_ablation_matrix.json"),
             "rerun_variance_report_path": _path_if_exists(root / "rerun_variance_report.json"),
             "benchmark_claims_report_path": _path_if_exists(root / "benchmark_claims_report.json"),
+            "benchmark_truth_audit_path": _path_if_exists(root / "benchmark_truth_audit.json"),
+            "paper_claim_guard_report_path": _path_if_exists(root / "paper_claim_guard_report.json"),
+            "benchmark_release_gate_path": _path_if_exists(root / "benchmark_release_gate.json"),
+            "dataset_leakage_audit_path": _path_if_exists(root / "dataset_leakage_audit.json"),
             "shadow_trial_manifest_path": _path_if_exists(root / "shadow_trial_manifest.json"),
             "shadow_trial_scorecard_path": _path_if_exists(root / "shadow_trial_scorecard.json"),
             "candidate_quarantine_path": _path_if_exists(root / "candidate_quarantine.json"),
@@ -1695,6 +1723,8 @@ def build_run_summary(
             "red_team_report_path": _path_if_exists(root / "red_team_report.json"),
             "protocol_conformance_report_path": _path_if_exists(root / "protocol_conformance_report.json"),
             "host_surface_matrix_path": _path_if_exists(root / "host_surface_matrix.json"),
+            "trace_identity_conformance_path": _path_if_exists(root / "trace_identity_conformance.json"),
+            "eval_surface_parity_report_path": _path_if_exists(root / "eval_surface_parity_report.json"),
             "search_controller_plan_path": _path_if_exists(root / "search_controller_plan.json"),
             "portfolio_search_trace_path": _path_if_exists(root / "portfolio_search_trace.json"),
             "hpo_campaign_report_path": _path_if_exists(root / "hpo_campaign_report.json"),
@@ -1948,11 +1978,16 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Winning family: `{benchmark.get('winning_family') or 'unknown'}`",
                 f"- Test gap: `{benchmark.get('test_gap')}`",
                 f"- Near parity: `{benchmark.get('near_parity')}`",
+                f"- Claim gate: `{benchmark.get('claim_gate_status') or 'unknown'}`",
+                f"- Safe to cite publicly: `{benchmark.get('safe_to_cite_publicly')}`",
+                f"- Demo safe: `{benchmark.get('demo_safe')}`",
                 f"- Incumbent: `{benchmark.get('incumbent_name') or 'none'}`",
                 f"- Incumbent parity: `{benchmark.get('incumbent_parity_status') or 'unknown'}`",
                 f"- Beat-target state: `{benchmark.get('beat_target_state') or 'unknown'}`",
             ]
         )
+        if benchmark.get("blocked_reason_count"):
+            lines.append(f"- Claim-blocking reasons: `{benchmark.get('blocked_reason_count')}`")
     if decision_lab and any(value is not None for value in decision_lab.values()):
         lines.extend(
             [
@@ -2053,6 +2088,8 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Protocol status: `{evals.get('protocol_status') or 'unknown'}`",
                 f"- Security status: `{evals.get('security_status') or 'unknown'}`",
                 f"- Red-team status: `{evals.get('red_team_status') or 'unknown'}`",
+                f"- Trace identity: `{evals.get('trace_identity_status') or 'unknown'}`",
+                f"- Surface parity: `{evals.get('surface_parity_status') or 'unknown'}`",
             ]
         )
         if evals.get("protocol_mismatch_count"):

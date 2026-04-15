@@ -5029,13 +5029,6 @@ def _show_access_run(*, run_dir: str | Path) -> dict[str, Any]:
     root = Path(run_dir)
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
-    _ensure_runtime_present(root)
-    _ensure_memory_present(root)
-    _ensure_intelligence_present(root)
-    _ensure_research_present(root)
-    _ensure_decision_present(root)
-    _ensure_completion_present(root)
-    _ensure_lifecycle_present(root)
     existing_summary = read_run_summary(root)
     request = dict(existing_summary.get("request", {})) if isinstance(existing_summary, dict) else {}
     summary_materialized = _load_or_materialize_summary(
@@ -10166,12 +10159,16 @@ def _run_benchmark_phase(
         paper_manifest = benchmark_result.bundle.paper_benchmark_manifest
         rerun_variance = benchmark_result.bundle.rerun_variance_report
         claims = benchmark_result.bundle.benchmark_claims_report
+        benchmark_truth_audit = benchmark_result.bundle.benchmark_truth_audit
+        benchmark_release_gate = benchmark_result.bundle.benchmark_release_gate
+        dataset_leakage_audit = benchmark_result.bundle.dataset_leakage_audit
         shadow_manifest = benchmark_result.bundle.shadow_trial_manifest
         promotion = benchmark_result.bundle.promotion_readiness_report
         quarantine = benchmark_result.bundle.candidate_quarantine
         from relaytic.analytics import read_temporal_engine_artifacts
 
         task_contract_bundle = read_task_contract_artifacts(root)
+        eval_bundle = _read_json_bundle(root, bundle="evals")
         temporal_bundle = read_temporal_engine_artifacts(root)
         operating_point_bundle = {
             key: json.loads((root / filename).read_text(encoding="utf-8"))
@@ -10186,6 +10183,7 @@ def _run_benchmark_phase(
             if (root / filename).exists()
         }
         bundle_payload = benchmark_result.bundle.to_dict()
+        bundle_payload.update(eval_bundle)
         bundle_payload.update(task_contract_bundle)
         bundle_payload.update(temporal_bundle)
         bundle_payload.update(operating_point_bundle)
@@ -10210,6 +10208,10 @@ def _run_benchmark_phase(
                     "relaytic_beats_incumbent": incumbent.relaytic_beats_incumbent,
                     "incumbent_stronger": incumbent.incumbent_stronger,
                     "paper_status": paper_manifest.status,
+                    "claim_gate_status": benchmark_release_gate.status,
+                    "safe_to_cite_publicly": benchmark_release_gate.safe_to_cite_publicly,
+                    "demo_safe": benchmark_release_gate.demo_safe,
+                    "blocked_reason_count": len(benchmark_release_gate.blocked_reason_codes),
                     "rerun_match_count": rerun_variance.matching_run_count,
                     "rerun_stability_band": rerun_variance.stability_band,
                     "competitiveness_claim": claims.competitiveness_claim,
@@ -10222,6 +10224,8 @@ def _run_benchmark_phase(
                     "objective_alignment_status": task_contract_bundle.get("objective_alignment_report", {}).get("status"),
                     "truth_precheck_status": task_contract_bundle.get("benchmark_truth_precheck", {}).get("status"),
                     "safe_to_rank": task_contract_bundle.get("benchmark_truth_precheck", {}).get("safe_to_rank"),
+                    "truth_audit_status": benchmark_truth_audit.status,
+                    "leakage_status": dataset_leakage_audit.status,
                     "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                     "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
                     "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),
@@ -10260,12 +10264,16 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     paper_manifest = dict(bundle.get("paper_benchmark_manifest", {}))
     rerun_variance = dict(bundle.get("rerun_variance_report", {}))
     claims = dict(bundle.get("benchmark_claims_report", {}))
+    benchmark_truth_audit = dict(bundle.get("benchmark_truth_audit", {}))
+    benchmark_release_gate = dict(bundle.get("benchmark_release_gate", {}))
+    dataset_leakage_audit = dict(bundle.get("dataset_leakage_audit", {}))
     shadow_manifest = dict(bundle.get("shadow_trial_manifest", {}))
     promotion = dict(bundle.get("promotion_readiness_report", {}))
     quarantine = dict(bundle.get("candidate_quarantine", {}))
     from relaytic.analytics import read_temporal_engine_artifacts
 
     task_contract_bundle = read_task_contract_artifacts(root)
+    eval_bundle = _read_json_bundle(root, bundle="evals")
     temporal_bundle = read_temporal_engine_artifacts(root)
     operating_point_bundle = {
         key: json.loads((root / filename).read_text(encoding="utf-8"))
@@ -10280,6 +10288,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
         if (root / filename).exists()
     }
     bundle_payload = dict(bundle)
+    bundle_payload.update(eval_bundle)
     bundle_payload.update(task_contract_bundle)
     bundle_payload.update(temporal_bundle)
     bundle_payload.update(operating_point_bundle)
@@ -10303,6 +10312,12 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "relaytic_beats_incumbent": incumbent.get("relaytic_beats_incumbent"),
                 "incumbent_stronger": incumbent.get("incumbent_stronger"),
                 "paper_status": paper_manifest.get("status"),
+                "claim_gate_status": benchmark_release_gate.get("status"),
+                "safe_to_cite_publicly": benchmark_release_gate.get("safe_to_cite_publicly"),
+                "demo_safe": benchmark_release_gate.get("demo_safe"),
+                "blocked_reason_count": len(benchmark_release_gate.get("blocked_reason_codes", []))
+                if isinstance(benchmark_release_gate.get("blocked_reason_codes"), list)
+                else 0,
                 "rerun_match_count": int(rerun_variance.get("matching_run_count", 0) or 0),
                 "rerun_stability_band": rerun_variance.get("stability_band"),
                 "competitiveness_claim": claims.get("competitiveness_claim"),
@@ -10315,6 +10330,8 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "objective_alignment_status": task_contract_bundle.get("objective_alignment_report", {}).get("status"),
                 "truth_precheck_status": task_contract_bundle.get("benchmark_truth_precheck", {}).get("status"),
                 "safe_to_rank": task_contract_bundle.get("benchmark_truth_precheck", {}).get("safe_to_rank"),
+                "truth_audit_status": benchmark_truth_audit.get("status"),
+                "leakage_status": dataset_leakage_audit.get("status"),
                 "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                 "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
                 "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),
@@ -10963,6 +10980,8 @@ def _run_evals_phase(
         protocol = eval_result.bundle.protocol_conformance_report
         security = eval_result.bundle.security_eval_report
         red_team = eval_result.bundle.red_team_report
+        trace_identity = eval_result.bundle.trace_identity_conformance
+        surface_parity = eval_result.bundle.eval_surface_parity_report
         return {
             "surface_payload": {
                 "status": "ok",
@@ -10980,6 +10999,10 @@ def _run_evals_phase(
                     "security_open_finding_count": security.open_finding_count,
                     "red_team_status": red_team.status,
                     "red_team_finding_count": red_team.finding_count,
+                    "trace_identity_status": trace_identity.status,
+                    "trace_identity_mismatch_count": trace_identity.mismatch_count,
+                    "surface_parity_status": surface_parity.status,
+                    "surface_parity_mismatch_count": surface_parity.mismatch_count,
                 },
                 "bundle": eval_result.bundle.to_dict(),
                 "run_summary": summary_bundle["summary"],
@@ -11021,6 +11044,8 @@ def _show_evals_surface(*, run_dir: str | Path, config_path: str | None = None) 
     protocol = dict(bundle.get("protocol_conformance_report", {}))
     security = dict(bundle.get("security_eval_report", {}))
     red_team = dict(bundle.get("red_team_report", {}))
+    trace_identity = dict(bundle.get("trace_identity_conformance", {}))
+    surface_parity = dict(bundle.get("eval_surface_parity_report", {}))
     return {
         "surface_payload": {
             "status": "ok",
@@ -11039,6 +11064,10 @@ def _show_evals_surface(*, run_dir: str | Path, config_path: str | None = None) 
                 "security_open_finding_count": security.get("open_finding_count"),
                 "red_team_status": red_team.get("status"),
                 "red_team_finding_count": red_team.get("finding_count"),
+                "trace_identity_status": trace_identity.get("status"),
+                "trace_identity_mismatch_count": trace_identity.get("mismatch_count"),
+                "surface_parity_status": surface_parity.get("status"),
+                "surface_parity_mismatch_count": surface_parity.get("mismatch_count"),
             },
             "bundle": bundle,
             "run_summary": summary_materialized["summary"],
@@ -12473,6 +12502,10 @@ def _benchmark_output_paths(run_dir: Path) -> dict[str, Path]:
         "shadow_trial_scorecard": run_dir / "shadow_trial_scorecard.json",
         "candidate_quarantine": run_dir / "candidate_quarantine.json",
         "promotion_readiness_report": run_dir / "promotion_readiness_report.json",
+        "benchmark_truth_audit": run_dir / "benchmark_truth_audit.json",
+        "paper_claim_guard_report": run_dir / "paper_claim_guard_report.json",
+        "benchmark_release_gate": run_dir / "benchmark_release_gate.json",
+        "dataset_leakage_audit": run_dir / "dataset_leakage_audit.json",
     }
 
 
@@ -12551,6 +12584,8 @@ def _evals_output_paths(run_dir: Path) -> dict[str, Path]:
         "red_team_report": run_dir / "red_team_report.json",
         "protocol_conformance_report": run_dir / "protocol_conformance_report.json",
         "host_surface_matrix": run_dir / "host_surface_matrix.json",
+        "trace_identity_conformance": run_dir / "trace_identity_conformance.json",
+        "eval_surface_parity_report": run_dir / "eval_surface_parity_report.json",
     }
 
 

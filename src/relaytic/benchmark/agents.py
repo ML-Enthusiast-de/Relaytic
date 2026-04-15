@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -18,12 +18,14 @@ from relaytic.analytics import (
 )
 from relaytic.analytics.task_detection import assess_task_profile, is_classification_task
 from relaytic.decision import read_decision_bundle
+from relaytic.evals import read_eval_bundle, run_agent_evals, write_eval_bundle
 from relaytic.ingestion import load_tabular_data
 from relaytic.modeling.evaluation import classification_metrics, regression_metrics
 from relaytic.modeling.feature_pipeline import prepare_split_safe_feature_frames
 from relaytic.modeling.normalization import MinMaxNormalizer
 from relaytic.modeling.splitters import build_train_validation_test_split
 from relaytic.modeling.training import train_surrogate_candidates
+from relaytic.tracing import read_trace_bundle
 
 from .incumbents import evaluate_incumbent
 from .models import (
@@ -33,9 +35,13 @@ from .models import (
     BENCHMARK_PARITY_REPORT_SCHEMA_VERSION,
     BEAT_TARGET_CONTRACT_SCHEMA_VERSION,
     CANDIDATE_QUARANTINE_SCHEMA_VERSION,
+    DATASET_LEAKAGE_AUDIT_SCHEMA_VERSION,
     EXTERNAL_CHALLENGER_EVALUATION_SCHEMA_VERSION,
     EXTERNAL_CHALLENGER_MANIFEST_SCHEMA_VERSION,
     INCUMBENT_PARITY_REPORT_SCHEMA_VERSION,
+    BENCHMARK_RELEASE_GATE_SCHEMA_VERSION,
+    BENCHMARK_TRUTH_AUDIT_SCHEMA_VERSION,
+    PAPER_CLAIM_GUARD_REPORT_SCHEMA_VERSION,
     PAPER_BENCHMARK_MANIFEST_SCHEMA_VERSION,
     PAPER_BENCHMARK_TABLE_SCHEMA_VERSION,
     PROMOTION_READINESS_REPORT_SCHEMA_VERSION,
@@ -46,15 +52,19 @@ from .models import (
     BenchmarkAblationMatrix,
     BenchmarkBundle,
     BenchmarkClaimsReport,
+    BenchmarkReleaseGate,
+    BenchmarkTruthAudit,
     CandidateQuarantine,
     BenchmarkControls,
     BenchmarkGapReport,
     BenchmarkParityReport,
     BenchmarkTrace,
     BeatTargetContract,
+    DatasetLeakageAudit,
     ExternalChallengerEvaluation,
     ExternalChallengerManifest,
     IncumbentParityReport,
+    PaperClaimGuardReport,
     PaperBenchmarkManifest,
     PaperBenchmarkTable,
     PromotionReadinessReport,
@@ -106,6 +116,8 @@ def run_benchmark_review(
     task_contract_bundle = read_task_contract_artifacts(run_dir)
     decision_bundle = read_decision_bundle(run_dir)
     architecture_bundle = read_architecture_routing_artifacts(run_dir)
+    eval_bundle = _ensure_eval_bundle(run_dir=run_dir, policy=policy)
+    trace_bundle = read_trace_bundle(run_dir)
     task_profile_contract = dict(task_contract_bundle.get("task_profile_contract", {}))
     metric_contract = dict(task_contract_bundle.get("metric_contract", {}))
     benchmark_mode_report = dict(task_contract_bundle.get("benchmark_mode_report", {}))
@@ -174,6 +186,11 @@ def run_benchmark_review(
             ),
             benchmark_expected=benchmark_expected,
             summary=str(benchmark_truth_precheck.get("summary") or "Relaytic blocked benchmark ranking because truth prechecks failed."),
+            blocked_reason_codes=[
+                str(item)
+                for item in benchmark_truth_precheck.get("reason_codes", [])
+                if str(item).strip()
+            ],
         )
         return BenchmarkRunResult(bundle=bundle, review_markdown=render_benchmark_review_markdown(bundle.to_dict()))
 
@@ -460,6 +477,51 @@ def run_benchmark_review(
         paper_manifest=paper_manifest,
         rerun_variance_report=rerun_variance_report,
     )
+    dataset_leakage_audit = _build_dataset_leakage_audit(
+        run_dir=run_dir,
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+    )
+    benchmark_truth_audit = _build_benchmark_truth_audit(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        task_contract_bundle=task_contract_bundle,
+        eval_bundle=eval_bundle,
+        trace_bundle=trace_bundle,
+        dataset_leakage_audit=dataset_leakage_audit,
+        paper_table=paper_table,
+    )
+    paper_claim_guard_report = _build_paper_claim_guard_report(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        benchmark_truth_audit=benchmark_truth_audit,
+        claims_report=benchmark_claims_report,
+        paper_table=paper_table,
+    )
+    benchmark_release_gate = _build_benchmark_release_gate(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        benchmark_truth_audit=benchmark_truth_audit,
+        paper_claim_guard_report=paper_claim_guard_report,
+    )
+    paper_manifest = replace(
+        paper_manifest,
+        status="ok" if benchmark_release_gate.safe_to_cite_publicly else "blocked",
+        claim_gate_status=benchmark_release_gate.status,
+        safe_to_cite_publicly=benchmark_release_gate.safe_to_cite_publicly,
+        claim_gate_reason_codes=list(benchmark_release_gate.blocked_reason_codes),
+    )
+    paper_table = replace(
+        paper_table,
+        status=("ok" if benchmark_release_gate.safe_to_cite_publicly else "blocked") if paper_table.rows else "not_available",
+        claim_gate_status=benchmark_release_gate.status,
+        safe_to_cite_publicly=benchmark_release_gate.safe_to_cite_publicly,
+        claim_gate_reason_codes=list(benchmark_release_gate.blocked_reason_codes),
+    )
     shadow_trial_manifest, shadow_trial_scorecard, candidate_quarantine, promotion_readiness_report = (
         _build_shadow_trial_outputs(
             run_dir=run_dir,
@@ -499,6 +561,10 @@ def run_benchmark_review(
         shadow_trial_scorecard=shadow_trial_scorecard,
         candidate_quarantine=candidate_quarantine,
         promotion_readiness_report=promotion_readiness_report,
+        benchmark_truth_audit=benchmark_truth_audit,
+        paper_claim_guard_report=paper_claim_guard_report,
+        benchmark_release_gate=benchmark_release_gate,
+        dataset_leakage_audit=dataset_leakage_audit,
     )
     return BenchmarkRunResult(bundle=bundle, review_markdown=render_benchmark_review_markdown(bundle.to_dict()))
 
@@ -1328,6 +1394,230 @@ def _build_benchmark_claims_report(
     )
 
 
+def _ensure_eval_bundle(*, run_dir: str | Path, policy: dict[str, Any] | None) -> dict[str, Any]:
+    root = Path(run_dir)
+    bundle = read_eval_bundle(root)
+    if bundle and isinstance(bundle.get("agent_eval_matrix"), dict) and bundle.get("agent_eval_matrix"):
+        return bundle
+    eval_result = run_agent_evals(run_dir=root, policy=policy)
+    write_eval_bundle(root, bundle=eval_result.bundle)
+    return eval_result.bundle.to_dict()
+
+
+def _build_dataset_leakage_audit(
+    *,
+    run_dir: str | Path,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+) -> DatasetLeakageAudit:
+    dataset_profile = _read_json_artifact(Path(run_dir) / "dataset_profile.json")
+    leakage_risk_level = _clean_text(dataset_profile.get("leakage_risk_level")) or "unknown"
+    raw_findings = [
+        dict(item)
+        for item in dataset_profile.get("leakage_risks", [])
+        if isinstance(item, dict)
+    ]
+    findings = [
+        {
+            "kind": _clean_text(item.get("kind")) or "unknown",
+            "column": _clean_text(item.get("column")),
+            "severity": _clean_text(item.get("severity")) or "unknown",
+            "reason": _clean_text(item.get("reason")) or "no detail",
+        }
+        for item in raw_findings[:8]
+    ]
+    blocked_findings = [item for item in findings if _clean_text(item.get("severity")) == "high"]
+    warning_findings = [item for item in findings if _clean_text(item.get("severity")) == "medium"]
+    blocked_reason_codes = sorted(
+        {
+            f"dataset_leakage_{_clean_text(item.get('kind')) or 'risk'}"
+            for item in blocked_findings
+        }
+    )
+    if leakage_risk_level == "high" and "dataset_leakage_high_risk_profile" not in blocked_reason_codes:
+        blocked_reason_codes.append("dataset_leakage_high_risk_profile")
+    if blocked_reason_codes:
+        status = "blocked"
+    elif warning_findings or leakage_risk_level == "medium":
+        status = "warning"
+    else:
+        status = "ok"
+    return DatasetLeakageAudit(
+        schema_version=DATASET_LEAKAGE_AUDIT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status=status,
+        leakage_risk_level=leakage_risk_level,
+        blocked_finding_count=len(blocked_findings),
+        warning_finding_count=len(warning_findings),
+        blocked_reason_codes=blocked_reason_codes,
+        findings=findings,
+        summary=(
+            "Relaytic did not detect blocking leakage findings for paper-facing benchmark claims."
+            if status == "ok"
+            else (
+                "Relaytic found medium-severity leakage warnings that should stay visible in benchmark interpretation."
+                if status == "warning"
+                else "Relaytic blocked paper-facing benchmark claims because unresolved leakage findings remain."
+            )
+        ),
+        trace=trace,
+    )
+
+
+def _build_benchmark_truth_audit(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    task_contract_bundle: dict[str, Any],
+    eval_bundle: dict[str, Any],
+    trace_bundle: dict[str, Any],
+    dataset_leakage_audit: DatasetLeakageAudit,
+    paper_table: PaperBenchmarkTable,
+) -> BenchmarkTruthAudit:
+    benchmark_truth_precheck = dict(task_contract_bundle.get("benchmark_truth_precheck", {}))
+    trace_identity_conformance = dict(eval_bundle.get("trace_identity_conformance", {}))
+    eval_surface_parity_report = dict(eval_bundle.get("eval_surface_parity_report", {}))
+    protocol_conformance_report = dict(eval_bundle.get("protocol_conformance_report", {}))
+    security_eval_report = dict(eval_bundle.get("security_eval_report", {}))
+    blocked_reason_codes = [
+        str(item).strip()
+        for item in benchmark_truth_precheck.get("reason_codes", [])
+        if str(item).strip()
+    ]
+    if _clean_text(protocol_conformance_report.get("status")) == "fail":
+        blocked_reason_codes.append("protocol_conformance_failed")
+    if _clean_text(security_eval_report.get("status")) == "fail":
+        blocked_reason_codes.append("security_eval_failed")
+    if _clean_text(trace_identity_conformance.get("status")) == "fail":
+        blocked_reason_codes.append("trace_identity_drift")
+    if _clean_text(eval_surface_parity_report.get("status")) == "fail":
+        blocked_reason_codes.append("eval_surface_parity_failed")
+    if dataset_leakage_audit.status == "blocked":
+        blocked_reason_codes.extend(dataset_leakage_audit.blocked_reason_codes)
+    adjudication = dict(trace_bundle.get("adjudication_scorecard", {}))
+    if not _clean_text(adjudication.get("winning_claim_id")):
+        blocked_reason_codes.append("trace_winner_missing")
+    if not list(paper_table.rows):
+        blocked_reason_codes.append("paper_benchmark_rows_unavailable")
+    deduped_reason_codes = list(dict.fromkeys(blocked_reason_codes))
+    safe_to_cite_publicly = not deduped_reason_codes
+    return BenchmarkTruthAudit(
+        schema_version=BENCHMARK_TRUTH_AUDIT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if safe_to_cite_publicly else "blocked",
+        safe_to_cite_publicly=safe_to_cite_publicly,
+        truth_precheck_status=_clean_text(benchmark_truth_precheck.get("status")),
+        protocol_status=_clean_text(protocol_conformance_report.get("status")),
+        security_status=_clean_text(security_eval_report.get("status")),
+        trace_identity_status=_clean_text(trace_identity_conformance.get("status")),
+        eval_surface_parity_status=_clean_text(eval_surface_parity_report.get("status")),
+        leakage_status=dataset_leakage_audit.status,
+        blocked_reason_codes=deduped_reason_codes,
+        summary=(
+            "Relaytic considers the current benchmark bundle truthful enough for paper-facing claims."
+            if safe_to_cite_publicly
+            else "Relaytic blocked paper-facing claims because one or more benchmark-truth gates failed."
+        ),
+        trace=trace,
+    )
+
+
+def _build_paper_claim_guard_report(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    benchmark_truth_audit: BenchmarkTruthAudit,
+    claims_report: BenchmarkClaimsReport,
+    paper_table: PaperBenchmarkTable,
+) -> PaperClaimGuardReport:
+    blocked_reason_codes = list(benchmark_truth_audit.blocked_reason_codes)
+    if not paper_table.rows and "paper_benchmark_rows_unavailable" not in blocked_reason_codes:
+        blocked_reason_codes.append("paper_benchmark_rows_unavailable")
+    required_fixes = [_required_fix_for_reason(code) for code in blocked_reason_codes]
+    safe_to_cite_publicly = benchmark_truth_audit.safe_to_cite_publicly and bool(paper_table.rows)
+    return PaperClaimGuardReport(
+        schema_version=PAPER_CLAIM_GUARD_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="safe_to_cite_publicly" if safe_to_cite_publicly else "blocked",
+        safe_to_cite_publicly=safe_to_cite_publicly,
+        blocked_reason_codes=blocked_reason_codes,
+        claim_boundaries=list(claims_report.claim_boundaries),
+        required_fixes=required_fixes,
+        summary=(
+            "Relaytic marked this benchmark bundle safe to cite publicly within the stated claim boundaries."
+            if safe_to_cite_publicly
+            else "Relaytic blocked public benchmark claims and recorded the concrete fixes required before citation."
+        ),
+        trace=trace,
+    )
+
+
+def _build_benchmark_release_gate(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    benchmark_truth_audit: BenchmarkTruthAudit,
+    paper_claim_guard_report: PaperClaimGuardReport,
+) -> BenchmarkReleaseGate:
+    demo_safe = (
+        _clean_text(benchmark_truth_audit.protocol_status) != "fail"
+        and _clean_text(benchmark_truth_audit.security_status) != "fail"
+        and _clean_text(benchmark_truth_audit.trace_identity_status) != "fail"
+    )
+    safe_to_cite_publicly = paper_claim_guard_report.safe_to_cite_publicly
+    if safe_to_cite_publicly:
+        status = "safe_to_cite_publicly"
+    elif demo_safe:
+        status = "demo_only"
+    else:
+        status = "blocked"
+    return BenchmarkReleaseGate(
+        schema_version=BENCHMARK_RELEASE_GATE_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status=status,
+        safe_to_cite_publicly=safe_to_cite_publicly,
+        demo_safe=demo_safe,
+        blocked_reason_codes=list(paper_claim_guard_report.blocked_reason_codes),
+        required_fixes=list(paper_claim_guard_report.required_fixes),
+        summary=(
+            "Relaytic marked this benchmark bundle safe to cite publicly."
+            if safe_to_cite_publicly
+            else (
+                "Relaytic marked this benchmark bundle demo-safe but not paper-safe."
+                if demo_safe
+                else "Relaytic blocked this benchmark bundle from public claim and demo release."
+            )
+        ),
+        trace=trace,
+    )
+
+
+def _required_fix_for_reason(reason_code: str) -> str:
+    mapping = {
+        "benchmark_metric_missing_in_execution": "materialize the benchmark comparison metric in the executed model metrics",
+        "benchmark_metric_missing_in_reference_rows": "materialize the benchmark comparison metric in the benchmark reference rows",
+        "temporal_fold_health_blocked": "fix temporal split degeneracy before benchmarking",
+        "protocol_conformance_failed": "repair CLI/MCP protocol drift and rerun evals",
+        "security_eval_failed": "resolve open security findings before public claims",
+        "trace_identity_drift": "repair adjudication winner drift across trace surfaces",
+        "eval_surface_parity_failed": "realign eval surface parity before citing results",
+        "dataset_leakage_high_risk_profile": "remove or neutralize high-risk leakage features",
+        "trace_winner_missing": "materialize a valid adjudication winner before citing benchmark results",
+        "paper_benchmark_rows_unavailable": "rerun benchmark review until paper table rows are available",
+    }
+    if reason_code.startswith("dataset_leakage_"):
+        return "remove or neutralize unresolved leakage findings before public claim"
+    return mapping.get(reason_code, "resolve the blocking benchmark-truth finding")
+
+
 def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -> str:
     payload = bundle.to_dict() if isinstance(bundle, BenchmarkBundle) else dict(bundle)
     matrix = dict(payload.get("reference_approach_matrix", {}))
@@ -1338,6 +1628,10 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
     paper_manifest = dict(payload.get("paper_benchmark_manifest", {}))
     rerun_variance = dict(payload.get("rerun_variance_report", {}))
     claims = dict(payload.get("benchmark_claims_report", {}))
+    truth_audit = dict(payload.get("benchmark_truth_audit", {}))
+    claim_guard = dict(payload.get("paper_claim_guard_report", {}))
+    release_gate = dict(payload.get("benchmark_release_gate", {}))
+    leakage_audit = dict(payload.get("dataset_leakage_audit", {}))
     shadow_manifest = dict(payload.get("shadow_trial_manifest", {}))
     shadow_scorecard = dict(payload.get("shadow_trial_scorecard", {}))
     promotion = dict(payload.get("promotion_readiness_report", {}))
@@ -1383,6 +1677,35 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
                 f"- Selected family: `{paper_manifest.get('selected_model_family') or 'unknown'}`",
                 f"- Horizon type: `{paper_manifest.get('horizon_type') or 'n/a'}`",
                 f"- Sequence candidate status: `{paper_manifest.get('sequence_candidate_status') or 'n/a'}`",
+                f"- Claim gate status: `{paper_manifest.get('claim_gate_status') or release_gate.get('status') or 'unknown'}`",
+                f"- Safe to cite publicly: `{paper_manifest.get('safe_to_cite_publicly')}`",
+            ]
+        )
+    if truth_audit or claim_guard or release_gate:
+        lines.extend(
+            [
+                "",
+                "## Claim Gate",
+                f"- Truth audit: `{truth_audit.get('status') or 'unknown'}`",
+                f"- Release gate: `{release_gate.get('status') or claim_guard.get('status') or 'unknown'}`",
+                f"- Demo safe: `{release_gate.get('demo_safe')}`",
+                f"- Safe to cite publicly: `{claim_guard.get('safe_to_cite_publicly')}`",
+            ]
+        )
+        blocked_reasons = [
+            str(item)
+            for item in claim_guard.get("blocked_reason_codes", [])
+            if str(item).strip()
+        ]
+        if blocked_reasons:
+            lines.append(f"- Blocked reasons: `{', '.join(blocked_reasons[:6])}`")
+    if leakage_audit:
+        lines.extend(
+            [
+                "",
+                "## Leakage",
+                f"- Leakage status: `{leakage_audit.get('status') or 'unknown'}`",
+                f"- Leakage risk level: `{leakage_audit.get('leakage_risk_level') or 'unknown'}`",
             ]
         )
     if rerun_variance:
@@ -2015,6 +2338,7 @@ def _disabled_bundle(
         status="disabled",
         recommended_action="continue_experimentation",
         parity_status="reference_unavailable",
+        blocked_reason_codes=["benchmark_disabled"],
     )
 
 
@@ -2028,8 +2352,10 @@ def _unavailable_bundle(
     status: str = "unavailable",
     recommended_action: str | None = None,
     parity_status: str = "reference_unavailable",
+    blocked_reason_codes: list[str] | None = None,
 ) -> BenchmarkBundle:
     recommendation = recommended_action or ("benchmark_needed" if benchmark_expected else "continue_experimentation")
+    reason_codes = [str(item).strip() for item in (blocked_reason_codes or []) if str(item).strip()] or ["benchmark_evidence_unavailable"]
     matrix = ReferenceApproachMatrix(
         schema_version=REFERENCE_APPROACH_MATRIX_SCHEMA_VERSION,
         generated_at=generated_at,
@@ -2294,6 +2620,59 @@ def _unavailable_bundle(
         summary=summary,
         trace=trace,
     )
+    truth_audit = BenchmarkTruthAudit(
+        schema_version=BENCHMARK_TRUTH_AUDIT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="blocked",
+        safe_to_cite_publicly=False,
+        truth_precheck_status="blocked",
+        protocol_status="unknown",
+        security_status="unknown",
+        trace_identity_status="unknown",
+        eval_surface_parity_status="unknown",
+        leakage_status="unknown",
+        blocked_reason_codes=reason_codes,
+        summary=summary,
+        trace=trace,
+    )
+    claim_guard = PaperClaimGuardReport(
+        schema_version=PAPER_CLAIM_GUARD_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="blocked",
+        safe_to_cite_publicly=False,
+        blocked_reason_codes=reason_codes,
+        claim_boundaries=["benchmark evidence unavailable"],
+        required_fixes=[_required_fix_for_reason(code) for code in reason_codes],
+        summary=summary,
+        trace=trace,
+    )
+    release_gate = BenchmarkReleaseGate(
+        schema_version=BENCHMARK_RELEASE_GATE_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="blocked",
+        safe_to_cite_publicly=False,
+        demo_safe=False,
+        blocked_reason_codes=reason_codes,
+        required_fixes=[_required_fix_for_reason(code) for code in reason_codes],
+        summary=summary,
+        trace=trace,
+    )
+    leakage_audit = DatasetLeakageAudit(
+        schema_version=DATASET_LEAKAGE_AUDIT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="unknown",
+        leakage_risk_level="unknown",
+        blocked_finding_count=0,
+        warning_finding_count=0,
+        blocked_reason_codes=[],
+        findings=[],
+        summary=summary,
+        trace=trace,
+    )
     return BenchmarkBundle(
         reference_approach_matrix=matrix,
         benchmark_gap_report=gap_report,
@@ -2311,6 +2690,10 @@ def _unavailable_bundle(
         shadow_trial_scorecard=shadow_scorecard,
         candidate_quarantine=candidate_quarantine,
         promotion_readiness_report=promotion_report,
+        benchmark_truth_audit=truth_audit,
+        paper_claim_guard_report=claim_guard,
+        benchmark_release_gate=release_gate,
+        dataset_leakage_audit=leakage_audit,
     )
 
 

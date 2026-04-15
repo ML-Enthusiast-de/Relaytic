@@ -23,6 +23,10 @@ SHADOW_TRIAL_MANIFEST_SCHEMA_VERSION = "relaytic.shadow_trial_manifest.v1"
 SHADOW_TRIAL_SCORECARD_SCHEMA_VERSION = "relaytic.shadow_trial_scorecard.v1"
 CANDIDATE_QUARANTINE_SCHEMA_VERSION = "relaytic.candidate_quarantine.v1"
 PROMOTION_READINESS_REPORT_SCHEMA_VERSION = "relaytic.promotion_readiness_report.v1"
+BENCHMARK_TRUTH_AUDIT_SCHEMA_VERSION = "relaytic.benchmark_truth_audit.v1"
+PAPER_CLAIM_GUARD_REPORT_SCHEMA_VERSION = "relaytic.paper_claim_guard_report.v1"
+BENCHMARK_RELEASE_GATE_SCHEMA_VERSION = "relaytic.benchmark_release_gate.v1"
+DATASET_LEAKAGE_AUDIT_SCHEMA_VERSION = "relaytic.dataset_leakage_audit.v1"
 
 
 @dataclass(frozen=True)
@@ -267,6 +271,9 @@ class PaperBenchmarkManifest:
     sequence_candidate_reason: str | None
     summary: str
     trace: BenchmarkTrace
+    claim_gate_status: str | None = None
+    safe_to_cite_publicly: bool | None = None
+    claim_gate_reason_codes: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
@@ -288,6 +295,9 @@ class PaperBenchmarkTable:
     rows: list[dict[str, Any]]
     summary: str
     trace: BenchmarkTrace
+    claim_gate_status: str | None = None
+    safe_to_cite_publicly: bool | None = None
+    claim_gate_reason_codes: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
@@ -447,6 +457,91 @@ class PromotionReadinessReport:
 
 
 @dataclass(frozen=True)
+class DatasetLeakageAudit:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    leakage_risk_level: str
+    blocked_finding_count: int
+    warning_finding_count: int
+    blocked_reason_codes: list[str]
+    findings: list[dict[str, Any]]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BenchmarkTruthAudit:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    safe_to_cite_publicly: bool
+    truth_precheck_status: str | None
+    protocol_status: str | None
+    security_status: str | None
+    trace_identity_status: str | None
+    eval_surface_parity_status: str | None
+    leakage_status: str | None
+    blocked_reason_codes: list[str]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class PaperClaimGuardReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    safe_to_cite_publicly: bool
+    blocked_reason_codes: list[str]
+    claim_boundaries: list[str]
+    required_fixes: list[str]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BenchmarkReleaseGate:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    safe_to_cite_publicly: bool
+    demo_safe: bool
+    blocked_reason_codes: list[str]
+    required_fixes: list[str]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class BenchmarkBundle:
     reference_approach_matrix: ReferenceApproachMatrix
     benchmark_gap_report: BenchmarkGapReport
@@ -464,6 +559,10 @@ class BenchmarkBundle:
     shadow_trial_scorecard: ShadowTrialScorecard
     candidate_quarantine: CandidateQuarantine
     promotion_readiness_report: PromotionReadinessReport
+    benchmark_truth_audit: BenchmarkTruthAudit
+    paper_claim_guard_report: PaperClaimGuardReport
+    benchmark_release_gate: BenchmarkReleaseGate
+    dataset_leakage_audit: DatasetLeakageAudit
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -483,6 +582,10 @@ class BenchmarkBundle:
             "shadow_trial_scorecard": self.shadow_trial_scorecard.to_dict(),
             "candidate_quarantine": self.candidate_quarantine.to_dict(),
             "promotion_readiness_report": self.promotion_readiness_report.to_dict(),
+            "benchmark_truth_audit": self.benchmark_truth_audit.to_dict(),
+            "paper_claim_guard_report": self.paper_claim_guard_report.to_dict(),
+            "benchmark_release_gate": self.benchmark_release_gate.to_dict(),
+            "dataset_leakage_audit": self.dataset_leakage_audit.to_dict(),
         }
 
 

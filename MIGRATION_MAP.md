@@ -160,6 +160,12 @@ Avoid introducing new references to:
 - introduced artifact boundaries for `calibration_strategy_report.json`, `operating_point_contract.json`, `threshold_search_report.json`, `decision_cost_profile.json`, `review_budget_optimization_report.json`, and `abstention_policy_report.json`
 - upgraded training, run summary, assist explanations, and benchmark CLI surfaces so calibration choice, threshold search, review-budget posture, and abstention posture are persisted from one canonical operating-point contract instead of being reconstructed differently per surface
 
+### Slice 15L
+
+- extended the existing `src/relaytic/benchmark/`, `src/relaytic/evals/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/mission_control/`, and `src/relaytic/ui/` boundaries rather than introducing a separate paper-claim or benchmark-governance package
+- introduced artifact boundaries for `trace_identity_conformance.json`, `eval_surface_parity_report.json`, `benchmark_truth_audit.json`, `paper_claim_guard_report.json`, `benchmark_release_gate.json`, and `dataset_leakage_audit.json`
+- upgraded benchmark review, eval review, run summary, assist explanations, mission-control cards, and benchmark/evals CLI surfaces so trace identity, surface parity, leakage posture, protocol conformance, and public-claim safety are decided from one canonical gate instead of drifting by surface
+
 ### Slice 09A
 
 - introduced the canonical package boundary `src/relaytic/memory/`

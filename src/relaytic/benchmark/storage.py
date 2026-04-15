@@ -28,6 +28,10 @@ BENCHMARK_FILENAMES = {
     "shadow_trial_scorecard": "shadow_trial_scorecard.json",
     "candidate_quarantine": "candidate_quarantine.json",
     "promotion_readiness_report": "promotion_readiness_report.json",
+    "benchmark_truth_audit": "benchmark_truth_audit.json",
+    "paper_claim_guard_report": "paper_claim_guard_report.json",
+    "benchmark_release_gate": "benchmark_release_gate.json",
+    "dataset_leakage_audit": "dataset_leakage_audit.json",
 }
 
 

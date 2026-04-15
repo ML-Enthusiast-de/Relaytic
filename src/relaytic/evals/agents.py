@@ -13,18 +13,22 @@ from relaytic.tracing import read_trace_bundle, run_trace_review
 
 from .models import (
     AGENT_EVAL_MATRIX_SCHEMA_VERSION,
+    EVAL_SURFACE_PARITY_REPORT_SCHEMA_VERSION,
     HOST_SURFACE_MATRIX_SCHEMA_VERSION,
     PROTOCOL_CONFORMANCE_REPORT_SCHEMA_VERSION,
     RED_TEAM_REPORT_SCHEMA_VERSION,
     SECURITY_EVAL_REPORT_SCHEMA_VERSION,
+    TRACE_IDENTITY_CONFORMANCE_SCHEMA_VERSION,
     AgentEvalMatrixArtifact,
     EvalBundle,
     EvalControls,
+    EvalSurfaceParityReportArtifact,
     EvalTrace,
     HostSurfaceMatrixArtifact,
     ProtocolConformanceReportArtifact,
     RedTeamReportArtifact,
     SecurityEvalReportArtifact,
+    TraceIdentityConformanceArtifact,
 )
 
 
@@ -68,6 +72,16 @@ def run_agent_evals(
         cli_run_surface=cli_run_surface,
         mcp_run_surface=mcp_run_surface,
     )
+    trace_identity_conformance = _build_trace_identity_conformance(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        trace_bundle=trace_bundle,
+        cli_trace_surface=cli_trace_surface,
+        mcp_trace_surface=mcp_trace_surface,
+        cli_run_surface=cli_run_surface,
+        mcp_run_surface=mcp_run_surface,
+    )
     host_surface_matrix = _build_host_surface_matrix(
         controls=controls,
         trace=trace,
@@ -92,6 +106,15 @@ def run_agent_evals(
         security_report=security_report,
         protocol_report=protocol_report,
     )
+    eval_surface_parity_report = _build_eval_surface_parity_report(
+        controls=controls,
+        trace=trace,
+        summary_payload=summary_payload,
+        protocol_report=protocol_report,
+        security_report=security_report,
+        cli_run_surface=cli_run_surface,
+        mcp_run_surface=mcp_run_surface,
+    )
     agent_eval_matrix = _build_agent_eval_matrix(
         controls=controls,
         trace=trace,
@@ -107,6 +130,8 @@ def run_agent_evals(
         red_team_report=red_team_report,
         protocol_conformance_report=protocol_report,
         host_surface_matrix=host_surface_matrix,
+        trace_identity_conformance=trace_identity_conformance,
+        eval_surface_parity_report=eval_surface_parity_report,
     )
     return EvalRunResult(bundle=bundle, review_markdown=render_eval_review_markdown(bundle.to_dict()))
 
@@ -116,6 +141,8 @@ def render_eval_review_markdown(bundle: dict[str, Any]) -> str:
     security = dict(bundle.get("security_eval_report", {}))
     protocol = dict(bundle.get("protocol_conformance_report", {}))
     red_team = dict(bundle.get("red_team_report", {}))
+    trace_identity = dict(bundle.get("trace_identity_conformance", {}))
+    parity = dict(bundle.get("eval_surface_parity_report", {}))
     scenarios = [dict(item) for item in matrix.get("scenarios", []) if isinstance(item, dict)]
     lines = [
         "# Relaytic Agent Evals",
@@ -127,6 +154,8 @@ def render_eval_review_markdown(bundle: dict[str, Any]) -> str:
         f"- Protocol status: `{protocol.get('status') or 'unknown'}`",
         f"- Security status: `{security.get('status') or 'unknown'}`",
         f"- Red-team status: `{red_team.get('status') or 'unknown'}`",
+        f"- Trace identity status: `{trace_identity.get('status') or 'unknown'}`",
+        f"- Eval surface parity: `{parity.get('status') or 'unknown'}`",
     ]
     if scenarios:
         lines.extend(["", "## Scenarios"])
@@ -147,6 +176,132 @@ def render_eval_review_markdown(bundle: dict[str, Any]) -> str:
         for item in findings[:5]:
             lines.append(f"- `{item.get('finding_id') or 'finding'}` | {item.get('detail') or 'no detail'}")
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _build_trace_identity_conformance(
+    *,
+    controls: EvalControls,
+    trace: EvalTrace,
+    summary_payload: dict[str, Any],
+    trace_bundle: dict[str, Any],
+    cli_trace_surface: dict[str, Any],
+    mcp_trace_surface: dict[str, Any],
+    cli_run_surface: dict[str, Any],
+    mcp_run_surface: dict[str, Any],
+) -> TraceIdentityConformanceArtifact:
+    adjudication = dict(trace_bundle.get("adjudication_scorecard", {}))
+    summary_trace = dict(summary_payload.get("trace", {}))
+    canonical_winning_claim_id = (
+        _clean_text(adjudication.get("winning_claim_id"))
+        or _clean_text(summary_trace.get("winning_claim_id"))
+        or _extract_path(cli_trace_surface, ["trace", "winning_claim_id"])
+        or _extract_path(mcp_trace_surface, ["trace", "winning_claim_id"])
+    )
+    canonical_winning_action = (
+        _clean_text(adjudication.get("winning_action"))
+        or _clean_text(summary_trace.get("winning_action"))
+        or _extract_path(cli_trace_surface, ["trace", "winning_action"])
+        or _extract_path(mcp_trace_surface, ["trace", "winning_action"])
+    )
+    comparisons = [
+        ("cli_trace_show.winning_claim_id", _extract_path(cli_trace_surface, ["trace", "winning_claim_id"]), canonical_winning_claim_id),
+        ("mcp_trace_show.winning_claim_id", _extract_path(mcp_trace_surface, ["trace", "winning_claim_id"]), canonical_winning_claim_id),
+        ("cli_run_show.winning_claim_id", _extract_path(cli_run_surface, ["run_summary", "trace", "winning_claim_id"]), canonical_winning_claim_id),
+        ("mcp_run_show.winning_claim_id", _extract_path(mcp_run_surface, ["run_summary", "trace", "winning_claim_id"]), canonical_winning_claim_id),
+        ("trace_bundle.adjudication_scorecard.winning_claim_id", _clean_text(adjudication.get("winning_claim_id")), canonical_winning_claim_id),
+        ("run_summary.trace.winning_claim_id", _clean_text(summary_trace.get("winning_claim_id")), canonical_winning_claim_id),
+        ("cli_trace_show.winning_action", _extract_path(cli_trace_surface, ["trace", "winning_action"]), canonical_winning_action),
+        ("mcp_trace_show.winning_action", _extract_path(mcp_trace_surface, ["trace", "winning_action"]), canonical_winning_action),
+        ("cli_run_show.winning_action", _extract_path(cli_run_surface, ["run_summary", "trace", "winning_action"]), canonical_winning_action),
+        ("mcp_run_show.winning_action", _extract_path(mcp_run_surface, ["run_summary", "trace", "winning_action"]), canonical_winning_action),
+        ("trace_bundle.adjudication_scorecard.winning_action", _clean_text(adjudication.get("winning_action")), canonical_winning_action),
+        ("run_summary.trace.winning_action", _clean_text(summary_trace.get("winning_action")), canonical_winning_action),
+    ]
+    mismatches: list[dict[str, Any]] = []
+    compared_surfaces: list[str] = []
+    for field, observed_value, canonical_value in comparisons:
+        compared_surfaces.append(field)
+        observed_text = _clean_text(observed_value)
+        if observed_text is None:
+            continue
+        if observed_text != canonical_value:
+            mismatches.append(
+                {
+                    "field": field,
+                    "observed_value": observed_text,
+                    "canonical_value": canonical_value,
+                }
+            )
+    status = "ok" if not mismatches else "fail"
+    return TraceIdentityConformanceArtifact(
+        schema_version=TRACE_IDENTITY_CONFORMANCE_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status=status,
+        canonical_winning_claim_id=canonical_winning_claim_id,
+        canonical_winning_action=canonical_winning_action,
+        compared_surfaces=compared_surfaces,
+        mismatch_count=len(mismatches),
+        mismatches=mismatches,
+        summary=(
+            "Relaytic host surfaces agree on the same adjudication winner."
+            if not mismatches
+            else f"Relaytic detected {len(mismatches)} trace-identity drift finding(s) across host surfaces."
+        ),
+        trace=trace,
+    )
+
+
+def _build_eval_surface_parity_report(
+    *,
+    controls: EvalControls,
+    trace: EvalTrace,
+    summary_payload: dict[str, Any],
+    protocol_report: ProtocolConformanceReportArtifact,
+    security_report: SecurityEvalReportArtifact,
+    cli_run_surface: dict[str, Any],
+    mcp_run_surface: dict[str, Any],
+) -> EvalSurfaceParityReportArtifact:
+    summary_evals = dict(summary_payload.get("evals", {}))
+    canonical_protocol_status = _clean_text(protocol_report.status)
+    canonical_security_status = _clean_text(security_report.status)
+    comparisons = [
+        ("run_summary.evals.protocol_status", _clean_text(summary_evals.get("protocol_status")), canonical_protocol_status),
+        ("cli_run_show.run_summary.evals.protocol_status", _extract_path(cli_run_surface, ["run_summary", "evals", "protocol_status"]), canonical_protocol_status),
+        ("mcp_run_show.run_summary.evals.protocol_status", _extract_path(mcp_run_surface, ["run_summary", "evals", "protocol_status"]), canonical_protocol_status),
+        ("run_summary.evals.security_status", _clean_text(summary_evals.get("security_status")), canonical_security_status),
+        ("cli_run_show.run_summary.evals.security_status", _extract_path(cli_run_surface, ["run_summary", "evals", "security_status"]), canonical_security_status),
+        ("mcp_run_show.run_summary.evals.security_status", _extract_path(mcp_run_surface, ["run_summary", "evals", "security_status"]), canonical_security_status),
+    ]
+    mismatches: list[dict[str, Any]] = []
+    for field, observed_value, canonical_value in comparisons:
+        observed_text = _clean_text(observed_value)
+        if observed_text is None:
+            continue
+        if observed_text != canonical_value:
+            mismatches.append(
+                {
+                    "field": field,
+                    "observed_value": observed_text,
+                    "canonical_value": canonical_value,
+                }
+            )
+    status = "ok" if not mismatches else "fail"
+    return EvalSurfaceParityReportArtifact(
+        schema_version=EVAL_SURFACE_PARITY_REPORT_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status=status,
+        compared_fields=[field for field, _, _ in comparisons],
+        mismatch_count=len(mismatches),
+        mismatches=mismatches,
+        summary=(
+            "Relaytic eval surfaces are aligned with the current protocol and security outcomes."
+            if not mismatches
+            else f"Relaytic detected {len(mismatches)} eval surface parity mismatch(es)."
+        ),
+        trace=trace,
+    )
 
 
 def _collect_surface_snapshots(root: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:

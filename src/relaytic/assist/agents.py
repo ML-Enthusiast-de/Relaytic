@@ -640,6 +640,7 @@ def build_assist_audit_explanation(
     feasibility = dict(run_summary.get("feasibility", {}))
     completion = dict(run_summary.get("completion", {}))
     benchmark = dict(run_summary.get("benchmark", {}))
+    evals = dict(run_summary.get("evals", {}))
     result_contract = dict(run_summary.get("result_contract", {}))
     task_contract = dict(run_summary.get("task_contract", {}))
     benchmark_vs_deploy = dict(run_summary.get("benchmark_vs_deploy", {}))
@@ -677,6 +678,32 @@ def build_assist_audit_explanation(
             "metric_materialization_audit.json",
             "split_diagnostics_report.json",
             "benchmark_truth_precheck.json",
+        ]
+    elif (
+        "safe to cite" in normalized
+        or "safe to mention publicly" in normalized
+        or "public claim" in normalized
+        or "paper claim" in normalized
+        or ("why blocked" in normalized and "claim" in normalized)
+    ):
+        question_type = "paper_claim_gate"
+        blocked_reason_count = int(benchmark.get("blocked_reason_count", 0) or 0)
+        reasons = [
+            f"Relaytic marked the benchmark claim gate as `{_clean_text(benchmark.get('claim_gate_status')) or 'unknown'}` with safe-to-cite-publicly = `{benchmark.get('safe_to_cite_publicly')}` and demo-safe = `{benchmark.get('demo_safe')}`.",
+            f"Benchmark truth audit is `{_clean_text(benchmark.get('truth_audit_status')) or _clean_text(objective_contract.get('truth_precheck_status')) or 'unknown'}`, protocol is `{_clean_text(evals.get('protocol_status')) or 'unknown'}`, security is `{_clean_text(evals.get('security_status')) or 'unknown'}`, and leakage posture is `{_clean_text(benchmark.get('leakage_status')) or 'unknown'}`.",
+            (
+                f"Relaytic is currently blocking `{blocked_reason_count}` paper-claim reason(s)."
+                if blocked_reason_count > 0
+                else "Relaytic did not record any active claim-blocking reasons on this run."
+            ),
+        ]
+        evidence_refs = [
+            "benchmark_truth_audit.json",
+            "paper_claim_guard_report.json",
+            "benchmark_release_gate.json",
+            "dataset_leakage_audit.json",
+            "trace_identity_conformance.json",
+            "eval_surface_parity_report.json",
         ]
     elif "task type" in normalized or ("why not" in normalized and "anomaly" in normalized):
         question_type = "task_semantics"

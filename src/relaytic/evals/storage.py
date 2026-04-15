@@ -17,6 +17,8 @@ EVAL_FILENAMES = {
     "red_team_report": "red_team_report.json",
     "protocol_conformance_report": "protocol_conformance_report.json",
     "host_surface_matrix": "host_surface_matrix.json",
+    "trace_identity_conformance": "trace_identity_conformance.json",
+    "eval_surface_parity_report": "eval_surface_parity_report.json",
 }
 
 

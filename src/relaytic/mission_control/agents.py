@@ -1431,6 +1431,13 @@ def _build_cards(
             "severity": "medium" if _clean_text(benchmark.get("beat_target_state")) == "unmet" else "normal",
         },
         {
+            "card_id": "paper_claim_gate",
+            "title": "Paper Claim Gate",
+            "value": _clean_text(benchmark.get("claim_gate_status")) or "unknown",
+            "detail": f"Safe to cite `{benchmark.get('safe_to_cite_publicly')}` | demo safe `{benchmark.get('demo_safe')}`",
+            "severity": "medium" if not bool(benchmark.get("safe_to_cite_publicly")) else "normal",
+        },
+        {
             "card_id": "decision_lab",
             "title": "Decision Lab",
             "value": _clean_text(decision_lab.get("selected_strategy")) or "hold_current_course",
