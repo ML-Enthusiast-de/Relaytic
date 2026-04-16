@@ -67,7 +67,7 @@ Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 16A**, because the performance-recovery track through Slice 15L is now landed and Relaytic can start the academy on top of a stronger modeling core and an explicit paper-claim trust gate instead of learning new capabilities on top of unstable benchmark truth.
+The next recommended build is **Slice 15M**, because the current rerun proved Relaytic is stronger but still not done with competitiveness work: multiclass and rare-event specialization still need help, temporal classification benchmark recovery is not finished, and we should add explicit benchmark-generalization guards before the academy so we do not accidentally optimize Relaytic around one repeatedly inspected dev pack.
 
 The initial model-competitiveness path through **Slice 15F** is now landed, and the first performance-recovery foundation slice is now landed too:
 
@@ -78,7 +78,7 @@ The full required performance-recovery path is now landed:
 
 - Slice 15L benchmark truth hardening and paper-claim gates
 
-The broader **Relaytic Academy** then starts at **Slice 16A**, after Relaytic has a stronger modeling core and benchmark-truth gate rather than learning new capabilities on top of a still-limited performance ceiling.
+The broader **Relaytic Academy** then starts at **Slice 16A**, after Slice 15M closes the remaining specialization and benchmark-generalization gap rather than learning new capabilities on top of a still-limited performance ceiling.
 
 After the academy track and the optional representation-engine bet, the roadmap now ends with **Slice 18**, a deliberate consolidation/remediation slice that removes legacy compatibility surfaces, misleading duplicate structure, oversized modules, and stale prototype residue so the finished repo reads like one intentional product rather than a long-lived construction site.
 

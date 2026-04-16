@@ -32,6 +32,10 @@ Serious performance gains require six things in order:
 5. calibration and decision optimization as first-class work
 6. benchmark-truth gates that block unsafe paper claims
 
+After those six are in place, Relaytic still needs one final bridge before academy work:
+
+7. competitive specialization plus benchmark-generalization guards
+
 If Relaytic skips any of those and simply adds more loops or more imported models, it will mostly spend more compute on the wrong families, the wrong objectives, or broken benchmark setups.
 
 ## Non-goals
@@ -44,6 +48,7 @@ This track must not:
 - promote sequence models because timestamps exist
 - let benchmark wins silently become deployment approval
 - let test-friendly loop budgets become production defaults
+- let repeated reuse of one visible benchmark pack silently become the de facto training objective
 
 ## Hard lessons that must become doctrine
 
@@ -124,6 +129,24 @@ Relaytic must not present a benchmark result as paper-safe if any of the followi
 - temporal splits are degenerate
 - leakage checks are unresolved
 
+### 7. Repeated benchmark visibility creates real overfitting risk
+
+Relaytic must explicitly distinguish:
+
+- dev benchmark packs used to shape implementation
+- holdout benchmark packs used to judge whether those changes generalized
+- paper-facing benchmark packs used in public claims
+
+No future slice may claim a serious competitiveness gain based only on the repeatedly inspected dev benchmark suite.
+
+Relaytic must also be able to prove that:
+
+- route selection does not branch on benchmark dataset identity
+- family selection does not branch on benchmark dataset identity
+- threshold or calibration logic does not branch on benchmark dataset identity
+
+If a slice makes Relaytic better only on the currently visible benchmark pack and cannot show the same architectural reason on holdout or non-benchmark runs, that is benchmark optimization theater, not real progress.
+
 ## Required invariants
 
 ### Objective and split invariants
@@ -186,6 +209,14 @@ Relaytic must not present a benchmark result as paper-safe if any of the followi
 - `benchmark_truth_audit.json`
 - `paper_claim_guard_report.json`
 - `benchmark_release_gate.json`
+- `family_specialization_matrix.json`
+- `multiclass_search_profile.json`
+- `rare_event_search_profile.json`
+- `adapter_activation_report.json`
+- `temporal_benchmark_recovery_report.json`
+- `benchmark_pack_partition.json`
+- `holdout_claim_policy.json`
+- `benchmark_generalization_audit.json`
 
 ## Proof burden
 
@@ -200,6 +231,7 @@ This recovery track is only complete if Relaytic can prove all of the following:
 7. one rare-event task changes outcome quality through calibration or threshold optimization rather than family change alone
 8. one benchmark bundle is explicitly blocked from paper-safe status because protocol or benchmark-truth gates fail
 9. one clean benchmark bundle is marked safe to cite publicly
+10. one gain visible on the dev benchmark pack is checked again under a holdout or untouched pack before it is treated as paper-facing evidence
 
 ## Relationship to the academy track
 
