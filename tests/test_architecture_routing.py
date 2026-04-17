@@ -391,3 +391,72 @@ def test_family_stack_widens_multiclass_eligibility(monkeypatch) -> None:
         "tabpfn_classifier",
     }.issubset(set(eligible_rows))
     assert artifacts["family_eligibility_matrix"]["eligible_family_count"] >= 6
+
+
+def test_family_specialization_profiles_materialize_for_multiclass_and_rare_event() -> None:
+    multiclass = build_architecture_routing_artifacts(
+        investigation_bundle={
+            "dataset_profile": {
+                "row_count": 1100,
+                "column_count": 12,
+                "data_mode": "steady_state",
+                "numeric_columns": ["length", "width", "density", "roundness", "compactness"],
+                "categorical_columns": ["region"],
+                "missingness_by_column": {"length": 0.0, "width": 0.0},
+            },
+            "optimization_profile": {},
+        },
+        planning_bundle={
+            "plan": {
+                "task_profile": {
+                    "task_type": "multiclass_classification",
+                    "data_mode": "steady_state",
+                    "row_count": 1100,
+                    "class_count": 7,
+                    "minority_class_fraction": 0.11,
+                },
+                "feature_columns": ["length", "width", "density", "roundness", "compactness", "region"],
+                "target_column": "bean_class",
+            }
+        },
+    )
+
+    assert multiclass["multiclass_search_profile"]["status"] == "active"
+    assert multiclass["multiclass_search_profile"]["broadened_finalist_count"] >= 3
+    assert multiclass["family_specialization_matrix"]["multiclass_active"] is True
+    assert any(
+        "multiclass_specialist" in row["specialization_tags"]
+        for row in multiclass["family_specialization_matrix"]["rows"]
+    )
+
+    rare_event = build_architecture_routing_artifacts(
+        investigation_bundle={
+            "dataset_profile": {
+                "row_count": 800,
+                "column_count": 8,
+                "data_mode": "steady_state",
+                "numeric_columns": ["risk", "utilization", "gap", "tenure", "reviews"],
+                "categorical_columns": [],
+                "missingness_by_column": {"risk": 0.0},
+            },
+            "optimization_profile": {},
+        },
+        planning_bundle={
+            "plan": {
+                "task_profile": {
+                    "task_type": "binary_classification",
+                    "data_mode": "steady_state",
+                    "row_count": 800,
+                    "class_count": 2,
+                    "minority_class_fraction": 0.08,
+                },
+                "feature_columns": ["risk", "utilization", "gap", "tenure", "reviews"],
+                "target_column": "default_flag",
+            }
+        },
+    )
+
+    assert rare_event["rare_event_search_profile"]["status"] == "active"
+    assert rare_event["rare_event_search_profile"]["imbalance_aware_profile"] is True
+    assert rare_event["family_specialization_matrix"]["rare_event_active"] is True
+    assert rare_event["adapter_activation_report"]["status"] == "ok"

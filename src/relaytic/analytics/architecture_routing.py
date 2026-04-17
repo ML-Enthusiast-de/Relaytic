@@ -29,6 +29,10 @@ FAMILY_ELIGIBILITY_MATRIX_SCHEMA_VERSION = "relaytic.family_eligibility_matrix.v
 FAMILY_PROBE_POLICY_SCHEMA_VERSION = "relaytic.family_probe_policy.v1"
 CATEGORICAL_STRATEGY_REPORT_SCHEMA_VERSION = "relaytic.categorical_strategy_report.v1"
 FAMILY_SPECIALIZATION_REPORT_SCHEMA_VERSION = "relaytic.family_specialization_report.v1"
+FAMILY_SPECIALIZATION_MATRIX_SCHEMA_VERSION = "relaytic.family_specialization_matrix.v1"
+MULTICLASS_SEARCH_PROFILE_SCHEMA_VERSION = "relaytic.multiclass_search_profile.v1"
+RARE_EVENT_SEARCH_PROFILE_SCHEMA_VERSION = "relaytic.rare_event_search_profile.v1"
+ADAPTER_ACTIVATION_REPORT_SCHEMA_VERSION = "relaytic.adapter_activation_report.v1"
 
 
 ARCHITECTURE_ROUTING_FILENAMES = {
@@ -44,6 +48,10 @@ ARCHITECTURE_ROUTING_FILENAMES = {
     "family_probe_policy": "family_probe_policy.json",
     "categorical_strategy_report": "categorical_strategy_report.json",
     "family_specialization_report": "family_specialization_report.json",
+    "family_specialization_matrix": "family_specialization_matrix.json",
+    "multiclass_search_profile": "multiclass_search_profile.json",
+    "rare_event_search_profile": "rare_event_search_profile.json",
+    "adapter_activation_report": "adapter_activation_report.json",
 }
 
 
@@ -449,6 +457,37 @@ def build_architecture_routing_artifacts(
         minority_fraction=minority_fraction,
         candidate_order=candidate_order,
     )
+    family_specialization_matrix = _build_family_specialization_matrix(
+        generated_at=generated_at,
+        task_type=task_type,
+        class_count=class_count,
+        minority_fraction=minority_fraction,
+        candidate_order=candidate_order,
+        registry_rows=registry_rows,
+        family_probe_policy=family_probe_policy,
+        family_specialization_report=family_specialization_report,
+    )
+    multiclass_search_profile = _build_multiclass_search_profile(
+        generated_at=generated_at,
+        task_type=task_type,
+        class_count=class_count,
+        candidate_order=candidate_order,
+        registry_rows=registry_rows,
+    )
+    rare_event_search_profile = _build_rare_event_search_profile(
+        generated_at=generated_at,
+        task_type=task_type,
+        minority_fraction=minority_fraction,
+        candidate_order=candidate_order,
+        registry_rows=registry_rows,
+    )
+    adapter_activation_report = _build_adapter_activation_report(
+        generated_at=generated_at,
+        task_type=task_type,
+        candidate_order=candidate_order,
+        categorical_strategy=str(categorical_strategy_report.get("selected_strategy") or ""),
+        registry_rows=registry_rows,
+    )
     family_readiness_report = {
         "schema_version": FAMILY_READINESS_REPORT_SCHEMA_VERSION,
         "generated_at": generated_at,
@@ -574,6 +613,10 @@ def build_architecture_routing_artifacts(
         "family_probe_policy": family_probe_policy,
         "categorical_strategy_report": categorical_strategy_report,
         "family_specialization_report": family_specialization_report,
+        "family_specialization_matrix": family_specialization_matrix,
+        "multiclass_search_profile": multiclass_search_profile,
+        "rare_event_search_profile": rare_event_search_profile,
+        "adapter_activation_report": adapter_activation_report,
     }
 
 
@@ -1041,6 +1084,219 @@ def _build_family_specialization_report(
     }
 
 
+def _build_family_specialization_matrix(
+    *,
+    generated_at: str,
+    task_type: str,
+    class_count: int,
+    minority_fraction: float | None,
+    candidate_order: list[str],
+    registry_rows: list[dict[str, Any]],
+    family_probe_policy: dict[str, Any],
+    family_specialization_report: dict[str, Any],
+) -> dict[str, Any]:
+    tier_one = {
+        str(item)
+        for item in family_probe_policy.get("tier_one_families", [])
+        if str(item).strip()
+    }
+    tier_two = {
+        str(item)
+        for item in family_probe_policy.get("tier_two_families", [])
+        if str(item).strip()
+    }
+    categorical_priority = {
+        str(item)
+        for item in family_specialization_report.get("categorical_priority_families", [])
+        if str(item).strip()
+    }
+    small_data_specialists = {
+        str(item)
+        for item in family_specialization_report.get("small_data_specialist_families", [])
+        if str(item).strip()
+    }
+    multiclass_active = bool(task_type == "multiclass_classification" and class_count >= 3)
+    rare_event_active = _rare_event_profile_active(task_type=task_type, minority_fraction=minority_fraction)
+    rows: list[dict[str, Any]] = []
+    for row in registry_rows:
+        family_id = str(row.get("family_id", "")).strip()
+        if not family_id:
+            continue
+        tags: list[str] = []
+        if family_id in categorical_priority:
+            tags.append("categorical_priority")
+        if family_id in small_data_specialists:
+            tags.append("small_data_specialist")
+        if multiclass_active and str(row.get("multiclass_affinity")) in {"high", "very_high"}:
+            tags.append("multiclass_specialist")
+        if rare_event_active and str(row.get("rare_event_affinity")) in {"high", "very_high"}:
+            tags.append("rare_event_specialist")
+        probe_tier = _family_probe_tier(
+            family_id=family_id,
+            tier_one=list(tier_one),
+            tier_two=list(tier_two),
+        )
+        rows.append(
+            {
+                "family_id": family_id,
+                "family_title": row.get("family_title"),
+                "eligible": family_id in candidate_order,
+                "probe_tier": probe_tier,
+                "multiclass_affinity": row.get("multiclass_affinity"),
+                "rare_event_affinity": row.get("rare_event_affinity"),
+                "specialization_tags": tags,
+                "search_priority": (
+                    "high"
+                    if probe_tier == "tier_one" or any(tag.endswith("specialist") for tag in tags)
+                    else "medium"
+                    if probe_tier == "tier_two"
+                    else "low"
+                ),
+            }
+        )
+    return {
+        "schema_version": FAMILY_SPECIALIZATION_MATRIX_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "ok" if rows else "partial",
+        "multiclass_active": multiclass_active,
+        "rare_event_active": rare_event_active,
+        "row_count": len(rows),
+        "rows": rows,
+        "summary": (
+            f"Relaytic materialized `{len(rows)}` family specialization rows with multiclass active=`{multiclass_active}` "
+            f"and rare-event active=`{rare_event_active}`."
+        ),
+    }
+
+
+def _build_multiclass_search_profile(
+    *,
+    generated_at: str,
+    task_type: str,
+    class_count: int,
+    candidate_order: list[str],
+    registry_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    active = bool(task_type == "multiclass_classification" and class_count >= 3)
+    specialist_families = [
+        str(row.get("family_id"))
+        for row in registry_rows
+        if str(row.get("family_id", "")).strip()
+        and str(row.get("family_id")) in candidate_order
+        and str(row.get("multiclass_affinity")) in {"high", "very_high"}
+    ]
+    broadened_finalists = specialist_families[:5] if active else []
+    return {
+        "schema_version": MULTICLASS_SEARCH_PROFILE_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "active" if active else "not_applicable",
+        "task_type": task_type,
+        "class_count": int(max(class_count, 0)),
+        "broadened_finalist_count": max(3, min(len(broadened_finalists), 5)) if active and broadened_finalists else 0,
+        "specialist_families": specialist_families,
+        "broadened_finalist_families": broadened_finalists,
+        "summary": (
+            "Relaytic widened multiclass family racing beyond the generic binary ladder."
+            if active
+            else "Relaytic did not activate the multiclass specialization profile for this run."
+        ),
+    }
+
+
+def _build_rare_event_search_profile(
+    *,
+    generated_at: str,
+    task_type: str,
+    minority_fraction: float | None,
+    candidate_order: list[str],
+    registry_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    active = _rare_event_profile_active(task_type=task_type, minority_fraction=minority_fraction)
+    specialist_families = [
+        str(row.get("family_id"))
+        for row in registry_rows
+        if str(row.get("family_id", "")).strip()
+        and str(row.get("family_id")) in candidate_order
+        and str(row.get("rare_event_affinity")) in {"high", "very_high"}
+    ]
+    return {
+        "schema_version": RARE_EVENT_SEARCH_PROFILE_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "active" if active else "not_applicable",
+        "task_type": task_type,
+        "minority_class_fraction": minority_fraction,
+        "imbalance_aware_profile": active,
+        "selection_priority": "pr_auc_then_recall" if active else "generic_classification",
+        "class_weighting_expected": active,
+        "review_budget_sensitive": active,
+        "specialist_families": specialist_families,
+        "summary": (
+            "Relaytic activated an imbalance-aware rare-event search profile with PR-oriented routing pressure."
+            if active
+            else "Relaytic did not activate the rare-event specialization profile for this run."
+        ),
+    }
+
+
+def _build_adapter_activation_report(
+    *,
+    generated_at: str,
+    task_type: str,
+    candidate_order: list[str],
+    categorical_strategy: str,
+    registry_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    activated = 0
+    for row in registry_rows:
+        if row.get("family_role") != "optional_adapter":
+            continue
+        family_id = str(row.get("family_id", "")).strip()
+        if not family_id:
+            continue
+        available = str(row.get("availability_status")) == "available"
+        eligible = family_id in candidate_order
+        activation_state = (
+            "active"
+            if available and eligible
+            else "ready"
+            if available
+            else "unavailable"
+        )
+        if activation_state == "active":
+            activated += 1
+        rows.append(
+            {
+                "family_id": family_id,
+                "family_title": row.get("family_title"),
+                "adapter_module": row.get("adapter_module"),
+                "adapter_version": row.get("adapter_version"),
+                "available": available,
+                "eligible": eligible,
+                "activation_state": activation_state,
+                "categorical_strategy_relevant": bool(
+                    categorical_strategy == "categorical_native_preferred"
+                    and family_id.startswith("catboost")
+                ),
+                "task_type": task_type,
+            }
+        )
+    return {
+        "schema_version": ADAPTER_ACTIVATION_REPORT_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "ok",
+        "task_type": task_type,
+        "row_count": len(rows),
+        "ready_family_count": sum(1 for item in rows if item["available"]),
+        "activated_family_count": activated,
+        "rows": rows,
+        "summary": (
+            f"Relaytic found `{sum(1 for item in rows if item['available'])}` ready optional adapter family/families and "
+            f"activated `{activated}` of them in the live candidate set."
+        ),
+    }
+
+
 def _family_readiness_reason(*, row: dict[str, Any]) -> str:
     family_id = str(row.get("family_id", "")).strip()
     availability_status = str(row.get("availability_status", "")).strip()
@@ -1103,6 +1359,13 @@ def _optional_float(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _rare_event_profile_active(*, task_type: str, minority_fraction: float | None) -> bool:
+    return bool(
+        (minority_fraction is not None and minority_fraction <= 0.20)
+        or task_type in {"fraud_detection", "anomaly_detection"}
+    )
 
 
 def _factor(store: dict[str, float], key: str, value: float) -> float:

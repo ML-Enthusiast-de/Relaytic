@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Shipped.
 
 Delivered package boundaries:
 
@@ -27,7 +27,7 @@ Intended artifacts:
 
 ## Intent
 
-Slice 15M should be the final competitiveness-focused bridge between the shipped performance-recovery track and the later academy work.
+Slice 15M is the final competitiveness-focused bridge between the shipped performance-recovery track and the later academy work.
 
 It exists because the latest benchmark rerun proved three things at once:
 

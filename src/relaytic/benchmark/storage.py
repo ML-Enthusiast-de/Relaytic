@@ -32,6 +32,10 @@ BENCHMARK_FILENAMES = {
     "paper_claim_guard_report": "paper_claim_guard_report.json",
     "benchmark_release_gate": "benchmark_release_gate.json",
     "dataset_leakage_audit": "dataset_leakage_audit.json",
+    "temporal_benchmark_recovery_report": "temporal_benchmark_recovery_report.json",
+    "benchmark_pack_partition": "benchmark_pack_partition.json",
+    "holdout_claim_policy": "holdout_claim_policy.json",
+    "benchmark_generalization_audit": "benchmark_generalization_audit.json",
 }
 
 

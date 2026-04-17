@@ -166,6 +166,12 @@ Avoid introducing new references to:
 - introduced artifact boundaries for `trace_identity_conformance.json`, `eval_surface_parity_report.json`, `benchmark_truth_audit.json`, `paper_claim_guard_report.json`, `benchmark_release_gate.json`, and `dataset_leakage_audit.json`
 - upgraded benchmark review, eval review, run summary, assist explanations, mission-control cards, and benchmark/evals CLI surfaces so trace identity, surface parity, leakage posture, protocol conformance, and public-claim safety are decided from one canonical gate instead of drifting by surface
 
+### Slice 15M
+
+- extended the existing `src/relaytic/analytics/`, `src/relaytic/modeling/`, `src/relaytic/benchmark/`, `src/relaytic/runs/`, `src/relaytic/assist/`, and `src/relaytic/ui/` boundaries rather than introducing a separate specialization or benchmark-generalization package
+- introduced artifact boundaries for `family_specialization_matrix.json`, `multiclass_search_profile.json`, `rare_event_search_profile.json`, `adapter_activation_report.json`, `temporal_benchmark_recovery_report.json`, `benchmark_pack_partition.json`, `holdout_claim_policy.json`, and `benchmark_generalization_audit.json`
+- upgraded HPO budgeting, architecture routing, benchmark review, run summary, assist explanations, and benchmark CLI surfaces so multiclass and rare-event search posture, adapter activation, temporal benchmark recovery, dev-vs-holdout claim provenance, and benchmark-generalization posture come from one canonical audited path instead of ad hoc benchmark-specific logic
+
 ### Slice 09A
 
 - introduced the canonical package boundary `src/relaytic/memory/`

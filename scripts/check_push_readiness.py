@@ -36,6 +36,7 @@ _PREPUSH_ONLY_GROUPS = (
         "tests/test_operating_points.py",
         "tests/test_cli_slice15k.py",
         "tests/test_cli_slice15l.py",
+        "tests/test_cli_slice15m.py",
         "tests/test_cli_slice15d.py::test_cli_slice15d_benchmark_run_materializes_paper_artifacts_for_public_binary_run",
     ],
 )

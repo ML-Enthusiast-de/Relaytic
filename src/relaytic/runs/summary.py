@@ -181,6 +181,10 @@ def build_run_summary(
             "paper_claim_guard_report": "paper_claim_guard_report.json",
             "benchmark_release_gate": "benchmark_release_gate.json",
             "dataset_leakage_audit": "dataset_leakage_audit.json",
+            "temporal_benchmark_recovery_report": "temporal_benchmark_recovery_report.json",
+            "benchmark_pack_partition": "benchmark_pack_partition.json",
+            "holdout_claim_policy": "holdout_claim_policy.json",
+            "benchmark_generalization_audit": "benchmark_generalization_audit.json",
             "shadow_trial_manifest": "shadow_trial_manifest.json",
             "shadow_trial_scorecard": "shadow_trial_scorecard.json",
             "candidate_quarantine": "candidate_quarantine.json",
@@ -422,6 +426,10 @@ def build_run_summary(
     family_probe_policy = dict(architecture_bundle.get("family_probe_policy", {})) if isinstance(architecture_bundle.get("family_probe_policy"), dict) else {}
     categorical_strategy_report = dict(architecture_bundle.get("categorical_strategy_report", {})) if isinstance(architecture_bundle.get("categorical_strategy_report"), dict) else {}
     family_specialization_report = dict(architecture_bundle.get("family_specialization_report", {})) if isinstance(architecture_bundle.get("family_specialization_report"), dict) else {}
+    family_specialization_matrix = dict(architecture_bundle.get("family_specialization_matrix", {})) if isinstance(architecture_bundle.get("family_specialization_matrix"), dict) else {}
+    multiclass_search_profile = dict(architecture_bundle.get("multiclass_search_profile", {})) if isinstance(architecture_bundle.get("multiclass_search_profile"), dict) else {}
+    rare_event_search_profile = dict(architecture_bundle.get("rare_event_search_profile", {})) if isinstance(architecture_bundle.get("rare_event_search_profile"), dict) else {}
+    adapter_activation_report = dict(architecture_bundle.get("adapter_activation_report", {})) if isinstance(architecture_bundle.get("adapter_activation_report"), dict) else {}
     hpo_budget_contract = dict(hpo_bundle.get("hpo_budget_contract", {})) if isinstance(hpo_bundle.get("hpo_budget_contract"), dict) else {}
     architecture_search_space = dict(hpo_bundle.get("architecture_search_space", {})) if isinstance(hpo_bundle.get("architecture_search_space"), dict) else {}
     early_stopping_report = dict(hpo_bundle.get("early_stopping_report", {})) if isinstance(hpo_bundle.get("early_stopping_report"), dict) else {}
@@ -480,6 +488,10 @@ def build_run_summary(
     paper_claim_guard_report = _bundle_item(benchmark_bundle, "paper_claim_guard_report")
     benchmark_release_gate = _bundle_item(benchmark_bundle, "benchmark_release_gate")
     dataset_leakage_audit = _bundle_item(benchmark_bundle, "dataset_leakage_audit")
+    temporal_benchmark_recovery_report = _bundle_item(benchmark_bundle, "temporal_benchmark_recovery_report")
+    benchmark_pack_partition = _bundle_item(benchmark_bundle, "benchmark_pack_partition")
+    holdout_claim_policy = _bundle_item(benchmark_bundle, "holdout_claim_policy")
+    benchmark_generalization_audit = _bundle_item(benchmark_bundle, "benchmark_generalization_audit")
     shadow_trial_manifest = _bundle_item(benchmark_bundle, "shadow_trial_manifest")
     shadow_trial_scorecard = _bundle_item(benchmark_bundle, "shadow_trial_scorecard")
     candidate_quarantine = _bundle_item(benchmark_bundle, "candidate_quarantine")
@@ -870,6 +882,9 @@ def build_run_summary(
             "claim_gate_status": _clean_text(benchmark_release_gate.get("status")) or _clean_text(paper_claim_guard_report.get("status")),
             "safe_to_cite_publicly": benchmark_release_gate.get("safe_to_cite_publicly"),
             "demo_safe": benchmark_release_gate.get("demo_safe"),
+            "pack_partition": _clean_text(benchmark_pack_partition.get("partition_name")),
+            "claim_origin": _clean_text(holdout_claim_policy.get("claim_origin")) or _clean_text(benchmark_pack_partition.get("claim_origin")),
+            "paper_primary_claim_allowed": holdout_claim_policy.get("paper_primary_claim_allowed"),
             "competitiveness_claim": _clean_text(benchmark_claims_report.get("competitiveness_claim")),
             "deployment_claim": _clean_text(benchmark_claims_report.get("deployment_claim")),
             "below_reference": benchmark_claims_report.get("below_reference"),
@@ -888,6 +903,9 @@ def build_run_summary(
             "sequence_candidate_status": _clean_text(paper_benchmark_manifest.get("sequence_candidate_status")),
             "truth_audit_status": _clean_text(benchmark_truth_audit.get("status")),
             "leakage_status": _clean_text(dataset_leakage_audit.get("status")),
+            "temporal_recovery_status": _clean_text(temporal_benchmark_recovery_report.get("recovery_state")) or _clean_text(temporal_benchmark_recovery_report.get("status")),
+            "benchmark_generalization_status": _clean_text(benchmark_generalization_audit.get("status")),
+            "identity_branching_detected": benchmark_generalization_audit.get("identity_branching_detected"),
             "imported_candidate_count": int(shadow_trial_manifest.get("candidate_count", 0) or 0),
             "promotion_ready_count": int(promotion_readiness_report.get("promotion_ready_count", 0) or 0),
             "candidate_available_count": int(promotion_readiness_report.get("candidate_available_count", 0) or 0),
@@ -1324,6 +1342,14 @@ def build_run_summary(
             ],
             "multiclass_widening_active": family_specialization_report.get("multiclass_widening_active"),
             "rare_event_policy_active": family_specialization_report.get("rare_event_policy_active"),
+            "multiclass_profile_status": _clean_text(multiclass_search_profile.get("status")),
+            "rare_event_profile_status": _clean_text(rare_event_search_profile.get("status")),
+            "activated_adapter_family_count": int(adapter_activation_report.get("activated_family_count", 0) or 0),
+            "activated_adapter_families": [
+                str(item.get("family_id"))
+                for item in adapter_activation_report.get("rows", [])
+                if isinstance(item, dict) and str(item.get("activation_state")) == "active" and str(item.get("family_id", "")).strip()
+            ],
             "probe_tier_one_families": [
                 str(item)
                 for item in family_probe_policy.get("tier_one_families", [])
@@ -1650,6 +1676,10 @@ def build_run_summary(
             "family_probe_policy_path": _path_if_exists(root / "family_probe_policy.json"),
             "categorical_strategy_report_path": _path_if_exists(root / "categorical_strategy_report.json"),
             "family_specialization_report_path": _path_if_exists(root / "family_specialization_report.json"),
+            "family_specialization_matrix_path": _path_if_exists(root / "family_specialization_matrix.json"),
+            "multiclass_search_profile_path": _path_if_exists(root / "multiclass_search_profile.json"),
+            "rare_event_search_profile_path": _path_if_exists(root / "rare_event_search_profile.json"),
+            "adapter_activation_report_path": _path_if_exists(root / "adapter_activation_report.json"),
             "hpo_budget_contract_path": _path_if_exists(root / "hpo_budget_contract.json"),
             "architecture_search_space_path": _path_if_exists(root / "architecture_search_space.json"),
             "trial_ledger_path": _path_if_exists(root / "trial_ledger.jsonl"),
@@ -1686,6 +1716,10 @@ def build_run_summary(
             "paper_claim_guard_report_path": _path_if_exists(root / "paper_claim_guard_report.json"),
             "benchmark_release_gate_path": _path_if_exists(root / "benchmark_release_gate.json"),
             "dataset_leakage_audit_path": _path_if_exists(root / "dataset_leakage_audit.json"),
+            "temporal_benchmark_recovery_report_path": _path_if_exists(root / "temporal_benchmark_recovery_report.json"),
+            "benchmark_pack_partition_path": _path_if_exists(root / "benchmark_pack_partition.json"),
+            "holdout_claim_policy_path": _path_if_exists(root / "holdout_claim_policy.json"),
+            "benchmark_generalization_audit_path": _path_if_exists(root / "benchmark_generalization_audit.json"),
             "shadow_trial_manifest_path": _path_if_exists(root / "shadow_trial_manifest.json"),
             "shadow_trial_scorecard_path": _path_if_exists(root / "shadow_trial_scorecard.json"),
             "candidate_quarantine_path": _path_if_exists(root / "candidate_quarantine.json"),

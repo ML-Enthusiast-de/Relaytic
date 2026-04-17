@@ -27,6 +27,10 @@ BENCHMARK_TRUTH_AUDIT_SCHEMA_VERSION = "relaytic.benchmark_truth_audit.v1"
 PAPER_CLAIM_GUARD_REPORT_SCHEMA_VERSION = "relaytic.paper_claim_guard_report.v1"
 BENCHMARK_RELEASE_GATE_SCHEMA_VERSION = "relaytic.benchmark_release_gate.v1"
 DATASET_LEAKAGE_AUDIT_SCHEMA_VERSION = "relaytic.dataset_leakage_audit.v1"
+TEMPORAL_BENCHMARK_RECOVERY_REPORT_SCHEMA_VERSION = "relaytic.temporal_benchmark_recovery_report.v1"
+BENCHMARK_PACK_PARTITION_SCHEMA_VERSION = "relaytic.benchmark_pack_partition.v1"
+HOLDOUT_CLAIM_POLICY_SCHEMA_VERSION = "relaytic.holdout_claim_policy.v1"
+BENCHMARK_GENERALIZATION_AUDIT_SCHEMA_VERSION = "relaytic.benchmark_generalization_audit.v1"
 
 
 @dataclass(frozen=True)
@@ -542,6 +546,88 @@ class BenchmarkReleaseGate:
 
 
 @dataclass(frozen=True)
+class TemporalBenchmarkRecoveryReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    applies_to_temporal_classification: bool
+    comparison_contract_ready: bool
+    fold_health_status: str | None
+    blocked_reason_codes: list[str]
+    recovery_state: str
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BenchmarkPackPartition:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    partition_name: str
+    dataset_fingerprint: str
+    claim_origin: str
+    partition_reason: str
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class HoldoutClaimPolicy:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    current_partition: str
+    requires_holdout_for_paper_primary: bool
+    development_claim_allowed: bool
+    paper_primary_claim_allowed: bool
+    claim_origin: str
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class BenchmarkGeneralizationAudit:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    identity_branching_detected: bool
+    audited_artifacts: list[str]
+    finding_count: int
+    findings: list[dict[str, Any]]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class BenchmarkBundle:
     reference_approach_matrix: ReferenceApproachMatrix
     benchmark_gap_report: BenchmarkGapReport
@@ -563,6 +649,10 @@ class BenchmarkBundle:
     paper_claim_guard_report: PaperClaimGuardReport
     benchmark_release_gate: BenchmarkReleaseGate
     dataset_leakage_audit: DatasetLeakageAudit
+    temporal_benchmark_recovery_report: TemporalBenchmarkRecoveryReport
+    benchmark_pack_partition: BenchmarkPackPartition
+    holdout_claim_policy: HoldoutClaimPolicy
+    benchmark_generalization_audit: BenchmarkGeneralizationAudit
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -586,6 +676,10 @@ class BenchmarkBundle:
             "paper_claim_guard_report": self.paper_claim_guard_report.to_dict(),
             "benchmark_release_gate": self.benchmark_release_gate.to_dict(),
             "dataset_leakage_audit": self.dataset_leakage_audit.to_dict(),
+            "temporal_benchmark_recovery_report": self.temporal_benchmark_recovery_report.to_dict(),
+            "benchmark_pack_partition": self.benchmark_pack_partition.to_dict(),
+            "holdout_claim_policy": self.holdout_claim_policy.to_dict(),
+            "benchmark_generalization_audit": self.benchmark_generalization_audit.to_dict(),
         }
 
 

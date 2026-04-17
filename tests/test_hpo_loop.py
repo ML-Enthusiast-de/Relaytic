@@ -220,6 +220,68 @@ def test_hpo_budget_profiles_keep_test_budgets_separate_from_benchmark_contracts
     assert len(benchmark_contract["selected_families"]) >= len(test_contract["selected_families"])
 
 
+def test_hpo_budget_contract_activates_multiclass_and_rare_event_specialization(tmp_path: Path) -> None:
+    multiclass_contract = derive_hpo_budget_contract(
+        run_dir=tmp_path / "multiclass_profile",
+        task_type="multiclass_classification",
+        row_count=1200,
+        class_count=7,
+        minority_fraction=0.10,
+        requested_family="auto",
+        preferred_candidate_order=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "extra_trees_classifier",
+            "xgboost_classifier",
+            "lightgbm_classifier",
+            "tabpfn_classifier",
+        ],
+        available_families=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "extra_trees_classifier",
+            "xgboost_classifier",
+            "lightgbm_classifier",
+            "tabpfn_classifier",
+        ],
+        search_budget_profile="benchmark",
+    )
+    rare_event_contract = derive_hpo_budget_contract(
+        run_dir=tmp_path / "rare_event_profile",
+        task_type="binary_classification",
+        row_count=1400,
+        class_count=2,
+        minority_fraction=0.06,
+        requested_family="auto",
+        preferred_candidate_order=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "xgboost_classifier",
+            "lightgbm_classifier",
+            "extra_trees_classifier",
+            "boosted_tree_classifier",
+        ],
+        available_families=[
+            "catboost_classifier",
+            "hist_gradient_boosting_classifier",
+            "xgboost_classifier",
+            "lightgbm_classifier",
+            "extra_trees_classifier",
+            "boosted_tree_classifier",
+        ],
+        search_budget_profile="benchmark",
+    )
+
+    assert multiclass_contract["specialization_profile"] == "multiclass_broadened"
+    assert multiclass_contract["multiclass_widening_active"] is True
+    assert multiclass_contract["race_family_count"] >= 4
+    assert len(multiclass_contract["selected_families"]) >= 5
+
+    assert rare_event_contract["specialization_profile"] == "rare_event_imbalance_aware"
+    assert rare_event_contract["rare_event_profile_active"] is True
+    assert rare_event_contract["finalist_family_count"] >= 3
+
+
 def test_portfolio_search_plan_reports_warm_start_influence_without_hiding_stage_evidence(tmp_path: Path) -> None:
     budget_contract = derive_hpo_budget_contract(
         run_dir=tmp_path,

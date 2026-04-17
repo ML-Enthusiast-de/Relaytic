@@ -77,6 +77,8 @@ def derive_hpo_budget_contract(
     run_dir: str | Path,
     task_type: str,
     row_count: int,
+    class_count: int | None = None,
+    minority_fraction: float | None = None,
     requested_family: str,
     preferred_candidate_order: list[str] | None,
     available_families: list[str],
@@ -91,11 +93,32 @@ def derive_hpo_budget_contract(
         available_families=available_families,
         task_type=task_type,
         budget_profile=budget_profile,
+        class_count=class_count,
+        minority_fraction=minority_fraction,
     )
     profile_contract = get_search_budget_profile(budget_profile)
     family_count = max(1, len(selected_families))
-    race_family_count = _race_family_count(profile=budget_profile, family_count=family_count)
-    finalist_family_count = _finalist_family_count(profile=budget_profile, family_count=family_count)
+    multiclass_active = bool(task_type == "multiclass_classification" and int(class_count or 0) >= 3)
+    rare_event_profile_active = _rare_event_profile_active(task_type=task_type, minority_fraction=minority_fraction)
+    specialization_profile = (
+        "multiclass_broadened"
+        if multiclass_active
+        else "rare_event_imbalance_aware"
+        if rare_event_profile_active
+        else "generic"
+    )
+    race_family_count = _race_family_count(
+        profile=budget_profile,
+        family_count=family_count,
+        multiclass_active=multiclass_active,
+        rare_event_profile_active=rare_event_profile_active,
+    )
+    finalist_family_count = _finalist_family_count(
+        profile=budget_profile,
+        family_count=family_count,
+        multiclass_active=multiclass_active,
+        rare_event_profile_active=rare_event_profile_active,
+    )
     probe_trials_per_family = int(profile_contract["probe_trials_per_family"])
     race_trials_per_family = int(profile_contract["race_trials_per_family"])
     finalist_followup_trials = int(profile_contract["finalist_followup_trials"])
@@ -110,7 +133,13 @@ def derive_hpo_budget_contract(
     max_trials = min(budget_cap, profile_max_trials, stage_target_trials)
     if max_trials < family_count:
         max_trials = family_count
-    default_seconds = _max_wall_clock_seconds(profile=budget_profile, row_count=row_count, task_type=task_type)
+    default_seconds = _max_wall_clock_seconds(
+        profile=budget_profile,
+        row_count=row_count,
+        task_type=task_type,
+        multiclass_active=multiclass_active,
+        rare_event_profile_active=rare_event_profile_active,
+    )
     family_count = max(1, len(selected_families))
     per_family_trial_cap = max(
         1,
@@ -128,6 +157,11 @@ def derive_hpo_budget_contract(
         "seed": 42,
         "budget_profile": budget_profile,
         "task_type": str(task_type),
+        "class_count": int(class_count or 0),
+        "minority_class_fraction": minority_fraction,
+        "specialization_profile": specialization_profile,
+        "multiclass_widening_active": multiclass_active,
+        "rare_event_profile_active": rare_event_profile_active,
         "row_count": int(max(row_count, 0)),
         "requested_family": str(requested_family or "auto"),
         "selected_families": selected_families,
@@ -149,7 +183,8 @@ def derive_hpo_budget_contract(
         "warm_start_enabled": True,
         "summary": (
             f"Relaytic will run staged portfolio search with `{budget_profile}` budget: probe `{family_count}` family(s), "
-            f"race `{race_family_count}`, deepen `{finalist_family_count}`, and spend up to `{max_trials}` total model trial(s)."
+            f"race `{race_family_count}`, deepen `{finalist_family_count}`, and spend up to `{max_trials}` total model trial(s) "
+            f"under `{specialization_profile}` specialization."
         ),
     }
     return payload
@@ -423,37 +458,43 @@ def _select_hpo_families(
     available_families: list[str],
     task_type: str,
     budget_profile: str,
+    class_count: int | None = None,
+    minority_fraction: float | None = None,
 ) -> list[str]:
     available = [str(item).strip() for item in available_families if str(item).strip() in SEARCHABLE_FAMILIES]
     if requested_family != "auto" and requested_family in available:
         return [requested_family]
     ordered = [family for family in preferred_candidate_order if family in available]
+    multiclass_active = bool(task_type == "multiclass_classification" and int(class_count or 0) >= 3)
+    rare_event_profile_active = _rare_event_profile_active(task_type=task_type, minority_fraction=minority_fraction)
     if not ordered:
-        if task_type in {"binary_classification", "fraud_detection", "anomaly_detection"}:
+        if multiclass_active:
             ordered = [
                 family
                 for family in [
-                    "logistic_regression",
                     "catboost_classifier",
                     "hist_gradient_boosting_classifier",
                     "extra_trees_classifier",
                     "xgboost_classifier",
                     "lightgbm_classifier",
+                    "tabpfn_classifier",
                     "boosted_tree_classifier",
+                    "bagged_tree_classifier",
                 ]
                 if family in available
             ]
-        elif task_type == "multiclass_classification":
+        elif rare_event_profile_active or task_type in {"binary_classification", "fraud_detection", "anomaly_detection"}:
             ordered = [
                 family
                 for family in [
                     "catboost_classifier",
                     "hist_gradient_boosting_classifier",
-                    "extra_trees_classifier",
                     "xgboost_classifier",
                     "lightgbm_classifier",
+                    "extra_trees_classifier",
                     "boosted_tree_classifier",
                     "bagged_tree_classifier",
+                    "logistic_regression",
                 ]
                 if family in available
             ]
@@ -472,6 +513,8 @@ def _select_hpo_families(
                 if family in available
             ]
     family_cap = 2 if budget_profile == "test" else (3 if budget_profile == "low_budget" else 4)
+    if budget_profile in {"operator", "benchmark"} and (multiclass_active or rare_event_profile_active):
+        family_cap += 1
     return ordered[:family_cap]
 
 
@@ -731,27 +774,50 @@ def _resolve_hpo_budget_profile(search_budget_profile: str | None) -> str:
     return resolve_search_budget_profile({}, default="operator")
 
 
-def _race_family_count(*, profile: str, family_count: int) -> int:
+def _race_family_count(
+    *,
+    profile: str,
+    family_count: int,
+    multiclass_active: bool = False,
+    rare_event_profile_active: bool = False,
+) -> int:
     if family_count <= 1:
         return family_count
     if profile == "test":
         return min(family_count, 2)
     if profile == "low_budget":
         return min(family_count, 2)
+    cap = 3
     if profile == "benchmark":
-        return min(family_count, 3)
-    return min(family_count, 3)
+        cap = 4 if (multiclass_active or rare_event_profile_active) else 3
+    elif multiclass_active or rare_event_profile_active:
+        cap = 4
+    return min(family_count, cap)
 
 
-def _finalist_family_count(*, profile: str, family_count: int) -> int:
+def _finalist_family_count(
+    *,
+    profile: str,
+    family_count: int,
+    multiclass_active: bool = False,
+    rare_event_profile_active: bool = False,
+) -> int:
     if family_count <= 1:
         return family_count
     if profile in {"test", "low_budget"}:
         return 1
-    return min(family_count, 2)
+    cap = 3 if (multiclass_active or rare_event_profile_active) else 2
+    return min(family_count, cap)
 
 
-def _max_wall_clock_seconds(*, profile: str, row_count: int, task_type: str) -> int:
+def _max_wall_clock_seconds(
+    *,
+    profile: str,
+    row_count: int,
+    task_type: str,
+    multiclass_active: bool = False,
+    rare_event_profile_active: bool = False,
+) -> int:
     base = {
         "test": 25,
         "low_budget": 50,
@@ -762,7 +828,18 @@ def _max_wall_clock_seconds(*, profile: str, row_count: int, task_type: str) -> 
         base += 25
     if task_type in {"multiclass_classification", "fraud_detection", "anomaly_detection"}:
         base += 10
+    if multiclass_active:
+        base += 10
+    if rare_event_profile_active:
+        base += 10
     return base
+
+
+def _rare_event_profile_active(*, task_type: str, minority_fraction: float | None) -> bool:
+    return bool(
+        task_type in {"fraud_detection", "anomaly_detection"}
+        or (minority_fraction is not None and float(minority_fraction) <= 0.20)
+    )
 
 
 def _utc_now() -> str:

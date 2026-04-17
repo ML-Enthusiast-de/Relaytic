@@ -705,6 +705,19 @@ def build_assist_audit_explanation(
             "trace_identity_conformance.json",
             "eval_surface_parity_report.json",
         ]
+    elif any(token in normalized for token in ("holdout", "dev pack", "benchmark overfit", "benchmark tuning", "optimizing for benchmark", "cheat")):
+        question_type = "benchmark_generalization"
+        reasons = [
+            f"Relaytic recorded benchmark partition `{_clean_text(benchmark.get('pack_partition')) or 'unknown'}` with claim origin `{_clean_text(benchmark.get('claim_origin')) or 'unknown'}`.",
+            f"Paper-primary claim allowed = `{benchmark.get('paper_primary_claim_allowed')}` and benchmark generalization audit is `{_clean_text(benchmark.get('benchmark_generalization_status')) or 'unknown'}`.",
+            f"Identity branching detected = `{benchmark.get('identity_branching_detected')}`; Relaytic should only use benchmark identity for pack partitioning, not for routing, HPO, or threshold selection.",
+        ]
+        evidence_refs = [
+            "benchmark_pack_partition.json",
+            "holdout_claim_policy.json",
+            "benchmark_generalization_audit.json",
+            "run_summary.json",
+        ]
     elif "task type" in normalized or ("why not" in normalized and "anomaly" in normalized):
         question_type = "task_semantics"
         reasons = [
@@ -822,6 +835,10 @@ def build_assist_audit_explanation(
             "family_probe_policy.json",
             "categorical_strategy_report.json",
             "family_specialization_report.json",
+            "family_specialization_matrix.json",
+            "multiclass_search_profile.json",
+            "rare_event_search_profile.json",
+            "adapter_activation_report.json",
         ]
     elif "why not" in normalized:
         question_type = "why_not"

@@ -10162,14 +10162,19 @@ def _run_benchmark_phase(
         benchmark_truth_audit = benchmark_result.bundle.benchmark_truth_audit
         benchmark_release_gate = benchmark_result.bundle.benchmark_release_gate
         dataset_leakage_audit = benchmark_result.bundle.dataset_leakage_audit
+        temporal_benchmark_recovery_report = benchmark_result.bundle.temporal_benchmark_recovery_report
+        benchmark_pack_partition = benchmark_result.bundle.benchmark_pack_partition
+        holdout_claim_policy = benchmark_result.bundle.holdout_claim_policy
+        benchmark_generalization_audit = benchmark_result.bundle.benchmark_generalization_audit
         shadow_manifest = benchmark_result.bundle.shadow_trial_manifest
         promotion = benchmark_result.bundle.promotion_readiness_report
         quarantine = benchmark_result.bundle.candidate_quarantine
-        from relaytic.analytics import read_temporal_engine_artifacts
+        from relaytic.analytics import read_architecture_routing_artifacts, read_temporal_engine_artifacts
 
         task_contract_bundle = read_task_contract_artifacts(root)
         eval_bundle = _read_json_bundle(root, bundle="evals")
         temporal_bundle = read_temporal_engine_artifacts(root)
+        architecture_bundle = read_architecture_routing_artifacts(root)
         operating_point_bundle = {
             key: json.loads((root / filename).read_text(encoding="utf-8"))
             for key, filename in {
@@ -10186,6 +10191,7 @@ def _run_benchmark_phase(
         bundle_payload.update(eval_bundle)
         bundle_payload.update(task_contract_bundle)
         bundle_payload.update(temporal_bundle)
+        bundle_payload.update(architecture_bundle)
         bundle_payload.update(operating_point_bundle)
         return {
             "surface_payload": {
@@ -10226,6 +10232,12 @@ def _run_benchmark_phase(
                     "safe_to_rank": task_contract_bundle.get("benchmark_truth_precheck", {}).get("safe_to_rank"),
                     "truth_audit_status": benchmark_truth_audit.status,
                     "leakage_status": dataset_leakage_audit.status,
+                    "temporal_recovery_status": temporal_benchmark_recovery_report.recovery_state,
+                    "pack_partition": benchmark_pack_partition.partition_name,
+                    "claim_origin": holdout_claim_policy.claim_origin,
+                    "paper_primary_claim_allowed": holdout_claim_policy.paper_primary_claim_allowed,
+                    "benchmark_generalization_status": benchmark_generalization_audit.status,
+                    "identity_branching_detected": benchmark_generalization_audit.identity_branching_detected,
                     "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                     "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
                     "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),
@@ -10267,14 +10279,19 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     benchmark_truth_audit = dict(bundle.get("benchmark_truth_audit", {}))
     benchmark_release_gate = dict(bundle.get("benchmark_release_gate", {}))
     dataset_leakage_audit = dict(bundle.get("dataset_leakage_audit", {}))
+    temporal_benchmark_recovery_report = dict(bundle.get("temporal_benchmark_recovery_report", {}))
+    benchmark_pack_partition = dict(bundle.get("benchmark_pack_partition", {}))
+    holdout_claim_policy = dict(bundle.get("holdout_claim_policy", {}))
+    benchmark_generalization_audit = dict(bundle.get("benchmark_generalization_audit", {}))
     shadow_manifest = dict(bundle.get("shadow_trial_manifest", {}))
     promotion = dict(bundle.get("promotion_readiness_report", {}))
     quarantine = dict(bundle.get("candidate_quarantine", {}))
-    from relaytic.analytics import read_temporal_engine_artifacts
+    from relaytic.analytics import read_architecture_routing_artifacts, read_temporal_engine_artifacts
 
     task_contract_bundle = read_task_contract_artifacts(root)
     eval_bundle = _read_json_bundle(root, bundle="evals")
     temporal_bundle = read_temporal_engine_artifacts(root)
+    architecture_bundle = read_architecture_routing_artifacts(root)
     operating_point_bundle = {
         key: json.loads((root / filename).read_text(encoding="utf-8"))
         for key, filename in {
@@ -10291,6 +10308,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle_payload.update(eval_bundle)
     bundle_payload.update(task_contract_bundle)
     bundle_payload.update(temporal_bundle)
+    bundle_payload.update(architecture_bundle)
     bundle_payload.update(operating_point_bundle)
     return {
         "surface_payload": {
@@ -10332,6 +10350,12 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "safe_to_rank": task_contract_bundle.get("benchmark_truth_precheck", {}).get("safe_to_rank"),
                 "truth_audit_status": benchmark_truth_audit.get("status"),
                 "leakage_status": dataset_leakage_audit.get("status"),
+                "temporal_recovery_status": temporal_benchmark_recovery_report.get("recovery_state") or temporal_benchmark_recovery_report.get("status"),
+                "pack_partition": benchmark_pack_partition.get("partition_name"),
+                "claim_origin": holdout_claim_policy.get("claim_origin") or benchmark_pack_partition.get("claim_origin"),
+                "paper_primary_claim_allowed": holdout_claim_policy.get("paper_primary_claim_allowed"),
+                "benchmark_generalization_status": benchmark_generalization_audit.get("status"),
+                "identity_branching_detected": benchmark_generalization_audit.get("identity_branching_detected"),
                 "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                 "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
                 "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),
@@ -12506,6 +12530,10 @@ def _benchmark_output_paths(run_dir: Path) -> dict[str, Path]:
         "paper_claim_guard_report": run_dir / "paper_claim_guard_report.json",
         "benchmark_release_gate": run_dir / "benchmark_release_gate.json",
         "dataset_leakage_audit": run_dir / "dataset_leakage_audit.json",
+        "temporal_benchmark_recovery_report": run_dir / "temporal_benchmark_recovery_report.json",
+        "benchmark_pack_partition": run_dir / "benchmark_pack_partition.json",
+        "holdout_claim_policy": run_dir / "holdout_claim_policy.json",
+        "benchmark_generalization_audit": run_dir / "benchmark_generalization_audit.json",
     }
 
 

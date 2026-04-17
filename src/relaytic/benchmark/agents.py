@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
+import hashlib
 import json
 from pathlib import Path
 from statistics import fmean, pstdev
@@ -52,7 +53,9 @@ from .models import (
     BenchmarkAblationMatrix,
     BenchmarkBundle,
     BenchmarkClaimsReport,
+    BenchmarkGeneralizationAudit,
     BenchmarkReleaseGate,
+    BenchmarkPackPartition,
     BenchmarkTruthAudit,
     CandidateQuarantine,
     BenchmarkControls,
@@ -63,7 +66,10 @@ from .models import (
     DatasetLeakageAudit,
     ExternalChallengerEvaluation,
     ExternalChallengerManifest,
+    HOLDOUT_CLAIM_POLICY_SCHEMA_VERSION,
     IncumbentParityReport,
+    BENCHMARK_GENERALIZATION_AUDIT_SCHEMA_VERSION,
+    BENCHMARK_PACK_PARTITION_SCHEMA_VERSION,
     PaperClaimGuardReport,
     PaperBenchmarkManifest,
     PaperBenchmarkTable,
@@ -72,6 +78,9 @@ from .models import (
     RerunVarianceReport,
     ShadowTrialManifest,
     ShadowTrialScorecard,
+    HoldoutClaimPolicy,
+    TemporalBenchmarkRecoveryReport,
+    TEMPORAL_BENCHMARK_RECOVERY_REPORT_SCHEMA_VERSION,
     build_benchmark_controls_from_policy,
 )
 
@@ -508,6 +517,35 @@ def run_benchmark_review(
         benchmark_truth_audit=benchmark_truth_audit,
         paper_claim_guard_report=paper_claim_guard_report,
     )
+    temporal_benchmark_recovery_report = _build_temporal_benchmark_recovery_report(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        paper_manifest=paper_manifest,
+        task_contract_bundle=task_contract_bundle,
+        benchmark_truth_audit=benchmark_truth_audit,
+        paper_table=paper_table,
+    )
+    benchmark_pack_partition = _build_benchmark_pack_partition(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        paper_manifest=paper_manifest,
+    )
+    holdout_claim_policy = _build_holdout_claim_policy(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        benchmark_pack_partition=benchmark_pack_partition,
+        benchmark_release_gate=benchmark_release_gate,
+    )
+    benchmark_generalization_audit = _build_benchmark_generalization_audit(
+        run_dir=run_dir,
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        paper_manifest=paper_manifest,
+    )
     paper_manifest = replace(
         paper_manifest,
         status="ok" if benchmark_release_gate.safe_to_cite_publicly else "blocked",
@@ -565,6 +603,10 @@ def run_benchmark_review(
         paper_claim_guard_report=paper_claim_guard_report,
         benchmark_release_gate=benchmark_release_gate,
         dataset_leakage_audit=dataset_leakage_audit,
+        temporal_benchmark_recovery_report=temporal_benchmark_recovery_report,
+        benchmark_pack_partition=benchmark_pack_partition,
+        holdout_claim_policy=holdout_claim_policy,
+        benchmark_generalization_audit=benchmark_generalization_audit,
     )
     return BenchmarkRunResult(bundle=bundle, review_markdown=render_benchmark_review_markdown(bundle.to_dict()))
 
@@ -1600,6 +1642,216 @@ def _build_benchmark_release_gate(
     )
 
 
+def _build_temporal_benchmark_recovery_report(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    paper_manifest: PaperBenchmarkManifest,
+    task_contract_bundle: dict[str, Any],
+    benchmark_truth_audit: BenchmarkTruthAudit,
+    paper_table: PaperBenchmarkTable,
+) -> TemporalBenchmarkRecoveryReport:
+    applies = (
+        _clean_text(paper_manifest.data_mode) == "time_series"
+        and is_classification_task(_clean_text(paper_manifest.task_type))
+    )
+    temporal_fold_health = dict(task_contract_bundle.get("temporal_fold_health", {}))
+    benchmark_truth_precheck = dict(task_contract_bundle.get("benchmark_truth_precheck", {}))
+    reason_codes = [
+        str(item).strip()
+        for item in benchmark_truth_precheck.get("reason_codes", [])
+        if str(item).strip() and (str(item).startswith("temporal_") or str(item).startswith("benchmark_metric_"))
+    ]
+    comparison_contract_ready = not any(
+        code in {"benchmark_metric_missing_in_execution", "benchmark_metric_missing_in_reference_rows"}
+        for code in reason_codes
+    )
+    fold_health_status = _clean_text(temporal_fold_health.get("status"))
+    if not applies:
+        status = "not_applicable"
+        recovery_state = "not_applicable"
+    elif comparison_contract_ready and fold_health_status == "ok" and bool(paper_table.rows) and benchmark_truth_audit.status != "blocked":
+        status = "ok"
+        recovery_state = "recovered"
+    else:
+        status = "blocked"
+        recovery_state = "blocked"
+        if fold_health_status == "blocked" and "temporal_fold_health_blocked" not in reason_codes:
+            reason_codes.append("temporal_fold_health_blocked")
+    return TemporalBenchmarkRecoveryReport(
+        schema_version=TEMPORAL_BENCHMARK_RECOVERY_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status=status,
+        applies_to_temporal_classification=applies,
+        comparison_contract_ready=comparison_contract_ready,
+        fold_health_status=fold_health_status,
+        blocked_reason_codes=reason_codes,
+        recovery_state=recovery_state,
+        summary=(
+            "Relaytic recovered a valid temporal classification benchmark contract with healthy folds."
+            if recovery_state == "recovered"
+            else (
+                "Relaytic blocked the temporal classification benchmark because the comparison contract or fold health is still not trustworthy."
+                if applies
+                else "Relaytic did not need temporal classification benchmark recovery for this run."
+            )
+        ),
+        trace=trace,
+    )
+
+
+def _build_benchmark_pack_partition(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    paper_manifest: PaperBenchmarkManifest,
+) -> BenchmarkPackPartition:
+    fingerprint_basis = "|".join(
+        [
+            _clean_text(paper_manifest.dataset_source_type) or "unknown_source_type",
+            _clean_text(paper_manifest.dataset_source_name) or "unknown_source",
+            _clean_text(paper_manifest.dataset_label) or "unknown_dataset",
+            _clean_text(paper_manifest.task_type) or "unknown_task",
+            _clean_text(paper_manifest.data_mode) or "unknown_mode",
+            str(int(paper_manifest.row_count or 0)),
+            str(int(paper_manifest.column_count or 0)),
+        ]
+    )
+    digest = hashlib.sha256(fingerprint_basis.encode("utf-8")).hexdigest()
+    partition_name = "holdout" if int(digest[:2], 16) % 5 == 0 else "dev"
+    claim_origin = f"{partition_name}_benchmark_pack"
+    return BenchmarkPackPartition(
+        schema_version=BENCHMARK_PACK_PARTITION_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok",
+        partition_name=partition_name,
+        dataset_fingerprint=digest[:12],
+        claim_origin=claim_origin,
+        partition_reason="stable_hash_partition",
+        summary=(
+            f"Relaytic assigned this benchmark bundle to the `{partition_name}` benchmark partition using a stable dataset fingerprint."
+        ),
+        trace=trace,
+    )
+
+
+def _build_holdout_claim_policy(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    benchmark_pack_partition: BenchmarkPackPartition,
+    benchmark_release_gate: BenchmarkReleaseGate,
+) -> HoldoutClaimPolicy:
+    current_partition = _clean_text(benchmark_pack_partition.partition_name) or "unknown"
+    development_claim_allowed = bool(benchmark_release_gate.safe_to_cite_publicly)
+    paper_primary_claim_allowed = development_claim_allowed and current_partition == "holdout"
+    claim_origin = (
+        "holdout_primary_claim"
+        if paper_primary_claim_allowed
+        else "dev_visible_claim"
+        if development_claim_allowed
+        else "blocked_claim"
+    )
+    return HoldoutClaimPolicy(
+        schema_version=HOLDOUT_CLAIM_POLICY_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if development_claim_allowed else "blocked",
+        current_partition=current_partition,
+        requires_holdout_for_paper_primary=True,
+        development_claim_allowed=development_claim_allowed,
+        paper_primary_claim_allowed=paper_primary_claim_allowed,
+        claim_origin=claim_origin,
+        summary=(
+            "Relaytic allows this result as a holdout-backed paper-primary claim."
+            if paper_primary_claim_allowed
+            else (
+                "Relaytic keeps this result visible for development discussion but not as the primary paper claim because it came from the dev pack."
+                if development_claim_allowed
+                else "Relaytic blocked this benchmark result from both development and paper claims."
+            )
+        ),
+        trace=trace,
+    )
+
+
+def _build_benchmark_generalization_audit(
+    *,
+    run_dir: str | Path,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    paper_manifest: PaperBenchmarkManifest,
+) -> BenchmarkGeneralizationAudit:
+    root = Path(run_dir)
+    audited_artifacts = [
+        "architecture_router_report.json",
+        "candidate_family_matrix.json",
+        "hpo_budget_contract.json",
+        "search_loop_scorecard.json",
+        "operating_point_contract.json",
+        "threshold_search_report.json",
+    ]
+    banned_keys = {"dataset_label", "dataset_source_name", "dataset_source_type", "source_url", "data_path"}
+    banned_values = {
+        value
+        for value in (
+            _clean_text(paper_manifest.dataset_label),
+            _clean_text(paper_manifest.dataset_source_name),
+            _clean_text(paper_manifest.source_url),
+        )
+        if value
+    }
+    findings: list[dict[str, Any]] = []
+    for artifact_name in audited_artifacts:
+        artifact_path = root / artifact_name
+        if not artifact_path.exists():
+            continue
+        payload = _read_json_artifact(artifact_path)
+        for key_path, value in _walk_json(payload):
+            terminal_key = key_path.rsplit(".", 1)[-1]
+            if terminal_key in banned_keys:
+                findings.append(
+                    {
+                        "artifact": artifact_name,
+                        "kind": "identity_key_present",
+                        "path": key_path,
+                        "value_excerpt": str(value)[:80],
+                    }
+                )
+            elif isinstance(value, str) and value.strip() and value.strip() in banned_values:
+                findings.append(
+                    {
+                        "artifact": artifact_name,
+                        "kind": "identity_value_present",
+                        "path": key_path,
+                        "value_excerpt": value[:80],
+                    }
+                )
+    identity_branching_detected = bool(findings)
+    return BenchmarkGeneralizationAudit(
+        schema_version=BENCHMARK_GENERALIZATION_AUDIT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if not identity_branching_detected else "blocked",
+        identity_branching_detected=identity_branching_detected,
+        audited_artifacts=[artifact for artifact in audited_artifacts if (Path(run_dir) / artifact).exists()],
+        finding_count=len(findings),
+        findings=findings,
+        summary=(
+            "Relaytic did not expose benchmark dataset identity inside routing, HPO, or threshold artifacts."
+            if not identity_branching_detected
+            else "Relaytic found benchmark-identity leakage inside competitive decision artifacts and blocked the generalization audit."
+        ),
+        trace=trace,
+    )
+
+
 def _required_fix_for_reason(reason_code: str) -> str:
     mapping = {
         "benchmark_metric_missing_in_execution": "materialize the benchmark comparison metric in the executed model metrics",
@@ -1632,6 +1884,10 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
     claim_guard = dict(payload.get("paper_claim_guard_report", {}))
     release_gate = dict(payload.get("benchmark_release_gate", {}))
     leakage_audit = dict(payload.get("dataset_leakage_audit", {}))
+    temporal_recovery = dict(payload.get("temporal_benchmark_recovery_report", {}))
+    benchmark_partition = dict(payload.get("benchmark_pack_partition", {}))
+    holdout_policy = dict(payload.get("holdout_claim_policy", {}))
+    generalization_audit = dict(payload.get("benchmark_generalization_audit", {}))
     shadow_manifest = dict(payload.get("shadow_trial_manifest", {}))
     shadow_scorecard = dict(payload.get("shadow_trial_scorecard", {}))
     promotion = dict(payload.get("promotion_readiness_report", {}))
@@ -1726,6 +1982,27 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
                 f"- Competitiveness claim: `{claims.get('competitiveness_claim')}`",
                 f"- Deployment claim: `{claims.get('deployment_claim')}`",
                 f"- Below reference: `{claims.get('below_reference')}`",
+            ]
+        )
+    if benchmark_partition or holdout_policy or generalization_audit:
+        lines.extend(
+            [
+                "",
+                "## Benchmark Generalization",
+                f"- Pack partition: `{benchmark_partition.get('partition_name') or 'unknown'}`",
+                f"- Claim origin: `{holdout_policy.get('claim_origin') or benchmark_partition.get('claim_origin') or 'unknown'}`",
+                f"- Paper primary claim allowed: `{holdout_policy.get('paper_primary_claim_allowed')}`",
+                f"- Identity branching detected: `{generalization_audit.get('identity_branching_detected')}`",
+            ]
+        )
+    if temporal_recovery:
+        lines.extend(
+            [
+                "",
+                "## Temporal Recovery",
+                f"- Recovery state: `{temporal_recovery.get('recovery_state') or temporal_recovery.get('status') or 'unknown'}`",
+                f"- Comparison contract ready: `{temporal_recovery.get('comparison_contract_ready')}`",
+                f"- Fold health: `{temporal_recovery.get('fold_health_status') or 'unknown'}`",
             ]
         )
     if shadow_manifest or promotion:
@@ -2169,15 +2446,21 @@ def _build_lagged_design_frame(
     else:
         combined = frame[required].copy().reset_index(drop=True)
         context_len = 0
-    out = pd.DataFrame(index=combined.index)
+    feature_parts: list[Any] = []
     for column in feature_columns:
         numeric = combined[column].astype(float)
-        out[f"{column}__t"] = numeric
+        column_parts = [numeric.rename(f"{column}__t")]
         for lag in range(1, int(lag_horizon) + 1):
-            out[f"{column}__lag{lag}"] = numeric.shift(lag)
-    out[target_column] = combined[target_column]
-    out["_is_current"] = False
-    out.loc[context_len:, "_is_current"] = True
+            column_parts.append(numeric.shift(lag).rename(f"{column}__lag{lag}"))
+        feature_parts.append(pd.concat(column_parts, axis=1))
+    out = pd.concat(
+        [
+            *feature_parts,
+            combined[target_column].rename(target_column),
+            pd.Series(np.arange(len(combined)) >= context_len, index=combined.index, name="_is_current"),
+        ],
+        axis=1,
+    )
     out = out.dropna()
     out = out[out["_is_current"]].drop(columns=["_is_current"]).reset_index(drop=True)
     return out
@@ -2673,6 +2956,56 @@ def _unavailable_bundle(
         summary=summary,
         trace=trace,
     )
+    temporal_recovery = TemporalBenchmarkRecoveryReport(
+        schema_version=TEMPORAL_BENCHMARK_RECOVERY_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_applicable",
+        applies_to_temporal_classification=False,
+        comparison_contract_ready=False,
+        fold_health_status="unknown",
+        blocked_reason_codes=[],
+        recovery_state="not_applicable",
+        summary=summary,
+        trace=trace,
+    )
+    benchmark_partition = BenchmarkPackPartition(
+        schema_version=BENCHMARK_PACK_PARTITION_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok",
+        partition_name="dev",
+        dataset_fingerprint="unavailable",
+        claim_origin="unavailable_benchmark_pack",
+        partition_reason="not_enough_benchmark_evidence",
+        summary=summary,
+        trace=trace,
+    )
+    holdout_policy = HoldoutClaimPolicy(
+        schema_version=HOLDOUT_CLAIM_POLICY_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="blocked",
+        current_partition="dev",
+        requires_holdout_for_paper_primary=True,
+        development_claim_allowed=False,
+        paper_primary_claim_allowed=False,
+        claim_origin="blocked_claim",
+        summary=summary,
+        trace=trace,
+    )
+    generalization_audit = BenchmarkGeneralizationAudit(
+        schema_version=BENCHMARK_GENERALIZATION_AUDIT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok",
+        identity_branching_detected=False,
+        audited_artifacts=[],
+        finding_count=0,
+        findings=[],
+        summary=summary,
+        trace=trace,
+    )
     return BenchmarkBundle(
         reference_approach_matrix=matrix,
         benchmark_gap_report=gap_report,
@@ -2694,6 +3027,10 @@ def _unavailable_bundle(
         paper_claim_guard_report=claim_guard,
         benchmark_release_gate=release_gate,
         dataset_leakage_audit=leakage_audit,
+        temporal_benchmark_recovery_report=temporal_recovery,
+        benchmark_pack_partition=benchmark_partition,
+        holdout_claim_policy=holdout_policy,
+        benchmark_generalization_audit=generalization_audit,
     )
 
 
@@ -2721,6 +3058,24 @@ def _read_jsonl_artifact(path: Path) -> list[dict[str, Any]]:
             continue
         if isinstance(payload, dict):
             rows.append(payload)
+    return rows
+
+
+def _walk_json(value: Any, *, prefix: str = "") -> list[tuple[str, Any]]:
+    rows: list[tuple[str, Any]] = []
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            key_text = str(key).strip()
+            next_prefix = f"{prefix}.{key_text}" if prefix else key_text
+            rows.extend(_walk_json(nested, prefix=next_prefix))
+        return rows
+    if isinstance(value, list):
+        for index, nested in enumerate(value):
+            next_prefix = f"{prefix}[{index}]"
+            rows.extend(_walk_json(nested, prefix=next_prefix))
+        return rows
+    if prefix:
+        rows.append((prefix, value))
     return rows
 
 
