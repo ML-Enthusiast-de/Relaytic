@@ -10967,7 +10967,9 @@ def _run_evals_phase(
         resolved_override = load_policy(config_path)
         effective_policy = resolved_override.policy
         effective_policy_source = config_path
-    _materialize_trace_bundle(run_dir=root, config_path=config_path)
+    trace_bundle = _read_json_bundle(root, bundle="trace")
+    if not trace_bundle or not isinstance(trace_bundle.get("adjudication_scorecard"), dict) or not trace_bundle.get("adjudication_scorecard"):
+        _materialize_trace_bundle(run_dir=root, config_path=config_path)
     runtime_token = _runtime_stage_token(
         run_dir=root,
         policy=effective_policy,

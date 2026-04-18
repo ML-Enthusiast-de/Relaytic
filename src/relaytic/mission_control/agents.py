@@ -121,8 +121,14 @@ def run_mission_control_review(
         run_permission_review(run_dir=resolved_run_dir, policy=policy or {})
         run_daemon_review(run_dir=resolved_run_dir, policy=policy or {})
         run_remote_control_review(run_dir=resolved_run_dir, policy=policy or {})
-        trace_result = run_trace_review(run_dir=resolved_run_dir, policy=policy or {})
-        write_trace_bundle(resolved_run_dir, bundle=trace_result.bundle)
+        trace_bundle = read_trace_bundle(resolved_run_dir)
+        if (
+            not trace_bundle
+            or not isinstance(trace_bundle.get("adjudication_scorecard"), dict)
+            or not trace_bundle.get("adjudication_scorecard")
+        ):
+            trace_result = run_trace_review(run_dir=resolved_run_dir, policy=policy or {})
+            write_trace_bundle(resolved_run_dir, bundle=trace_result.bundle)
         materialized = materialize_run_summary(run_dir=resolved_run_dir)
         summary_payload = dict(materialized.get("summary", {}))
         summary_paths = {

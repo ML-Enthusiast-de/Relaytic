@@ -580,11 +580,23 @@ def _build_agent_eval_matrix(
         None,
     )
     control = dict(summary_payload.get("control", {}))
+    competition_present = len(scorecard) >= 2
+    single_claim_adjudication = len(scorecard) == 1 and bool(winner)
     scenarios = [
         {
             "scenario_id": "claim_competition_present",
-            "result": "pass" if len(scorecard) >= 3 else "fail",
-            "detail": f"Relaytic recorded `{len(scorecard)}` competing adjudication entries.",
+            "result": (
+                "pass"
+                if competition_present
+                else "not_applicable" if single_claim_adjudication else "fail"
+            ),
+            "detail": (
+                f"Relaytic recorded `{len(scorecard)}` adjudication entries with explicit claim competition."
+                if competition_present
+                else "This run resolved through a single adjudicated claim rather than a multi-claim competition."
+                if single_claim_adjudication
+                else "Relaytic did not record enough adjudication structure to evaluate claim competition."
+            ),
             "required": True,
         },
         {
