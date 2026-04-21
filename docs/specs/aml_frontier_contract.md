@@ -178,11 +178,17 @@ The paper pack should eventually cover:
 
 The exact pack can evolve, but the roadmap should be designed around public or reproducible tasks such as:
 
+- PaySim-style temporal transaction fraud
 - Elliptic transaction risk
 - Elliptic2 subgraph AML tasks
 - AMLSim-derived public tasks where licensing and reproducibility are acceptable
 - public transaction-fraud datasets with temporal ordering
 - graph-feature AML baselines and review-budget-oriented fraud tasks
+
+Near-term practical rule:
+
+- PaySim-style and flattened Elliptic-style snapshots should work now through the existing local file contract
+- raw multi-file graph bundles should be called future work until dedicated loaders exist
 
 Relaytic-AML must never silently optimize on dataset identity. Public claims require holdout verification and a benchmark-generalization audit.
 

@@ -28,6 +28,10 @@ SPLIT_DIAGNOSTICS_REPORT_SCHEMA_VERSION = "relaytic.split_diagnostics_report.v1"
 TEMPORAL_FOLD_HEALTH_SCHEMA_VERSION = "relaytic.temporal_fold_health.v1"
 METRIC_MATERIALIZATION_AUDIT_SCHEMA_VERSION = "relaytic.metric_materialization_audit.v1"
 BENCHMARK_TRUTH_PRECHECK_SCHEMA_VERSION = "relaytic.benchmark_truth_precheck.v1"
+AML_DOMAIN_CONTRACT_SCHEMA_VERSION = "relaytic.aml_domain_contract.v1"
+AML_CASE_ONTOLOGY_SCHEMA_VERSION = "relaytic.aml_case_ontology.v1"
+AML_REVIEW_BUDGET_CONTRACT_SCHEMA_VERSION = "relaytic.aml_review_budget_contract.v1"
+AML_CLAIM_SCOPE_SCHEMA_VERSION = "relaytic.aml_claim_scope.v1"
 
 
 TASK_CONTRACT_FILENAMES = {
@@ -44,6 +48,10 @@ TASK_CONTRACT_FILENAMES = {
     "temporal_fold_health": "temporal_fold_health.json",
     "metric_materialization_audit": "metric_materialization_audit.json",
     "benchmark_truth_precheck": "benchmark_truth_precheck.json",
+    "aml_domain_contract": "aml_domain_contract.json",
+    "aml_case_ontology": "aml_case_ontology.json",
+    "aml_review_budget_contract": "aml_review_budget_contract.json",
+    "aml_claim_scope": "aml_claim_scope.json",
 }
 
 
@@ -108,6 +116,7 @@ def build_task_contract_artifacts(
     generated_at = _utc_now()
     run_brief = _bundle_item(mandate_bundle or {}, "run_brief")
     task_brief = _bundle_item(context_bundle or {}, "task_brief")
+    domain_brief = _bundle_item(context_bundle or {}, "domain_brief")
     dataset_profile = _bundle_item(investigation_bundle or {}, "dataset_profile")
     plan = _bundle_item(planning_bundle or {}, "plan")
     builder_handoff = dict(plan.get("builder_handoff") or {})
@@ -345,6 +354,33 @@ def build_task_contract_artifacts(
         objective_alignment_report=objective_alignment_report,
         reference_approach_matrix=reference_approach_matrix,
     )
+    aml_domain_contract = _build_aml_domain_contract(
+        generated_at=generated_at,
+        run_brief=run_brief,
+        task_brief=task_brief,
+        domain_brief=domain_brief,
+        task_profile_contract=task_profile_contract,
+        target_semantics_report=target_semantics_report,
+    )
+    aml_case_ontology = _build_aml_case_ontology(
+        generated_at=generated_at,
+        aml_domain_contract=aml_domain_contract,
+        run_brief=run_brief,
+        task_brief=task_brief,
+        domain_brief=domain_brief,
+    )
+    aml_review_budget_contract = _build_aml_review_budget_contract(
+        generated_at=generated_at,
+        aml_domain_contract=aml_domain_contract,
+        metric_contract=metric_contract,
+        optimization_objective_contract=optimization_objective_contract,
+    )
+    aml_claim_scope = _build_aml_claim_scope(
+        generated_at=generated_at,
+        aml_domain_contract=aml_domain_contract,
+        benchmark_mode_report=benchmark_mode_report,
+        benchmark_truth_precheck=benchmark_truth_precheck,
+    )
     return {
         "task_profile_contract": task_profile_contract,
         "target_semantics_report": target_semantics_report,
@@ -359,6 +395,10 @@ def build_task_contract_artifacts(
         "temporal_fold_health": temporal_fold_health,
         "metric_materialization_audit": metric_materialization_audit,
         "benchmark_truth_precheck": benchmark_truth_precheck,
+        "aml_domain_contract": aml_domain_contract,
+        "aml_case_ontology": aml_case_ontology,
+        "aml_review_budget_contract": aml_review_budget_contract,
+        "aml_claim_scope": aml_claim_scope,
     }
 
 
@@ -373,6 +413,331 @@ def infer_benchmark_expected(*, run_brief: dict[str, Any], task_brief: dict[str,
         ]
     ).lower()
     return any(token in corpus for token in ("benchmark", "baseline", "reference", "parity", "sota", "state of the art"))
+
+
+def _build_aml_domain_contract(
+    *,
+    generated_at: str,
+    run_brief: dict[str, Any],
+    task_brief: dict[str, Any],
+    domain_brief: dict[str, Any],
+    task_profile_contract: dict[str, Any],
+    target_semantics_report: dict[str, Any],
+) -> dict[str, Any]:
+    corpus = _aml_domain_corpus(
+        run_brief=run_brief,
+        task_brief=task_brief,
+        domain_brief=domain_brief,
+        task_profile_contract=task_profile_contract,
+    )
+    aml_active = _contains_aml_signal(corpus)
+    target_level = _infer_aml_target_level(corpus=corpus)
+    domain_focus = _infer_aml_domain_focus(corpus=corpus)
+    review_budget_relevant = aml_active
+    business_goal = _infer_aml_business_goal(corpus=corpus)
+    target_column = _clean_text(task_profile_contract.get("target_column"))
+    if not aml_active:
+        return {
+            "schema_version": AML_DOMAIN_CONTRACT_SCHEMA_VERSION,
+            "generated_at": generated_at,
+            "status": "not_applicable",
+            "aml_active": False,
+            "domain_family": "generic_structured_data",
+            "domain_focus": "not_applicable",
+            "target_level": "not_applicable",
+            "review_budget_relevant": False,
+            "business_goal": "standard_model_quality",
+            "target_column": target_column,
+            "task_type": _clean_text(task_profile_contract.get("task_type")),
+            "problem_posture": _clean_text(task_profile_contract.get("problem_posture")),
+            "summary": "AML posture is inactive for this run; Relaytic stays on the generic structured-data contract.",
+        }
+    return {
+        "schema_version": AML_DOMAIN_CONTRACT_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "active",
+        "aml_active": True,
+        "domain_family": "aml_financial_crime",
+        "domain_focus": domain_focus,
+        "target_level": target_level,
+        "review_budget_relevant": review_budget_relevant,
+        "business_goal": business_goal,
+        "target_column": target_column,
+        "task_type": _clean_text(task_profile_contract.get("task_type")),
+        "problem_posture": _clean_text(task_profile_contract.get("problem_posture")),
+        "target_semantics": _clean_text(target_semantics_report.get("target_semantics")),
+        "summary": (
+            f"Relaytic-AML activated `{domain_focus}` posture at `{target_level}` level and will favor alert quality, "
+            "review burden, and case usefulness over metric-only reporting."
+        ),
+    }
+
+
+def _build_aml_case_ontology(
+    *,
+    generated_at: str,
+    aml_domain_contract: dict[str, Any],
+    run_brief: dict[str, Any],
+    task_brief: dict[str, Any],
+    domain_brief: dict[str, Any],
+) -> dict[str, Any]:
+    aml_active = bool(aml_domain_contract.get("aml_active"))
+    corpus = " ".join(
+        [
+            str(run_brief.get("objective", "")),
+            str(run_brief.get("success_criteria", "")),
+            str(task_brief.get("problem_statement", "")),
+            str(task_brief.get("success_criteria", "")),
+            str(domain_brief.get("summary", "")),
+            str(domain_brief.get("target_meaning", "")),
+        ]
+    ).lower()
+    if not aml_active:
+        return {
+            "schema_version": AML_CASE_ONTOLOGY_SCHEMA_VERSION,
+            "generated_at": generated_at,
+            "status": "not_applicable",
+            "entity_types": [],
+            "case_levels": [],
+            "typology_candidates": [],
+            "reasoning_scope": "generic_structured_data",
+            "summary": "No AML case ontology is active on this run.",
+        }
+    entity_types = _infer_aml_entity_types(corpus=corpus, target_level=_clean_text(aml_domain_contract.get("target_level")))
+    case_levels = _infer_aml_case_levels(target_level=_clean_text(aml_domain_contract.get("target_level")))
+    typology_candidates = _infer_aml_typology_candidates(corpus=corpus, domain_focus=_clean_text(aml_domain_contract.get("domain_focus")))
+    return {
+        "schema_version": AML_CASE_ONTOLOGY_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "active",
+        "entity_types": entity_types,
+        "case_levels": case_levels,
+        "typology_candidates": typology_candidates,
+        "reasoning_scope": "entity_graph_and_casework_ready",
+        "summary": (
+            f"Relaytic-AML framed this run around entity types `{', '.join(entity_types)}` with typology candidates "
+            f"`{', '.join(typology_candidates)}`."
+        ),
+    }
+
+
+def _build_aml_review_budget_contract(
+    *,
+    generated_at: str,
+    aml_domain_contract: dict[str, Any],
+    metric_contract: dict[str, Any],
+    optimization_objective_contract: dict[str, Any],
+) -> dict[str, Any]:
+    aml_active = bool(aml_domain_contract.get("aml_active"))
+    review_budget_relevant = bool(aml_domain_contract.get("review_budget_relevant"))
+    if not aml_active:
+        return {
+            "schema_version": AML_REVIEW_BUDGET_CONTRACT_SCHEMA_VERSION,
+            "generated_at": generated_at,
+            "status": "not_applicable",
+            "review_budget_relevant": False,
+            "priority": "not_applicable",
+            "decision_objective": "standard_metric_optimization",
+            "recommended_metrics": [],
+            "analyst_capacity_assumption": "not_applicable",
+            "recommended_next_action": None,
+            "summary": "Review-budget posture is inactive because this run is not under the AML contract.",
+        }
+    selection_metric = _clean_text(optimization_objective_contract.get("family_selection_metric")) or _clean_text(metric_contract.get("selection_metric"))
+    benchmark_metric = _clean_text(optimization_objective_contract.get("benchmark_comparison_metric")) or _clean_text(metric_contract.get("benchmark_comparison_metric"))
+    return {
+        "schema_version": AML_REVIEW_BUDGET_CONTRACT_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "active",
+        "review_budget_relevant": review_budget_relevant,
+        "priority": "primary",
+        "decision_objective": "maximize_precision_at_review_budget",
+        "recommended_metrics": [
+            "precision_at_k",
+            "recall_at_review_budget",
+            "pr_auc",
+            benchmark_metric or "pr_auc",
+        ],
+        "analyst_capacity_assumption": "bounded_manual_review",
+        "selection_metric": selection_metric,
+        "recommended_next_action": "optimize_review_queue",
+        "summary": (
+            f"Relaytic-AML keeps `{selection_metric or 'unknown'}` for model selection but elevates review-budget decisions "
+            "toward precision-at-k, recall-at-review-budget, and case usefulness."
+        ),
+    }
+
+
+def _build_aml_claim_scope(
+    *,
+    generated_at: str,
+    aml_domain_contract: dict[str, Any],
+    benchmark_mode_report: dict[str, Any],
+    benchmark_truth_precheck: dict[str, Any],
+) -> dict[str, Any]:
+    aml_active = bool(aml_domain_contract.get("aml_active"))
+    if not aml_active:
+        return {
+            "schema_version": AML_CLAIM_SCOPE_SCHEMA_VERSION,
+            "generated_at": generated_at,
+            "status": "not_applicable",
+            "aml_active": False,
+            "benchmark_pack_family": "generic_supporting_pack",
+            "claim_scope": "generic_supporting_only",
+            "public_claim_ready": bool(benchmark_truth_precheck.get("safe_to_rank")),
+            "summary": "AML-specific public claim scope is inactive for this run.",
+        }
+    benchmark_expected = bool(benchmark_mode_report.get("benchmark_expected"))
+    public_claim_ready = False
+    return {
+        "schema_version": AML_CLAIM_SCOPE_SCHEMA_VERSION,
+        "generated_at": generated_at,
+        "status": "active",
+        "aml_active": True,
+        "benchmark_pack_family": "aml_flagship_pending",
+        "claim_scope": "generic_supporting_only_until_15r",
+        "public_claim_ready": public_claim_ready,
+        "benchmark_expected": benchmark_expected,
+        "summary": (
+            "Relaytic-AML can use generic benchmark packs as supporting evidence, but flagship AML public claims stay "
+            "gated until the dedicated AML benchmark and holdout pack are shipped."
+        ),
+    }
+
+
+def _aml_domain_corpus(
+    *,
+    run_brief: dict[str, Any],
+    task_brief: dict[str, Any],
+    domain_brief: dict[str, Any],
+    task_profile_contract: dict[str, Any],
+) -> str:
+    return " ".join(
+        [
+            str(run_brief.get("objective", "")),
+            str(run_brief.get("success_criteria", "")),
+            str(task_brief.get("problem_statement", "")),
+            str(task_brief.get("success_criteria", "")),
+            str(task_brief.get("target_column", "")),
+            str(domain_brief.get("summary", "")),
+            str(domain_brief.get("target_meaning", "")),
+            str(domain_brief.get("system_name", "")),
+            str(task_profile_contract.get("target_column", "")),
+            str(task_profile_contract.get("problem_posture", "")),
+        ]
+    ).lower()
+
+
+def _contains_aml_signal(corpus: str) -> bool:
+    tokens = (
+        "aml",
+        "anti-money laundering",
+        "money laundering",
+        "laundering",
+        "financial crime",
+        "payment fraud",
+        "payment-fraud",
+        "paysim",
+        "elliptic",
+        "illicit transaction",
+        "fraud",
+        "chargeback",
+        "charge back",
+        "suspicious activity",
+        "transaction monitoring",
+        "analyst review",
+        "review queue",
+        "case packet",
+    )
+    return any(token in corpus for token in tokens)
+
+
+def _infer_aml_domain_focus(*, corpus: str) -> str:
+    if any(token in corpus for token in ("chargeback", "charge back", "payment fraud", "payment-fraud", "merchant fraud", "paysim")):
+        return "payment_fraud"
+    if any(token in corpus for token in ("review queue", "analyst review", "case packet", "triage")):
+        return "analyst_review"
+    if any(token in corpus for token in ("transaction monitoring", "suspicious transaction", "alert queue", "elliptic", "bitcoin")):
+        return "transaction_monitoring"
+    if any(token in corpus for token in ("aml", "anti-money laundering", "money laundering", "financial crime", "suspicious activity")):
+        return "aml_investigation"
+    return "aml_financial_crime"
+
+
+def _infer_aml_target_level(*, corpus: str) -> str:
+    if any(token in corpus for token in ("subgraph", "multi-hop", "network", "community", "typology motif")):
+        return "subgraph"
+    if any(token in corpus for token in ("entity", "account", "merchant", "customer", "wallet", "counterparty", "device")):
+        return "entity"
+    if any(token in corpus for token in ("case", "investigation", "review queue", "analyst review", "case packet")):
+        return "case"
+    return "transaction"
+
+
+def _infer_aml_business_goal(corpus: str) -> str:
+    if any(token in corpus for token in ("review queue", "analyst review", "case packet", "triage")):
+        return "analyst_triage"
+    if any(token in corpus for token in ("chargeback", "payment fraud", "fraud")):
+        return "false_positive_reduction"
+    return "suspicious_activity_detection"
+
+
+def _infer_aml_entity_types(*, corpus: str, target_level: str | None) -> list[str]:
+    entity_types: list[str] = []
+    for token, label in (
+        ("transaction", "transaction"),
+        ("account", "account"),
+        ("customer", "customer"),
+        ("merchant", "merchant"),
+        ("device", "device"),
+        ("card", "card"),
+        ("wallet", "wallet"),
+        ("counterparty", "counterparty"),
+        ("ip", "ip"),
+    ):
+        if token in corpus:
+            entity_types.append(label)
+    if not entity_types:
+        if target_level == "entity":
+            entity_types = ["account", "counterparty", "transaction"]
+        elif target_level == "case":
+            entity_types = ["case", "transaction", "account"]
+        else:
+            entity_types = ["transaction", "account", "counterparty"]
+    return entity_types
+
+
+def _infer_aml_case_levels(*, target_level: str | None) -> list[str]:
+    if target_level == "subgraph":
+        return ["transaction", "entity", "subgraph", "case"]
+    if target_level == "entity":
+        return ["transaction", "entity", "case"]
+    if target_level == "case":
+        return ["alert", "case"]
+    return ["transaction", "alert", "case"]
+
+
+def _infer_aml_typology_candidates(*, corpus: str, domain_focus: str | None) -> list[str]:
+    typologies: list[str] = []
+    for token, label in (
+        ("smurf", "smurfing"),
+        ("layer", "layering"),
+        ("funnel", "funnel_accounts"),
+        ("peel", "peel_chain"),
+        ("bitcoin", "peel_chain"),
+        ("elliptic", "peel_chain"),
+        ("chargeback", "chargeback_abuse"),
+        ("account takeover", "account_takeover"),
+        ("suspicious activity", "suspicious_activity_pattern"),
+    ):
+        if token in corpus and label not in typologies:
+            typologies.append(label)
+    if not typologies:
+        if domain_focus == "payment_fraud":
+            typologies = ["chargeback_abuse", "account_takeover", "merchant_abuse"]
+        else:
+            typologies = ["suspicious_activity_pattern", "money_laundering_pattern", "alert_triad_priority"]
+    return typologies
 
 
 def _deployment_readiness_status(

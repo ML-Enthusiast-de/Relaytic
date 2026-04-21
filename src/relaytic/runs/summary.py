@@ -43,6 +43,7 @@ def build_run_summary(
         read_task_contract_artifacts,
         read_temporal_engine_artifacts,
     )
+    from relaytic.aml import read_aml_graph_artifacts
     from relaytic.iteration import read_iteration_bundle
     from relaytic.events import read_event_bus_bundle
     from relaytic.permissions import read_permission_bundle
@@ -192,6 +193,7 @@ def build_run_summary(
         },
     )
     task_contract_bundle = read_task_contract_artifacts(root)
+    aml_graph_bundle = read_aml_graph_artifacts(root)
     decision_bundle = _read_bundle(
         root,
         {
@@ -407,6 +409,15 @@ def build_run_summary(
     temporal_fold_health = dict(task_contract_bundle.get("temporal_fold_health", {})) if isinstance(task_contract_bundle.get("temporal_fold_health"), dict) else {}
     metric_materialization_audit = dict(task_contract_bundle.get("metric_materialization_audit", {})) if isinstance(task_contract_bundle.get("metric_materialization_audit"), dict) else {}
     benchmark_truth_precheck = dict(task_contract_bundle.get("benchmark_truth_precheck", {})) if isinstance(task_contract_bundle.get("benchmark_truth_precheck"), dict) else {}
+    aml_domain_contract = dict(task_contract_bundle.get("aml_domain_contract", {})) if isinstance(task_contract_bundle.get("aml_domain_contract"), dict) else {}
+    aml_case_ontology = dict(task_contract_bundle.get("aml_case_ontology", {})) if isinstance(task_contract_bundle.get("aml_case_ontology"), dict) else {}
+    aml_review_budget_contract = dict(task_contract_bundle.get("aml_review_budget_contract", {})) if isinstance(task_contract_bundle.get("aml_review_budget_contract"), dict) else {}
+    aml_claim_scope = dict(task_contract_bundle.get("aml_claim_scope", {})) if isinstance(task_contract_bundle.get("aml_claim_scope"), dict) else {}
+    entity_graph_profile = dict(aml_graph_bundle.get("entity_graph_profile", {})) if isinstance(aml_graph_bundle.get("entity_graph_profile"), dict) else {}
+    counterparty_network_report = dict(aml_graph_bundle.get("counterparty_network_report", {})) if isinstance(aml_graph_bundle.get("counterparty_network_report"), dict) else {}
+    typology_detection_report = dict(aml_graph_bundle.get("typology_detection_report", {})) if isinstance(aml_graph_bundle.get("typology_detection_report"), dict) else {}
+    subgraph_risk_report = dict(aml_graph_bundle.get("subgraph_risk_report", {})) if isinstance(aml_graph_bundle.get("subgraph_risk_report"), dict) else {}
+    entity_case_expansion = dict(aml_graph_bundle.get("entity_case_expansion", {})) if isinstance(aml_graph_bundle.get("entity_case_expansion"), dict) else {}
     temporal_structure_report = dict(temporal_bundle.get("temporal_structure_report", {})) if isinstance(temporal_bundle.get("temporal_structure_report"), dict) else {}
     temporal_feature_ladder = dict(temporal_bundle.get("temporal_feature_ladder", {})) if isinstance(temporal_bundle.get("temporal_feature_ladder"), dict) else {}
     rolling_cv_plan = dict(temporal_bundle.get("rolling_cv_plan", {})) if isinstance(temporal_bundle.get("rolling_cv_plan"), dict) else {}
@@ -906,6 +917,10 @@ def build_run_summary(
             "temporal_recovery_status": _clean_text(temporal_benchmark_recovery_report.get("recovery_state")) or _clean_text(temporal_benchmark_recovery_report.get("status")),
             "benchmark_generalization_status": _clean_text(benchmark_generalization_audit.get("status")),
             "identity_branching_detected": benchmark_generalization_audit.get("identity_branching_detected"),
+            "aml_domain_active": aml_domain_contract.get("aml_active"),
+            "aml_pack_family": _clean_text(aml_claim_scope.get("benchmark_pack_family")),
+            "aml_claim_scope": _clean_text(aml_claim_scope.get("claim_scope")),
+            "aml_public_claim_ready": aml_claim_scope.get("public_claim_ready"),
             "imported_candidate_count": int(shadow_trial_manifest.get("candidate_count", 0) or 0),
             "promotion_ready_count": int(promotion_readiness_report.get("promotion_ready_count", 0) or 0),
             "candidate_available_count": int(promotion_readiness_report.get("candidate_available_count", 0) or 0),
@@ -1228,6 +1243,51 @@ def build_run_summary(
             "why_not_anomaly_detection": _clean_text(target_semantics_report.get("why_not_anomaly_detection"))
             or _clean_text(task_profile_contract.get("why_not_anomaly_detection")),
             "multiclass_string_labels_preserved": dataset_semantics_audit.get("multiclass_string_labels_preserved"),
+        },
+        "aml": {
+            "status": _clean_text(aml_domain_contract.get("status")) or _clean_text(aml_review_budget_contract.get("status")),
+            "aml_active": aml_domain_contract.get("aml_active"),
+            "domain_focus": _clean_text(aml_domain_contract.get("domain_focus")),
+            "target_level": _clean_text(aml_domain_contract.get("target_level")),
+            "business_goal": _clean_text(aml_domain_contract.get("business_goal")),
+            "review_budget_relevant": aml_domain_contract.get("review_budget_relevant"),
+            "review_priority": _clean_text(aml_review_budget_contract.get("priority")),
+            "decision_objective": _clean_text(aml_review_budget_contract.get("decision_objective")),
+            "recommended_next_action": _clean_text(aml_review_budget_contract.get("recommended_next_action")),
+            "entity_type_count": len(aml_case_ontology.get("entity_types", []))
+            if isinstance(aml_case_ontology.get("entity_types"), list)
+            else 0,
+            "typology_candidate_count": len(aml_case_ontology.get("typology_candidates", []))
+            if isinstance(aml_case_ontology.get("typology_candidates"), list)
+            else 0,
+            "claim_scope": _clean_text(aml_claim_scope.get("claim_scope")),
+            "benchmark_pack_family": _clean_text(aml_claim_scope.get("benchmark_pack_family")),
+            "public_claim_ready": aml_claim_scope.get("public_claim_ready"),
+            "summary": _clean_text(aml_review_budget_contract.get("summary"))
+            or _clean_text(aml_domain_contract.get("summary"))
+            or _clean_text(aml_claim_scope.get("summary")),
+        },
+        "aml_graph": {
+            "status": _clean_text(entity_graph_profile.get("status")) or _clean_text(subgraph_risk_report.get("status")),
+            "node_count": int(entity_graph_profile.get("node_count", 0) or 0),
+            "edge_count": int(entity_graph_profile.get("edge_count", 0) or 0),
+            "component_count": int(counterparty_network_report.get("component_count", 0) or 0),
+            "high_risk_entity_count": len(entity_graph_profile.get("high_risk_entities", []))
+            if isinstance(entity_graph_profile.get("high_risk_entities"), list)
+            else 0,
+            "top_entity": _clean_text(dict(entity_graph_profile.get("high_risk_entities", [{}])[0]).get("entity_id"))
+            if isinstance(entity_graph_profile.get("high_risk_entities"), list) and entity_graph_profile.get("high_risk_entities")
+            else None,
+            "typology_hit_count": int(typology_detection_report.get("typology_hit_count", 0) or 0),
+            "top_typology": _clean_text(dict(typology_detection_report.get("typology_hits", [{}])[0]).get("typology"))
+            if isinstance(typology_detection_report.get("typology_hits"), list) and typology_detection_report.get("typology_hits")
+            else None,
+            "focal_entity": _clean_text(entity_case_expansion.get("focal_entity")),
+            "expanded_entity_count": int(entity_case_expansion.get("expanded_entity_count", 0) or 0),
+            "shadow_winner": _clean_text(dict(subgraph_risk_report.get("candidate_comparison", {})).get("winner")),
+            "summary": _clean_text(entity_case_expansion.get("summary"))
+            or _clean_text(subgraph_risk_report.get("summary"))
+            or _clean_text(entity_graph_profile.get("summary")),
         },
         "objective_contract": {
             "status": _clean_text(objective_alignment_report.get("status")) or _clean_text(optimization_objective_contract.get("status")),
@@ -1655,9 +1715,18 @@ def build_run_summary(
                 "objective_alignment_report_path": _path_if_exists(root / "objective_alignment_report.json"),
                 "split_diagnostics_report_path": _path_if_exists(root / "split_diagnostics_report.json"),
                 "temporal_fold_health_path": _path_if_exists(root / "temporal_fold_health.json"),
-                "metric_materialization_audit_path": _path_if_exists(root / "metric_materialization_audit.json"),
-                "benchmark_truth_precheck_path": _path_if_exists(root / "benchmark_truth_precheck.json"),
-                "temporal_structure_report_path": _path_if_exists(root / "temporal_structure_report.json"),
+            "metric_materialization_audit_path": _path_if_exists(root / "metric_materialization_audit.json"),
+            "benchmark_truth_precheck_path": _path_if_exists(root / "benchmark_truth_precheck.json"),
+            "aml_domain_contract_path": _path_if_exists(root / "aml_domain_contract.json"),
+            "aml_case_ontology_path": _path_if_exists(root / "aml_case_ontology.json"),
+            "aml_review_budget_contract_path": _path_if_exists(root / "aml_review_budget_contract.json"),
+            "aml_claim_scope_path": _path_if_exists(root / "aml_claim_scope.json"),
+            "entity_graph_profile_path": _path_if_exists(root / "entity_graph_profile.json"),
+            "counterparty_network_report_path": _path_if_exists(root / "counterparty_network_report.json"),
+            "typology_detection_report_path": _path_if_exists(root / "typology_detection_report.json"),
+            "subgraph_risk_report_path": _path_if_exists(root / "subgraph_risk_report.json"),
+            "entity_case_expansion_path": _path_if_exists(root / "entity_case_expansion.json"),
+            "temporal_structure_report_path": _path_if_exists(root / "temporal_structure_report.json"),
                 "temporal_feature_ladder_path": _path_if_exists(root / "temporal_feature_ladder.json"),
                 "rolling_cv_plan_path": _path_if_exists(root / "rolling_cv_plan.json"),
                 "temporal_split_guard_report_path": _path_if_exists(root / "temporal_split_guard_report.json"),
@@ -1842,6 +1911,8 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     intelligence = dict(summary.get("intelligence", {}))
     research = dict(summary.get("research", {}))
     benchmark = dict(summary.get("benchmark", {}))
+    aml = dict(summary.get("aml", {}))
+    aml_graph = dict(summary.get("aml_graph", {}))
     decision_lab = dict(summary.get("decision_lab", {}))
     dojo = dict(summary.get("dojo", {}))
     pulse = dict(summary.get("pulse", {}))
@@ -2022,6 +2093,37 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
         )
         if benchmark.get("blocked_reason_count"):
             lines.append(f"- Claim-blocking reasons: `{benchmark.get('blocked_reason_count')}`")
+    if aml and (aml.get("aml_active") is True or _clean_text(aml.get("status")) == "active"):
+        lines.extend(
+            [
+                "",
+                "## Relaytic-AML",
+                f"- Status: `{aml.get('status') or 'unknown'}`",
+                f"- AML active: `{aml.get('aml_active')}`",
+                f"- Domain focus: `{aml.get('domain_focus') or 'unknown'}`",
+                f"- Target level: `{aml.get('target_level') or 'unknown'}`",
+                f"- Business goal: `{aml.get('business_goal') or 'unknown'}`",
+                f"- Review budget relevant: `{aml.get('review_budget_relevant')}`",
+                f"- Decision objective: `{aml.get('decision_objective') or 'unknown'}`",
+                f"- Recommended next action: `{aml.get('recommended_next_action') or 'none'}`",
+                f"- Claim scope: `{aml.get('claim_scope') or 'unknown'}`",
+            ]
+        )
+    if aml_graph and any(value not in (None, 0, False, "", []) for value in aml_graph.values()):
+        lines.extend(
+            [
+                "",
+                "## AML Graph",
+                f"- Status: `{aml_graph.get('status') or 'unknown'}`",
+                f"- Nodes: `{aml_graph.get('node_count', 0)}`",
+                f"- Edges: `{aml_graph.get('edge_count', 0)}`",
+                f"- Components: `{aml_graph.get('component_count', 0)}`",
+                f"- Top entity: `{aml_graph.get('top_entity') or 'none'}`",
+                f"- Typology hits: `{aml_graph.get('typology_hit_count', 0)}`",
+                f"- Focal entity: `{aml_graph.get('focal_entity') or 'none'}`",
+                f"- Shadow winner: `{aml_graph.get('shadow_winner') or 'unknown'}`",
+            ]
+        )
     if decision_lab and any(value is not None for value in decision_lab.values()):
         lines.extend(
             [
@@ -2436,6 +2538,7 @@ def materialize_run_summary(
         sync_task_contract_artifacts,
         sync_temporal_engine_artifacts,
     )
+    from relaytic.aml import sync_aml_graph_artifacts
     from relaytic.iteration import sync_iteration_from_run
     from relaytic.learnings import (
         default_learnings_state_dir,
@@ -2480,6 +2583,12 @@ def materialize_run_summary(
                 "review_gate_state": "review_gate_state.json",
             },
         ),
+    )
+    sync_aml_graph_artifacts(
+        root,
+        data_path=data_path or _path_if_exists(root / "data.csv") or _clean_text(dict(base_summary.get("data", {})).get("data_path")),
+        context_bundle=_read_bundle(root, {"domain_brief": "domain_brief.json", "task_brief": "task_brief.json"}),
+        task_contract_bundle=read_task_contract_artifacts(root),
     )
     sync_architecture_routing_artifacts(
         root,

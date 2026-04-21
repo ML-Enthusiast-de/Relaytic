@@ -34,6 +34,8 @@ _PREPUSH_ONLY_GROUPS = (
         "tests/test_cli_slice15i.py",
         "tests/test_cli_slice15j.py",
         "tests/test_operating_points.py",
+        "tests/test_aml_realworld_compatibility.py",
+        "tests/test_cli_aml_realworld.py",
         "tests/test_cli_slice15k.py",
         "tests/test_cli_slice15l.py",
         "tests/test_cli_slice15m.py",

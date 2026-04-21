@@ -9342,6 +9342,7 @@ def _run_planning_phase(
         sync_task_contract_artifacts,
         sync_temporal_engine_artifacts,
     )
+    from relaytic.aml import sync_aml_graph_artifacts
     from relaytic.planning import write_planning_bundle
 
     root = Path(run_dir)
@@ -9426,6 +9427,12 @@ def _run_planning_phase(
             investigation_bundle=investigation_state["bundle"],
             planning_bundle=planning_bundle.to_dict(),
         )
+        aml_graph_written = sync_aml_graph_artifacts(
+            root,
+            data_path=staged_data_path,
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+        )
         architecture_written = sync_architecture_routing_artifacts(
             root,
             investigation_bundle=investigation_state["bundle"],
@@ -9462,6 +9469,7 @@ def _run_planning_phase(
             output_artifacts=[
                 *(str(value) for value in written.values()),
                 *(str(value) for value in task_contract_written.values()),
+                *(str(value) for value in aml_graph_written.values()),
                 *(str(value) for value in architecture_written.values()),
                 *(str(value) for value in temporal_written.values()),
                 *model_artifacts,
@@ -9477,6 +9485,7 @@ def _run_planning_phase(
             "paths": {
                 **{key: str(value) for key, value in written.items()},
                 **{key: str(value) for key, value in task_contract_written.items()},
+                **{key: str(value) for key, value in aml_graph_written.items()},
                 **{key: str(value) for key, value in architecture_written.items()},
                 **{key: str(value) for key, value in temporal_written.items()},
             },
@@ -10170,11 +10179,13 @@ def _run_benchmark_phase(
         promotion = benchmark_result.bundle.promotion_readiness_report
         quarantine = benchmark_result.bundle.candidate_quarantine
         from relaytic.analytics import read_architecture_routing_artifacts, read_temporal_engine_artifacts
+        from relaytic.aml import read_aml_graph_artifacts
 
         task_contract_bundle = read_task_contract_artifacts(root)
         eval_bundle = _read_json_bundle(root, bundle="evals")
         temporal_bundle = read_temporal_engine_artifacts(root)
         architecture_bundle = read_architecture_routing_artifacts(root)
+        aml_graph_bundle = read_aml_graph_artifacts(root)
         operating_point_bundle = {
             key: json.loads((root / filename).read_text(encoding="utf-8"))
             for key, filename in {
@@ -10190,6 +10201,7 @@ def _run_benchmark_phase(
         bundle_payload = benchmark_result.bundle.to_dict()
         bundle_payload.update(eval_bundle)
         bundle_payload.update(task_contract_bundle)
+        bundle_payload.update(aml_graph_bundle)
         bundle_payload.update(temporal_bundle)
         bundle_payload.update(architecture_bundle)
         bundle_payload.update(operating_point_bundle)
@@ -10238,6 +10250,10 @@ def _run_benchmark_phase(
                     "paper_primary_claim_allowed": holdout_claim_policy.paper_primary_claim_allowed,
                     "benchmark_generalization_status": benchmark_generalization_audit.status,
                     "identity_branching_detected": benchmark_generalization_audit.identity_branching_detected,
+                    "aml_domain_active": task_contract_bundle.get("aml_domain_contract", {}).get("aml_active"),
+                    "aml_pack_family": task_contract_bundle.get("aml_claim_scope", {}).get("benchmark_pack_family"),
+                    "aml_claim_scope": task_contract_bundle.get("aml_claim_scope", {}).get("claim_scope"),
+                    "aml_public_claim_ready": task_contract_bundle.get("aml_claim_scope", {}).get("public_claim_ready"),
                     "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                     "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
                     "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),
@@ -10287,11 +10303,13 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     promotion = dict(bundle.get("promotion_readiness_report", {}))
     quarantine = dict(bundle.get("candidate_quarantine", {}))
     from relaytic.analytics import read_architecture_routing_artifacts, read_temporal_engine_artifacts
+    from relaytic.aml import read_aml_graph_artifacts
 
     task_contract_bundle = read_task_contract_artifacts(root)
     eval_bundle = _read_json_bundle(root, bundle="evals")
     temporal_bundle = read_temporal_engine_artifacts(root)
     architecture_bundle = read_architecture_routing_artifacts(root)
+    aml_graph_bundle = read_aml_graph_artifacts(root)
     operating_point_bundle = {
         key: json.loads((root / filename).read_text(encoding="utf-8"))
         for key, filename in {
@@ -10307,6 +10325,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle_payload = dict(bundle)
     bundle_payload.update(eval_bundle)
     bundle_payload.update(task_contract_bundle)
+    bundle_payload.update(aml_graph_bundle)
     bundle_payload.update(temporal_bundle)
     bundle_payload.update(architecture_bundle)
     bundle_payload.update(operating_point_bundle)
@@ -10356,6 +10375,10 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "paper_primary_claim_allowed": holdout_claim_policy.get("paper_primary_claim_allowed"),
                 "benchmark_generalization_status": benchmark_generalization_audit.get("status"),
                 "identity_branching_detected": benchmark_generalization_audit.get("identity_branching_detected"),
+                "aml_domain_active": task_contract_bundle.get("aml_domain_contract", {}).get("aml_active"),
+                "aml_pack_family": task_contract_bundle.get("aml_claim_scope", {}).get("benchmark_pack_family"),
+                "aml_claim_scope": task_contract_bundle.get("aml_claim_scope", {}).get("claim_scope"),
+                "aml_public_claim_ready": task_contract_bundle.get("aml_claim_scope", {}).get("public_claim_ready"),
                 "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                 "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
                 "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),

@@ -173,6 +173,18 @@ Avoid introducing new references to:
 - introduced artifact boundaries for `family_specialization_matrix.json`, `multiclass_search_profile.json`, `rare_event_search_profile.json`, `adapter_activation_report.json`, `temporal_benchmark_recovery_report.json`, `benchmark_pack_partition.json`, `holdout_claim_policy.json`, and `benchmark_generalization_audit.json`
 - upgraded HPO budgeting, architecture routing, benchmark review, run summary, assist explanations, and benchmark CLI surfaces so multiclass and rare-event search posture, adapter activation, temporal benchmark recovery, dev-vs-holdout claim provenance, and benchmark-generalization posture come from one canonical audited path instead of ad hoc benchmark-specific logic
 
+### Slice 15N
+
+- extended the existing `src/relaytic/analytics/`, `src/relaytic/runs/`, `src/relaytic/assist/`, and `src/relaytic/ui/` boundaries instead of introducing a premature AML package before the domain contract was stable
+- introduced artifact boundaries for `aml_domain_contract.json`, `aml_case_ontology.json`, `aml_review_budget_contract.json`, and `aml_claim_scope.json`
+- upgraded canonical task contracts, run summary, assist explanations, and benchmark CLI surfaces so Relaytic-AML posture, review-budget semantics, and AML claim scope come from one deterministic contract instead of free-form prompt interpretation
+
+### Slice 15O
+
+- introduced the canonical package boundary `src/relaytic/aml/`
+- introduced artifact boundaries for `entity_graph_profile.json`, `counterparty_network_report.json`, `typology_detection_report.json`, `subgraph_risk_report.json`, and `entity_case_expansion.json`
+- upgraded planning, run-summary materialization, benchmark bundle payloads, and assist explanations so Relaytic-AML can persist and surface deterministic entity-graph evidence instead of staying row-only
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`

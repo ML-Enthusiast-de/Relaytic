@@ -253,3 +253,107 @@ def test_task_contract_audit_fails_when_benchmark_metric_is_not_materialized() -
     assert "stability_adjusted_mae" in audit["missing_metrics"]
     assert precheck["status"] == "blocked"
     assert precheck["safe_to_rank"] is False
+
+
+def test_task_contract_builds_aml_domain_and_review_budget_contracts() -> None:
+    artifacts = build_task_contract_artifacts(
+        mandate_bundle={
+            "run_brief": {
+                "objective": (
+                    "Run AML transaction monitoring for suspicious activity, optimize the analyst review queue, "
+                    "and benchmark the route against strong references."
+                )
+            }
+        },
+        context_bundle={
+            "task_brief": {
+                "target_column": "suspicious_activity_flag",
+                "problem_statement": "Classify suspicious_activity_flag for analyst review.",
+            },
+            "domain_brief": {
+                "summary": "Payment-fraud and financial-crime triage for overloaded analysts.",
+                "target_meaning": "Whether a transaction should be escalated into analyst review.",
+            },
+        },
+        investigation_bundle={"dataset_profile": {"row_count": 1200, "column_count": 18, "data_mode": "steady_state"}},
+        planning_bundle={
+            "plan": {
+                "target_column": "suspicious_activity_flag",
+                "task_type": "binary_classification",
+                "data_mode": "steady_state",
+                "primary_metric": "pr_auc",
+                "split_strategy": "stratified_deterministic_modulo_70_15_15",
+                "builder_handoff": {"selection_metric": "log_loss", "threshold_policy": "favor_pr_auc"},
+                "task_profile": {
+                    "target_signal": "suspicious_activity_flag",
+                    "task_type": "binary_classification",
+                    "task_family": "classification",
+                    "data_mode": "steady_state",
+                    "target_semantics": "rare_event_supervised_label",
+                    "problem_posture": "rare_event_supervised",
+                    "rare_event_supervised": True,
+                    "override_applied": False,
+                    "row_count": 1200,
+                    "class_count": 2,
+                    "class_balance": {"0": 1120, "1": 80},
+                    "minority_class_fraction": 80 / 1200,
+                    "positive_class_label": "1",
+                    "recommended_split_strategy": "stratified_deterministic_modulo_70_15_15",
+                    "rationale": "Explicit suspicious-activity labels under review-budget pressure.",
+                },
+            }
+        },
+    )
+
+    aml_domain = artifacts["aml_domain_contract"]
+    aml_review = artifacts["aml_review_budget_contract"]
+    aml_scope = artifacts["aml_claim_scope"]
+    assert aml_domain["status"] == "active"
+    assert aml_domain["aml_active"] is True
+    assert aml_domain["review_budget_relevant"] is True
+    assert aml_review["decision_objective"] == "maximize_precision_at_review_budget"
+    assert aml_review["recommended_next_action"] == "optimize_review_queue"
+    assert "precision_at_k" in aml_review["recommended_metrics"]
+    assert aml_scope["benchmark_pack_family"] == "aml_flagship_pending"
+    assert aml_scope["claim_scope"] == "generic_supporting_only_until_15r"
+    assert aml_scope["public_claim_ready"] is False
+
+
+def test_task_contract_marks_non_aml_run_as_not_applicable_for_aml_contracts() -> None:
+    artifacts = build_task_contract_artifacts(
+        mandate_bundle={"run_brief": {"objective": "Predict house_price from the neighborhood features."}},
+        context_bundle={"task_brief": {"target_column": "house_price", "problem_statement": "Predict house_price."}},
+        investigation_bundle={"dataset_profile": {"row_count": 350, "column_count": 12, "data_mode": "steady_state"}},
+        planning_bundle={
+            "plan": {
+                "target_column": "house_price",
+                "task_type": "regression",
+                "data_mode": "steady_state",
+                "primary_metric": "mae",
+                "split_strategy": "deterministic_modulo_70_15_15",
+                "builder_handoff": {"selection_metric": "mae", "threshold_policy": "auto"},
+                "task_profile": {
+                    "target_signal": "house_price",
+                    "task_type": "regression",
+                    "task_family": "regression",
+                    "data_mode": "steady_state",
+                    "target_semantics": "continuous_signal",
+                    "problem_posture": "regression",
+                    "rare_event_supervised": False,
+                    "override_applied": False,
+                    "row_count": 350,
+                    "class_count": 0,
+                    "class_balance": {},
+                    "minority_class_fraction": None,
+                    "positive_class_label": None,
+                    "recommended_split_strategy": "deterministic_modulo_70_15_15",
+                    "rationale": "Continuous supervised target.",
+                },
+            }
+        },
+    )
+
+    assert artifacts["aml_domain_contract"]["status"] == "not_applicable"
+    assert artifacts["aml_domain_contract"]["aml_active"] is False
+    assert artifacts["aml_review_budget_contract"]["status"] == "not_applicable"
+    assert artifacts["aml_claim_scope"]["benchmark_pack_family"] == "generic_supporting_pack"

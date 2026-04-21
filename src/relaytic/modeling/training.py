@@ -815,39 +815,45 @@ def _train_classification_candidates(
             target_column=target_column,
             lag_horizon=lagged_horizon,
         )
-        lagged_logistic_rows = lagged_logistic_model.fit_dataframe(prepared_frames["train"])
-        rows_used_by_model["lagged_logistic_regression"] = int(lagged_logistic_rows)
-        lagged_logistic_candidate = _classification_candidate_metrics_with_context(
-            model_family="lagged_logistic_regression",
-            model=lagged_logistic_model,
-            frames=prepared_frames,
-            task_type=str(task_profile.task_type),
-            threshold_policy=threshold_policy,
-            decision_threshold=decision_threshold,
-            notes=(
-                "Lagged logistic classifier over current and historical predictor windows. "
-                f"Lag horizon={lagged_horizon} samples. Train rows used={lagged_logistic_rows}."
-            ),
-            hyperparameters={
-                "learning_rate": float(lagged_logistic_model.learning_rate),
-                "epochs": int(lagged_logistic_model.epochs),
-                "l2": float(lagged_logistic_model.l2),
-                "lag_horizon_samples": int(lagged_logistic_model.lag_horizon),
-                "training_rows_used": int(lagged_logistic_rows),
-                "class_count": int(len(lagged_logistic_model.class_labels)),
-                "training_feature_count": int(len(lagged_logistic_model._lagged_feature_columns)),
-            },
-        )
-        candidate_records.append(
-            {
-                "candidate": lagged_logistic_candidate,
-                "model": lagged_logistic_model,
-                "rows_used": int(lagged_logistic_rows),
-            }
-        )
-        classifier_thresholds["lagged_logistic_regression"] = float(
-            lagged_logistic_candidate.train_metrics.get("decision_threshold", 0.5)
-        )
+        try:
+            lagged_logistic_rows = lagged_logistic_model.fit_dataframe(prepared_frames["train"])
+        except ValueError:
+            if requested == "lagged_logistic_regression" and not compare_against_baseline:
+                raise
+            lagged_logistic_model = None
+        else:
+            rows_used_by_model["lagged_logistic_regression"] = int(lagged_logistic_rows)
+            lagged_logistic_candidate = _classification_candidate_metrics_with_context(
+                model_family="lagged_logistic_regression",
+                model=lagged_logistic_model,
+                frames=prepared_frames,
+                task_type=str(task_profile.task_type),
+                threshold_policy=threshold_policy,
+                decision_threshold=decision_threshold,
+                notes=(
+                    "Lagged logistic classifier over current and historical predictor windows. "
+                    f"Lag horizon={lagged_horizon} samples. Train rows used={lagged_logistic_rows}."
+                ),
+                hyperparameters={
+                    "learning_rate": float(lagged_logistic_model.learning_rate),
+                    "epochs": int(lagged_logistic_model.epochs),
+                    "l2": float(lagged_logistic_model.l2),
+                    "lag_horizon_samples": int(lagged_logistic_model.lag_horizon),
+                    "training_rows_used": int(lagged_logistic_rows),
+                    "class_count": int(len(lagged_logistic_model.class_labels)),
+                    "training_feature_count": int(len(lagged_logistic_model._lagged_feature_columns)),
+                },
+            )
+            candidate_records.append(
+                {
+                    "candidate": lagged_logistic_candidate,
+                    "model": lagged_logistic_model,
+                    "rows_used": int(lagged_logistic_rows),
+                }
+            )
+            classifier_thresholds["lagged_logistic_regression"] = float(
+                lagged_logistic_candidate.train_metrics.get("decision_threshold", 0.5)
+            )
 
     if compare_against_baseline or requested == "bagged_tree_classifier":
         for record in _fit_classifier_tree_candidates(
@@ -912,39 +918,45 @@ def _train_classification_candidates(
             target_column=target_column,
             lag_horizon=lagged_horizon,
         )
-        lagged_tree_rows = lagged_tree_classifier.fit_dataframe(prepared_frames["train"])
-        rows_used_by_model["lagged_tree_classifier"] = int(lagged_tree_rows)
-        lagged_tree_candidate = _classification_candidate_metrics_with_context(
-            model_family="lagged_tree_classifier",
-            model=lagged_tree_classifier,
-            frames=prepared_frames,
-            task_type=str(task_profile.task_type),
-            threshold_policy=threshold_policy,
-            decision_threshold=decision_threshold,
-            notes=(
-                "Lag-window bagged tree classifier over current and historical predictor windows. "
-                f"Lag horizon={lagged_horizon} samples. Train rows used={lagged_tree_rows}."
-            ),
-            hyperparameters={
-                "n_estimators": int(lagged_tree_classifier.n_estimators),
-                "max_depth": int(lagged_tree_classifier.max_depth),
-                "min_leaf": int(lagged_tree_classifier.min_leaf),
-                "lag_horizon_samples": int(lagged_tree_classifier.lag_horizon),
-                "training_rows_used": int(lagged_tree_rows),
-                "class_count": int(len(lagged_tree_classifier.class_labels)),
-                "training_feature_count": int(len(lagged_tree_classifier._lagged_feature_columns)),
-            },
-        )
-        candidate_records.append(
-            {
-                "candidate": lagged_tree_candidate,
-                "model": lagged_tree_classifier,
-                "rows_used": int(lagged_tree_rows),
-            }
-        )
-        classifier_thresholds["lagged_tree_classifier"] = float(
-            lagged_tree_candidate.train_metrics.get("decision_threshold", 0.5)
-        )
+        try:
+            lagged_tree_rows = lagged_tree_classifier.fit_dataframe(prepared_frames["train"])
+        except ValueError:
+            if requested == "lagged_tree_classifier" and not compare_against_baseline:
+                raise
+            lagged_tree_classifier = None
+        else:
+            rows_used_by_model["lagged_tree_classifier"] = int(lagged_tree_rows)
+            lagged_tree_candidate = _classification_candidate_metrics_with_context(
+                model_family="lagged_tree_classifier",
+                model=lagged_tree_classifier,
+                frames=prepared_frames,
+                task_type=str(task_profile.task_type),
+                threshold_policy=threshold_policy,
+                decision_threshold=decision_threshold,
+                notes=(
+                    "Lag-window bagged tree classifier over current and historical predictor windows. "
+                    f"Lag horizon={lagged_horizon} samples. Train rows used={lagged_tree_rows}."
+                ),
+                hyperparameters={
+                    "n_estimators": int(lagged_tree_classifier.n_estimators),
+                    "max_depth": int(lagged_tree_classifier.max_depth),
+                    "min_leaf": int(lagged_tree_classifier.min_leaf),
+                    "lag_horizon_samples": int(lagged_tree_classifier.lag_horizon),
+                    "training_rows_used": int(lagged_tree_rows),
+                    "class_count": int(len(lagged_tree_classifier.class_labels)),
+                    "training_feature_count": int(len(lagged_tree_classifier._lagged_feature_columns)),
+                },
+            )
+            candidate_records.append(
+                {
+                    "candidate": lagged_tree_candidate,
+                    "model": lagged_tree_classifier,
+                    "rows_used": int(lagged_tree_rows),
+                }
+            )
+            classifier_thresholds["lagged_tree_classifier"] = float(
+                lagged_tree_candidate.train_metrics.get("decision_threshold", 0.5)
+            )
 
     candidates = [dict(record).get("candidate") for record in candidate_records]
     if requested in _CLASSIFICATION_ADAPTER_FAMILIES and not any(

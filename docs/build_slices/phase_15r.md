@@ -42,9 +42,12 @@ It turns the earlier AML slices into a recruiter-safe, paper-safe, and demo-safe
 1. one AML benchmark pack can be rerun and rendered as a public-ready table
 2. one AML demo pack can be scored as recruiter-safe
 3. one real AML miss is surfaced honestly with a concrete next-step recommendation
+4. the benchmark pack explicitly covers PaySim-style temporal transaction fraud and Elliptic-style temporal graph AML before broader public claims are made
 
 ## Required Verification
 
 - one AML benchmark manifest test
 - one AML holdout-claim test
 - one AML flagship-demo regression test
+- one PaySim-style workload regression test
+- one Elliptic-style workload regression test

@@ -39,6 +39,8 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
                 "tests/test_planning_agents.py",
                 "tests/test_search_agents.py",
                 "tests/test_temporal_engine.py",
+                "tests/test_aml_realworld_compatibility.py",
+                "tests/test_cli_aml_realworld.py",
                 "tests/test_cli_slice15h.py",
                 "tests/test_cli_slice15i.py",
                 "tests/test_cli_slice15j.py",

@@ -72,6 +72,58 @@ def test_build_assist_audit_explanation_answers_task_semantics_questions() -> No
     assert "task_profile_contract.json" in audit["evidence_refs"]
 
 
+def test_build_assist_audit_explanation_answers_aml_posture_questions() -> None:
+    audit = build_assist_audit_explanation(
+        message="why is this in aml mode and what is the review queue objective?",
+        actor_type="user",
+        run_summary={
+            "aml": {
+                "status": "active",
+                "aml_active": True,
+                "domain_focus": "transaction_monitoring",
+                "target_level": "transaction",
+                "business_goal": "analyst_triage",
+                "review_budget_relevant": True,
+                "decision_objective": "maximize_precision_at_review_budget",
+                "claim_scope": "generic_supporting_only_until_15r",
+                "benchmark_pack_family": "aml_flagship_pending",
+                "public_claim_ready": False,
+            }
+        },
+    )
+
+    assert audit["question_type"] == "aml_posture"
+    assert "transaction_monitoring" in audit["answer"]
+    assert "maximize_precision_at_review_budget" in audit["answer"]
+    assert "aml_review_budget_contract.json" in audit["evidence_refs"]
+
+
+def test_build_assist_audit_explanation_answers_aml_graph_questions() -> None:
+    audit = build_assist_audit_explanation(
+        message="why is this structurally suspicious and what did the graph find?",
+        actor_type="agent",
+        run_summary={
+            "aml_graph": {
+                "status": "active",
+                "node_count": 14,
+                "edge_count": 11,
+                "component_count": 3,
+                "top_entity": "HUB1",
+                "typology_hit_count": 3,
+                "top_typology": "smurfing",
+                "focal_entity": "HUB1",
+                "expanded_entity_count": 5,
+                "shadow_winner": "structural_baseline",
+            }
+        },
+    )
+
+    assert audit["question_type"] == "aml_graph"
+    assert "HUB1" in audit["answer"]
+    assert "smurfing" in audit["answer"]
+    assert "subgraph_risk_report.json" in audit["evidence_refs"]
+
+
 def test_build_assist_audit_explanation_answers_objective_alignment_questions() -> None:
     audit = build_assist_audit_explanation(
         message="why did you optimize one metric but benchmark another?",

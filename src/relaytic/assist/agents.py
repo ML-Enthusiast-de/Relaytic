@@ -653,6 +653,8 @@ def build_assist_audit_explanation(
     iteration = dict(run_summary.get("iteration", {}))
     objective_contract = dict(run_summary.get("objective_contract", {}))
     split_health = dict(run_summary.get("split_health", {}))
+    aml = dict(run_summary.get("aml", {}))
+    aml_graph = dict(run_summary.get("aml_graph", {}))
 
     question_type = "general"
     reasons: list[str] = []
@@ -716,6 +718,41 @@ def build_assist_audit_explanation(
             "benchmark_pack_partition.json",
             "holdout_claim_policy.json",
             "benchmark_generalization_audit.json",
+            "run_summary.json",
+        ]
+    elif any(
+        token in normalized
+        for token in ("aml", "anti-money laundering", "financial crime", "review queue", "analyst review", "case packet", "payment fraud", "paypal")
+    ):
+        question_type = "aml_posture"
+        reasons = [
+            f"Relaytic-AML posture is `{_clean_text(aml.get('status')) or 'unknown'}` with domain focus `{_clean_text(aml.get('domain_focus')) or 'unknown'}` at target level `{_clean_text(aml.get('target_level')) or 'unknown'}`.",
+            f"Business goal is `{_clean_text(aml.get('business_goal')) or 'unknown'}` and review-budget relevance = `{aml.get('review_budget_relevant')}` under decision objective `{_clean_text(aml.get('decision_objective')) or 'unknown'}`.",
+            f"Benchmark claim scope is `{_clean_text(aml.get('claim_scope')) or 'unknown'}` with pack family `{_clean_text(aml.get('benchmark_pack_family')) or 'unknown'}` and public-claim-ready = `{aml.get('public_claim_ready')}`.",
+        ]
+        evidence_refs = [
+            "aml_domain_contract.json",
+            "aml_case_ontology.json",
+            "aml_review_budget_contract.json",
+            "aml_claim_scope.json",
+            "run_summary.json",
+        ]
+    elif any(
+        token in normalized
+        for token in ("graph", "entity", "subgraph", "counterparty", "typology", "smurf", "layering", "funnel", "structurally suspicious")
+    ):
+        question_type = "aml_graph"
+        reasons = [
+            f"Relaytic-AML graph posture is `{_clean_text(aml_graph.get('status')) or 'unknown'}` with `{aml_graph.get('node_count', 0)}` node(s), `{aml_graph.get('edge_count', 0)}` edge(s), and focal entity `{_clean_text(aml_graph.get('focal_entity')) or _clean_text(aml_graph.get('top_entity')) or 'unknown'}`.",
+            f"Typology hit count is `{aml_graph.get('typology_hit_count', 0)}` with top typology `{_clean_text(aml_graph.get('top_typology')) or 'none'}` and expanded-entity count `{aml_graph.get('expanded_entity_count', 0)}`.",
+            f"Relaytic kept shadow winner `{_clean_text(aml_graph.get('shadow_winner')) or 'unknown'}` so heavier graph reasoning stays shadow-first until it beats the structural baseline honestly.",
+        ]
+        evidence_refs = [
+            "entity_graph_profile.json",
+            "counterparty_network_report.json",
+            "typology_detection_report.json",
+            "subgraph_risk_report.json",
+            "entity_case_expansion.json",
             "run_summary.json",
         ]
     elif "task type" in normalized or ("why not" in normalized and "anomaly" in normalized):
