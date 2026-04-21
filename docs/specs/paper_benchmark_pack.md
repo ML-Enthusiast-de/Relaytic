@@ -4,6 +4,8 @@
 
 This document defines the first paper-grade benchmark and eval pack for Relaytic.
 
+After the Relaytic-AML pivot, this pack should be treated as the **generic supporting benchmark pack**, not the flagship domain proof pack.
+
 The pack is designed to answer two different questions:
 
 - can Relaytic operate credibly across the main structured-data task families?
@@ -51,9 +53,10 @@ So the correct scientific claim today is:
 
 - the pack is legitimate and paper-acceptable
 - it is strong enough for a credible first benchmark section
-- it should later be expanded before making stronger modeling-dominance claims
+- it should later be expanded or subordinated to the AML-specific paper pack before making stronger domain or modeling-dominance claims
 
 The dedicated future time-aware benchmark track is specified separately in [temporal_benchmark_pack.md](temporal_benchmark_pack.md).
+The future flagship AML benchmark doctrine is specified separately in [aml_frontier_contract.md](aml_frontier_contract.md).
 
 ## Dataset matrix
 

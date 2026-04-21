@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document freezes the post-Slice-15F performance recovery and paper-competitiveness track that must land before Relaytic starts the academy work.
+This document freezes the post-Slice-15F performance recovery and paper-competitiveness track that must land before Relaytic starts the AML pivot and then the academy work.
 
 It exists because the initial model-competitiveness track improved semantics, routing breadth, HPO structure, benchmark surfaces, artifact reuse, and research-imported shadow trials, but it did not yet produce the level of raw modeling strength and paper-safe benchmark truth that Relaytic needs.
 
@@ -32,7 +32,7 @@ Serious performance gains require six things in order:
 5. calibration and decision optimization as first-class work
 6. benchmark-truth gates that block unsafe paper claims
 
-After those six are in place, Relaytic still needs one final bridge before academy work:
+After those six are in place, Relaytic still needs one final bridge before the AML pivot:
 
 7. competitive specialization plus benchmark-generalization guards
 
@@ -233,11 +233,12 @@ This recovery track is only complete if Relaytic can prove all of the following:
 9. one clean benchmark bundle is marked safe to cite publicly
 10. one gain visible on the dev benchmark pack is checked again under a holdout or untouched pack before it is treated as paper-facing evidence
 
-## Relationship to the academy track
+## Relationship to the AML and academy tracks
 
-The academy track must stay after this recovery track.
+The AML pivot and the academy track must stay after this recovery track.
 
 Reason:
 
 - a weak modeling core will only let the academy discover and promote mediocrity faster
 - capability growth is only worth it once Relaytic can trust its task contracts, family competition, search budgets, temporal evaluation, and benchmark-truth gates
+- the AML pivot is only credible if it inherits a stronger modeling and benchmark-truth core instead of a generic weak stack with new domain language pasted on top

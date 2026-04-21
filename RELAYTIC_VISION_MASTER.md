@@ -11,13 +11,14 @@
 **The Relay Inference Lab**
 
 ### Positioning line
-**Relaytic is a local-first inference engineering system for structured data, built around specialist agents that investigate data, form competing hypotheses, run challenger science, preserve mandate-aware user intent, optionally ground themselves in expert context, optionally perform privacy-safe external method and benchmark retrieval from redacted run signatures, amplify their judgment when a powerful LLM is available, optionally use a minimum local LLM baseline when users want semantic help on-device, actively help users and external agents set up local LLMs when desired, debate what the run should optimize for, keep core subsystems replaceable, carry bounded evidence between specialists, and expose their judgment as reusable tools.**
+**Relaytic is now pivoting toward Relaytic-AML, a local-first AML and financial-crime investigation system built around specialist agents that investigate data, form competing hypotheses, run challenger science, preserve mandate-aware user intent, optionally ground themselves in expert context, optionally perform privacy-safe external method and benchmark retrieval from redacted run signatures, amplify their judgment when a powerful LLM is available, optionally use a minimum local LLM baseline when users want semantic help on-device, debate what the run should optimize for, keep core subsystems replaceable, carry bounded evidence between specialists, and expose their judgment as reusable tools.**
 
 ### Naming strategy
 Use a two-layer naming system throughout the repository and docs:
 
 - **Brand:** Relaytic
 - **Descriptor:** The Relay Inference Lab
+- **Flagship frontier edition:** Relaytic-AML
 
 ### Documentation rule
 All top-level docs should present the project as:
@@ -28,7 +29,7 @@ All top-level docs should present the project as:
 
 ## Goal
 
-Transform this repository from a “data -> surrogate model” framework into a **local-first inference engineering system** for structured data that:
+Transform this repository from a “data -> surrogate model” framework into a **local-first AML and financial-crime inference engineering system** that:
 
 - runs fully locally by default
 - treats “local” broadly: personal computer, workstation, local server, local instance, or local cluster under the user’s control
@@ -171,7 +172,7 @@ Every ambitious Relaytic claim should be falsifiable and backed by at least one 
 
 By the time the product is mature, Relaytic should be able to show, not just claim, that:
 
-- it can match strong standard baselines on ordinary structured-data tasks
+- it can match strong standard baselines on ordinary risk, fraud, AML, and supporting structured-data tasks
 - it can exceed them when mandate, reliability, lifecycle, or operator constraints matter
 - it can be driven end to end by either a human or an external agent through stable tool surfaces
 - it can explain why it continued, stopped, recalibrated, retrained, promoted, or rolled back
@@ -244,7 +245,7 @@ Before the academy begins, Relaytic needs one explicit **performance-recovery tr
 ### New product identity
 Relaytic becomes:
 
-> A local-first inference engineering workspace for structured data, where multiple specialist agents independently inspect data, form and challenge hypotheses, run evidence-driven experiments, quantify reliability, preserve mandate-aware user intent, recommend the right next move across runs, and produce reusable inference systems, result contracts, and governed workspace memory.
+> A local-first AML and financial-crime investigation workspace, where multiple specialist agents independently inspect transactions, entities, temporal behavior, and suspicious structures, form and challenge hypotheses, run evidence-driven experiments, quantify reliability, preserve mandate-aware user intent, recommend the right next move across runs, and produce reusable risk systems, case packets, result contracts, and governed workspace memory.
 
 ### What Relaytic is not
 Relaytic is **not**:
@@ -254,7 +255,7 @@ Relaytic is **not**:
 - a benchmark-only leaderboard generator
 
 Relaytic is:
-- an investigator of unknown structured datasets
+- an investigator of unfamiliar transaction, entity, graph, temporal, and supporting structured datasets
 - a workspace-first investigation system that can carry governed continuity across runs instead of treating every run as a fresh conversation
 - a builder of robust inference systems
 - a generator of evidence, not just metrics

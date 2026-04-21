@@ -6,6 +6,7 @@ This file freezes the load-bearing contracts that later slices must obey.
 
 - Product name: `Relaytic`
 - Descriptor: `The Relay Inference Lab`
+- Flagship frontier edition: `Relaytic-AML`
 - Canonical package: `relaytic`
 - Canonical CLI: `relaytic`
 - Compatibility package: `corr2surrogate` for import fallback only
@@ -63,6 +64,7 @@ Current canonical boundaries:
 Reserved future boundaries:
 
 - `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15M task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, replay/shadow-tested imported-model, objective/split/metric-truth, first-class family-stack, staged portfolio-search, temporal-engine, operating-point, benchmark-truth-gate, competitive-specialization, and benchmark-generalization responsibilities; later work may introduce focused subpackages such as `src/relaytic/modeling/families/`, `src/relaytic/modeling/portfolio/`, or `src/relaytic/temporal/` only if they sharpen responsibility instead of forking a disconnected parallel stack
+- `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` should absorb the planned Slice 15N through Slice 15R AML pivot work, including AML domain contracts, case ontology, graph and subgraph reasoning, analyst-review optimization, case-packet generation, streaming drift posture, weak-label handling, and AML-specific benchmark/demo truth
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should be a cross-cutting consolidation and remediation slice rather than a feature-expansion boundary; by default it should remove misleading or redundant packages, split oversized modules, and retire legacy surfaces instead of introducing a new permanent package
@@ -131,6 +133,11 @@ These files are required and must stay current:
 - `docs/build_slices/phase_15j.md`
 - `docs/build_slices/phase_15k.md`
 - `docs/build_slices/phase_15l.md`
+- `docs/build_slices/phase_15n.md`
+- `docs/build_slices/phase_15o.md`
+- `docs/build_slices/phase_15p.md`
+- `docs/build_slices/phase_15q.md`
+- `docs/build_slices/phase_15r.md`
 - `docs/build_slices/phase_16.md`
 - `docs/build_slices/phase_16a.md`
 - `docs/build_slices/phase_16b.md`
@@ -145,6 +152,7 @@ These files are required and must stay current:
 - `docs/specs/governed_learnings_schema.md`
 - `docs/specs/model_competitiveness_contract.md`
 - `docs/specs/performance_recovery_contract.md`
+- `docs/specs/aml_frontier_contract.md`
 - `docs/specs/temporal_benchmark_pack.md`
 - `docs/specs/capability_academy_contract.md`
 - `docs/specs/mission_control_contract.md`

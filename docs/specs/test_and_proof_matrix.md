@@ -127,6 +127,10 @@ To reduce timeout risk, future CI should support at least:
 - `performance_recovery`
 - `temporal_benchmark_pack`
 - `benchmark_truth`
+- `aml_graph`
+- `aml_review_budget`
+- `aml_streaming`
+- `aml_flagship_pack`
 - `capability_academy`
 
 ## Minimum pass expectation by slice family
@@ -186,6 +190,14 @@ To reduce timeout risk, future CI should support at least:
 - non-core specialist recruitment and retirement tests
 - no-core-deletion guards
 - human and agent explanation tests for promoted or retired capabilities
+
+### AML pivot family
+
+- AML domain-contract and case-ontology tests
+- graph and typology reasoning tests
+- analyst review-budget and top-k ranking tests
+- weak-label and streaming-drift tests
+- AML holdout-claim and recruiter-demo tests
 
 ### Slice 17 family
 

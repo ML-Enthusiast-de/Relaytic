@@ -24,6 +24,8 @@ Intended artifacts:
 
 Slice 16A gives Relaytic one canonical registry for candidate and promoted tools or non-core specialists.
 
+It should begin only after the AML pivot slices have made Relaytic's flagship domain thesis real enough that future capability growth has a clear target.
+
 ## Load-Bearing Improvement
 
 - Relaytic should be able to represent capabilities explicitly as typed cards with lifecycle state, risk, owner, domain fit, and proof posture instead of scattering those judgments across ad hoc notes or code branches

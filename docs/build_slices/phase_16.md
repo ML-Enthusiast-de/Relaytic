@@ -17,7 +17,7 @@ Intended package boundaries:
 
 Slice 16 is the future umbrella track where Relaytic learns new non-core capabilities without turning into an uncontrolled self-modifying system.
 
-It should start only after the model-competitiveness track in Slices 15A through 15F has strengthened task semantics, architecture routing, HPO depth, benchmark rigor, artifact reuse, and model-family shadow testing.
+It should start only after the full performance-recovery track in Slices 15A through 15M and the AML pivot track in Slices 15N through 15R have landed.
 
 This is not a single coding pass. It is a governed program delivered through:
 
@@ -27,6 +27,9 @@ This is not a single coding pass. It is a governed program delivered through:
 - Slice 16D hunt campaigns, seeded exploration, and provider feedback
 - Slice 16E non-core specialist recruitment and retirement
 - Slice 16F academy mission control and explainability surfaces
+
+The academy is intentionally not the next move anymore.
+Relaytic first needs to become genuinely interesting as **Relaytic-AML**, with domain contracts, graph-aware reasoning, analyst-review optimization, streaming AML posture, and hard AML proof packs.
 
 This slice family must continue obeying:
 

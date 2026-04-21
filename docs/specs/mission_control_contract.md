@@ -6,6 +6,8 @@ This document freezes the current mission-control contract shipped across Slices
 
 The goal is to make the already-coded mission-control layer a stable foundation rather than a moving target.
 
+For the current roadmap direction, that foundation should increasingly render **Relaytic-AML** work clearly for fraud and AML operators, not just generic experiment runners.
+
 ## Scope
 
 This contract governs:
@@ -68,6 +70,7 @@ If one of those is unavailable, mission control should say so explicitly rather 
 For humans, mission control should make clear:
 
 - what Relaytic is
+- what Relaytic-AML is trying to optimize when the active workspace is in AML mode
 - what it needs next
 - what it can do right now
 - what the human can do right now
@@ -141,3 +144,12 @@ Slice 15 may add:
 - workspace continuity views
 
 But it must not break the operator legibility already established in Slices 11B through 11G.
+
+The AML pivot slices should further add:
+
+- review-budget posture
+- alert or casework queue visibility
+- graph or typology evidence visibility
+- drift and weak-label posture
+
+without turning mission control into a domain-specific fork that loses the canonical Relaytic state model.

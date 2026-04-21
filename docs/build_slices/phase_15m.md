@@ -27,7 +27,7 @@ Intended artifacts:
 
 ## Intent
 
-Slice 15M is the final competitiveness-focused bridge between the shipped performance-recovery track and the later academy work.
+Slice 15M is the final competitiveness-focused bridge between the shipped performance-recovery track and the later AML pivot.
 
 It exists because the latest benchmark rerun proved three things at once:
 
@@ -36,6 +36,8 @@ It exists because the latest benchmark rerun proved three things at once:
 - repeated reuse of the same representative benchmark pack creates a real risk of optimizing Relaytic around the visible dev suite instead of improving general modeling quality
 
 This slice should attack both problems directly: better specialization where Relaytic is weak, and stricter benchmark-governance rules so we do not accidentally cheat by repeatedly training our architecture around the same public scorecards.
+
+It exists so the following AML slices start from a stronger and more honest base instead of inheriting benchmark-shaped blind spots.
 
 ## Load-Bearing Improvement
 

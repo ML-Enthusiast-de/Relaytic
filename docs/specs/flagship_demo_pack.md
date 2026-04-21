@@ -1,16 +1,18 @@
 # Flagship Demo Pack Contract
 
+The future flagship domain story for these demos is **Relaytic-AML**. The generic demo structure still applies, but the highest-value recruiter and hiring-manager version of the pack should be AML-first.
+
 ## Purpose
 
 This document defines the recruiter-safe and lab-safe flagship demos Relaytic should maintain once the later mission-control slices land.
 
 The goal is to make Relaytic impressive through repeatable proof, not narration.
 
-## Demo 1: Unknown dataset to governed decision
+## Demo 1: New AML dataset to governed alert policy
 
 ### Story
 
-A first-time operator points Relaytic at an unfamiliar structured dataset, states a reasonable objective, and Relaytic produces a governed result plus a clear next-step recommendation.
+A first-time operator points Relaytic at an unfamiliar AML or fraud dataset, states a reasonable objective, and Relaytic produces a governed alerting or investigation posture plus a clear next-step recommendation.
 
 ### Must prove
 
@@ -28,11 +30,11 @@ A first-time operator points Relaytic at an unfamiliar structured dataset, state
 - mission-control view
 - onboarding-success evidence
 
-## Demo 2: Incumbent challenge
+## Demo 2: Legacy alert engine challenge
 
 ### Story
 
-A user or external agent brings an incumbent model or prediction baseline. Relaytic evaluates it under the same contract and tries to beat it honestly.
+A user or external agent brings an incumbent ruleset, alert engine, model, or prediction baseline. Relaytic evaluates it under the same contract and tries to beat it honestly.
 
 ### Must prove
 
@@ -69,11 +71,11 @@ A user or external agent tries to push Relaytic into an unsafe or weakly justifi
 - trace replay
 - adjudication scorecard where relevant
 
-## Demo 4: Multi-run workspace continuity
+## Demo 4: Multi-run case investigation continuity
 
 ### Story
 
-Relaytic finishes one run, carries the investigation into a second run, preserves governed learnings, and explicitly recommends whether to stay on the same data, add data, or start over.
+Relaytic finishes one AML run, carries the investigation into a second run, preserves governed learnings, and explicitly recommends whether to stay on the same data, add graph evidence, widen the review queue, or start over.
 
 ### Must prove
 

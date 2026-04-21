@@ -1,6 +1,10 @@
 # Relaytic - The Relay Inference Lab
 
-Relaytic is a local-first inference engineering system for structured data. It turns datasets, operator intent, and optional local semantic help into auditable modeling decisions, structured artifacts, and reusable local tooling.
+**Flagship frontier edition:** `Relaytic-AML`
+
+Relaytic is now being positioned around a sharper wedge: a local-first AML and financial-crime investigation system that turns datasets, operator intent, and optional local semantic help into auditable modeling decisions, structured case evidence, and reusable local tooling.
+
+The public product name, package, and CLI stay `Relaytic` / `relaytic` / `relaytic`. `Relaytic-AML` is the flagship product story and roadmap direction, not a package rename.
 
 Relaytic is designed around a deterministic floor, specialist-agent reasoning, explicit policy and mandate handling, and artifact-first execution. The system should be able to continue autonomously when non-critical ambiguity remains, while still making its assumptions inspectable.
 
@@ -67,7 +71,7 @@ Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 16A**, because the performance-recovery track is now complete through Slice 15M and the next disciplined step is to start the academy with one governed capability registry instead of scattering future tool and specialist candidates across ad hoc surfaces.
+The next recommended build is **Slice 15N**, because the general performance-recovery track is now complete through Slice 15M and the highest-leverage move is to pivot the frontier story into a hard AML domain track before starting the academy.
 
 The initial model-competitiveness path through **Slice 15F** is now landed, and the first performance-recovery foundation slice is now landed too:
 
@@ -79,11 +83,19 @@ The full required performance-recovery path is now landed:
 - Slice 15L benchmark truth hardening and paper-claim gates
 - Slice 15M competitive specialization and benchmark-generalization guards
 
-The broader **Relaytic Academy** now starts at **Slice 16A**, after Slice 15M closed the remaining specialization and benchmark-generalization gap rather than learning new capabilities on top of a still-limited performance ceiling.
+The broader **Relaytic Academy** now starts at **Slice 16A**, but only after the new AML flagship track lands:
+
+- **Slice 15N** AML domain contract and flagship pivot
+- **Slice 15O** entity, graph, and typology reasoning
+- **Slice 15P** analyst review optimization and casework
+- **Slice 15Q** streaming drift, weak labels, and continual AML learning
+- **Slice 15R** AML flagship benchmark, demo, and paper pack
+
+That ordering is deliberate. Relaytic is more interesting as a world-class AML system than as a generic capability-evolution project with no sharp domain wedge.
 
 After the academy track and the optional representation-engine bet, the roadmap now ends with **Slice 18**, a deliberate consolidation/remediation slice that removes legacy compatibility surfaces, misleading duplicate structure, oversized modules, and stale prototype residue so the finished repo reads like one intentional product rather than a long-lived construction site.
 
-The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [temporal_benchmark_pack.md](docs/specs/temporal_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
+The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [temporal_benchmark_pack.md](docs/specs/temporal_benchmark_pack.md), [aml_frontier_contract.md](docs/specs/aml_frontier_contract.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
 
 - machine-stable result contracts with confidence posture and belief-revision triggers so humans, agents, CLI, MCP, and later richer UI shells can all read the same conclusion differently without drifting
 - governed learnings with source, confidence, reaffirmation, invalidation, reset, and optional expiry semantics
