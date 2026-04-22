@@ -594,13 +594,13 @@ def _build_aml_claim_scope(
         "generated_at": generated_at,
         "status": "active",
         "aml_active": True,
-        "benchmark_pack_family": "aml_flagship_pending",
-        "claim_scope": "generic_supporting_only_until_15r",
+        "benchmark_pack_family": "aml_flagship_pack",
+        "claim_scope": "aml_supporting_claims_until_holdout_and_cross_track_coverage",
         "public_claim_ready": public_claim_ready,
         "benchmark_expected": benchmark_expected,
         "summary": (
-            "Relaytic-AML can use generic benchmark packs as supporting evidence, but flagship AML public claims stay "
-            "gated until the dedicated AML benchmark and holdout pack are shipped."
+            "Relaytic-AML now has a dedicated flagship benchmark pack, but broader AML public claims remain gated until "
+            "holdout posture, benchmark truth, and cross-track coverage are all satisfied."
         ),
     }
 

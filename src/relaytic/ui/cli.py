@@ -9343,6 +9343,8 @@ def _run_planning_phase(
         sync_temporal_engine_artifacts,
     )
     from relaytic.aml import sync_aml_graph_artifacts
+    from relaytic.casework import sync_casework_artifacts
+    from relaytic.stream_risk import sync_stream_risk_artifacts
     from relaytic.planning import write_planning_bundle
 
     root = Path(run_dir)
@@ -9449,6 +9451,61 @@ def _run_planning_phase(
             architecture_bundle=read_architecture_routing_artifacts(root),
             task_contract_bundle=read_task_contract_artifacts(root),
         )
+        casework_written = sync_casework_artifacts(
+            root,
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            aml_graph_bundle={
+                key: json.loads((root / filename).read_text(encoding="utf-8"))
+                for key, filename in {
+                    "entity_graph_profile": "entity_graph_profile.json",
+                    "counterparty_network_report": "counterparty_network_report.json",
+                    "typology_detection_report": "typology_detection_report.json",
+                    "subgraph_risk_report": "subgraph_risk_report.json",
+                    "entity_case_expansion": "entity_case_expansion.json",
+                }.items()
+                if (root / filename).exists()
+            },
+            operating_point_bundle={
+                key: json.loads((root / filename).read_text(encoding="utf-8"))
+                for key, filename in {
+                    "operating_point_contract": "operating_point_contract.json",
+                    "review_budget_optimization_report": "review_budget_optimization_report.json",
+                }.items()
+                if (root / filename).exists()
+            },
+        )
+        stream_risk_written = sync_stream_risk_artifacts(
+            root,
+            data_path=staged_data_path,
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            temporal_bundle={
+                key: json.loads((root / filename).read_text(encoding="utf-8"))
+                for key, filename in {
+                    "temporal_structure_report": "temporal_structure_report.json",
+                    "rolling_cv_plan": "rolling_cv_plan.json",
+                }.items()
+                if (root / filename).exists()
+            },
+            operating_point_bundle={
+                key: json.loads((root / filename).read_text(encoding="utf-8"))
+                for key, filename in {
+                    "operating_point_contract": "operating_point_contract.json",
+                    "review_budget_optimization_report": "review_budget_optimization_report.json",
+                }.items()
+                if (root / filename).exists()
+            },
+            lifecycle_bundle={
+                key: json.loads((root / filename).read_text(encoding="utf-8"))
+                for key, filename in {
+                    "champion_vs_candidate": "champion_vs_candidate.json",
+                    "recalibration_decision": "recalibration_decision.json",
+                    "retrain_decision": "retrain_decision.json",
+                }.items()
+                if (root / filename).exists()
+            },
+        )
         manifest_path = _refresh_planning_manifest(
             root,
             run_id=run_id,
@@ -9472,6 +9529,8 @@ def _run_planning_phase(
                 *(str(value) for value in aml_graph_written.values()),
                 *(str(value) for value in architecture_written.values()),
                 *(str(value) for value in temporal_written.values()),
+                *(str(value) for value in casework_written.values()),
+                *(str(value) for value in stream_risk_written.values()),
                 *model_artifacts,
                 str(manifest_path),
             ],
@@ -9488,6 +9547,8 @@ def _run_planning_phase(
                 **{key: str(value) for key, value in aml_graph_written.items()},
                 **{key: str(value) for key, value in architecture_written.items()},
                 **{key: str(value) for key, value in temporal_written.items()},
+                **{key: str(value) for key, value in casework_written.items()},
+                **{key: str(value) for key, value in stream_risk_written.items()},
             },
             "manifest_path": str(manifest_path),
             "plan": {
@@ -10175,17 +10236,26 @@ def _run_benchmark_phase(
         benchmark_pack_partition = benchmark_result.bundle.benchmark_pack_partition
         holdout_claim_policy = benchmark_result.bundle.holdout_claim_policy
         benchmark_generalization_audit = benchmark_result.bundle.benchmark_generalization_audit
+        aml_benchmark_manifest = benchmark_result.bundle.aml_benchmark_manifest
+        aml_holdout_claim_report = benchmark_result.bundle.aml_holdout_claim_report
+        aml_demo_scorecard = benchmark_result.bundle.aml_demo_scorecard
+        aml_public_claim_guard = benchmark_result.bundle.aml_public_claim_guard
+        aml_failure_report = benchmark_result.bundle.aml_failure_report
         shadow_manifest = benchmark_result.bundle.shadow_trial_manifest
         promotion = benchmark_result.bundle.promotion_readiness_report
         quarantine = benchmark_result.bundle.candidate_quarantine
         from relaytic.analytics import read_architecture_routing_artifacts, read_temporal_engine_artifacts
         from relaytic.aml import read_aml_graph_artifacts
+        from relaytic.casework import read_casework_artifacts
+        from relaytic.stream_risk import read_stream_risk_artifacts
 
         task_contract_bundle = read_task_contract_artifacts(root)
         eval_bundle = _read_json_bundle(root, bundle="evals")
         temporal_bundle = read_temporal_engine_artifacts(root)
         architecture_bundle = read_architecture_routing_artifacts(root)
         aml_graph_bundle = read_aml_graph_artifacts(root)
+        casework_bundle = read_casework_artifacts(root)
+        stream_risk_bundle = read_stream_risk_artifacts(root)
         operating_point_bundle = {
             key: json.loads((root / filename).read_text(encoding="utf-8"))
             for key, filename in {
@@ -10202,6 +10272,8 @@ def _run_benchmark_phase(
         bundle_payload.update(eval_bundle)
         bundle_payload.update(task_contract_bundle)
         bundle_payload.update(aml_graph_bundle)
+        bundle_payload.update(casework_bundle)
+        bundle_payload.update(stream_risk_bundle)
         bundle_payload.update(temporal_bundle)
         bundle_payload.update(architecture_bundle)
         bundle_payload.update(operating_point_bundle)
@@ -10254,10 +10326,26 @@ def _run_benchmark_phase(
                     "aml_pack_family": task_contract_bundle.get("aml_claim_scope", {}).get("benchmark_pack_family"),
                     "aml_claim_scope": task_contract_bundle.get("aml_claim_scope", {}).get("claim_scope"),
                     "aml_public_claim_ready": task_contract_bundle.get("aml_claim_scope", {}).get("public_claim_ready"),
+                    "aml_dataset_family": aml_benchmark_manifest.dataset_family,
+                    "aml_required_track_coverage_met": aml_benchmark_manifest.required_track_coverage_met,
+                    "aml_supporting_public_claim_allowed": aml_public_claim_guard.supporting_public_claim_allowed,
+                    "aml_paper_primary_claim_allowed": aml_public_claim_guard.paper_primary_claim_allowed,
+                    "aml_broader_flagship_claim_allowed": aml_public_claim_guard.broader_flagship_claim_allowed,
+                    "aml_current_run_story": aml_demo_scorecard.current_run_story,
+                    "aml_ready_demo_count": aml_demo_scorecard.ready_demo_count,
+                    "aml_demo_safe": aml_demo_scorecard.demo_safe,
+                    "aml_primary_failure_kind": aml_failure_report.primary_failure_kind,
+                    "aml_recommended_next_step": aml_failure_report.recommended_next_step,
                     "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                     "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
                     "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),
                     "selected_calibration_method": operating_point_bundle.get("calibration_strategy_report", {}).get("selected_method"),
+                    "review_capacity_cases": casework_bundle.get("alert_queue_policy", {}).get("review_capacity_cases"),
+                    "top_case_id": casework_bundle.get("case_packet", {}).get("case_id"),
+                    "top_case_entity": casework_bundle.get("case_packet", {}).get("focal_entity"),
+                    "stream_risk_status": stream_risk_bundle.get("stream_risk_posture", {}).get("status"),
+                    "weak_label_risk_level": stream_risk_bundle.get("weak_label_posture", {}).get("weak_label_risk_level"),
+                    "drift_trigger_action": stream_risk_bundle.get("drift_recalibration_trigger", {}).get("recommended_action"),
                 },
                 "bundle": bundle_payload,
             },
@@ -10299,17 +10387,26 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     benchmark_pack_partition = dict(bundle.get("benchmark_pack_partition", {}))
     holdout_claim_policy = dict(bundle.get("holdout_claim_policy", {}))
     benchmark_generalization_audit = dict(bundle.get("benchmark_generalization_audit", {}))
+    aml_benchmark_manifest = dict(bundle.get("aml_benchmark_manifest", {}))
+    aml_holdout_claim_report = dict(bundle.get("aml_holdout_claim_report", {}))
+    aml_demo_scorecard = dict(bundle.get("aml_demo_scorecard", {}))
+    aml_public_claim_guard = dict(bundle.get("aml_public_claim_guard", {}))
+    aml_failure_report = dict(bundle.get("aml_failure_report", {}))
     shadow_manifest = dict(bundle.get("shadow_trial_manifest", {}))
     promotion = dict(bundle.get("promotion_readiness_report", {}))
     quarantine = dict(bundle.get("candidate_quarantine", {}))
     from relaytic.analytics import read_architecture_routing_artifacts, read_temporal_engine_artifacts
     from relaytic.aml import read_aml_graph_artifacts
+    from relaytic.casework import read_casework_artifacts
+    from relaytic.stream_risk import read_stream_risk_artifacts
 
     task_contract_bundle = read_task_contract_artifacts(root)
     eval_bundle = _read_json_bundle(root, bundle="evals")
     temporal_bundle = read_temporal_engine_artifacts(root)
     architecture_bundle = read_architecture_routing_artifacts(root)
     aml_graph_bundle = read_aml_graph_artifacts(root)
+    casework_bundle = read_casework_artifacts(root)
+    stream_risk_bundle = read_stream_risk_artifacts(root)
     operating_point_bundle = {
         key: json.loads((root / filename).read_text(encoding="utf-8"))
         for key, filename in {
@@ -10326,6 +10423,8 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle_payload.update(eval_bundle)
     bundle_payload.update(task_contract_bundle)
     bundle_payload.update(aml_graph_bundle)
+    bundle_payload.update(casework_bundle)
+    bundle_payload.update(stream_risk_bundle)
     bundle_payload.update(temporal_bundle)
     bundle_payload.update(architecture_bundle)
     bundle_payload.update(operating_point_bundle)
@@ -10379,10 +10478,26 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "aml_pack_family": task_contract_bundle.get("aml_claim_scope", {}).get("benchmark_pack_family"),
                 "aml_claim_scope": task_contract_bundle.get("aml_claim_scope", {}).get("claim_scope"),
                 "aml_public_claim_ready": task_contract_bundle.get("aml_claim_scope", {}).get("public_claim_ready"),
+                "aml_dataset_family": aml_benchmark_manifest.get("dataset_family"),
+                "aml_required_track_coverage_met": aml_benchmark_manifest.get("required_track_coverage_met"),
+                "aml_supporting_public_claim_allowed": aml_public_claim_guard.get("supporting_public_claim_allowed"),
+                "aml_paper_primary_claim_allowed": aml_holdout_claim_report.get("paper_primary_claim_allowed"),
+                "aml_broader_flagship_claim_allowed": aml_public_claim_guard.get("broader_flagship_claim_allowed"),
+                "aml_current_run_story": aml_demo_scorecard.get("current_run_story"),
+                "aml_ready_demo_count": aml_demo_scorecard.get("ready_demo_count"),
+                "aml_demo_safe": aml_demo_scorecard.get("demo_safe"),
+                "aml_primary_failure_kind": aml_failure_report.get("primary_failure_kind"),
+                "aml_recommended_next_step": aml_failure_report.get("recommended_next_step"),
                 "split_diagnostics_status": task_contract_bundle.get("split_diagnostics_report", {}).get("status"),
                 "temporal_fold_status": task_contract_bundle.get("temporal_fold_health", {}).get("status"),
                 "selected_threshold": operating_point_bundle.get("operating_point_contract", {}).get("selected_threshold"),
                 "selected_calibration_method": operating_point_bundle.get("calibration_strategy_report", {}).get("selected_method"),
+                "review_capacity_cases": casework_bundle.get("alert_queue_policy", {}).get("review_capacity_cases"),
+                "top_case_id": casework_bundle.get("case_packet", {}).get("case_id"),
+                "top_case_entity": casework_bundle.get("case_packet", {}).get("focal_entity"),
+                "stream_risk_status": stream_risk_bundle.get("stream_risk_posture", {}).get("status"),
+                "weak_label_risk_level": stream_risk_bundle.get("weak_label_posture", {}).get("weak_label_risk_level"),
+                "drift_trigger_action": stream_risk_bundle.get("drift_recalibration_trigger", {}).get("recommended_action"),
             },
             "bundle": bundle_payload,
         },

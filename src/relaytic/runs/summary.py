@@ -45,6 +45,8 @@ def build_run_summary(
     )
     from relaytic.aml import read_aml_graph_artifacts
     from relaytic.iteration import read_iteration_bundle
+    from relaytic.casework import read_casework_artifacts
+    from relaytic.stream_risk import read_stream_risk_artifacts
     from relaytic.events import read_event_bus_bundle
     from relaytic.permissions import read_permission_bundle
     from relaytic.search import read_search_bundle
@@ -186,6 +188,11 @@ def build_run_summary(
             "benchmark_pack_partition": "benchmark_pack_partition.json",
             "holdout_claim_policy": "holdout_claim_policy.json",
             "benchmark_generalization_audit": "benchmark_generalization_audit.json",
+            "aml_benchmark_manifest": "aml_benchmark_manifest.json",
+            "aml_holdout_claim_report": "aml_holdout_claim_report.json",
+            "aml_demo_scorecard": "aml_demo_scorecard.json",
+            "aml_public_claim_guard": "aml_public_claim_guard.json",
+            "aml_failure_report": "aml_failure_report.json",
             "shadow_trial_manifest": "shadow_trial_manifest.json",
             "shadow_trial_scorecard": "shadow_trial_scorecard.json",
             "candidate_quarantine": "candidate_quarantine.json",
@@ -194,6 +201,8 @@ def build_run_summary(
     )
     task_contract_bundle = read_task_contract_artifacts(root)
     aml_graph_bundle = read_aml_graph_artifacts(root)
+    casework_bundle = read_casework_artifacts(root)
+    stream_risk_bundle = read_stream_risk_artifacts(root)
     decision_bundle = _read_bundle(
         root,
         {
@@ -418,6 +427,16 @@ def build_run_summary(
     typology_detection_report = dict(aml_graph_bundle.get("typology_detection_report", {})) if isinstance(aml_graph_bundle.get("typology_detection_report"), dict) else {}
     subgraph_risk_report = dict(aml_graph_bundle.get("subgraph_risk_report", {})) if isinstance(aml_graph_bundle.get("subgraph_risk_report"), dict) else {}
     entity_case_expansion = dict(aml_graph_bundle.get("entity_case_expansion", {})) if isinstance(aml_graph_bundle.get("entity_case_expansion"), dict) else {}
+    alert_queue_policy = dict(casework_bundle.get("alert_queue_policy", {})) if isinstance(casework_bundle.get("alert_queue_policy"), dict) else {}
+    alert_queue_rankings = dict(casework_bundle.get("alert_queue_rankings", {})) if isinstance(casework_bundle.get("alert_queue_rankings"), dict) else {}
+    analyst_review_scorecard = dict(casework_bundle.get("analyst_review_scorecard", {})) if isinstance(casework_bundle.get("analyst_review_scorecard"), dict) else {}
+    case_packet = dict(casework_bundle.get("case_packet", {})) if isinstance(casework_bundle.get("case_packet"), dict) else {}
+    review_capacity_sensitivity = dict(casework_bundle.get("review_capacity_sensitivity", {})) if isinstance(casework_bundle.get("review_capacity_sensitivity"), dict) else {}
+    stream_risk_posture = dict(stream_risk_bundle.get("stream_risk_posture", {})) if isinstance(stream_risk_bundle.get("stream_risk_posture"), dict) else {}
+    weak_label_posture = dict(stream_risk_bundle.get("weak_label_posture", {})) if isinstance(stream_risk_bundle.get("weak_label_posture"), dict) else {}
+    delayed_outcome_alignment = dict(stream_risk_bundle.get("delayed_outcome_alignment", {})) if isinstance(stream_risk_bundle.get("delayed_outcome_alignment"), dict) else {}
+    drift_recalibration_trigger = dict(stream_risk_bundle.get("drift_recalibration_trigger", {})) if isinstance(stream_risk_bundle.get("drift_recalibration_trigger"), dict) else {}
+    rolling_alert_quality_report = dict(stream_risk_bundle.get("rolling_alert_quality_report", {})) if isinstance(stream_risk_bundle.get("rolling_alert_quality_report"), dict) else {}
     temporal_structure_report = dict(temporal_bundle.get("temporal_structure_report", {})) if isinstance(temporal_bundle.get("temporal_structure_report"), dict) else {}
     temporal_feature_ladder = dict(temporal_bundle.get("temporal_feature_ladder", {})) if isinstance(temporal_bundle.get("temporal_feature_ladder"), dict) else {}
     rolling_cv_plan = dict(temporal_bundle.get("rolling_cv_plan", {})) if isinstance(temporal_bundle.get("rolling_cv_plan"), dict) else {}
@@ -503,6 +522,11 @@ def build_run_summary(
     benchmark_pack_partition = _bundle_item(benchmark_bundle, "benchmark_pack_partition")
     holdout_claim_policy = _bundle_item(benchmark_bundle, "holdout_claim_policy")
     benchmark_generalization_audit = _bundle_item(benchmark_bundle, "benchmark_generalization_audit")
+    aml_benchmark_manifest = _bundle_item(benchmark_bundle, "aml_benchmark_manifest")
+    aml_holdout_claim_report = _bundle_item(benchmark_bundle, "aml_holdout_claim_report")
+    aml_demo_scorecard = _bundle_item(benchmark_bundle, "aml_demo_scorecard")
+    aml_public_claim_guard = _bundle_item(benchmark_bundle, "aml_public_claim_guard")
+    aml_failure_report = _bundle_item(benchmark_bundle, "aml_failure_report")
     shadow_trial_manifest = _bundle_item(benchmark_bundle, "shadow_trial_manifest")
     shadow_trial_scorecard = _bundle_item(benchmark_bundle, "shadow_trial_scorecard")
     candidate_quarantine = _bundle_item(benchmark_bundle, "candidate_quarantine")
@@ -921,6 +945,16 @@ def build_run_summary(
             "aml_pack_family": _clean_text(aml_claim_scope.get("benchmark_pack_family")),
             "aml_claim_scope": _clean_text(aml_claim_scope.get("claim_scope")),
             "aml_public_claim_ready": aml_claim_scope.get("public_claim_ready"),
+            "aml_dataset_family": _clean_text(aml_benchmark_manifest.get("dataset_family")),
+            "aml_supporting_public_claim_allowed": aml_public_claim_guard.get("supporting_public_claim_allowed"),
+            "aml_paper_primary_claim_allowed": aml_public_claim_guard.get("paper_primary_claim_allowed"),
+            "aml_broader_flagship_claim_allowed": aml_public_claim_guard.get("broader_flagship_claim_allowed"),
+            "aml_required_track_coverage_met": aml_benchmark_manifest.get("required_track_coverage_met"),
+            "aml_current_run_story": _clean_text(aml_demo_scorecard.get("current_run_story")),
+            "aml_ready_demo_count": int(aml_demo_scorecard.get("ready_demo_count", 0) or 0),
+            "aml_demo_safe": aml_demo_scorecard.get("demo_safe"),
+            "aml_primary_failure_kind": _clean_text(aml_failure_report.get("primary_failure_kind")),
+            "aml_recommended_next_step": _clean_text(aml_failure_report.get("recommended_next_step")),
             "imported_candidate_count": int(shadow_trial_manifest.get("candidate_count", 0) or 0),
             "promotion_ready_count": int(promotion_readiness_report.get("promotion_ready_count", 0) or 0),
             "candidate_available_count": int(promotion_readiness_report.get("candidate_available_count", 0) or 0),
@@ -1288,6 +1322,79 @@ def build_run_summary(
             "summary": _clean_text(entity_case_expansion.get("summary"))
             or _clean_text(subgraph_risk_report.get("summary"))
             or _clean_text(entity_graph_profile.get("summary")),
+        },
+        "casework": {
+            "status": _clean_text(alert_queue_policy.get("status"))
+            or _clean_text(alert_queue_rankings.get("status"))
+            or _clean_text(case_packet.get("status")),
+            "queue_count": int(alert_queue_rankings.get("queue_count", 0) or 0),
+            "review_capacity_cases": int(alert_queue_policy.get("review_capacity_cases", 0) or 0),
+            "review_budget_fraction": alert_queue_policy.get("review_budget_fraction"),
+            "decision_objective": _clean_text(alert_queue_policy.get("decision_objective")),
+            "top_case_id": _clean_text(case_packet.get("case_id"))
+            or _clean_text(analyst_review_scorecard.get("top_case_id")),
+            "top_case_entity": _clean_text(case_packet.get("focal_entity")),
+            "top_case_priority_score": case_packet.get("priority_score")
+            or analyst_review_scorecard.get("top_priority_score"),
+            "top_case_action": _clean_text(case_packet.get("review_action")),
+            "estimated_review_hours": analyst_review_scorecard.get("estimated_review_hours"),
+            "review_typology_coverage": analyst_review_scorecard.get("review_typology_coverage"),
+            "selected_review_fraction": review_capacity_sensitivity.get("selected_review_fraction")
+            or alert_queue_policy.get("review_budget_fraction"),
+            "summary": _clean_text(case_packet.get("summary"))
+            or _clean_text(analyst_review_scorecard.get("summary"))
+            or _clean_text(alert_queue_policy.get("summary")),
+        },
+        "stream_risk": {
+            "status": _clean_text(stream_risk_posture.get("status"))
+            or _clean_text(weak_label_posture.get("status"))
+            or _clean_text(drift_recalibration_trigger.get("status")),
+            "stream_mode": _clean_text(stream_risk_posture.get("stream_mode")),
+            "timestamp_column": _clean_text(stream_risk_posture.get("timestamp_column"))
+            or _clean_text(rolling_alert_quality_report.get("timestamp_column")),
+            "weak_label_risk_level": _clean_text(weak_label_posture.get("weak_label_risk_level")),
+            "label_kind": _clean_text(weak_label_posture.get("label_kind")),
+            "delayed_confirmation_likely": delayed_outcome_alignment.get("delayed_confirmation_likely"),
+            "alignment_state": _clean_text(delayed_outcome_alignment.get("alignment_state")),
+            "rolling_window_count": int(rolling_alert_quality_report.get("window_count", 0) or 0),
+            "latest_alert_rate": rolling_alert_quality_report.get("latest_alert_rate"),
+            "drift_score": drift_recalibration_trigger.get("drift_score"),
+            "trigger_recalibration": drift_recalibration_trigger.get("trigger_recalibration"),
+            "trigger_action": _clean_text(drift_recalibration_trigger.get("recommended_action")),
+            "threshold_posture": _clean_text(drift_recalibration_trigger.get("threshold_posture")),
+            "benchmark_safe": rolling_alert_quality_report.get("benchmark_safe")
+            if "benchmark_safe" in rolling_alert_quality_report
+            else stream_risk_posture.get("benchmark_safe"),
+            "audit_safe": stream_risk_posture.get("audit_safe"),
+            "summary": _clean_text(stream_risk_posture.get("summary"))
+            or _clean_text(drift_recalibration_trigger.get("summary"))
+            or _clean_text(weak_label_posture.get("summary")),
+        },
+        "aml_proof": {
+            "status": _clean_text(aml_benchmark_manifest.get("status"))
+            or _clean_text(aml_demo_scorecard.get("status"))
+            or _clean_text(aml_public_claim_guard.get("status")),
+            "dataset_family": _clean_text(aml_benchmark_manifest.get("dataset_family")),
+            "benchmark_track": _clean_text(aml_benchmark_manifest.get("benchmark_track")),
+            "current_partition": _clean_text(aml_benchmark_manifest.get("current_partition")),
+            "supporting_public_claim_allowed": aml_public_claim_guard.get("supporting_public_claim_allowed"),
+            "paper_primary_claim_allowed": aml_public_claim_guard.get("paper_primary_claim_allowed"),
+            "broader_flagship_claim_allowed": aml_public_claim_guard.get("broader_flagship_claim_allowed"),
+            "required_track_coverage_met": aml_benchmark_manifest.get("required_track_coverage_met"),
+            "covered_track_families": list(aml_benchmark_manifest.get("covered_track_families", []))
+            if isinstance(aml_benchmark_manifest.get("covered_track_families"), list)
+            else [],
+            "current_run_story": _clean_text(aml_demo_scorecard.get("current_run_story")),
+            "ready_demo_count": int(aml_demo_scorecard.get("ready_demo_count", 0) or 0),
+            "demo_safe": aml_demo_scorecard.get("demo_safe"),
+            "primary_failure_kind": _clean_text(aml_failure_report.get("primary_failure_kind")),
+            "recommended_next_step": _clean_text(aml_failure_report.get("recommended_next_step")),
+            "summary": _clean_text(aml_failure_report.get("summary"))
+            or _clean_text(aml_public_claim_guard.get("summary"))
+            or _clean_text(aml_benchmark_manifest.get("summary")),
+            "scored_demos": list(aml_demo_scorecard.get("scored_demos", []))
+            if isinstance(aml_demo_scorecard.get("scored_demos"), list)
+            else [],
         },
         "objective_contract": {
             "status": _clean_text(objective_alignment_report.get("status")) or _clean_text(optimization_objective_contract.get("status")),
@@ -1726,6 +1833,16 @@ def build_run_summary(
             "typology_detection_report_path": _path_if_exists(root / "typology_detection_report.json"),
             "subgraph_risk_report_path": _path_if_exists(root / "subgraph_risk_report.json"),
             "entity_case_expansion_path": _path_if_exists(root / "entity_case_expansion.json"),
+            "alert_queue_policy_path": _path_if_exists(root / "alert_queue_policy.json"),
+            "alert_queue_rankings_path": _path_if_exists(root / "alert_queue_rankings.json"),
+            "analyst_review_scorecard_path": _path_if_exists(root / "analyst_review_scorecard.json"),
+            "case_packet_path": _path_if_exists(root / "case_packet.json"),
+            "review_capacity_sensitivity_path": _path_if_exists(root / "review_capacity_sensitivity.json"),
+            "stream_risk_posture_path": _path_if_exists(root / "stream_risk_posture.json"),
+            "weak_label_posture_path": _path_if_exists(root / "weak_label_posture.json"),
+            "delayed_outcome_alignment_path": _path_if_exists(root / "delayed_outcome_alignment.json"),
+            "drift_recalibration_trigger_path": _path_if_exists(root / "drift_recalibration_trigger.json"),
+            "rolling_alert_quality_report_path": _path_if_exists(root / "rolling_alert_quality_report.json"),
             "temporal_structure_report_path": _path_if_exists(root / "temporal_structure_report.json"),
                 "temporal_feature_ladder_path": _path_if_exists(root / "temporal_feature_ladder.json"),
                 "rolling_cv_plan_path": _path_if_exists(root / "rolling_cv_plan.json"),
@@ -1789,6 +1906,11 @@ def build_run_summary(
             "benchmark_pack_partition_path": _path_if_exists(root / "benchmark_pack_partition.json"),
             "holdout_claim_policy_path": _path_if_exists(root / "holdout_claim_policy.json"),
             "benchmark_generalization_audit_path": _path_if_exists(root / "benchmark_generalization_audit.json"),
+            "aml_benchmark_manifest_path": _path_if_exists(root / "aml_benchmark_manifest.json"),
+            "aml_holdout_claim_report_path": _path_if_exists(root / "aml_holdout_claim_report.json"),
+            "aml_demo_scorecard_path": _path_if_exists(root / "aml_demo_scorecard.json"),
+            "aml_public_claim_guard_path": _path_if_exists(root / "aml_public_claim_guard.json"),
+            "aml_failure_report_path": _path_if_exists(root / "aml_failure_report.json"),
             "shadow_trial_manifest_path": _path_if_exists(root / "shadow_trial_manifest.json"),
             "shadow_trial_scorecard_path": _path_if_exists(root / "shadow_trial_scorecard.json"),
             "candidate_quarantine_path": _path_if_exists(root / "candidate_quarantine.json"),
@@ -1913,6 +2035,9 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     benchmark = dict(summary.get("benchmark", {}))
     aml = dict(summary.get("aml", {}))
     aml_graph = dict(summary.get("aml_graph", {}))
+    casework = dict(summary.get("casework", {}))
+    stream_risk = dict(summary.get("stream_risk", {}))
+    aml_proof = dict(summary.get("aml_proof", {}))
     decision_lab = dict(summary.get("decision_lab", {}))
     dojo = dict(summary.get("dojo", {}))
     pulse = dict(summary.get("pulse", {}))
@@ -2122,6 +2247,58 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Typology hits: `{aml_graph.get('typology_hit_count', 0)}`",
                 f"- Focal entity: `{aml_graph.get('focal_entity') or 'none'}`",
                 f"- Shadow winner: `{aml_graph.get('shadow_winner') or 'unknown'}`",
+            ]
+        )
+    if casework and any(value not in (None, 0, False, "", []) for value in casework.values()):
+        lines.extend(
+            [
+                "",
+                "## AML Casework",
+                f"- Status: `{casework.get('status') or 'unknown'}`",
+                f"- Queue count: `{casework.get('queue_count', 0)}`",
+                f"- Review capacity: `{casework.get('review_capacity_cases', 0)}`",
+                f"- Review budget fraction: `{casework.get('review_budget_fraction')}`",
+                f"- Decision objective: `{casework.get('decision_objective') or 'unknown'}`",
+                f"- Top case: `{casework.get('top_case_id') or 'none'}`",
+                f"- Top entity: `{casework.get('top_case_entity') or 'none'}`",
+                f"- Top action: `{casework.get('top_case_action') or 'unknown'}`",
+                f"- Estimated review hours: `{casework.get('estimated_review_hours')}`",
+            ]
+        )
+    if stream_risk and any(value not in (None, 0, False, "", []) for value in stream_risk.values()):
+        lines.extend(
+            [
+                "",
+                "## AML Stream Risk",
+                f"- Status: `{stream_risk.get('status') or 'unknown'}`",
+                f"- Stream mode: `{stream_risk.get('stream_mode') or 'unknown'}`",
+                f"- Timestamp column: `{stream_risk.get('timestamp_column') or 'none'}`",
+                f"- Weak-label risk: `{stream_risk.get('weak_label_risk_level') or 'unknown'}`",
+                f"- Delayed confirmation likely: `{stream_risk.get('delayed_confirmation_likely')}`",
+                f"- Rolling windows: `{stream_risk.get('rolling_window_count', 0)}`",
+                f"- Drift score: `{stream_risk.get('drift_score')}`",
+                f"- Trigger action: `{stream_risk.get('trigger_action') or 'none'}`",
+                f"- Benchmark safe: `{stream_risk.get('benchmark_safe')}`",
+            ]
+        )
+    if aml_proof and any(value not in (None, 0, False, "", []) for value in aml_proof.values()):
+        lines.extend(
+            [
+                "",
+                "## AML Proof Pack",
+                f"- Status: `{aml_proof.get('status') or 'unknown'}`",
+                f"- Dataset family: `{aml_proof.get('dataset_family') or 'unknown'}`",
+                f"- Benchmark track: `{aml_proof.get('benchmark_track') or 'unknown'}`",
+                f"- Current partition: `{aml_proof.get('current_partition') or 'unknown'}`",
+                f"- Supporting public claim allowed: `{aml_proof.get('supporting_public_claim_allowed')}`",
+                f"- Paper primary claim allowed: `{aml_proof.get('paper_primary_claim_allowed')}`",
+                f"- Broader flagship claim allowed: `{aml_proof.get('broader_flagship_claim_allowed')}`",
+                f"- Cross-track coverage met: `{aml_proof.get('required_track_coverage_met')}`",
+                f"- Current demo story: `{aml_proof.get('current_run_story') or 'none'}`",
+                f"- Ready demo count: `{aml_proof.get('ready_demo_count', 0)}`",
+                f"- Demo safe: `{aml_proof.get('demo_safe')}`",
+                f"- Primary remaining gap: `{aml_proof.get('primary_failure_kind') or 'none'}`",
+                f"- Recommended next step: `{aml_proof.get('recommended_next_step') or 'none'}`",
             ]
         )
     if decision_lab and any(value is not None for value in decision_lab.values()):
@@ -2539,6 +2716,8 @@ def materialize_run_summary(
         sync_temporal_engine_artifacts,
     )
     from relaytic.aml import sync_aml_graph_artifacts
+    from relaytic.casework import sync_casework_artifacts
+    from relaytic.stream_risk import sync_stream_risk_artifacts
     from relaytic.iteration import sync_iteration_from_run
     from relaytic.learnings import (
         default_learnings_state_dir,
@@ -2624,6 +2803,56 @@ def materialize_run_summary(
             },
         ),
         task_contract_bundle=read_task_contract_artifacts(root),
+    )
+    sync_casework_artifacts(
+        root,
+        context_bundle=_read_bundle(root, {"domain_brief": "domain_brief.json", "task_brief": "task_brief.json"}),
+        task_contract_bundle=read_task_contract_artifacts(root),
+        aml_graph_bundle=_read_bundle(
+            root,
+            {
+                "entity_graph_profile": "entity_graph_profile.json",
+                "counterparty_network_report": "counterparty_network_report.json",
+                "typology_detection_report": "typology_detection_report.json",
+                "subgraph_risk_report": "subgraph_risk_report.json",
+                "entity_case_expansion": "entity_case_expansion.json",
+            },
+        ),
+        operating_point_bundle=_read_bundle(
+            root,
+            {
+                "operating_point_contract": "operating_point_contract.json",
+                "review_budget_optimization_report": "review_budget_optimization_report.json",
+            },
+        ),
+    )
+    sync_stream_risk_artifacts(
+        root,
+        data_path=data_path or _path_if_exists(root / "data.csv") or _clean_text(dict(base_summary.get("data", {})).get("data_path")),
+        context_bundle=_read_bundle(root, {"domain_brief": "domain_brief.json", "task_brief": "task_brief.json"}),
+        task_contract_bundle=read_task_contract_artifacts(root),
+        temporal_bundle=_read_bundle(
+            root,
+            {
+                "temporal_structure_report": "temporal_structure_report.json",
+                "rolling_cv_plan": "rolling_cv_plan.json",
+            },
+        ),
+        operating_point_bundle=_read_bundle(
+            root,
+            {
+                "operating_point_contract": "operating_point_contract.json",
+                "review_budget_optimization_report": "review_budget_optimization_report.json",
+            },
+        ),
+        lifecycle_bundle=_read_bundle(
+            root,
+            {
+                "champion_vs_candidate": "champion_vs_candidate.json",
+                "recalibration_decision": "recalibration_decision.json",
+                "retrain_decision": "retrain_decision.json",
+            },
+        ),
     )
     try:
         policy_path = root / "policy_resolved.yaml"

@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Shipped.
 
 ## Intent
 
@@ -48,3 +48,9 @@ It should handle delayed feedback, weak labels, streaming posture, and recalibra
 - one weak-label posture test
 - one drift-trigger regression test
 - one rolling temporal AML evaluation test
+
+## Implementation Notes
+
+- Slice 15Q now lands under `src/relaytic/stream_risk/`
+- planning and run-summary materialization now persist stream-risk artifacts from the same deterministic AML, temporal, operating-point, and lifecycle truth
+- assist and benchmark surfaces now expose weak-label risk, delayed-outcome posture, rolling alert pressure, and recalibration triggers instead of limiting AML explanations to graph structure and queue order only

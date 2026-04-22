@@ -31,6 +31,11 @@ TEMPORAL_BENCHMARK_RECOVERY_REPORT_SCHEMA_VERSION = "relaytic.temporal_benchmark
 BENCHMARK_PACK_PARTITION_SCHEMA_VERSION = "relaytic.benchmark_pack_partition.v1"
 HOLDOUT_CLAIM_POLICY_SCHEMA_VERSION = "relaytic.holdout_claim_policy.v1"
 BENCHMARK_GENERALIZATION_AUDIT_SCHEMA_VERSION = "relaytic.benchmark_generalization_audit.v1"
+AML_BENCHMARK_MANIFEST_SCHEMA_VERSION = "relaytic.aml_benchmark_manifest.v1"
+AML_HOLDOUT_CLAIM_REPORT_SCHEMA_VERSION = "relaytic.aml_holdout_claim_report.v1"
+AML_DEMO_SCORECARD_SCHEMA_VERSION = "relaytic.aml_demo_scorecard.v1"
+AML_PUBLIC_CLAIM_GUARD_SCHEMA_VERSION = "relaytic.aml_public_claim_guard.v1"
+AML_FAILURE_REPORT_SCHEMA_VERSION = "relaytic.aml_failure_report.v1"
 
 
 @dataclass(frozen=True)
@@ -628,6 +633,128 @@ class BenchmarkGeneralizationAudit:
 
 
 @dataclass(frozen=True)
+class AMLBenchmarkManifest:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    dataset_family: str
+    benchmark_track: str
+    task_type: str
+    data_mode: str
+    comparison_metric: str
+    metric_direction: str
+    selected_model_family: str | None
+    current_partition: str
+    supporting_public_claim_allowed: bool
+    paper_primary_claim_allowed: bool
+    required_track_families: list[str]
+    covered_track_families: list[str]
+    required_track_coverage_met: bool
+    relaytic_rank: int | None
+    public_table_rows: list[dict[str, Any]]
+    top_case_entity: str | None
+    top_typology: str | None
+    drift_trigger_action: str | None
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class AMLHoldoutClaimReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    dataset_family: str
+    current_partition: str
+    supporting_public_claim_allowed: bool
+    paper_primary_claim_allowed: bool
+    required_track_coverage_met: bool
+    broader_flagship_claim_allowed: bool
+    claim_origin: str
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class AMLDemoScorecard:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    demo_safe: bool
+    current_run_story: str | None
+    ready_demo_count: int
+    scored_demos: list[dict[str, Any]]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class AMLPublicClaimGuard:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    supporting_public_claim_allowed: bool
+    paper_primary_claim_allowed: bool
+    broader_flagship_claim_allowed: bool
+    required_track_coverage_met: bool
+    blocked_reason_codes: list[str]
+    allowed_claims: list[str]
+    claim_boundaries: list[str]
+    required_fixes: list[str]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
+class AMLFailureReport:
+    schema_version: str
+    generated_at: str
+    controls: BenchmarkControls
+    status: str
+    primary_failure_kind: str | None
+    severity: str
+    public_safe_to_discuss: bool
+    recommended_next_step: str | None
+    evidence_refs: list[str]
+    summary: str
+    trace: BenchmarkTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class BenchmarkBundle:
     reference_approach_matrix: ReferenceApproachMatrix
     benchmark_gap_report: BenchmarkGapReport
@@ -653,6 +780,11 @@ class BenchmarkBundle:
     benchmark_pack_partition: BenchmarkPackPartition
     holdout_claim_policy: HoldoutClaimPolicy
     benchmark_generalization_audit: BenchmarkGeneralizationAudit
+    aml_benchmark_manifest: AMLBenchmarkManifest
+    aml_holdout_claim_report: AMLHoldoutClaimReport
+    aml_demo_scorecard: AMLDemoScorecard
+    aml_public_claim_guard: AMLPublicClaimGuard
+    aml_failure_report: AMLFailureReport
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -680,6 +812,11 @@ class BenchmarkBundle:
             "benchmark_pack_partition": self.benchmark_pack_partition.to_dict(),
             "holdout_claim_policy": self.holdout_claim_policy.to_dict(),
             "benchmark_generalization_audit": self.benchmark_generalization_audit.to_dict(),
+            "aml_benchmark_manifest": self.aml_benchmark_manifest.to_dict(),
+            "aml_holdout_claim_report": self.aml_holdout_claim_report.to_dict(),
+            "aml_demo_scorecard": self.aml_demo_scorecard.to_dict(),
+            "aml_public_claim_guard": self.aml_public_claim_guard.to_dict(),
+            "aml_failure_report": self.aml_failure_report.to_dict(),
         }
 
 

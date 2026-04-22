@@ -185,11 +185,23 @@ Avoid introducing new references to:
 - introduced artifact boundaries for `entity_graph_profile.json`, `counterparty_network_report.json`, `typology_detection_report.json`, `subgraph_risk_report.json`, and `entity_case_expansion.json`
 - upgraded planning, run-summary materialization, benchmark bundle payloads, and assist explanations so Relaytic-AML can persist and surface deterministic entity-graph evidence instead of staying row-only
 
+### Slice 15P
+
+- introduced the canonical package boundary `src/relaytic/casework/`
+- introduced artifact boundaries for `alert_queue_policy.json`, `alert_queue_rankings.json`, `analyst_review_scorecard.json`, `case_packet.json`, and `review_capacity_sensitivity.json`
+- upgraded planning, run-summary materialization, benchmark bundle payloads, and assist explanations so Relaytic-AML can rank review queues under explicit analyst budgets and surface one evidence-backed case packet instead of only graph structure or flat risk scores
+
+### Slice 15Q
+
+- introduced the canonical package boundary `src/relaytic/stream_risk/`
+- introduced artifact boundaries for `stream_risk_posture.json`, `weak_label_posture.json`, `delayed_outcome_alignment.json`, `drift_recalibration_trigger.json`, and `rolling_alert_quality_report.json`
+- upgraded planning, run-summary materialization, benchmark bundle payloads, and assist explanations so Relaytic-AML can expose weak-label risk, delayed-outcome posture, rolling alert pressure, and recalibration triggers from one deterministic stream-risk path instead of treating AML as a static supervised table
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
 - future AML-specific work should land through bounded slices `15N` through `15R` before the academy work begins
-- future AML boundaries should concentrate under `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` rather than scattering domain logic across unrelated generic packages
+- future AML boundaries should concentrate under `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/graph_fabric/`, and `src/relaytic/stream_risk/` rather than scattering domain logic across unrelated generic packages
 - future public AML artifacts should remain additive and must not break the canonical `relaytic` package or CLI surface
 
 ### Slice 09A

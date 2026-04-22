@@ -3639,6 +3639,42 @@ def _build_demo_pack_manifest(
     control = dict(summary_payload.get("control", {}))
     workspace = dict(summary_payload.get("workspace", {}))
     trace_state = dict(summary_payload.get("trace", {}))
+    aml = dict(summary_payload.get("aml", {}))
+    aml_proof = dict(summary_payload.get("aml_proof", {}))
+    if bool(aml.get("aml_active")) and isinstance(aml_proof.get("scored_demos"), list) and aml_proof.get("scored_demos"):
+        demos = []
+        evidence_map = {
+            "legacy_alert_engine_challenge": ["incumbent_parity_report.json", "beat_target_contract.json", "run_summary.json"],
+            "overloaded_review_queue_optimization": ["alert_queue_policy.json", "alert_queue_rankings.json", "case_packet.json"],
+            "suspicious_subgraph_entity_expansion_with_explanation": ["entity_graph_profile.json", "subgraph_risk_report.json", "case_packet.json"],
+            "drift_triggered_recalibration_or_threshold_reset": ["stream_risk_posture.json", "drift_recalibration_trigger.json", "rolling_alert_quality_report.json"],
+        }
+        for item in aml_proof.get("scored_demos", []):
+            demo = dict(item)
+            demo_id = str(demo.get("demo_id") or "").strip()
+            demos.append(
+                {
+                    "demo_id": demo_id or "aml_demo",
+                    "title": str(demo.get("title") or "AML demo"),
+                    "available": str(demo.get("status") or "").strip() in {"ready", "partial"},
+                    "evidence": evidence_map.get(demo_id, ["run_summary.json"]),
+                }
+            )
+        ready_demo_count = sum(1 for item in aml_proof.get("scored_demos", []) if str(dict(item).get("status") or "").strip() == "ready")
+        status = "ready" if bool(aml_proof.get("demo_safe")) and release_health_report.safe_to_hand_out_publicly else "partial"
+        return DemoPackManifest(
+            schema_version=DEMO_PACK_MANIFEST_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status=status,
+            demo_count=len(demos),
+            ready_demo_count=ready_demo_count,
+            demos=demos,
+            summary=(
+                f"Relaytic-AML currently has `{ready_demo_count}` ready flagship AML demo(s) out of `{len(demos)}`."
+            ),
+            trace=trace,
+        )
     demos = [
         {
             "demo_id": "unknown_dataset_to_governed_decision",
@@ -3698,6 +3734,25 @@ def _build_flagship_demo_scorecard(
     benchmark = dict(summary_payload.get("benchmark", {}))
     control = dict(summary_payload.get("control", {}))
     workspace = dict(summary_payload.get("workspace", {}))
+    aml = dict(summary_payload.get("aml", {}))
+    aml_proof = dict(summary_payload.get("aml_proof", {}))
+    if bool(aml.get("aml_active")) and isinstance(aml_proof.get("scored_demos"), list) and aml_proof.get("scored_demos"):
+        current_run_qualifies = bool(aml_proof.get("demo_safe")) and release_health_report.safe_to_hand_out_publicly
+        return FlagshipDemoScorecard(
+            schema_version=FLAGSHIP_DEMO_SCORECARD_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="ready" if current_run_qualifies else "partial",
+            current_run_qualifies=current_run_qualifies,
+            current_run_story=_clean_text(aml_proof.get("current_run_story")),
+            scored_demos=[dict(item) for item in aml_proof.get("scored_demos", []) if isinstance(item, dict)],
+            summary=(
+                f"Relaytic-AML currently scores this run as `{_clean_text(aml_proof.get('current_run_story')) or 'none'}`."
+                if _clean_text(aml_proof.get("current_run_story"))
+                else "Relaytic-AML has not yet matched the current run to a flagship AML demo story."
+            ),
+            trace=trace,
+        )
     scored_demos = [
         _score_demo_story(
             demo_id="unknown_dataset_to_governed_decision",

@@ -655,6 +655,9 @@ def build_assist_audit_explanation(
     split_health = dict(run_summary.get("split_health", {}))
     aml = dict(run_summary.get("aml", {}))
     aml_graph = dict(run_summary.get("aml_graph", {}))
+    casework = dict(run_summary.get("casework", {}))
+    stream_risk = dict(run_summary.get("stream_risk", {}))
+    aml_proof = dict(run_summary.get("aml_proof", {}))
 
     question_type = "general"
     reasons: list[str] = []
@@ -722,7 +725,49 @@ def build_assist_audit_explanation(
         ]
     elif any(
         token in normalized
-        for token in ("aml", "anti-money laundering", "financial crime", "review queue", "analyst review", "case packet", "payment fraud", "paypal")
+        for token in ("aml benchmark", "paysim", "elliptic", "flagship demo", "demo pack", "aml paper pack", "aml proof")
+    ) and any(value not in (None, 0, False, "", []) for value in aml_proof.values()):
+        question_type = "aml_proof_pack"
+        reasons = [
+            f"Relaytic-AML benchmark family is `{_clean_text(aml_proof.get('dataset_family')) or 'unknown'}` on track `{_clean_text(aml_proof.get('benchmark_track')) or 'unknown'}` with current partition `{_clean_text(aml_proof.get('current_partition')) or 'unknown'}`.",
+            f"Supporting public claim allowed = `{aml_proof.get('supporting_public_claim_allowed')}`, paper-primary allowed = `{aml_proof.get('paper_primary_claim_allowed')}`, and broader flagship claim allowed = `{aml_proof.get('broader_flagship_claim_allowed')}`.",
+            f"Current demo story is `{_clean_text(aml_proof.get('current_run_story')) or 'none'}` with `{aml_proof.get('ready_demo_count', 0)}` ready AML demo(s); the main remaining gap is `{_clean_text(aml_proof.get('primary_failure_kind')) or 'none'}`.",
+        ]
+        evidence_refs = [
+            "aml_benchmark_manifest.json",
+            "aml_holdout_claim_report.json",
+            "aml_demo_scorecard.json",
+            "aml_public_claim_guard.json",
+            "aml_failure_report.json",
+            "run_summary.json",
+        ]
+    elif (
+        any(
+            token in normalized
+            for token in ("review queue", "analyst review", "case packet", "review first", "top case", "review now", "queue policy", "why this case")
+        )
+        and any(value not in (None, 0, False, "", []) for value in casework.values())
+    ):
+        question_type = "aml_casework"
+        reasons = [
+            f"Relaytic-AML casework posture is `{_clean_text(casework.get('status')) or 'unknown'}` with `{casework.get('queue_count', 0)}` queued case(s) and immediate review capacity for `{casework.get('review_capacity_cases', 0)}` case(s).",
+            f"Top case is `{_clean_text(casework.get('top_case_id')) or 'none'}` for entity `{_clean_text(casework.get('top_case_entity')) or 'unknown'}` with action `{_clean_text(casework.get('top_case_action')) or 'unknown'}` under objective `{_clean_text(casework.get('decision_objective')) or _clean_text(aml.get('decision_objective')) or 'unknown'}`.",
+            f"Estimated review hours are `{casework.get('estimated_review_hours')}` with typology coverage `{casework.get('review_typology_coverage')}` and selected review fraction `{casework.get('selected_review_fraction')}`.",
+        ]
+        evidence_refs = [
+            "alert_queue_policy.json",
+            "alert_queue_rankings.json",
+            "analyst_review_scorecard.json",
+            "case_packet.json",
+            "review_capacity_sensitivity.json",
+            "run_summary.json",
+        ]
+    elif any(
+        token in normalized
+        for token in ("aml", "anti-money laundering", "financial crime", "payment fraud", "paypal")
+    ) and not any(
+        token in normalized
+        for token in ("weak label", "weak labels", "delayed outcome", "label delay", "drift", "recalibration", "stream risk", "streaming")
     ):
         question_type = "aml_posture"
         reasons = [
@@ -735,6 +780,24 @@ def build_assist_audit_explanation(
             "aml_case_ontology.json",
             "aml_review_budget_contract.json",
             "aml_claim_scope.json",
+            "run_summary.json",
+        ]
+    elif any(
+        token in normalized
+        for token in ("weak label", "weak labels", "delayed outcome", "label delay", "drift", "recalibration", "stream risk", "streaming")
+    ):
+        question_type = "aml_stream_risk"
+        reasons = [
+            f"Relaytic-AML stream-risk posture is `{_clean_text(stream_risk.get('status')) or 'unknown'}` under mode `{_clean_text(stream_risk.get('stream_mode')) or 'unknown'}` with timestamp column `{_clean_text(stream_risk.get('timestamp_column')) or 'none'}`.",
+            f"Weak-label risk is `{_clean_text(stream_risk.get('weak_label_risk_level')) or 'unknown'}` with label kind `{_clean_text(stream_risk.get('label_kind')) or 'unknown'}` and delayed confirmation likely = `{stream_risk.get('delayed_confirmation_likely')}`.",
+            f"Rolling window count is `{stream_risk.get('rolling_window_count', 0)}` with drift score `{stream_risk.get('drift_score')}` and trigger action `{_clean_text(stream_risk.get('trigger_action')) or 'none'}`.",
+        ]
+        evidence_refs = [
+            "stream_risk_posture.json",
+            "weak_label_posture.json",
+            "delayed_outcome_alignment.json",
+            "drift_recalibration_trigger.json",
+            "rolling_alert_quality_report.json",
             "run_summary.json",
         ]
     elif any(

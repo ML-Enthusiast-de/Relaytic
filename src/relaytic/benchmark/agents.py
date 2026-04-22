@@ -18,6 +18,8 @@ from relaytic.analytics import (
     read_task_contract_artifacts,
 )
 from relaytic.analytics.task_detection import assess_task_profile, is_classification_task
+from relaytic.aml import read_aml_graph_artifacts
+from relaytic.casework import read_casework_artifacts
 from relaytic.decision import read_decision_bundle
 from relaytic.evals import read_eval_bundle, run_agent_evals, write_eval_bundle
 from relaytic.ingestion import load_tabular_data
@@ -26,10 +28,16 @@ from relaytic.modeling.feature_pipeline import prepare_split_safe_feature_frames
 from relaytic.modeling.normalization import MinMaxNormalizer
 from relaytic.modeling.splitters import build_train_validation_test_split
 from relaytic.modeling.training import train_surrogate_candidates
+from relaytic.stream_risk import read_stream_risk_artifacts
 from relaytic.tracing import read_trace_bundle
 
 from .incumbents import evaluate_incumbent
 from .models import (
+    AML_BENCHMARK_MANIFEST_SCHEMA_VERSION,
+    AML_DEMO_SCORECARD_SCHEMA_VERSION,
+    AML_FAILURE_REPORT_SCHEMA_VERSION,
+    AML_HOLDOUT_CLAIM_REPORT_SCHEMA_VERSION,
+    AML_PUBLIC_CLAIM_GUARD_SCHEMA_VERSION,
     BENCHMARK_ABLATION_MATRIX_SCHEMA_VERSION,
     BENCHMARK_CLAIMS_REPORT_SCHEMA_VERSION,
     BENCHMARK_GAP_REPORT_SCHEMA_VERSION,
@@ -51,6 +59,11 @@ from .models import (
     SHADOW_TRIAL_MANIFEST_SCHEMA_VERSION,
     SHADOW_TRIAL_SCORECARD_SCHEMA_VERSION,
     BenchmarkAblationMatrix,
+    AMLBenchmarkManifest,
+    AMLDemoScorecard,
+    AMLFailureReport,
+    AMLHoldoutClaimReport,
+    AMLPublicClaimGuard,
     BenchmarkBundle,
     BenchmarkClaimsReport,
     BenchmarkGeneralizationAudit,
@@ -546,6 +559,65 @@ def run_benchmark_review(
         trace=trace,
         paper_manifest=paper_manifest,
     )
+    aml_graph_bundle = read_aml_graph_artifacts(run_dir)
+    casework_bundle = read_casework_artifacts(run_dir)
+    stream_risk_bundle = read_stream_risk_artifacts(run_dir)
+    aml_benchmark_manifest = _build_aml_benchmark_manifest(
+        run_dir=run_dir,
+        data_path=data_path,
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        task_contract_bundle=task_contract_bundle,
+        paper_manifest=paper_manifest,
+        paper_table=paper_table,
+        benchmark_pack_partition=benchmark_pack_partition,
+        holdout_claim_policy=holdout_claim_policy,
+        benchmark_release_gate=benchmark_release_gate,
+        aml_graph_bundle=aml_graph_bundle,
+        casework_bundle=casework_bundle,
+        stream_risk_bundle=stream_risk_bundle,
+    )
+    aml_holdout_claim_report = _build_aml_holdout_claim_report(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        aml_benchmark_manifest=aml_benchmark_manifest,
+        holdout_claim_policy=holdout_claim_policy,
+        benchmark_generalization_audit=benchmark_generalization_audit,
+        benchmark_release_gate=benchmark_release_gate,
+    )
+    aml_demo_scorecard = _build_aml_demo_scorecard(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        task_contract_bundle=task_contract_bundle,
+        benchmark_release_gate=benchmark_release_gate,
+        aml_graph_bundle=aml_graph_bundle,
+        casework_bundle=casework_bundle,
+        stream_risk_bundle=stream_risk_bundle,
+        incumbent_parity=incumbent_outputs["parity"],
+    )
+    aml_public_claim_guard = _build_aml_public_claim_guard(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        aml_benchmark_manifest=aml_benchmark_manifest,
+        aml_holdout_claim_report=aml_holdout_claim_report,
+        aml_demo_scorecard=aml_demo_scorecard,
+        benchmark_release_gate=benchmark_release_gate,
+        benchmark_generalization_audit=benchmark_generalization_audit,
+    )
+    aml_failure_report = _build_aml_failure_report(
+        generated_at=generated_at,
+        controls=controls,
+        trace=trace,
+        aml_benchmark_manifest=aml_benchmark_manifest,
+        aml_public_claim_guard=aml_public_claim_guard,
+        benchmark_parity_report=parity_report,
+        temporal_benchmark_recovery_report=temporal_benchmark_recovery_report,
+        benchmark_generalization_audit=benchmark_generalization_audit,
+    )
     paper_manifest = replace(
         paper_manifest,
         status="ok" if benchmark_release_gate.safe_to_cite_publicly else "blocked",
@@ -607,6 +679,11 @@ def run_benchmark_review(
         benchmark_pack_partition=benchmark_pack_partition,
         holdout_claim_policy=holdout_claim_policy,
         benchmark_generalization_audit=benchmark_generalization_audit,
+        aml_benchmark_manifest=aml_benchmark_manifest,
+        aml_holdout_claim_report=aml_holdout_claim_report,
+        aml_demo_scorecard=aml_demo_scorecard,
+        aml_public_claim_guard=aml_public_claim_guard,
+        aml_failure_report=aml_failure_report,
     )
     return BenchmarkRunResult(bundle=bundle, review_markdown=render_benchmark_review_markdown(bundle.to_dict()))
 
@@ -1852,6 +1929,421 @@ def _build_benchmark_generalization_audit(
     )
 
 
+def _build_aml_benchmark_manifest(
+    *,
+    run_dir: str | Path,
+    data_path: str,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    task_contract_bundle: dict[str, Any],
+    paper_manifest: PaperBenchmarkManifest,
+    paper_table: PaperBenchmarkTable,
+    benchmark_pack_partition: BenchmarkPackPartition,
+    holdout_claim_policy: HoldoutClaimPolicy,
+    benchmark_release_gate: BenchmarkReleaseGate,
+    aml_graph_bundle: dict[str, Any],
+    casework_bundle: dict[str, Any],
+    stream_risk_bundle: dict[str, Any],
+) -> AMLBenchmarkManifest:
+    aml_domain_contract = dict(task_contract_bundle.get("aml_domain_contract", {}))
+    if not bool(aml_domain_contract.get("aml_active")):
+        return AMLBenchmarkManifest(
+            schema_version=AML_BENCHMARK_MANIFEST_SCHEMA_VERSION,
+            generated_at=generated_at,
+            controls=controls,
+            status="not_applicable",
+            dataset_family="non_aml",
+            benchmark_track="not_applicable",
+            task_type=paper_manifest.task_type,
+            data_mode=paper_manifest.data_mode,
+            comparison_metric=paper_manifest.comparison_metric,
+            metric_direction=paper_manifest.metric_direction,
+            selected_model_family=paper_manifest.selected_model_family,
+            current_partition=benchmark_pack_partition.partition_name,
+            supporting_public_claim_allowed=False,
+            paper_primary_claim_allowed=False,
+            required_track_families=[],
+            covered_track_families=[],
+            required_track_coverage_met=False,
+            relaytic_rank=paper_table.relaytic_rank,
+            public_table_rows=[],
+            top_case_entity=None,
+            top_typology=None,
+            drift_trigger_action=None,
+            summary="AML benchmark packaging is not applicable for a non-AML run.",
+            trace=trace,
+        )
+    frame = _read_frame_or_empty(data_path)
+    dataset_family = _infer_aml_dataset_family(frame=frame, paper_manifest=paper_manifest)
+    covered_track_families = _discover_aml_pack_families(current_run_dir=Path(run_dir), current_family=dataset_family)
+    required_track_families = [
+        "paysim_style_temporal_transaction_fraud",
+        "elliptic_style_temporal_graph_aml",
+    ]
+    required_track_coverage_met = all(family in covered_track_families for family in required_track_families)
+    public_table_rows = [
+        {
+            "rank": row.get("rank"),
+            "role": row.get("role"),
+            "model_family": row.get("model_family"),
+            "test_metric": row.get("test_metric"),
+            "selected": row.get("selected"),
+        }
+        for row in paper_table.rows[:6]
+    ]
+    entity_graph_profile = _bundle_item(aml_graph_bundle, "entity_graph_profile")
+    typology_detection_report = _bundle_item(aml_graph_bundle, "typology_detection_report")
+    case_packet = _bundle_item(casework_bundle, "case_packet")
+    drift_recalibration_trigger = _bundle_item(stream_risk_bundle, "drift_recalibration_trigger")
+    supporting_public_claim_allowed = bool(benchmark_release_gate.safe_to_cite_publicly) and dataset_family in set(required_track_families)
+    paper_primary_claim_allowed = bool(holdout_claim_policy.paper_primary_claim_allowed) and supporting_public_claim_allowed
+    return AMLBenchmarkManifest(
+        schema_version=AML_BENCHMARK_MANIFEST_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if dataset_family in set(required_track_families) else "supporting_only",
+        dataset_family=dataset_family,
+        benchmark_track=_aml_benchmark_track_label(dataset_family),
+        task_type=paper_manifest.task_type,
+        data_mode=paper_manifest.data_mode,
+        comparison_metric=paper_manifest.comparison_metric,
+        metric_direction=paper_manifest.metric_direction,
+        selected_model_family=paper_manifest.selected_model_family,
+        current_partition=benchmark_pack_partition.partition_name,
+        supporting_public_claim_allowed=supporting_public_claim_allowed,
+        paper_primary_claim_allowed=paper_primary_claim_allowed,
+        required_track_families=required_track_families,
+        covered_track_families=covered_track_families,
+        required_track_coverage_met=required_track_coverage_met,
+        relaytic_rank=paper_table.relaytic_rank,
+        public_table_rows=public_table_rows,
+        top_case_entity=_clean_text(case_packet.get("focal_entity")) or _clean_text(entity_graph_profile.get("top_entity")),
+        top_typology=_clean_text(typology_detection_report.get("top_typology")),
+        drift_trigger_action=_clean_text(drift_recalibration_trigger.get("recommended_action")),
+        summary=(
+            f"Relaytic-AML recorded `{dataset_family}` as the current AML benchmark family with partition "
+            f"`{benchmark_pack_partition.partition_name}` and supporting-public-claim posture `{supporting_public_claim_allowed}`."
+        ),
+        trace=trace,
+    )
+
+
+def _build_aml_holdout_claim_report(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    aml_benchmark_manifest: AMLBenchmarkManifest,
+    holdout_claim_policy: HoldoutClaimPolicy,
+    benchmark_generalization_audit: BenchmarkGeneralizationAudit,
+    benchmark_release_gate: BenchmarkReleaseGate,
+) -> AMLHoldoutClaimReport:
+    broader_flagship_claim_allowed = bool(
+        aml_benchmark_manifest.required_track_coverage_met
+        and aml_benchmark_manifest.paper_primary_claim_allowed
+        and not benchmark_generalization_audit.identity_branching_detected
+    )
+    status = "ok" if aml_benchmark_manifest.status != "not_applicable" else "not_applicable"
+    return AMLHoldoutClaimReport(
+        schema_version=AML_HOLDOUT_CLAIM_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status=status,
+        dataset_family=aml_benchmark_manifest.dataset_family,
+        current_partition=aml_benchmark_manifest.current_partition,
+        supporting_public_claim_allowed=aml_benchmark_manifest.supporting_public_claim_allowed,
+        paper_primary_claim_allowed=aml_benchmark_manifest.paper_primary_claim_allowed,
+        required_track_coverage_met=aml_benchmark_manifest.required_track_coverage_met,
+        broader_flagship_claim_allowed=broader_flagship_claim_allowed,
+        claim_origin=holdout_claim_policy.claim_origin,
+        summary=(
+            "Relaytic-AML allows this run as a broader flagship claim."
+            if broader_flagship_claim_allowed
+            else (
+                "Relaytic-AML keeps this run as supporting-only evidence until holdout and cross-track coverage are both satisfied."
+                if aml_benchmark_manifest.supporting_public_claim_allowed
+                else "Relaytic-AML blocks this run from public AML claims until the release and holdout gates are satisfied."
+            )
+        ),
+        trace=trace,
+    )
+
+
+def _build_aml_demo_scorecard(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    task_contract_bundle: dict[str, Any],
+    benchmark_release_gate: BenchmarkReleaseGate,
+    aml_graph_bundle: dict[str, Any],
+    casework_bundle: dict[str, Any],
+    stream_risk_bundle: dict[str, Any],
+    incumbent_parity: IncumbentParityReport,
+) -> AMLDemoScorecard:
+    aml_domain_contract = dict(task_contract_bundle.get("aml_domain_contract", {}))
+    if not bool(aml_domain_contract.get("aml_active")):
+        return AMLDemoScorecard(
+            schema_version=AML_DEMO_SCORECARD_SCHEMA_VERSION,
+            generated_at=generated_at,
+            controls=controls,
+            status="not_applicable",
+            demo_safe=False,
+            current_run_story=None,
+            ready_demo_count=0,
+            scored_demos=[],
+            summary="AML demo scoring is not applicable for a non-AML run.",
+            trace=trace,
+        )
+    entity_graph_profile = _bundle_item(aml_graph_bundle, "entity_graph_profile")
+    typology_detection_report = _bundle_item(aml_graph_bundle, "typology_detection_report")
+    case_packet = _bundle_item(casework_bundle, "case_packet")
+    analyst_review_scorecard = _bundle_item(casework_bundle, "analyst_review_scorecard")
+    alert_queue_rankings = _bundle_item(casework_bundle, "alert_queue_rankings")
+    drift_recalibration_trigger = _bundle_item(stream_risk_bundle, "drift_recalibration_trigger")
+    stream_risk_posture = _bundle_item(stream_risk_bundle, "stream_risk_posture")
+
+    demos = [
+        _score_demo_story(
+            demo_id="legacy_alert_engine_challenge",
+            title="Legacy alert engine challenge",
+            clarity=bool(incumbent_parity.incumbent_present),
+            correctness=bool(incumbent_parity.incumbent_present and _clean_text(incumbent_parity.parity_status)),
+            continuity=True,
+            operator_trust=bool(benchmark_release_gate.demo_safe),
+            agent_usability=bool(incumbent_parity.incumbent_present),
+            replayability=bool(incumbent_parity.incumbent_present),
+        ),
+        _score_demo_story(
+            demo_id="overloaded_review_queue_optimization",
+            title="Overloaded review queue optimization",
+            clarity=bool(_clean_text(case_packet.get("case_id"))),
+            correctness=bool(int(alert_queue_rankings.get("queue_count", 0) or 0) >= int(analyst_review_scorecard.get("review_capacity_cases", 0) or 0)),
+            continuity=bool(int(alert_queue_rankings.get("queue_count", 0) or 0) > 0),
+            operator_trust=bool(benchmark_release_gate.demo_safe),
+            agent_usability=bool(_clean_text(case_packet.get("case_id"))),
+            replayability=True,
+        ),
+        _score_demo_story(
+            demo_id="suspicious_subgraph_entity_expansion_with_explanation",
+            title="Suspicious subgraph / entity expansion with explanation",
+            clarity=bool(_clean_text(case_packet.get("focal_entity")) or _clean_text(entity_graph_profile.get("top_entity"))),
+            correctness=bool(int(typology_detection_report.get("typology_hit_count", 0) or 0) >= 1),
+            continuity=bool(int(entity_graph_profile.get("node_count", 0) or 0) > 0),
+            operator_trust=bool(benchmark_release_gate.demo_safe),
+            agent_usability=bool(_clean_text(case_packet.get("summary"))),
+            replayability=True,
+        ),
+        _score_demo_story(
+            demo_id="drift_triggered_recalibration_or_threshold_reset",
+            title="Drift-triggered recalibration or threshold reset",
+            clarity=bool(_clean_text(drift_recalibration_trigger.get("recommended_action"))),
+            correctness=bool(_clean_text(stream_risk_posture.get("status")) == "active"),
+            continuity=bool(int(stream_risk_posture.get("rolling_window_count", 0) or 0) >= 3),
+            operator_trust=bool(benchmark_release_gate.demo_safe),
+            agent_usability=bool(_clean_text(drift_recalibration_trigger.get("recommended_action"))),
+            replayability=True,
+        ),
+    ]
+    ready_demo_count = sum(1 for item in demos if item.get("status") == "ready")
+    current_run_story = next(
+        (
+            item["demo_id"]
+            for item in demos
+            if item.get("status") in {"ready", "partial"}
+        ),
+        None,
+    )
+    demo_safe = bool(benchmark_release_gate.demo_safe) and ready_demo_count >= 2 and current_run_story is not None
+    return AMLDemoScorecard(
+        schema_version=AML_DEMO_SCORECARD_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ready" if demo_safe else "partial",
+        demo_safe=demo_safe,
+        current_run_story=current_run_story,
+        ready_demo_count=ready_demo_count,
+        scored_demos=demos,
+        summary=(
+            f"Relaytic-AML currently scores `{ready_demo_count}` recruiter-safe AML demo(s); current run story is `{current_run_story or 'none'}`."
+        ),
+        trace=trace,
+    )
+
+
+def _build_aml_public_claim_guard(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    aml_benchmark_manifest: AMLBenchmarkManifest,
+    aml_holdout_claim_report: AMLHoldoutClaimReport,
+    aml_demo_scorecard: AMLDemoScorecard,
+    benchmark_release_gate: BenchmarkReleaseGate,
+    benchmark_generalization_audit: BenchmarkGeneralizationAudit,
+) -> AMLPublicClaimGuard:
+    blocked_reason_codes = list(benchmark_release_gate.blocked_reason_codes)
+    if not aml_benchmark_manifest.required_track_coverage_met:
+        blocked_reason_codes.append("aml_cross_track_coverage_missing")
+    if benchmark_generalization_audit.identity_branching_detected:
+        blocked_reason_codes.append("benchmark_identity_branching_detected")
+    blocked_reason_codes = list(dict.fromkeys(blocked_reason_codes))
+    broader_flagship_claim_allowed = bool(
+        aml_holdout_claim_report.broader_flagship_claim_allowed and aml_demo_scorecard.demo_safe
+    )
+    allowed_claims: list[str] = []
+    if aml_benchmark_manifest.supporting_public_claim_allowed:
+        allowed_claims.append("supporting_workload_claims")
+    if aml_holdout_claim_report.paper_primary_claim_allowed:
+        allowed_claims.append("paper_primary_for_current_workload")
+    if broader_flagship_claim_allowed:
+        allowed_claims.append("broader_flagship_aml_claims")
+    claim_boundaries = [
+        "Relaytic-AML claims are workload-specific unless both flagship AML tracks are covered.",
+        "Public AML claims remain gated by benchmark truth, release safety, and benchmark-generalization audits.",
+        "Recruiter-safe demos are not the same as broader paper-primary AML claims.",
+    ]
+    return AMLPublicClaimGuard(
+        schema_version=AML_PUBLIC_CLAIM_GUARD_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="ok" if aml_benchmark_manifest.supporting_public_claim_allowed else "blocked",
+        supporting_public_claim_allowed=aml_benchmark_manifest.supporting_public_claim_allowed,
+        paper_primary_claim_allowed=aml_holdout_claim_report.paper_primary_claim_allowed,
+        broader_flagship_claim_allowed=broader_flagship_claim_allowed,
+        required_track_coverage_met=aml_benchmark_manifest.required_track_coverage_met,
+        blocked_reason_codes=blocked_reason_codes,
+        allowed_claims=allowed_claims,
+        claim_boundaries=claim_boundaries,
+        required_fixes=[_required_fix_for_reason(code) for code in blocked_reason_codes],
+        summary=(
+            "Relaytic-AML allows supporting public claims for this workload."
+            if aml_benchmark_manifest.supporting_public_claim_allowed
+            else "Relaytic-AML blocks public AML claims until truth and cross-track coverage gates are satisfied."
+        ),
+        trace=trace,
+    )
+
+
+def _build_aml_failure_report(
+    *,
+    generated_at: str,
+    controls: BenchmarkControls,
+    trace: BenchmarkTrace,
+    aml_benchmark_manifest: AMLBenchmarkManifest,
+    aml_public_claim_guard: AMLPublicClaimGuard,
+    benchmark_parity_report: BenchmarkParityReport,
+    temporal_benchmark_recovery_report: TemporalBenchmarkRecoveryReport,
+    benchmark_generalization_audit: BenchmarkGeneralizationAudit,
+) -> AMLFailureReport:
+    failure_kind: str | None = None
+    severity = "medium"
+    recommended_next_step = None
+    evidence_refs = [
+        "aml_benchmark_manifest.json",
+        "aml_public_claim_guard.json",
+        "benchmark_parity_report.json",
+    ]
+    if aml_benchmark_manifest.status == "not_applicable":
+        return AMLFailureReport(
+            schema_version=AML_FAILURE_REPORT_SCHEMA_VERSION,
+            generated_at=generated_at,
+            controls=controls,
+            status="not_applicable",
+            primary_failure_kind=None,
+            severity="low",
+            public_safe_to_discuss=False,
+            recommended_next_step=None,
+            evidence_refs=[],
+            summary="AML failure reporting is not applicable for a non-AML run.",
+            trace=trace,
+        )
+    if _clean_text(benchmark_parity_report.parity_status) == "below_reference":
+        failure_kind = "below_reference_on_current_workload"
+        severity = "high"
+        recommended_next_step = "deepen AML-specialized search and stronger graph-temporal challengers on this workload before making stronger claims"
+    elif _clean_text(temporal_benchmark_recovery_report.recovery_state) == "blocked":
+        failure_kind = "temporal_benchmark_contract_gap"
+        severity = "high"
+        recommended_next_step = "repair temporal fold health or benchmark-metric materialization before using this AML workload in public proof"
+        evidence_refs.append("temporal_benchmark_recovery_report.json")
+    elif benchmark_generalization_audit.identity_branching_detected:
+        failure_kind = "benchmark_generalization_guard_failed"
+        severity = "high"
+        recommended_next_step = "remove benchmark identity leakage from routing, HPO, and threshold artifacts before citing AML results"
+        evidence_refs.append("benchmark_generalization_audit.json")
+    elif not aml_benchmark_manifest.required_track_coverage_met:
+        failure_kind = "cross_track_coverage_gap"
+        severity = "medium"
+        missing = [
+            family
+            for family in aml_benchmark_manifest.required_track_families
+            if family not in aml_benchmark_manifest.covered_track_families
+        ]
+        recommended_next_step = (
+            "benchmark the complementary AML track next: " + ", ".join(missing)
+            if missing
+            else "benchmark the complementary AML track next before making broader flagship claims"
+        )
+    elif not aml_public_claim_guard.paper_primary_claim_allowed:
+        failure_kind = "holdout_claim_not_ready"
+        severity = "medium"
+        recommended_next_step = "rerun this AML workload on a holdout partition before turning it into the flagship paper-primary claim"
+    else:
+        failure_kind = "known_remaining_gap"
+        severity = "low"
+        recommended_next_step = "expand the AML paper pack to harder graph or subgraph tasks while preserving the current truth gates"
+    return AMLFailureReport(
+        schema_version=AML_FAILURE_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="active",
+        primary_failure_kind=failure_kind,
+        severity=severity,
+        public_safe_to_discuss=True,
+        recommended_next_step=recommended_next_step,
+        evidence_refs=evidence_refs,
+        summary=(
+            f"Relaytic-AML currently records `{failure_kind}` as the main remaining proof gap and recommends `{recommended_next_step}`."
+        ),
+        trace=trace,
+    )
+
+
+def _infer_aml_dataset_family(*, frame: Any, paper_manifest: PaperBenchmarkManifest) -> str:
+    columns = {str(item).strip() for item in getattr(frame, "columns", [])}
+    if {"step", "type", "amount", "nameOrig", "nameDest"}.issubset(columns):
+        return "paysim_style_temporal_transaction_fraud"
+    if {"src", "dst", "time_step"}.issubset(columns):
+        return "elliptic_style_temporal_graph_aml"
+    if paper_manifest.data_mode == "time_series":
+        return "generic_temporal_aml_snapshot"
+    return "generic_aml_snapshot"
+
+
+def _aml_benchmark_track_label(dataset_family: str) -> str:
+    mapping = {
+        "paysim_style_temporal_transaction_fraud": "temporal_transaction_fraud",
+        "elliptic_style_temporal_graph_aml": "temporal_graph_aml",
+    }
+    return mapping.get(dataset_family, "supporting_snapshot")
+
+
+def _discover_aml_pack_families(*, current_run_dir: Path, current_family: str) -> list[str]:
+    families = {current_family}
+    parent = current_run_dir.parent
+    if parent.exists():
+        for child in parent.iterdir():
+            if not child.is_dir():
+                continue
+            payload = _read_json_artifact(child / "aml_benchmark_manifest.json")
+            family = _clean_text(payload.get("dataset_family"))
+            if family:
+                families.add(family)
+    return sorted(families)
+
+
 def _required_fix_for_reason(reason_code: str) -> str:
     mapping = {
         "benchmark_metric_missing_in_execution": "materialize the benchmark comparison metric in the executed model metrics",
@@ -1888,6 +2380,11 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
     benchmark_partition = dict(payload.get("benchmark_pack_partition", {}))
     holdout_policy = dict(payload.get("holdout_claim_policy", {}))
     generalization_audit = dict(payload.get("benchmark_generalization_audit", {}))
+    aml_benchmark_manifest = dict(payload.get("aml_benchmark_manifest", {}))
+    aml_holdout_claim_report = dict(payload.get("aml_holdout_claim_report", {}))
+    aml_demo_scorecard = dict(payload.get("aml_demo_scorecard", {}))
+    aml_public_claim_guard = dict(payload.get("aml_public_claim_guard", {}))
+    aml_failure_report = dict(payload.get("aml_failure_report", {}))
     shadow_manifest = dict(payload.get("shadow_trial_manifest", {}))
     shadow_scorecard = dict(payload.get("shadow_trial_scorecard", {}))
     promotion = dict(payload.get("promotion_readiness_report", {}))
@@ -1993,6 +2490,23 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
                 f"- Claim origin: `{holdout_policy.get('claim_origin') or benchmark_partition.get('claim_origin') or 'unknown'}`",
                 f"- Paper primary claim allowed: `{holdout_policy.get('paper_primary_claim_allowed')}`",
                 f"- Identity branching detected: `{generalization_audit.get('identity_branching_detected')}`",
+            ]
+        )
+    if aml_benchmark_manifest or aml_demo_scorecard or aml_public_claim_guard:
+        lines.extend(
+            [
+                "",
+                "## AML Proof Pack",
+                f"- Dataset family: `{aml_benchmark_manifest.get('dataset_family') or 'unknown'}`",
+                f"- Benchmark track: `{aml_benchmark_manifest.get('benchmark_track') or 'unknown'}`",
+                f"- Supporting public claim allowed: `{aml_benchmark_manifest.get('supporting_public_claim_allowed')}`",
+                f"- Paper primary claim allowed: `{aml_holdout_claim_report.get('paper_primary_claim_allowed')}`",
+                f"- Cross-track coverage met: `{aml_benchmark_manifest.get('required_track_coverage_met')}`",
+                f"- Current demo story: `{aml_demo_scorecard.get('current_run_story') or 'none'}`",
+                f"- Ready demo count: `{aml_demo_scorecard.get('ready_demo_count', 0)}`",
+                f"- Demo safe: `{aml_demo_scorecard.get('demo_safe')}`",
+                f"- Broader flagship claim allowed: `{aml_public_claim_guard.get('broader_flagship_claim_allowed')}`",
+                f"- Primary remaining gap: `{aml_failure_report.get('primary_failure_kind') or 'none'}`",
             ]
         )
     if temporal_recovery:
@@ -3006,6 +3520,88 @@ def _unavailable_bundle(
         summary=summary,
         trace=trace,
     )
+    aml_benchmark_manifest = AMLBenchmarkManifest(
+        schema_version=AML_BENCHMARK_MANIFEST_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="not_available",
+        dataset_family="unknown",
+        benchmark_track="unknown",
+        task_type="unknown",
+        data_mode="unknown",
+        comparison_metric="unknown",
+        metric_direction="higher_is_better",
+        selected_model_family=None,
+        current_partition="dev",
+        supporting_public_claim_allowed=False,
+        paper_primary_claim_allowed=False,
+        required_track_families=[],
+        covered_track_families=[],
+        required_track_coverage_met=False,
+        relaytic_rank=None,
+        public_table_rows=[],
+        top_case_entity=None,
+        top_typology=None,
+        drift_trigger_action=None,
+        summary=summary,
+        trace=trace,
+    )
+    aml_holdout_claim_report = AMLHoldoutClaimReport(
+        schema_version=AML_HOLDOUT_CLAIM_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="blocked",
+        dataset_family="unknown",
+        current_partition="dev",
+        supporting_public_claim_allowed=False,
+        paper_primary_claim_allowed=False,
+        required_track_coverage_met=False,
+        broader_flagship_claim_allowed=False,
+        claim_origin="blocked_claim",
+        summary=summary,
+        trace=trace,
+    )
+    aml_demo_scorecard = AMLDemoScorecard(
+        schema_version=AML_DEMO_SCORECARD_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="blocked",
+        demo_safe=False,
+        current_run_story=None,
+        ready_demo_count=0,
+        scored_demos=[],
+        summary=summary,
+        trace=trace,
+    )
+    aml_public_claim_guard = AMLPublicClaimGuard(
+        schema_version=AML_PUBLIC_CLAIM_GUARD_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="blocked",
+        supporting_public_claim_allowed=False,
+        paper_primary_claim_allowed=False,
+        broader_flagship_claim_allowed=False,
+        required_track_coverage_met=False,
+        blocked_reason_codes=reason_codes,
+        allowed_claims=[],
+        claim_boundaries=["AML flagship proof unavailable"],
+        required_fixes=[_required_fix_for_reason(code) for code in reason_codes],
+        summary=summary,
+        trace=trace,
+    )
+    aml_failure_report = AMLFailureReport(
+        schema_version=AML_FAILURE_REPORT_SCHEMA_VERSION,
+        generated_at=generated_at,
+        controls=controls,
+        status="active",
+        primary_failure_kind="aml_proof_pack_unavailable",
+        severity="high",
+        public_safe_to_discuss=True,
+        recommended_next_step="run the AML benchmark and demo pack before making flagship AML claims",
+        evidence_refs=["aml_benchmark_manifest.json", "aml_public_claim_guard.json"],
+        summary=summary,
+        trace=trace,
+    )
     return BenchmarkBundle(
         reference_approach_matrix=matrix,
         benchmark_gap_report=gap_report,
@@ -3031,6 +3627,11 @@ def _unavailable_bundle(
         benchmark_pack_partition=benchmark_partition,
         holdout_claim_policy=holdout_policy,
         benchmark_generalization_audit=generalization_audit,
+        aml_benchmark_manifest=aml_benchmark_manifest,
+        aml_holdout_claim_report=aml_holdout_claim_report,
+        aml_demo_scorecard=aml_demo_scorecard,
+        aml_public_claim_guard=aml_public_claim_guard,
+        aml_failure_report=aml_failure_report,
     )
 
 
@@ -3304,6 +3905,33 @@ def _normalize_shadow_baseline_family(value: str | None) -> str | None:
     if family.startswith("sklearn_"):
         family = family[len("sklearn_") :]
     return family
+
+
+def _score_demo_story(
+    *,
+    demo_id: str,
+    title: str,
+    clarity: bool,
+    correctness: bool,
+    continuity: bool,
+    operator_trust: bool,
+    agent_usability: bool,
+    replayability: bool,
+) -> dict[str, Any]:
+    checks = [clarity, correctness, continuity, operator_trust, agent_usability, replayability]
+    passed = sum(1 for item in checks if item)
+    status = "ready" if passed >= 5 else ("partial" if passed >= 3 else "watch")
+    return {
+        "demo_id": demo_id,
+        "title": title,
+        "status": status,
+        "clarity": "strong" if clarity else "weak",
+        "correctness": "strong" if correctness else "weak",
+        "continuity": "strong" if continuity else "weak",
+        "operator_trust": "strong" if operator_trust else "weak",
+        "agent_usability": "strong" if agent_usability else "weak",
+        "replayability": "strong" if replayability else "weak",
+    }
 
 
 def _infer_data_mode(*, frame: Any, timestamp_column: str | None) -> str:

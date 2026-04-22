@@ -36,6 +36,11 @@ BENCHMARK_FILENAMES = {
     "benchmark_pack_partition": "benchmark_pack_partition.json",
     "holdout_claim_policy": "holdout_claim_policy.json",
     "benchmark_generalization_audit": "benchmark_generalization_audit.json",
+    "aml_benchmark_manifest": "aml_benchmark_manifest.json",
+    "aml_holdout_claim_report": "aml_holdout_claim_report.json",
+    "aml_demo_scorecard": "aml_demo_scorecard.json",
+    "aml_public_claim_guard": "aml_public_claim_guard.json",
+    "aml_failure_report": "aml_failure_report.json",
 }
 
 

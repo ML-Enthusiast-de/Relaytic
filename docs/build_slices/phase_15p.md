@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Shipped.
 
 ## Intent
 
@@ -48,3 +48,9 @@ Relaytic-AML should optimize not only for suspiciousness but for which alerts de
 - one review-budget ranking test
 - one case-packet generation test
 - one burden-aware operating-point regression test
+
+## Implementation Notes
+
+- Slice 15P now lands under `src/relaytic/casework/`
+- planning and run-summary materialization now persist analyst-review queue and case-packet artifacts from the same deterministic AML evidence path
+- assist and benchmark surfaces now expose casework posture, top-case identity, and review-budget rationale instead of limiting AML explanations to graph structure only

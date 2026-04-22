@@ -124,6 +124,61 @@ def test_build_assist_audit_explanation_answers_aml_graph_questions() -> None:
     assert "subgraph_risk_report.json" in audit["evidence_refs"]
 
 
+def test_build_assist_audit_explanation_answers_aml_casework_questions() -> None:
+    audit = build_assist_audit_explanation(
+        message="why is this the top case in the review queue and what is in the case packet?",
+        actor_type="user",
+        run_summary={
+            "aml": {
+                "decision_objective": "maximize_precision_at_review_budget",
+            },
+            "casework": {
+                "status": "active",
+                "queue_count": 6,
+                "review_capacity_cases": 2,
+                "decision_objective": "maximize_precision_at_review_budget",
+                "top_case_id": "case_hub1",
+                "top_case_entity": "HUB1",
+                "top_case_action": "review_now",
+                "estimated_review_hours": 1.5,
+                "review_typology_coverage": 3,
+                "selected_review_fraction": 0.2,
+            },
+        },
+    )
+
+    assert audit["question_type"] == "aml_casework"
+    assert "case_hub1" in audit["answer"]
+    assert "HUB1" in audit["answer"]
+    assert "maximize_precision_at_review_budget" in audit["answer"]
+    assert "case_packet.json" in audit["evidence_refs"]
+
+
+def test_build_assist_audit_explanation_answers_aml_stream_risk_questions() -> None:
+    audit = build_assist_audit_explanation(
+        message="why did drift trigger recalibration and how weak are these labels?",
+        actor_type="agent",
+        run_summary={
+            "stream_risk": {
+                "status": "active",
+                "stream_mode": "batched_temporal_monitoring",
+                "timestamp_column": "step",
+                "weak_label_risk_level": "high",
+                "label_kind": "proxy_alert_label",
+                "delayed_confirmation_likely": True,
+                "rolling_window_count": 4,
+                "drift_score": 0.72,
+                "trigger_action": "run_recalibration_pass",
+            }
+        },
+    )
+
+    assert audit["question_type"] == "aml_stream_risk"
+    assert "run_recalibration_pass" in audit["answer"]
+    assert "proxy_alert_label" in audit["answer"]
+    assert "stream_risk_posture.json" in audit["evidence_refs"]
+
+
 def test_build_assist_audit_explanation_answers_objective_alignment_questions() -> None:
     audit = build_assist_audit_explanation(
         message="why did you optimize one metric but benchmark another?",
