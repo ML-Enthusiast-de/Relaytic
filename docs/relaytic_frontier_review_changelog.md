@@ -2,6 +2,8 @@
 
 Date: 2026-05-06
 
+Status: Adopted into the master slicing plan, build master, status docs, architecture contract, migration map, and AML specs.
+
 ## Executive Verdict
 
 Relaytic is more interesting after the Relaytic-AML pivot than it was as a broad structured-data automation system.

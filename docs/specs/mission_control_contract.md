@@ -153,3 +153,17 @@ The AML pivot slices should further add:
 - drift and weak-label posture
 
 without turning mission control into a domain-specific fork that loses the canonical Relaytic state model.
+
+## Adopted UI Direction
+
+The current mission-control implementation is a static local HTML report plus terminal chat and JSON-first artifacts.
+
+That remains the fallback, but the next UI direction is defined in [relaytic_ui_frontier_review.md](../relaytic_ui_frontier_review.md):
+
+- keep static HTML as the guaranteed local-first fallback
+- add an AML investigation board for alert queues, case packets, typology evidence, drift posture, benchmark gates, and public-claim guards
+- add a separate agent console view for canonical artifacts, next commands, action affordances, MCP status, and blocked reasons
+- add live browser serving only after the information architecture is correct
+- expose belief deltas, "what would change my mind", review-budget simulation, public-claim firewall, and trace replay as product primitives
+
+Mission control should not become prettier card inventory. Every new panel must help a human or external agent decide what to do next.

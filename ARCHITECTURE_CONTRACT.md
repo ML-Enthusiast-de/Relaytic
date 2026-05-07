@@ -48,7 +48,7 @@ Current canonical boundaries:
 - `src/relaytic/aml/` owns Slice 15O deterministic AML graph construction, counterparty-network profiling, typology detection, suspicious-subgraph scoring, and entity-case expansion artifacts
 - `src/relaytic/casework/` owns Slice 15P analyst-review queue policy, review-budget ranking, analyst scorecard, case-packet generation, and review-capacity sensitivity artifacts
 - `src/relaytic/stream_risk/` owns Slice 15Q stream-risk posture, weak-label posture, delayed-outcome alignment, drift-triggered recalibration signals, and rolling alert-quality artifacts
-- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding plus live terminal mission-control chat surfaces, Slice 11E role-specific handbook discovery and handbook-aware onboarding surfaces, Slice 11F demo-grade onboarding, explicit mode education, stuck recovery, recruiter-safe walkthrough surfaces, Slice 11G adaptive human onboarding capture plus lightweight local semantic guidance surfaces, and Slice 15 branch DAG, confidence map, trace exploration, change-attribution, approval-timeline, background-job, release-health, demo-pack, and human-factors surfaces
+- `src/relaytic/mission_control/` owns Slice 11B mission-control MVP state, onboarding/install-health state, review-queue state, launch metadata, static control-center rendering, Slice 11C clarity surfaces for modes/capabilities/actions/navigation/questions, Slice 11D guided onboarding plus live terminal mission-control chat surfaces, Slice 11E role-specific handbook discovery and handbook-aware onboarding surfaces, Slice 11F demo-grade onboarding, explicit mode education, stuck recovery, public-safe walkthrough surfaces, Slice 11G adaptive human onboarding capture plus lightweight local semantic guidance surfaces, and Slice 15 branch DAG, confidence map, trace exploration, change-attribution, approval-timeline, background-job, release-health, demo-pack, and human-factors surfaces
 - `src/relaytic/dojo/` owns Slice 12 guarded self-improvement controls, quarantined proposal bundles, validation results, promotion ledgers, rollback state, and architecture-proposal quarantine
 - `src/relaytic/pulse/` owns Slice 12A periodic awareness scheduling, innovation-watch gathering, pulse recommendations, skip reporting, bounded pulse-run persistence, explicit memory-maintenance orchestration, and pulse-to-mission-control visibility surfaces
 - `src/relaytic/tracing/` owns Slice 12B canonical trace schemas, specialist/tool/intervention/branch span persistence, claim-packet persistence, deterministic adjudication scorecards, replay reports, and replay/query surfaces
@@ -67,7 +67,8 @@ Current canonical boundaries:
 Reserved future boundaries:
 
 - `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15M task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, replay/shadow-tested imported-model, objective/split/metric-truth, first-class family-stack, staged portfolio-search, temporal-engine, operating-point, benchmark-truth-gate, competitive-specialization, and benchmark-generalization responsibilities; later work may introduce focused subpackages such as `src/relaytic/modeling/families/`, `src/relaytic/modeling/portfolio/`, or `src/relaytic/temporal/` only if they sharpen responsibility instead of forking a disconnected parallel stack
-- `src/relaytic/graph_fabric/` should absorb the remaining planned Slice 15R AML pivot work where richer graph and subgraph reasoning is needed beyond the shipped `src/relaytic/aml/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` slices
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and future focused AML loaders or eval-environment packages should absorb the Slice 15R-A through Slice 15Z proof/productization work before Academy expansion resumes
+- `src/relaytic/graph_fabric/` may still absorb richer graph and subgraph reasoning where it sharpens responsibility beyond the shipped `src/relaytic/aml/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` slices
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should be a cross-cutting consolidation and remediation slice rather than a feature-expansion boundary; by default it should remove misleading or redundant packages, split oversized modules, and retire legacy surfaces instead of introducing a new permanent package
@@ -141,6 +142,15 @@ These files are required and must stay current:
 - `docs/build_slices/phase_15p.md`
 - `docs/build_slices/phase_15q.md`
 - `docs/build_slices/phase_15r.md`
+- `docs/build_slices/phase_15ra.md`
+- `docs/build_slices/phase_15s.md`
+- `docs/build_slices/phase_15t.md`
+- `docs/build_slices/phase_15u.md`
+- `docs/build_slices/phase_15v.md`
+- `docs/build_slices/phase_15w.md`
+- `docs/build_slices/phase_15x.md`
+- `docs/build_slices/phase_15y.md`
+- `docs/build_slices/phase_15z.md`
 - `docs/build_slices/phase_16.md`
 - `docs/build_slices/phase_16a.md`
 - `docs/build_slices/phase_16b.md`
@@ -416,6 +426,42 @@ Current AML artifact names:
 - `delayed_outcome_alignment.json`
 - `drift_recalibration_trigger.json`
 - `rolling_alert_quality_report.json`
+
+Planned AML proof/productization artifact names for Slices 15R-A through 15Z:
+
+- `aml_benchmark_manifest.json`
+- `aml_holdout_claim_report.json`
+- `aml_demo_scorecard.json`
+- `aml_public_claim_guard.json`
+- `aml_failure_report.json`
+- `aml_demo_bundle_manifest.json`
+- `aml_demo_business_metric_table.json`
+- `aml_demo_flow_report.md`
+- `aml_demo_artifact_index.json`
+- `aml_business_value_report.json`
+- `analyst_hour_savings_report.json`
+- `review_capacity_metric_report.json`
+- `operational_metric_guard.json`
+- `aml_baseline_matrix.json`
+- `aml_ablation_matrix.json`
+- `aml_baseline_adapter_report.json`
+- `aml_capability_contribution_report.json`
+- `aml_graph_loader_manifest.json`
+- `aml_graph_provenance_report.json`
+- `aml_subgraph_task_manifest.json`
+- `aml_graph_claim_scope.json`
+- `aml_delayed_label_eval_report.json`
+- `aml_positive_unlabeled_posture.json`
+- `aml_threshold_drift_report.json`
+- `aml_time_window_scorecard.json`
+- `aml_eval_environment_manifest.json`
+- `aml_environment_scorecard.json`
+- `aml_workflow_task_matrix.json`
+- `aml_environment_failure_report.json`
+- `pre_academy_repo_audit.json`
+- `module_extraction_plan.json`
+- `public_surface_inventory.json`
+- `module_split_report.json`
 
 Current trace and eval artifact names:
 

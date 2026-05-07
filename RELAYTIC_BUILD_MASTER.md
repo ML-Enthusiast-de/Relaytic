@@ -126,6 +126,15 @@ Start with:
 15P. analyst review optimization and casework
 15Q. streaming drift, weak labels, and continual AML learning
 15R. AML flagship benchmark, demo, and paper pack
+15R-A. finish the AML proof pack, tests, docs, and public-claim alignment
+15S. flagship AML demo pack
+15T. business-value metrics and analyst-hour proof
+15U. strong AML baselines and ablations
+15V. raw graph and subgraph ingestion
+15W. temporal and weak-label upgrade
+15X. AML evaluation-environment reframe
+15Y. demo-first documentation rewrite
+15Z. pre-academy repo credibility cleanup
 16. Relaytic Academy umbrella track, governed capability evolution, and shadow-tested growth
 16A. capability registry and capability cards
 16B. offline replay packs and shadow mode
@@ -191,16 +200,24 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 49. Slice 15O
 50. Slice 15P
 51. Slice 15Q
-52. Slice 15R
-53. Slice 16
-54. Slice 16A
-55. Slice 16B
-56. Slice 16C
-57. Slice 16D
-58. Slice 16E
-59. Slice 16F
-60. Slice 17
-61. Slice 18
+52. Slice 15R-A
+53. Slice 15S
+54. Slice 15T
+55. Slice 15U
+56. Slice 15V
+57. Slice 15W
+58. Slice 15X
+59. Slice 15Y
+60. Slice 15Z
+61. Slice 16
+62. Slice 16A
+63. Slice 16B
+64. Slice 16C
+65. Slice 16D
+66. Slice 16E
+67. Slice 16F
+68. Slice 17
+69. Slice 18
 
 Reason:
 
@@ -251,7 +268,15 @@ Reason:
 - Slice 15O should come next because AML becomes interesting only when Relaytic can reason over entities, counterparties, typologies, and suspicious subgraphs rather than only rows
 - Slice 15P is now implemented and makes analyst-review burden, queue order, and case usefulness first-class AML outputs instead of downstream reporting afterthoughts
 - Slice 15Q is now implemented and makes stream posture, weak-label risk, delayed-outcome alignment, and recalibration triggers explicit instead of treating AML like a static supervised table
-- Slice 15R should close the AML pivot by turning the domain thesis into one benchmark, demo, and paper-safe proof pack
+- Slice 15R is partially present in the codebase but should not be treated as shipped until Slice 15R-A aligns docs, tests, CLI, run summary, assist, mission control, and public-claim gates
+- Slice 15S should turn the AML proof pack into one public-safe flagship demo that a technical reviewer can run without reading the whole repository
+- Slice 15T should add business-value metrics so Relaytic-AML is judged on analyst-hour value and review-capacity tradeoffs instead of only model-score posture
+- Slice 15U should deepen AML baselines and ablations so the proof story is about what graph, temporal, calibration, threshold, and review-budget machinery contributed
+- Slice 15V should add raw graph and subgraph ingestion so Elliptic-style work stops being limited to flattened snapshots
+- Slice 15W should upgrade delayed labels, weak labels, threshold drift, and time-window evaluation before Relaytic-AML claims production-shaped temporal strength
+- Slice 15X should frame Relaytic runs as evaluation environments with scorecards for task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claims
+- Slice 15Y should rewrite first-contact documentation around the flagship AML path rather than slice history
+- Slice 15Z should split credibility-damaging oversized modules and clean misleading surfaces before any Academy work expands the system again
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so later post-AML capability-evolution work has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -264,8 +289,8 @@ Reason:
 
 Current repo state:
 
-- implemented through Slice 15Q, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace continuity plus result-contract/iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety plus build attestation, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, Slice 15 mission-control expansion, demo packs, release-health posture, and human-supervision proof, Slice 15A canonical task contracts, rare-event taxonomy cleanup, benchmark-vs-deploy separation, temporal benchmark scaffolding, Slice 15B architecture registry expansion, adaptive routing, widened trainable families, sequence-shadow gating, Slice 15C budgeted HPO, early stopping, warm-start reuse, threshold tuning, deeper portfolio loops, Slice 15D paper-grade benchmark harness, rerun variance reporting, benchmark ablation matrices, temporal benchmark posture, explicit benchmark claim boundaries, Slice 15E execution DAG, runtime freshness contracts, recompute planning, artifact reuse, Slice 15F research-imported architecture candidates, shadow-trial scorecards, candidate quarantine, promotion-readiness reporting, Slice 15G objective contracts, split correctness, metric-materialization auditing, temporal fold-health gating, benchmark-truth prechecks, Slice 15H first-class competitive family stack, adapter readiness/version capture, categorical strategy selection, family eligibility/probe artifacts, Slice 15I staged portfolio search, budget-profile separation, finalist planning, pruning reasons, explicit search-stop doctrine, Slice 15J temporal engine, event-preserving blocked splits, temporal feature ladders, honest lagged baseline ladders, sequence-shadow scorecards, Slice 15K calibration strategy selection, threshold-search artifacts, review-budget optimization, abstention posture, and operating-point explanation surfaces, Slice 15L benchmark truth hardening, trace-identity conformance, eval-surface parity, leakage audits, and paper-claim gates, Slice 15M competitive specialization, adapter-activation reporting, temporal benchmark recovery, dev-vs-holdout claim partitioning, benchmark-generalization guards, Slice 15N AML domain contracts, Slice 15O deterministic entity graphs and typology reasoning, Slice 15P analyst-review queue policy, review-budget ranking, case packets, review-capacity sensitivity, and Slice 15Q stream-risk posture, weak-label posture, delayed-outcome alignment, drift-triggered recalibration signals, and rolling alert-quality reporting now landed
-- next execution target: Slice 15R
+- implemented through Slice 15Q, with Slice 09F routed-intelligence hardening, Slice 10 feedback assimilation, Slice 10B explicit quality/budget/profile contracts, Slice 10C skeptical behavioral control, Slice 10A decision-lab modeling, Slice 11A imported-incumbent challenge support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-driven onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace continuity plus result-contract/iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety plus build attestation, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, Slice 15 mission-control expansion, demo packs, release-health posture, and human-supervision proof, Slice 15A canonical task contracts, rare-event taxonomy cleanup, benchmark-vs-deploy separation, temporal benchmark scaffolding, Slice 15B architecture registry expansion, adaptive routing, widened trainable families, sequence-shadow gating, Slice 15C budgeted HPO, early stopping, warm-start reuse, threshold tuning, deeper portfolio loops, Slice 15D paper-grade benchmark harness, rerun variance reporting, benchmark ablation matrices, temporal benchmark posture, explicit benchmark claim boundaries, Slice 15E execution DAG, runtime freshness contracts, recompute planning, artifact reuse, Slice 15F research-imported architecture candidates, shadow-trial scorecards, candidate quarantine, promotion-readiness reporting, Slice 15G objective contracts, split correctness, metric-materialization auditing, temporal fold-health gating, benchmark-truth prechecks, Slice 15H first-class competitive family stack, adapter readiness/version capture, categorical strategy selection, family eligibility/probe artifacts, Slice 15I staged portfolio search, budget-profile separation, finalist planning, pruning reasons, explicit search-stop doctrine, Slice 15J temporal engine, event-preserving blocked splits, temporal feature ladders, honest lagged baseline ladders, sequence-shadow scorecards, Slice 15K calibration strategy selection, threshold-search artifacts, review-budget optimization, abstention posture, and operating-point explanation surfaces, Slice 15L benchmark truth hardening, trace-identity conformance, eval-surface parity, leakage audits, and paper-claim gates, Slice 15M competitive specialization, adapter-activation reporting, temporal benchmark recovery, dev-vs-holdout claim partitioning, benchmark-generalization guards, Slice 15N AML domain contracts, Slice 15O deterministic entity graphs and typology reasoning, Slice 15P analyst-review queue policy, review-budget ranking, case packets, review-capacity sensitivity, and Slice 15Q stream-risk posture, weak-label posture, delayed-outcome alignment, drift-triggered recalibration signals, and rolling alert-quality reporting now landed; Slice 15R proof-pack code is partially present but not accepted as shipped until Slice 15R-A completes targeted tests and doc/status alignment
+- next execution target: Slice 15R-A
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
 - latest handoff-and-learnings slice: Slice 12D
@@ -274,10 +299,11 @@ Current repo state:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after the AML pivot track: Slice 16A
+- next planned academy follow-on after the AML proof/productization track: Slice 16A, after Slices 15R-A through 15Z
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces rather than leaving the UI stale until late polish
-- the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, performance recovery, academy, handoff, learnings, and external-agent continuation surfaces
+- the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [aml_frontier_contract.md](docs/specs/aml_frontier_contract.md), [aml_benchmark_pack.md](docs/specs/aml_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, performance recovery, AML proof/productization, academy, handoff, learnings, and external-agent continuation surfaces
+- mission-control and browser-facing work should also follow [relaytic_ui_frontier_review.md](docs/relaytic_ui_frontier_review.md): static HTML remains the fallback, but the product direction is an AML investigation board, agent console, belief-delta/claim-firewall views, review-budget simulation, trace replay, and eventually a local live UI server backed by canonical artifacts
 
 ## MVP boundary
 
@@ -345,7 +371,7 @@ If the goal is to turn the current implementation into something that looks genu
 
 Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.
 Slices 10, 10B, 10C, and 10A are the current category-shift unlocks that turned Relaytic from a governed inference lab into a more explicit decision-and-discovery system with skeptical steering. Slice 11A added real incumbent pressure, Slice 11B completed the first adoption unlock because humans and external agents can now launch, inspect, and demo the system from one coherent control surface, and Slice 11C made that surface legible enough to act as a real MVP cockpit instead of only a technical dashboard.
-Slices 15A through 15M are now shipped as the initial model-competitiveness track plus the full performance-recovery and benchmark-generalization bridge. Slices 15N through 15R are now the AML frontier pivot track that gives Relaytic a sharper hiring- and product-grade thesis before any academy work begins. Slices 16A through 16F are the later governed capability-evolution track after that AML pivot, Slice 17 remains the long-range optional representation-engine bet after the academy track, and Slice 18 is the planned endgame consolidation/remediation pass after all feature work.
+Slices 15A through 15M are now shipped as the initial model-competitiveness track plus the full performance-recovery and benchmark-generalization bridge. Slices 15N through 15Q are the shipped AML foundation. Slice 15R-A through Slice 15Z are now the mandatory pre-Academy AML proof and productization track: finish the proof pack, build one flagship demo, add business-value metrics, deepen AML baselines and ablations, support raw graph/subgraph ingestion, improve temporal and weak-label posture, frame Relaytic runs as evaluation environments, rewrite first-contact docs around the demo, and clean credibility-damaging repo structure before capability growth resumes. Slices 16A through 16F are the later governed capability-evolution track after that AML proof track, Slice 17 remains the long-range optional representation-engine bet after the academy track, and Slice 18 is the planned endgame consolidation/remediation pass after all feature work.
 
 ## Source of truth precedence
 

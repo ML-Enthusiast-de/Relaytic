@@ -112,3 +112,25 @@ Before the AML flagship paper/demo pack is considered credible, Relaytic-AML sho
 2. Elliptic-like flattened graph runs work end to end through the current CLI
 3. both workload families materialize AML contracts plus graph/case artifacts
 4. benchmark doctrine for both is explicit and honest
+
+## Adopted pre-Academy proof sequence
+
+The benchmark pack is now part of a broader AML proof/productization sequence. The next implementation sessions must follow this order before Academy work resumes:
+
+1. **15R-A**: finish AML proof-pack alignment across tests, CLI, run summary, assist, mission control, docs, and claim gates.
+2. **15S**: create the public-safe flagship AML demo bundle.
+3. **15T**: add operational business-value metrics and analyst-hour proof.
+4. **15U**: add strong AML baselines and ablations.
+5. **15V**: add raw graph and subgraph ingestion.
+6. **15W**: strengthen temporal and weak-label evaluation.
+7. **15X**: add AML evaluation-environment scorecards.
+8. **15Y**: rewrite first-contact docs around the flagship path.
+9. **15Z**: clean repo credibility risks before capability growth expands.
+
+Benchmark success must stay separated from:
+
+- schema compatibility
+- operational business value
+- environment behavior
+- public-claim readiness
+- paper-safe broader claims

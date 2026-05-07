@@ -59,7 +59,7 @@ If a run exists:
 5. Mission-control chat must answer the same questions through natural language, not only slash commands.
 6. The human handbook must explain the main flow, what happens next, and what to do when stuck.
 7. The agent handbook must explain the safe operating pattern, source-of-truth hierarchy, and what to do when stuck.
-8. A separate demo walkthrough must exist for recruiter-safe or first-contact demos.
+8. A separate demo walkthrough must exist for public-safe or first-contact demos.
 
 ## Proof obligation
 

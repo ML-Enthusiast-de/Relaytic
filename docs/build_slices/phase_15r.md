@@ -2,13 +2,15 @@
 
 ## Status
 
-Planned.
+Partially implemented. Not accepted as shipped until Slice 15R-A completes targeted tests, cross-surface alignment, and control-doc status updates.
 
 ## Intent
 
 Slice 15R is the proof slice for the AML pivot.
 
-It turns the earlier AML slices into a recruiter-safe, paper-safe, and demo-safe evidence pack.
+It turns the earlier AML slices into a public-safe, paper-safe, and demo-safe evidence pack.
+
+Current doctrine: do not move into Academy work after the partial 15R implementation. The next implementation target is Slice 15R-A, which finishes this proof pack and blocks broader AML claims until the proof artifacts, tests, and surfaces agree.
 
 ## Load-Bearing Improvement
 
@@ -40,9 +42,11 @@ It turns the earlier AML slices into a recruiter-safe, paper-safe, and demo-safe
 ## Acceptance Criteria
 
 1. one AML benchmark pack can be rerun and rendered as a public-ready table
-2. one AML demo pack can be scored as recruiter-safe
+2. one AML demo pack can be scored as public-safe
 3. one real AML miss is surfaced honestly with a concrete next-step recommendation
 4. the benchmark pack explicitly covers PaySim-style temporal transaction fraud and Elliptic-style temporal graph AML before broader public claims are made
+5. benchmark CLI, benchmark show, run summary, assist, and mission control expose the same AML proof posture
+6. docs and status files say clearly whether 15R is partial, shipped, or blocked
 
 ## Required Verification
 

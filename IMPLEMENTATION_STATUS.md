@@ -6,7 +6,7 @@ This document tracks the operational state of the repository. It is an implement
 
 - completed slices: 00 through 15Q, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, Slice 13A release safety, build attestation, and packaging discipline, Slice 13B event bus, runtime hooks, and visible permission modes, Slice 13C bounded daemon, resumable jobs, stale-job reporting, approval-aware background execution, and memory maintenance, Slice 14 real-world feasibility, domain constraints, action boundaries, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, Slice 15 mission-control expansion, demo packs, release-health posture, and human-factors proof, Slice 15A canonical task contracts, rare-event taxonomy cleanup, benchmark-vs-deploy separation, and temporal benchmark scaffolding, Slice 15B adaptive architecture routing, widened trainable family support, and canonical architecture artifacts, Slice 15C budgeted HPO, early stopping, warm-start reuse, threshold tuning, and deeper portfolio loops, Slice 15D paper-grade benchmark harness, rerun variance reporting, ablation matrices, temporal benchmark posture, explicit benchmark claim boundaries, Slice 15E execution DAG, freshness contracts, runtime recompute planning, and artifact reuse, Slice 15F research-imported architecture candidates, governed shadow trials, candidate quarantine, and promotion-readiness reporting, Slice 15G objective contracts, split correctness, metric-materialization auditing, temporal fold-health gating, and benchmark-truth prechecks, Slice 15H first-class competitive family stack, adapter readiness/version reporting, categorical strategy selection, and family eligibility/probe artifacts, Slice 15I staged portfolio search, budget-profile separation, finalist planning, pruning reasons, and explicit search stop doctrine, Slice 15J temporal engine, event-preserving time-series evaluation, richer lagged feature ladders, honest temporal baselines, and sequence-shadow scorecards, Slice 15K calibration strategy selection, operating-point contracts, threshold-search artifacts, review-budget optimization, abstention posture, decision-quality explanations, Slice 15L benchmark truth hardening, trace-identity conformance, eval-surface parity, leakage audits, paper-claim gates, Slice 15M competitive specialization, adapter-activation reporting, temporal benchmark recovery, dev-vs-holdout claim partitioning, benchmark-generalization guards, Slice 15N AML domain contracts, case ontology, review-budget posture, AML claim-scope reporting, Slice 15O deterministic entity graphs, typology detection, suspicious-subgraph scoring, entity-case expansion, Slice 15P analyst-review queue policy, review-budget ranking, case packets, review-capacity sensitivity, and Slice 15Q stream-risk posture, weak-label posture, delayed-outcome alignment, drift-triggered recalibration signals, and rolling alert-quality reporting
 - flagship frontier direction: Relaytic-AML, the AML and financial-crime edition of Relaytic
-- next recommended slice: 15R, AML flagship benchmark, demo, and paper pack
+- next recommended slice: 15R-A, finish the AML proof pack, tests, docs, and public-claim alignment
 - latest trace-and-safety slice: 12B, first-class tracing, agent evaluation, and runtime security harnesses
 - latest handoff-and-learnings slice: 12D, workspace-first continuity, result contracts, governed learnings migration, and explicit iteration planning
 - latest workspace-and-search slice: 13, search controller, bounded branch widening, and execution-strategy selection
@@ -21,7 +21,7 @@ This document tracks the operational state of the repository. It is an implement
 - latest AML casework slice: 15P, analyst-review queue policy, review-budget ranking, case packets, and review-capacity sensitivity
 - latest AML stream-risk slice: 15Q, stream-risk posture, weak-label posture, delayed-outcome alignment, drift-triggered recalibration signals, and rolling alert-quality reporting
 - latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, broader human-chaos coverage, and a prepared paper-grade benchmark/eval pack
-- next planned academy follow-on after the AML pivot track: 16A, capability registry and capability cards
+- next planned academy follow-on after the AML proof/productization track: 16A, capability registry and capability cards
 - final planned cleanup follow-on after Slice 17: 18, endgame consolidation, legacy removal, and repo-quality hardening
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -87,7 +87,7 @@ The repository currently supports:
 - a thin but real mission-control surface via `relaytic mission-control show` and `relaytic mission-control launch`, with shared local truth for onboarding, review queue, operator cards, launch metadata, and demo-session state
 - install-launch coupling so the documented bootstrap wrappers can verify the environment and land a user in the same local control-center flow without inventing a separate onboarding truth
 - role-specific handbook discovery through mission control, mission-control chat, and checked-in host notes so the product can point humans to `docs/handbooks/relaytic_user_handbook.md` and external agents to `docs/handbooks/relaytic_agent_handbook.md` on first contact
-- demo-grade onboarding through explicit guided demo flow, mode explanations, stuck-recovery guidance, and a recruiter-safe walkthrough surfaced directly from mission control, chat, and the handbook stack
+- demo-grade onboarding through explicit guided demo flow, mode explanations, stuck-recovery guidance, and a public-safe walkthrough surfaced directly from mission control, chat, and the handbook stack
 - adaptive human onboarding with visible captured chat state, dataset-path detection, explicit objective-family routing for quick analysis-first versus full governed-run requests, objective capture, confirmation-before-run behavior, direct analysis-first handling for lightweight exploratory requests, and bounded local semantic extraction for messy first-contact human input
 - full-profile bootstrap that now attempts to provision a lightweight CPU-safe onboarding model so mission-control chat can be more forgiving without changing deterministic run control
 - explicit dojo review via `relaytic dojo review`, `relaytic dojo show`, and `relaytic dojo rollback`, with quarantined self-improvement proposals, benchmark/quality/control gates, promotion ledgers, rollback-ready state, and mission-control visibility
@@ -148,8 +148,8 @@ The most important not-yet-implemented shifts after the current baseline are:
 - broader flagship demo packs and harder scorecards so Relaytic can be judged by repeatable proof scenarios instead of ad hoc walkthroughs
 - broader human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy across more datasets and host paths
 - later academy-aware mission-control surfaces that explain capability promotion, shadow trials, hunt campaigns, and roster changes to both humans and external agents
-- a new AML-first pivot track through Slices 15N through 15R for domain contract, graph and typology reasoning, analyst-review optimization, streaming drift and weak labels, and a flagship AML benchmark/demo pack
-- a Slice 16A+ capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement after the AML track lands
+- a mandatory pre-Academy AML proof/productization track through Slices 15R-A through 15Z for proof-pack completion, flagship demo packaging, business-value metrics, strong AML baselines and ablations, raw graph/subgraph ingestion, temporal weak-label upgrades, evaluation-environment framing, demo-first docs, and repo credibility cleanup
+- a Slice 16A+ capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement after the AML proof/productization track lands
 - a later optional representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family after the academy track
 
 ## Implemented Slices
@@ -498,10 +498,18 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-With Slice 15Q now landed, the next high-leverage frontier follow-ons are:
+With Slice 15Q now landed and partial Slice 15R proof-pack code present, the next high-leverage frontier follow-ons are:
 
-- Slice 15R AML flagship benchmark, demo, and paper pack so public claims are built on domain-specific proof instead of generic benchmark narration
-- Slice 16A capability registry and capability cards so future academy work starts from one governed source of truth instead of ad hoc candidate state, but only after the AML wedge is real
-- holdout benchmark expansion and stronger untouched comparison packs so the shipped 15M benchmark-generalization guards can prove themselves on a broader paper-facing suite
+- Slice 15R-A finish the AML proof pack so docs, tests, CLI surfaces, run summary, assist, mission control, and public-claim gates agree before any broader claims are made
+- Slice 15S flagship AML demo pack so public evaluation starts from one runnable review-queue demo rather than a long artifact tour
+- Slice 15T business-value metrics so Relaytic-AML can prove analyst-hour value, review-capacity tradeoffs, and false-positive reduction instead of only model-score quality
+- Slice 15U strong AML baselines and ablations so graph, temporal, calibration, threshold, and review-budget contributions are measured instead of implied
+- Slice 15V raw graph and subgraph ingestion so Elliptic-style and future subgraph workloads are not limited to flattened snapshots
+- Slice 15W temporal and weak-label upgrade so delayed labels, positive-unlabeled posture, threshold drift, and rolling windows become stronger proof surfaces
+- Slice 15X AML evaluation-environment reframe so Relaytic can score realistic workflow behavior, unsafe steering resistance, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claim generation
+- Slice 15Y demo-first documentation rewrite so first contact is guided by the flagship AML path rather than slice chronology
+- Slice 15Z pre-Academy repo credibility cleanup so oversized modules and misleading surfaces are addressed before capability growth resumes
+- Slice 16A capability registry and capability cards so future academy work starts from one governed source of truth instead of ad hoc candidate state, but only after Slices 15R-A through 15Z are complete
+- holdout benchmark expansion and stronger untouched comparison packs so benchmark-generalization guards can prove themselves on a broader paper-facing suite
 - richer long-term memory compaction, pinning, and replay rules that keep the shipped workspace/result-contract/search-controller loop durable across longer investigations
-- broader flagship demos and harder human-factors proof so the recruiter-facing MVP keeps reading as polished software rather than a strong terminal prototype
+- broader flagship demos and harder human-factors proof so the public-facing MVP keeps reading as polished software rather than a strong terminal prototype

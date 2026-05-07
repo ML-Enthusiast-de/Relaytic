@@ -1,10 +1,10 @@
 # Flagship Demo Pack Contract
 
-The future flagship domain story for these demos is **Relaytic-AML**. The generic demo structure still applies, but the highest-value recruiter and hiring-manager version of the pack should be AML-first.
+The future flagship domain story for these demos is **Relaytic-AML**. The generic demo structure still applies, but the highest-value public product version of the pack should be AML-first.
 
 ## Purpose
 
-This document defines the recruiter-safe and lab-safe flagship demos Relaytic should maintain once the later mission-control slices land.
+This document defines the public-safe and lab-safe flagship demos Relaytic should maintain once the later mission-control slices land.
 
 The goal is to make Relaytic impressive through repeatable proof, not narration.
 
@@ -105,3 +105,15 @@ Each demo should be judged at least on:
 - replayability
 
 Those judgments should later feed `flagship_demo_scorecard.json`.
+
+## Slice 15S flagship path
+
+The next demo implementation should not create another generic tour.
+
+Slice 15S should produce one `relaytic-aml-review-queue` bundle that proves:
+
+- alert queue quality under review capacity
+- one evidence-backed case packet
+- business-value metrics separate from model metrics
+- AML benchmark and public-claim guard status
+- trace/eval visibility for the same run

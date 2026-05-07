@@ -243,16 +243,24 @@ Stable slice numbering stays the same, but the preferred execution order after S
 49. Slice 15O
 50. Slice 15P
 51. Slice 15Q
-52. Slice 15R
-53. Slice 16
-54. Slice 16A
-55. Slice 16B
-56. Slice 16C
-57. Slice 16D
-58. Slice 16E
-59. Slice 16F
-60. Slice 17
-61. Slice 18
+52. Slice 15R-A
+53. Slice 15S
+54. Slice 15T
+55. Slice 15U
+56. Slice 15V
+57. Slice 15W
+58. Slice 15X
+59. Slice 15Y
+60. Slice 15Z
+61. Slice 16
+62. Slice 16A
+63. Slice 16B
+64. Slice 16C
+65. Slice 16D
+66. Slice 16E
+67. Slice 16F
+68. Slice 17
+69. Slice 18
 
 Why:
 
@@ -271,7 +279,7 @@ Why:
 - Slice 10B makes quality gates, budget posture, and operating-profile assumptions explicit before deeper decision-world modeling and broader search begin leaning on them
 - Slice 10C should now come before Slice 10A because Relaytic needs skeptical steering, intervention contracts, causal memory, and control-injection defenses before it expands decision authority again
 - Slice 10A is the category-shift slice that turns Relaytic from a governed model/evaluation engine into a decision-and-discovery engine with compiled methods and data-acquisition reasoning
-- Slice 11A turns Relaytic's benchmark and challenger story into something much more real for operators and recruiters by letting users attach an incumbent model and forcing Relaytic to beat it honestly
+- Slice 11A turns Relaytic's benchmark and challenger story into something much more real for operators and technical reviewers by letting users attach an incumbent model and forcing Relaytic to beat it honestly
 - Slice 11B is now implemented and gives Relaytic a real operator-facing control center plus a low-friction install/onboarding path before dojo and later frontier slices expand the lab
 - Slice 11C is now implemented and makes that control center legible on first contact by surfacing modes, capabilities, safe next actions, bounded stage reruns, and starter questions even before a user has discovered the assist surface manually
 - Slice 11D is now implemented and makes first contact far less confusing by adding guided onboarding, real terminal mission-control chat, explicit capability reasons, and a clearer dashboard-versus-chat split
@@ -302,7 +310,15 @@ Why:
 - Slice 15O should follow because AML is a graph, entity, and subgraph problem as much as a row-classification problem
 - Slice 15P is now implemented and makes analyst-review burden, queue quality, and case-packet usefulness first-class AML outputs
 - Slice 15Q is now implemented and makes stream posture, weak-label risk, delayed-outcome alignment, and recalibration triggers explicit instead of treating AML as a static supervised problem
-- Slice 15R should close the pivot by proving the AML story through one benchmark, demo, and paper-safe pack
+- Slice 15R is partially present, but it is not a shipped proof slice until Slice 15R-A adds targeted tests, status alignment, and cross-surface public-claim consistency
+- Slice 15S should make the AML story obvious through one public-safe flagship demo bundle instead of expecting reviewers to infer value from many artifacts
+- Slice 15T should add business-value metrics so Relaytic-AML can defend analyst-hour and review-capacity decisions instead of optimizing only model scores
+- Slice 15U should deepen AML baselines and ablations so the system can prove which capabilities actually changed outcomes
+- Slice 15V should add raw graph and subgraph ingestion so public graph AML work no longer depends only on flattened snapshots
+- Slice 15W should add delayed-label, weak-label, threshold-drift, and time-window proof before production-shaped temporal claims expand
+- Slice 15X should reframe Relaytic runs as evaluation environments with scorecards for messy task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claims
+- Slice 15Y should rewrite first-contact documentation around the flagship AML path and move slice-history detail out of the main story
+- Slice 15Z should clean credibility-damaging repo structure, especially oversized modules, before Academy work increases surface area again
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -315,8 +331,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Q, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, Slice 15 mission-control expansion, release-health visibility, demo packs, and human-factors proof, Slice 15A canonical task contracts, rare-event taxonomy cleanup, benchmark-vs-deploy separation, temporal benchmark scaffolding, Slice 15B model registry expansion, adaptive architecture routing, widened trainable families, and sequence-shadow gating, Slice 15C budgeted HPO, early stopping, warm-start reuse, threshold tuning, and deeper portfolio loops, Slice 15D paper-grade benchmark harness, rerun variance reporting, benchmark ablation matrices, temporal benchmark posture, explicit claim-boundary reporting, Slice 15E execution DAG, runtime freshness contracts, recompute planning, and artifact reuse, Slice 15F research-imported architecture candidates, shadow trials, candidate quarantine, promotion-readiness reporting, Slice 15G objective contracts, split correctness, metric-materialization auditing, temporal fold-health gating, benchmark-truth prechecks, Slice 15H first-class competitive family stack, Slice 15I staged portfolio search, budget-profile separation, finalist planning, pruning reasons, explicit search-stop doctrine, Slice 15J temporal engine, event-preserving blocked splits, temporal feature ladders, honest lagged baseline ladders, sequence-shadow scorecards, Slice 15K calibration strategy selection, threshold-search artifacts, review-budget optimization, abstention posture, and operating-point explanation surfaces, Slice 15L benchmark truth hardening, trace-identity conformance, eval-surface parity, leakage audits, and paper-claim gates, Slice 15M competitive specialization, adapter-activation reporting, temporal benchmark recovery, dev-vs-holdout claim partitioning, and benchmark-generalization guards, Slice 15N AML domain contracts, Slice 15O deterministic entity graphs and typology reasoning, Slice 15P analyst-review queue policy, review-budget ranking, case packets, review-capacity sensitivity, and Slice 15Q stream-risk posture, weak-label posture, delayed-outcome alignment, drift-triggered recalibration signals, and rolling alert-quality reporting. The next track is the closing AML proof slice, 15R, before academy work begins.
-- next execution target: Slice 15R
+- implemented baseline: Slice 00 through Slice 15Q, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, Slice 15 mission-control expansion, release-health visibility, demo packs, and human-factors proof, Slice 15A canonical task contracts, rare-event taxonomy cleanup, benchmark-vs-deploy separation, temporal benchmark scaffolding, Slice 15B model registry expansion, adaptive architecture routing, widened trainable families, and sequence-shadow gating, Slice 15C budgeted HPO, early stopping, warm-start reuse, threshold tuning, and deeper portfolio loops, Slice 15D paper-grade benchmark harness, rerun variance reporting, benchmark ablation matrices, temporal benchmark posture, explicit claim-boundary reporting, Slice 15E execution DAG, runtime freshness contracts, recompute planning, and artifact reuse, Slice 15F research-imported architecture candidates, shadow trials, candidate quarantine, promotion-readiness reporting, Slice 15G objective contracts, split correctness, metric-materialization auditing, temporal fold-health gating, benchmark-truth prechecks, Slice 15H first-class competitive family stack, Slice 15I staged portfolio search, budget-profile separation, finalist planning, pruning reasons, explicit search-stop doctrine, Slice 15J temporal engine, event-preserving blocked splits, temporal feature ladders, honest lagged baseline ladders, sequence-shadow scorecards, Slice 15K calibration strategy selection, threshold-search artifacts, review-budget optimization, abstention posture, and operating-point explanation surfaces, Slice 15L benchmark truth hardening, trace-identity conformance, eval-surface parity, leakage audits, and paper-claim gates, Slice 15M competitive specialization, adapter-activation reporting, temporal benchmark recovery, dev-vs-holdout claim partitioning, and benchmark-generalization guards, Slice 15N AML domain contracts, Slice 15O deterministic entity graphs and typology reasoning, Slice 15P analyst-review queue policy, review-budget ranking, case packets, review-capacity sensitivity, and Slice 15Q stream-risk posture, weak-label posture, delayed-outcome alignment, drift-triggered recalibration signals, and rolling alert-quality reporting. Slice 15R proof-pack code exists partially, but the next accepted implementation target is Slice 15R-A to finish proof, tests, docs, and public-claim alignment before the broader AML productization slices begin.
+- next execution target: Slice 15R-A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -325,7 +341,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after the AML pivot track: Slice 16A
+- next planned academy follow-on after the AML proof/productization track: Slice 16A, after Slices 15R-A through 15Z
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -1593,7 +1609,7 @@ Goal:
 - guided demo flow
 - mode education
 - stuck recovery
-- recruiter-safe first-contact experience
+- public-safe first-contact experience
 
 Load-bearing improvement:
 
@@ -1601,7 +1617,7 @@ Load-bearing improvement:
 
 Human surface:
 
-- humans should be able to open mission control and immediately find a demo flow, mode explanations, stuck guidance, and a recruiter-safe walkthrough
+- humans should be able to open mission control and immediately find a demo flow, mode explanations, stuck guidance, and a public-safe walkthrough
 - mission-control chat should support direct help through `/demo`, `/modes`, and `/stuck`
 
 Agent surface:
@@ -1629,7 +1645,7 @@ Required behavior:
 - the same guidance must also work through natural-language onboarding questions
 - the user handbook must explain the main flow, what happens after a run starts, and what to do when stuck
 - the agent handbook must explain the safe operating pattern, source-of-truth hierarchy, and what to do when stuck
-- a separate demo walkthrough must exist for recruiter-safe demos
+- a separate demo walkthrough must exist for public-safe demos
 
 Required outputs:
 
@@ -2870,7 +2886,7 @@ Required outputs:
 ## Slice 15R - AML flagship benchmark, demo, and paper pack
 
 Goal:
-- turn the AML pivot into recruiter-safe and paper-safe proof
+- turn the AML pivot into public-safe and paper-safe proof
 - maintain one AML benchmark pack, one holdout claim policy, and one flagship demo pack
 - force honest failure reporting on AML misses
 
@@ -2880,6 +2896,344 @@ Required outputs:
 - `aml_demo_scorecard.json`
 - `aml_public_claim_guard.json`
 - `aml_failure_report.json`
+
+## Slice 15R-A - Finish AML proof pack alignment
+
+Goal:
+- finish the partially present Slice 15R implementation
+- align docs, status files, CLI output, run summary, assist, mission control, tests, and public-claim gates
+- prevent Relaytic from treating AML proof artifacts as shipped when the proof path is incomplete
+
+Load-bearing improvement:
+
+- Relaytic-AML should be able to rerun PaySim-style and flattened Elliptic-style workloads, materialize the proof pack, and explain which claims are allowed, blocked, or still supporting-only
+
+Human surface:
+
+- humans should see AML proof status, demo status, covered benchmark tracks, and primary remaining failure directly through benchmark and summary surfaces
+
+Agent surface:
+
+- external agents should be able to consume the same proof state from stable JSON fields without parsing markdown
+
+Intelligence source:
+
+- deterministic benchmark manifests, holdout claim policy, benchmark-generalization guards, demo scorecards, release gates, and explicit failure reports
+
+Fallback rule:
+
+- if cross-track coverage, holdout posture, or release gates are incomplete, Relaytic must block broader AML claims and emit a concrete next-step recommendation
+
+Required outputs:
+- `aml_benchmark_manifest.json`
+- `aml_holdout_claim_report.json`
+- `aml_demo_scorecard.json`
+- `aml_public_claim_guard.json`
+- `aml_failure_report.json`
+
+Minimum proof:
+
+- one PaySim-style workload regression
+- one flattened Elliptic-style workload regression
+- one cross-track claim-gating regression
+- one assist or mission-control regression that surfaces the AML proof posture
+
+## Slice 15S - Flagship AML demo pack
+
+Goal:
+- make Relaytic-AML immediately understandable through one public-safe demo bundle
+- prove the end-to-end story from data to review queue, case packet, operating point, drift posture, benchmark guard, and failure report
+
+Load-bearing improvement:
+
+- Relaytic should be able to create a `relaytic-aml-review-queue` demo bundle from fixture data with no repo archaeology
+
+Human surface:
+
+- humans should get one concise demo report with a run-flow diagram, business-metric table, top case packet, and safe claims
+
+Agent surface:
+
+- external agents should be able to inspect the demo manifest, artifact paths, proof status, and recommended next command from JSON
+
+Intelligence source:
+
+- existing AML graph, casework, stream-risk, benchmark, trace, release-gate, and public-claim artifacts
+
+Fallback rule:
+
+- if a richer HTML demo renderer is unavailable, Relaytic must still produce a markdown and JSON demo bundle
+
+Required outputs:
+- `aml_demo_bundle_manifest.json`
+- `aml_demo_business_metric_table.json`
+- `aml_demo_flow_report.md`
+- `aml_demo_artifact_index.json`
+
+Minimum proof:
+
+- one command creates the demo bundle from fixture data
+- the bundle links to the case packet, benchmark guard, public-claim guard, and failure report
+
+## Slice 15T - Business-value metrics and analyst-hour proof
+
+Goal:
+- make analyst capacity and business value first-class evaluation criteria
+- separate model quality from operational usefulness
+
+Load-bearing improvement:
+
+- Relaytic-AML should report analyst-hours saved, false-positive reduction at fixed recall, recall at review capacity, precision at top-k, and case-packet completeness
+
+Human surface:
+
+- humans should see whether Relaytic improved the actual review queue, not only the predictive score
+
+Agent surface:
+
+- external agents should consume a stable business-value report and know when high AUROC is operationally weak
+
+Intelligence source:
+
+- review-budget contracts, threshold search, casework scorecards, operating-point contracts, and incumbent comparisons
+
+Fallback rule:
+
+- if analyst-hour assumptions are missing, Relaytic must use conservative defaults, label them as assumptions, and avoid hard business-value claims
+
+Required outputs:
+- `aml_business_value_report.json`
+- `analyst_hour_savings_report.json`
+- `review_capacity_metric_report.json`
+- `operational_metric_guard.json`
+
+Minimum proof:
+
+- one regression where a model-score improvement fails the operational metric guard
+- one incumbent comparison with analyst-capacity tradeoffs
+
+## Slice 15U - Strong AML baselines and ablations
+
+Goal:
+- strengthen AML proof through explicit baselines and ablation science
+- show what graph, temporal, calibration, threshold, and review-budget machinery contributed
+
+Load-bearing improvement:
+
+- Relaytic-AML should compare against rules, calibrated linear models, tree ensembles, optional boosted trees, lagged temporal baselines, structural graph baselines, and graph-shadow candidates under the same contract
+
+Human surface:
+
+- humans should see one AML ablation matrix that explains which capability mattered
+
+Agent surface:
+
+- external agents should inspect baseline availability, adapter versions, ablation outcomes, and blocked claims through stable artifacts
+
+Intelligence source:
+
+- existing model-family registry, optional adapter readiness, benchmark truth gates, temporal ladder, graph evidence, and casework metrics
+
+Fallback rule:
+
+- optional baselines may be unavailable, but Relaytic must record adapter absence and keep deterministic baselines alive
+
+Required outputs:
+- `aml_baseline_matrix.json`
+- `aml_ablation_matrix.json`
+- `aml_baseline_adapter_report.json`
+- `aml_capability_contribution_report.json`
+
+Minimum proof:
+
+- one AML workload where at least three baseline families run or explicitly fall back
+- one ablation that changes a public metric and is surfaced in the benchmark/demo report
+
+## Slice 15V - Raw graph and subgraph ingestion
+
+Goal:
+- move beyond flattened graph snapshots for AML workloads
+- support public graph/subgraph datasets through explicit local loaders and provenance manifests
+
+Load-bearing improvement:
+
+- Relaytic-AML should ingest Elliptic-style multi-file graph bundles and preserve node, edge, feature, time, and label provenance
+
+Human surface:
+
+- humans should see whether a graph workload was raw graph, flattened graph, or subgraph-packaged, and which claims that permits
+
+Agent surface:
+
+- external agents should consume graph-loader manifests and know which files, IDs, and transformations were used
+
+Intelligence source:
+
+- deterministic graph loaders, graph provenance, entity graph construction, typology reasoning, and subgraph packaging
+
+Fallback rule:
+
+- if raw graph files are incomplete, Relaytic must fall back to flattened snapshot mode only when a valid flattened file is provided and must downgrade graph claims
+
+Required outputs:
+- `aml_graph_loader_manifest.json`
+- `aml_graph_provenance_report.json`
+- `aml_subgraph_task_manifest.json`
+- `aml_graph_claim_scope.json`
+
+Minimum proof:
+
+- one raw graph fixture loads into the same graph/entity artifact path
+- one incomplete graph bundle fails safely with a precise recovery instruction
+
+## Slice 15W - Temporal and weak-label upgrade
+
+Goal:
+- improve production-shaped AML time and label handling
+- make delayed labels, weak labels, threshold drift, and rolling windows explicit
+
+Load-bearing improvement:
+
+- Relaytic-AML should evaluate delayed-label windows, positive-unlabeled posture, threshold stability, and recalibration choices under ordered data
+
+Human surface:
+
+- humans should see whether Relaytic recommends retraining, recalibration, threshold reset, or more delayed-outcome observation
+
+Agent surface:
+
+- external agents should consume time-window scorecards and weak-label guards without reinterpreting raw rows
+
+Intelligence source:
+
+- temporal engine, stream-risk posture, weak-label posture, delayed-outcome alignment, rolling alert-quality reports, and threshold-search artifacts
+
+Fallback rule:
+
+- if timestamp or delayed-label evidence is missing, Relaytic must keep temporal claims blocked and emit required-data recommendations
+
+Required outputs:
+- `aml_delayed_label_eval_report.json`
+- `aml_positive_unlabeled_posture.json`
+- `aml_threshold_drift_report.json`
+- `aml_time_window_scorecard.json`
+
+Minimum proof:
+
+- one ordered workload produces a threshold-drift decision
+- one delayed-label scenario blocks overconfident public claims
+
+## Slice 15X - AML evaluation-environment reframe
+
+Goal:
+- turn Relaytic runs into explicit evaluation environments for humans and agents
+- separate environment behavior from model-score behavior
+
+Load-bearing improvement:
+
+- Relaytic should score environment tasks such as messy task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claim generation
+
+Human surface:
+
+- humans should see one environment scorecard that explains whether Relaytic behaved well under realistic workflow pressure
+
+Agent surface:
+
+- external agents should be able to run or inspect environment tasks non-interactively
+
+Intelligence source:
+
+- trace/eval artifacts, assist/control artifacts, benchmark guards, incumbent comparisons, casework, stream-risk posture, and public-claim gates
+
+Fallback rule:
+
+- if an environment task cannot run, Relaytic must report it as incomplete rather than silently treating model success as environment success
+
+Required outputs:
+- `aml_eval_environment_manifest.json`
+- `aml_environment_scorecard.json`
+- `aml_workflow_task_matrix.json`
+- `aml_environment_failure_report.json`
+
+Minimum proof:
+
+- one environment scorecard includes both a model-quality task and a workflow-safety task
+- one unsafe steering task remains rejected with trace-backed evidence
+
+## Slice 15Y - Demo-first documentation rewrite
+
+Goal:
+- make first contact demo-led instead of roadmap-led
+- keep slice history available without making it the main public story
+
+Load-bearing improvement:
+
+- a new reader should understand the AML path, run the demo, inspect the case packet, inspect benchmark/public-claim guards, and inspect trace/evals before learning the full slice history
+
+Human surface:
+
+- README and handbooks should point to one flagship path first
+
+Agent surface:
+
+- agent handbooks should expose one command-first AML demo path and the proof artifacts to inspect
+
+Intelligence source:
+
+- documentation structure, product-story artifacts, and proof links
+
+Fallback rule:
+
+- if a demo artifact is not generated yet, docs must say which slice generates it instead of pretending it exists
+
+Required outputs:
+- `docs/why_relaytic_aml.md`
+- `docs/product_story.md`
+- README flagship path rewrite
+- handbook demo-path updates
+
+Minimum proof:
+
+- README names the next command for a new operator
+- docs link to AML proof artifacts without overstating support
+
+## Slice 15Z - Pre-Academy repo credibility cleanup
+
+Goal:
+- reduce credibility risk before adding capability-academy surface area
+- split oversized modules where extraction improves clarity
+- remove or document misleading surfaces that make the repo feel accumulated
+
+Load-bearing improvement:
+
+- the codebase should look easier to evaluate and maintain before it grows again
+
+Human surface:
+
+- humans should see a cleaner package map and public-surface inventory
+
+Agent surface:
+
+- external agents should have a clearer import/module boundary map and fewer oversized entrypoints to reason about
+
+Intelligence source:
+
+- deterministic module-size audits, import-boundary checks, public-surface inventory, and targeted regression tests
+
+Fallback rule:
+
+- if a large module cannot be safely split in one pass, Relaytic must document the retained responsibility and the next extraction boundary
+
+Required outputs:
+- `pre_academy_repo_audit.json`
+- `module_extraction_plan.json`
+- `public_surface_inventory.json`
+- `module_split_report.json`
+
+Minimum proof:
+
+- at least one oversized module is split without changing public behavior
+- public CLI and import-boundary smoke tests still pass
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

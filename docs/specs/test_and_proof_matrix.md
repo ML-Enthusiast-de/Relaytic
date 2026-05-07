@@ -197,7 +197,15 @@ To reduce timeout risk, future CI should support at least:
 - graph and typology reasoning tests
 - analyst review-budget and top-k ranking tests
 - weak-label and streaming-drift tests
-- AML holdout-claim and recruiter-demo tests
+- AML proof-pack alignment tests across benchmark CLI, benchmark show, run summary, assist, and mission control
+- PaySim-style and flattened Elliptic-style workload regressions
+- AML holdout-claim and public-demo tests
+- AML business-value and analyst-hour tests
+- AML baseline and ablation tests
+- AML raw graph/subgraph loader tests
+- AML delayed-label and threshold-drift tests
+- AML evaluation-environment tests for unsafe steering, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claim generation
+- pre-Academy repo credibility tests for module-size and public-surface inventory changes
 
 ### Slice 17 family
 
@@ -208,7 +216,7 @@ To reduce timeout risk, future CI should support at least:
 
 ## Release gate
 
-For a slice to be considered recruiter-demo-ready, it should have:
+For a slice to be considered public-demo-ready, it should have:
 
 - green targeted tests for the slice
 - green human-chaos tests for impacted flows

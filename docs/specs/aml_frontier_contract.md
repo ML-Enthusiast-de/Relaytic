@@ -201,6 +201,24 @@ Relaytic-AML should eventually keep these four flagship demos green:
 3. suspicious subgraph / entity expansion with explanation
 4. drift-triggered recalibration or threshold reset without hidden behavior
 
+## Pre-Academy implementation doctrine
+
+Relaytic must not move into the capability Academy track merely because the first AML proof artifacts exist.
+
+The AML proof path is accepted only after these slices are complete:
+
+- **15R-A** finishes the AML proof pack by aligning tests, CLI, run summary, assist, mission control, docs, and public-claim gates.
+- **15S** builds one public-safe flagship AML demo bundle around review-queue value and case evidence.
+- **15T** adds business-value metrics such as analyst-hours saved, false-positive reduction at fixed recall, recall at review capacity, precision at top-k, and case-packet completeness.
+- **15U** adds strong AML baselines and ablations so graph, temporal, calibration, threshold, and review-budget contributions are measured.
+- **15V** adds raw graph and subgraph ingestion so public graph AML work is not limited to flattened snapshots.
+- **15W** strengthens delayed-label, positive-unlabeled, threshold-drift, and time-window evaluation.
+- **15X** frames Relaytic runs as evaluation environments with explicit workflow scorecards.
+- **15Y** rewrites first-contact docs around the flagship AML path.
+- **15Z** cleans credibility-damaging repo structure before broader capability growth resumes.
+
+If any of these slices discovers that Relaytic-AML loses, the correct output is a failure report and next experiment, not a broader claim.
+
 ## Required future artifacts
 
 - `aml_domain_contract.json`
@@ -217,6 +235,12 @@ Relaytic-AML should eventually keep these four flagship demos green:
 - `weak_label_posture.json`
 - `aml_benchmark_manifest.json`
 - `aml_holdout_claim_report.json`
+- `aml_demo_bundle_manifest.json`
+- `aml_business_value_report.json`
+- `aml_ablation_matrix.json`
+- `aml_graph_loader_manifest.json`
+- `aml_delayed_label_eval_report.json`
+- `aml_environment_scorecard.json`
 
 ## Success criterion
 

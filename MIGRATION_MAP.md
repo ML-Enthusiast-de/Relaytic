@@ -200,8 +200,8 @@ Avoid introducing new references to:
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
-- future AML-specific work should land through bounded slices `15N` through `15R` before the academy work begins
-- future AML boundaries should concentrate under `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/graph_fabric/`, and `src/relaytic/stream_risk/` rather than scattering domain logic across unrelated generic packages
+- future AML-specific work should land through bounded slices `15R-A` through `15Z` before the academy work begins
+- future AML boundaries should concentrate under `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/graph_fabric/`, `src/relaytic/stream_risk/`, and any focused future AML loader or evaluation-environment package rather than scattering domain logic across unrelated generic packages
 - future public AML artifacts should remain additive and must not break the canonical `relaytic` package or CLI surface
 
 ### Slice 09A
@@ -415,7 +415,7 @@ Avoid introducing new references to:
 - `src/relaytic/handoff/` for Slice 12C differentiated post-run handoff generation, next-run options, persisted next-run focus, and differentiated report rendering for humans and external agents
 - `src/relaytic/learnings/` for Slice 12C durable local learnings state, learnings markdown, per-run learnings snapshots, and workspace learnings reset behavior
 - `docs/handbooks/` for Slice 11E role-specific human/operator and external-agent onboarding guides
-- `docs/handbooks/relaytic_demo_walkthrough.md` for Slice 11F recruiter-safe demo sequencing and first-contact presentation
+- `docs/handbooks/relaytic_demo_walkthrough.md` for Slice 11F public-safe demo sequencing and first-contact presentation
 - `docs/specs/` for normative product-contract docs covering workspace lifecycle, result-contract schema, governed learnings, mission-control behavior, compatibility migration, proof burden, and flagship demos
 
 Shipped artifact names:
@@ -554,7 +554,7 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/modeling/families/`, if introduced during Slice 15H, for first-class family-owned trainers, search spaces, adapter shims, and specialization logic rather than one generic trainer path
 - `src/relaytic/modeling/portfolio/`, if introduced during Slice 15I, for staged family probing, racing, finalist search, pruning, and budget-envelope logic
 - `src/relaytic/temporal/`, if introduced after Slice 15J, for deeper temporal family ownership beyond the currently shipped temporal-engine surfaces in `src/relaytic/analytics/`, `src/relaytic/modeling/`, and `src/relaytic/benchmark/`
-- `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` for the AML pivot track in Slices 15N through 15R
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader or evaluation-environment package for the AML proof/productization track in Slices 15R-A through 15Z
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement after the AML pivot lands
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should avoid creating a new package boundary unless absolutely necessary; its job is to remove misleading, duplicated, or legacy boundaries, split oversized modules, retire compatibility shims when the removal criteria are met, and leave the public surface cleaner than before
@@ -581,6 +581,32 @@ Implemented event-bus and permission artifact names:
 - `session_capability_contract.json`
 
 Implemented daemon, feasibility, remote-supervision, and mission-control proof artifact names plus reserved later academy and representation names:
+- `aml_demo_bundle_manifest.json`
+- `aml_demo_business_metric_table.json`
+- `aml_demo_flow_report.md`
+- `aml_demo_artifact_index.json`
+- `aml_business_value_report.json`
+- `analyst_hour_savings_report.json`
+- `review_capacity_metric_report.json`
+- `operational_metric_guard.json`
+- `aml_baseline_matrix.json`
+- `aml_ablation_matrix.json`
+- `aml_baseline_adapter_report.json`
+- `aml_capability_contribution_report.json`
+- `aml_graph_loader_manifest.json`
+- `aml_graph_provenance_report.json`
+- `aml_subgraph_task_manifest.json`
+- `aml_graph_claim_scope.json`
+- `aml_delayed_label_eval_report.json`
+- `aml_positive_unlabeled_posture.json`
+- `aml_threshold_drift_report.json`
+- `aml_time_window_scorecard.json`
+- `aml_eval_environment_manifest.json`
+- `aml_environment_scorecard.json`
+- `aml_workflow_task_matrix.json`
+- `aml_environment_failure_report.json`
+- `pre_academy_repo_audit.json`
+- `module_extraction_plan.json`
 - `daemon_state.json`
 - `background_job_registry.json`
 - `background_job_log.jsonl`
