@@ -2,7 +2,7 @@
 
 ## Status
 
-Partially implemented. Not accepted as shipped until Slice 15R-A completes targeted tests, cross-surface alignment, and control-doc status updates.
+Accepted through Slice 15R-A. The proof-pack implementation is now covered by targeted tests, cross-surface alignment checks, and control-doc status updates.
 
 ## Intent
 
@@ -10,7 +10,7 @@ Slice 15R is the proof slice for the AML pivot.
 
 It turns the earlier AML slices into a public-safe, paper-safe, and demo-safe evidence pack.
 
-Current doctrine: do not move into Academy work after the partial 15R implementation. The next implementation target is Slice 15R-A, which finishes this proof pack and blocks broader AML claims until the proof artifacts, tests, and surfaces agree.
+Current doctrine: do not move into Academy work after the AML proof-pack implementation. The next implementation target is Slice 15S, which turns the accepted proof pack into one public-safe flagship AML demo bundle.
 
 ## Load-Bearing Improvement
 

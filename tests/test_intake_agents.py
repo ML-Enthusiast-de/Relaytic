@@ -69,6 +69,22 @@ def _write_string_multiclass_dataset(path: Path) -> Path:
     return path
 
 
+def _write_elliptic_y_dataset(path: Path) -> Path:
+    rows = [
+        ["txId", "src", "dst", "time_step", "amount", "feature_local_1", "feature_local_2", "y"],
+        ["tx_001", "wallet_a", "wallet_hub", 1, 10.0, 0.2, 0.3, 1],
+        ["tx_002", "wallet_b", "wallet_hub", 2, 12.0, 0.3, 0.4, 1],
+        ["tx_003", "wallet_hub", "cashout_a", 3, 90.0, 0.8, 0.7, 1],
+        ["tx_004", "wallet_c", "merchant_a", 4, 30.0, 0.1, 0.2, 0],
+        ["tx_005", "wallet_d", "merchant_b", 5, 28.0, 0.1, 0.2, 0],
+        ["tx_006", "bridge_a", "bridge_hub", 6, 24.0, 0.4, 0.5, 0],
+    ]
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerows(rows)
+    return path
+
+
 def _build_foundation(policy: dict) -> tuple[dict, dict]:
     mandate_controls = build_mandate_controls_from_policy(policy)
     context_controls = build_context_controls_from_policy(policy)
@@ -233,6 +249,29 @@ def test_run_intake_interpretation_uses_dataset_evidence_for_string_multiclass_t
 
     assert resolution.task_brief.target_column == "bean_class"
     assert resolution.task_brief.task_type_hint == "multiclass_classification"
+
+
+def test_run_intake_interpretation_accepts_single_character_targets(tmp_path: Path) -> None:
+    data_path = _write_elliptic_y_dataset(tmp_path / "elliptic_y_intake.csv")
+    policy = load_policy().policy
+    mandate_bundle, context_bundle = _build_foundation(policy)
+
+    resolution = run_intake_interpretation(
+        message=(
+            "Classify y from flattened Elliptic-style AML graph transaction evidence. "
+            "Use source and destination entity context for analyst review."
+        ),
+        actor_type="user",
+        actor_name="aml_operator",
+        channel="cli",
+        policy=policy,
+        mandate_bundle=mandate_bundle,
+        context_bundle=context_bundle,
+        data_path=str(data_path),
+    )
+
+    assert resolution.task_brief.target_column == "y"
+    assert resolution.task_brief.task_type_hint == "fraud_detection"
 
 
 def test_run_intake_interpretation_logs_conflict_instead_of_overwriting_existing_target(tmp_path: Path) -> None:

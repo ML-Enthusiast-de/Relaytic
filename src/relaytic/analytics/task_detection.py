@@ -36,7 +36,7 @@ _BOOLEAN_LABELS = {
     "n",
 }
 
-_FRAUD_KEYWORDS = ("fraud", "chargeback", "scam", "abuse")
+_FRAUD_KEYWORDS = ("fraud", "chargeback", "scam", "abuse", "aml", "laundering", "illicit")
 _ANOMALY_KEYWORDS = ("anomaly", "anomal", "outlier", "fault", "alert", "attack")
 
 

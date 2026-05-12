@@ -2,13 +2,13 @@
 
 ## Status
 
-Planned next.
+Implemented.
 
 ## Intent
 
-Slice 15R-A finishes the partially present Slice 15R implementation.
+Slice 15R-A finished the partially present Slice 15R implementation.
 
-It prevents Relaytic from treating AML proof-pack artifacts as shipped until the benchmark CLI, benchmark show, run summary, assist, mission control, tests, and control docs all expose the same proof posture.
+It prevents Relaytic from treating AML proof-pack artifacts as shipped unless the benchmark CLI, benchmark show, run summary, assist, mission control, tests, and control docs all expose the same proof posture.
 
 ## Load-Bearing Improvement
 
@@ -57,4 +57,3 @@ It prevents Relaytic from treating AML proof-pack artifacts as shipped until the
 - one PaySim-style workload regression
 - one Elliptic-style workload regression
 - one assist or mission-control AML proof regression
-

@@ -117,7 +117,7 @@ Before the AML flagship paper/demo pack is considered credible, Relaytic-AML sho
 
 The benchmark pack is now part of a broader AML proof/productization sequence. The next implementation sessions must follow this order before Academy work resumes:
 
-1. **15R-A**: finish AML proof-pack alignment across tests, CLI, run summary, assist, mission control, docs, and claim gates.
+1. **15R-A**: finished AML proof-pack alignment across tests, CLI, run summary, assist, mission control, docs, and claim gates.
 2. **15S**: create the public-safe flagship AML demo bundle.
 3. **15T**: add operational business-value metrics and analyst-hour proof.
 4. **15U**: add strong AML baselines and ablations.

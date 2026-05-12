@@ -197,10 +197,17 @@ Avoid introducing new references to:
 - introduced artifact boundaries for `stream_risk_posture.json`, `weak_label_posture.json`, `delayed_outcome_alignment.json`, `drift_recalibration_trigger.json`, and `rolling_alert_quality_report.json`
 - upgraded planning, run-summary materialization, benchmark bundle payloads, and assist explanations so Relaytic-AML can expose weak-label risk, delayed-outcome posture, rolling alert pressure, and recalibration triggers from one deterministic stream-risk path instead of treating AML as a static supervised table
 
+### Slice 15R-A
+
+- extended the existing `src/relaytic/benchmark/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/mission_control/`, and `src/relaytic/ui/` boundaries rather than introducing a separate AML proof package
+- introduced accepted AML proof-pack artifact boundaries for `aml_benchmark_manifest.json`, `aml_holdout_claim_report.json`, `aml_demo_scorecard.json`, `aml_public_claim_guard.json`, and `aml_failure_report.json`
+- upgraded intake target parsing so canonical one-character AML labels such as Elliptic-style `y` can be selected explicitly instead of being displaced by graph endpoint columns
+- upgraded benchmark CLI/show, run-summary, assist, and mission-control proof visibility so PaySim-style and flattened Elliptic-style workloads expose the same AML proof posture and cross-track claim gate
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
-- future AML-specific work should land through bounded slices `15R-A` through `15Z` before the academy work begins
+- future AML-specific work should land through bounded slices `15S` through `15Z` before the academy work begins
 - future AML boundaries should concentrate under `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/graph_fabric/`, `src/relaytic/stream_risk/`, and any focused future AML loader or evaluation-environment package rather than scattering domain logic across unrelated generic packages
 - future public AML artifacts should remain additive and must not break the canonical `relaytic` package or CLI surface
 
@@ -554,7 +561,7 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/modeling/families/`, if introduced during Slice 15H, for first-class family-owned trainers, search spaces, adapter shims, and specialization logic rather than one generic trainer path
 - `src/relaytic/modeling/portfolio/`, if introduced during Slice 15I, for staged family probing, racing, finalist search, pruning, and budget-envelope logic
 - `src/relaytic/temporal/`, if introduced after Slice 15J, for deeper temporal family ownership beyond the currently shipped temporal-engine surfaces in `src/relaytic/analytics/`, `src/relaytic/modeling/`, and `src/relaytic/benchmark/`
-- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader or evaluation-environment package for the AML proof/productization track in Slices 15R-A through 15Z
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader or evaluation-environment package for the remaining AML productization track in Slices 15S through 15Z
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement after the AML pivot lands
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should avoid creating a new package boundary unless absolutely necessary; its job is to remove misleading, duplicated, or legacy boundaries, split oversized modules, retire compatibility shims when the removal criteria are met, and leave the public surface cleaner than before

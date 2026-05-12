@@ -17,7 +17,7 @@ Intended package boundaries:
 
 Slice 16 is the future umbrella track where Relaytic learns new non-core capabilities without turning into an uncontrolled self-modifying system.
 
-It should start only after the full performance-recovery track in Slices 15A through 15M, the AML foundation track in Slices 15N through 15Q, and the AML proof/productization track in Slices 15R-A through 15Z have landed.
+It should start only after the full performance-recovery track in Slices 15A through 15M, the AML foundation track in Slices 15N through 15Q, the AML proof alignment in Slice 15R-A, and the remaining AML productization track in Slices 15S through 15Z have landed.
 
 This is not a single coding pass. It is a governed program delivered through:
 

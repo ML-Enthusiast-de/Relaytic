@@ -55,11 +55,11 @@ from .semantic import build_local_advisor
 TARGET_PATTERNS = (
     re.compile(
         r"\b(?:predict|forecast|estimate|model|classify|detect|identify|explain)\s+"
-        r"(?P<target>[a-z0-9_][a-z0-9_ \-/]{1,80})",
+        r"(?P<target>[a-z0-9_][a-z0-9_ \-/]{0,80})",
         re.IGNORECASE,
     ),
     re.compile(
-        r"\btarget(?:\s+column)?\s+is\s+(?P<target>[a-z0-9_][a-z0-9_ \-/]{1,80})",
+        r"\btarget(?:\s+column)?\s+is\s+(?P<target>[a-z0-9_][a-z0-9_ \-/]{0,80})",
         re.IGNORECASE,
     ),
 )
@@ -517,13 +517,16 @@ class ContextInterpreterAgent:
                 parsed=parsed,
                 target_column=target_column,
             )
+        text_task_type_hint = _infer_task_type_hint(
+            normalized_text=parsed.normalized_text,
+            target_column=target_column,
+        )
+        if text_task_type_hint in {"fraud_detection", "anomaly_detection", "multiclass_classification"}:
+            dataset_task_type_hint = None
         task_type_hint = (
             explicit_task_type_hint
             or dataset_task_type_hint
-            or _infer_task_type_hint(
-                normalized_text=parsed.normalized_text,
-                target_column=target_column,
-            )
+            or text_task_type_hint
         )
         if task_type_hint and task_type_hint != "auto":
             task_brief_updates["task_type_hint"] = task_type_hint
@@ -1092,7 +1095,7 @@ def _infer_decision_type(normalized_text: str) -> str | None:
 
 def _infer_task_type_hint(*, normalized_text: str, target_column: str) -> str | None:
     combined = f"{normalized_text} {str(target_column).strip().lower()}".strip()
-    if any(token in combined for token in ("fraud", "chargeback", "scam", "abuse")):
+    if any(token in combined for token in ("fraud", "chargeback", "scam", "abuse", "aml", "laundering", "illicit")):
         return "fraud_detection"
     if any(token in combined for token in ("anomaly", "outlier", "fault", "alert", "attack")):
         return "anomaly_detection"
@@ -1121,7 +1124,7 @@ def _infer_task_type_hint_from_data(*, parsed: _ParsedInput, target_column: str)
 
 def _infer_domain_archetype_hint(*, normalized_text: str, target_column: str) -> str | None:
     combined = f"{normalized_text} {str(target_column).strip().lower()}".strip()
-    if any(token in combined for token in ("fraud", "chargeback", "abuse", "scam", "transaction")):
+    if any(token in combined for token in ("fraud", "chargeback", "abuse", "scam", "transaction", "aml", "laundering", "illicit")):
         return "fraud_risk"
     if any(token in combined for token in ("anomaly", "outlier", "fault", "alert", "attack")):
         return "anomaly_monitoring"

@@ -207,7 +207,7 @@ Relaytic must not move into the capability Academy track merely because the firs
 
 The AML proof path is accepted only after these slices are complete:
 
-- **15R-A** finishes the AML proof pack by aligning tests, CLI, run summary, assist, mission control, docs, and public-claim gates.
+- **15R-A** finished the AML proof pack by aligning tests, CLI, run summary, assist, mission control, docs, and public-claim gates.
 - **15S** builds one public-safe flagship AML demo bundle around review-queue value and case evidence.
 - **15T** adds business-value metrics such as analyst-hours saved, false-positive reduction at fixed recall, recall at review capacity, precision at top-k, and case-packet completeness.
 - **15U** adds strong AML baselines and ablations so graph, temporal, calibration, threshold, and review-budget contributions are measured.
