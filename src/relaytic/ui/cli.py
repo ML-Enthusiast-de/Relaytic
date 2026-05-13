@@ -1759,6 +1759,29 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    demo_surface = sub.add_parser(
+        "demo",
+        help="Create or inspect public-safe Relaytic demo bundles.",
+    )
+    demo_sub = demo_surface.add_subparsers(dest="demo_command", required=True)
+    aml_review_queue_demo = demo_sub.add_parser(
+        "aml-review-queue",
+        help="Create the Slice 15S Relaytic-AML review-queue demo bundle from fixture data or a supplied AML dataset.",
+    )
+    aml_review_queue_demo.add_argument("--run-dir", default=None, help="Optional run directory. Defaults to a generated artifacts run.")
+    aml_review_queue_demo.add_argument("--data-path", default=None, help="Optional AML dataset path. If omitted, Relaytic writes a synthetic public-safe fixture.")
+    aml_review_queue_demo.add_argument("--config", default=None, help="Optional config/policy source.")
+    aml_review_queue_demo.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    aml_review_queue_demo.add_argument("--timestamp-column", default="step", help="Timestamp column for the demo run.")
+    aml_review_queue_demo.add_argument("--overwrite", action="store_true", help="Allow overwriting existing demo/run artifacts.")
+    aml_review_queue_demo.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    aml_review_queue_demo.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     decision_surface = sub.add_parser(
         "decision",
         help="Run or inspect Slice 10A decision-world modeling, controller logic, and local data-fabric artifacts.",
@@ -4145,6 +4168,31 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
+    if args.command == "demo":
+        if args.demo_command != "aml-review-queue":
+            parser.error("Unsupported demo subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_aml_review_queue_demo(
+                run_dir=args.run_dir,
+                data_path=args.data_path,
+                config_path=args.config,
+                run_id=args.run_id,
+                timestamp_column=args.timestamp_column,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
     if args.command == "assist":
         if args.assist_command == "show":
             try:
@@ -4956,6 +5004,110 @@ def _run_access_flow(
     return {
         "surface_payload": surface_payload,
         "human_output": summary_materialized["report_markdown"],
+    }
+
+
+def _run_aml_review_queue_demo(
+    *,
+    run_dir: str | None,
+    data_path: str | None,
+    config_path: str | None,
+    run_id: str | None,
+    timestamp_column: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.aml import AML_DEMO_ID, build_aml_demo_bundle_artifacts, write_aml_review_queue_fixture
+
+    fixture_written = False
+    root = Path(run_dir) if run_dir else None
+    if data_path:
+        resolved_data_path = Path(data_path)
+        if not resolved_data_path.exists():
+            raise ValueError(f"Demo data path does not exist: {resolved_data_path}")
+    else:
+        fixture_root = (root / "inputs") if root is not None else (Path("artifacts") / "demo_fixtures")
+        resolved_data_path = write_aml_review_queue_fixture(fixture_root / "relaytic_aml_review_queue_fixture.csv")
+        fixture_written = True
+    root = root if root is not None else _default_access_run_dir(data_path=resolved_data_path)
+    demo_labels = {
+        "slice": "15S",
+        "demo_id": AML_DEMO_ID,
+        **dict(labels or {}),
+    }
+    request_text = (
+        "Do everything on your own. This is the Relaytic-AML review-queue flagship demo. "
+        "Classify isFraud on a PaySim-style AML payment-fraud workload, optimize analyst review queue value, "
+        "materialize the top case packet, expose drift posture, and keep public AML claims bounded by the claim guard."
+    )
+    run_payload = _run_access_flow(
+        run_dir=str(root),
+        data_path=str(resolved_data_path),
+        source_type="auto",
+        source_table=None,
+        sql_query=None,
+        stream_window_rows=5000,
+        stream_format="auto",
+        materialized_format="auto",
+        config_path=config_path,
+        run_id=run_id,
+        text=request_text,
+        text_file=None,
+        actor_type="agent",
+        actor_name="relaytic_demo_packager",
+        channel="cli",
+        sheet_name=None,
+        header_row=None,
+        data_start_row=None,
+        timestamp_column=timestamp_column or "step",
+        overwrite=overwrite,
+        labels=demo_labels,
+    )
+    demo_bundle = build_aml_demo_bundle_artifacts(
+        run_dir=root,
+        data_path=resolved_data_path,
+        command="relaytic demo aml-review-queue",
+    )
+    mission_control_payload = _show_mission_control_surface(
+        run_dir=str(root),
+        output_dir=None,
+        config_path=config_path,
+        expected_profile="full",
+    )
+    manifest_path = _refresh_aml_demo_manifest(
+        root,
+        run_id=run_id,
+        policy_source=run_payload["surface_payload"].get("policy_resolved"),
+        labels=demo_labels,
+    )
+    mission_bundle = dict(mission_control_payload["surface_payload"].get("bundle", {}))
+    aml_board = dict(mission_bundle.get("aml_investigation_board", {}))
+    surface_payload = {
+        "status": "ok",
+        "demo_id": AML_DEMO_ID,
+        "run_dir": str(root),
+        "data_path": str(resolved_data_path),
+        "fixture_written": fixture_written,
+        "manifest_path": str(manifest_path),
+        "paths": demo_bundle["paths"],
+        "demo_bundle": demo_bundle["manifest"],
+        "business_metric_table": {
+            "status": demo_bundle["business_metric_table"].get("status"),
+            "model_metric_count": len(demo_bundle["business_metric_table"].get("model_metrics", [])),
+            "operational_review_metric_count": len(demo_bundle["business_metric_table"].get("operational_review_metrics", [])),
+        },
+        "artifact_index": {
+            "status": demo_bundle["artifact_index"].get("status"),
+            "missing_required_artifact_count": demo_bundle["artifact_index"].get("missing_required_artifact_count"),
+            "missing_required_artifacts": demo_bundle["artifact_index"].get("missing_required_artifacts", []),
+        },
+        "mission_control": mission_control_payload["surface_payload"].get("mission_control", {}),
+        "aml_investigation_board": aml_board,
+        "recommended_next_command": demo_bundle["manifest"].get("recommended_next_command"),
+    }
+    return {
+        "surface_payload": surface_payload,
+        "human_output": demo_bundle["flow_report"],
     }
 
 
@@ -8039,6 +8191,7 @@ def _show_mission_control_surface(
     release_health = dict(bundle.get("release_health_report", {}))
     demo_pack = dict(bundle.get("demo_pack_manifest", {}))
     demo_scorecard = dict(bundle.get("flagship_demo_scorecard", {}))
+    aml_board = dict(bundle.get("aml_investigation_board", {}))
     human_factors = dict(bundle.get("human_factors_eval_report", {}))
     onboarding_success = dict(bundle.get("onboarding_success_report", {}))
     pulse = read_run_summary(run_dir).get("pulse", {}) if run_dir is not None else {}
@@ -8114,6 +8267,10 @@ def _show_mission_control_surface(
                 "demo_story_count": demo_pack.get("demo_count"),
                 "current_demo_story": demo_scorecard.get("current_run_story"),
                 "current_run_qualifies_demo": demo_scorecard.get("current_run_qualifies"),
+                "aml_investigation_board_status": aml_board.get("status"),
+                "aml_demo_bundle_present": aml_board.get("demo_bundle_present"),
+                "aml_top_case_id": dict(aml_board.get("top_case_packet", {})).get("case_id"),
+                "aml_claim_posture": dict(aml_board.get("claim_guard", {})).get("claim_posture"),
                 "first_run_success_ready": human_factors.get("first_run_success_ready"),
                 "onboarding_ready_for_first_time_user": onboarding_success.get("ready_for_first_time_user"),
             },
@@ -8176,6 +8333,7 @@ def _launch_mission_control_surface(
     background_jobs = dict(bundle.get("background_job_view", {}))
     release_health = dict(bundle.get("release_health_report", {}))
     demo_scorecard = dict(bundle.get("flagship_demo_scorecard", {}))
+    aml_board = dict(bundle.get("aml_investigation_board", {}))
     onboarding_success = dict(bundle.get("onboarding_success_report", {}))
     pulse = read_run_summary(run_dir).get("pulse", {}) if run_dir is not None else {}
     pulse = dict(pulse) if isinstance(pulse, dict) else {}
@@ -8219,6 +8377,10 @@ def _launch_mission_control_surface(
                 "background_job_count": background_jobs.get("job_count"),
                 "release_health_status": release_health.get("status"),
                 "current_demo_story": demo_scorecard.get("current_run_story"),
+                "aml_investigation_board_status": aml_board.get("status"),
+                "aml_demo_bundle_present": aml_board.get("demo_bundle_present"),
+                "aml_top_case_id": dict(aml_board.get("top_case_packet", {})).get("case_id"),
+                "aml_claim_posture": dict(aml_board.get("claim_guard", {})).get("claim_posture"),
                 "onboarding_ready_for_first_time_user": onboarding_success.get("ready_for_first_time_user"),
             },
             "bundle": bundle,
@@ -14105,6 +14267,73 @@ def _refresh_mission_control_manifest(
     for path in _pulse_output_paths(root).values():
         if path.exists():
             entries.append(artifact_entry(path.name, run_dir=root, kind="pulse", required=True))
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _aml_demo_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "aml_demo_bundle_manifest": run_dir / "aml_demo_bundle_manifest.json",
+        "aml_demo_business_metric_table": run_dir / "aml_demo_business_metric_table.json",
+        "aml_demo_flow_report": run_dir / "aml_demo_flow_report.md",
+        "aml_demo_artifact_index": run_dir / "aml_demo_artifact_index.json",
+    }
+
+
+def _refresh_aml_demo_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_mission_control_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for key, path in _aml_demo_output_paths(root).items():
+        if path.exists():
+            entries.append(
+                artifact_entry(
+                    path.name,
+                    run_dir=root,
+                    kind="aml_demo",
+                    required=key != "aml_demo_flow_report",
+                )
+            )
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:

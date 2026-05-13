@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Intent
 
@@ -40,7 +40,12 @@ Slice 15S makes Relaytic-AML obvious through one public-safe demo bundle instead
 - `aml_demo_business_metric_table.json`
 - `aml_demo_flow_report.md`
 - `aml_demo_artifact_index.json`
+- `aml_investigation_board.json`
 - mission-control AML investigation board section backed by existing artifacts
+
+Implemented command:
+
+- `relaytic demo aml-review-queue`
 
 ## Acceptance Criteria
 

@@ -3,6 +3,7 @@
 from .agents import MissionControlRunResult, render_mission_control_html, render_mission_control_markdown, run_mission_control_review
 from .models import (
     ACTION_AFFORDANCES_SCHEMA_VERSION,
+    AML_INVESTIGATION_BOARD_SCHEMA_VERSION,
     APPROVAL_TIMELINE_SCHEMA_VERSION,
     BACKGROUND_JOB_VIEW_SCHEMA_VERSION,
     BRANCH_DAG_SCHEMA_VERSION,
@@ -30,6 +31,7 @@ from .models import (
     STAGE_NAVIGATOR_SCHEMA_VERSION,
     TRACE_EXPLORER_STATE_SCHEMA_VERSION,
     UI_PREFERENCES_SCHEMA_VERSION,
+    AMLInvestigationBoard,
     ActionAffordances,
     ApprovalTimeline,
     BackgroundJobView,
@@ -77,6 +79,7 @@ __all__ = [
     "MODE_OVERVIEW_SCHEMA_VERSION",
     "CAPABILITY_MANIFEST_SCHEMA_VERSION",
     "ACTION_AFFORDANCES_SCHEMA_VERSION",
+    "AML_INVESTIGATION_BOARD_SCHEMA_VERSION",
     "STAGE_NAVIGATOR_SCHEMA_VERSION",
     "QUESTION_STARTERS_SCHEMA_VERSION",
     "BRANCH_DAG_SCHEMA_VERSION",
@@ -107,6 +110,7 @@ __all__ = [
     "OnboardingChatSessionState",
     "CapabilityManifest",
     "ActionAffordances",
+    "AMLInvestigationBoard",
     "StageNavigator",
     "QuestionStarters",
     "ONBOARDING_STATUS_SCHEMA_VERSION",

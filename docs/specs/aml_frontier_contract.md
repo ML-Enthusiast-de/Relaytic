@@ -208,7 +208,7 @@ Relaytic must not move into the capability Academy track merely because the firs
 The AML proof path is accepted only after these slices are complete:
 
 - **15R-A** finished the AML proof pack by aligning tests, CLI, run summary, assist, mission control, docs, and public-claim gates.
-- **15S** builds one public-safe flagship AML demo bundle around review-queue value and case evidence.
+- **15S** built one public-safe flagship AML demo bundle around review-queue value and case evidence.
 - **15T** adds business-value metrics such as analyst-hours saved, false-positive reduction at fixed recall, recall at review capacity, precision at top-k, and case-packet completeness.
 - **15U** adds strong AML baselines and ablations so graph, temporal, calibration, threshold, and review-budget contributions are measured.
 - **15V** adds raw graph and subgraph ingestion so public graph AML work is not limited to flattened snapshots.
@@ -236,6 +236,7 @@ If any of these slices discovers that Relaytic-AML loses, the correct output is 
 - `aml_benchmark_manifest.json`
 - `aml_holdout_claim_report.json`
 - `aml_demo_bundle_manifest.json`
+- `aml_investigation_board.json`
 - `aml_business_value_report.json`
 - `aml_ablation_matrix.json`
 - `aml_graph_loader_manifest.json`

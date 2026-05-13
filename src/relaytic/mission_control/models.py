@@ -34,6 +34,7 @@ DEMO_PACK_MANIFEST_SCHEMA_VERSION = "relaytic.demo_pack_manifest.v1"
 FLAGSHIP_DEMO_SCORECARD_SCHEMA_VERSION = "relaytic.flagship_demo_scorecard.v1"
 HUMAN_FACTORS_EVAL_REPORT_SCHEMA_VERSION = "relaytic.human_factors_eval_report.v1"
 ONBOARDING_SUCCESS_REPORT_SCHEMA_VERSION = "relaytic.onboarding_success_report.v1"
+AML_INVESTIGATION_BOARD_SCHEMA_VERSION = "relaytic.aml_investigation_board.v1"
 
 
 @dataclass(frozen=True)
@@ -660,6 +661,30 @@ class OnboardingSuccessReport:
 
 
 @dataclass(frozen=True)
+class AMLInvestigationBoard:
+    schema_version: str
+    generated_at: str
+    controls: MissionControlControls
+    status: str
+    demo_id: str | None
+    demo_bundle_present: bool
+    alert_queue: dict[str, Any]
+    top_case_packet: dict[str, Any]
+    drift_posture: dict[str, Any]
+    claim_guard: dict[str, Any]
+    artifact_paths: dict[str, str]
+    recommended_next_command: str | None
+    summary: str
+    trace: MissionControlTrace
+
+    def to_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["controls"] = self.controls.to_dict()
+        payload["trace"] = self.trace.to_dict()
+        return payload
+
+
+@dataclass(frozen=True)
 class MissionControlBundle:
     mission_control_state: MissionControlState
     review_queue_state: ReviewQueueState
@@ -686,6 +711,7 @@ class MissionControlBundle:
     release_health_report: ReleaseHealthReport
     demo_pack_manifest: DemoPackManifest
     flagship_demo_scorecard: FlagshipDemoScorecard
+    aml_investigation_board: AMLInvestigationBoard
     human_factors_eval_report: HumanFactorsEvalReport
     onboarding_success_report: OnboardingSuccessReport
 
@@ -716,6 +742,7 @@ class MissionControlBundle:
             "release_health_report": self.release_health_report.to_dict(),
             "demo_pack_manifest": self.demo_pack_manifest.to_dict(),
             "flagship_demo_scorecard": self.flagship_demo_scorecard.to_dict(),
+            "aml_investigation_board": self.aml_investigation_board.to_dict(),
             "human_factors_eval_report": self.human_factors_eval_report.to_dict(),
             "onboarding_success_report": self.onboarding_success_report.to_dict(),
         }

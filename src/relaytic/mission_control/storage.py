@@ -37,6 +37,7 @@ MISSION_CONTROL_FILENAMES = {
     "release_health_report": "release_health_report.json",
     "demo_pack_manifest": "demo_pack_manifest.json",
     "flagship_demo_scorecard": "flagship_demo_scorecard.json",
+    "aml_investigation_board": "aml_investigation_board.json",
     "human_factors_eval_report": "human_factors_eval_report.json",
     "onboarding_success_report": "onboarding_success_report.json",
 }

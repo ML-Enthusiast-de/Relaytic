@@ -110,7 +110,7 @@ Those judgments should later feed `flagship_demo_scorecard.json`.
 
 The next demo implementation should not create another generic tour.
 
-Slice 15S should produce one `relaytic-aml-review-queue` bundle that proves:
+Slice 15S produced one `relaytic-aml-review-queue` bundle that proves:
 
 - alert queue quality under review capacity
 - one evidence-backed case packet

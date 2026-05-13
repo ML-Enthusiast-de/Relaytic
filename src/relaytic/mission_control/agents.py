@@ -31,6 +31,7 @@ from relaytic.workspace.storage import read_result_contract_artifacts, read_work
 
 from .models import (
     ACTION_AFFORDANCES_SCHEMA_VERSION,
+    AML_INVESTIGATION_BOARD_SCHEMA_VERSION,
     APPROVAL_TIMELINE_SCHEMA_VERSION,
     BACKGROUND_JOB_VIEW_SCHEMA_VERSION,
     BRANCH_DAG_SCHEMA_VERSION,
@@ -57,6 +58,7 @@ from .models import (
     STAGE_NAVIGATOR_SCHEMA_VERSION,
     TRACE_EXPLORER_STATE_SCHEMA_VERSION,
     UI_PREFERENCES_SCHEMA_VERSION,
+    AMLInvestigationBoard,
     ActionAffordances,
     ApprovalTimeline,
     BackgroundJobView,
@@ -231,6 +233,12 @@ def run_mission_control_review(
         branch_dag=branch_dag,
         release_health_report=release_health_report,
     )
+    aml_investigation_board = _build_aml_investigation_board(
+        controls=controls,
+        trace=trace,
+        run_dir=resolved_run_dir,
+        summary_payload=summary_payload,
+    )
     human_factors_eval_report = _build_human_factors_eval_report(
         controls=controls,
         trace=trace,
@@ -261,6 +269,7 @@ def run_mission_control_review(
         release_health_report=release_health_report,
         demo_pack_manifest=demo_pack_manifest,
         flagship_demo_scorecard=flagship_demo_scorecard,
+        aml_investigation_board=aml_investigation_board,
     )
     mode_overview = _build_mode_overview(
         controls=controls,
@@ -393,6 +402,7 @@ def run_mission_control_review(
         release_health_report=release_health_report,
         demo_pack_manifest=demo_pack_manifest,
         flagship_demo_scorecard=flagship_demo_scorecard,
+        aml_investigation_board=aml_investigation_board,
         human_factors_eval_report=human_factors_eval_report,
         onboarding_success_report=onboarding_success_report,
     )
@@ -426,6 +436,7 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
     release_health = dict(payload.get("release_health_report", {}))
     demo_pack = dict(payload.get("demo_pack_manifest", {}))
     demo_scorecard = dict(payload.get("flagship_demo_scorecard", {}))
+    aml_board = dict(payload.get("aml_investigation_board", {}))
     human_factors = dict(payload.get("human_factors_eval_report", {}))
     onboarding_success = dict(payload.get("onboarding_success_report", {}))
     cards = [dict(item) for item in state.get("cards", []) if isinstance(item, dict)]
@@ -567,6 +578,23 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
                 "",
             ]
         )
+    if aml_board:
+        alert_queue = dict(aml_board.get("alert_queue", {}))
+        top_case = dict(aml_board.get("top_case_packet", {}))
+        drift = dict(aml_board.get("drift_posture", {}))
+        claim_guard = dict(aml_board.get("claim_guard", {}))
+        lines.extend(
+            [
+                "## AML Investigation Board",
+                f"- Demo bundle present: `{aml_board.get('demo_bundle_present')}`",
+                f"- Alert queue: `{alert_queue.get('queue_count', 0)}` case(s), capacity `{alert_queue.get('review_capacity_cases', 0)}`",
+                f"- Top case: `{top_case.get('case_id') or 'unknown'}` for `{top_case.get('focal_entity') or 'unknown'}`",
+                f"- Drift action: `{drift.get('recommended_action') or 'unknown'}`",
+                f"- Claim posture: `{claim_guard.get('claim_posture') or 'unknown'}`",
+                f"- Public-claim guard: `{dict(aml_board.get('artifact_paths', {})).get('public_claim_guard') or 'not linked'}`",
+                "",
+            ]
+        )
     if human_factors or onboarding_success:
         lines.extend(
             [
@@ -695,6 +723,7 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
     install = dict(payload.get("install_experience_report", {}))
     launch = dict(payload.get("launch_manifest", {}))
     demo = dict(payload.get("demo_session_manifest", {}))
+    aml_board = dict(payload.get("aml_investigation_board", {}))
     cards = [dict(item) for item in state.get("cards", []) if isinstance(item, dict)]
     review_items = [dict(item) for item in review_queue.get("items", []) if isinstance(item, dict)]
     commands = [str(item).strip() for item in onboarding.get("recommended_commands", []) if str(item).strip()]
@@ -904,6 +933,10 @@ def render_mission_control_html(bundle: MissionControlBundle | dict[str, Any]) -
           {_render_queue(review_items)}
         </article>
         <article class="panel">
+          <h2>AML Investigation Board</h2>
+          {_render_aml_investigation_board(aml_board)}
+        </article>
+        <article class="panel">
           <h2>Capabilities</h2>
           <ul>{_render_capability_items(capability_items)}</ul>
         </article>
@@ -994,6 +1027,27 @@ def _render_queue(items: list[dict[str, Any]]) -> str:
             f"<div class=\"{css}\"><strong>{title}</strong><div class=\"detail\">{detail}</div><div class=\"detail\">Source: {source} | Action: {action}</div></div>"
         )
     return "".join(chunks)
+
+
+def _render_aml_investigation_board(board: dict[str, Any]) -> str:
+    if not board or not bool(board.get("demo_bundle_present")):
+        return "<p>No AML demo bundle is attached to this run yet.</p>"
+    alert_queue = dict(board.get("alert_queue", {}))
+    top_case = dict(board.get("top_case_packet", {}))
+    drift = dict(board.get("drift_posture", {}))
+    claim_guard = dict(board.get("claim_guard", {}))
+    artifact_paths = dict(board.get("artifact_paths", {}))
+    return (
+        "<div class=\"meta-list\">"
+        f"<div class=\"meta-row\"><span class=\"label\">Alert queue</span><span class=\"value-compact\">{escape(str(alert_queue.get('queue_count', 0)))} cases / {escape(str(alert_queue.get('review_capacity_cases', 0)))} review</span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Top case</span><span class=\"value-compact\">{escape(str(top_case.get('case_id') or 'unknown'))}</span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Focal entity</span><span class=\"value-compact\">{escape(str(top_case.get('focal_entity') or 'unknown'))}</span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Drift action</span><span class=\"value-compact\">{escape(str(drift.get('recommended_action') or 'unknown'))}</span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Claim posture</span><span class=\"value-compact\">{escape(str(claim_guard.get('claim_posture') or 'unknown'))}</span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Case packet</span><span class=\"value-compact\"><code>{escape(str(artifact_paths.get('case_packet') or 'not linked'))}</code></span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Claim guard</span><span class=\"value-compact\"><code>{escape(str(artifact_paths.get('public_claim_guard') or 'not linked'))}</code></span></div>"
+        "</div>"
+    )
 
 
 def _render_string_items(items: list[str]) -> str:
@@ -1272,6 +1326,7 @@ def _build_cards(
     release_health_report: ReleaseHealthReport,
     demo_pack_manifest: DemoPackManifest,
     flagship_demo_scorecard: FlagshipDemoScorecard,
+    aml_investigation_board: AMLInvestigationBoard,
 ) -> list[dict[str, Any]]:
     if _is_onboarding_state(summary_payload):
         host_summary = dict(interoperability_inventory.get("host_summary", {}))
@@ -1671,6 +1726,25 @@ def _build_cards(
             "severity": "normal",
         },
     ]
+    if aml_investigation_board.demo_bundle_present:
+        cards.insert(
+            0,
+            {
+                "card_id": "aml_investigation_board",
+                "title": "AML Investigation Board",
+                "value": _clean_text(aml_investigation_board.top_case_packet.get("case_id"))
+                or _clean_text(aml_investigation_board.alert_queue.get("status"))
+                or aml_investigation_board.status,
+                "detail": (
+                    f"Queue `{aml_investigation_board.alert_queue.get('queue_count', 0)}`"
+                    f" | top entity `{aml_investigation_board.top_case_packet.get('focal_entity') or 'unknown'}`"
+                    f" | claim `{aml_investigation_board.claim_guard.get('claim_posture') or 'unknown'}`"
+                ),
+                "severity": "medium"
+                if aml_investigation_board.claim_guard.get("claim_posture") == "blocked"
+                else "normal",
+            },
+        )
     if decision:
         cards.insert(
             1,
@@ -3822,6 +3896,156 @@ def _build_flagship_demo_scorecard(
     )
 
 
+def _build_aml_investigation_board(
+    *,
+    controls: MissionControlControls,
+    trace: MissionControlTrace,
+    run_dir: Path | None,
+    summary_payload: dict[str, Any],
+) -> AMLInvestigationBoard:
+    if run_dir is None:
+        return AMLInvestigationBoard(
+            schema_version=AML_INVESTIGATION_BOARD_SCHEMA_VERSION,
+            generated_at=_utc_now(),
+            controls=controls,
+            status="not_available",
+            demo_id=None,
+            demo_bundle_present=False,
+            alert_queue={},
+            top_case_packet={},
+            drift_posture={},
+            claim_guard={},
+            artifact_paths={},
+            recommended_next_command=None,
+            summary="AML investigation board is unavailable until mission control is attached to a run.",
+            trace=trace,
+        )
+    root = Path(run_dir)
+    demo_manifest = _read_json_artifact(root / "aml_demo_bundle_manifest.json")
+    case_packet = _read_json_artifact(root / "case_packet.json")
+    alert_queue_policy = _read_json_artifact(root / "alert_queue_policy.json")
+    alert_queue_rankings = _read_json_artifact(root / "alert_queue_rankings.json")
+    stream_risk_posture = _read_json_artifact(root / "stream_risk_posture.json")
+    drift_recalibration_trigger = _read_json_artifact(root / "drift_recalibration_trigger.json")
+    public_claim_guard = _read_json_artifact(root / "aml_public_claim_guard.json")
+    failure_report = _read_json_artifact(root / "aml_failure_report.json")
+
+    casework = dict(summary_payload.get("casework", {})) if isinstance(summary_payload.get("casework"), dict) else {}
+    stream_risk = dict(summary_payload.get("stream_risk", {})) if isinstance(summary_payload.get("stream_risk"), dict) else {}
+    aml_proof = dict(summary_payload.get("aml_proof", {})) if isinstance(summary_payload.get("aml_proof"), dict) else {}
+    manifest_alert_queue = dict(demo_manifest.get("alert_queue", {}))
+    manifest_top_case = dict(demo_manifest.get("top_case_packet", {}))
+    manifest_drift = dict(demo_manifest.get("drift_posture", {}))
+    manifest_claim_guard = dict(demo_manifest.get("claim_guard", {}))
+    artifact_paths = dict(demo_manifest.get("artifact_paths", {}))
+
+    alert_queue = {
+        "status": _clean_text(manifest_alert_queue.get("status"))
+        or _clean_text(alert_queue_policy.get("status"))
+        or _clean_text(alert_queue_rankings.get("status"))
+        or _clean_text(casework.get("status")),
+        "queue_count": manifest_alert_queue.get("queue_count")
+        if manifest_alert_queue.get("queue_count") is not None
+        else casework.get("queue_count", alert_queue_rankings.get("queue_count", 0)),
+        "review_capacity_cases": manifest_alert_queue.get("review_capacity_cases")
+        if manifest_alert_queue.get("review_capacity_cases") is not None
+        else casework.get("review_capacity_cases", alert_queue_policy.get("review_capacity_cases", 0)),
+        "path": artifact_paths.get("alert_queue_rankings", "alert_queue_rankings.json"),
+    }
+    top_case_packet = {
+        "case_id": _clean_text(manifest_top_case.get("case_id"))
+        or _clean_text(case_packet.get("case_id"))
+        or _clean_text(casework.get("top_case_id")),
+        "focal_entity": _clean_text(manifest_top_case.get("focal_entity"))
+        or _clean_text(case_packet.get("focal_entity"))
+        or _clean_text(casework.get("top_case_entity")),
+        "priority_score": manifest_top_case.get("priority_score")
+        if manifest_top_case.get("priority_score") is not None
+        else case_packet.get("priority_score", casework.get("top_case_priority_score")),
+        "review_action": _clean_text(manifest_top_case.get("review_action"))
+        or _clean_text(case_packet.get("review_action"))
+        or _clean_text(casework.get("top_case_action")),
+        "path": artifact_paths.get("case_packet", "case_packet.json"),
+    }
+    drift_posture = {
+        "status": _clean_text(manifest_drift.get("status"))
+        or _clean_text(stream_risk_posture.get("status"))
+        or _clean_text(stream_risk.get("status")),
+        "stream_mode": _clean_text(manifest_drift.get("stream_mode"))
+        or _clean_text(stream_risk_posture.get("stream_mode"))
+        or _clean_text(stream_risk.get("stream_mode")),
+        "trigger_recalibration": manifest_drift.get("trigger_recalibration")
+        if manifest_drift.get("trigger_recalibration") is not None
+        else drift_recalibration_trigger.get("trigger_recalibration"),
+        "recommended_action": _clean_text(manifest_drift.get("recommended_action"))
+        or _clean_text(drift_recalibration_trigger.get("recommended_action"))
+        or _clean_text(stream_risk.get("trigger_action")),
+        "path": artifact_paths.get("drift_recalibration_trigger", "drift_recalibration_trigger.json"),
+    }
+    claim_posture = _clean_text(manifest_claim_guard.get("claim_posture"))
+    if claim_posture is None:
+        if bool(public_claim_guard.get("broader_flagship_claim_allowed")):
+            claim_posture = "broader_flagship_allowed"
+        elif bool(public_claim_guard.get("paper_primary_claim_allowed")):
+            claim_posture = "paper_primary_allowed"
+        elif bool(public_claim_guard.get("supporting_public_claim_allowed")):
+            claim_posture = "supporting_only"
+        elif public_claim_guard:
+            claim_posture = "blocked"
+        else:
+            claim_posture = _clean_text(aml_proof.get("status")) or "unknown"
+    blocked_reason_codes = public_claim_guard.get("blocked_reason_codes")
+    claim_guard = {
+        "claim_posture": claim_posture,
+        "supporting_public_claim_allowed": manifest_claim_guard.get("supporting_public_claim_allowed")
+        if manifest_claim_guard.get("supporting_public_claim_allowed") is not None
+        else public_claim_guard.get("supporting_public_claim_allowed", aml_proof.get("supporting_public_claim_allowed")),
+        "paper_primary_claim_allowed": manifest_claim_guard.get("paper_primary_claim_allowed")
+        if manifest_claim_guard.get("paper_primary_claim_allowed") is not None
+        else public_claim_guard.get("paper_primary_claim_allowed", aml_proof.get("paper_primary_claim_allowed")),
+        "broader_flagship_claim_allowed": manifest_claim_guard.get("broader_flagship_claim_allowed")
+        if manifest_claim_guard.get("broader_flagship_claim_allowed") is not None
+        else public_claim_guard.get("broader_flagship_claim_allowed", aml_proof.get("broader_flagship_claim_allowed")),
+        "blocked_reason_codes": list(blocked_reason_codes) if isinstance(blocked_reason_codes, list) else [],
+        "path": artifact_paths.get("public_claim_guard", "aml_public_claim_guard.json"),
+    }
+    if not artifact_paths:
+        artifact_paths = {
+            "aml_demo_bundle_manifest": "aml_demo_bundle_manifest.json",
+            "case_packet": "case_packet.json",
+            "benchmark_guard": "benchmark_release_gate.json",
+            "public_claim_guard": "aml_public_claim_guard.json",
+            "failure_report": "aml_failure_report.json",
+        }
+    demo_bundle_present = bool(demo_manifest)
+    board_ready = bool(top_case_packet.get("case_id")) and bool(claim_guard.get("claim_posture"))
+    return AMLInvestigationBoard(
+        schema_version=AML_INVESTIGATION_BOARD_SCHEMA_VERSION,
+        generated_at=_utc_now(),
+        controls=controls,
+        status="ready" if demo_bundle_present and board_ready else ("partial" if board_ready else "not_available"),
+        demo_id=_clean_text(demo_manifest.get("demo_id")),
+        demo_bundle_present=demo_bundle_present,
+        alert_queue=alert_queue,
+        top_case_packet=top_case_packet,
+        drift_posture=drift_posture,
+        claim_guard=claim_guard,
+        artifact_paths={key: str(value) for key, value in artifact_paths.items() if str(value).strip()},
+        recommended_next_command=_clean_text(demo_manifest.get("recommended_next_command"))
+        or f"relaytic demo aml-review-queue --run-dir {root} --format json",
+        summary=(
+            "Mission control is showing the Relaytic-AML demo bundle as an investigation board."
+            if demo_bundle_present
+            else (
+                "Mission control can see AML casework and claim posture, but no 15S demo bundle has been created yet."
+                if board_ready
+                else "AML investigation board is waiting for casework and claim-guard artifacts."
+            )
+        ),
+        trace=trace,
+    )
+
+
 def _build_human_factors_eval_report(
     *,
     controls: MissionControlControls,
@@ -4085,6 +4309,16 @@ def _maybe_bool(value: Any) -> bool | None:
     if text in {"false", "0", "no", "off"}:
         return False
     return None
+
+
+def _read_json_artifact(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
 
 
 def _read_onboarding_chat_session_payload(root_dir: Path) -> dict[str, Any]:
