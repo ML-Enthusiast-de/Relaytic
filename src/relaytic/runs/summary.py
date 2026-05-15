@@ -43,7 +43,7 @@ def build_run_summary(
         read_task_contract_artifacts,
         read_temporal_engine_artifacts,
     )
-    from relaytic.aml import read_aml_graph_artifacts
+    from relaytic.aml import read_aml_business_value_artifacts, read_aml_graph_artifacts
     from relaytic.iteration import read_iteration_bundle
     from relaytic.casework import read_casework_artifacts
     from relaytic.stream_risk import read_stream_risk_artifacts
@@ -201,6 +201,7 @@ def build_run_summary(
     )
     task_contract_bundle = read_task_contract_artifacts(root)
     aml_graph_bundle = read_aml_graph_artifacts(root)
+    aml_business_value_bundle = read_aml_business_value_artifacts(root)
     casework_bundle = read_casework_artifacts(root)
     stream_risk_bundle = read_stream_risk_artifacts(root)
     decision_bundle = _read_bundle(
@@ -437,6 +438,10 @@ def build_run_summary(
     delayed_outcome_alignment = dict(stream_risk_bundle.get("delayed_outcome_alignment", {})) if isinstance(stream_risk_bundle.get("delayed_outcome_alignment"), dict) else {}
     drift_recalibration_trigger = dict(stream_risk_bundle.get("drift_recalibration_trigger", {})) if isinstance(stream_risk_bundle.get("drift_recalibration_trigger"), dict) else {}
     rolling_alert_quality_report = dict(stream_risk_bundle.get("rolling_alert_quality_report", {})) if isinstance(stream_risk_bundle.get("rolling_alert_quality_report"), dict) else {}
+    aml_business_value_report = dict(aml_business_value_bundle.get("aml_business_value_report", {})) if isinstance(aml_business_value_bundle.get("aml_business_value_report"), dict) else {}
+    analyst_hour_savings_report = dict(aml_business_value_bundle.get("analyst_hour_savings_report", {})) if isinstance(aml_business_value_bundle.get("analyst_hour_savings_report"), dict) else {}
+    review_capacity_metric_report = dict(aml_business_value_bundle.get("review_capacity_metric_report", {})) if isinstance(aml_business_value_bundle.get("review_capacity_metric_report"), dict) else {}
+    operational_metric_guard = dict(aml_business_value_bundle.get("operational_metric_guard", {})) if isinstance(aml_business_value_bundle.get("operational_metric_guard"), dict) else {}
     temporal_structure_report = dict(temporal_bundle.get("temporal_structure_report", {})) if isinstance(temporal_bundle.get("temporal_structure_report"), dict) else {}
     temporal_feature_ladder = dict(temporal_bundle.get("temporal_feature_ladder", {})) if isinstance(temporal_bundle.get("temporal_feature_ladder"), dict) else {}
     rolling_cv_plan = dict(temporal_bundle.get("rolling_cv_plan", {})) if isinstance(temporal_bundle.get("rolling_cv_plan"), dict) else {}
@@ -1369,6 +1374,33 @@ def build_run_summary(
             "summary": _clean_text(stream_risk_posture.get("summary"))
             or _clean_text(drift_recalibration_trigger.get("summary"))
             or _clean_text(weak_label_posture.get("summary")),
+        },
+        "aml_business_value": {
+            "status": _clean_text(aml_business_value_report.get("status"))
+            or _clean_text(operational_metric_guard.get("status")),
+            "business_value_ready": aml_business_value_report.get("business_value_ready"),
+            "hard_business_value_claim_allowed": operational_metric_guard.get("hard_business_value_claim_allowed"),
+            "operational_guard_status": _clean_text(operational_metric_guard.get("operational_utility_state"))
+            or _clean_text(operational_metric_guard.get("status")),
+            "model_operational_disagreement": operational_metric_guard.get("model_operational_disagreement"),
+            "blocked_reason_codes": list(operational_metric_guard.get("blocked_reason_codes", []))
+            if isinstance(operational_metric_guard.get("blocked_reason_codes"), list)
+            else [],
+            "precision_at_top_k": review_capacity_metric_report.get("precision_at_top_k"),
+            "recall_at_review_capacity": review_capacity_metric_report.get("recall_at_review_capacity"),
+            "false_positives_per_analyst_hour": review_capacity_metric_report.get("false_positives_per_analyst_hour"),
+            "case_packet_completeness": review_capacity_metric_report.get("case_packet_completeness"),
+            "analyst_hours_saved_at_fixed_recall": analyst_hour_savings_report.get("analyst_hours_saved_at_fixed_recall"),
+            "false_positive_reduction_at_fixed_recall": analyst_hour_savings_report.get("false_positive_reduction_at_fixed_recall"),
+            "analyst_hours_assumption_defaulted": analyst_hour_savings_report.get("analyst_hours_assumption_defaulted"),
+            "incumbent_present": dict(aml_business_value_report.get("incumbent_tradeoff", {})).get("incumbent_present")
+            if isinstance(aml_business_value_report.get("incumbent_tradeoff"), dict)
+            else None,
+            "incumbent_operational_comparison_scope": dict(aml_business_value_report.get("incumbent_tradeoff", {})).get("operational_comparison_scope")
+            if isinstance(aml_business_value_report.get("incumbent_tradeoff"), dict)
+            else None,
+            "summary": _clean_text(aml_business_value_report.get("summary"))
+            or _clean_text(operational_metric_guard.get("summary")),
         },
         "aml_proof": {
             "status": _clean_text(aml_benchmark_manifest.get("status"))

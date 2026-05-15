@@ -2385,6 +2385,10 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
     aml_demo_scorecard = dict(payload.get("aml_demo_scorecard", {}))
     aml_public_claim_guard = dict(payload.get("aml_public_claim_guard", {}))
     aml_failure_report = dict(payload.get("aml_failure_report", {}))
+    aml_business_value_report = dict(payload.get("aml_business_value_report", {}))
+    analyst_hour_savings_report = dict(payload.get("analyst_hour_savings_report", {}))
+    review_capacity_metric_report = dict(payload.get("review_capacity_metric_report", {}))
+    operational_metric_guard = dict(payload.get("operational_metric_guard", {}))
     shadow_manifest = dict(payload.get("shadow_trial_manifest", {}))
     shadow_scorecard = dict(payload.get("shadow_trial_scorecard", {}))
     promotion = dict(payload.get("promotion_readiness_report", {}))
@@ -2507,6 +2511,21 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
                 f"- Demo safe: `{aml_demo_scorecard.get('demo_safe')}`",
                 f"- Broader flagship claim allowed: `{aml_public_claim_guard.get('broader_flagship_claim_allowed')}`",
                 f"- Primary remaining gap: `{aml_failure_report.get('primary_failure_kind') or 'none'}`",
+            ]
+        )
+    if aml_business_value_report or operational_metric_guard:
+        lines.extend(
+            [
+                "",
+                "## AML Business Value",
+                f"- Business-value status: `{aml_business_value_report.get('status') or 'unknown'}`",
+                f"- Operational guard: `{operational_metric_guard.get('operational_utility_state') or operational_metric_guard.get('status') or 'unknown'}`",
+                f"- Hard business-value claim allowed: `{operational_metric_guard.get('hard_business_value_claim_allowed')}`",
+                f"- Analyst-hours saved at fixed recall: `{analyst_hour_savings_report.get('analyst_hours_saved_at_fixed_recall')}`",
+                f"- False-positive reduction at fixed recall: `{analyst_hour_savings_report.get('false_positive_reduction_at_fixed_recall')}`",
+                f"- Precision at top-k: `{review_capacity_metric_report.get('precision_at_top_k')}`",
+                f"- Recall at review capacity: `{review_capacity_metric_report.get('recall_at_review_capacity')}`",
+                f"- Model-operational disagreement: `{operational_metric_guard.get('model_operational_disagreement')}`",
             ]
         )
     if temporal_recovery:

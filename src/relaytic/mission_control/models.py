@@ -671,6 +671,7 @@ class AMLInvestigationBoard:
     alert_queue: dict[str, Any]
     top_case_packet: dict[str, Any]
     drift_posture: dict[str, Any]
+    business_value: dict[str, Any]
     claim_guard: dict[str, Any]
     artifact_paths: dict[str, str]
     recommended_next_command: str | None

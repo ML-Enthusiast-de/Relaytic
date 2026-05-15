@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Intent
 
@@ -39,6 +39,12 @@ Slice 15T makes analyst capacity and business value first-class Relaytic-AML eva
 - `review_capacity_metric_report.json`
 - `operational_metric_guard.json`
 
+## Implemented Notes
+
+- `relaytic aml business-value --run-dir <run_dir>` builds the four Slice 15T artifacts from existing AML casework, operating-point, benchmark, and incumbent artifacts.
+- Benchmark runs now materialize the same business-value reports automatically, and `relaytic benchmark show`, `relaytic assist turn`, `relaytic mission-control show`, and the 15S demo bundle surface the guarded operational posture.
+- The operational metric guard blocks hard business-value claims when analyst-hour assumptions are defaulted, case packets are incomplete, false-positive reduction is not positive, or model-score wins disagree with review-capacity utility.
+
 ## Acceptance Criteria
 
 1. One regression shows AUROC can improve while operational utility worsens.
@@ -50,4 +56,3 @@ Slice 15T makes analyst capacity and business value first-class Relaytic-AML eva
 - business-value metric unit tests
 - operational guard CLI regression
 - incumbent review-budget comparison regression
-

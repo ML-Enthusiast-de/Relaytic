@@ -38,6 +38,10 @@ _SOURCE_ARTIFACTS = (
     ("benchmark_release_gate", "benchmark_release_gate.json", "benchmark guard", True),
     ("aml_public_claim_guard", "aml_public_claim_guard.json", "public-claim guard", True),
     ("aml_failure_report", "aml_failure_report.json", "failure report", True),
+    ("aml_business_value_report", "aml_business_value_report.json", "business-value posture", True),
+    ("analyst_hour_savings_report", "analyst_hour_savings_report.json", "analyst-hour savings", True),
+    ("review_capacity_metric_report", "review_capacity_metric_report.json", "review-capacity metrics", True),
+    ("operational_metric_guard", "operational_metric_guard.json", "operational claim guard", True),
     ("trace_model", "trace_model.json", "trace truth", False),
     ("protocol_conformance_report", "protocol_conformance_report.json", "eval protocol conformance", False),
 )
@@ -265,6 +269,10 @@ def _read_demo_source_payloads(root: Path) -> dict[str, dict[str, Any]]:
         "benchmark_release_gate": _read_json(root / "benchmark_release_gate.json"),
         "aml_public_claim_guard": _read_json(root / "aml_public_claim_guard.json"),
         "aml_failure_report": _read_json(root / "aml_failure_report.json"),
+        "aml_business_value_report": _read_json(root / "aml_business_value_report.json"),
+        "analyst_hour_savings_report": _read_json(root / "analyst_hour_savings_report.json"),
+        "review_capacity_metric_report": _read_json(root / "review_capacity_metric_report.json"),
+        "operational_metric_guard": _read_json(root / "operational_metric_guard.json"),
     }
 
 
@@ -286,9 +294,11 @@ def _build_bundle_manifest(
     stream_risk = payloads["stream_risk_posture"]
     drift_trigger = payloads["drift_recalibration_trigger"]
     alert_queue = payloads["alert_queue_rankings"]
+    business_value_report = payloads["aml_business_value_report"]
+    operational_metric_guard = payloads["operational_metric_guard"]
     claim_posture = _claim_posture(public_claim_guard)
     status = "ready" if artifact_index["missing_required_artifact_count"] == 0 else "partial"
-    if claim_posture == "blocked":
+    if claim_posture == "blocked" or operational_metric_guard.get("operational_utility_state") == "blocked":
         status = "supporting_only"
     return {
         "schema_version": AML_DEMO_BUNDLE_MANIFEST_SCHEMA_VERSION,
@@ -345,6 +355,23 @@ def _build_bundle_manifest(
             "recommended_next_step": _clean_text(failure_report.get("recommended_next_step")),
             "path": "aml_failure_report.json",
         },
+        "business_value": {
+            "status": _clean_text(business_value_report.get("status")),
+            "operational_guard_status": _clean_text(operational_metric_guard.get("operational_utility_state"))
+            or _clean_text(operational_metric_guard.get("status")),
+            "hard_business_value_claim_allowed": operational_metric_guard.get("hard_business_value_claim_allowed"),
+            "analyst_hours_saved_at_fixed_recall": _get_nested(
+                business_value_report,
+                "analyst_hour_metrics",
+                "analyst_hours_saved_at_fixed_recall",
+            ),
+            "false_positive_reduction_at_fixed_recall": _get_nested(
+                business_value_report,
+                "analyst_hour_metrics",
+                "false_positive_reduction_at_fixed_recall",
+            ),
+            "path": "aml_business_value_report.json",
+        },
         "business_metric_table_status": business_metric_table.get("status"),
         "artifact_index_status": artifact_index.get("status"),
         "missing_required_artifact_count": artifact_index.get("missing_required_artifact_count"),
@@ -357,6 +384,10 @@ def _build_bundle_manifest(
             "benchmark_guard": "benchmark_release_gate.json",
             "public_claim_guard": "aml_public_claim_guard.json",
             "failure_report": "aml_failure_report.json",
+            "aml_business_value_report": "aml_business_value_report.json",
+            "analyst_hour_savings_report": "analyst_hour_savings_report.json",
+            "review_capacity_metric_report": "review_capacity_metric_report.json",
+            "operational_metric_guard": "operational_metric_guard.json",
         },
         "recommended_next_command": f"relaytic mission-control show --run-dir {run_dir} --format json",
         "summary": (
@@ -380,6 +411,10 @@ def _build_business_metric_table(
     operating_point = dict(summary.get("operating_point", {})) if isinstance(summary.get("operating_point"), dict) else {}
     analyst_review_scorecard = payloads["analyst_review_scorecard"]
     review_capacity = payloads["review_capacity_sensitivity"]
+    business_value = payloads["aml_business_value_report"]
+    analyst_hours = payloads["analyst_hour_savings_report"]
+    capacity_metrics = payloads["review_capacity_metric_report"]
+    operational_guard = payloads["operational_metric_guard"]
 
     model_metrics = [
         _metric_row("selected_model_family", decision.get("selected_model_family"), "Model family selected by the run."),
@@ -395,6 +430,11 @@ def _build_business_metric_table(
         _metric_row("top_case_priority_score", casework.get("top_case_priority_score"), "Priority score for the top case packet."),
         _metric_row("review_typology_coverage", casework.get("review_typology_coverage"), "Typology coverage among immediate-review cases."),
         _metric_row("drift_trigger_action", stream_risk.get("trigger_action"), "Current drift or threshold action."),
+        _metric_row("precision_at_top_k", capacity_metrics.get("precision_at_top_k"), "Expected precision for the selected analyst-review capacity."),
+        _metric_row("recall_at_review_capacity", capacity_metrics.get("recall_at_review_capacity"), "Expected recall at the selected review capacity."),
+        _metric_row("analyst_hours_saved_at_fixed_recall", analyst_hours.get("analyst_hours_saved_at_fixed_recall"), "Estimated analyst-hours saved against the conservative ungoverned-review baseline."),
+        _metric_row("false_positive_reduction_at_fixed_recall", analyst_hours.get("false_positive_reduction_at_fixed_recall"), "Estimated false-positive reduction at the selected fixed-recall target."),
+        _metric_row("operational_metric_guard", operational_guard.get("operational_utility_state"), "Whether operational utility supports hard business-value claims."),
     ]
     return {
         "schema_version": AML_DEMO_BUSINESS_METRIC_TABLE_SCHEMA_VERSION,
@@ -407,6 +447,8 @@ def _build_business_metric_table(
         "review_capacity_scenarios": list(review_capacity.get("rows", []))
         if isinstance(review_capacity.get("rows"), list)
         else [],
+        "business_value_status": business_value.get("status"),
+        "hard_business_value_claim_allowed": operational_guard.get("hard_business_value_claim_allowed"),
         "assumptions": [
             {
                 "assumption_id": "analyst_hours_per_case",
@@ -415,11 +457,11 @@ def _build_business_metric_table(
             },
             {
                 "assumption_id": "slice_boundary",
-                "value": "15S packages demo metrics; 15T owns stronger business-value proof and operational guards.",
+                "value": "15T business-value proof is materialized in aml_business_value_report.json and guarded by operational_metric_guard.json.",
                 "source": "docs/build_slices/phase_15t.md",
             },
         ],
-        "claim_boundary": "Model metrics and operational review-budget metrics are separate; this demo does not claim analyst-hour ROI.",
+        "claim_boundary": "Model metrics and operational review-budget metrics are separate; hard analyst-hour ROI claims require the operational guard to pass.",
         "summary": "Relaytic-AML separates model-score posture from review-queue operating metrics for the flagship demo.",
     }
 
@@ -469,6 +511,10 @@ def _render_flow_report(
     benchmark_manifest = payloads["aml_benchmark_manifest"]
     alert_queue = payloads["alert_queue_rankings"]
     drift_trigger = payloads["drift_recalibration_trigger"]
+    business_value = payloads["aml_business_value_report"]
+    analyst_hours = payloads["analyst_hour_savings_report"]
+    capacity_metrics = payloads["review_capacity_metric_report"]
+    operational_guard = payloads["operational_metric_guard"]
     allowed_claims = [
         str(item).strip()
         for item in public_claim_guard.get("allowed_claims", [])
@@ -526,6 +572,17 @@ def _render_flow_report(
             f"- Focal entity: `{case_packet.get('focal_entity') or 'unknown'}`",
             f"- Review action: `{case_packet.get('review_action') or 'unknown'}`",
             f"- Case packet path: `case_packet.json`",
+            "",
+            "## Business Value Guard",
+            "",
+            f"- Business-value status: `{business_value.get('status') or 'unknown'}`",
+            f"- Hard business-value claim allowed: `{operational_guard.get('hard_business_value_claim_allowed')}`",
+            f"- Operational guard: `{operational_guard.get('operational_utility_state') or operational_guard.get('status') or 'unknown'}`",
+            f"- Analyst-hours saved at fixed recall: `{analyst_hours.get('analyst_hours_saved_at_fixed_recall')}`",
+            f"- False-positive reduction at fixed recall: `{analyst_hours.get('false_positive_reduction_at_fixed_recall')}`",
+            f"- Precision at top-k: `{capacity_metrics.get('precision_at_top_k')}`",
+            f"- Recall at review capacity: `{capacity_metrics.get('recall_at_review_capacity')}`",
+            f"- Business-value report path: `aml_business_value_report.json`",
             "",
             "## Drift Posture",
             "",

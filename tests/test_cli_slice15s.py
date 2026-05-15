@@ -16,6 +16,10 @@ AML_DEMO_ARTIFACTS = (
     "aml_demo_business_metric_table.json",
     "aml_demo_flow_report.md",
     "aml_demo_artifact_index.json",
+    "aml_business_value_report.json",
+    "analyst_hour_savings_report.json",
+    "review_capacity_metric_report.json",
+    "operational_metric_guard.json",
 )
 
 
@@ -55,6 +59,8 @@ def test_cli_slice15s_creates_public_safe_aml_review_queue_demo_bundle(
     index = _read_json(run_dir / "aml_demo_artifact_index.json")
     business_metrics = _read_json(run_dir / "aml_demo_business_metric_table.json")
     public_claim_guard = _read_json(run_dir / "aml_public_claim_guard.json")
+    business_value = _read_json(run_dir / "aml_business_value_report.json")
+    operational_guard = _read_json(run_dir / "operational_metric_guard.json")
     flow_report = (run_dir / "aml_demo_flow_report.md").read_text(encoding="utf-8")
 
     required_by_id = {str(item["artifact_id"]): item for item in index["required_artifacts"]}
@@ -65,16 +71,21 @@ def test_cli_slice15s_creates_public_safe_aml_review_queue_demo_bundle(
 
     assert business_metrics["model_metrics"]
     assert business_metrics["operational_review_metrics"]
+    assert business_metrics["hard_business_value_claim_allowed"] is operational_guard["hard_business_value_claim_allowed"]
     assert business_metrics["claim_boundary"].startswith("Model metrics and operational review-budget metrics")
     assert "## Model Metrics" in flow_report
     assert "## Operational Review Metrics" in flow_report
+    assert "## Business Value Guard" in flow_report
     assert "## Safe Claims" in flow_report
 
     assert manifest["artifact_paths"]["case_packet"] == "case_packet.json"
     assert manifest["artifact_paths"]["benchmark_guard"] == "benchmark_release_gate.json"
     assert manifest["artifact_paths"]["public_claim_guard"] == "aml_public_claim_guard.json"
     assert manifest["artifact_paths"]["failure_report"] == "aml_failure_report.json"
+    assert manifest["artifact_paths"]["aml_business_value_report"] == "aml_business_value_report.json"
     assert manifest["claim_guard"]["broader_flagship_claim_allowed"] is False
+    assert manifest["business_value"]["status"] == business_value["status"]
+    assert manifest["business_value"]["hard_business_value_claim_allowed"] is operational_guard["hard_business_value_claim_allowed"]
     assert "aml_cross_track_coverage_missing" in public_claim_guard["blocked_reason_codes"]
 
     assert main(["mission-control", "show", "--run-dir", str(run_dir), "--format", "json"]) == 0
@@ -88,6 +99,8 @@ def test_cli_slice15s_creates_public_safe_aml_review_queue_demo_bundle(
     assert board["demo_bundle_present"] is True
     assert board["alert_queue"]["queue_count"] > 0
     assert board["top_case_packet"]["case_id"]
+    assert board["business_value"]["status"] == business_value["status"]
+    assert board["business_value"]["operational_guard_status"] == operational_guard["operational_utility_state"]
     assert board["drift_posture"]["recommended_action"]
     assert board["claim_guard"]["broader_flagship_claim_allowed"] is False
     assert any(item["card_id"] == "aml_investigation_board" for item in cards)

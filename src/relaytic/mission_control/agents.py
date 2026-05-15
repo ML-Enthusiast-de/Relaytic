@@ -582,6 +582,7 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
         alert_queue = dict(aml_board.get("alert_queue", {}))
         top_case = dict(aml_board.get("top_case_packet", {}))
         drift = dict(aml_board.get("drift_posture", {}))
+        business_value = dict(aml_board.get("business_value", {}))
         claim_guard = dict(aml_board.get("claim_guard", {}))
         lines.extend(
             [
@@ -589,6 +590,8 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
                 f"- Demo bundle present: `{aml_board.get('demo_bundle_present')}`",
                 f"- Alert queue: `{alert_queue.get('queue_count', 0)}` case(s), capacity `{alert_queue.get('review_capacity_cases', 0)}`",
                 f"- Top case: `{top_case.get('case_id') or 'unknown'}` for `{top_case.get('focal_entity') or 'unknown'}`",
+                f"- Business-value guard: `{business_value.get('operational_guard_status') or 'unknown'}`; hard claim allowed `{business_value.get('hard_business_value_claim_allowed')}`",
+                f"- Analyst-hours saved: `{business_value.get('analyst_hours_saved_at_fixed_recall')}`; precision@top-k `{business_value.get('precision_at_top_k')}`",
                 f"- Drift action: `{drift.get('recommended_action') or 'unknown'}`",
                 f"- Claim posture: `{claim_guard.get('claim_posture') or 'unknown'}`",
                 f"- Public-claim guard: `{dict(aml_board.get('artifact_paths', {})).get('public_claim_guard') or 'not linked'}`",
@@ -1035,6 +1038,7 @@ def _render_aml_investigation_board(board: dict[str, Any]) -> str:
     alert_queue = dict(board.get("alert_queue", {}))
     top_case = dict(board.get("top_case_packet", {}))
     drift = dict(board.get("drift_posture", {}))
+    business_value = dict(board.get("business_value", {}))
     claim_guard = dict(board.get("claim_guard", {}))
     artifact_paths = dict(board.get("artifact_paths", {}))
     return (
@@ -1042,6 +1046,8 @@ def _render_aml_investigation_board(board: dict[str, Any]) -> str:
         f"<div class=\"meta-row\"><span class=\"label\">Alert queue</span><span class=\"value-compact\">{escape(str(alert_queue.get('queue_count', 0)))} cases / {escape(str(alert_queue.get('review_capacity_cases', 0)))} review</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Top case</span><span class=\"value-compact\">{escape(str(top_case.get('case_id') or 'unknown'))}</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Focal entity</span><span class=\"value-compact\">{escape(str(top_case.get('focal_entity') or 'unknown'))}</span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Business guard</span><span class=\"value-compact\">{escape(str(business_value.get('operational_guard_status') or 'unknown'))}</span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Hours saved</span><span class=\"value-compact\">{escape(str(business_value.get('analyst_hours_saved_at_fixed_recall')))}</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Drift action</span><span class=\"value-compact\">{escape(str(drift.get('recommended_action') or 'unknown'))}</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Claim posture</span><span class=\"value-compact\">{escape(str(claim_guard.get('claim_posture') or 'unknown'))}</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Case packet</span><span class=\"value-compact\"><code>{escape(str(artifact_paths.get('case_packet') or 'not linked'))}</code></span></div>"
@@ -1738,10 +1744,12 @@ def _build_cards(
                 "detail": (
                     f"Queue `{aml_investigation_board.alert_queue.get('queue_count', 0)}`"
                     f" | top entity `{aml_investigation_board.top_case_packet.get('focal_entity') or 'unknown'}`"
+                    f" | business guard `{aml_investigation_board.business_value.get('operational_guard_status') or 'unknown'}`"
                     f" | claim `{aml_investigation_board.claim_guard.get('claim_posture') or 'unknown'}`"
                 ),
                 "severity": "medium"
                 if aml_investigation_board.claim_guard.get("claim_posture") == "blocked"
+                or aml_investigation_board.business_value.get("operational_guard_status") == "blocked"
                 else "normal",
             },
         )
@@ -3914,6 +3922,7 @@ def _build_aml_investigation_board(
             alert_queue={},
             top_case_packet={},
             drift_posture={},
+            business_value={},
             claim_guard={},
             artifact_paths={},
             recommended_next_command=None,
@@ -3929,9 +3938,14 @@ def _build_aml_investigation_board(
     drift_recalibration_trigger = _read_json_artifact(root / "drift_recalibration_trigger.json")
     public_claim_guard = _read_json_artifact(root / "aml_public_claim_guard.json")
     failure_report = _read_json_artifact(root / "aml_failure_report.json")
+    aml_business_value_report = _read_json_artifact(root / "aml_business_value_report.json")
+    analyst_hour_savings_report = _read_json_artifact(root / "analyst_hour_savings_report.json")
+    review_capacity_metric_report = _read_json_artifact(root / "review_capacity_metric_report.json")
+    operational_metric_guard = _read_json_artifact(root / "operational_metric_guard.json")
 
     casework = dict(summary_payload.get("casework", {})) if isinstance(summary_payload.get("casework"), dict) else {}
     stream_risk = dict(summary_payload.get("stream_risk", {})) if isinstance(summary_payload.get("stream_risk"), dict) else {}
+    aml_business_summary = dict(summary_payload.get("aml_business_value", {})) if isinstance(summary_payload.get("aml_business_value"), dict) else {}
     aml_proof = dict(summary_payload.get("aml_proof", {})) if isinstance(summary_payload.get("aml_proof"), dict) else {}
     manifest_alert_queue = dict(demo_manifest.get("alert_queue", {}))
     manifest_top_case = dict(demo_manifest.get("top_case_packet", {}))
@@ -3982,6 +3996,34 @@ def _build_aml_investigation_board(
         or _clean_text(stream_risk.get("trigger_action")),
         "path": artifact_paths.get("drift_recalibration_trigger", "drift_recalibration_trigger.json"),
     }
+    manifest_business_value = dict(demo_manifest.get("business_value", {}))
+    business_value = {
+        "status": _clean_text(manifest_business_value.get("status"))
+        or _clean_text(aml_business_value_report.get("status"))
+        or _clean_text(aml_business_summary.get("status")),
+        "operational_guard_status": _clean_text(manifest_business_value.get("operational_guard_status"))
+        or _clean_text(operational_metric_guard.get("operational_utility_state"))
+        or _clean_text(aml_business_summary.get("operational_guard_status")),
+        "hard_business_value_claim_allowed": manifest_business_value.get("hard_business_value_claim_allowed")
+        if manifest_business_value.get("hard_business_value_claim_allowed") is not None
+        else operational_metric_guard.get("hard_business_value_claim_allowed", aml_business_summary.get("hard_business_value_claim_allowed")),
+        "model_operational_disagreement": operational_metric_guard.get("model_operational_disagreement", aml_business_summary.get("model_operational_disagreement")),
+        "analyst_hours_saved_at_fixed_recall": manifest_business_value.get("analyst_hours_saved_at_fixed_recall")
+        if manifest_business_value.get("analyst_hours_saved_at_fixed_recall") is not None
+        else analyst_hour_savings_report.get("analyst_hours_saved_at_fixed_recall", aml_business_summary.get("analyst_hours_saved_at_fixed_recall")),
+        "false_positive_reduction_at_fixed_recall": manifest_business_value.get("false_positive_reduction_at_fixed_recall")
+        if manifest_business_value.get("false_positive_reduction_at_fixed_recall") is not None
+        else analyst_hour_savings_report.get("false_positive_reduction_at_fixed_recall", aml_business_summary.get("false_positive_reduction_at_fixed_recall")),
+        "precision_at_top_k": review_capacity_metric_report.get("precision_at_top_k", aml_business_summary.get("precision_at_top_k")),
+        "recall_at_review_capacity": review_capacity_metric_report.get("recall_at_review_capacity", aml_business_summary.get("recall_at_review_capacity")),
+        "case_packet_completeness": review_capacity_metric_report.get("case_packet_completeness", aml_business_summary.get("case_packet_completeness")),
+        "blocked_reason_codes": list(operational_metric_guard.get("blocked_reason_codes", []))
+        if isinstance(operational_metric_guard.get("blocked_reason_codes"), list)
+        else list(aml_business_summary.get("blocked_reason_codes", []))
+        if isinstance(aml_business_summary.get("blocked_reason_codes"), list)
+        else [],
+        "path": artifact_paths.get("aml_business_value_report", "aml_business_value_report.json"),
+    }
     claim_posture = _clean_text(manifest_claim_guard.get("claim_posture"))
     if claim_posture is None:
         if bool(public_claim_guard.get("broader_flagship_claim_allowed")):
@@ -4016,6 +4058,8 @@ def _build_aml_investigation_board(
             "benchmark_guard": "benchmark_release_gate.json",
             "public_claim_guard": "aml_public_claim_guard.json",
             "failure_report": "aml_failure_report.json",
+            "aml_business_value_report": "aml_business_value_report.json",
+            "operational_metric_guard": "operational_metric_guard.json",
         }
     demo_bundle_present = bool(demo_manifest)
     board_ready = bool(top_case_packet.get("case_id")) and bool(claim_guard.get("claim_posture"))
@@ -4029,6 +4073,7 @@ def _build_aml_investigation_board(
         alert_queue=alert_queue,
         top_case_packet=top_case_packet,
         drift_posture=drift_posture,
+        business_value=business_value,
         claim_guard=claim_guard,
         artifact_paths={key: str(value) for key, value in artifact_paths.items() if str(value).strip()},
         recommended_next_command=_clean_text(demo_manifest.get("recommended_next_command"))

@@ -1759,6 +1759,27 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    aml_surface = sub.add_parser(
+        "aml",
+        help="Run or inspect Relaytic-AML productization artifacts.",
+    )
+    aml_sub = aml_surface.add_subparsers(dest="aml_command", required=True)
+    aml_business_value = aml_sub.add_parser(
+        "business-value",
+        help="Build and show Slice 15T AML business-value and analyst-capacity artifacts for a run.",
+    )
+    aml_business_value.add_argument("--run-dir", required=True, help="Run directory containing AML casework and benchmark artifacts.")
+    aml_business_value.add_argument("--config", default=None, help="Optional config/policy source.")
+    aml_business_value.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    aml_business_value.add_argument("--overwrite", action="store_true", help="Allow overwriting existing AML business-value artifacts.")
+    aml_business_value.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    aml_business_value.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     demo_surface = sub.add_parser(
         "demo",
         help="Create or inspect public-safe Relaytic demo bundles.",
@@ -4168,6 +4189,29 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
+    if args.command == "aml":
+        if args.aml_command != "business-value":
+            parser.error("Unsupported AML subcommand.")
+            return 2
+        try:
+            labels = _parse_key_value_pairs(args.label)
+            payload = _run_aml_business_value_phase(
+                run_dir=args.run_dir,
+                config_path=args.config,
+                run_id=args.run_id,
+                overwrite=bool(args.overwrite),
+                labels=labels,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
+
     if args.command == "demo":
         if args.demo_command != "aml-review-queue":
             parser.error("Unsupported demo subcommand.")
@@ -5108,6 +5152,117 @@ def _run_aml_review_queue_demo(
     return {
         "surface_payload": surface_payload,
         "human_output": demo_bundle["flow_report"],
+    }
+
+
+def _run_aml_business_value_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.aml import render_aml_business_value_markdown, sync_aml_business_value_artifacts
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    targets = _aml_business_value_output_paths(root)
+    if not overwrite and all(path.exists() for path in targets.values()):
+        return _show_aml_business_value_surface(run_dir=root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    written = sync_aml_business_value_artifacts(root)
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_aml_business_value_manifest(
+        root,
+        run_id=run_id,
+        policy_source=config_path,
+        labels=labels,
+    )
+    bundle = _read_aml_business_value_bundle(root)
+    report = dict(bundle.get("aml_business_value_report", {}))
+    guard = dict(bundle.get("operational_metric_guard", {}))
+    capacity = dict(bundle.get("review_capacity_metric_report", {}))
+    hours = dict(bundle.get("analyst_hour_savings_report", {}))
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "paths": {key: str(value) for key, value in written.items()},
+            "aml_business_value": _aml_business_value_surface_summary(bundle),
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+            "guard": {
+                "operational_utility_state": guard.get("operational_utility_state"),
+                "hard_business_value_claim_allowed": guard.get("hard_business_value_claim_allowed"),
+                "blocked_reason_codes": guard.get("blocked_reason_codes", []),
+                "model_operational_disagreement": guard.get("model_operational_disagreement"),
+            },
+            "metrics": {
+                "precision_at_top_k": capacity.get("precision_at_top_k"),
+                "recall_at_review_capacity": capacity.get("recall_at_review_capacity"),
+                "analyst_hours_saved_at_fixed_recall": hours.get("analyst_hours_saved_at_fixed_recall"),
+                "false_positive_reduction_at_fixed_recall": hours.get("false_positive_reduction_at_fixed_recall"),
+                "business_value_status": report.get("status"),
+            },
+        },
+        "human_output": render_aml_business_value_markdown(bundle),
+    }
+
+
+def _show_aml_business_value_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    from relaytic.aml import render_aml_business_value_markdown, sync_aml_business_value_artifacts
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_aml_business_value_bundle(root)
+    if not bundle:
+        sync_aml_business_value_artifacts(root)
+        bundle = _read_aml_business_value_bundle(root)
+    if not bundle:
+        raise ValueError(f"No AML business-value artifacts could be built in {root}.")
+    materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_aml_business_value_manifest(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "aml_business_value": _aml_business_value_surface_summary(bundle),
+            "bundle": bundle,
+        },
+        "human_output": render_aml_business_value_markdown(bundle),
+    }
+
+
+def _read_aml_business_value_bundle(root: Path) -> dict[str, Any]:
+    from relaytic.aml import read_aml_business_value_artifacts
+
+    return read_aml_business_value_artifacts(root)
+
+
+def _aml_business_value_surface_summary(bundle: dict[str, Any]) -> dict[str, Any]:
+    report = dict(bundle.get("aml_business_value_report", {}))
+    capacity = dict(bundle.get("review_capacity_metric_report", {}))
+    hours = dict(bundle.get("analyst_hour_savings_report", {}))
+    guard = dict(bundle.get("operational_metric_guard", {}))
+    incumbent = dict(report.get("incumbent_tradeoff", {})) or dict(guard.get("incumbent_tradeoff", {}))
+    return {
+        "status": report.get("status"),
+        "operational_guard_status": guard.get("operational_utility_state") or guard.get("status"),
+        "hard_business_value_claim_allowed": guard.get("hard_business_value_claim_allowed"),
+        "model_operational_disagreement": guard.get("model_operational_disagreement"),
+        "precision_at_top_k": capacity.get("precision_at_top_k"),
+        "recall_at_review_capacity": capacity.get("recall_at_review_capacity"),
+        "case_packet_completeness": capacity.get("case_packet_completeness"),
+        "analyst_hours_saved_at_fixed_recall": hours.get("analyst_hours_saved_at_fixed_recall"),
+        "false_positive_reduction_at_fixed_recall": hours.get("false_positive_reduction_at_fixed_recall"),
+        "incumbent_present": incumbent.get("incumbent_present"),
+        "incumbent_operational_comparison_scope": incumbent.get("operational_comparison_scope"),
+        "blocked_reason_codes": guard.get("blocked_reason_codes", []),
     }
 
 
@@ -8271,6 +8426,9 @@ def _show_mission_control_surface(
                 "aml_demo_bundle_present": aml_board.get("demo_bundle_present"),
                 "aml_top_case_id": dict(aml_board.get("top_case_packet", {})).get("case_id"),
                 "aml_claim_posture": dict(aml_board.get("claim_guard", {})).get("claim_posture"),
+                "aml_business_value_guard_status": dict(aml_board.get("business_value", {})).get("operational_guard_status"),
+                "aml_hard_business_value_claim_allowed": dict(aml_board.get("business_value", {})).get("hard_business_value_claim_allowed"),
+                "aml_analyst_hours_saved_at_fixed_recall": dict(aml_board.get("business_value", {})).get("analyst_hours_saved_at_fixed_recall"),
                 "first_run_success_ready": human_factors.get("first_run_success_ready"),
                 "onboarding_ready_for_first_time_user": onboarding_success.get("ready_for_first_time_user"),
             },
@@ -8381,6 +8539,9 @@ def _launch_mission_control_surface(
                 "aml_demo_bundle_present": aml_board.get("demo_bundle_present"),
                 "aml_top_case_id": dict(aml_board.get("top_case_packet", {})).get("case_id"),
                 "aml_claim_posture": dict(aml_board.get("claim_guard", {})).get("claim_posture"),
+                "aml_business_value_guard_status": dict(aml_board.get("business_value", {})).get("operational_guard_status"),
+                "aml_hard_business_value_claim_allowed": dict(aml_board.get("business_value", {})).get("hard_business_value_claim_allowed"),
+                "aml_analyst_hours_saved_at_fixed_recall": dict(aml_board.get("business_value", {})).get("analyst_hours_saved_at_fixed_recall"),
                 "onboarding_ready_for_first_time_user": onboarding_success.get("ready_for_first_time_user"),
             },
             "bundle": bundle,
@@ -10318,6 +10479,7 @@ def _run_benchmark_phase(
 ) -> dict[str, Any]:
     from relaytic.benchmark import write_benchmark_bundle
     from relaytic.analytics import read_task_contract_artifacts
+    from relaytic.aml import sync_aml_business_value_artifacts
 
     root = Path(run_dir)
     targets = _benchmark_output_paths(root)
@@ -10369,7 +10531,10 @@ def _run_benchmark_phase(
             trust_model_deserialization=trust_model_deserialization,
         )
         written = write_benchmark_bundle(root, bundle=benchmark_result.bundle)
-        manifest_path = _refresh_benchmark_manifest(
+        materialize_run_summary(run_dir=root, data_path=resolved_data_path)
+        aml_business_value_written = sync_aml_business_value_artifacts(root)
+        materialize_run_summary(run_dir=root, data_path=resolved_data_path)
+        manifest_path = _refresh_aml_business_value_manifest(
             root,
             run_id=run_id,
             policy_source=foundation_state["policy_path"],
@@ -10379,10 +10544,13 @@ def _run_benchmark_phase(
             run_dir=root,
             policy=foundation_state["resolved"].policy,
             stage_token=runtime_token,
-            output_artifacts=[*(str(value) for value in written.values()), str(manifest_path)],
-            summary="Relaytic compared the selected route against same-contract strong reference approaches and recorded honest parity artifacts.",
+            output_artifacts=[
+                *(str(value) for value in written.values()),
+                *(str(value) for value in aml_business_value_written.values()),
+                str(manifest_path),
+            ],
+            summary="Relaytic compared the selected route against same-contract strong reference approaches and recorded honest parity plus AML business-value artifacts.",
         )
-        materialize_run_summary(run_dir=root, data_path=resolved_data_path)
         sync_materialization_runtime_artifacts(root)
         parity = benchmark_result.bundle.benchmark_parity_report
         gap = benchmark_result.bundle.benchmark_gap_report
@@ -10410,6 +10578,7 @@ def _run_benchmark_phase(
         from relaytic.aml import read_aml_graph_artifacts
         from relaytic.casework import read_casework_artifacts
         from relaytic.stream_risk import read_stream_risk_artifacts
+        from relaytic.aml import read_aml_business_value_artifacts
 
         task_contract_bundle = read_task_contract_artifacts(root)
         eval_bundle = _read_json_bundle(root, bundle="evals")
@@ -10418,6 +10587,7 @@ def _run_benchmark_phase(
         aml_graph_bundle = read_aml_graph_artifacts(root)
         casework_bundle = read_casework_artifacts(root)
         stream_risk_bundle = read_stream_risk_artifacts(root)
+        aml_business_value_bundle = read_aml_business_value_artifacts(root)
         operating_point_bundle = {
             key: json.loads((root / filename).read_text(encoding="utf-8"))
             for key, filename in {
@@ -10436,6 +10606,7 @@ def _run_benchmark_phase(
         bundle_payload.update(aml_graph_bundle)
         bundle_payload.update(casework_bundle)
         bundle_payload.update(stream_risk_bundle)
+        bundle_payload.update(aml_business_value_bundle)
         bundle_payload.update(temporal_bundle)
         bundle_payload.update(architecture_bundle)
         bundle_payload.update(operating_point_bundle)
@@ -10508,6 +10679,14 @@ def _run_benchmark_phase(
                     "stream_risk_status": stream_risk_bundle.get("stream_risk_posture", {}).get("status"),
                     "weak_label_risk_level": stream_risk_bundle.get("weak_label_posture", {}).get("weak_label_risk_level"),
                     "drift_trigger_action": stream_risk_bundle.get("drift_recalibration_trigger", {}).get("recommended_action"),
+                    "aml_business_value_status": aml_business_value_bundle.get("aml_business_value_report", {}).get("status"),
+                    "aml_operational_guard_status": aml_business_value_bundle.get("operational_metric_guard", {}).get("operational_utility_state"),
+                    "aml_hard_business_value_claim_allowed": aml_business_value_bundle.get("operational_metric_guard", {}).get("hard_business_value_claim_allowed"),
+                    "aml_model_operational_disagreement": aml_business_value_bundle.get("operational_metric_guard", {}).get("model_operational_disagreement"),
+                    "aml_precision_at_top_k": aml_business_value_bundle.get("review_capacity_metric_report", {}).get("precision_at_top_k"),
+                    "aml_recall_at_review_capacity": aml_business_value_bundle.get("review_capacity_metric_report", {}).get("recall_at_review_capacity"),
+                    "aml_analyst_hours_saved_at_fixed_recall": aml_business_value_bundle.get("analyst_hour_savings_report", {}).get("analyst_hours_saved_at_fixed_recall"),
+                    "aml_false_positive_reduction_at_fixed_recall": aml_business_value_bundle.get("analyst_hour_savings_report", {}).get("false_positive_reduction_at_fixed_recall"),
                 },
                 "bundle": bundle_payload,
             },
@@ -10525,6 +10704,7 @@ def _run_benchmark_phase(
 
 def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     from relaytic.analytics import read_task_contract_artifacts
+    from relaytic.aml import sync_aml_business_value_artifacts
 
     root = Path(run_dir)
     if not root.exists():
@@ -10534,7 +10714,10 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
         raise ValueError(f"No Slice 11 benchmark artifacts found in {root}.")
     sync_materialization_runtime_artifacts(root)
     _load_or_materialize_summary(run_dir=root)
-    manifest_path = _refresh_benchmark_manifest(root)
+    if not all(path.exists() for path in _aml_business_value_output_paths(root).values()):
+        sync_aml_business_value_artifacts(root)
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_aml_business_value_manifest(root)
     parity = dict(bundle.get("benchmark_parity_report", {}))
     gap = dict(bundle.get("benchmark_gap_report", {}))
     incumbent = dict(bundle.get("incumbent_parity_report", {}))
@@ -10561,6 +10744,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     from relaytic.aml import read_aml_graph_artifacts
     from relaytic.casework import read_casework_artifacts
     from relaytic.stream_risk import read_stream_risk_artifacts
+    from relaytic.aml import read_aml_business_value_artifacts
 
     task_contract_bundle = read_task_contract_artifacts(root)
     eval_bundle = _read_json_bundle(root, bundle="evals")
@@ -10569,6 +10753,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     aml_graph_bundle = read_aml_graph_artifacts(root)
     casework_bundle = read_casework_artifacts(root)
     stream_risk_bundle = read_stream_risk_artifacts(root)
+    aml_business_value_bundle = read_aml_business_value_artifacts(root)
     operating_point_bundle = {
         key: json.loads((root / filename).read_text(encoding="utf-8"))
         for key, filename in {
@@ -10587,6 +10772,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle_payload.update(aml_graph_bundle)
     bundle_payload.update(casework_bundle)
     bundle_payload.update(stream_risk_bundle)
+    bundle_payload.update(aml_business_value_bundle)
     bundle_payload.update(temporal_bundle)
     bundle_payload.update(architecture_bundle)
     bundle_payload.update(operating_point_bundle)
@@ -10660,6 +10846,14 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "stream_risk_status": stream_risk_bundle.get("stream_risk_posture", {}).get("status"),
                 "weak_label_risk_level": stream_risk_bundle.get("weak_label_posture", {}).get("weak_label_risk_level"),
                 "drift_trigger_action": stream_risk_bundle.get("drift_recalibration_trigger", {}).get("recommended_action"),
+                "aml_business_value_status": aml_business_value_bundle.get("aml_business_value_report", {}).get("status"),
+                "aml_operational_guard_status": aml_business_value_bundle.get("operational_metric_guard", {}).get("operational_utility_state"),
+                "aml_hard_business_value_claim_allowed": aml_business_value_bundle.get("operational_metric_guard", {}).get("hard_business_value_claim_allowed"),
+                "aml_model_operational_disagreement": aml_business_value_bundle.get("operational_metric_guard", {}).get("model_operational_disagreement"),
+                "aml_precision_at_top_k": aml_business_value_bundle.get("review_capacity_metric_report", {}).get("precision_at_top_k"),
+                "aml_recall_at_review_capacity": aml_business_value_bundle.get("review_capacity_metric_report", {}).get("recall_at_review_capacity"),
+                "aml_analyst_hours_saved_at_fixed_recall": aml_business_value_bundle.get("analyst_hour_savings_report", {}).get("analyst_hours_saved_at_fixed_recall"),
+                "aml_false_positive_reduction_at_fixed_recall": aml_business_value_bundle.get("analyst_hour_savings_report", {}).get("false_positive_reduction_at_fixed_recall"),
             },
             "bundle": bundle_payload,
         },
@@ -14292,6 +14486,73 @@ def _aml_demo_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _aml_business_value_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "aml_business_value_report": run_dir / "aml_business_value_report.json",
+        "analyst_hour_savings_report": run_dir / "analyst_hour_savings_report.json",
+        "review_capacity_metric_report": run_dir / "review_capacity_metric_report.json",
+        "operational_metric_guard": run_dir / "operational_metric_guard.json",
+    }
+
+
+def _refresh_aml_business_value_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_benchmark_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for key, path in _aml_business_value_output_paths(root).items():
+        if path.exists():
+            entries.append(
+                artifact_entry(
+                    path.name,
+                    run_dir=root,
+                    kind="aml_business_value",
+                    required=True,
+                )
+            )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
 def _refresh_aml_demo_manifest(
     run_dir: str | Path,
     *,
@@ -14300,7 +14561,7 @@ def _refresh_aml_demo_manifest(
     labels: dict[str, str] | None = None,
 ) -> Path:
     root = Path(run_dir)
-    _refresh_mission_control_manifest(
+    _refresh_aml_business_value_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,

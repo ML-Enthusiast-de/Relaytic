@@ -657,6 +657,7 @@ def build_assist_audit_explanation(
     aml_graph = dict(run_summary.get("aml_graph", {}))
     casework = dict(run_summary.get("casework", {}))
     stream_risk = dict(run_summary.get("stream_risk", {}))
+    aml_business_value = dict(run_summary.get("aml_business_value", {}))
     aml_proof = dict(run_summary.get("aml_proof", {}))
 
     question_type = "general"
@@ -721,6 +722,37 @@ def build_assist_audit_explanation(
             "benchmark_pack_partition.json",
             "holdout_claim_policy.json",
             "benchmark_generalization_audit.json",
+            "run_summary.json",
+        ]
+    elif any(
+        token in normalized
+        for token in (
+            "business value",
+            "analyst hour",
+            "hours saved",
+            "false positive reduction",
+            "operational metric",
+            "operational guard",
+            "review capacity metric",
+        )
+    ):
+        question_type = "aml_business_value"
+        reasons = [
+            f"Relaytic-AML business-value posture is `{_clean_text(aml_business_value.get('status')) or 'unknown'}` with guard `{_clean_text(aml_business_value.get('operational_guard_status')) or 'unknown'}` and hard claim allowed = `{aml_business_value.get('hard_business_value_claim_allowed')}`.",
+            f"Precision@top-k is `{aml_business_value.get('precision_at_top_k')}`, recall at review capacity is `{aml_business_value.get('recall_at_review_capacity')}`, analyst-hours saved at fixed recall are `{aml_business_value.get('analyst_hours_saved_at_fixed_recall')}`, and false-positive reduction is `{aml_business_value.get('false_positive_reduction_at_fixed_recall')}`.",
+        ]
+        blocked = [
+            str(item)
+            for item in aml_business_value.get("blocked_reason_codes", [])
+            if str(item).strip()
+        ] if isinstance(aml_business_value.get("blocked_reason_codes"), list) else []
+        if blocked:
+            reasons.append(f"Hard business-value claims are blocked by `{', '.join(blocked[:6])}`.")
+        evidence_refs = [
+            "aml_business_value_report.json",
+            "analyst_hour_savings_report.json",
+            "review_capacity_metric_report.json",
+            "operational_metric_guard.json",
             "run_summary.json",
         ]
     elif any(
