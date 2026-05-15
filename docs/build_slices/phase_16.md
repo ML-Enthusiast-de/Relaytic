@@ -17,7 +17,7 @@ Intended package boundaries:
 
 Slice 16 is the future umbrella track where Relaytic learns new non-core capabilities without turning into an uncontrolled self-modifying system.
 
-It should start only after the full performance-recovery track in Slices 15A through 15M, the AML foundation track in Slices 15N through 15Q, the AML proof alignment in Slice 15R-A, the flagship demo packaging in Slice 15S, the business-value guard in Slice 15T, and the remaining AML productization track in Slices 15U through 15Z have landed.
+It should start only after the full performance-recovery track in Slices 15A through 15M, the AML foundation track in Slices 15N through 15Q, the AML proof alignment in Slice 15R-A, the flagship demo packaging in Slice 15S, the business-value guard in Slice 15T, and the remaining AML productization plus paper-freeze track in Slices 15U through 15Z-R have landed.
 
 This is not a single coding pass. It is a governed program delivered through:
 
@@ -30,6 +30,7 @@ This is not a single coding pass. It is a governed program delivered through:
 
 The academy is intentionally not the next move anymore.
 Relaytic first needs to become genuinely interesting as **Relaytic-AML**, with domain contracts, graph-aware reasoning, analyst-review optimization, streaming AML posture, and hard AML proof packs.
+After Slice 15Z-R, academy work must treat the frozen relevant benchmark catalog as a target and guardrail: new capabilities can attack benchmark gaps, but they must not redefine the benchmark story or bypass paper-claim gates.
 
 This slice family must continue obeying:
 
@@ -67,10 +68,12 @@ This slice family must continue obeying:
 - Slice 16 must keep all exploration seeded, budgeted, and replayable
 - Slice 16 must record provider feedback on both successful and failed candidates
 - Slice 16 must integrate with the same permission, daemon, trace, and remote-supervision truth already used elsewhere in Relaytic
+- Slice 16 must consume frozen benchmark gaps and claim boundaries from Slice 15Z-R when capability candidates are justified by public benchmark relevance
 
 ## Proof Obligation
 
 - Relaytic must prove that academy growth increases search power and specialization depth without weakening authority, auditability, or rollback safety
+- Relaytic must also prove that academy growth improves or honestly fails against the frozen benchmark catalog rather than inventing easier post-hoc proof tasks
 
 ## Acceptance Criteria
 

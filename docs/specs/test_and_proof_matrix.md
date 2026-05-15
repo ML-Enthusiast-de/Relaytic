@@ -206,6 +206,7 @@ To reduce timeout risk, future CI should support at least:
 - AML delayed-label and threshold-drift tests
 - AML evaluation-environment tests for unsafe steering, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claim generation
 - pre-Academy repo credibility tests for module-size and public-surface inventory changes
+- AML paper/release-freeze tests for relevant benchmark catalog coverage, claim-boundary correctness, reproducibility attestation, and release-freeze rerun behavior
 
 ### Slice 17 family
 

@@ -141,6 +141,8 @@ From Slice 05 onward, Relaytic should keep these cross-cutting proof tracks aliv
   one case where a redacted run signature retrieves external methods or benchmark references, changes planning/evidence/autonomy design, and records explicit no-raw-row audit
 - **benchmark path**
   formal benchmark parity is Slice 11, but benchmark harness stubs and reference logging should start earlier whenever route, evidence, or completion logic changes
+- **paper-release benchmark path**
+  later AML/paper claims must end in a release-freeze bundle that names relevant public benchmark families, records proxy or blocked status honestly, and ties every claim to reproducible artifacts
 
 If a later slice adds "smartness" without strengthening at least one of those proof tracks, it is not sharp enough.
 
@@ -252,6 +254,7 @@ Stable slice numbering stays the same, but the preferred execution order after S
 58. Slice 15X
 59. Slice 15Y
 60. Slice 15Z
+60A. Slice 15Z-R
 61. Slice 16
 62. Slice 16A
 63. Slice 16B
@@ -319,6 +322,7 @@ Why:
 - Slice 15X should reframe Relaytic runs as evaluation environments with scorecards for messy task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claims
 - Slice 15Y should rewrite first-contact documentation around the flagship AML path and move slice-history detail out of the main story
 - Slice 15Z should clean credibility-damaging repo structure, especially oversized modules, before Academy work increases surface area again
+- Slice 15Z-R should freeze the relevant benchmark and release evidence so public paper/demo claims are reproducible, claim-gated, and tied to PaySim-style, Elliptic-style, Elliptic2/subgraph or AMLSim-style, and generic supporting benchmark families instead of one easy dataset
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -341,7 +345,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after the AML productization track: Slice 16A, after Slices 15U through 15Z
+- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15U through 15Z-R
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3232,11 +3236,54 @@ Required outputs:
 - `module_extraction_plan.json`
 - `public_surface_inventory.json`
 - `module_split_report.json`
+- `benchmark_surface_cleanup_report.json`
 
 Minimum proof:
 
 - at least one oversized module is split without changing public behavior
 - public CLI and import-boundary smoke tests still pass
+- benchmark/demo/public-claim commands are inventoried without stale prototype language
+
+## Slice 15Z-R - Paper benchmark and release freeze
+
+Goal:
+- freeze the public benchmark and release evidence after the AML productization track and before Academy work
+- make paper/demo claims reproducible, relevant, and claim-gated before Academy work expands scope
+
+Load-bearing improvement:
+
+- Relaytic should emit one paper/release benchmark pack that ties named benchmark families, exact commands, result tables, ablations, operational metrics, public-claim gates, and release-safety evidence into one reproducible bundle
+
+Human surface:
+
+- humans should be able to run one documented benchmark sequence, inspect one paper result table, and see exactly which claims are allowed, blocked, or supporting-only
+
+Agent surface:
+
+- external agents should consume a stable release-freeze manifest and verify benchmark relevance, run completeness, public-claim posture, and reproducibility without scraping prose
+
+Intelligence source:
+
+- 15U through 15Z AML artifacts, benchmark truth gates, release-safety scans, demo bundles, and run summaries
+
+Fallback rule:
+
+- if a benchmark is unavailable, login-gated, licensing-unclear, too expensive for the local release profile, or not yet supported by the relevant loader, Relaytic must record the reason and exclude it from hard claims instead of substituting a weaker benchmark silently
+
+Required outputs:
+- `paper_release_freeze_manifest.json`
+- `aml_relevant_benchmark_catalog.json`
+- `paper_benchmark_runbook.md`
+- `paper_result_table.json`
+- `paper_claim_boundary_report.json`
+- `reproducibility_attestation.json`
+- `release_attention_pack_manifest.json`
+
+Minimum proof:
+
+- the benchmark catalog includes at least one transaction-fraud temporal track, one graph AML track, one subgraph or synthetic-bank-graph AML track, and one generic supporting structured-data track, each labeled as `dev`, `holdout`, `paper`, `proxy`, or `blocked`
+- every public-facing claim cites the exact artifact path and is labeled hard, supporting-only, or blocked
+- a clean local rerun regenerates the release-freeze manifest or emits a deterministic blocked-rerun reason
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

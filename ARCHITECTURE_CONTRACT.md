@@ -67,7 +67,7 @@ Current canonical boundaries:
 Reserved future boundaries:
 
 - `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15M task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, replay/shadow-tested imported-model, objective/split/metric-truth, first-class family-stack, staged portfolio-search, temporal-engine, operating-point, benchmark-truth-gate, competitive-specialization, and benchmark-generalization responsibilities; later work may introduce focused subpackages such as `src/relaytic/modeling/families/`, `src/relaytic/modeling/portfolio/`, or `src/relaytic/temporal/` only if they sharpen responsibility instead of forking a disconnected parallel stack
-- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and future focused AML loaders or eval-environment packages should absorb the remaining Slice 15U through Slice 15Z AML productization work before Academy expansion resumes
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and future focused AML loaders, eval-environment packages, or release-freeze helpers should absorb the remaining Slice 15U through Slice 15Z-R AML productization and paper-freeze work before Academy expansion resumes
 - `src/relaytic/graph_fabric/` may still absorb richer graph and subgraph reasoning where it sharpens responsibility beyond the shipped `src/relaytic/aml/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` slices
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
@@ -450,28 +450,40 @@ Current AML business-value artifact names from Slice 15T:
 - `review_capacity_metric_report.json`
 - `operational_metric_guard.json`
 
-Planned AML productization artifact names for Slices 15U through 15Z:
+Planned AML productization and paper-freeze artifact names for Slices 15U through 15Z-R:
 
 - `aml_baseline_matrix.json`
 - `aml_ablation_matrix.json`
 - `aml_baseline_adapter_report.json`
 - `aml_capability_contribution_report.json`
+- `aml_benchmark_relevance_scorecard.json`
 - `aml_graph_loader_manifest.json`
 - `aml_graph_provenance_report.json`
 - `aml_subgraph_task_manifest.json`
 - `aml_graph_claim_scope.json`
+- `aml_public_graph_benchmark_catalog.json`
 - `aml_delayed_label_eval_report.json`
 - `aml_positive_unlabeled_posture.json`
 - `aml_threshold_drift_report.json`
 - `aml_time_window_scorecard.json`
+- `aml_temporal_benchmark_claim_report.json`
 - `aml_eval_environment_manifest.json`
 - `aml_environment_scorecard.json`
 - `aml_workflow_task_matrix.json`
 - `aml_environment_failure_report.json`
+- `aml_benchmark_environment_scorecard.json`
 - `pre_academy_repo_audit.json`
 - `module_extraction_plan.json`
 - `public_surface_inventory.json`
 - `module_split_report.json`
+- `benchmark_surface_cleanup_report.json`
+- `paper_release_freeze_manifest.json`
+- `aml_relevant_benchmark_catalog.json`
+- `paper_benchmark_runbook.md`
+- `paper_result_table.json`
+- `paper_claim_boundary_report.json`
+- `reproducibility_attestation.json`
+- `release_attention_pack_manifest.json`
 
 Current trace and eval artifact names:
 

@@ -183,3 +183,5 @@ This temporal benchmark pack should be consumed by:
 - Slice 15C for temporal HPO depth and stop logic
 - Slice 15D for paper-grade temporal benchmark reporting
 - Slice 15F for research-imported temporal candidates such as LSTM, TCN, or temporal-transformer families in replay and shadow mode
+- Slice 15W for AML delayed-label and time-window claim discipline
+- Slice 15Z-R for the final paper/release freeze, where temporal benchmark evidence must be labeled as hard, supporting-only, proxy, or blocked

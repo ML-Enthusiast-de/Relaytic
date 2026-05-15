@@ -8,9 +8,12 @@ Planned.
 
 Slice 15W improves production-shaped AML time and label handling.
 
+This slice must make time-aware benchmark claims defensible under forward-only evaluation, not merely under randomly shuffled supervised splits.
+
 ## Load-Bearing Improvement
 
 - Relaytic-AML evaluates delayed-label windows, positive-unlabeled posture, threshold stability, and recalibration choices under ordered data.
+- PaySim-style `step` fields, Elliptic-style `time_step` fields, and later AMLSim or subgraph time windows must all flow into the same temporal claim discipline.
 
 ## Human Surface
 
@@ -39,16 +42,19 @@ Slice 15W improves production-shaped AML time and label handling.
 - `aml_positive_unlabeled_posture.json`
 - `aml_threshold_drift_report.json`
 - `aml_time_window_scorecard.json`
+- `aml_temporal_benchmark_claim_report.json`
 
 ## Acceptance Criteria
 
 1. One ordered workload produces a threshold-drift decision.
 2. One delayed-label scenario blocks overconfident public claims.
 3. Sequence-native candidates remain shadow-only unless they beat strong lagged tabular baselines.
+4. Time-sliced metrics are reported separately from aggregate metrics, and public temporal claims are blocked when future leakage, zero-positive future folds, or missing delayed-outcome evidence remain unresolved.
+5. One PaySim-style or Elliptic-style ordered workload produces a forward-evaluation artifact suitable for the later paper benchmark freeze.
 
 ## Required Verification
 
 - delayed-label window tests
 - threshold-drift report regression
 - public-claim block regression
-
+- temporal benchmark claim regression

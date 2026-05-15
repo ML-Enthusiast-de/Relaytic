@@ -24,7 +24,7 @@ This document tracks the operational state of the repository. It is an implement
 - latest AML demo-pack slice: 15S, one-command `relaytic demo aml-review-queue` demo bundle creation, business-metric table packaging, artifact-index integrity, flow report, and mission-control AML investigation board
 - latest AML business-value slice: 15T, `relaytic aml business-value`, analyst-hour savings, false-positive reduction, review-capacity metrics, incumbent capacity tradeoffs, and operational metric guard visibility
 - latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, broader human-chaos coverage, and a prepared paper-grade benchmark/eval pack
-- next planned academy follow-on after the remaining AML productization track: 16A, capability registry and capability cards
+- next planned academy follow-on after the remaining AML productization and paper-freeze track: 16A, capability registry and capability cards
 - final planned cleanup follow-on after Slice 17: 18, endgame consolidation, legacy removal, and repo-quality hardening
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -153,8 +153,8 @@ The most important not-yet-implemented shifts after the current baseline are:
 - broader flagship demo packs and harder scorecards so Relaytic can be judged by repeatable proof scenarios instead of ad hoc walkthroughs
 - broader human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy across more datasets and host paths
 - later academy-aware mission-control surfaces that explain capability promotion, shadow trials, hunt campaigns, and roster changes to both humans and external agents
-- a mandatory pre-Academy AML productization track through Slices 15U through 15Z for strong AML baselines and ablations, raw graph/subgraph ingestion, temporal weak-label upgrades, evaluation-environment framing, demo-first docs, and repo credibility cleanup
-- a Slice 16A+ capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement after the AML proof/productization track lands
+- a mandatory pre-Academy AML productization and paper-freeze track through Slices 15U through 15Z-R for strong AML baselines and ablations, raw graph/subgraph ingestion, temporal weak-label upgrades, evaluation-environment framing, demo-first docs, repo credibility cleanup, and a relevant benchmark/release freeze
+- a Slice 16A+ capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement after the AML proof/productization and paper-freeze track lands
 - a later optional representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family after the academy track
 
 ## Implemented Slices
@@ -511,7 +511,8 @@ With Slice 15T now landed and AML business-value proof guarded by operational me
 - Slice 15X AML evaluation-environment reframe so Relaytic can score realistic workflow behavior, unsafe steering resistance, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claim generation
 - Slice 15Y demo-first documentation rewrite so first contact is guided by the flagship AML path rather than slice chronology
 - Slice 15Z pre-Academy repo credibility cleanup so oversized modules and misleading surfaces are addressed before capability growth resumes
-- Slice 16A capability registry and capability cards so future academy work starts from one governed source of truth instead of ad hoc candidate state, but only after Slices 15U through 15Z are complete
+- Slice 15Z-R paper benchmark and release freeze so attention-seeking public claims are tied to reproducible, relevant AML benchmark evidence rather than one easy dataset or a demo-only story
+- Slice 16A capability registry and capability cards so future academy work starts from one governed source of truth instead of ad hoc candidate state, but only after Slices 15U through 15Z-R are complete
 - holdout benchmark expansion and stronger untouched comparison packs so benchmark-generalization guards can prove themselves on a broader paper-facing suite
 - richer long-term memory compaction, pinning, and replay rules that keep the shipped workspace/result-contract/search-controller loop durable across longer investigations
 - broader flagship demos and harder human-factors proof so the public-facing MVP keeps reading as polished software rather than a strong terminal prototype

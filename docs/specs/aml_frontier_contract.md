@@ -216,6 +216,7 @@ The AML proof path is accepted only after these slices are complete:
 - **15X** frames Relaytic runs as evaluation environments with explicit workflow scorecards.
 - **15Y** rewrites first-contact docs around the flagship AML path.
 - **15Z** cleans credibility-damaging repo structure before broader capability growth resumes.
+- **15Z-R** freezes the relevant benchmark and release evidence so public paper/demo claims are tied to reproducible artifacts instead of aspirational roadmap language.
 
 If any of these slices discovers that Relaytic-AML loses, the correct output is a failure report and next experiment, not a broader claim.
 
@@ -242,6 +243,13 @@ If any of these slices discovers that Relaytic-AML loses, the correct output is 
 - `aml_graph_loader_manifest.json`
 - `aml_delayed_label_eval_report.json`
 - `aml_environment_scorecard.json`
+- `aml_relevant_benchmark_catalog.json`
+- `paper_release_freeze_manifest.json`
+- `paper_benchmark_runbook.md`
+- `paper_result_table.json`
+- `paper_claim_boundary_report.json`
+- `reproducibility_attestation.json`
+- `release_attention_pack_manifest.json`
 
 ## Success criterion
 
@@ -252,3 +260,4 @@ Relaytic-AML is successful only if a strong technical reviewer can say:
 - the benchmark story is honest
 - the review-budget and human-analyst economics are first-class
 - the product is more than a general modeling shell with AML words pasted on top
+- the paper/release benchmark pack covers relevant AML workload shapes and blocks claims when evidence is only synthetic, flattened, proxy, or incomplete

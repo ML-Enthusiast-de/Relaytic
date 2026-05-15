@@ -6,6 +6,8 @@ This document defines the first paper-grade benchmark and eval pack for Relaytic
 
 After the Relaytic-AML pivot, this pack should be treated as the **generic supporting benchmark pack**, not the flagship domain proof pack.
 
+The final AML paper/release freeze is defined by the AML benchmark pack and Slice 15Z-R. This generic pack should support breadth claims, sanity checks, and structured-data robustness, but it should not carry the main AML/fraud relevance claim by itself.
+
 The pack is designed to answer two different questions:
 
 - can Relaytic operate credibly across the main structured-data task families?
@@ -57,6 +59,8 @@ So the correct scientific claim today is:
 
 The dedicated future time-aware benchmark track is specified separately in [temporal_benchmark_pack.md](temporal_benchmark_pack.md).
 The future flagship AML benchmark doctrine is specified separately in [aml_frontier_contract.md](aml_frontier_contract.md).
+
+The future paper/release freeze must combine this generic pack with the AML-specific relevant benchmark catalog, public-claim boundary report, and reproducibility attestation.
 
 ## Dataset matrix
 

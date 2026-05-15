@@ -117,6 +117,7 @@ Hunt mode may not:
 - bypass permission mode
 - run unbounded compute
 - invent a second authority path
+- redefine benchmark relevance or bypass the frozen public-claim boundaries from the AML paper/release freeze
 
 ## Randomness contract
 
@@ -236,6 +237,8 @@ The future academy track must reserve these artifact families:
 - `academy_promotion_timeline.json`
 - `academy_explanation_report.json`
 
+When a capability is justified by public benchmark relevance, academy artifacts must cite the frozen benchmark catalog and claim-boundary artifacts rather than creating a private benchmark taxonomy.
+
 ## Proof burden
 
 The academy is only credible if it can prove:
@@ -245,4 +248,5 @@ The academy is only credible if it can prove:
 - non-core specialists can be retired but core agents cannot
 - hunt campaigns are budgeted and replayable
 - failed candidates still produce reusable feedback
+- benchmark-motivated candidates improve or honestly fail against the frozen relevant benchmark catalog
 - humans and external agents can ask why a capability was promoted, blocked, or retired and receive a trace-backed answer

@@ -88,7 +88,7 @@ The full required performance-recovery path is now landed:
 - Slice 15L benchmark truth hardening and paper-claim gates
 - Slice 15M competitive specialization and benchmark-generalization guards
 
-The broader **Relaytic Academy** now starts at **Slice 16A**, but only after the new AML proof and productization track lands:
+The broader **Relaytic Academy** now starts at **Slice 16A**, but only after the new AML proof, productization, and paper-freeze track lands:
 
 - **Slice 15N** AML domain contract and flagship pivot
 - **Slice 15O** entity, graph, and typology reasoning
@@ -103,6 +103,7 @@ The broader **Relaytic Academy** now starts at **Slice 16A**, but only after the
 - **Slice 15X** AML evaluation-environment reframe
 - **Slice 15Y** demo-first documentation rewrite
 - **Slice 15Z** pre-Academy repo credibility cleanup
+- **Slice 15Z-R** paper benchmark and release freeze
 
 That ordering is deliberate. Relaytic is more interesting as a world-class AML system than as a generic capability-evolution project with no sharp domain wedge.
 

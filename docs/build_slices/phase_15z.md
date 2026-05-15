@@ -8,9 +8,12 @@ Planned.
 
 Slice 15Z reduces credibility risk before Relaytic adds capability-academy surface area.
 
+This slice should leave the repository clean enough that a benchmark reviewer can reproduce the AML path without reverse-engineering oversized modules, stale names, or hidden prototype-era assumptions.
+
 ## Load-Bearing Improvement
 
 - the codebase looks easier to evaluate and maintain before it grows again.
+- benchmark and release surfaces look intentional enough that the following paper-freeze slice can focus on evidence rather than repo archaeology.
 
 ## Human Surface
 
@@ -37,16 +40,19 @@ Slice 15Z reduces credibility risk before Relaytic adds capability-academy surfa
 - `module_extraction_plan.json`
 - `public_surface_inventory.json`
 - `module_split_report.json`
+- `benchmark_surface_cleanup_report.json`
 
 ## Acceptance Criteria
 
 1. At least one oversized module is split without changing public behavior.
 2. Public CLI and import-boundary smoke tests still pass.
 3. Any retained oversized module has a documented extraction boundary.
+4. Benchmark, demo, and public-claim commands are present in the public-surface inventory with no stale `corr2surrogate` expansion or prototype naming.
+5. The benchmark-surface cleanup report lists any retained cleanup debt that could affect paper reproduction.
 
 ## Required Verification
 
 - module-size audit
 - import-boundary smoke test
 - targeted public CLI regression
-
+- benchmark surface inventory regression

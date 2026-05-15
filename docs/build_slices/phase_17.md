@@ -29,6 +29,7 @@ This is where Relaytic can experiment with JEPA-style latent predictive represen
 - no representation engine may silently replace deterministic metric, calibration, lifecycle, or artifact contracts
 - representation influence must be explicit, inspectable, and benchmark-separated
 - JEPA-style backends should be evaluated first for retrieval quality, anomaly/OOD support, temporal state understanding, and challenger/data-acquisition help
+- representation-augmented benchmark claims must reuse the frozen benchmark catalog and claim-boundary discipline from Slice 15Z-R rather than creating a new ungoverned benchmark story
 
 ## Acceptance Criteria
 
@@ -38,6 +39,7 @@ Slice 17 is acceptable only if:
 2. one latent predictive path improves anomaly or OOD support on a time-aware dataset
 3. one honest failure case shows no gain from representation pretraining
 4. benchmark reporting separates deterministic-floor and representation-augmented Relaytic clearly
+5. one representation result is evaluated against a frozen relevant benchmark or explicitly blocked as outside the paper-release claim scope
 
 ## Required Verification
 
@@ -47,3 +49,4 @@ Slice 17 should not be considered complete without targeted tests and benchmark 
 - one anomaly or OOD-support case
 - one no-gain case
 - one representation-aware benchmark report
+- one frozen-catalog claim-boundary regression

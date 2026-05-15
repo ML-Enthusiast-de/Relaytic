@@ -74,6 +74,22 @@ This is the harder public-proof track.
 
 It should be used once Relaytic-AML can support subgraph-centric benchmark packaging and holdout-safe claim gates.
 
+### 4. AMLSim-style synthetic bank-transaction graph
+
+Expected shape:
+
+- generated account, transaction, alert, SAR, and typology-pattern outputs
+- account/entity graph edges
+- configurable simulation steps and alert patterns
+
+What Relaytic-AML should prove here:
+
+- account/entity risk scoring
+- typology-aware alert generation
+- synthetic-bank graph provenance
+- analyst-review queue optimization over known injected patterns
+- clear labeling as synthetic benchmark evidence, not real-bank deployment proof
+
 ## Required evaluation posture
 
 Relaytic-AML should not reduce AML evaluation to AUROC.
@@ -126,6 +142,7 @@ The benchmark pack is now part of a broader AML proof/productization sequence. T
 7. **15X**: add AML evaluation-environment scorecards.
 8. **15Y**: rewrite first-contact docs around the flagship path.
 9. **15Z**: clean repo credibility risks before capability growth expands.
+10. **15Z-R**: freeze the relevant benchmark and release evidence for paper/demo use.
 
 Benchmark success must stay separated from:
 
@@ -134,3 +151,17 @@ Benchmark success must stay separated from:
 - environment behavior
 - public-claim readiness
 - paper-safe broader claims
+
+## Release-freeze relevance gate
+
+The final pre-Academy paper/release freeze must not rely on one easy or repeatedly inspected dataset.
+
+The relevant benchmark catalog should include:
+
+- PaySim-style or equivalent transaction-fraud temporal evidence, treated as useful but synthetic/proxy unless stronger real public data is available
+- Elliptic-style graph AML evidence, with flattened, raw-graph, and claim-scope status separated
+- Elliptic2-style subgraph AML evidence when the loader and data-access posture are mature enough; otherwise a precise blocked reason
+- AMLSim-style synthetic bank graph evidence when reproducible local generation is available
+- the generic paper benchmark pack only as supporting structured-data evidence, not as the flagship AML proof
+
+Public claims require the benchmark catalog, holdout/partition posture, operational business-value guard, benchmark truth gate, environment scorecard, and release-safety scan to agree.

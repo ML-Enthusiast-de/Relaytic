@@ -44,6 +44,7 @@ Its job is to remove misleading legacy structure, retire stale compatibility sur
 - preserve supported public CLI, artifact, and integration contracts unless the migration docs explicitly authorize a breaking change
 - clean public docs, handbook language, and host-bundle guidance so the final repo does not read like an archaeological dig through earlier slices
 - leave explicit cleanup scorecards and audit artifacts so the repo-quality gains are inspectable rather than hand-waved
+- preserve the paper/release benchmark freeze artifacts and public-claim boundaries unless a later migration explicitly replaces them with stronger reproducible evidence
 
 ## Acceptance Criteria
 
@@ -54,6 +55,7 @@ Slice 18 is acceptable only if:
 3. one compatibility shim is either removed or given an explicit documented retention reason
 4. one repo-wide public-surface inventory shows fewer confusing entry points than before
 5. the final repo passes the broad proof wall, not just narrow targeted tests
+6. paper benchmark and release-freeze commands still point to current artifacts or documented replacements
 
 ## Required Verification
 
