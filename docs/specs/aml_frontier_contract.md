@@ -210,7 +210,7 @@ The AML proof path is accepted only after these slices are complete:
 - **15R-A** finished the AML proof pack by aligning tests, CLI, run summary, assist, mission control, docs, and public-claim gates.
 - **15S** built one public-safe flagship AML demo bundle around review-queue value and case evidence.
 - **15T** added guarded business-value metrics such as analyst-hours saved, false-positive reduction at fixed recall, recall at review capacity, precision at top-k, case-packet completeness, and operational overclaim blocking.
-- **15U** adds strong AML baselines and ablations so graph, temporal, calibration, threshold, and review-budget contributions are measured.
+- **15U** added strong AML baselines, capability ablations, adapter fallback reporting, contribution summaries, and benchmark relevance scorecards so graph, temporal, calibration, threshold, and review-budget contributions are measured.
 - **15V** adds raw graph and subgraph ingestion so public graph AML work is not limited to flattened snapshots.
 - **15W** strengthens delayed-label, positive-unlabeled, threshold-drift, and time-window evaluation.
 - **15X** frames Relaytic runs as evaluation environments with explicit workflow scorecards.

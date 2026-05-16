@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Intent
 
@@ -58,3 +58,10 @@ This slice must make the benchmark story causal, not just comparative: a reviewe
 - AML ablation matrix regression
 - optional-adapter fallback regression
 - benchmark relevance scorecard regression
+
+## Implemented Notes
+
+- Added deterministic 15U artifact generation in `src/relaytic/aml/baselines.py`.
+- Added `relaytic aml baselines --run-dir <run_dir>` for rebuilding and inspecting baseline, ablation, capability-contribution, adapter, and relevance artifacts.
+- Benchmark run/show, run summary, and the 15S demo bundle now surface AML baseline and ablation outcomes with explicit supported/proxy/blocked benchmark-family language.
+- Optional boosted-tree and graph-shadow paths remain guarded: missing adapters are recorded as fallback or blocked evidence, and proxy graph relevance is not promoted into a hard Elliptic/Elliptic2 public claim.

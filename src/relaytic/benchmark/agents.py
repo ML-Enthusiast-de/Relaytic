@@ -2389,6 +2389,10 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
     analyst_hour_savings_report = dict(payload.get("analyst_hour_savings_report", {}))
     review_capacity_metric_report = dict(payload.get("review_capacity_metric_report", {}))
     operational_metric_guard = dict(payload.get("operational_metric_guard", {}))
+    aml_baseline_matrix = dict(payload.get("aml_baseline_matrix", {}))
+    aml_ablation_matrix = dict(payload.get("aml_ablation_matrix", {}))
+    aml_capability_contribution_report = dict(payload.get("aml_capability_contribution_report", {}))
+    aml_benchmark_relevance_scorecard = dict(payload.get("aml_benchmark_relevance_scorecard", {}))
     shadow_manifest = dict(payload.get("shadow_trial_manifest", {}))
     shadow_scorecard = dict(payload.get("shadow_trial_scorecard", {}))
     promotion = dict(payload.get("promotion_readiness_report", {}))
@@ -2528,6 +2532,30 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
                 f"- Model-operational disagreement: `{operational_metric_guard.get('model_operational_disagreement')}`",
             ]
         )
+    if aml_baseline_matrix or aml_ablation_matrix or aml_benchmark_relevance_scorecard:
+        lines.extend(
+            [
+                "",
+                "## AML Baselines And Ablations",
+                f"- Baseline status: `{aml_baseline_matrix.get('status') or 'unknown'}`",
+                f"- Run-or-fallback families: `{aml_baseline_matrix.get('run_or_fallback_count')}`",
+                f"- Material capability contributions: `{aml_capability_contribution_report.get('material_contribution_count')}`",
+                f"- Public metric changed by capabilities: `{aml_capability_contribution_report.get('public_metric_changed')}`",
+                f"- Supported AML benchmark families: `{aml_benchmark_relevance_scorecard.get('supported_family_count')}`",
+                f"- Proxy AML benchmark families: `{aml_benchmark_relevance_scorecard.get('proxy_family_count')}`",
+                f"- Hard benchmark claim allowed: `{aml_benchmark_relevance_scorecard.get('hard_benchmark_claim_allowed')}`",
+            ]
+        )
+        ablation_rows = [
+            dict(item)
+            for item in aml_ablation_matrix.get("rows", [])
+            if isinstance(item, dict)
+        ]
+        for item in ablation_rows[:5]:
+            lines.append(
+                f"- Ablation `{item.get('ablation_id')}` evidence=`{item.get('evidence_state')}` "
+                f"impact=`{item.get('impact_state')}` delta=`{item.get('metric_delta_proxy')}`"
+            )
     if temporal_recovery:
         lines.extend(
             [

@@ -43,7 +43,7 @@ def build_run_summary(
         read_task_contract_artifacts,
         read_temporal_engine_artifacts,
     )
-    from relaytic.aml import read_aml_business_value_artifacts, read_aml_graph_artifacts
+    from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts, read_aml_graph_artifacts
     from relaytic.iteration import read_iteration_bundle
     from relaytic.casework import read_casework_artifacts
     from relaytic.stream_risk import read_stream_risk_artifacts
@@ -202,6 +202,7 @@ def build_run_summary(
     task_contract_bundle = read_task_contract_artifacts(root)
     aml_graph_bundle = read_aml_graph_artifacts(root)
     aml_business_value_bundle = read_aml_business_value_artifacts(root)
+    aml_baseline_bundle = read_aml_baseline_artifacts(root)
     casework_bundle = read_casework_artifacts(root)
     stream_risk_bundle = read_stream_risk_artifacts(root)
     decision_bundle = _read_bundle(
@@ -442,6 +443,11 @@ def build_run_summary(
     analyst_hour_savings_report = dict(aml_business_value_bundle.get("analyst_hour_savings_report", {})) if isinstance(aml_business_value_bundle.get("analyst_hour_savings_report"), dict) else {}
     review_capacity_metric_report = dict(aml_business_value_bundle.get("review_capacity_metric_report", {})) if isinstance(aml_business_value_bundle.get("review_capacity_metric_report"), dict) else {}
     operational_metric_guard = dict(aml_business_value_bundle.get("operational_metric_guard", {})) if isinstance(aml_business_value_bundle.get("operational_metric_guard"), dict) else {}
+    aml_baseline_matrix = dict(aml_baseline_bundle.get("aml_baseline_matrix", {})) if isinstance(aml_baseline_bundle.get("aml_baseline_matrix"), dict) else {}
+    aml_ablation_matrix = dict(aml_baseline_bundle.get("aml_ablation_matrix", {})) if isinstance(aml_baseline_bundle.get("aml_ablation_matrix"), dict) else {}
+    aml_baseline_adapter_report = dict(aml_baseline_bundle.get("aml_baseline_adapter_report", {})) if isinstance(aml_baseline_bundle.get("aml_baseline_adapter_report"), dict) else {}
+    aml_capability_contribution_report = dict(aml_baseline_bundle.get("aml_capability_contribution_report", {})) if isinstance(aml_baseline_bundle.get("aml_capability_contribution_report"), dict) else {}
+    aml_benchmark_relevance_scorecard = dict(aml_baseline_bundle.get("aml_benchmark_relevance_scorecard", {})) if isinstance(aml_baseline_bundle.get("aml_benchmark_relevance_scorecard"), dict) else {}
     temporal_structure_report = dict(temporal_bundle.get("temporal_structure_report", {})) if isinstance(temporal_bundle.get("temporal_structure_report"), dict) else {}
     temporal_feature_ladder = dict(temporal_bundle.get("temporal_feature_ladder", {})) if isinstance(temporal_bundle.get("temporal_feature_ladder"), dict) else {}
     rolling_cv_plan = dict(temporal_bundle.get("rolling_cv_plan", {})) if isinstance(temporal_bundle.get("rolling_cv_plan"), dict) else {}
@@ -1401,6 +1407,35 @@ def build_run_summary(
             else None,
             "summary": _clean_text(aml_business_value_report.get("summary"))
             or _clean_text(operational_metric_guard.get("summary")),
+        },
+        "aml_baselines": {
+            "status": _clean_text(aml_baseline_matrix.get("status"))
+            or _clean_text(aml_baseline_adapter_report.get("status")),
+            "baseline_family_count": aml_baseline_matrix.get("baseline_family_count")
+            or aml_baseline_adapter_report.get("baseline_family_count"),
+            "run_or_fallback_count": aml_baseline_matrix.get("run_or_fallback_count")
+            or aml_baseline_adapter_report.get("run_or_fallback_count"),
+            "ran_count": aml_baseline_matrix.get("ran_count"),
+            "fallback_count": aml_baseline_matrix.get("fallback_count"),
+            "shadow_only_count": aml_baseline_matrix.get("shadow_only_count"),
+            "material_contribution_count": aml_capability_contribution_report.get("material_contribution_count")
+            if aml_capability_contribution_report
+            else aml_ablation_matrix.get("material_contribution_count"),
+            "public_metric_changed": aml_capability_contribution_report.get("public_metric_changed")
+            if aml_capability_contribution_report
+            else aml_ablation_matrix.get("public_metric_changed"),
+            "supported_family_count": aml_benchmark_relevance_scorecard.get("supported_family_count"),
+            "proxy_family_count": aml_benchmark_relevance_scorecard.get("proxy_family_count"),
+            "blocked_family_count": aml_benchmark_relevance_scorecard.get("blocked_family_count"),
+            "hard_benchmark_claim_allowed": aml_benchmark_relevance_scorecard.get("hard_benchmark_claim_allowed"),
+            "benchmark_support_levels": {
+                str(item.get("benchmark_family")): item.get("support_level")
+                for item in aml_benchmark_relevance_scorecard.get("rows", [])
+                if isinstance(item, dict) and item.get("benchmark_family")
+            } if isinstance(aml_benchmark_relevance_scorecard.get("rows"), list) else {},
+            "summary": _clean_text(aml_capability_contribution_report.get("summary"))
+            or _clean_text(aml_benchmark_relevance_scorecard.get("summary"))
+            or _clean_text(aml_baseline_matrix.get("summary")),
         },
         "aml_proof": {
             "status": _clean_text(aml_benchmark_manifest.get("status"))

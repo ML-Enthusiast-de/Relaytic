@@ -42,6 +42,11 @@ _SOURCE_ARTIFACTS = (
     ("analyst_hour_savings_report", "analyst_hour_savings_report.json", "analyst-hour savings", True),
     ("review_capacity_metric_report", "review_capacity_metric_report.json", "review-capacity metrics", True),
     ("operational_metric_guard", "operational_metric_guard.json", "operational claim guard", True),
+    ("aml_baseline_matrix", "aml_baseline_matrix.json", "baseline matrix", True),
+    ("aml_ablation_matrix", "aml_ablation_matrix.json", "ablation matrix", True),
+    ("aml_baseline_adapter_report", "aml_baseline_adapter_report.json", "baseline adapter report", True),
+    ("aml_capability_contribution_report", "aml_capability_contribution_report.json", "capability contribution report", True),
+    ("aml_benchmark_relevance_scorecard", "aml_benchmark_relevance_scorecard.json", "benchmark relevance scorecard", True),
     ("trace_model", "trace_model.json", "trace truth", False),
     ("protocol_conformance_report", "protocol_conformance_report.json", "eval protocol conformance", False),
 )
@@ -273,6 +278,11 @@ def _read_demo_source_payloads(root: Path) -> dict[str, dict[str, Any]]:
         "analyst_hour_savings_report": _read_json(root / "analyst_hour_savings_report.json"),
         "review_capacity_metric_report": _read_json(root / "review_capacity_metric_report.json"),
         "operational_metric_guard": _read_json(root / "operational_metric_guard.json"),
+        "aml_baseline_matrix": _read_json(root / "aml_baseline_matrix.json"),
+        "aml_ablation_matrix": _read_json(root / "aml_ablation_matrix.json"),
+        "aml_baseline_adapter_report": _read_json(root / "aml_baseline_adapter_report.json"),
+        "aml_capability_contribution_report": _read_json(root / "aml_capability_contribution_report.json"),
+        "aml_benchmark_relevance_scorecard": _read_json(root / "aml_benchmark_relevance_scorecard.json"),
     }
 
 
@@ -296,6 +306,10 @@ def _build_bundle_manifest(
     alert_queue = payloads["alert_queue_rankings"]
     business_value_report = payloads["aml_business_value_report"]
     operational_metric_guard = payloads["operational_metric_guard"]
+    baseline_matrix = payloads["aml_baseline_matrix"]
+    ablation_matrix = payloads["aml_ablation_matrix"]
+    contribution_report = payloads["aml_capability_contribution_report"]
+    relevance_scorecard = payloads["aml_benchmark_relevance_scorecard"]
     claim_posture = _claim_posture(public_claim_guard)
     status = "ready" if artifact_index["missing_required_artifact_count"] == 0 else "partial"
     if claim_posture == "blocked" or operational_metric_guard.get("operational_utility_state") == "blocked":
@@ -372,6 +386,22 @@ def _build_bundle_manifest(
             ),
             "path": "aml_business_value_report.json",
         },
+        "baseline_and_ablation": {
+            "status": _clean_text(baseline_matrix.get("status")),
+            "run_or_fallback_count": baseline_matrix.get("run_or_fallback_count"),
+            "material_contribution_count": contribution_report.get("material_contribution_count")
+            if contribution_report
+            else ablation_matrix.get("material_contribution_count"),
+            "public_metric_changed": contribution_report.get("public_metric_changed")
+            if contribution_report
+            else ablation_matrix.get("public_metric_changed"),
+            "supported_family_count": relevance_scorecard.get("supported_family_count"),
+            "proxy_family_count": relevance_scorecard.get("proxy_family_count"),
+            "hard_benchmark_claim_allowed": relevance_scorecard.get("hard_benchmark_claim_allowed"),
+            "path": "aml_baseline_matrix.json",
+            "ablation_path": "aml_ablation_matrix.json",
+            "relevance_path": "aml_benchmark_relevance_scorecard.json",
+        },
         "business_metric_table_status": business_metric_table.get("status"),
         "artifact_index_status": artifact_index.get("status"),
         "missing_required_artifact_count": artifact_index.get("missing_required_artifact_count"),
@@ -388,6 +418,11 @@ def _build_bundle_manifest(
             "analyst_hour_savings_report": "analyst_hour_savings_report.json",
             "review_capacity_metric_report": "review_capacity_metric_report.json",
             "operational_metric_guard": "operational_metric_guard.json",
+            "aml_baseline_matrix": "aml_baseline_matrix.json",
+            "aml_ablation_matrix": "aml_ablation_matrix.json",
+            "aml_baseline_adapter_report": "aml_baseline_adapter_report.json",
+            "aml_capability_contribution_report": "aml_capability_contribution_report.json",
+            "aml_benchmark_relevance_scorecard": "aml_benchmark_relevance_scorecard.json",
         },
         "recommended_next_command": f"relaytic mission-control show --run-dir {run_dir} --format json",
         "summary": (
@@ -415,6 +450,10 @@ def _build_business_metric_table(
     analyst_hours = payloads["analyst_hour_savings_report"]
     capacity_metrics = payloads["review_capacity_metric_report"]
     operational_guard = payloads["operational_metric_guard"]
+    baseline_matrix = payloads["aml_baseline_matrix"]
+    ablation_matrix = payloads["aml_ablation_matrix"]
+    contribution_report = payloads["aml_capability_contribution_report"]
+    relevance_scorecard = payloads["aml_benchmark_relevance_scorecard"]
 
     model_metrics = [
         _metric_row("selected_model_family", decision.get("selected_model_family"), "Model family selected by the run."),
@@ -435,6 +474,10 @@ def _build_business_metric_table(
         _metric_row("analyst_hours_saved_at_fixed_recall", analyst_hours.get("analyst_hours_saved_at_fixed_recall"), "Estimated analyst-hours saved against the conservative ungoverned-review baseline."),
         _metric_row("false_positive_reduction_at_fixed_recall", analyst_hours.get("false_positive_reduction_at_fixed_recall"), "Estimated false-positive reduction at the selected fixed-recall target."),
         _metric_row("operational_metric_guard", operational_guard.get("operational_utility_state"), "Whether operational utility supports hard business-value claims."),
+        _metric_row("baseline_run_or_fallback_count", baseline_matrix.get("run_or_fallback_count"), "AML baseline families that ran or have an explicit fallback path."),
+        _metric_row("material_capability_contribution_count", contribution_report.get("material_contribution_count", ablation_matrix.get("material_contribution_count")), "AML capability ablations with material contribution evidence."),
+        _metric_row("public_metric_changed_by_capabilities", contribution_report.get("public_metric_changed", ablation_matrix.get("public_metric_changed")), "Whether AML capability ablations changed a public-facing metric proxy."),
+        _metric_row("hard_benchmark_claim_allowed", relevance_scorecard.get("hard_benchmark_claim_allowed"), "Whether current AML benchmark relevance evidence supports hard public benchmark claims."),
     ]
     return {
         "schema_version": AML_DEMO_BUSINESS_METRIC_TABLE_SCHEMA_VERSION,
@@ -457,8 +500,8 @@ def _build_business_metric_table(
             },
             {
                 "assumption_id": "slice_boundary",
-                "value": "15T business-value proof is materialized in aml_business_value_report.json and guarded by operational_metric_guard.json.",
-                "source": "docs/build_slices/phase_15t.md",
+                "value": "15U baseline and ablation proof is materialized alongside 15T business-value guard artifacts.",
+                "source": "docs/build_slices/phase_15u.md",
             },
         ],
         "claim_boundary": "Model metrics and operational review-budget metrics are separate; hard analyst-hour ROI claims require the operational guard to pass.",
@@ -515,6 +558,10 @@ def _render_flow_report(
     analyst_hours = payloads["analyst_hour_savings_report"]
     capacity_metrics = payloads["review_capacity_metric_report"]
     operational_guard = payloads["operational_metric_guard"]
+    baseline_matrix = payloads["aml_baseline_matrix"]
+    ablation_matrix = payloads["aml_ablation_matrix"]
+    contribution_report = payloads["aml_capability_contribution_report"]
+    relevance_scorecard = payloads["aml_benchmark_relevance_scorecard"]
     allowed_claims = [
         str(item).strip()
         for item in public_claim_guard.get("allowed_claims", [])
@@ -583,6 +630,18 @@ def _render_flow_report(
             f"- Precision at top-k: `{capacity_metrics.get('precision_at_top_k')}`",
             f"- Recall at review capacity: `{capacity_metrics.get('recall_at_review_capacity')}`",
             f"- Business-value report path: `aml_business_value_report.json`",
+            "",
+            "## Baselines And Ablations",
+            "",
+            f"- Baseline status: `{baseline_matrix.get('status') or 'unknown'}`",
+            f"- Run-or-fallback baseline families: `{baseline_matrix.get('run_or_fallback_count')}`",
+            f"- Material capability contributions: `{contribution_report.get('material_contribution_count', ablation_matrix.get('material_contribution_count'))}`",
+            f"- Public metric changed by capabilities: `{contribution_report.get('public_metric_changed', ablation_matrix.get('public_metric_changed'))}`",
+            f"- Supported AML benchmark families: `{relevance_scorecard.get('supported_family_count')}`",
+            f"- Proxy AML benchmark families: `{relevance_scorecard.get('proxy_family_count')}`",
+            f"- Hard benchmark claim allowed: `{relevance_scorecard.get('hard_benchmark_claim_allowed')}`",
+            f"- Baseline matrix path: `aml_baseline_matrix.json`",
+            f"- Ablation matrix path: `aml_ablation_matrix.json`",
             "",
             "## Drift Posture",
             "",

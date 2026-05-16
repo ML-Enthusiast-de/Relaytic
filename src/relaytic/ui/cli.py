@@ -1779,6 +1779,21 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    aml_baselines = aml_sub.add_parser(
+        "baselines",
+        help="Build and show Slice 15U AML baseline, ablation, contribution, and benchmark-relevance artifacts for a run.",
+    )
+    aml_baselines.add_argument("--run-dir", required=True, help="Run directory containing AML casework, graph, benchmark, and business-value artifacts.")
+    aml_baselines.add_argument("--config", default=None, help="Optional config/policy source.")
+    aml_baselines.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    aml_baselines.add_argument("--overwrite", action="store_true", help="Allow overwriting existing AML baseline and ablation artifacts.")
+    aml_baselines.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    aml_baselines.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     demo_surface = sub.add_parser(
         "demo",
@@ -4190,18 +4205,27 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "aml":
-        if args.aml_command != "business-value":
-            parser.error("Unsupported AML subcommand.")
-            return 2
         try:
             labels = _parse_key_value_pairs(args.label)
-            payload = _run_aml_business_value_phase(
-                run_dir=args.run_dir,
-                config_path=args.config,
-                run_id=args.run_id,
-                overwrite=bool(args.overwrite),
-                labels=labels,
-            )
+            if args.aml_command == "business-value":
+                payload = _run_aml_business_value_phase(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    overwrite=bool(args.overwrite),
+                    labels=labels,
+                )
+            elif args.aml_command == "baselines":
+                payload = _run_aml_baseline_phase(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    overwrite=bool(args.overwrite),
+                    labels=labels,
+                )
+            else:
+                parser.error("Unsupported AML subcommand.")
+                return 2
         except ValueError as exc:
             parser.error(str(exc))
             return 2
@@ -5263,6 +5287,121 @@ def _aml_business_value_surface_summary(bundle: dict[str, Any]) -> dict[str, Any
         "incumbent_present": incumbent.get("incumbent_present"),
         "incumbent_operational_comparison_scope": incumbent.get("operational_comparison_scope"),
         "blocked_reason_codes": guard.get("blocked_reason_codes", []),
+    }
+
+
+def _run_aml_baseline_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.aml import (
+        render_aml_baseline_markdown,
+        sync_aml_baseline_artifacts,
+        sync_aml_business_value_artifacts,
+    )
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    targets = _aml_baseline_output_paths(root)
+    if not overwrite and all(path.exists() for path in targets.values()):
+        return _show_aml_baseline_surface(run_dir=root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    if overwrite or not all(path.exists() for path in _aml_business_value_output_paths(root).values()):
+        sync_aml_business_value_artifacts(root)
+    written = sync_aml_baseline_artifacts(root)
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_aml_baseline_manifest(
+        root,
+        run_id=run_id,
+        policy_source=config_path,
+        labels=labels,
+    )
+    bundle = _read_aml_baseline_bundle(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "paths": {key: str(value) for key, value in written.items()},
+            "aml_baselines": _aml_baseline_surface_summary(bundle),
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_aml_baseline_markdown(bundle),
+    }
+
+
+def _show_aml_baseline_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    from relaytic.aml import (
+        render_aml_baseline_markdown,
+        sync_aml_baseline_artifacts,
+        sync_aml_business_value_artifacts,
+    )
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    if not all(path.exists() for path in _aml_business_value_output_paths(root).values()):
+        sync_aml_business_value_artifacts(root)
+    bundle = _read_aml_baseline_bundle(root)
+    if not bundle:
+        sync_aml_baseline_artifacts(root)
+        bundle = _read_aml_baseline_bundle(root)
+    if not bundle:
+        raise ValueError(f"No AML baseline artifacts could be built in {root}.")
+    materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_aml_baseline_manifest(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "aml_baselines": _aml_baseline_surface_summary(bundle),
+            "bundle": bundle,
+        },
+        "human_output": render_aml_baseline_markdown(bundle),
+    }
+
+
+def _read_aml_baseline_bundle(root: Path) -> dict[str, Any]:
+    from relaytic.aml import read_aml_baseline_artifacts
+
+    return read_aml_baseline_artifacts(root)
+
+
+def _aml_baseline_surface_summary(bundle: dict[str, Any]) -> dict[str, Any]:
+    baseline = dict(bundle.get("aml_baseline_matrix", {}))
+    adapter = dict(bundle.get("aml_baseline_adapter_report", {}))
+    ablation = dict(bundle.get("aml_ablation_matrix", {}))
+    contribution = dict(bundle.get("aml_capability_contribution_report", {}))
+    relevance = dict(bundle.get("aml_benchmark_relevance_scorecard", {}))
+    rows = baseline.get("rows", []) if isinstance(baseline.get("rows"), list) else []
+    relevance_rows = relevance.get("rows", []) if isinstance(relevance.get("rows"), list) else []
+    return {
+        "status": baseline.get("status") or adapter.get("status"),
+        "run_or_fallback_count": baseline.get("run_or_fallback_count", adapter.get("run_or_fallback_count")),
+        "baseline_family_count": baseline.get("baseline_family_count", adapter.get("baseline_family_count")),
+        "ran_count": baseline.get("ran_count"),
+        "fallback_count": baseline.get("fallback_count"),
+        "shadow_only_count": baseline.get("shadow_only_count"),
+        "ablation_status": ablation.get("status"),
+        "material_contribution_count": contribution.get("material_contribution_count", ablation.get("material_contribution_count")),
+        "public_metric_changed": contribution.get("public_metric_changed", ablation.get("public_metric_changed")),
+        "hard_benchmark_claim_allowed": relevance.get("hard_benchmark_claim_allowed"),
+        "supported_family_count": relevance.get("supported_family_count"),
+        "proxy_family_count": relevance.get("proxy_family_count"),
+        "blocked_family_count": relevance.get("blocked_family_count"),
+        "baseline_ids": [str(item.get("baseline_id")) for item in rows if isinstance(item, dict) and item.get("baseline_id")],
+        "benchmark_support_levels": {
+            str(item.get("benchmark_family")): item.get("support_level")
+            for item in relevance_rows
+            if isinstance(item, dict) and item.get("benchmark_family")
+        },
     }
 
 
@@ -10479,7 +10618,7 @@ def _run_benchmark_phase(
 ) -> dict[str, Any]:
     from relaytic.benchmark import write_benchmark_bundle
     from relaytic.analytics import read_task_contract_artifacts
-    from relaytic.aml import sync_aml_business_value_artifacts
+    from relaytic.aml import sync_aml_baseline_artifacts, sync_aml_business_value_artifacts
 
     root = Path(run_dir)
     targets = _benchmark_output_paths(root)
@@ -10533,8 +10672,9 @@ def _run_benchmark_phase(
         written = write_benchmark_bundle(root, bundle=benchmark_result.bundle)
         materialize_run_summary(run_dir=root, data_path=resolved_data_path)
         aml_business_value_written = sync_aml_business_value_artifacts(root)
+        aml_baseline_written = sync_aml_baseline_artifacts(root)
         materialize_run_summary(run_dir=root, data_path=resolved_data_path)
-        manifest_path = _refresh_aml_business_value_manifest(
+        manifest_path = _refresh_aml_baseline_manifest(
             root,
             run_id=run_id,
             policy_source=foundation_state["policy_path"],
@@ -10547,9 +10687,10 @@ def _run_benchmark_phase(
             output_artifacts=[
                 *(str(value) for value in written.values()),
                 *(str(value) for value in aml_business_value_written.values()),
+                *(str(value) for value in aml_baseline_written.values()),
                 str(manifest_path),
             ],
-            summary="Relaytic compared the selected route against same-contract strong reference approaches and recorded honest parity plus AML business-value artifacts.",
+            summary="Relaytic compared the selected route against same-contract strong reference approaches and recorded honest parity plus AML business-value, baseline, and ablation artifacts.",
         )
         sync_materialization_runtime_artifacts(root)
         parity = benchmark_result.bundle.benchmark_parity_report
@@ -10578,7 +10719,7 @@ def _run_benchmark_phase(
         from relaytic.aml import read_aml_graph_artifacts
         from relaytic.casework import read_casework_artifacts
         from relaytic.stream_risk import read_stream_risk_artifacts
-        from relaytic.aml import read_aml_business_value_artifacts
+        from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts
 
         task_contract_bundle = read_task_contract_artifacts(root)
         eval_bundle = _read_json_bundle(root, bundle="evals")
@@ -10588,6 +10729,7 @@ def _run_benchmark_phase(
         casework_bundle = read_casework_artifacts(root)
         stream_risk_bundle = read_stream_risk_artifacts(root)
         aml_business_value_bundle = read_aml_business_value_artifacts(root)
+        aml_baseline_bundle = read_aml_baseline_artifacts(root)
         operating_point_bundle = {
             key: json.loads((root / filename).read_text(encoding="utf-8"))
             for key, filename in {
@@ -10607,6 +10749,7 @@ def _run_benchmark_phase(
         bundle_payload.update(casework_bundle)
         bundle_payload.update(stream_risk_bundle)
         bundle_payload.update(aml_business_value_bundle)
+        bundle_payload.update(aml_baseline_bundle)
         bundle_payload.update(temporal_bundle)
         bundle_payload.update(architecture_bundle)
         bundle_payload.update(operating_point_bundle)
@@ -10615,7 +10758,11 @@ def _run_benchmark_phase(
                 "status": "ok",
                 "run_dir": str(root),
                 "manifest_path": str(manifest_path),
-                "paths": {key: str(value) for key, value in written.items()},
+                "paths": {
+                    **{key: str(value) for key, value in written.items()},
+                    **{key: str(value) for key, value in aml_business_value_written.items()},
+                    **{key: str(value) for key, value in aml_baseline_written.items()},
+                },
                 "benchmark": {
                     "parity_status": parity.parity_status,
                     "recommended_action": parity.recommended_action,
@@ -10687,10 +10834,15 @@ def _run_benchmark_phase(
                     "aml_recall_at_review_capacity": aml_business_value_bundle.get("review_capacity_metric_report", {}).get("recall_at_review_capacity"),
                     "aml_analyst_hours_saved_at_fixed_recall": aml_business_value_bundle.get("analyst_hour_savings_report", {}).get("analyst_hours_saved_at_fixed_recall"),
                     "aml_false_positive_reduction_at_fixed_recall": aml_business_value_bundle.get("analyst_hour_savings_report", {}).get("false_positive_reduction_at_fixed_recall"),
+                    "aml_baseline_status": aml_baseline_bundle.get("aml_baseline_matrix", {}).get("status"),
+                    "aml_baseline_run_or_fallback_count": aml_baseline_bundle.get("aml_baseline_matrix", {}).get("run_or_fallback_count"),
+                    "aml_material_ablation_count": aml_baseline_bundle.get("aml_capability_contribution_report", {}).get("material_contribution_count"),
+                    "aml_public_metric_changed_by_capabilities": aml_baseline_bundle.get("aml_capability_contribution_report", {}).get("public_metric_changed"),
+                    "aml_hard_benchmark_claim_allowed": aml_baseline_bundle.get("aml_benchmark_relevance_scorecard", {}).get("hard_benchmark_claim_allowed"),
                 },
                 "bundle": bundle_payload,
             },
-            "human_output": benchmark_result.review_markdown,
+            "human_output": render_benchmark_review_markdown(bundle_payload),
         }
     except Exception as exc:
         record_runtime_stage_failure(
@@ -10704,7 +10856,7 @@ def _run_benchmark_phase(
 
 def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     from relaytic.analytics import read_task_contract_artifacts
-    from relaytic.aml import sync_aml_business_value_artifacts
+    from relaytic.aml import sync_aml_baseline_artifacts, sync_aml_business_value_artifacts
 
     root = Path(run_dir)
     if not root.exists():
@@ -10717,7 +10869,10 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     if not all(path.exists() for path in _aml_business_value_output_paths(root).values()):
         sync_aml_business_value_artifacts(root)
         materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
-    manifest_path = _refresh_aml_business_value_manifest(root)
+    if not all(path.exists() for path in _aml_baseline_output_paths(root).values()):
+        sync_aml_baseline_artifacts(root)
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_aml_baseline_manifest(root)
     parity = dict(bundle.get("benchmark_parity_report", {}))
     gap = dict(bundle.get("benchmark_gap_report", {}))
     incumbent = dict(bundle.get("incumbent_parity_report", {}))
@@ -10744,7 +10899,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     from relaytic.aml import read_aml_graph_artifacts
     from relaytic.casework import read_casework_artifacts
     from relaytic.stream_risk import read_stream_risk_artifacts
-    from relaytic.aml import read_aml_business_value_artifacts
+    from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts
 
     task_contract_bundle = read_task_contract_artifacts(root)
     eval_bundle = _read_json_bundle(root, bundle="evals")
@@ -10754,6 +10909,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     casework_bundle = read_casework_artifacts(root)
     stream_risk_bundle = read_stream_risk_artifacts(root)
     aml_business_value_bundle = read_aml_business_value_artifacts(root)
+    aml_baseline_bundle = read_aml_baseline_artifacts(root)
     operating_point_bundle = {
         key: json.loads((root / filename).read_text(encoding="utf-8"))
         for key, filename in {
@@ -10773,6 +10929,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle_payload.update(casework_bundle)
     bundle_payload.update(stream_risk_bundle)
     bundle_payload.update(aml_business_value_bundle)
+    bundle_payload.update(aml_baseline_bundle)
     bundle_payload.update(temporal_bundle)
     bundle_payload.update(architecture_bundle)
     bundle_payload.update(operating_point_bundle)
@@ -10854,6 +11011,11 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "aml_recall_at_review_capacity": aml_business_value_bundle.get("review_capacity_metric_report", {}).get("recall_at_review_capacity"),
                 "aml_analyst_hours_saved_at_fixed_recall": aml_business_value_bundle.get("analyst_hour_savings_report", {}).get("analyst_hours_saved_at_fixed_recall"),
                 "aml_false_positive_reduction_at_fixed_recall": aml_business_value_bundle.get("analyst_hour_savings_report", {}).get("false_positive_reduction_at_fixed_recall"),
+                "aml_baseline_status": aml_baseline_bundle.get("aml_baseline_matrix", {}).get("status"),
+                "aml_baseline_run_or_fallback_count": aml_baseline_bundle.get("aml_baseline_matrix", {}).get("run_or_fallback_count"),
+                "aml_material_ablation_count": aml_baseline_bundle.get("aml_capability_contribution_report", {}).get("material_contribution_count"),
+                "aml_public_metric_changed_by_capabilities": aml_baseline_bundle.get("aml_capability_contribution_report", {}).get("public_metric_changed"),
+                "aml_hard_benchmark_claim_allowed": aml_baseline_bundle.get("aml_benchmark_relevance_scorecard", {}).get("hard_benchmark_claim_allowed"),
             },
             "bundle": bundle_payload,
         },
@@ -14495,6 +14657,16 @@ def _aml_business_value_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _aml_baseline_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "aml_baseline_matrix": run_dir / "aml_baseline_matrix.json",
+        "aml_ablation_matrix": run_dir / "aml_ablation_matrix.json",
+        "aml_baseline_adapter_report": run_dir / "aml_baseline_adapter_report.json",
+        "aml_capability_contribution_report": run_dir / "aml_capability_contribution_report.json",
+        "aml_benchmark_relevance_scorecard": run_dir / "aml_benchmark_relevance_scorecard.json",
+    }
+
+
 def _refresh_aml_business_value_manifest(
     run_dir: str | Path,
     *,
@@ -14553,7 +14725,7 @@ def _refresh_aml_business_value_manifest(
     )
 
 
-def _refresh_aml_demo_manifest(
+def _refresh_aml_baseline_manifest(
     run_dir: str | Path,
     *,
     run_id: str | None = None,
@@ -14562,6 +14734,64 @@ def _refresh_aml_demo_manifest(
 ) -> Path:
     root = Path(run_dir)
     _refresh_aml_business_value_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for key, path in _aml_baseline_output_paths(root).items():
+        if path.exists():
+            entries.append(
+                artifact_entry(
+                    path.name,
+                    run_dir=root,
+                    kind="aml_baseline",
+                    required=True,
+                )
+            )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_aml_demo_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_aml_baseline_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,

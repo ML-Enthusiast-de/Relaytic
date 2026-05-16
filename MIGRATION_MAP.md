@@ -218,10 +218,17 @@ Avoid introducing new references to:
 - introduced accepted AML business-value artifact boundaries for `aml_business_value_report.json`, `analyst_hour_savings_report.json`, `review_capacity_metric_report.json`, and `operational_metric_guard.json`
 - upgraded benchmark, run-summary, assist, mission-control, and demo-bundle surfaces so model-score wins do not imply analyst-hour value unless the operational guard passes
 
+### Slice 15U
+
+- introduced `src/relaytic/aml/baselines.py` for AML baseline matrices, capability ablations, adapter fallback reports, contribution summaries, and benchmark relevance scorecards
+- introduced the public command `relaytic aml baselines --run-dir <run_dir>` for rebuilding and inspecting 15U baseline and ablation artifacts
+- introduced accepted AML baseline artifact boundaries for `aml_baseline_matrix.json`, `aml_ablation_matrix.json`, `aml_baseline_adapter_report.json`, `aml_capability_contribution_report.json`, and `aml_benchmark_relevance_scorecard.json`
+- upgraded benchmark, run-summary, and demo-bundle surfaces so no-graph, no-temporal, no-review-budget, no-calibration, and no-typology-prior evidence is visible without turning proxy evidence into a hard AML benchmark claim
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
-- future AML-specific work should land through bounded slices `15U` through `15Z-R` before the academy work begins
+- future AML-specific work should land through bounded slices `15V` through `15Z-R` before the academy work begins
 - future AML boundaries should concentrate under `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/graph_fabric/`, `src/relaytic/stream_risk/`, and any focused future AML loader, evaluation-environment, or release-freeze package rather than scattering domain logic across unrelated generic packages
 - future public AML artifacts should remain additive and must not break the canonical `relaytic` package or CLI surface
 
@@ -575,7 +582,7 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/modeling/families/`, if introduced during Slice 15H, for first-class family-owned trainers, search spaces, adapter shims, and specialization logic rather than one generic trainer path
 - `src/relaytic/modeling/portfolio/`, if introduced during Slice 15I, for staged family probing, racing, finalist search, pruning, and budget-envelope logic
 - `src/relaytic/temporal/`, if introduced after Slice 15J, for deeper temporal family ownership beyond the currently shipped temporal-engine surfaces in `src/relaytic/analytics/`, `src/relaytic/modeling/`, and `src/relaytic/benchmark/`
-- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader, evaluation-environment, or release-freeze package for the remaining AML productization and paper-freeze track in Slices 15U through 15Z-R
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader, evaluation-environment, or release-freeze package for the remaining AML productization and paper-freeze track in Slices 15V through 15Z-R
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement after the AML pivot lands
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should avoid creating a new package boundary unless absolutely necessary; its job is to remove misleading, duplicated, or legacy boundaries, split oversized modules, retire compatibility shims when the removal criteria are met, and leave the public surface cleaner than before

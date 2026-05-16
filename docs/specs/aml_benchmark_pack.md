@@ -136,7 +136,7 @@ The benchmark pack is now part of a broader AML proof/productization sequence. T
 1. **15R-A**: finished AML proof-pack alignment across tests, CLI, run summary, assist, mission control, docs, and claim gates.
 2. **15S**: created the public-safe flagship AML demo bundle.
 3. **15T**: added operational business-value metrics, analyst-hour proof, and guarded overclaim blocking.
-4. **15U**: add strong AML baselines and ablations.
+4. **15U**: added strong AML baselines, ablations, adapter fallback reporting, contribution summaries, and benchmark relevance scorecards.
 5. **15V**: add raw graph and subgraph ingestion.
 6. **15W**: strengthen temporal and weak-label evaluation.
 7. **15X**: add AML evaluation-environment scorecards.

@@ -20,6 +20,11 @@ AML_DEMO_ARTIFACTS = (
     "analyst_hour_savings_report.json",
     "review_capacity_metric_report.json",
     "operational_metric_guard.json",
+    "aml_baseline_matrix.json",
+    "aml_ablation_matrix.json",
+    "aml_baseline_adapter_report.json",
+    "aml_capability_contribution_report.json",
+    "aml_benchmark_relevance_scorecard.json",
 )
 
 
@@ -61,10 +66,20 @@ def test_cli_slice15s_creates_public_safe_aml_review_queue_demo_bundle(
     public_claim_guard = _read_json(run_dir / "aml_public_claim_guard.json")
     business_value = _read_json(run_dir / "aml_business_value_report.json")
     operational_guard = _read_json(run_dir / "operational_metric_guard.json")
+    baseline_matrix = _read_json(run_dir / "aml_baseline_matrix.json")
+    contribution_report = _read_json(run_dir / "aml_capability_contribution_report.json")
     flow_report = (run_dir / "aml_demo_flow_report.md").read_text(encoding="utf-8")
 
     required_by_id = {str(item["artifact_id"]): item for item in index["required_artifacts"]}
-    for artifact_id in ("case_packet", "benchmark_release_gate", "aml_public_claim_guard", "aml_failure_report"):
+    for artifact_id in (
+        "case_packet",
+        "benchmark_release_gate",
+        "aml_public_claim_guard",
+        "aml_failure_report",
+        "aml_baseline_matrix",
+        "aml_ablation_matrix",
+        "aml_benchmark_relevance_scorecard",
+    ):
         assert required_by_id[artifact_id]["exists"] is True
     for item in index["bundle_artifacts"]:
         assert item["exists"] is True
@@ -76,6 +91,7 @@ def test_cli_slice15s_creates_public_safe_aml_review_queue_demo_bundle(
     assert "## Model Metrics" in flow_report
     assert "## Operational Review Metrics" in flow_report
     assert "## Business Value Guard" in flow_report
+    assert "## Baselines And Ablations" in flow_report
     assert "## Safe Claims" in flow_report
 
     assert manifest["artifact_paths"]["case_packet"] == "case_packet.json"
@@ -86,6 +102,10 @@ def test_cli_slice15s_creates_public_safe_aml_review_queue_demo_bundle(
     assert manifest["claim_guard"]["broader_flagship_claim_allowed"] is False
     assert manifest["business_value"]["status"] == business_value["status"]
     assert manifest["business_value"]["hard_business_value_claim_allowed"] is operational_guard["hard_business_value_claim_allowed"]
+    assert manifest["baseline_and_ablation"]["status"] == baseline_matrix["status"]
+    assert manifest["baseline_and_ablation"]["material_contribution_count"] == contribution_report["material_contribution_count"]
+    assert manifest["artifact_paths"]["aml_baseline_matrix"] == "aml_baseline_matrix.json"
+    assert manifest["artifact_paths"]["aml_benchmark_relevance_scorecard"] == "aml_benchmark_relevance_scorecard.json"
     assert "aml_cross_track_coverage_missing" in public_claim_guard["blocked_reason_codes"]
 
     assert main(["mission-control", "show", "--run-dir", str(run_dir), "--format", "json"]) == 0
