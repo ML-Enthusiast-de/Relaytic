@@ -42,6 +42,11 @@ _SOURCE_FILENAMES = {
     "aml_benchmark_manifest": "aml_benchmark_manifest.json",
     "aml_public_claim_guard": "aml_public_claim_guard.json",
     "aml_failure_report": "aml_failure_report.json",
+    "aml_graph_loader_manifest": "aml_graph_loader_manifest.json",
+    "aml_graph_provenance_report": "aml_graph_provenance_report.json",
+    "aml_subgraph_task_manifest": "aml_subgraph_task_manifest.json",
+    "aml_graph_claim_scope": "aml_graph_claim_scope.json",
+    "aml_public_graph_benchmark_catalog": "aml_public_graph_benchmark_catalog.json",
     "aml_domain_contract": "aml_domain_contract.json",
     "aml_claim_scope": "aml_claim_scope.json",
     "task_profile_contract": "task_profile_contract.json",
@@ -532,6 +537,17 @@ def _build_benchmark_relevance_scorecard(
     corpus = _payload_corpus(payloads)
     graph_active = _graph_active(payloads)
     subgraph_active = _subgraph_active(payloads)
+    graph_loader = payloads["aml_graph_loader_manifest"]
+    graph_claim_scope = payloads["aml_graph_claim_scope"]
+    graph_catalog = payloads["aml_public_graph_benchmark_catalog"]
+    raw_graph_loader_ready = bool(graph_loader.get("raw_graph_bundle_ready"))
+    flattened_graph_ready = bool(graph_loader.get("flattened_graph_ready"))
+    subgraph_loader_ready = bool(payloads["aml_subgraph_task_manifest"].get("subgraph_pack_ready"))
+    graph_catalog_rows = {
+        str(row.get("benchmark_family")): row
+        for row in _as_list(graph_catalog.get("rows"))
+        if isinstance(row, dict) and row.get("benchmark_family")
+    }
     transaction_active = _mentions_any(
         corpus,
         ["paysim", "transaction_fraud", "payment", "cash_out", "transfer", "nameorig", "namedest", "isfraud"],
@@ -554,23 +570,60 @@ def _build_benchmark_relevance_scorecard(
         },
         {
             "benchmark_family": "elliptic_style_graph_aml",
-            "support_level": "supported" if elliptic_named and graph_active else "proxy" if graph_active else "blocked",
-            "covered_by_current_run": bool(elliptic_named and graph_active),
-            "proxy_usable": bool(graph_active and not elliptic_named),
-            "public_claim_level": "current_run_supported" if elliptic_named and graph_active else "proxy_only",
-            "blocked_reason_codes": [] if elliptic_named and graph_active else ["elliptic_raw_or_named_flattened_workload_missing"],
-            "evidence_refs": _refs(payloads, ["aml_benchmark_manifest", "entity_graph_profile", "counterparty_network_report", "subgraph_risk_report"]),
-            "notes": "Flattened graph evidence can support an Elliptic-style proxy; raw graph ingestion remains a later 15V boundary unless named evidence is present.",
+            "support_level": "supported" if raw_graph_loader_ready else "proxy" if (flattened_graph_ready or graph_active) else "blocked",
+            "covered_by_current_run": bool(raw_graph_loader_ready or (elliptic_named and flattened_graph_ready)),
+            "proxy_usable": bool(flattened_graph_ready or graph_active),
+            "public_claim_level": "loader_supported_benchmark_not_run" if raw_graph_loader_ready else "proxy_only" if (flattened_graph_ready or graph_active) else "not_supported",
+            "blocked_reason_codes": []
+            if raw_graph_loader_ready
+            else ["elliptic_raw_graph_loader_missing"] if flattened_graph_ready or graph_active else ["elliptic_raw_or_named_flattened_workload_missing"],
+            "evidence_refs": _refs(
+                payloads,
+                [
+                    "aml_benchmark_manifest",
+                    "aml_graph_loader_manifest",
+                    "aml_graph_provenance_report",
+                    "aml_graph_claim_scope",
+                    "entity_graph_profile",
+                    "counterparty_network_report",
+                    "subgraph_risk_report",
+                ],
+            ),
+            "notes": "Slice 15V separates raw graph ingestion from flattened proxy evidence before any public graph benchmark claim.",
+        },
+        {
+            "benchmark_family": "elliptic_style_raw_graph_aml",
+            "support_level": str(graph_catalog_rows.get("elliptic_style_raw_graph_aml", {}).get("support_level") or ("supported" if raw_graph_loader_ready else "blocked")),
+            "covered_by_current_run": bool(raw_graph_loader_ready),
+            "proxy_usable": False,
+            "public_claim_level": str(graph_catalog_rows.get("elliptic_style_raw_graph_aml", {}).get("public_claim_level") or ("loader_supported_benchmark_not_run" if raw_graph_loader_ready else "not_supported")),
+            "blocked_reason_codes": list(graph_catalog_rows.get("elliptic_style_raw_graph_aml", {}).get("blocked_reason_codes", []))
+            if graph_catalog_rows.get("elliptic_style_raw_graph_aml")
+            else ([] if raw_graph_loader_ready else ["raw_elliptic_edge_feature_label_time_bundle_missing"]),
+            "evidence_refs": _refs(payloads, ["aml_graph_loader_manifest", "aml_graph_provenance_report", "aml_graph_claim_scope"]),
+            "notes": "Raw graph support means loader/provenance support; public performance claims still require benchmark execution and claim gates.",
+        },
+        {
+            "benchmark_family": "elliptic_style_flattened_graph_aml",
+            "support_level": str(graph_catalog_rows.get("elliptic_style_flattened_graph_aml", {}).get("support_level") or ("supported" if flattened_graph_ready else "proxy" if raw_graph_loader_ready or graph_active else "blocked")),
+            "covered_by_current_run": bool(flattened_graph_ready),
+            "proxy_usable": bool(raw_graph_loader_ready or graph_active),
+            "public_claim_level": str(graph_catalog_rows.get("elliptic_style_flattened_graph_aml", {}).get("public_claim_level") or ("current_run_supported" if flattened_graph_ready else "derived_proxy" if raw_graph_loader_ready or graph_active else "not_supported")),
+            "blocked_reason_codes": list(graph_catalog_rows.get("elliptic_style_flattened_graph_aml", {}).get("blocked_reason_codes", []))
+            if graph_catalog_rows.get("elliptic_style_flattened_graph_aml")
+            else ([] if flattened_graph_ready or raw_graph_loader_ready or graph_active else ["flattened_edge_table_missing"]),
+            "evidence_refs": _refs(payloads, ["aml_graph_loader_manifest", "entity_graph_profile", "counterparty_network_report"]),
+            "notes": "Flattened graph snapshots are useful compatibility evidence but remain distinct from raw graph benchmark evidence.",
         },
         {
             "benchmark_family": "elliptic2_style_subgraph_aml",
-            "support_level": "proxy" if subgraph_active else "blocked",
-            "covered_by_current_run": False,
+            "support_level": "supported" if subgraph_loader_ready else "proxy" if subgraph_active else "blocked",
+            "covered_by_current_run": bool(subgraph_loader_ready),
             "proxy_usable": bool(subgraph_active),
-            "public_claim_level": "proxy_only",
-            "blocked_reason_codes": [] if subgraph_active else ["subgraph_risk_artifacts_missing"],
-            "evidence_refs": _refs(payloads, ["subgraph_risk_report", "entity_case_expansion", "typology_detection_report"]),
-            "notes": "Relaytic can explain suspicious subgraphs now; raw Elliptic2-style subgraph loading is reserved for Slice 15V.",
+            "public_claim_level": "loader_supported_benchmark_not_run" if subgraph_loader_ready else "proxy_only",
+            "blocked_reason_codes": [] if subgraph_loader_ready or subgraph_active else ["subgraph_risk_artifacts_missing"],
+            "evidence_refs": _refs(payloads, ["aml_subgraph_task_manifest", "subgraph_risk_report", "entity_case_expansion", "typology_detection_report"]),
+            "notes": "Slice 15V can represent labeled subgraph tasks when explicit subgraph IDs and labels are supplied; derived suspicious subgraphs remain proxy-only.",
         },
         {
             "benchmark_family": "amlsim_style_synthetic_bank_graph",
@@ -621,6 +674,9 @@ def _build_benchmark_relevance_scorecard(
         "required_public_families": sorted(required_public_families),
         "covered_required_public_families": sorted(covered_required),
         "hard_benchmark_claim_allowed": hard_claim_allowed,
+        "raw_graph_benchmark_claim_allowed": graph_claim_scope.get("raw_graph_benchmark_claim_allowed"),
+        "subgraph_benchmark_claim_allowed": graph_claim_scope.get("subgraph_benchmark_claim_allowed"),
+        "graph_sota_claim_allowed": graph_claim_scope.get("graph_sota_claim_allowed"),
         "public_claim_boundary": (
             "Use supported/proxy/blocked labels when discussing AML benchmarks; proxy graph evidence is useful for demos "
             "but not a raw Elliptic or Elliptic2 leaderboard claim."

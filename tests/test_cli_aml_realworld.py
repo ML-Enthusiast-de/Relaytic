@@ -65,7 +65,9 @@ def test_cli_relaytic_aml_paysim_like_run_and_benchmark_work(
 
     assert benchmark_payload["status"] == "ok"
     assert benchmark_payload["benchmark"]["aml_domain_active"] is True
-    assert benchmark_payload["benchmark"]["aml_pack_family"] == "aml_flagship_pending"
+    assert benchmark_payload["benchmark"]["aml_pack_family"] == "aml_flagship_pack"
+    assert benchmark_payload["benchmark"]["aml_graph_input_mode"] == "flattened_graph_snapshot"
+    assert benchmark_payload["bundle"]["aml_graph_claim_scope"]["graph_sota_claim_allowed"] is False
     assert benchmark_payload["bundle"]["entity_graph_profile"]["source_column"] == "nameOrig"
     assert benchmark_payload["bundle"]["entity_graph_profile"]["destination_column"] == "nameDest"
 

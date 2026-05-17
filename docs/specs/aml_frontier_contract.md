@@ -188,7 +188,7 @@ The exact pack can evolve, but the roadmap should be designed around public or r
 Near-term practical rule:
 
 - PaySim-style and flattened Elliptic-style snapshots should work now through the existing local file contract
-- raw multi-file graph bundles should be called future work until dedicated loaders exist
+- raw multi-file graph bundles and labeled subgraph packs now have dedicated loader/provenance artifacts, but public graph benchmark or SOTA claims remain blocked until benchmarked and claim-gated
 
 Relaytic-AML must never silently optimize on dataset identity. Public claims require holdout verification and a benchmark-generalization audit.
 
@@ -211,7 +211,7 @@ The AML proof path is accepted only after these slices are complete:
 - **15S** built one public-safe flagship AML demo bundle around review-queue value and case evidence.
 - **15T** added guarded business-value metrics such as analyst-hours saved, false-positive reduction at fixed recall, recall at review capacity, precision at top-k, case-packet completeness, and operational overclaim blocking.
 - **15U** added strong AML baselines, capability ablations, adapter fallback reporting, contribution summaries, and benchmark relevance scorecards so graph, temporal, calibration, threshold, and review-budget contributions are measured.
-- **15V** adds raw graph and subgraph ingestion so public graph AML work is not limited to flattened snapshots.
+- **15V** added raw graph and subgraph ingestion, graph provenance, graph claim scope, and public graph benchmark cataloging so public graph AML work is not limited to flattened snapshots.
 - **15W** strengthens delayed-label, positive-unlabeled, threshold-drift, and time-window evaluation.
 - **15X** frames Relaytic runs as evaluation environments with explicit workflow scorecards.
 - **15Y** rewrites first-contact docs around the flagship AML path.
@@ -241,6 +241,10 @@ If any of these slices discovers that Relaytic-AML loses, the correct output is 
 - `aml_business_value_report.json`
 - `aml_ablation_matrix.json`
 - `aml_graph_loader_manifest.json`
+- `aml_graph_provenance_report.json`
+- `aml_subgraph_task_manifest.json`
+- `aml_graph_claim_scope.json`
+- `aml_public_graph_benchmark_catalog.json`
 - `aml_delayed_label_eval_report.json`
 - `aml_environment_scorecard.json`
 - `aml_relevant_benchmark_catalog.json`

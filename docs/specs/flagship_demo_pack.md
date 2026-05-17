@@ -110,7 +110,7 @@ Those judgments should later feed `flagship_demo_scorecard.json`.
 
 The next demo implementation should not create another generic tour.
 
-Slice 15S produced one `relaytic-aml-review-queue` bundle, strengthened by Slice 15T business-value guards and Slice 15U baseline/ablation artifacts, that proves:
+Slice 15S produced one `relaytic-aml-review-queue` bundle, strengthened by Slice 15T business-value guards, Slice 15U baseline/ablation artifacts, and Slice 15V graph-loader claim-scope artifacts, that proves:
 
 - alert queue quality under review capacity
 - one evidence-backed case packet

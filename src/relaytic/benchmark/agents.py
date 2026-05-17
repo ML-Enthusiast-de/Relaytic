@@ -2389,6 +2389,10 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
     analyst_hour_savings_report = dict(payload.get("analyst_hour_savings_report", {}))
     review_capacity_metric_report = dict(payload.get("review_capacity_metric_report", {}))
     operational_metric_guard = dict(payload.get("operational_metric_guard", {}))
+    aml_graph_loader_manifest = dict(payload.get("aml_graph_loader_manifest", {}))
+    aml_subgraph_task_manifest = dict(payload.get("aml_subgraph_task_manifest", {}))
+    aml_graph_claim_scope = dict(payload.get("aml_graph_claim_scope", {}))
+    aml_public_graph_benchmark_catalog = dict(payload.get("aml_public_graph_benchmark_catalog", {}))
     aml_baseline_matrix = dict(payload.get("aml_baseline_matrix", {}))
     aml_ablation_matrix = dict(payload.get("aml_ablation_matrix", {}))
     aml_capability_contribution_report = dict(payload.get("aml_capability_contribution_report", {}))
@@ -2530,6 +2534,23 @@ def render_benchmark_review_markdown(bundle: BenchmarkBundle | dict[str, Any]) -
                 f"- Precision at top-k: `{review_capacity_metric_report.get('precision_at_top_k')}`",
                 f"- Recall at review capacity: `{review_capacity_metric_report.get('recall_at_review_capacity')}`",
                 f"- Model-operational disagreement: `{operational_metric_guard.get('model_operational_disagreement')}`",
+            ]
+        )
+    if aml_graph_loader_manifest or aml_graph_claim_scope or aml_public_graph_benchmark_catalog:
+        lines.extend(
+            [
+                "",
+                "## AML Graph Loader",
+                f"- Loader status: `{aml_graph_loader_manifest.get('status') or 'unknown'}`",
+                f"- Input mode: `{aml_graph_loader_manifest.get('graph_input_mode') or 'unknown'}`",
+                f"- Raw graph ready: `{aml_graph_loader_manifest.get('raw_graph_bundle_ready')}`",
+                f"- Flattened graph ready: `{aml_graph_loader_manifest.get('flattened_graph_ready')}`",
+                f"- Subgraph task status: `{aml_subgraph_task_manifest.get('status') or 'unknown'}`",
+                f"- Raw graph benchmark claim allowed: `{aml_graph_claim_scope.get('raw_graph_benchmark_claim_allowed')}`",
+                f"- Subgraph benchmark claim allowed: `{aml_graph_claim_scope.get('subgraph_benchmark_claim_allowed')}`",
+                f"- Graph SOTA claim allowed: `{aml_graph_claim_scope.get('graph_sota_claim_allowed')}`",
+                f"- Supported graph benchmark families: `{aml_public_graph_benchmark_catalog.get('supported_family_count')}`",
+                f"- Proxy graph benchmark families: `{aml_public_graph_benchmark_catalog.get('proxy_family_count')}`",
             ]
         )
     if aml_baseline_matrix or aml_ablation_matrix or aml_benchmark_relevance_scorecard:

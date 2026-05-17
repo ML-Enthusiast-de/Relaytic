@@ -38,6 +38,11 @@ _SOURCE_ARTIFACTS = (
     ("benchmark_release_gate", "benchmark_release_gate.json", "benchmark guard", True),
     ("aml_public_claim_guard", "aml_public_claim_guard.json", "public-claim guard", True),
     ("aml_failure_report", "aml_failure_report.json", "failure report", True),
+    ("aml_graph_loader_manifest", "aml_graph_loader_manifest.json", "graph-loader manifest", True),
+    ("aml_graph_provenance_report", "aml_graph_provenance_report.json", "graph-loader provenance", True),
+    ("aml_subgraph_task_manifest", "aml_subgraph_task_manifest.json", "subgraph task manifest", True),
+    ("aml_graph_claim_scope", "aml_graph_claim_scope.json", "graph claim scope", True),
+    ("aml_public_graph_benchmark_catalog", "aml_public_graph_benchmark_catalog.json", "public graph benchmark catalog", True),
     ("aml_business_value_report", "aml_business_value_report.json", "business-value posture", True),
     ("analyst_hour_savings_report", "analyst_hour_savings_report.json", "analyst-hour savings", True),
     ("review_capacity_metric_report", "review_capacity_metric_report.json", "review-capacity metrics", True),
@@ -274,6 +279,11 @@ def _read_demo_source_payloads(root: Path) -> dict[str, dict[str, Any]]:
         "benchmark_release_gate": _read_json(root / "benchmark_release_gate.json"),
         "aml_public_claim_guard": _read_json(root / "aml_public_claim_guard.json"),
         "aml_failure_report": _read_json(root / "aml_failure_report.json"),
+        "aml_graph_loader_manifest": _read_json(root / "aml_graph_loader_manifest.json"),
+        "aml_graph_provenance_report": _read_json(root / "aml_graph_provenance_report.json"),
+        "aml_subgraph_task_manifest": _read_json(root / "aml_subgraph_task_manifest.json"),
+        "aml_graph_claim_scope": _read_json(root / "aml_graph_claim_scope.json"),
+        "aml_public_graph_benchmark_catalog": _read_json(root / "aml_public_graph_benchmark_catalog.json"),
         "aml_business_value_report": _read_json(root / "aml_business_value_report.json"),
         "analyst_hour_savings_report": _read_json(root / "analyst_hour_savings_report.json"),
         "review_capacity_metric_report": _read_json(root / "review_capacity_metric_report.json"),
@@ -304,6 +314,9 @@ def _build_bundle_manifest(
     stream_risk = payloads["stream_risk_posture"]
     drift_trigger = payloads["drift_recalibration_trigger"]
     alert_queue = payloads["alert_queue_rankings"]
+    graph_loader = payloads["aml_graph_loader_manifest"]
+    graph_claim_scope = payloads["aml_graph_claim_scope"]
+    graph_catalog = payloads["aml_public_graph_benchmark_catalog"]
     business_value_report = payloads["aml_business_value_report"]
     operational_metric_guard = payloads["operational_metric_guard"]
     baseline_matrix = payloads["aml_baseline_matrix"]
@@ -369,6 +382,21 @@ def _build_bundle_manifest(
             "recommended_next_step": _clean_text(failure_report.get("recommended_next_step")),
             "path": "aml_failure_report.json",
         },
+        "graph_loader": {
+            "status": _clean_text(graph_loader.get("status")),
+            "graph_input_mode": _clean_text(graph_loader.get("graph_input_mode")),
+            "graph_family": _clean_text(graph_loader.get("graph_family")),
+            "raw_graph_bundle_ready": graph_loader.get("raw_graph_bundle_ready"),
+            "flattened_graph_ready": graph_loader.get("flattened_graph_ready"),
+            "raw_graph_benchmark_claim_allowed": graph_claim_scope.get("raw_graph_benchmark_claim_allowed"),
+            "subgraph_benchmark_claim_allowed": graph_claim_scope.get("subgraph_benchmark_claim_allowed"),
+            "graph_sota_claim_allowed": graph_claim_scope.get("graph_sota_claim_allowed"),
+            "supported_family_count": graph_catalog.get("supported_family_count"),
+            "proxy_family_count": graph_catalog.get("proxy_family_count"),
+            "path": "aml_graph_loader_manifest.json",
+            "claim_scope_path": "aml_graph_claim_scope.json",
+            "catalog_path": "aml_public_graph_benchmark_catalog.json",
+        },
         "business_value": {
             "status": _clean_text(business_value_report.get("status")),
             "operational_guard_status": _clean_text(operational_metric_guard.get("operational_utility_state"))
@@ -414,6 +442,11 @@ def _build_bundle_manifest(
             "benchmark_guard": "benchmark_release_gate.json",
             "public_claim_guard": "aml_public_claim_guard.json",
             "failure_report": "aml_failure_report.json",
+            "aml_graph_loader_manifest": "aml_graph_loader_manifest.json",
+            "aml_graph_provenance_report": "aml_graph_provenance_report.json",
+            "aml_subgraph_task_manifest": "aml_subgraph_task_manifest.json",
+            "aml_graph_claim_scope": "aml_graph_claim_scope.json",
+            "aml_public_graph_benchmark_catalog": "aml_public_graph_benchmark_catalog.json",
             "aml_business_value_report": "aml_business_value_report.json",
             "analyst_hour_savings_report": "analyst_hour_savings_report.json",
             "review_capacity_metric_report": "review_capacity_metric_report.json",
@@ -450,6 +483,8 @@ def _build_business_metric_table(
     analyst_hours = payloads["analyst_hour_savings_report"]
     capacity_metrics = payloads["review_capacity_metric_report"]
     operational_guard = payloads["operational_metric_guard"]
+    graph_loader = payloads["aml_graph_loader_manifest"]
+    graph_claim_scope = payloads["aml_graph_claim_scope"]
     baseline_matrix = payloads["aml_baseline_matrix"]
     ablation_matrix = payloads["aml_ablation_matrix"]
     contribution_report = payloads["aml_capability_contribution_report"]
@@ -474,6 +509,9 @@ def _build_business_metric_table(
         _metric_row("analyst_hours_saved_at_fixed_recall", analyst_hours.get("analyst_hours_saved_at_fixed_recall"), "Estimated analyst-hours saved against the conservative ungoverned-review baseline."),
         _metric_row("false_positive_reduction_at_fixed_recall", analyst_hours.get("false_positive_reduction_at_fixed_recall"), "Estimated false-positive reduction at the selected fixed-recall target."),
         _metric_row("operational_metric_guard", operational_guard.get("operational_utility_state"), "Whether operational utility supports hard business-value claims."),
+        _metric_row("graph_input_mode", graph_loader.get("graph_input_mode"), "Whether graph evidence is raw bundle, flattened snapshot, or subgraph pack."),
+        _metric_row("raw_graph_benchmark_claim_allowed", graph_claim_scope.get("raw_graph_benchmark_claim_allowed"), "Whether raw graph benchmark claims are currently claim-gated."),
+        _metric_row("graph_sota_claim_allowed", graph_claim_scope.get("graph_sota_claim_allowed"), "Whether graph SOTA or leaderboard claims are currently allowed."),
         _metric_row("baseline_run_or_fallback_count", baseline_matrix.get("run_or_fallback_count"), "AML baseline families that ran or have an explicit fallback path."),
         _metric_row("material_capability_contribution_count", contribution_report.get("material_contribution_count", ablation_matrix.get("material_contribution_count")), "AML capability ablations with material contribution evidence."),
         _metric_row("public_metric_changed_by_capabilities", contribution_report.get("public_metric_changed", ablation_matrix.get("public_metric_changed")), "Whether AML capability ablations changed a public-facing metric proxy."),
@@ -500,8 +538,8 @@ def _build_business_metric_table(
             },
             {
                 "assumption_id": "slice_boundary",
-                "value": "15U baseline and ablation proof is materialized alongside 15T business-value guard artifacts.",
-                "source": "docs/build_slices/phase_15u.md",
+                "value": "15V graph-loader evidence is separated from benchmark and SOTA claims unless benchmarked and claim-gated.",
+                "source": "docs/build_slices/phase_15v.md",
             },
         ],
         "claim_boundary": "Model metrics and operational review-budget metrics are separate; hard analyst-hour ROI claims require the operational guard to pass.",
@@ -558,6 +596,10 @@ def _render_flow_report(
     analyst_hours = payloads["analyst_hour_savings_report"]
     capacity_metrics = payloads["review_capacity_metric_report"]
     operational_guard = payloads["operational_metric_guard"]
+    graph_loader = payloads["aml_graph_loader_manifest"]
+    subgraph_task = payloads["aml_subgraph_task_manifest"]
+    graph_claim_scope = payloads["aml_graph_claim_scope"]
+    graph_catalog = payloads["aml_public_graph_benchmark_catalog"]
     baseline_matrix = payloads["aml_baseline_matrix"]
     ablation_matrix = payloads["aml_ablation_matrix"]
     contribution_report = payloads["aml_capability_contribution_report"]
@@ -630,6 +672,19 @@ def _render_flow_report(
             f"- Precision at top-k: `{capacity_metrics.get('precision_at_top_k')}`",
             f"- Recall at review capacity: `{capacity_metrics.get('recall_at_review_capacity')}`",
             f"- Business-value report path: `aml_business_value_report.json`",
+            "",
+            "## Graph Loader And Claim Scope",
+            "",
+            f"- Loader status: `{graph_loader.get('status') or 'unknown'}`",
+            f"- Graph input mode: `{graph_loader.get('graph_input_mode') or 'unknown'}`",
+            f"- Graph family: `{graph_loader.get('graph_family') or 'unknown'}`",
+            f"- Raw graph ready: `{graph_loader.get('raw_graph_bundle_ready')}`",
+            f"- Flattened graph ready: `{graph_loader.get('flattened_graph_ready')}`",
+            f"- Subgraph task: `{subgraph_task.get('status') or 'unknown'}`",
+            f"- Raw graph benchmark claim allowed: `{graph_claim_scope.get('raw_graph_benchmark_claim_allowed')}`",
+            f"- Graph SOTA claim allowed: `{graph_claim_scope.get('graph_sota_claim_allowed')}`",
+            f"- Supported graph benchmark families: `{graph_catalog.get('supported_family_count')}`",
+            f"- Graph-loader manifest path: `aml_graph_loader_manifest.json`",
             "",
             "## Baselines And Ablations",
             "",

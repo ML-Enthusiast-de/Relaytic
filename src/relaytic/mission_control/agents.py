@@ -582,6 +582,7 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
         alert_queue = dict(aml_board.get("alert_queue", {}))
         top_case = dict(aml_board.get("top_case_packet", {}))
         drift = dict(aml_board.get("drift_posture", {}))
+        graph_loader = dict(aml_board.get("graph_loader", {}))
         business_value = dict(aml_board.get("business_value", {}))
         claim_guard = dict(aml_board.get("claim_guard", {}))
         lines.extend(
@@ -591,6 +592,7 @@ def render_mission_control_markdown(bundle: MissionControlBundle | dict[str, Any
                 f"- Alert queue: `{alert_queue.get('queue_count', 0)}` case(s), capacity `{alert_queue.get('review_capacity_cases', 0)}`",
                 f"- Top case: `{top_case.get('case_id') or 'unknown'}` for `{top_case.get('focal_entity') or 'unknown'}`",
                 f"- Business-value guard: `{business_value.get('operational_guard_status') or 'unknown'}`; hard claim allowed `{business_value.get('hard_business_value_claim_allowed')}`",
+                f"- Graph loader: `{graph_loader.get('graph_input_mode') or 'unknown'}`; raw benchmark claim `{graph_loader.get('raw_graph_benchmark_claim_allowed')}`",
                 f"- Analyst-hours saved: `{business_value.get('analyst_hours_saved_at_fixed_recall')}`; precision@top-k `{business_value.get('precision_at_top_k')}`",
                 f"- Drift action: `{drift.get('recommended_action') or 'unknown'}`",
                 f"- Claim posture: `{claim_guard.get('claim_posture') or 'unknown'}`",
@@ -1038,6 +1040,7 @@ def _render_aml_investigation_board(board: dict[str, Any]) -> str:
     alert_queue = dict(board.get("alert_queue", {}))
     top_case = dict(board.get("top_case_packet", {}))
     drift = dict(board.get("drift_posture", {}))
+    graph_loader = dict(board.get("graph_loader", {}))
     business_value = dict(board.get("business_value", {}))
     claim_guard = dict(board.get("claim_guard", {}))
     artifact_paths = dict(board.get("artifact_paths", {}))
@@ -1047,6 +1050,8 @@ def _render_aml_investigation_board(board: dict[str, Any]) -> str:
         f"<div class=\"meta-row\"><span class=\"label\">Top case</span><span class=\"value-compact\">{escape(str(top_case.get('case_id') or 'unknown'))}</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Focal entity</span><span class=\"value-compact\">{escape(str(top_case.get('focal_entity') or 'unknown'))}</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Business guard</span><span class=\"value-compact\">{escape(str(business_value.get('operational_guard_status') or 'unknown'))}</span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Graph input</span><span class=\"value-compact\">{escape(str(graph_loader.get('graph_input_mode') or 'unknown'))}</span></div>"
+        f"<div class=\"meta-row\"><span class=\"label\">Graph claim</span><span class=\"value-compact\">{escape(str(graph_loader.get('raw_graph_benchmark_claim_allowed')))}</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Hours saved</span><span class=\"value-compact\">{escape(str(business_value.get('analyst_hours_saved_at_fixed_recall')))}</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Drift action</span><span class=\"value-compact\">{escape(str(drift.get('recommended_action') or 'unknown'))}</span></div>"
         f"<div class=\"meta-row\"><span class=\"label\">Claim posture</span><span class=\"value-compact\">{escape(str(claim_guard.get('claim_posture') or 'unknown'))}</span></div>"
@@ -3922,6 +3927,7 @@ def _build_aml_investigation_board(
             alert_queue={},
             top_case_packet={},
             drift_posture={},
+            graph_loader={},
             business_value={},
             claim_guard={},
             artifact_paths={},
@@ -3942,6 +3948,9 @@ def _build_aml_investigation_board(
     analyst_hour_savings_report = _read_json_artifact(root / "analyst_hour_savings_report.json")
     review_capacity_metric_report = _read_json_artifact(root / "review_capacity_metric_report.json")
     operational_metric_guard = _read_json_artifact(root / "operational_metric_guard.json")
+    graph_loader_manifest = _read_json_artifact(root / "aml_graph_loader_manifest.json")
+    graph_claim_scope = _read_json_artifact(root / "aml_graph_claim_scope.json")
+    graph_catalog = _read_json_artifact(root / "aml_public_graph_benchmark_catalog.json")
 
     casework = dict(summary_payload.get("casework", {})) if isinstance(summary_payload.get("casework"), dict) else {}
     stream_risk = dict(summary_payload.get("stream_risk", {})) if isinstance(summary_payload.get("stream_risk"), dict) else {}
@@ -3950,6 +3959,7 @@ def _build_aml_investigation_board(
     manifest_alert_queue = dict(demo_manifest.get("alert_queue", {}))
     manifest_top_case = dict(demo_manifest.get("top_case_packet", {}))
     manifest_drift = dict(demo_manifest.get("drift_posture", {}))
+    manifest_graph_loader = dict(demo_manifest.get("graph_loader", {}))
     manifest_claim_guard = dict(demo_manifest.get("claim_guard", {}))
     artifact_paths = dict(demo_manifest.get("artifact_paths", {}))
 
@@ -3995,6 +4005,33 @@ def _build_aml_investigation_board(
         or _clean_text(drift_recalibration_trigger.get("recommended_action"))
         or _clean_text(stream_risk.get("trigger_action")),
         "path": artifact_paths.get("drift_recalibration_trigger", "drift_recalibration_trigger.json"),
+    }
+    graph_loader = {
+        "status": _clean_text(manifest_graph_loader.get("status"))
+        or _clean_text(graph_loader_manifest.get("status")),
+        "graph_input_mode": _clean_text(manifest_graph_loader.get("graph_input_mode"))
+        or _clean_text(graph_loader_manifest.get("graph_input_mode")),
+        "graph_family": _clean_text(manifest_graph_loader.get("graph_family"))
+        or _clean_text(graph_loader_manifest.get("graph_family")),
+        "raw_graph_bundle_ready": manifest_graph_loader.get("raw_graph_bundle_ready")
+        if manifest_graph_loader.get("raw_graph_bundle_ready") is not None
+        else graph_loader_manifest.get("raw_graph_bundle_ready"),
+        "flattened_graph_ready": manifest_graph_loader.get("flattened_graph_ready")
+        if manifest_graph_loader.get("flattened_graph_ready") is not None
+        else graph_loader_manifest.get("flattened_graph_ready"),
+        "raw_graph_benchmark_claim_allowed": manifest_graph_loader.get("raw_graph_benchmark_claim_allowed")
+        if manifest_graph_loader.get("raw_graph_benchmark_claim_allowed") is not None
+        else graph_claim_scope.get("raw_graph_benchmark_claim_allowed"),
+        "graph_sota_claim_allowed": manifest_graph_loader.get("graph_sota_claim_allowed")
+        if manifest_graph_loader.get("graph_sota_claim_allowed") is not None
+        else graph_claim_scope.get("graph_sota_claim_allowed"),
+        "supported_family_count": manifest_graph_loader.get("supported_family_count")
+        if manifest_graph_loader.get("supported_family_count") is not None
+        else graph_catalog.get("supported_family_count"),
+        "proxy_family_count": manifest_graph_loader.get("proxy_family_count")
+        if manifest_graph_loader.get("proxy_family_count") is not None
+        else graph_catalog.get("proxy_family_count"),
+        "path": artifact_paths.get("aml_graph_loader_manifest", "aml_graph_loader_manifest.json"),
     }
     manifest_business_value = dict(demo_manifest.get("business_value", {}))
     business_value = {
@@ -4058,6 +4095,8 @@ def _build_aml_investigation_board(
             "benchmark_guard": "benchmark_release_gate.json",
             "public_claim_guard": "aml_public_claim_guard.json",
             "failure_report": "aml_failure_report.json",
+            "aml_graph_loader_manifest": "aml_graph_loader_manifest.json",
+            "aml_graph_claim_scope": "aml_graph_claim_scope.json",
             "aml_business_value_report": "aml_business_value_report.json",
             "operational_metric_guard": "operational_metric_guard.json",
         }
@@ -4073,6 +4112,7 @@ def _build_aml_investigation_board(
         alert_queue=alert_queue,
         top_case_packet=top_case_packet,
         drift_posture=drift_posture,
+        graph_loader=graph_loader,
         business_value=business_value,
         claim_guard=claim_guard,
         artifact_paths={key: str(value) for key, value in artifact_paths.items() if str(value).strip()},

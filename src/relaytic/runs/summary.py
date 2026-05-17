@@ -43,7 +43,12 @@ def build_run_summary(
         read_task_contract_artifacts,
         read_temporal_engine_artifacts,
     )
-    from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts, read_aml_graph_artifacts
+    from relaytic.aml import (
+        read_aml_baseline_artifacts,
+        read_aml_business_value_artifacts,
+        read_aml_graph_artifacts,
+        read_aml_graph_loader_artifacts,
+    )
     from relaytic.iteration import read_iteration_bundle
     from relaytic.casework import read_casework_artifacts
     from relaytic.stream_risk import read_stream_risk_artifacts
@@ -201,6 +206,7 @@ def build_run_summary(
     )
     task_contract_bundle = read_task_contract_artifacts(root)
     aml_graph_bundle = read_aml_graph_artifacts(root)
+    aml_graph_loader_bundle = read_aml_graph_loader_artifacts(root)
     aml_business_value_bundle = read_aml_business_value_artifacts(root)
     aml_baseline_bundle = read_aml_baseline_artifacts(root)
     casework_bundle = read_casework_artifacts(root)
@@ -429,6 +435,11 @@ def build_run_summary(
     typology_detection_report = dict(aml_graph_bundle.get("typology_detection_report", {})) if isinstance(aml_graph_bundle.get("typology_detection_report"), dict) else {}
     subgraph_risk_report = dict(aml_graph_bundle.get("subgraph_risk_report", {})) if isinstance(aml_graph_bundle.get("subgraph_risk_report"), dict) else {}
     entity_case_expansion = dict(aml_graph_bundle.get("entity_case_expansion", {})) if isinstance(aml_graph_bundle.get("entity_case_expansion"), dict) else {}
+    aml_graph_loader_manifest = dict(aml_graph_loader_bundle.get("aml_graph_loader_manifest", {})) if isinstance(aml_graph_loader_bundle.get("aml_graph_loader_manifest"), dict) else {}
+    aml_graph_provenance_report = dict(aml_graph_loader_bundle.get("aml_graph_provenance_report", {})) if isinstance(aml_graph_loader_bundle.get("aml_graph_provenance_report"), dict) else {}
+    aml_subgraph_task_manifest = dict(aml_graph_loader_bundle.get("aml_subgraph_task_manifest", {})) if isinstance(aml_graph_loader_bundle.get("aml_subgraph_task_manifest"), dict) else {}
+    aml_graph_claim_scope = dict(aml_graph_loader_bundle.get("aml_graph_claim_scope", {})) if isinstance(aml_graph_loader_bundle.get("aml_graph_claim_scope"), dict) else {}
+    aml_public_graph_benchmark_catalog = dict(aml_graph_loader_bundle.get("aml_public_graph_benchmark_catalog", {})) if isinstance(aml_graph_loader_bundle.get("aml_public_graph_benchmark_catalog"), dict) else {}
     alert_queue_policy = dict(casework_bundle.get("alert_queue_policy", {})) if isinstance(casework_bundle.get("alert_queue_policy"), dict) else {}
     alert_queue_rankings = dict(casework_bundle.get("alert_queue_rankings", {})) if isinstance(casework_bundle.get("alert_queue_rankings"), dict) else {}
     analyst_review_scorecard = dict(casework_bundle.get("analyst_review_scorecard", {})) if isinstance(casework_bundle.get("analyst_review_scorecard"), dict) else {}
@@ -1334,6 +1345,27 @@ def build_run_summary(
             or _clean_text(subgraph_risk_report.get("summary"))
             or _clean_text(entity_graph_profile.get("summary")),
         },
+        "aml_graph_loader": {
+            "status": _clean_text(aml_graph_loader_manifest.get("status")),
+            "graph_input_mode": _clean_text(aml_graph_loader_manifest.get("graph_input_mode")),
+            "graph_family": _clean_text(aml_graph_loader_manifest.get("graph_family")),
+            "loader_can_construct_graph": aml_graph_loader_manifest.get("loader_can_construct_graph"),
+            "raw_graph_bundle_ready": aml_graph_loader_manifest.get("raw_graph_bundle_ready"),
+            "flattened_graph_ready": aml_graph_loader_manifest.get("flattened_graph_ready"),
+            "benchmark_label_provenance_ready": aml_graph_loader_manifest.get("benchmark_label_provenance_ready"),
+            "source_file_count": aml_graph_provenance_report.get("source_file_count"),
+            "subgraph_task_status": _clean_text(aml_subgraph_task_manifest.get("status")),
+            "subgraph_support_level": _clean_text(aml_subgraph_task_manifest.get("support_level")),
+            "raw_graph_loader_claim_allowed": aml_graph_claim_scope.get("raw_graph_loader_claim_allowed"),
+            "raw_graph_benchmark_claim_allowed": aml_graph_claim_scope.get("raw_graph_benchmark_claim_allowed"),
+            "subgraph_benchmark_claim_allowed": aml_graph_claim_scope.get("subgraph_benchmark_claim_allowed"),
+            "graph_sota_claim_allowed": aml_graph_claim_scope.get("graph_sota_claim_allowed"),
+            "supported_family_count": aml_public_graph_benchmark_catalog.get("supported_family_count"),
+            "proxy_family_count": aml_public_graph_benchmark_catalog.get("proxy_family_count"),
+            "blocked_family_count": aml_public_graph_benchmark_catalog.get("blocked_family_count"),
+            "summary": _clean_text(aml_graph_claim_scope.get("summary"))
+            or _clean_text(aml_graph_loader_manifest.get("summary")),
+        },
         "casework": {
             "status": _clean_text(alert_queue_policy.get("status"))
             or _clean_text(alert_queue_rankings.get("status"))
@@ -1900,6 +1932,11 @@ def build_run_summary(
             "typology_detection_report_path": _path_if_exists(root / "typology_detection_report.json"),
             "subgraph_risk_report_path": _path_if_exists(root / "subgraph_risk_report.json"),
             "entity_case_expansion_path": _path_if_exists(root / "entity_case_expansion.json"),
+            "aml_graph_loader_manifest_path": _path_if_exists(root / "aml_graph_loader_manifest.json"),
+            "aml_graph_provenance_report_path": _path_if_exists(root / "aml_graph_provenance_report.json"),
+            "aml_subgraph_task_manifest_path": _path_if_exists(root / "aml_subgraph_task_manifest.json"),
+            "aml_graph_claim_scope_path": _path_if_exists(root / "aml_graph_claim_scope.json"),
+            "aml_public_graph_benchmark_catalog_path": _path_if_exists(root / "aml_public_graph_benchmark_catalog.json"),
             "alert_queue_policy_path": _path_if_exists(root / "alert_queue_policy.json"),
             "alert_queue_rankings_path": _path_if_exists(root / "alert_queue_rankings.json"),
             "analyst_review_scorecard_path": _path_if_exists(root / "analyst_review_scorecard.json"),
@@ -2314,6 +2351,22 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Typology hits: `{aml_graph.get('typology_hit_count', 0)}`",
                 f"- Focal entity: `{aml_graph.get('focal_entity') or 'none'}`",
                 f"- Shadow winner: `{aml_graph.get('shadow_winner') or 'unknown'}`",
+            ]
+        )
+    aml_graph_loader = dict(summary.get("aml_graph_loader", {})) if isinstance(summary.get("aml_graph_loader"), dict) else {}
+    if aml_graph_loader and any(value not in (None, 0, False, "", []) for value in aml_graph_loader.values()):
+        lines.extend(
+            [
+                "",
+                "## AML Graph Loader",
+                f"- Status: `{aml_graph_loader.get('status') or 'unknown'}`",
+                f"- Input mode: `{aml_graph_loader.get('graph_input_mode') or 'unknown'}`",
+                f"- Graph family: `{aml_graph_loader.get('graph_family') or 'unknown'}`",
+                f"- Loader can construct graph: `{aml_graph_loader.get('loader_can_construct_graph')}`",
+                f"- Raw graph loader claim: `{aml_graph_loader.get('raw_graph_loader_claim_allowed')}`",
+                f"- Raw graph benchmark claim: `{aml_graph_loader.get('raw_graph_benchmark_claim_allowed')}`",
+                f"- Subgraph task: `{aml_graph_loader.get('subgraph_task_status') or 'unknown'}`",
+                f"- Graph SOTA claim: `{aml_graph_loader.get('graph_sota_claim_allowed')}`",
             ]
         )
     if casework and any(value not in (None, 0, False, "", []) for value in casework.values()):
@@ -2782,7 +2835,7 @@ def materialize_run_summary(
         sync_task_contract_artifacts,
         sync_temporal_engine_artifacts,
     )
-    from relaytic.aml import sync_aml_graph_artifacts
+    from relaytic.aml import sync_aml_graph_artifacts, sync_aml_graph_loader_artifacts
     from relaytic.casework import sync_casework_artifacts
     from relaytic.stream_risk import sync_stream_risk_artifacts
     from relaytic.iteration import sync_iteration_from_run
@@ -2830,12 +2883,27 @@ def materialize_run_summary(
             },
         ),
     )
-    sync_aml_graph_artifacts(
-        root,
-        data_path=data_path or _path_if_exists(root / "data.csv") or _clean_text(dict(base_summary.get("data", {})).get("data_path")),
-        context_bundle=_read_bundle(root, {"domain_brief": "domain_brief.json", "task_brief": "task_brief.json"}),
-        task_contract_bundle=read_task_contract_artifacts(root),
-    )
+    graph_data_path = data_path or _path_if_exists(root / "data.csv") or _clean_text(dict(base_summary.get("data", {})).get("data_path"))
+    existing_entity_graph = _read_json(root / "entity_graph_profile.json")
+    if graph_data_path or _clean_text(existing_entity_graph.get("status")) not in {"active", "ok", "ready"}:
+        sync_aml_graph_artifacts(
+            root,
+            data_path=graph_data_path,
+            context_bundle=_read_bundle(root, {"domain_brief": "domain_brief.json", "task_brief": "task_brief.json"}),
+            task_contract_bundle=read_task_contract_artifacts(root),
+        )
+    graph_loader_data_path = graph_data_path
+    existing_graph_loader_manifest = _read_json(root / "aml_graph_loader_manifest.json")
+    existing_loader_is_explicit_bundle = _clean_text(existing_graph_loader_manifest.get("source_kind")) == "directory"
+    if (graph_loader_data_path and not existing_loader_is_explicit_bundle) or not (root / "aml_graph_loader_manifest.json").exists():
+        sync_aml_graph_loader_artifacts(
+            root,
+            data_path=graph_loader_data_path,
+            context_bundle=_read_bundle(root, {"domain_brief": "domain_brief.json", "task_brief": "task_brief.json"}),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            sync_entity_graph=False,
+            force_aml_active=False,
+        )
     sync_architecture_routing_artifacts(
         root,
         investigation_bundle=_read_bundle(

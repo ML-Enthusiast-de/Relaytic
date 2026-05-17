@@ -1764,6 +1764,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run or inspect Relaytic-AML productization artifacts.",
     )
     aml_sub = aml_surface.add_subparsers(dest="aml_command", required=True)
+    aml_graph_loader = aml_sub.add_parser(
+        "graph-loader",
+        help="Build and show Slice 15V raw graph, flattened graph, and subgraph ingestion artifacts for a run.",
+    )
+    aml_graph_loader.add_argument("--run-dir", required=True, help="Run directory for AML graph-loader artifacts.")
+    aml_graph_loader.add_argument("--graph-path", default=None, help="Optional raw graph directory, subgraph pack, or graph file to inspect.")
+    aml_graph_loader.add_argument("--data-path", default=None, help="Optional flattened graph dataset path; defaults to the run dataset when discoverable.")
+    aml_graph_loader.add_argument("--config", default=None, help="Optional config/policy source.")
+    aml_graph_loader.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    aml_graph_loader.add_argument("--overwrite", action="store_true", help="Allow overwriting existing AML graph-loader artifacts.")
+    aml_graph_loader.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    aml_graph_loader.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
     aml_business_value = aml_sub.add_parser(
         "business-value",
         help="Build and show Slice 15T AML business-value and analyst-capacity artifacts for a run.",
@@ -4207,7 +4224,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "aml":
         try:
             labels = _parse_key_value_pairs(args.label)
-            if args.aml_command == "business-value":
+            if args.aml_command == "graph-loader":
+                payload = _run_aml_graph_loader_phase(
+                    run_dir=args.run_dir,
+                    graph_path=args.graph_path,
+                    data_path=args.data_path,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    overwrite=bool(args.overwrite),
+                    labels=labels,
+                )
+            elif args.aml_command == "business-value":
                 payload = _run_aml_business_value_phase(
                     run_dir=args.run_dir,
                     config_path=args.config,
@@ -5236,6 +5263,126 @@ def _run_aml_business_value_phase(
     }
 
 
+def _run_aml_graph_loader_phase(
+    *,
+    run_dir: str | Path,
+    graph_path: str | None,
+    data_path: str | None,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.analytics import read_task_contract_artifacts
+    from relaytic.aml import render_aml_graph_loader_markdown, sync_aml_graph_loader_artifacts
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    targets = _aml_graph_loader_output_paths(root)
+    if not overwrite and all(path.exists() for path in targets.values()):
+        return _show_aml_graph_loader_surface(run_dir=root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    resolved_data_path = data_path or _resolve_run_data_path(root)
+    written = sync_aml_graph_loader_artifacts(
+        root,
+        graph_path=graph_path,
+        data_path=resolved_data_path,
+        context_bundle=_read_optional_json_bundle(root, bundle="context"),
+        task_contract_bundle=read_task_contract_artifacts(root),
+        sync_entity_graph=True,
+        force_aml_active=True,
+    )
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=resolved_data_path if graph_path is None else None)
+    manifest_path = _refresh_aml_graph_loader_manifest(
+        root,
+        run_id=run_id,
+        policy_source=config_path,
+        labels=labels,
+    )
+    bundle = _read_aml_graph_loader_bundle(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "paths": {key: str(value) for key, value in written.items()},
+            "aml_graph_loader": _aml_graph_loader_surface_summary(bundle),
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_aml_graph_loader_markdown(bundle),
+    }
+
+
+def _show_aml_graph_loader_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    from relaytic.analytics import read_task_contract_artifacts
+    from relaytic.aml import render_aml_graph_loader_markdown, sync_aml_graph_loader_artifacts
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_aml_graph_loader_bundle(root)
+    if not bundle:
+        resolved_data_path = _resolve_run_data_path(root)
+        sync_aml_graph_loader_artifacts(
+            root,
+            data_path=resolved_data_path,
+            context_bundle=_read_optional_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            sync_entity_graph=True,
+            force_aml_active=True,
+        )
+        bundle = _read_aml_graph_loader_bundle(root)
+    if not bundle:
+        raise ValueError(f"No AML graph-loader artifacts could be built in {root}.")
+    materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_aml_graph_loader_manifest(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "aml_graph_loader": _aml_graph_loader_surface_summary(bundle),
+            "bundle": bundle,
+        },
+        "human_output": render_aml_graph_loader_markdown(bundle),
+    }
+
+
+def _read_aml_graph_loader_bundle(root: Path) -> dict[str, Any]:
+    from relaytic.aml import read_aml_graph_loader_artifacts
+
+    return read_aml_graph_loader_artifacts(root)
+
+
+def _aml_graph_loader_surface_summary(bundle: dict[str, Any]) -> dict[str, Any]:
+    manifest = dict(bundle.get("aml_graph_loader_manifest", {}))
+    subgraph = dict(bundle.get("aml_subgraph_task_manifest", {}))
+    claim_scope = dict(bundle.get("aml_graph_claim_scope", {}))
+    catalog = dict(bundle.get("aml_public_graph_benchmark_catalog", {}))
+    rows = catalog.get("rows", []) if isinstance(catalog.get("rows"), list) else []
+    return {
+        "status": manifest.get("status"),
+        "graph_input_mode": manifest.get("graph_input_mode"),
+        "graph_family": manifest.get("graph_family"),
+        "loader_can_construct_graph": manifest.get("loader_can_construct_graph"),
+        "raw_graph_bundle_ready": manifest.get("raw_graph_bundle_ready"),
+        "flattened_graph_ready": manifest.get("flattened_graph_ready"),
+        "subgraph_task_status": subgraph.get("status"),
+        "raw_graph_benchmark_claim_allowed": claim_scope.get("raw_graph_benchmark_claim_allowed"),
+        "subgraph_benchmark_claim_allowed": claim_scope.get("subgraph_benchmark_claim_allowed"),
+        "graph_sota_claim_allowed": claim_scope.get("graph_sota_claim_allowed"),
+        "supported_family_count": catalog.get("supported_family_count"),
+        "proxy_family_count": catalog.get("proxy_family_count"),
+        "blocked_family_count": catalog.get("blocked_family_count"),
+        "benchmark_support_levels": {
+            str(item.get("benchmark_family")): item.get("support_level")
+            for item in rows
+            if isinstance(item, dict) and item.get("benchmark_family")
+        },
+    }
+
 def _show_aml_business_value_surface(*, run_dir: str | Path) -> dict[str, Any]:
     from relaytic.aml import render_aml_business_value_markdown, sync_aml_business_value_artifacts
 
@@ -5298,10 +5445,12 @@ def _run_aml_baseline_phase(
     overwrite: bool,
     labels: dict[str, str] | None,
 ) -> dict[str, Any]:
+    from relaytic.analytics import read_task_contract_artifacts
     from relaytic.aml import (
         render_aml_baseline_markdown,
         sync_aml_baseline_artifacts,
         sync_aml_business_value_artifacts,
+        sync_aml_graph_loader_artifacts,
     )
 
     root = Path(run_dir)
@@ -5311,10 +5460,20 @@ def _run_aml_baseline_phase(
     if not overwrite and all(path.exists() for path in targets.values()):
         return _show_aml_baseline_surface(run_dir=root)
     _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    resolved_data_path = _resolve_run_data_path(root)
+    if overwrite or not all(path.exists() for path in _aml_graph_loader_output_paths(root).values()):
+        sync_aml_graph_loader_artifacts(
+            root,
+            data_path=resolved_data_path,
+            context_bundle=_read_optional_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            sync_entity_graph=False,
+            force_aml_active=False,
+        )
     if overwrite or not all(path.exists() for path in _aml_business_value_output_paths(root).values()):
         sync_aml_business_value_artifacts(root)
     written = sync_aml_baseline_artifacts(root)
-    summary_materialized = materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=resolved_data_path)
     manifest_path = _refresh_aml_baseline_manifest(
         root,
         run_id=run_id,
@@ -5337,15 +5496,26 @@ def _run_aml_baseline_phase(
 
 
 def _show_aml_baseline_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    from relaytic.analytics import read_task_contract_artifacts
     from relaytic.aml import (
         render_aml_baseline_markdown,
         sync_aml_baseline_artifacts,
         sync_aml_business_value_artifacts,
+        sync_aml_graph_loader_artifacts,
     )
 
     root = Path(run_dir)
     if not root.exists():
         raise ValueError(f"Run directory does not exist: {root}")
+    if not all(path.exists() for path in _aml_graph_loader_output_paths(root).values()):
+        sync_aml_graph_loader_artifacts(
+            root,
+            data_path=_resolve_run_data_path(root),
+            context_bundle=_read_optional_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            sync_entity_graph=False,
+            force_aml_active=False,
+        )
     if not all(path.exists() for path in _aml_business_value_output_paths(root).values()):
         sync_aml_business_value_artifacts(root)
     bundle = _read_aml_baseline_bundle(root)
@@ -9324,6 +9494,13 @@ def _read_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
     raise ValueError(f"Unsupported bundle '{bundle}'.")
 
 
+def _read_optional_json_bundle(run_dir: str | Path, *, bundle: str) -> dict[str, Any]:
+    try:
+        return _read_json_bundle(run_dir, bundle=bundle)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+
+
 def _resolve_run_data_path(run_dir: str | Path) -> str | None:
     root = Path(run_dir)
     try:
@@ -9804,7 +9981,7 @@ def _run_planning_phase(
         sync_task_contract_artifacts,
         sync_temporal_engine_artifacts,
     )
-    from relaytic.aml import sync_aml_graph_artifacts
+    from relaytic.aml import sync_aml_graph_artifacts, sync_aml_graph_loader_artifacts
     from relaytic.casework import sync_casework_artifacts
     from relaytic.stream_risk import sync_stream_risk_artifacts
     from relaytic.planning import write_planning_bundle
@@ -9896,6 +10073,14 @@ def _run_planning_phase(
             data_path=staged_data_path,
             context_bundle=_read_json_bundle(root, bundle="context"),
             task_contract_bundle=read_task_contract_artifacts(root),
+        )
+        aml_graph_loader_written = sync_aml_graph_loader_artifacts(
+            root,
+            data_path=staged_data_path,
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            sync_entity_graph=False,
+            force_aml_active=False,
         )
         architecture_written = sync_architecture_routing_artifacts(
             root,
@@ -9989,6 +10174,7 @@ def _run_planning_phase(
                 *(str(value) for value in written.values()),
                 *(str(value) for value in task_contract_written.values()),
                 *(str(value) for value in aml_graph_written.values()),
+                *(str(value) for value in aml_graph_loader_written.values()),
                 *(str(value) for value in architecture_written.values()),
                 *(str(value) for value in temporal_written.values()),
                 *(str(value) for value in casework_written.values()),
@@ -10007,6 +10193,7 @@ def _run_planning_phase(
                 **{key: str(value) for key, value in written.items()},
                 **{key: str(value) for key, value in task_contract_written.items()},
                 **{key: str(value) for key, value in aml_graph_written.items()},
+                **{key: str(value) for key, value in aml_graph_loader_written.items()},
                 **{key: str(value) for key, value in architecture_written.items()},
                 **{key: str(value) for key, value in temporal_written.items()},
                 **{key: str(value) for key, value in casework_written.items()},
@@ -10618,7 +10805,7 @@ def _run_benchmark_phase(
 ) -> dict[str, Any]:
     from relaytic.benchmark import write_benchmark_bundle
     from relaytic.analytics import read_task_contract_artifacts
-    from relaytic.aml import sync_aml_baseline_artifacts, sync_aml_business_value_artifacts
+    from relaytic.aml import sync_aml_baseline_artifacts, sync_aml_business_value_artifacts, sync_aml_graph_loader_artifacts
 
     root = Path(run_dir)
     targets = _benchmark_output_paths(root)
@@ -10671,6 +10858,14 @@ def _run_benchmark_phase(
         )
         written = write_benchmark_bundle(root, bundle=benchmark_result.bundle)
         materialize_run_summary(run_dir=root, data_path=resolved_data_path)
+        aml_graph_loader_written = sync_aml_graph_loader_artifacts(
+            root,
+            data_path=resolved_data_path,
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            sync_entity_graph=False,
+            force_aml_active=False,
+        )
         aml_business_value_written = sync_aml_business_value_artifacts(root)
         aml_baseline_written = sync_aml_baseline_artifacts(root)
         materialize_run_summary(run_dir=root, data_path=resolved_data_path)
@@ -10686,6 +10881,7 @@ def _run_benchmark_phase(
             stage_token=runtime_token,
             output_artifacts=[
                 *(str(value) for value in written.values()),
+                *(str(value) for value in aml_graph_loader_written.values()),
                 *(str(value) for value in aml_business_value_written.values()),
                 *(str(value) for value in aml_baseline_written.values()),
                 str(manifest_path),
@@ -10719,13 +10915,14 @@ def _run_benchmark_phase(
         from relaytic.aml import read_aml_graph_artifacts
         from relaytic.casework import read_casework_artifacts
         from relaytic.stream_risk import read_stream_risk_artifacts
-        from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts
+        from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts, read_aml_graph_loader_artifacts
 
         task_contract_bundle = read_task_contract_artifacts(root)
         eval_bundle = _read_json_bundle(root, bundle="evals")
         temporal_bundle = read_temporal_engine_artifacts(root)
         architecture_bundle = read_architecture_routing_artifacts(root)
         aml_graph_bundle = read_aml_graph_artifacts(root)
+        aml_graph_loader_bundle = read_aml_graph_loader_artifacts(root)
         casework_bundle = read_casework_artifacts(root)
         stream_risk_bundle = read_stream_risk_artifacts(root)
         aml_business_value_bundle = read_aml_business_value_artifacts(root)
@@ -10746,6 +10943,7 @@ def _run_benchmark_phase(
         bundle_payload.update(eval_bundle)
         bundle_payload.update(task_contract_bundle)
         bundle_payload.update(aml_graph_bundle)
+        bundle_payload.update(aml_graph_loader_bundle)
         bundle_payload.update(casework_bundle)
         bundle_payload.update(stream_risk_bundle)
         bundle_payload.update(aml_business_value_bundle)
@@ -10760,6 +10958,7 @@ def _run_benchmark_phase(
                 "manifest_path": str(manifest_path),
                 "paths": {
                     **{key: str(value) for key, value in written.items()},
+                    **{key: str(value) for key, value in aml_graph_loader_written.items()},
                     **{key: str(value) for key, value in aml_business_value_written.items()},
                     **{key: str(value) for key, value in aml_baseline_written.items()},
                 },
@@ -10839,6 +11038,10 @@ def _run_benchmark_phase(
                     "aml_material_ablation_count": aml_baseline_bundle.get("aml_capability_contribution_report", {}).get("material_contribution_count"),
                     "aml_public_metric_changed_by_capabilities": aml_baseline_bundle.get("aml_capability_contribution_report", {}).get("public_metric_changed"),
                     "aml_hard_benchmark_claim_allowed": aml_baseline_bundle.get("aml_benchmark_relevance_scorecard", {}).get("hard_benchmark_claim_allowed"),
+                    "aml_graph_loader_status": aml_graph_loader_bundle.get("aml_graph_loader_manifest", {}).get("status"),
+                    "aml_graph_input_mode": aml_graph_loader_bundle.get("aml_graph_loader_manifest", {}).get("graph_input_mode"),
+                    "aml_raw_graph_loader_claim_allowed": aml_graph_loader_bundle.get("aml_graph_claim_scope", {}).get("raw_graph_loader_claim_allowed"),
+                    "aml_graph_sota_claim_allowed": aml_graph_loader_bundle.get("aml_graph_claim_scope", {}).get("graph_sota_claim_allowed"),
                 },
                 "bundle": bundle_payload,
             },
@@ -10856,7 +11059,7 @@ def _run_benchmark_phase(
 
 def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     from relaytic.analytics import read_task_contract_artifacts
-    from relaytic.aml import sync_aml_baseline_artifacts, sync_aml_business_value_artifacts
+    from relaytic.aml import sync_aml_baseline_artifacts, sync_aml_business_value_artifacts, sync_aml_graph_loader_artifacts
 
     root = Path(run_dir)
     if not root.exists():
@@ -10866,6 +11069,16 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
         raise ValueError(f"No Slice 11 benchmark artifacts found in {root}.")
     sync_materialization_runtime_artifacts(root)
     _load_or_materialize_summary(run_dir=root)
+    if not all(path.exists() for path in _aml_graph_loader_output_paths(root).values()):
+        sync_aml_graph_loader_artifacts(
+            root,
+            data_path=_resolve_run_data_path(root),
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            sync_entity_graph=False,
+            force_aml_active=False,
+        )
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
     if not all(path.exists() for path in _aml_business_value_output_paths(root).values()):
         sync_aml_business_value_artifacts(root)
         materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
@@ -10899,13 +11112,14 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     from relaytic.aml import read_aml_graph_artifacts
     from relaytic.casework import read_casework_artifacts
     from relaytic.stream_risk import read_stream_risk_artifacts
-    from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts
+    from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts, read_aml_graph_loader_artifacts
 
     task_contract_bundle = read_task_contract_artifacts(root)
     eval_bundle = _read_json_bundle(root, bundle="evals")
     temporal_bundle = read_temporal_engine_artifacts(root)
     architecture_bundle = read_architecture_routing_artifacts(root)
     aml_graph_bundle = read_aml_graph_artifacts(root)
+    aml_graph_loader_bundle = read_aml_graph_loader_artifacts(root)
     casework_bundle = read_casework_artifacts(root)
     stream_risk_bundle = read_stream_risk_artifacts(root)
     aml_business_value_bundle = read_aml_business_value_artifacts(root)
@@ -10926,6 +11140,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle_payload.update(eval_bundle)
     bundle_payload.update(task_contract_bundle)
     bundle_payload.update(aml_graph_bundle)
+    bundle_payload.update(aml_graph_loader_bundle)
     bundle_payload.update(casework_bundle)
     bundle_payload.update(stream_risk_bundle)
     bundle_payload.update(aml_business_value_bundle)
@@ -11016,6 +11231,10 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "aml_material_ablation_count": aml_baseline_bundle.get("aml_capability_contribution_report", {}).get("material_contribution_count"),
                 "aml_public_metric_changed_by_capabilities": aml_baseline_bundle.get("aml_capability_contribution_report", {}).get("public_metric_changed"),
                 "aml_hard_benchmark_claim_allowed": aml_baseline_bundle.get("aml_benchmark_relevance_scorecard", {}).get("hard_benchmark_claim_allowed"),
+                "aml_graph_loader_status": aml_graph_loader_bundle.get("aml_graph_loader_manifest", {}).get("status"),
+                "aml_graph_input_mode": aml_graph_loader_bundle.get("aml_graph_loader_manifest", {}).get("graph_input_mode"),
+                "aml_raw_graph_loader_claim_allowed": aml_graph_loader_bundle.get("aml_graph_claim_scope", {}).get("raw_graph_loader_claim_allowed"),
+                "aml_graph_sota_claim_allowed": aml_graph_loader_bundle.get("aml_graph_claim_scope", {}).get("graph_sota_claim_allowed"),
             },
             "bundle": bundle_payload,
         },
@@ -14657,6 +14876,16 @@ def _aml_business_value_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _aml_graph_loader_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "aml_graph_loader_manifest": run_dir / "aml_graph_loader_manifest.json",
+        "aml_graph_provenance_report": run_dir / "aml_graph_provenance_report.json",
+        "aml_subgraph_task_manifest": run_dir / "aml_subgraph_task_manifest.json",
+        "aml_graph_claim_scope": run_dir / "aml_graph_claim_scope.json",
+        "aml_public_graph_benchmark_catalog": run_dir / "aml_public_graph_benchmark_catalog.json",
+    }
+
+
 def _aml_baseline_output_paths(run_dir: Path) -> dict[str, Path]:
     return {
         "aml_baseline_matrix": run_dir / "aml_baseline_matrix.json",
@@ -14675,7 +14904,7 @@ def _refresh_aml_business_value_manifest(
     labels: dict[str, str] | None = None,
 ) -> Path:
     root = Path(run_dir)
-    _refresh_benchmark_manifest(
+    _refresh_aml_graph_loader_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,
@@ -14709,6 +14938,74 @@ def _refresh_aml_business_value_manifest(
                     required=True,
                 )
             )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_aml_graph_loader_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_benchmark_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for key, path in _aml_graph_loader_output_paths(root).items():
+        if path.exists():
+            entries.append(
+                artifact_entry(
+                    path.name,
+                    run_dir=root,
+                    kind="aml_graph_loader",
+                    required=True,
+                )
+            )
+    normalized_edge_table = root / "aml_graph_loader_edge_table.csv"
+    if normalized_edge_table.exists():
+        entries.append(
+            artifact_entry(
+                normalized_edge_table.name,
+                run_dir=root,
+                kind="aml_graph_loader",
+                required=False,
+            )
+        )
     deduped_entries: list[Any] = []
     seen_paths: set[str] = set()
     for entry in entries:

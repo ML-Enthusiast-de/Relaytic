@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Intent
 
@@ -42,6 +42,14 @@ This slice is the point where Relaytic starts being credible on graph AML benchm
 - `aml_subgraph_task_manifest.json`
 - `aml_graph_claim_scope.json`
 - `aml_public_graph_benchmark_catalog.json`
+
+## Implemented Surface
+
+- `relaytic aml graph-loader --run-dir <run_dir> --graph-path <graph_dir_or_file>` builds the graph-loader bundle and refreshes the manifest.
+- Raw Elliptic-style multi-file bundles are detected from edge, feature, class/label, and time provenance.
+- Flattened edge-table support remains compatible and is labeled as flattened/proxy evidence.
+- Incomplete graph bundles fail closed with recovery instructions rather than silently becoming benchmark evidence.
+- The benchmark, run-summary, demo-bundle, and mission-control surfaces expose graph-loader and graph-claim posture.
 
 ## Acceptance Criteria
 
