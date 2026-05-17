@@ -67,6 +67,7 @@ Current canonical boundaries:
 Reserved future boundaries:
 
 - `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15M task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, replay/shadow-tested imported-model, objective/split/metric-truth, first-class family-stack, staged portfolio-search, temporal-engine, operating-point, benchmark-truth-gate, competitive-specialization, and benchmark-generalization responsibilities; later work may introduce focused subpackages such as `src/relaytic/modeling/families/`, `src/relaytic/modeling/portfolio/`, or `src/relaytic/temporal/` only if they sharpen responsibility instead of forking a disconnected parallel stack
+- `src/relaytic/guide/`, if introduced during Slice 15V-A, should own the no-lost guide surface, safe action-menu synthesis, artifact shortlists, optional local-LLM guide summaries, and external LLM context-pack exports without replacing mission control, assist, handoff, workspace, or benchmark as sources of truth
 - `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and future focused AML loaders, eval-environment packages, or release-freeze helpers should absorb the remaining Slice 15W through Slice 15Z-R AML productization and paper-freeze work before Academy expansion resumes
 - `src/relaytic/graph_fabric/` may still absorb richer graph and subgraph reasoning where it sharpens responsibility beyond the shipped `src/relaytic/aml/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` slices
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
@@ -466,8 +467,17 @@ Current AML graph-loader artifact names from Slice 15V:
 - `aml_graph_claim_scope.json`
 - `aml_public_graph_benchmark_catalog.json`
 
-Planned AML productization and paper-freeze artifact names for Slices 15W through 15Z-R:
+Planned productization and paper-freeze artifact names for Slices 15V-A through 15Z-R:
 
+- `guide_state.json`
+- `guide_action_menu.json`
+- `guide_artifact_shortlist.json`
+- `guide_question_starters.json`
+- `guide_local_llm_summary.json`
+- `external_llm_context_pack.json`
+- `external_llm_context_pack.md`
+- `external_llm_artifact_index.json`
+- `external_llm_redaction_report.json`
 - `aml_delayed_label_eval_report.json`
 - `aml_positive_unlabeled_posture.json`
 - `aml_threshold_drift_report.json`

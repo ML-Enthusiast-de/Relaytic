@@ -235,7 +235,7 @@ Avoid introducing new references to:
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
-- future AML-specific work should land through bounded slices `15W` through `15Z-R` before the academy work begins
+- future productization work should land through bounded slices `15V-A` through `15Z-R` before the academy work begins, with Slice 15V-A acting as the general no-lost guide and context-export bridge before the remaining AML-specific work
 - future AML boundaries should concentrate under `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/graph_fabric/`, `src/relaytic/stream_risk/`, and any focused future AML loader, evaluation-environment, or release-freeze package rather than scattering domain logic across unrelated generic packages
 - future public AML artifacts should remain additive and must not break the canonical `relaytic` package or CLI surface
 
@@ -589,6 +589,7 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/modeling/families/`, if introduced during Slice 15H, for first-class family-owned trainers, search spaces, adapter shims, and specialization logic rather than one generic trainer path
 - `src/relaytic/modeling/portfolio/`, if introduced during Slice 15I, for staged family probing, racing, finalist search, pruning, and budget-envelope logic
 - `src/relaytic/temporal/`, if introduced after Slice 15J, for deeper temporal family ownership beyond the currently shipped temporal-engine surfaces in `src/relaytic/analytics/`, `src/relaytic/modeling/`, and `src/relaytic/benchmark/`
+- `src/relaytic/guide/`, if introduced during Slice 15V-A, for no-lost guidance, safe action menus, artifact shortlists, optional local-LLM guide summaries, and redacted external-context exports without becoming a second source of truth
 - `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader, evaluation-environment, or release-freeze package for the remaining AML productization and paper-freeze track in Slices 15W through 15Z-R
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement after the AML pivot lands
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support

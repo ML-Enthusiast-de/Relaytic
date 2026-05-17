@@ -250,6 +250,7 @@ Stable slice numbering stays the same, but the preferred execution order after S
 54. Slice 15T
 55. Slice 15U
 56. Slice 15V
+56A. Slice 15V-A
 57. Slice 15W
 58. Slice 15X
 59. Slice 15Y
@@ -318,6 +319,7 @@ Why:
 - Slice 15T is now implemented and makes analyst-hour value, review-capacity tradeoffs, case-packet completeness, and operational overclaim guards first-class AML outputs
 - Slice 15U is now implemented and deepens AML baselines and ablations so the system can prove which capabilities actually changed outcomes
 - Slice 15V is now implemented and adds raw graph/subgraph ingestion, graph provenance, subgraph task manifests, graph claim scope, and public graph benchmark cataloging so public graph AML work no longer depends only on flattened snapshots
+- Slice 15V-A should land before stronger temporal/benchmark work because beginners and external agents need one no-lost guidance layer, one safe context-pack export, and one always-available status explanation before Relaytic adds still more artifact families
 - Slice 15W should add delayed-label, weak-label, threshold-drift, and time-window proof before production-shaped temporal claims expand
 - Slice 15X should reframe Relaytic runs as evaluation environments with scorecards for messy task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claims
 - Slice 15Y should rewrite first-contact documentation around the flagship AML path and move slice-history detail out of the main story
@@ -336,7 +338,7 @@ Why:
 ## Current execution state
 
 - implemented baseline: Slice 00 through Slice 15V, including Slice 09F routed intelligence, Slice 10 feedback assimilation/outcome learning, Slice 10B explicit quality-budget-profile contracts, Slice 10C skeptical behavioral control contracts, Slice 10A decision-lab world modeling, data-fabric reasoning, method compilation, Slice 11A imported-incumbent beat-target support, Slice 11B mission-control/onboarding/install surfaces, Slice 11C mission-control clarity surfaces, Slice 11D guided onboarding/chat surfaces, Slice 11E handbook-guided onboarding surfaces, Slice 11F demo-grade onboarding surfaces, Slice 11G adaptive human onboarding plus lightweight local semantic guidance, Slice 12 guarded dojo review, Slice 12A lab pulse, Slice 12B first-class tracing plus runtime evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and explicit iteration planning, Slice 13 search-controller depth plus execution-strategy selection, Slice 13A release safety, Slice 13B event bus plus visible permission modes, Slice 13C bounded daemon orchestration plus resumable jobs, Slice 14 feasibility, domain-constraint, action-boundary, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, Slice 15 mission-control expansion, release-health visibility, demo packs, and human-factors proof, Slice 15A canonical task contracts, rare-event taxonomy cleanup, benchmark-vs-deploy separation, temporal benchmark scaffolding, Slice 15B model registry expansion, adaptive architecture routing, widened trainable families, and sequence-shadow gating, Slice 15C budgeted HPO, early stopping, warm-start reuse, threshold tuning, and deeper portfolio loops, Slice 15D paper-grade benchmark harness, rerun variance reporting, benchmark ablation matrices, temporal benchmark posture, explicit claim-boundary reporting, Slice 15E execution DAG, runtime freshness contracts, recompute planning, and artifact reuse, Slice 15F research-imported architecture candidates, shadow trials, candidate quarantine, promotion-readiness reporting, Slice 15G objective contracts, split correctness, metric-materialization auditing, temporal fold-health gating, benchmark-truth prechecks, Slice 15H first-class competitive family stack, adapter readiness/version capture, categorical strategy selection, family eligibility/probe artifacts, Slice 15I staged portfolio search, budget-profile separation, finalist planning, pruning reasons, explicit search-stop doctrine, Slice 15J temporal engine, event-preserving blocked splits, temporal feature ladders, honest lagged baseline ladders, sequence-shadow scorecards, Slice 15K calibration strategy selection, threshold-search artifacts, review-budget optimization, abstention posture, and operating-point explanation surfaces, Slice 15L benchmark truth hardening, trace-identity conformance, eval-surface parity, leakage audits, and paper-claim gates, Slice 15M competitive specialization, adapter-activation reporting, temporal benchmark recovery, dev-vs-holdout claim partitioning, and benchmark-generalization guards, Slice 15N AML domain contracts, Slice 15O deterministic entity graphs and typology reasoning, Slice 15P analyst-review queue policy, review-budget ranking, case packets, review-capacity sensitivity, Slice 15Q stream-risk posture, weak-label posture, delayed-outcome alignment, drift-triggered recalibration signals, rolling alert-quality reporting, Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, and Slice 15V raw graph/subgraph ingestion.
-- next execution target: Slice 15W
+- next execution target: Slice 15V-A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -345,7 +347,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15W through 15Z-R
+- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15V-A through 15Z-R
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3098,6 +3100,77 @@ Minimum proof:
 - one incomplete graph bundle fails safely with a precise recovery instruction
 - flattened graph compatibility remains labeled as proxy evidence
 - the graph catalog separates raw Elliptic-style, flattened Elliptic-style, Elliptic2-style subgraph, and AMLSim-style graph support
+
+## Slice 15V-A - No-lost guide and external context pack
+
+Goal:
+- make Relaytic self-orienting for inexperienced humans and external agents
+- add one canonical guidance surface that answers what is happening, what is possible now, what is blocked, and how to proceed without requiring artifact literacy
+- add a local, redacted context-pack export that a user can hand to an external LLM or agent
+
+Load-bearing improvement:
+
+- Relaytic should provide one safe front door for every product state: no run, onboarding capture, partial run, completed run, benchmark-ready run, blocked environment, stale artifacts, and multi-run workspace continuation
+- the guide must synthesize mission control, run summary, assist, handoff, workspace, learnings, benchmark, release-health, and artifact-index truth into plain next actions
+- `relaytic status` and guide-style status queries must degrade gracefully when completion artifacts are missing instead of making inexperienced users feel stuck
+
+Human surface:
+
+- humans should be able to run `relaytic guide` or `relaytic guide --run-dir <run_dir>` and immediately see:
+  - where Relaytic is now
+  - the single best next move
+  - what is blocked and why
+  - the safe actions available now, with exact commands
+  - which reports matter and why
+  - what not to claim yet
+  - how to export a safe context pack for another LLM
+- humans should also be able to ask plain questions through `relaytic guide ask --run-dir <run_dir> --message "<question>"` without knowing whether the answer lives in mission control, assist, handoff, workspace, or benchmark artifacts
+
+Agent surface:
+
+- external agents should consume one JSON-first guide payload instead of guessing which artifact or command to inspect first
+- the agent payload must include `current_state`, `state_confidence`, `blocking_items`, `recommended_next_action`, `available_actions`, `safe_commands`, `artifact_shortlist`, `claim_boundaries`, `missing_evidence`, `external_context_pack`, and `starter_questions`
+- safe commands must be generated from registered CLI affordances, not free-form prose
+
+Intelligence source:
+
+- deterministic artifact synthesis from mission control, run summary, result contract, handoff, workspace continuity, durable learnings, benchmark truth gates, release-health posture, and doctor output
+- optional local LLM assistance may improve phrasing, summarize the deterministic guide bundle, and answer natural-language guide questions, but it must remain rowless/redacted by default and must cite deterministic guide fields rather than inventing commands or claims
+- if a local LLM is not configured, the guide must still work fully through deterministic templates and should point to existing local-LLM setup guidance only when the user asks for richer conversational help
+
+Fallback rule:
+
+- if a run directory is missing, guide must fall back to onboarding and install guidance
+- if completion, lifecycle, benchmark, or handoff artifacts are missing, guide must report which artifact family is absent and use the strongest available lower-level truth
+- if a local LLM is unavailable, disabled, too slow, or fails, guide must emit the deterministic answer and record the local-LLM status without changing recommended actions
+- if external context export would include raw rows, secrets, machine-private paths, or unsupported claim text, export must redact or block those fields and write a redaction report
+
+Required outputs:
+- `guide_state.json`
+- `guide_action_menu.json`
+- `guide_artifact_shortlist.json`
+- `guide_question_starters.json`
+- `guide_local_llm_summary.json`
+- `external_llm_context_pack.json`
+- `external_llm_context_pack.md`
+- `external_llm_artifact_index.json`
+- `external_llm_redaction_report.json`
+
+Required commands:
+- `relaytic guide`
+- `relaytic guide --run-dir <run_dir>`
+- `relaytic guide ask --run-dir <run_dir> --message "<question>"`
+- `relaytic guide export-context --run-dir <run_dir> --audience external-llm --format json`
+
+Minimum proof:
+
+- no-run onboarding guide explains how to start without requiring repo knowledge
+- partial-run guide does not fail when `completion_decision.json` is missing and explains what state it used instead
+- completed-run guide points to the human report, agent handoff, result contract, next-run options, and workspace continuation command
+- agent JSON guide lists only valid commands and stable artifact paths
+- external context export contains no raw data rows and records any redactions
+- local-LLM-assisted guide produces a friendlier explanation from the deterministic guide bundle while preserving the same recommended action and claim boundaries as deterministic mode
+- local-LLM-unavailable guide falls back cleanly and explains that conversational help is optional
 
 ## Slice 15W - Temporal and weak-label upgrade
 
