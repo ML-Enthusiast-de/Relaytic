@@ -48,6 +48,7 @@ def build_run_summary(
         read_aml_business_value_artifacts,
         read_aml_graph_artifacts,
         read_aml_graph_loader_artifacts,
+        read_aml_temporal_artifacts,
     )
     from relaytic.iteration import read_iteration_bundle
     from relaytic.casework import read_casework_artifacts
@@ -209,6 +210,7 @@ def build_run_summary(
     aml_graph_loader_bundle = read_aml_graph_loader_artifacts(root)
     aml_business_value_bundle = read_aml_business_value_artifacts(root)
     aml_baseline_bundle = read_aml_baseline_artifacts(root)
+    aml_temporal_bundle = read_aml_temporal_artifacts(root)
     casework_bundle = read_casework_artifacts(root)
     stream_risk_bundle = read_stream_risk_artifacts(root)
     decision_bundle = _read_bundle(
@@ -450,6 +452,11 @@ def build_run_summary(
     delayed_outcome_alignment = dict(stream_risk_bundle.get("delayed_outcome_alignment", {})) if isinstance(stream_risk_bundle.get("delayed_outcome_alignment"), dict) else {}
     drift_recalibration_trigger = dict(stream_risk_bundle.get("drift_recalibration_trigger", {})) if isinstance(stream_risk_bundle.get("drift_recalibration_trigger"), dict) else {}
     rolling_alert_quality_report = dict(stream_risk_bundle.get("rolling_alert_quality_report", {})) if isinstance(stream_risk_bundle.get("rolling_alert_quality_report"), dict) else {}
+    aml_delayed_label_eval_report = dict(aml_temporal_bundle.get("aml_delayed_label_eval_report", {})) if isinstance(aml_temporal_bundle.get("aml_delayed_label_eval_report"), dict) else {}
+    aml_positive_unlabeled_posture = dict(aml_temporal_bundle.get("aml_positive_unlabeled_posture", {})) if isinstance(aml_temporal_bundle.get("aml_positive_unlabeled_posture"), dict) else {}
+    aml_threshold_drift_report = dict(aml_temporal_bundle.get("aml_threshold_drift_report", {})) if isinstance(aml_temporal_bundle.get("aml_threshold_drift_report"), dict) else {}
+    aml_time_window_scorecard = dict(aml_temporal_bundle.get("aml_time_window_scorecard", {})) if isinstance(aml_temporal_bundle.get("aml_time_window_scorecard"), dict) else {}
+    aml_temporal_benchmark_claim_report = dict(aml_temporal_bundle.get("aml_temporal_benchmark_claim_report", {})) if isinstance(aml_temporal_bundle.get("aml_temporal_benchmark_claim_report"), dict) else {}
     aml_business_value_report = dict(aml_business_value_bundle.get("aml_business_value_report", {})) if isinstance(aml_business_value_bundle.get("aml_business_value_report"), dict) else {}
     analyst_hour_savings_report = dict(aml_business_value_bundle.get("analyst_hour_savings_report", {})) if isinstance(aml_business_value_bundle.get("analyst_hour_savings_report"), dict) else {}
     review_capacity_metric_report = dict(aml_business_value_bundle.get("review_capacity_metric_report", {})) if isinstance(aml_business_value_bundle.get("review_capacity_metric_report"), dict) else {}
@@ -1413,6 +1420,35 @@ def build_run_summary(
             or _clean_text(drift_recalibration_trigger.get("summary"))
             or _clean_text(weak_label_posture.get("summary")),
         },
+        "aml_temporal": {
+            "status": _clean_text(aml_temporal_benchmark_claim_report.get("status"))
+            or _clean_text(aml_delayed_label_eval_report.get("status"))
+            or _clean_text(aml_time_window_scorecard.get("status")),
+            "claim_state": _clean_text(aml_temporal_benchmark_claim_report.get("claim_state")),
+            "temporal_public_claim_allowed": aml_temporal_benchmark_claim_report.get("temporal_public_claim_allowed"),
+            "supporting_temporal_evidence_allowed": aml_temporal_benchmark_claim_report.get("supporting_temporal_evidence_allowed"),
+            "sequence_native_claim_allowed": aml_temporal_benchmark_claim_report.get("sequence_native_claim_allowed"),
+            "sequence_candidate_status": _clean_text(aml_temporal_benchmark_claim_report.get("sequence_candidate_status")),
+            "timestamp_column": _clean_text(aml_time_window_scorecard.get("timestamp_column"))
+            or _clean_text(aml_temporal_benchmark_claim_report.get("timestamp_column")),
+            "window_count": int(aml_time_window_scorecard.get("window_count", 0) or 0),
+            "time_sliced_metric_count": int(aml_time_window_scorecard.get("time_sliced_metric_count", 0) or 0),
+            "zero_positive_future_fold_count": int(aml_time_window_scorecard.get("zero_positive_future_fold_count", 0) or 0),
+            "delayed_label_status": _clean_text(aml_delayed_label_eval_report.get("status")),
+            "delayed_label_evidence_state": _clean_text(aml_delayed_label_eval_report.get("delayed_label_evidence_state")),
+            "matured_outcome_window_count": aml_delayed_label_eval_report.get("matured_outcome_window_count"),
+            "pu_risk_state": _clean_text(aml_positive_unlabeled_posture.get("pu_risk_state")),
+            "assume_unlabeled_are_negative_allowed": aml_positive_unlabeled_posture.get("assume_unlabeled_are_negative_allowed"),
+            "threshold_drift_state": _clean_text(aml_threshold_drift_report.get("threshold_drift_state")),
+            "threshold_reset_recommended": aml_threshold_drift_report.get("threshold_reset_recommended"),
+            "recommended_action": _clean_text(aml_temporal_benchmark_claim_report.get("recommended_next_action"))
+            or _clean_text(aml_threshold_drift_report.get("recommended_action")),
+            "claim_blockers": list(aml_temporal_benchmark_claim_report.get("claim_blockers", []))
+            if isinstance(aml_temporal_benchmark_claim_report.get("claim_blockers"), list)
+            else [],
+            "summary": _clean_text(aml_temporal_benchmark_claim_report.get("summary"))
+            or _clean_text(aml_delayed_label_eval_report.get("summary")),
+        },
         "aml_business_value": {
             "status": _clean_text(aml_business_value_report.get("status"))
             or _clean_text(operational_metric_guard.get("status")),
@@ -1947,6 +1983,11 @@ def build_run_summary(
             "delayed_outcome_alignment_path": _path_if_exists(root / "delayed_outcome_alignment.json"),
             "drift_recalibration_trigger_path": _path_if_exists(root / "drift_recalibration_trigger.json"),
             "rolling_alert_quality_report_path": _path_if_exists(root / "rolling_alert_quality_report.json"),
+            "aml_delayed_label_eval_report_path": _path_if_exists(root / "aml_delayed_label_eval_report.json"),
+            "aml_positive_unlabeled_posture_path": _path_if_exists(root / "aml_positive_unlabeled_posture.json"),
+            "aml_threshold_drift_report_path": _path_if_exists(root / "aml_threshold_drift_report.json"),
+            "aml_time_window_scorecard_path": _path_if_exists(root / "aml_time_window_scorecard.json"),
+            "aml_temporal_benchmark_claim_report_path": _path_if_exists(root / "aml_temporal_benchmark_claim_report.json"),
             "temporal_structure_report_path": _path_if_exists(root / "temporal_structure_report.json"),
                 "temporal_feature_ladder_path": _path_if_exists(root / "temporal_feature_ladder.json"),
                 "rolling_cv_plan_path": _path_if_exists(root / "rolling_cv_plan.json"),
@@ -2141,6 +2182,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     aml_graph = dict(summary.get("aml_graph", {}))
     casework = dict(summary.get("casework", {}))
     stream_risk = dict(summary.get("stream_risk", {}))
+    aml_temporal = dict(summary.get("aml_temporal", {}))
     aml_proof = dict(summary.get("aml_proof", {}))
     decision_lab = dict(summary.get("decision_lab", {}))
     dojo = dict(summary.get("dojo", {}))
@@ -2399,6 +2441,25 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- Drift score: `{stream_risk.get('drift_score')}`",
                 f"- Trigger action: `{stream_risk.get('trigger_action') or 'none'}`",
                 f"- Benchmark safe: `{stream_risk.get('benchmark_safe')}`",
+            ]
+        )
+    if aml_temporal and any(value not in (None, 0, False, "", []) for value in aml_temporal.values()):
+        lines.extend(
+            [
+                "",
+                "## AML Temporal Claims",
+                f"- Status: `{aml_temporal.get('status') or 'unknown'}`",
+                f"- Claim state: `{aml_temporal.get('claim_state') or 'unknown'}`",
+                f"- Temporal public claim allowed: `{aml_temporal.get('temporal_public_claim_allowed')}`",
+                f"- Supporting temporal evidence allowed: `{aml_temporal.get('supporting_temporal_evidence_allowed')}`",
+                f"- Sequence-native claim allowed: `{aml_temporal.get('sequence_native_claim_allowed')}`",
+                f"- Timestamp column: `{aml_temporal.get('timestamp_column') or 'none'}`",
+                f"- Time windows: `{aml_temporal.get('window_count', 0)}`",
+                f"- Zero-positive future folds: `{aml_temporal.get('zero_positive_future_fold_count', 0)}`",
+                f"- Delayed-label state: `{aml_temporal.get('delayed_label_evidence_state') or 'unknown'}`",
+                f"- PU risk state: `{aml_temporal.get('pu_risk_state') or 'unknown'}`",
+                f"- Threshold drift state: `{aml_temporal.get('threshold_drift_state') or 'unknown'}`",
+                f"- Recommended action: `{aml_temporal.get('recommended_action') or 'none'}`",
             ]
         )
     if aml_proof and any(value not in (None, 0, False, "", []) for value in aml_proof.values()):
@@ -2835,7 +2896,7 @@ def materialize_run_summary(
         sync_task_contract_artifacts,
         sync_temporal_engine_artifacts,
     )
-    from relaytic.aml import sync_aml_graph_artifacts, sync_aml_graph_loader_artifacts
+    from relaytic.aml import sync_aml_graph_artifacts, sync_aml_graph_loader_artifacts, sync_aml_temporal_artifacts
     from relaytic.casework import sync_casework_artifacts
     from relaytic.stream_risk import sync_stream_risk_artifacts
     from relaytic.iteration import sync_iteration_from_run
@@ -2986,6 +3047,49 @@ def materialize_run_summary(
                 "champion_vs_candidate": "champion_vs_candidate.json",
                 "recalibration_decision": "recalibration_decision.json",
                 "retrain_decision": "retrain_decision.json",
+            },
+        ),
+    )
+    sync_aml_temporal_artifacts(
+        root,
+        data_path=data_path or _path_if_exists(root / "data.csv") or _clean_text(dict(base_summary.get("data", {})).get("data_path")),
+        context_bundle=_read_bundle(root, {"domain_brief": "domain_brief.json", "task_brief": "task_brief.json"}),
+        task_contract_bundle=read_task_contract_artifacts(root),
+        temporal_bundle=_read_bundle(
+            root,
+            {
+                "temporal_structure_report": "temporal_structure_report.json",
+                "temporal_split_guard_report": "temporal_split_guard_report.json",
+                "rolling_cv_plan": "rolling_cv_plan.json",
+                "sequence_shadow_scorecard": "sequence_shadow_scorecard.json",
+                "temporal_baseline_ladder": "temporal_baseline_ladder.json",
+                "temporal_metric_contract": "temporal_metric_contract.json",
+            },
+        ),
+        operating_point_bundle=_read_bundle(
+            root,
+            {
+                "operating_point_contract": "operating_point_contract.json",
+                "threshold_search_report": "threshold_search_report.json",
+                "review_budget_optimization_report": "review_budget_optimization_report.json",
+            },
+        ),
+        lifecycle_bundle=_read_bundle(
+            root,
+            {
+                "champion_vs_candidate": "champion_vs_candidate.json",
+                "recalibration_decision": "recalibration_decision.json",
+                "retrain_decision": "retrain_decision.json",
+            },
+        ),
+        benchmark_bundle=_read_bundle(
+            root,
+            {
+                "benchmark_release_gate": "benchmark_release_gate.json",
+                "benchmark_truth_audit": "benchmark_truth_audit.json",
+                "dataset_leakage_audit": "dataset_leakage_audit.json",
+                "paper_claim_guard_report": "paper_claim_guard_report.json",
+                "aml_public_claim_guard": "aml_public_claim_guard.json",
             },
         ),
     )

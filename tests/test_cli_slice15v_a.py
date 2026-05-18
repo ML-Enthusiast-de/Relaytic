@@ -26,7 +26,7 @@ def _write_partial_run_summary(run_dir: Path) -> None:
             "request": {
                 "actor_type": "user",
                 "channel": "cli",
-                "text_preview": r"Review C:\Users\demo\private\data.csv without exposing raw rows.",
+                "text_preview": "Review /private/local/data.csv without exposing raw rows.",
             },
             "intent": {
                 "objective": "classify suspicious transactions",
@@ -111,7 +111,7 @@ def test_cli_guide_export_context_pack_is_rowless_and_redacted(tmp_path: Path, c
     context_text = context_path.read_text(encoding="utf-8")
     redaction_report = json.loads(redaction_path.read_text(encoding="utf-8"))
     assert str(tmp_path).replace("\\", "/") not in context_text.replace("\\", "/")
-    assert "C:\\Users\\demo" not in context_text
+    assert "/private/local/data.csv" not in context_text
     assert "<redacted_path:" in context_text
     assert redaction_report["raw_rows_included"] is False
     assert redaction_report["redaction_count"] >= 1

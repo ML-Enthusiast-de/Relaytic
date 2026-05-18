@@ -70,14 +70,15 @@ The repository already supports a working early product baseline:
 - AML proof-pack surfaces that align PaySim-style and flattened Elliptic-style workload evidence across benchmark CLI/show, run summary, assist, mission control, and public-claim gates
 - AML business-value surfaces through `relaytic aml business-value`, with analyst-hour savings, false-positive reduction, review-capacity metrics, incumbent capacity tradeoffs, and an operational guard that blocks model-score overclaims
 - AML baseline and ablation surfaces through `relaytic aml baselines`, with baseline matrices, optional-adapter fallback reporting, no-graph/no-temporal/no-review-budget/no-calibration/no-typology-prior ablations, and supported/proxy/blocked benchmark relevance scorecards
+- AML temporal weak-label surfaces through `relaytic aml temporal`, with delayed-label evaluation, positive-unlabeled posture, threshold-drift reporting, rowless time-window scorecards, and temporal public-claim gates
 - a one-command Relaytic-AML review-queue demo bundle through `relaytic demo aml-review-queue`, with a flow report, business-metric table, artifact index, business-value guard, baseline/ablation proof, and mission-control investigation board
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, and 15V are now implemented. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, and raw graph/subgraph ingestion evidence on the same local-first artifact path.
+Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, and 15W are now implemented. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, and temporal weak-label claim gates on the same local-first artifact path.
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 15W**, because raw graph/subgraph ingestion now exists and the next leverage point is delayed-label, positive-unlabeled, threshold-drift, and time-window proof.
+The next recommended build is **Slice 15X**, because temporal weak-label claim gates now exist and the next leverage point is evaluating Relaytic as a realistic AML workflow environment, not only as a model-score pipeline.
 
 The initial model-competitiveness path through **Slice 15F** is now landed, and the first performance-recovery foundation slice is now landed too:
 

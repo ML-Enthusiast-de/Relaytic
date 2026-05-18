@@ -1823,6 +1823,22 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    aml_temporal = aml_sub.add_parser(
+        "temporal",
+        help="Build and show Slice 15W AML temporal, weak-label, delayed-outcome, and threshold-drift artifacts for a run.",
+    )
+    aml_temporal.add_argument("--run-dir", required=True, help="Run directory containing AML temporal and stream-risk artifacts.")
+    aml_temporal.add_argument("--data-path", default=None, help="Optional dataset path; defaults to the run dataset when discoverable.")
+    aml_temporal.add_argument("--config", default=None, help="Optional config/policy source.")
+    aml_temporal.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    aml_temporal.add_argument("--overwrite", action="store_true", help="Allow overwriting existing AML temporal artifacts.")
+    aml_temporal.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    aml_temporal.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     demo_surface = sub.add_parser(
         "demo",
@@ -4340,6 +4356,15 @@ def main(argv: list[str] | None = None) -> int:
                     overwrite=bool(args.overwrite),
                     labels=labels,
                 )
+            elif args.aml_command == "temporal":
+                payload = _run_aml_temporal_phase(
+                    run_dir=args.run_dir,
+                    data_path=args.data_path,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    overwrite=bool(args.overwrite),
+                    labels=labels,
+                )
             else:
                 parser.error("Unsupported AML subcommand.")
                 return 2
@@ -5401,7 +5426,7 @@ def _run_aml_graph_loader_phase(
     overwrite: bool,
     labels: dict[str, str] | None,
 ) -> dict[str, Any]:
-    from relaytic.analytics import read_task_contract_artifacts
+    from relaytic.analytics import read_task_contract_artifacts, read_temporal_engine_artifacts
     from relaytic.aml import render_aml_graph_loader_markdown, sync_aml_graph_loader_artifacts
 
     root = Path(run_dir)
@@ -5444,7 +5469,7 @@ def _run_aml_graph_loader_phase(
 
 
 def _show_aml_graph_loader_surface(*, run_dir: str | Path) -> dict[str, Any]:
-    from relaytic.analytics import read_task_contract_artifacts
+    from relaytic.analytics import read_task_contract_artifacts, read_temporal_engine_artifacts
     from relaytic.aml import render_aml_graph_loader_markdown, sync_aml_graph_loader_artifacts
 
     root = Path(run_dir)
@@ -5701,6 +5726,148 @@ def _aml_baseline_surface_summary(bundle: dict[str, Any]) -> dict[str, Any]:
             if isinstance(item, dict) and item.get("benchmark_family")
         },
     }
+
+
+def _run_aml_temporal_phase(
+    *,
+    run_dir: str | Path,
+    data_path: str | None,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.analytics import read_task_contract_artifacts, read_temporal_engine_artifacts
+    from relaytic.aml import render_aml_temporal_markdown, sync_aml_temporal_artifacts
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    targets = _aml_temporal_output_paths(root)
+    if not overwrite and all(path.exists() for path in targets.values()):
+        return _show_aml_temporal_surface(run_dir=root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    resolved_data_path = data_path or _resolve_run_data_path(root)
+    written = sync_aml_temporal_artifacts(
+        root,
+        data_path=resolved_data_path,
+        context_bundle=_read_optional_json_bundle(root, bundle="context"),
+        task_contract_bundle=read_task_contract_artifacts(root),
+        temporal_bundle=read_temporal_engine_artifacts(root),
+        operating_point_bundle=_read_aml_temporal_operating_point_bundle(root),
+        lifecycle_bundle=_read_optional_json_bundle(root, bundle="lifecycle"),
+        benchmark_bundle=_read_optional_json_bundle(root, bundle="benchmark"),
+    )
+    summary_materialized = materialize_run_summary(run_dir=root, data_path=resolved_data_path)
+    manifest_path = _refresh_aml_temporal_manifest(
+        root,
+        run_id=run_id,
+        policy_source=config_path,
+        labels=labels,
+    )
+    bundle = _read_aml_temporal_bundle(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "paths": {key: str(value) for key, value in written.items()},
+            "aml_temporal": _aml_temporal_surface_summary(bundle),
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_aml_temporal_markdown(bundle),
+    }
+
+
+def _show_aml_temporal_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    from relaytic.analytics import read_task_contract_artifacts, read_temporal_engine_artifacts
+    from relaytic.aml import render_aml_temporal_markdown, sync_aml_temporal_artifacts
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_aml_temporal_bundle(root)
+    if not all(path.exists() for path in _aml_temporal_output_paths(root).values()):
+        sync_aml_temporal_artifacts(
+            root,
+            data_path=_resolve_run_data_path(root),
+            context_bundle=_read_optional_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            temporal_bundle=read_temporal_engine_artifacts(root),
+            operating_point_bundle=_read_aml_temporal_operating_point_bundle(root),
+            lifecycle_bundle=_read_optional_json_bundle(root, bundle="lifecycle"),
+            benchmark_bundle=_read_optional_json_bundle(root, bundle="benchmark"),
+        )
+        bundle = _read_aml_temporal_bundle(root)
+    if not bundle:
+        raise ValueError(f"No AML temporal artifacts could be built in {root}.")
+    materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_aml_temporal_manifest(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "aml_temporal": _aml_temporal_surface_summary(bundle),
+            "bundle": bundle,
+        },
+        "human_output": render_aml_temporal_markdown(bundle),
+    }
+
+
+def _read_aml_temporal_bundle(root: Path) -> dict[str, Any]:
+    from relaytic.aml import read_aml_temporal_artifacts
+
+    return read_aml_temporal_artifacts(root)
+
+
+def _aml_temporal_surface_summary(bundle: dict[str, Any]) -> dict[str, Any]:
+    delayed = dict(bundle.get("aml_delayed_label_eval_report", {}))
+    pu = dict(bundle.get("aml_positive_unlabeled_posture", {}))
+    drift = dict(bundle.get("aml_threshold_drift_report", {}))
+    windows = dict(bundle.get("aml_time_window_scorecard", {}))
+    claims = dict(bundle.get("aml_temporal_benchmark_claim_report", {}))
+    return {
+        "status": claims.get("status") or delayed.get("status") or windows.get("status"),
+        "claim_state": claims.get("claim_state"),
+        "temporal_public_claim_allowed": claims.get("temporal_public_claim_allowed"),
+        "supporting_temporal_evidence_allowed": claims.get("supporting_temporal_evidence_allowed"),
+        "sequence_native_claim_allowed": claims.get("sequence_native_claim_allowed"),
+        "sequence_candidate_status": claims.get("sequence_candidate_status"),
+        "timestamp_column": windows.get("timestamp_column") or claims.get("timestamp_column"),
+        "window_count": windows.get("window_count"),
+        "time_sliced_metric_count": windows.get("time_sliced_metric_count"),
+        "zero_positive_future_fold_count": windows.get("zero_positive_future_fold_count"),
+        "delayed_label_status": delayed.get("status"),
+        "delayed_label_evidence_state": delayed.get("delayed_label_evidence_state"),
+        "matured_outcome_window_count": delayed.get("matured_outcome_window_count"),
+        "pu_risk_state": pu.get("pu_risk_state"),
+        "assume_unlabeled_are_negative_allowed": pu.get("assume_unlabeled_are_negative_allowed"),
+        "threshold_drift_state": drift.get("threshold_drift_state"),
+        "threshold_reset_recommended": drift.get("threshold_reset_recommended"),
+        "recommended_action": claims.get("recommended_next_action") or drift.get("recommended_action"),
+        "claim_blockers": claims.get("claim_blockers", []),
+    }
+
+
+def _read_aml_temporal_operating_point_bundle(root: Path) -> dict[str, Any]:
+    bundle: dict[str, Any] = {}
+    for key, filename in {
+        "operating_point_contract": "operating_point_contract.json",
+        "threshold_search_report": "threshold_search_report.json",
+        "review_budget_optimization_report": "review_budget_optimization_report.json",
+    }.items():
+        path = root / filename
+        if not path.exists():
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(payload, dict):
+            bundle[key] = payload
+    return bundle
 
 
 def _run_source_inspection(
@@ -10976,8 +11143,13 @@ def _run_benchmark_phase(
     runtime_command: str | None = None,
 ) -> dict[str, Any]:
     from relaytic.benchmark import write_benchmark_bundle
-    from relaytic.analytics import read_task_contract_artifacts
-    from relaytic.aml import sync_aml_baseline_artifacts, sync_aml_business_value_artifacts, sync_aml_graph_loader_artifacts
+    from relaytic.analytics import read_task_contract_artifacts, read_temporal_engine_artifacts
+    from relaytic.aml import (
+        sync_aml_baseline_artifacts,
+        sync_aml_business_value_artifacts,
+        sync_aml_graph_loader_artifacts,
+        sync_aml_temporal_artifacts,
+    )
 
     root = Path(run_dir)
     targets = _benchmark_output_paths(root)
@@ -11040,8 +11212,18 @@ def _run_benchmark_phase(
         )
         aml_business_value_written = sync_aml_business_value_artifacts(root)
         aml_baseline_written = sync_aml_baseline_artifacts(root)
+        aml_temporal_written = sync_aml_temporal_artifacts(
+            root,
+            data_path=resolved_data_path,
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            temporal_bundle=read_temporal_engine_artifacts(root),
+            operating_point_bundle=_read_aml_temporal_operating_point_bundle(root),
+            lifecycle_bundle=_read_optional_json_bundle(root, bundle="lifecycle"),
+            benchmark_bundle=benchmark_result.bundle.to_dict(),
+        )
         materialize_run_summary(run_dir=root, data_path=resolved_data_path)
-        manifest_path = _refresh_aml_baseline_manifest(
+        manifest_path = _refresh_aml_temporal_manifest(
             root,
             run_id=run_id,
             policy_source=foundation_state["policy_path"],
@@ -11056,9 +11238,10 @@ def _run_benchmark_phase(
                 *(str(value) for value in aml_graph_loader_written.values()),
                 *(str(value) for value in aml_business_value_written.values()),
                 *(str(value) for value in aml_baseline_written.values()),
+                *(str(value) for value in aml_temporal_written.values()),
                 str(manifest_path),
             ],
-            summary="Relaytic compared the selected route against same-contract strong reference approaches and recorded honest parity plus AML business-value, baseline, and ablation artifacts.",
+            summary="Relaytic compared the selected route against same-contract strong reference approaches and recorded honest parity plus AML business-value, baseline, ablation, and temporal weak-label artifacts.",
         )
         sync_materialization_runtime_artifacts(root)
         parity = benchmark_result.bundle.benchmark_parity_report
@@ -11087,7 +11270,12 @@ def _run_benchmark_phase(
         from relaytic.aml import read_aml_graph_artifacts
         from relaytic.casework import read_casework_artifacts
         from relaytic.stream_risk import read_stream_risk_artifacts
-        from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts, read_aml_graph_loader_artifacts
+        from relaytic.aml import (
+            read_aml_baseline_artifacts,
+            read_aml_business_value_artifacts,
+            read_aml_graph_loader_artifacts,
+            read_aml_temporal_artifacts,
+        )
 
         task_contract_bundle = read_task_contract_artifacts(root)
         eval_bundle = _read_json_bundle(root, bundle="evals")
@@ -11099,6 +11287,7 @@ def _run_benchmark_phase(
         stream_risk_bundle = read_stream_risk_artifacts(root)
         aml_business_value_bundle = read_aml_business_value_artifacts(root)
         aml_baseline_bundle = read_aml_baseline_artifacts(root)
+        aml_temporal_bundle = read_aml_temporal_artifacts(root)
         operating_point_bundle = {
             key: json.loads((root / filename).read_text(encoding="utf-8"))
             for key, filename in {
@@ -11120,6 +11309,7 @@ def _run_benchmark_phase(
         bundle_payload.update(stream_risk_bundle)
         bundle_payload.update(aml_business_value_bundle)
         bundle_payload.update(aml_baseline_bundle)
+        bundle_payload.update(aml_temporal_bundle)
         bundle_payload.update(temporal_bundle)
         bundle_payload.update(architecture_bundle)
         bundle_payload.update(operating_point_bundle)
@@ -11133,6 +11323,7 @@ def _run_benchmark_phase(
                     **{key: str(value) for key, value in aml_graph_loader_written.items()},
                     **{key: str(value) for key, value in aml_business_value_written.items()},
                     **{key: str(value) for key, value in aml_baseline_written.items()},
+                    **{key: str(value) for key, value in aml_temporal_written.items()},
                 },
                 "benchmark": {
                     "parity_status": parity.parity_status,
@@ -11197,6 +11388,11 @@ def _run_benchmark_phase(
                     "stream_risk_status": stream_risk_bundle.get("stream_risk_posture", {}).get("status"),
                     "weak_label_risk_level": stream_risk_bundle.get("weak_label_posture", {}).get("weak_label_risk_level"),
                     "drift_trigger_action": stream_risk_bundle.get("drift_recalibration_trigger", {}).get("recommended_action"),
+                    "aml_temporal_claim_state": aml_temporal_bundle.get("aml_temporal_benchmark_claim_report", {}).get("claim_state"),
+                    "aml_temporal_public_claim_allowed": aml_temporal_bundle.get("aml_temporal_benchmark_claim_report", {}).get("temporal_public_claim_allowed"),
+                    "aml_temporal_claim_blockers": aml_temporal_bundle.get("aml_temporal_benchmark_claim_report", {}).get("claim_blockers", []),
+                    "aml_time_window_count": aml_temporal_bundle.get("aml_time_window_scorecard", {}).get("window_count"),
+                    "aml_pu_risk_state": aml_temporal_bundle.get("aml_positive_unlabeled_posture", {}).get("pu_risk_state"),
                     "aml_business_value_status": aml_business_value_bundle.get("aml_business_value_report", {}).get("status"),
                     "aml_operational_guard_status": aml_business_value_bundle.get("operational_metric_guard", {}).get("operational_utility_state"),
                     "aml_hard_business_value_claim_allowed": aml_business_value_bundle.get("operational_metric_guard", {}).get("hard_business_value_claim_allowed"),
@@ -11231,7 +11427,12 @@ def _run_benchmark_phase(
 
 def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     from relaytic.analytics import read_task_contract_artifacts
-    from relaytic.aml import sync_aml_baseline_artifacts, sync_aml_business_value_artifacts, sync_aml_graph_loader_artifacts
+    from relaytic.aml import (
+        sync_aml_baseline_artifacts,
+        sync_aml_business_value_artifacts,
+        sync_aml_graph_loader_artifacts,
+        sync_aml_temporal_artifacts,
+    )
 
     root = Path(run_dir)
     if not root.exists():
@@ -11257,7 +11458,21 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     if not all(path.exists() for path in _aml_baseline_output_paths(root).values()):
         sync_aml_baseline_artifacts(root)
         materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
-    manifest_path = _refresh_aml_baseline_manifest(root)
+    if not all(path.exists() for path in _aml_temporal_output_paths(root).values()):
+        from relaytic.analytics import read_temporal_engine_artifacts
+
+        sync_aml_temporal_artifacts(
+            root,
+            data_path=_resolve_run_data_path(root),
+            context_bundle=_read_json_bundle(root, bundle="context"),
+            task_contract_bundle=read_task_contract_artifacts(root),
+            temporal_bundle=read_temporal_engine_artifacts(root),
+            operating_point_bundle=_read_aml_temporal_operating_point_bundle(root),
+            lifecycle_bundle=_read_optional_json_bundle(root, bundle="lifecycle"),
+            benchmark_bundle=bundle,
+        )
+        materialize_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    manifest_path = _refresh_aml_temporal_manifest(root)
     parity = dict(bundle.get("benchmark_parity_report", {}))
     gap = dict(bundle.get("benchmark_gap_report", {}))
     incumbent = dict(bundle.get("incumbent_parity_report", {}))
@@ -11284,7 +11499,12 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     from relaytic.aml import read_aml_graph_artifacts
     from relaytic.casework import read_casework_artifacts
     from relaytic.stream_risk import read_stream_risk_artifacts
-    from relaytic.aml import read_aml_baseline_artifacts, read_aml_business_value_artifacts, read_aml_graph_loader_artifacts
+    from relaytic.aml import (
+        read_aml_baseline_artifacts,
+        read_aml_business_value_artifacts,
+        read_aml_graph_loader_artifacts,
+        read_aml_temporal_artifacts,
+    )
 
     task_contract_bundle = read_task_contract_artifacts(root)
     eval_bundle = _read_json_bundle(root, bundle="evals")
@@ -11296,6 +11516,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     stream_risk_bundle = read_stream_risk_artifacts(root)
     aml_business_value_bundle = read_aml_business_value_artifacts(root)
     aml_baseline_bundle = read_aml_baseline_artifacts(root)
+    aml_temporal_bundle = read_aml_temporal_artifacts(root)
     operating_point_bundle = {
         key: json.loads((root / filename).read_text(encoding="utf-8"))
         for key, filename in {
@@ -11317,6 +11538,7 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
     bundle_payload.update(stream_risk_bundle)
     bundle_payload.update(aml_business_value_bundle)
     bundle_payload.update(aml_baseline_bundle)
+    bundle_payload.update(aml_temporal_bundle)
     bundle_payload.update(temporal_bundle)
     bundle_payload.update(architecture_bundle)
     bundle_payload.update(operating_point_bundle)
@@ -11390,6 +11612,11 @@ def _show_benchmark_surface(*, run_dir: str | Path) -> dict[str, Any]:
                 "stream_risk_status": stream_risk_bundle.get("stream_risk_posture", {}).get("status"),
                 "weak_label_risk_level": stream_risk_bundle.get("weak_label_posture", {}).get("weak_label_risk_level"),
                 "drift_trigger_action": stream_risk_bundle.get("drift_recalibration_trigger", {}).get("recommended_action"),
+                "aml_temporal_claim_state": aml_temporal_bundle.get("aml_temporal_benchmark_claim_report", {}).get("claim_state"),
+                "aml_temporal_public_claim_allowed": aml_temporal_bundle.get("aml_temporal_benchmark_claim_report", {}).get("temporal_public_claim_allowed"),
+                "aml_temporal_claim_blockers": aml_temporal_bundle.get("aml_temporal_benchmark_claim_report", {}).get("claim_blockers", []),
+                "aml_time_window_count": aml_temporal_bundle.get("aml_time_window_scorecard", {}).get("window_count"),
+                "aml_pu_risk_state": aml_temporal_bundle.get("aml_positive_unlabeled_posture", {}).get("pu_risk_state"),
                 "aml_business_value_status": aml_business_value_bundle.get("aml_business_value_report", {}).get("status"),
                 "aml_operational_guard_status": aml_business_value_bundle.get("operational_metric_guard", {}).get("operational_utility_state"),
                 "aml_hard_business_value_claim_allowed": aml_business_value_bundle.get("operational_metric_guard", {}).get("hard_business_value_claim_allowed"),
@@ -15168,6 +15395,16 @@ def _aml_baseline_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _aml_temporal_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "aml_delayed_label_eval_report": run_dir / "aml_delayed_label_eval_report.json",
+        "aml_positive_unlabeled_posture": run_dir / "aml_positive_unlabeled_posture.json",
+        "aml_threshold_drift_report": run_dir / "aml_threshold_drift_report.json",
+        "aml_time_window_scorecard": run_dir / "aml_time_window_scorecard.json",
+        "aml_temporal_benchmark_claim_report": run_dir / "aml_temporal_benchmark_claim_report.json",
+    }
+
+
 def _refresh_aml_business_value_manifest(
     run_dir: str | Path,
     *,
@@ -15352,7 +15589,7 @@ def _refresh_aml_baseline_manifest(
     )
 
 
-def _refresh_aml_demo_manifest(
+def _refresh_aml_temporal_manifest(
     run_dir: str | Path,
     *,
     run_id: str | None = None,
@@ -15361,6 +15598,64 @@ def _refresh_aml_demo_manifest(
 ) -> Path:
     root = Path(run_dir)
     _refresh_aml_baseline_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for key, path in _aml_temporal_output_paths(root).items():
+        if path.exists():
+            entries.append(
+                artifact_entry(
+                    path.name,
+                    run_dir=root,
+                    kind="aml_temporal",
+                    required=True,
+                )
+            )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_aml_demo_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_aml_temporal_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,

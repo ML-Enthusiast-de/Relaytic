@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Intent
 
@@ -58,3 +58,10 @@ This slice must make time-aware benchmark claims defensible under forward-only e
 - threshold-drift report regression
 - public-claim block regression
 - temporal benchmark claim regression
+
+## Implementation Notes
+
+- Implemented in `src/relaytic/aml/temporal.py`.
+- Exposed through `relaytic aml temporal`.
+- Integrated into `run_summary.json`, benchmark CLI/show payloads, guide artifact shortlists, and manifest refresh.
+- Covered by `tests/test_cli_slice15w.py`.

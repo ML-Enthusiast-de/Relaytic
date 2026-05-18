@@ -34,6 +34,8 @@ relaytic guide ask --run-dir <run_dir> --message "what should I do now?"
 
 The guide tells you where Relaytic is, the best next move, what is blocked, which files matter, what not to claim yet, and how to export safe context for another LLM.
 
+For AML runs with ordered transaction streams, use `relaytic aml temporal --run-dir <run_dir> --format json` when you need to see delayed-label evidence, positive-unlabeled posture, threshold drift, time-window scorecards, and whether temporal public claims are currently allowed.
+
 ## What Relaytic Needs First
 
 Relaytic becomes meaningfully useful after you give it:

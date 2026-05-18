@@ -279,7 +279,7 @@ Reason:
 - Slice 15U is now implemented and deepens AML baselines and ablations so the proof story is about what graph, temporal, calibration, threshold, and review-budget machinery contributed
 - Slice 15V is now implemented and adds raw graph/subgraph ingestion, graph provenance, graph claim scope, and public graph benchmark cataloging so Elliptic-style work stops being limited to flattened snapshots
 - Slice 15V-A is now implemented and adds one no-lost guide, one safe external context pack, and one graceful status path before stronger temporal and benchmark work adds still more artifact families
-- Slice 15W should upgrade delayed labels, weak labels, threshold drift, and time-window evaluation before Relaytic-AML claims production-shaped temporal strength
+- Slice 15W is now implemented and upgrades delayed labels, positive-unlabeled posture, threshold drift, and time-window evaluation before Relaytic-AML makes production-shaped temporal claims
 - Slice 15X should frame Relaytic runs as evaluation environments with scorecards for task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claims
 - Slice 15Y should rewrite first-contact documentation around the flagship AML path rather than slice history
 - Slice 15Z should split credibility-damaging oversized modules and clean misleading surfaces before any Academy work expands the system again
@@ -296,8 +296,8 @@ Reason:
 
 Current repo state:
 
-- implemented through Slice 15V-A, with Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U AML baseline and ablation relevance proof, Slice 15V raw graph/subgraph ingestion, and Slice 15V-A no-lost guide/status/context-pack export now landed
-- next execution target: Slice 15W
+- implemented through Slice 15W, with Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U AML baseline and ablation relevance proof, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, and Slice 15W temporal weak-label claim gating now landed
+- next execution target: Slice 15X
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
 - latest handoff-and-learnings slice: Slice 12D
@@ -306,7 +306,7 @@ Current repo state:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15W through 15Z-R
+- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15X through 15Z-R
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces rather than leaving the UI stale until late polish
 - the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [aml_frontier_contract.md](docs/specs/aml_frontier_contract.md), [aml_benchmark_pack.md](docs/specs/aml_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, performance recovery, AML proof/productization, academy, handoff, learnings, and external-agent continuation surfaces
@@ -378,7 +378,7 @@ If the goal is to turn the current implementation into something that looks genu
 
 Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.
 Slices 10, 10B, 10C, and 10A are the current category-shift unlocks that turned Relaytic from a governed inference lab into a more explicit decision-and-discovery system with skeptical steering. Slice 11A added real incumbent pressure, Slice 11B completed the first adoption unlock because humans and external agents can now launch, inspect, and demo the system from one coherent control surface, and Slice 11C made that surface legible enough to act as a real MVP cockpit instead of only a technical dashboard.
-Slices 15A through 15M are now shipped as the initial model-competitiveness track plus the full performance-recovery and benchmark-generalization bridge. Slices 15N through 15V-A are the shipped AML foundation, proof-pack alignment, flagship demo-bundle, guarded business-value track, baseline/ablation relevance track, raw graph/subgraph ingestion track, and no-lost guide/context-pack track. Slice 15W through Slice 15Z-R are now the remaining mandatory pre-Academy productization and paper-freeze track: improve temporal and weak-label posture, frame Relaytic runs as evaluation environments, rewrite first-contact docs around the demo, clean credibility-damaging repo structure, and freeze a relevant benchmark/release pack before capability growth resumes. Slices 16A through 16F are the later governed capability-evolution track after that productization and paper-freeze track, Slice 17 remains the long-range optional representation-engine bet after the academy track, and Slice 18 is the planned endgame consolidation/remediation pass after all feature work.
+Slices 15A through 15M are now shipped as the initial model-competitiveness track plus the full performance-recovery and benchmark-generalization bridge. Slices 15N through 15W are the shipped AML foundation, proof-pack alignment, flagship demo-bundle, guarded business-value track, baseline/ablation relevance track, raw graph/subgraph ingestion track, no-lost guide/context-pack track, and temporal weak-label claim-gating track. Slice 15X through Slice 15Z-R are now the remaining mandatory pre-Academy productization and paper-freeze track: frame Relaytic runs as evaluation environments, rewrite first-contact docs around the demo, clean credibility-damaging repo structure, and freeze a relevant benchmark/release pack before capability growth resumes. Slices 16A through 16F are the later governed capability-evolution track after that productization and paper-freeze track, Slice 17 remains the long-range optional representation-engine bet after the academy track, and Slice 18 is the planned endgame consolidation/remediation pass after all feature work.
 
 ## Source of truth precedence
 

@@ -447,6 +447,7 @@ def _missing_evidence(*, context: dict[str, Any]) -> list[dict[str, Any]]:
         ("result_contract.json", "workspace", "Machine-stable result contract is not available yet."),
         ("benchmark_release_gate.json", "benchmark", "Paper/public benchmark claim gate is not available yet."),
         ("aml_public_claim_guard.json", "aml", "AML public-claim guard is not available yet."),
+        ("aml_temporal_benchmark_claim_report.json", "aml", "AML temporal weak-label claim gate is not available yet."),
     ]
     missing = []
     for filename, family, reason in expected:
@@ -465,6 +466,7 @@ def _missing_evidence(*, context: dict[str, Any]) -> list[dict[str, Any]]:
 def _claim_boundaries(*, summary: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
     benchmark = dict(summary.get("benchmark", {}))
     aml_proof = dict(summary.get("aml_proof", {}))
+    aml_temporal = dict(summary.get("aml_temporal", {}))
     objective = dict(summary.get("objective_contract", {}))
     split = dict(summary.get("split_health", {}))
     hard_allowed = bool(
@@ -488,10 +490,15 @@ def _claim_boundaries(*, summary: dict[str, Any], context: dict[str, Any]) -> di
         do_not_claim.append("Do not rank model families as final winners while objective truth is blocked.")
     if split.get("safe_for_benchmarking") is False:
         do_not_claim.append("Do not treat the current split as benchmark-safe.")
+    if aml_temporal.get("temporal_public_claim_allowed") is False:
+        do_not_claim.append("Do not make temporal AML claims while delayed-label, PU, or drift gates are unresolved.")
     return {
         "posture": posture,
         "hard_public_claim_allowed": hard_allowed,
         "supporting_public_claim_allowed": supporting_allowed,
+        "aml_temporal_public_claim_allowed": aml_temporal.get("temporal_public_claim_allowed"),
+        "aml_temporal_claim_state": aml_temporal.get("claim_state"),
+        "aml_temporal_claim_blockers": aml_temporal.get("claim_blockers", []),
         "benchmark_safe_to_cite_publicly": benchmark.get("safe_to_cite_publicly"),
         "objective_contract_status": objective.get("status"),
         "split_safe_for_benchmarking": split.get("safe_for_benchmarking"),
@@ -667,6 +674,9 @@ def _artifact_shortlist(*, context: dict[str, Any]) -> list[dict[str, Any]]:
         ("next_action_queue.json", "Completion next-action queue", "agent", True),
         ("benchmark_release_gate.json", "Paper/public benchmark claim gate", "agent", True),
         ("aml_public_claim_guard.json", "AML public-claim guard", "agent", True),
+        ("aml_temporal_benchmark_claim_report.json", "AML temporal weak-label claim gate", "agent", True),
+        ("aml_time_window_scorecard.json", "Rowless AML time-window scorecard", "agent", True),
+        ("aml_positive_unlabeled_posture.json", "AML positive-unlabeled posture", "agent", True),
         ("external_llm_context_pack.json", "Redacted external LLM context pack", "both", True),
     ]
     return [

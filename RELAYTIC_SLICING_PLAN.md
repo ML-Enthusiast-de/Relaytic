@@ -320,7 +320,7 @@ Why:
 - Slice 15U is now implemented and deepens AML baselines and ablations so the system can prove which capabilities actually changed outcomes
 - Slice 15V is now implemented and adds raw graph/subgraph ingestion, graph provenance, subgraph task manifests, graph claim scope, and public graph benchmark cataloging so public graph AML work no longer depends only on flattened snapshots
 - Slice 15V-A is now implemented and gives beginners plus external agents one no-lost guidance layer, one safe context-pack export, and one always-available status explanation before Relaytic adds still more artifact families
-- Slice 15W should add delayed-label, weak-label, threshold-drift, and time-window proof before production-shaped temporal claims expand
+- Slice 15W is now implemented and adds delayed-label, positive-unlabeled, threshold-drift, and time-window proof before production-shaped temporal claims expand
 - Slice 15X should reframe Relaytic runs as evaluation environments with scorecards for messy task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claims
 - Slice 15Y should rewrite first-contact documentation around the flagship AML path and move slice-history detail out of the main story
 - Slice 15Z should clean credibility-damaging repo structure, especially oversized modules, before Academy work increases surface area again
@@ -337,8 +337,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15V-A. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, and Slice 15V-A no-lost guide/status/context-pack export.
-- next execution target: Slice 15W
+- implemented baseline: Slice 00 through Slice 15W. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, and Slice 15W temporal weak-label claim gating.
+- next execution target: Slice 15X
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -347,7 +347,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15W through 15Z-R
+- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15X through 15Z-R
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3207,11 +3207,16 @@ Required outputs:
 - `aml_positive_unlabeled_posture.json`
 - `aml_threshold_drift_report.json`
 - `aml_time_window_scorecard.json`
+- `aml_temporal_benchmark_claim_report.json`
 
 Minimum proof:
 
 - one ordered workload produces a threshold-drift decision
 - one delayed-label scenario blocks overconfident public claims
+
+Implementation:
+
+- implemented in `src/relaytic/aml/temporal.py` and exposed through `relaytic aml temporal`, run summaries, benchmark surfaces, guide artifact shortlists, and temporal public-claim gates
 
 ## Slice 15X - AML evaluation-environment reframe
 

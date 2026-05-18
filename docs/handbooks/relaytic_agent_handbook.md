@@ -90,6 +90,10 @@ Workspace-level durable learnings inspection and reset.
 
 Attach an incumbent and force an honest comparison.
 
+### `aml temporal`
+
+Inspect AML delayed-label, positive-unlabeled, threshold-drift, time-window, and temporal public-claim gates without raw rows.
+
 ## The Main Operating Pattern
 
 When the user knows little:
