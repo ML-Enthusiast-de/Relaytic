@@ -1,0 +1,118 @@
+# Relaytic-AML Paper Benchmark Runbook
+
+This runbook defines the public benchmark path reviewers should expect before Relaytic-AML makes paper-facing claims.
+
+The current public-safe AML review-queue demo is demo-only. The paper-ready path is reserved for the later release-freeze pack, but this document names the benchmark families, artifacts, blocked-claim conditions, and reproducibility sequence now so the next slices have a stable target.
+
+## Benchmark Families
+
+| Family | Current role | Claim status | Expected evidence |
+| --- | --- | --- | --- |
+| PaySim-style transaction fraud | Temporal transaction-fraud evidence | `dev` or `proxy` until holdout and claim gates pass | `aml_benchmark_manifest.json`, `aml_temporal_benchmark_claim_report.json`, `aml_time_window_scorecard.json`, `aml_environment_scorecard.json` |
+| Elliptic-style graph AML | Flattened and raw-graph AML evidence | `dev`, `proxy`, or `holdout` depending on source and graph-loader posture | `aml_graph_loader_manifest.json`, `aml_graph_provenance_report.json`, `aml_graph_claim_scope.json`, `aml_benchmark_relevance_scorecard.json` |
+| Elliptic2-style subgraph AML | Subgraph investigation evidence | `blocked` until local access, loader support, and claim scope are explicit | `aml_subgraph_task_manifest.json`, `aml_public_graph_benchmark_catalog.json`, `aml_environment_failure_report.json` |
+| AMLSim-style synthetic bank graph | Synthetic bank-network evidence | `proxy` until reproducible generation and benchmark relevance are frozen | `aml_public_graph_benchmark_catalog.json`, `entity_graph_profile.json`, `subgraph_risk_report.json`, `case_packet.json` |
+| Generic structured-data benchmark pack | Supporting breadth evidence | supporting-only, not the flagship AML claim | `paper_benchmark_manifest.json`, `paper_benchmark_table.json`, `benchmark_release_gate.json` |
+
+Status labels:
+
+- `dev`: useful for engineering, not final public evidence.
+- `holdout`: held-out partition evidence, potentially stronger if claim gates pass.
+- `paper`: paper-ready only after the release-freeze pack passes.
+- `proxy`: relevant shape but not enough for a hard real-world AML claim.
+- `blocked`: excluded from hard claims with a recorded reason.
+
+## Minimum Command Sequence
+
+Demo-only path:
+
+```powershell
+relaytic demo aml-review-queue --run-dir artifacts\relaytic_aml_demo --format json
+relaytic show --run-dir artifacts\relaytic_aml_demo --format json
+relaytic aml environment --run-dir artifacts\relaytic_aml_demo --format json
+```
+
+Benchmark path for a local AML dataset:
+
+```powershell
+relaytic run --run-dir artifacts\aml_benchmark_run --data-path <aml_dataset.csv> --text "Build an AML transaction-monitoring model and keep benchmark claims guarded." --format json
+relaytic benchmark run --run-dir artifacts\aml_benchmark_run --data-path <aml_dataset.csv> --format json
+relaytic aml baselines --run-dir artifacts\aml_benchmark_run --format json
+relaytic aml temporal --run-dir artifacts\aml_benchmark_run --format json
+relaytic aml environment --run-dir artifacts\aml_benchmark_run --format json
+relaytic guide export-context --run-dir artifacts\aml_benchmark_run --audience external-llm --format json
+```
+
+Raw graph or subgraph path when graph files are available:
+
+```powershell
+relaytic aml graph-loader --run-dir artifacts\aml_benchmark_run --graph-path <graph_bundle_or_subgraph_pack> --format json
+relaytic aml environment --run-dir artifacts\aml_benchmark_run --format json
+```
+
+Release hygiene before public use:
+
+```powershell
+relaytic release-safety scan --format json
+relaytic doctor --expected-profile full --format json
+```
+
+## Expected Artifacts
+
+The release-freeze pack should cite these when available:
+
+- `manifest.json`
+- `run_summary.json`
+- `data_copy_manifest.json`
+- `benchmark_truth_precheck.json`
+- `benchmark_release_gate.json`
+- `paper_claim_guard_report.json`
+- `aml_benchmark_manifest.json`
+- `aml_holdout_claim_report.json`
+- `aml_public_claim_guard.json`
+- `aml_failure_report.json`
+- `aml_business_value_report.json`
+- `review_capacity_metric_report.json`
+- `operational_metric_guard.json`
+- `aml_baseline_matrix.json`
+- `aml_ablation_matrix.json`
+- `aml_benchmark_relevance_scorecard.json`
+- `aml_graph_loader_manifest.json`
+- `aml_graph_provenance_report.json`
+- `aml_subgraph_task_manifest.json`
+- `aml_graph_claim_scope.json`
+- `aml_public_graph_benchmark_catalog.json`
+- `aml_temporal_benchmark_claim_report.json`
+- `aml_environment_scorecard.json`
+- `aml_workflow_task_matrix.json`
+- `aml_benchmark_environment_scorecard.json`
+- `release_safety_scan.json`
+
+## Blocked-Claim Conditions
+
+Do not claim paper-ready AML superiority when any of these are true:
+
+- `benchmark_truth_precheck.json` says ranking is unsafe.
+- `benchmark_release_gate.json` blocks public citation.
+- `paper_claim_guard_report.json` or `aml_public_claim_guard.json` contains blockers.
+- `aml_benchmark_relevance_scorecard.json` labels the family `proxy` or `blocked`.
+- `aml_temporal_benchmark_claim_report.json` blocks temporal claims because delayed labels, positive-unlabeled posture, leakage, or threshold drift are unresolved.
+- `aml_environment_scorecard.json` reports `partial`, `fail`, or model/environment disagreement.
+- `aml_benchmark_environment_scorecard.json` reports incomplete reproducibility, claim safety, or benchmark relevance.
+- The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
+
+## Reproducibility Record
+
+For any paper-facing table, record:
+
+- exact commands
+- Relaytic version or commit
+- Python version and install profile
+- dataset family and source posture
+- whether the dataset is demo, dev, holdout, paper, proxy, or blocked
+- run directory
+- runtime budget assumptions
+- release-safety scan result
+- claim-boundary artifact paths
+
+Slice 15Z-R will turn this runbook into machine-readable freeze artifacts. Until then, this runbook is the human and agent contract for what the benchmark pack must prove.

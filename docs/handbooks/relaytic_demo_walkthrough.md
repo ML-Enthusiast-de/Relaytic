@@ -21,6 +21,18 @@ If you use the full install profile, Relaytic will also try to provision a light
 
 Any small local CSV, TSV, Excel, Parquet, JSON, JSONL, or NDJSON file is enough for a first demo.
 
+## Fastest AML Demo
+
+When the audience wants the flagship Relaytic-AML path, use the public-safe fixture:
+
+```powershell
+relaytic demo aml-review-queue --run-dir artifacts\relaytic_aml_demo --format json
+relaytic mission-control launch --run-dir artifacts\relaytic_aml_demo
+relaytic aml environment --run-dir artifacts\relaytic_aml_demo --format json
+```
+
+Show `case_packet.json`, `aml_business_value_report.json`, `aml_environment_scorecard.json`, and `aml_public_claim_guard.json` before explaining the broader roadmap.
+
 ## The Five-Step Demo
 
 ### 1. Verify The Local Environment

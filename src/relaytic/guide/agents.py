@@ -448,6 +448,8 @@ def _missing_evidence(*, context: dict[str, Any]) -> list[dict[str, Any]]:
         ("benchmark_release_gate.json", "benchmark", "Paper/public benchmark claim gate is not available yet."),
         ("aml_public_claim_guard.json", "aml", "AML public-claim guard is not available yet."),
         ("aml_temporal_benchmark_claim_report.json", "aml", "AML temporal weak-label claim gate is not available yet."),
+        ("aml_environment_scorecard.json", "aml", "AML evaluation-environment scorecard is not available yet."),
+        ("aml_benchmark_environment_scorecard.json", "aml", "AML benchmark-environment scorecard is not available yet."),
     ]
     missing = []
     for filename, family, reason in expected:
@@ -467,6 +469,7 @@ def _claim_boundaries(*, summary: dict[str, Any], context: dict[str, Any]) -> di
     benchmark = dict(summary.get("benchmark", {}))
     aml_proof = dict(summary.get("aml_proof", {}))
     aml_temporal = dict(summary.get("aml_temporal", {}))
+    aml_environment = dict(summary.get("aml_environment", {}))
     objective = dict(summary.get("objective_contract", {}))
     split = dict(summary.get("split_health", {}))
     hard_allowed = bool(
@@ -492,6 +495,10 @@ def _claim_boundaries(*, summary: dict[str, Any], context: dict[str, Any]) -> di
         do_not_claim.append("Do not treat the current split as benchmark-safe.")
     if aml_temporal.get("temporal_public_claim_allowed") is False:
         do_not_claim.append("Do not make temporal AML claims while delayed-label, PU, or drift gates are unresolved.")
+    if aml_environment.get("model_success_environment_success_disagreement"):
+        do_not_claim.append("Do not treat model-quality success as AML workflow-environment success.")
+    if aml_environment.get("benchmark_environment_status") in {"fail", "incomplete", "partial"}:
+        do_not_claim.append("Do not claim benchmark-environment readiness until reproducibility, claim safety, and AML relevance pass.")
     return {
         "posture": posture,
         "hard_public_claim_allowed": hard_allowed,
@@ -499,6 +506,11 @@ def _claim_boundaries(*, summary: dict[str, Any], context: dict[str, Any]) -> di
         "aml_temporal_public_claim_allowed": aml_temporal.get("temporal_public_claim_allowed"),
         "aml_temporal_claim_state": aml_temporal.get("claim_state"),
         "aml_temporal_claim_blockers": aml_temporal.get("claim_blockers", []),
+        "aml_environment_status": aml_environment.get("status"),
+        "aml_environment_score": aml_environment.get("environment_score"),
+        "aml_model_quality_score": aml_environment.get("model_quality_score"),
+        "aml_benchmark_environment_status": aml_environment.get("benchmark_environment_status"),
+        "aml_model_environment_disagreement": aml_environment.get("model_success_environment_success_disagreement"),
         "benchmark_safe_to_cite_publicly": benchmark.get("safe_to_cite_publicly"),
         "objective_contract_status": objective.get("status"),
         "split_safe_for_benchmarking": split.get("safe_for_benchmarking"),
@@ -632,6 +644,11 @@ def _action_menu(*, context: dict[str, Any], state: dict[str, Any], recommended_
                     "Export safe context for another LLM",
                     f"relaytic guide export-context --run-dir {root_text} --audience external-llm --format json",
                 ),
+                _action(
+                    "score_aml_environment",
+                    "Score AML evaluation environment",
+                    f"relaytic aml environment --run-dir {root_text} --format json",
+                ),
             ]
         )
         if Path(root_text, "run_handoff.json").exists():
@@ -677,6 +694,10 @@ def _artifact_shortlist(*, context: dict[str, Any]) -> list[dict[str, Any]]:
         ("aml_temporal_benchmark_claim_report.json", "AML temporal weak-label claim gate", "agent", True),
         ("aml_time_window_scorecard.json", "Rowless AML time-window scorecard", "agent", True),
         ("aml_positive_unlabeled_posture.json", "AML positive-unlabeled posture", "agent", True),
+        ("aml_environment_scorecard.json", "AML model-vs-environment scorecard", "both", True),
+        ("aml_workflow_task_matrix.json", "AML workflow task matrix", "agent", True),
+        ("aml_environment_failure_report.json", "AML environment blocker report", "both", True),
+        ("aml_benchmark_environment_scorecard.json", "AML benchmark-environment scorecard", "agent", True),
         ("external_llm_context_pack.json", "Redacted external LLM context pack", "both", True),
     ]
     return [
@@ -726,6 +747,15 @@ def _answer_message(
     normalized = " ".join(str(message or "").strip().lower().split())
     if not normalized:
         return _state_summary(state=state, recommended=recommended_action, blocking_items=[])
+    if any(word in normalized for word in ("environment", "workflow", "unsafe steering")):
+        env_status = claim_boundaries.get("aml_environment_status") or "unknown"
+        env_score = claim_boundaries.get("aml_environment_score")
+        benchmark_status = claim_boundaries.get("aml_benchmark_environment_status") or "unknown"
+        return (
+            f"AML environment status is `{env_status}` with environment score `{env_score}` "
+            f"and benchmark-environment status `{benchmark_status}`. "
+            "Use `relaytic aml environment --run-dir <run_dir> --format json` for the task matrix and blockers."
+        )
     if any(word in normalized for word in ("claim", "paper", "benchmark", "sota", "public")):
         blocked = "; ".join(claim_boundaries.get("do_not_claim", [])[:2])
         return f"Claim posture is `{claim_boundaries.get('posture')}`. {blocked or 'Current claim boundaries are available in the guide payload.'}"

@@ -321,8 +321,8 @@ Why:
 - Slice 15V is now implemented and adds raw graph/subgraph ingestion, graph provenance, subgraph task manifests, graph claim scope, and public graph benchmark cataloging so public graph AML work no longer depends only on flattened snapshots
 - Slice 15V-A is now implemented and gives beginners plus external agents one no-lost guidance layer, one safe context-pack export, and one always-available status explanation before Relaytic adds still more artifact families
 - Slice 15W is now implemented and adds delayed-label, positive-unlabeled, threshold-drift, and time-window proof before production-shaped temporal claims expand
-- Slice 15X should reframe Relaytic runs as evaluation environments with scorecards for messy task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claims
-- Slice 15Y should rewrite first-contact documentation around the flagship AML path and move slice-history detail out of the main story
+- Slice 15X is now implemented and reframes Relaytic runs as evaluation environments with scorecards for messy task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, public-safe claims, benchmark-environment readiness, and model/environment score separation
+- Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z should clean credibility-damaging repo structure, especially oversized modules, before Academy work increases surface area again
 - Slice 15Z-R should freeze the relevant benchmark and release evidence so public paper/demo claims are reproducible, claim-gated, and tied to PaySim-style, Elliptic-style, Elliptic2/subgraph or AMLSim-style, and generic supporting benchmark families instead of one easy dataset
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
@@ -337,8 +337,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15W. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, and Slice 15W temporal weak-label claim gating.
-- next execution target: Slice 15X
+- implemented baseline: Slice 00 through Slice 15Y. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, and Slice 15Y demo-first public documentation.
+- next execution target: Slice 15Z
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -347,7 +347,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15X through 15Z-R
+- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15Z through 15Z-R
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3220,6 +3220,9 @@ Implementation:
 
 ## Slice 15X - AML evaluation-environment reframe
 
+Status:
+- implemented
+
 Goal:
 - turn Relaytic runs into explicit evaluation environments for humans and agents
 - separate environment behavior from model-score behavior
@@ -3249,13 +3252,18 @@ Required outputs:
 - `aml_environment_scorecard.json`
 - `aml_workflow_task_matrix.json`
 - `aml_environment_failure_report.json`
+- `aml_benchmark_environment_scorecard.json`
 
 Minimum proof:
 
 - one environment scorecard includes both a model-quality task and a workflow-safety task
 - one unsafe steering task remains rejected with trace-backed evidence
+- implemented in `src/relaytic/aml/environment.py` and exposed through `relaytic aml environment`, run summaries, guide artifact shortlists, and benchmark-environment claim boundaries
 
 ## Slice 15Y - Demo-first documentation rewrite
+
+Status:
+- implemented
 
 Goal:
 - make first contact demo-led instead of roadmap-led
@@ -3282,8 +3290,10 @@ Fallback rule:
 - if a demo artifact is not generated yet, docs must say which slice generates it instead of pretending it exists
 
 Required outputs:
+- `docs/relaytic_ui_frontier_review.md`
 - `docs/why_relaytic_aml.md`
 - `docs/product_story.md`
+- `docs/paper_benchmark_runbook.md`
 - README flagship path rewrite
 - handbook demo-path updates
 
@@ -3291,6 +3301,7 @@ Minimum proof:
 
 - README names the next command for a new operator
 - docs link to AML proof artifacts without overstating support
+- implemented by moving the README first-contact path to `relaytic demo aml-review-queue`, adding the AML thesis/product-story/runbook docs, and documenting demo-only, dev-benchmark, holdout-benchmark, and paper-ready claim boundaries
 
 ## Slice 15Z - Pre-Academy repo credibility cleanup
 

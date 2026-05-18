@@ -105,6 +105,17 @@ Mission Control should split into two related surfaces:
 
 Both should read the same artifacts. They should never invent separate truth.
 
+## First-Contact UI Contract
+
+For Slice 15Y, first-contact docs should describe four UI layers clearly:
+
+- **Static fallback:** `relaytic mission-control launch` writes and opens a local static HTML report. This remains the dependable no-server view.
+- **AML investigation board:** the flagship workflow view for the review queue, case packet, graph/typology evidence, drift posture, benchmark guard, public-claim guard, and AML environment scorecard.
+- **Agent Console:** the command-first and JSON-linked surface for external agents that need `run_summary.json`, guide payloads, external context packs, and exact artifact paths.
+- **Local live UI server:** a later local-only server direction for live updates, event subscription, trace replay, approvals, benchmark runs, and richer filtering. It must read canonical artifacts rather than becoming a second backend truth.
+
+The public demo should send a new reviewer to the static fallback and AML investigation board first. The Agent Console and future live server should be explained as operating surfaces over the same artifact graph, not as separate products.
+
 ## Proposed UI Architecture
 
 ### 1. Static HTML remains the fallback
@@ -498,4 +509,3 @@ Each frame links to the exact artifact and trace span.
 Do not build a prettier dashboard over weak proof.
 
 The UI should make Relaytic more useful by exposing decisions, tradeoffs, evidence, and next actions. If a panel does not help a human or external agent decide what to do next, it should not be on the main screen.
-

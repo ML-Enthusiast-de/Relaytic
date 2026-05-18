@@ -1839,6 +1839,21 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    aml_environment = aml_sub.add_parser(
+        "environment",
+        help="Build and show Slice 15X AML evaluation-environment scorecards for a run.",
+    )
+    aml_environment.add_argument("--run-dir", required=True, help="Run directory containing AML workflow, benchmark, trace, and claim artifacts.")
+    aml_environment.add_argument("--config", default=None, help="Optional config/policy source.")
+    aml_environment.add_argument("--run-id", default=None, help="Optional manifest run id.")
+    aml_environment.add_argument("--overwrite", action="store_true", help="Allow overwriting existing AML environment artifacts.")
+    aml_environment.add_argument("--label", action="append", default=[], help="Optional `key=value` label for the manifest.")
+    aml_environment.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     demo_surface = sub.add_parser(
         "demo",
@@ -4365,6 +4380,14 @@ def main(argv: list[str] | None = None) -> int:
                     overwrite=bool(args.overwrite),
                     labels=labels,
                 )
+            elif args.aml_command == "environment":
+                payload = _run_aml_environment_phase(
+                    run_dir=args.run_dir,
+                    config_path=args.config,
+                    run_id=args.run_id,
+                    overwrite=bool(args.overwrite),
+                    labels=labels,
+                )
             else:
                 parser.error("Unsupported AML subcommand.")
                 return 2
@@ -5848,6 +5871,145 @@ def _aml_temporal_surface_summary(bundle: dict[str, Any]) -> dict[str, Any]:
         "threshold_reset_recommended": drift.get("threshold_reset_recommended"),
         "recommended_action": claims.get("recommended_next_action") or drift.get("recommended_action"),
         "claim_blockers": claims.get("claim_blockers", []),
+    }
+
+
+def _run_aml_environment_phase(
+    *,
+    run_dir: str | Path,
+    config_path: str | None,
+    run_id: str | None,
+    overwrite: bool,
+    labels: dict[str, str] | None,
+) -> dict[str, Any]:
+    from relaytic.aml import render_aml_environment_markdown, sync_aml_environment_artifacts
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    targets = _aml_environment_output_paths(root)
+    if not overwrite and all(path.exists() for path in targets.values()):
+        return _show_aml_environment_surface(run_dir=root)
+    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
+    written = sync_aml_environment_artifacts(root)
+    manifest_path = _refresh_aml_environment_manifest(
+        root,
+        run_id=run_id,
+        policy_source=config_path,
+        labels=labels,
+    )
+    summary_materialized = _refresh_run_summary_from_current_artifacts(root)
+    bundle = _read_aml_environment_bundle(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "paths": {key: str(value) for key, value in written.items()},
+            "aml_environment": _aml_environment_surface_summary(bundle),
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_aml_environment_markdown(bundle),
+    }
+
+
+def _show_aml_environment_surface(*, run_dir: str | Path) -> dict[str, Any]:
+    from relaytic.aml import render_aml_environment_markdown, sync_aml_environment_artifacts
+
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    bundle = _read_aml_environment_bundle(root)
+    if not all(path.exists() for path in _aml_environment_output_paths(root).values()):
+        sync_aml_environment_artifacts(root)
+        bundle = _read_aml_environment_bundle(root)
+    if not bundle:
+        raise ValueError(f"No AML environment artifacts could be built in {root}.")
+    bundle = _read_aml_environment_bundle(root)
+    manifest_path = _refresh_aml_environment_manifest(root)
+    summary_materialized = _refresh_run_summary_from_current_artifacts(root)
+    return {
+        "surface_payload": {
+            "status": "ok",
+            "run_dir": str(root),
+            "manifest_path": str(manifest_path),
+            "aml_environment": _aml_environment_surface_summary(bundle),
+            "bundle": bundle,
+            "run_summary": summary_materialized["summary"],
+        },
+        "human_output": render_aml_environment_markdown(bundle),
+    }
+
+
+def _read_aml_environment_bundle(root: Path) -> dict[str, Any]:
+    from relaytic.aml import read_aml_environment_artifacts
+
+    return read_aml_environment_artifacts(root)
+
+
+def _aml_environment_surface_summary(bundle: dict[str, Any]) -> dict[str, Any]:
+    manifest = dict(bundle.get("aml_eval_environment_manifest", {}))
+    scorecard = dict(bundle.get("aml_environment_scorecard", {}))
+    matrix = dict(bundle.get("aml_workflow_task_matrix", {}))
+    failure = dict(bundle.get("aml_environment_failure_report", {}))
+    benchmark = dict(bundle.get("aml_benchmark_environment_scorecard", {}))
+    rows = matrix.get("rows", []) if isinstance(matrix.get("rows"), list) else []
+    return {
+        "status": scorecard.get("overall_environment_status") or manifest.get("status"),
+        "environment_score": scorecard.get("environment_score"),
+        "model_quality_score": scorecard.get("model_quality_score"),
+        "workflow_safety_score": scorecard.get("workflow_safety_score"),
+        "model_score_and_environment_score_separate": scorecard.get("model_score_and_environment_score_separate"),
+        "model_success_environment_success_disagreement": scorecard.get("model_success_environment_success_disagreement")
+        or failure.get("model_success_environment_success_disagreement"),
+        "unsafe_steering_status": scorecard.get("unsafe_steering_status"),
+        "unsafe_steering_trace_backed": scorecard.get("unsafe_steering_trace_backed"),
+        "benchmark_environment_status": benchmark.get("overall_benchmark_environment_status")
+        or scorecard.get("benchmark_environment_status"),
+        "named_benchmark_family": benchmark.get("named_benchmark_family"),
+        "reproducibility_status": benchmark.get("reproducibility_status"),
+        "claim_safety_status": benchmark.get("claim_safety_status"),
+        "benchmark_relevance_status": benchmark.get("benchmark_relevance_status"),
+        "task_count": matrix.get("task_count"),
+        "pass_count": matrix.get("pass_count"),
+        "fail_count": matrix.get("fail_count"),
+        "incomplete_count": matrix.get("incomplete_count"),
+        "primary_failure_kind": failure.get("primary_failure_kind"),
+        "recommended_next_action": scorecard.get("recommended_next_action") or failure.get("recommended_next_step"),
+        "task_statuses": {
+            str(item.get("task_id")): item.get("status")
+            for item in rows
+            if isinstance(item, dict) and item.get("task_id")
+        },
+        "summary": scorecard.get("summary") or manifest.get("summary"),
+    }
+
+
+def _refresh_run_summary_from_current_artifacts(root: Path) -> dict[str, Any]:
+    from relaytic.core.json_utils import write_json
+    from relaytic.runs.summary import (
+        RUN_REPORT_RELATIVE_PATH,
+        RUN_SUMMARY_FILENAME,
+        build_run_summary,
+        render_run_summary_markdown,
+    )
+
+    summary = build_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
+    summary_path = write_json(
+        root / RUN_SUMMARY_FILENAME,
+        summary,
+        indent=2,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+    report_path = root / RUN_REPORT_RELATIVE_PATH
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(render_run_summary_markdown(summary), encoding="utf-8")
+    return {
+        "summary": summary,
+        "summary_path": summary_path,
+        "report_path": report_path,
     }
 
 
@@ -15405,6 +15567,16 @@ def _aml_temporal_output_paths(run_dir: Path) -> dict[str, Path]:
     }
 
 
+def _aml_environment_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "aml_eval_environment_manifest": run_dir / "aml_eval_environment_manifest.json",
+        "aml_environment_scorecard": run_dir / "aml_environment_scorecard.json",
+        "aml_workflow_task_matrix": run_dir / "aml_workflow_task_matrix.json",
+        "aml_environment_failure_report": run_dir / "aml_environment_failure_report.json",
+        "aml_benchmark_environment_scorecard": run_dir / "aml_benchmark_environment_scorecard.json",
+    }
+
+
 def _refresh_aml_business_value_manifest(
     run_dir: str | Path,
     *,
@@ -15647,7 +15819,7 @@ def _refresh_aml_temporal_manifest(
     )
 
 
-def _refresh_aml_demo_manifest(
+def _refresh_aml_environment_manifest(
     run_dir: str | Path,
     *,
     run_id: str | None = None,
@@ -15656,6 +15828,64 @@ def _refresh_aml_demo_manifest(
 ) -> Path:
     root = Path(run_dir)
     _refresh_aml_temporal_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for key, path in _aml_environment_output_paths(root).items():
+        if path.exists():
+            entries.append(
+                artifact_entry(
+                    path.name,
+                    run_dir=root,
+                    kind="aml_environment",
+                    required=True,
+                )
+            )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id") or root.name,
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_aml_demo_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_aml_environment_manifest(
         root,
         run_id=run_id,
         policy_source=policy_source,

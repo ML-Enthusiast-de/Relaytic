@@ -46,6 +46,7 @@ def build_run_summary(
     from relaytic.aml import (
         read_aml_baseline_artifacts,
         read_aml_business_value_artifacts,
+        read_aml_environment_artifacts,
         read_aml_graph_artifacts,
         read_aml_graph_loader_artifacts,
         read_aml_temporal_artifacts,
@@ -211,6 +212,7 @@ def build_run_summary(
     aml_business_value_bundle = read_aml_business_value_artifacts(root)
     aml_baseline_bundle = read_aml_baseline_artifacts(root)
     aml_temporal_bundle = read_aml_temporal_artifacts(root)
+    aml_environment_bundle = read_aml_environment_artifacts(root)
     casework_bundle = read_casework_artifacts(root)
     stream_risk_bundle = read_stream_risk_artifacts(root)
     decision_bundle = _read_bundle(
@@ -457,6 +459,11 @@ def build_run_summary(
     aml_threshold_drift_report = dict(aml_temporal_bundle.get("aml_threshold_drift_report", {})) if isinstance(aml_temporal_bundle.get("aml_threshold_drift_report"), dict) else {}
     aml_time_window_scorecard = dict(aml_temporal_bundle.get("aml_time_window_scorecard", {})) if isinstance(aml_temporal_bundle.get("aml_time_window_scorecard"), dict) else {}
     aml_temporal_benchmark_claim_report = dict(aml_temporal_bundle.get("aml_temporal_benchmark_claim_report", {})) if isinstance(aml_temporal_bundle.get("aml_temporal_benchmark_claim_report"), dict) else {}
+    aml_eval_environment_manifest = dict(aml_environment_bundle.get("aml_eval_environment_manifest", {})) if isinstance(aml_environment_bundle.get("aml_eval_environment_manifest"), dict) else {}
+    aml_environment_scorecard = dict(aml_environment_bundle.get("aml_environment_scorecard", {})) if isinstance(aml_environment_bundle.get("aml_environment_scorecard"), dict) else {}
+    aml_workflow_task_matrix = dict(aml_environment_bundle.get("aml_workflow_task_matrix", {})) if isinstance(aml_environment_bundle.get("aml_workflow_task_matrix"), dict) else {}
+    aml_environment_failure_report = dict(aml_environment_bundle.get("aml_environment_failure_report", {})) if isinstance(aml_environment_bundle.get("aml_environment_failure_report"), dict) else {}
+    aml_benchmark_environment_scorecard = dict(aml_environment_bundle.get("aml_benchmark_environment_scorecard", {})) if isinstance(aml_environment_bundle.get("aml_benchmark_environment_scorecard"), dict) else {}
     aml_business_value_report = dict(aml_business_value_bundle.get("aml_business_value_report", {})) if isinstance(aml_business_value_bundle.get("aml_business_value_report"), dict) else {}
     analyst_hour_savings_report = dict(aml_business_value_bundle.get("analyst_hour_savings_report", {})) if isinstance(aml_business_value_bundle.get("analyst_hour_savings_report"), dict) else {}
     review_capacity_metric_report = dict(aml_business_value_bundle.get("review_capacity_metric_report", {})) if isinstance(aml_business_value_bundle.get("review_capacity_metric_report"), dict) else {}
@@ -1449,6 +1456,36 @@ def build_run_summary(
             "summary": _clean_text(aml_temporal_benchmark_claim_report.get("summary"))
             or _clean_text(aml_delayed_label_eval_report.get("summary")),
         },
+        "aml_environment": {
+            "status": _clean_text(aml_environment_scorecard.get("overall_environment_status"))
+            or _clean_text(aml_eval_environment_manifest.get("status")),
+            "environment_score": aml_environment_scorecard.get("environment_score"),
+            "model_quality_score": aml_environment_scorecard.get("model_quality_score"),
+            "workflow_safety_score": aml_environment_scorecard.get("workflow_safety_score"),
+            "public_claim_discipline_score": aml_environment_scorecard.get("public_claim_discipline_score"),
+            "benchmark_environment_score": aml_environment_scorecard.get("benchmark_environment_score")
+            or aml_benchmark_environment_scorecard.get("benchmark_environment_score"),
+            "model_score_and_environment_score_separate": aml_environment_scorecard.get("model_score_and_environment_score_separate"),
+            "model_success_environment_success_disagreement": aml_environment_scorecard.get("model_success_environment_success_disagreement")
+            or aml_environment_failure_report.get("model_success_environment_success_disagreement"),
+            "unsafe_steering_status": _clean_text(aml_environment_scorecard.get("unsafe_steering_status")),
+            "unsafe_steering_trace_backed": aml_environment_scorecard.get("unsafe_steering_trace_backed"),
+            "benchmark_environment_status": _clean_text(aml_benchmark_environment_scorecard.get("overall_benchmark_environment_status"))
+            or _clean_text(aml_environment_scorecard.get("benchmark_environment_status")),
+            "named_benchmark_family": _clean_text(aml_benchmark_environment_scorecard.get("named_benchmark_family")),
+            "reproducibility_status": _clean_text(aml_benchmark_environment_scorecard.get("reproducibility_status")),
+            "claim_safety_status": _clean_text(aml_benchmark_environment_scorecard.get("claim_safety_status")),
+            "benchmark_relevance_status": _clean_text(aml_benchmark_environment_scorecard.get("benchmark_relevance_status")),
+            "task_count": int(aml_workflow_task_matrix.get("task_count", 0) or 0),
+            "pass_count": int(aml_workflow_task_matrix.get("pass_count", 0) or 0),
+            "fail_count": int(aml_workflow_task_matrix.get("fail_count", 0) or 0),
+            "incomplete_count": int(aml_workflow_task_matrix.get("incomplete_count", 0) or 0),
+            "primary_failure_kind": _clean_text(aml_environment_failure_report.get("primary_failure_kind")),
+            "recommended_next_action": _clean_text(aml_environment_scorecard.get("recommended_next_action"))
+            or _clean_text(aml_environment_failure_report.get("recommended_next_step")),
+            "summary": _clean_text(aml_environment_scorecard.get("summary"))
+            or _clean_text(aml_eval_environment_manifest.get("summary")),
+        },
         "aml_business_value": {
             "status": _clean_text(aml_business_value_report.get("status"))
             or _clean_text(operational_metric_guard.get("status")),
@@ -1988,6 +2025,11 @@ def build_run_summary(
             "aml_threshold_drift_report_path": _path_if_exists(root / "aml_threshold_drift_report.json"),
             "aml_time_window_scorecard_path": _path_if_exists(root / "aml_time_window_scorecard.json"),
             "aml_temporal_benchmark_claim_report_path": _path_if_exists(root / "aml_temporal_benchmark_claim_report.json"),
+            "aml_eval_environment_manifest_path": _path_if_exists(root / "aml_eval_environment_manifest.json"),
+            "aml_environment_scorecard_path": _path_if_exists(root / "aml_environment_scorecard.json"),
+            "aml_workflow_task_matrix_path": _path_if_exists(root / "aml_workflow_task_matrix.json"),
+            "aml_environment_failure_report_path": _path_if_exists(root / "aml_environment_failure_report.json"),
+            "aml_benchmark_environment_scorecard_path": _path_if_exists(root / "aml_benchmark_environment_scorecard.json"),
             "temporal_structure_report_path": _path_if_exists(root / "temporal_structure_report.json"),
                 "temporal_feature_ladder_path": _path_if_exists(root / "temporal_feature_ladder.json"),
                 "rolling_cv_plan_path": _path_if_exists(root / "rolling_cv_plan.json"),
@@ -2183,6 +2225,7 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
     casework = dict(summary.get("casework", {}))
     stream_risk = dict(summary.get("stream_risk", {}))
     aml_temporal = dict(summary.get("aml_temporal", {}))
+    aml_environment = dict(summary.get("aml_environment", {}))
     aml_proof = dict(summary.get("aml_proof", {}))
     decision_lab = dict(summary.get("decision_lab", {}))
     dojo = dict(summary.get("dojo", {}))
@@ -2460,6 +2503,22 @@ def render_run_summary_markdown(summary: dict[str, Any]) -> str:
                 f"- PU risk state: `{aml_temporal.get('pu_risk_state') or 'unknown'}`",
                 f"- Threshold drift state: `{aml_temporal.get('threshold_drift_state') or 'unknown'}`",
                 f"- Recommended action: `{aml_temporal.get('recommended_action') or 'none'}`",
+            ]
+        )
+    if aml_environment and any(value not in (None, 0, False, "", []) for value in aml_environment.values()):
+        lines.extend(
+            [
+                "",
+                "## AML Evaluation Environment",
+                f"- Status: `{aml_environment.get('status') or 'unknown'}`",
+                f"- Environment score: `{aml_environment.get('environment_score')}`",
+                f"- Model-quality score: `{aml_environment.get('model_quality_score')}`",
+                f"- Workflow-safety score: `{aml_environment.get('workflow_safety_score')}`",
+                f"- Benchmark-environment status: `{aml_environment.get('benchmark_environment_status') or 'unknown'}`",
+                f"- Unsafe steering: `{aml_environment.get('unsafe_steering_status') or 'unknown'}` trace-backed=`{aml_environment.get('unsafe_steering_trace_backed')}`",
+                f"- Model/environment disagreement: `{aml_environment.get('model_success_environment_success_disagreement')}`",
+                f"- Primary blocker: `{aml_environment.get('primary_failure_kind') or 'none'}`",
+                f"- Recommended action: `{aml_environment.get('recommended_next_action') or 'none'}`",
             ]
         )
     if aml_proof and any(value not in (None, 0, False, "", []) for value in aml_proof.values()):
@@ -2896,7 +2955,12 @@ def materialize_run_summary(
         sync_task_contract_artifacts,
         sync_temporal_engine_artifacts,
     )
-    from relaytic.aml import sync_aml_graph_artifacts, sync_aml_graph_loader_artifacts, sync_aml_temporal_artifacts
+    from relaytic.aml import (
+        sync_aml_environment_artifacts,
+        sync_aml_graph_artifacts,
+        sync_aml_graph_loader_artifacts,
+        sync_aml_temporal_artifacts,
+    )
     from relaytic.casework import sync_casework_artifacts
     from relaytic.stream_risk import sync_stream_risk_artifacts
     from relaytic.iteration import sync_iteration_from_run
@@ -3093,6 +3157,7 @@ def materialize_run_summary(
             },
         ),
     )
+    sync_aml_environment_artifacts(root)
     try:
         policy_path = root / "policy_resolved.yaml"
         policy = load_policy(policy_path if policy_path.exists() else None).policy

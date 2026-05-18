@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Intent
 
@@ -56,3 +56,10 @@ This slice must also make the benchmark path legible: a technical reviewer shoul
 - handbook command-surface regression
 - README proof-path review
 - paper benchmark runbook review
+
+## Implementation Notes
+
+- Added `docs/why_relaytic_aml.md`, `docs/product_story.md`, and `docs/paper_benchmark_runbook.md`.
+- Reworked the top of `README.md` around the public-safe AML demo command, proof artifacts, and claim-boundary labels before the slice history.
+- Updated the user, agent, and demo handbooks with the flagship AML demo path and artifact checklist.
+- Updated `docs/relaytic_ui_frontier_review.md` to distinguish the static fallback, AML investigation board, Agent Console, and future local live UI server.

@@ -33,6 +33,7 @@ Relaytic is the local inference-engineering system in this workspace.
 - `relaytic show --run-dir <run_dir> --format json`
 - `relaytic status --run-dir <run_dir> --format json`
 - `relaytic aml temporal --run-dir <run_dir> --format json`
+- `relaytic aml environment --run-dir <run_dir> --format json`
 - `relaytic assist show --run-dir <run_dir> --format json`
 - `relaytic assist turn --run-dir <run_dir> --message "<message>" --format json`
 - `relaytic predict --run-dir <run_dir> --data-path <new_data.csv> --format json`

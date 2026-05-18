@@ -56,6 +56,34 @@ If you already control the Python interpreter, `python scripts/install_relaytic.
 
 If the human is present at first contact, prefer mission-control chat before forcing a perfect `relaytic run` command. The chat now supports path capture, objective capture, `/state`, `/reset`, and explicit confirmation before run creation.
 
+## Flagship AML Demo Path
+
+When a human or reviewer asks what to try first, use the AML demo path:
+
+```powershell
+relaytic demo aml-review-queue --run-dir artifacts\relaytic_aml_demo --format json
+relaytic mission-control launch --run-dir artifacts\relaytic_aml_demo
+relaytic show --run-dir artifacts\relaytic_aml_demo --format json
+relaytic aml environment --run-dir artifacts\relaytic_aml_demo --format json
+relaytic guide export-context --run-dir artifacts\relaytic_aml_demo --audience external-llm --format json
+```
+
+Inspect these artifacts before making claims:
+
+- `run_summary.json`
+- `aml_demo_bundle_manifest.json`
+- `case_packet.json`
+- `alert_queue_rankings.json`
+- `aml_business_value_report.json`
+- `operational_metric_guard.json`
+- `aml_temporal_benchmark_claim_report.json`
+- `aml_environment_scorecard.json`
+- `aml_benchmark_environment_scorecard.json`
+- `aml_public_claim_guard.json`
+- `benchmark_release_gate.json`
+
+The demo is demo-only. Use [paper_benchmark_runbook.md](../paper_benchmark_runbook.md) for benchmark-family status, blocked-claim conditions, and the reproducibility sequence.
+
 ## What Each Surface Is For
 
 ### `mission-control show`
@@ -93,6 +121,10 @@ Attach an incumbent and force an honest comparison.
 ### `aml temporal`
 
 Inspect AML delayed-label, positive-unlabeled, threshold-drift, time-window, and temporal public-claim gates without raw rows.
+
+### `aml environment`
+
+Inspect AML model-vs-environment scores, workflow task status, unsafe-steering rejection evidence, benchmark-environment readiness, and blockers without raw rows.
 
 ## The Main Operating Pattern
 

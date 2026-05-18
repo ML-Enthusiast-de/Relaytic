@@ -213,8 +213,8 @@ The AML proof path is accepted only after these slices are complete:
 - **15U** added strong AML baselines, capability ablations, adapter fallback reporting, contribution summaries, and benchmark relevance scorecards so graph, temporal, calibration, threshold, and review-budget contributions are measured.
 - **15V** added raw graph and subgraph ingestion, graph provenance, graph claim scope, and public graph benchmark cataloging so public graph AML work is not limited to flattened snapshots.
 - **15W** strengthens delayed-label, positive-unlabeled, threshold-drift, and time-window evaluation.
-- **15X** frames Relaytic runs as evaluation environments with explicit workflow scorecards.
-- **15Y** rewrites first-contact docs around the flagship AML path.
+- **15X** frames Relaytic runs as evaluation environments with explicit workflow scorecards, benchmark-environment readiness, unsafe-steering evidence, and model/environment score separation.
+- **15Y** rewrote first-contact docs around the flagship AML path, including the thesis page, product story, and paper benchmark runbook.
 - **15Z** cleans credibility-damaging repo structure before broader capability growth resumes.
 - **15Z-R** freezes the relevant benchmark and release evidence so public paper/demo claims are tied to reproducible artifacts instead of aspirational roadmap language.
 
@@ -246,7 +246,11 @@ If any of these slices discovers that Relaytic-AML loses, the correct output is 
 - `aml_graph_claim_scope.json`
 - `aml_public_graph_benchmark_catalog.json`
 - `aml_delayed_label_eval_report.json`
+- `aml_eval_environment_manifest.json`
 - `aml_environment_scorecard.json`
+- `aml_workflow_task_matrix.json`
+- `aml_environment_failure_report.json`
+- `aml_benchmark_environment_scorecard.json`
 - `aml_relevant_benchmark_catalog.json`
 - `paper_release_freeze_manifest.json`
 - `paper_benchmark_runbook.md`

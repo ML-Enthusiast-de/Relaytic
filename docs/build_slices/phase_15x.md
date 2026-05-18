@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Intent
 
@@ -59,3 +59,10 @@ This slice should make the public proof story broader than model accuracy: Relay
 - unsafe steering environment regression
 - CLI/MCP parity check for environment score
 - benchmark-environment scorecard regression
+
+## Implementation Notes
+
+- Implemented in `src/relaytic/aml/environment.py`.
+- Exposed through `relaytic aml environment --run-dir <run_dir> --format json`.
+- Run summaries now carry the model-quality score, environment score, workflow-safety score, unsafe-steering status, benchmark-environment status, primary blocker, and recommended next action.
+- The guide artifact shortlist and external context path now surface AML environment scorecards for humans and external agents.

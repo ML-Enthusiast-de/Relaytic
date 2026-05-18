@@ -246,11 +246,25 @@ Avoid introducing new references to:
 - introduced accepted AML temporal artifact boundaries for `aml_delayed_label_eval_report.json`, `aml_positive_unlabeled_posture.json`, `aml_threshold_drift_report.json`, `aml_time_window_scorecard.json`, and `aml_temporal_benchmark_claim_report.json`
 - upgraded benchmark, run-summary, guide, and AML CLI surfaces so time-window evidence stays rowless, delayed-label and PU blockers are visible, sequence-native claims remain shadow-gated, and temporal public claims fail closed under missing delayed outcomes, zero-positive future folds, leakage, or unresolved threshold drift
 
+### Slice 15X
+
+- introduced `src/relaytic/aml/environment.py` for AML evaluation-environment scoring, workflow task matrices, benchmark-environment scorecards, and failure reporting
+- introduced the public command `relaytic aml environment --run-dir <run_dir>` for rebuilding and inspecting model-vs-environment score separation without regenerating upstream evidence
+- introduced accepted AML environment artifact boundaries for `aml_eval_environment_manifest.json`, `aml_environment_scorecard.json`, `aml_workflow_task_matrix.json`, `aml_environment_failure_report.json`, and `aml_benchmark_environment_scorecard.json`
+- upgraded run-summary, guide, and AML CLI surfaces so unsafe steering rejection, benchmark-environment readiness, public-claim discipline, and model/environment disagreement are visible to humans and external agents
+
+### Slice 15Y
+
+- introduced the public documentation contract for the demo-first Relaytic-AML path through `docs/why_relaytic_aml.md`, `docs/product_story.md`, and `docs/paper_benchmark_runbook.md`
+- upgraded `README.md`, `docs/handbooks/relaytic_user_handbook.md`, `docs/handbooks/relaytic_agent_handbook.md`, and `docs/handbooks/relaytic_demo_walkthrough.md` so first contact starts with `relaytic demo aml-review-queue` and the AML proof artifact checklist
+- upgraded `docs/relaytic_ui_frontier_review.md` so mission-control docs distinguish the static fallback, AML investigation board, Agent Console, and later local live UI server
+- no new code package boundary was introduced; Slice 15Y is a public documentation and proof-path boundary
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
-- future productization work should land through bounded slices `15X` through `15Z-R` before the academy work begins, with Slice 15W now serving as the AML temporal weak-label bridge before evaluation-environment and paper-freeze work
-- future AML boundaries should concentrate under `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/graph_fabric/`, `src/relaytic/stream_risk/`, and any focused future AML loader, evaluation-environment, or release-freeze package rather than scattering domain logic across unrelated generic packages
+- future productization work should land through bounded slices `15Z` through `15Z-R` before the academy work begins, with Slice 15Y now serving as the demo-first public documentation bridge before repo credibility cleanup and paper-freeze work
+- future AML boundaries should concentrate under `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/graph_fabric/`, `src/relaytic/stream_risk/`, and any focused future AML loader or release-freeze package rather than scattering domain logic across unrelated generic packages
 - future public AML artifacts should remain additive and must not break the canonical `relaytic` package or CLI surface
 
 ### Slice 09A
@@ -604,7 +618,7 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/modeling/families/`, if introduced during Slice 15H, for first-class family-owned trainers, search spaces, adapter shims, and specialization logic rather than one generic trainer path
 - `src/relaytic/modeling/portfolio/`, if introduced during Slice 15I, for staged family probing, racing, finalist search, pruning, and budget-envelope logic
 - `src/relaytic/temporal/`, if introduced after Slice 15J, for deeper temporal family ownership beyond the currently shipped temporal-engine surfaces in `src/relaytic/analytics/`, `src/relaytic/modeling/`, and `src/relaytic/benchmark/`
-- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader, evaluation-environment, or release-freeze package for the remaining AML productization and paper-freeze track in Slices 15X through 15Z-R
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader or release-freeze package for the remaining AML productization and paper-freeze track in Slices 15Z through 15Z-R
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement after the AML pivot lands
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should avoid creating a new package boundary unless absolutely necessary; its job is to remove misleading, duplicated, or legacy boundaries, split oversized modules, retire compatibility shims when the removal criteria are met, and leave the public surface cleaner than before
@@ -659,6 +673,7 @@ Implemented daemon, feasibility, remote-supervision, and mission-control proof a
 - `aml_environment_scorecard.json`
 - `aml_workflow_task_matrix.json`
 - `aml_environment_failure_report.json`
+- `aml_benchmark_environment_scorecard.json`
 - `pre_academy_repo_audit.json`
 - `module_extraction_plan.json`
 - `daemon_state.json`

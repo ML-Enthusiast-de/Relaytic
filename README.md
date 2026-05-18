@@ -8,6 +8,68 @@ The public product name, package, and CLI stay `Relaytic` / `relaytic` / `relayt
 
 Relaytic is designed around a deterministic floor, specialist-agent reasoning, explicit policy and mandate handling, and artifact-first execution. The system should be able to continue autonomously when non-critical ambiguity remains, while still making its assumptions inspectable.
 
+## Start Here: Relaytic-AML Demo Path
+
+For a first technical review, start with the public-safe AML review-queue demo instead of reading the roadmap first.
+
+Windows PowerShell:
+
+```powershell
+.\scripts\bootstrap.ps1 -Profile full -LaunchControlCenter:$false
+relaytic doctor --expected-profile full --format json
+relaytic demo aml-review-queue --run-dir artifacts\relaytic_aml_demo --format json
+relaytic mission-control launch --run-dir artifacts\relaytic_aml_demo
+```
+
+macOS/Linux:
+
+```bash
+bash ./scripts/bootstrap.sh --profile full --no-launch-control-center
+relaytic doctor --expected-profile full --format json
+relaytic demo aml-review-queue --run-dir artifacts/relaytic_aml_demo --format json
+relaytic mission-control launch --run-dir artifacts/relaytic_aml_demo
+```
+
+After the demo bundle exists, inspect the proof path in this order:
+
+```powershell
+relaytic show --run-dir artifacts\relaytic_aml_demo --format json
+relaytic aml environment --run-dir artifacts\relaytic_aml_demo --format json
+relaytic aml temporal --run-dir artifacts\relaytic_aml_demo --format json
+relaytic guide export-context --run-dir artifacts\relaytic_aml_demo --audience external-llm --format json
+```
+
+The demo is meant to show the product shape: analyst queue, case packet, drift posture, benchmark/public-claim guards, business-value guard, baseline/ablation proof, and model-vs-environment separation. It is not by itself a paper-grade benchmark result.
+
+## What To Inspect
+
+The shortest proof tour is:
+
+- `aml_demo_bundle_manifest.json` for the public-safe demo bundle.
+- `case_packet.json`, `alert_queue_rankings.json`, and `analyst_review_scorecard.json` for analyst workflow value.
+- `aml_business_value_report.json`, `review_capacity_metric_report.json`, and `operational_metric_guard.json` for guarded business-value claims.
+- `aml_baseline_matrix.json`, `aml_ablation_matrix.json`, and `aml_benchmark_relevance_scorecard.json` for baseline and contribution evidence.
+- `aml_temporal_benchmark_claim_report.json` and `aml_time_window_scorecard.json` for delayed-label, weak-label, and temporal claim posture.
+- `aml_environment_scorecard.json`, `aml_workflow_task_matrix.json`, and `aml_benchmark_environment_scorecard.json` for whether Relaytic behaved well as an AML workflow environment, not only as a model scorer.
+- `benchmark_release_gate.json`, `paper_claim_guard_report.json`, and `aml_public_claim_guard.json` for what can be claimed publicly.
+- `trace_model.json`, `agent_eval_matrix.json`, `security_eval_report.json`, and `eval_surface_parity_report.json` when present for trace/eval posture.
+
+## Claim Boundaries
+
+Use these labels when discussing results:
+
+- **Demo-only:** the public-safe fixture proves the product workflow and artifact contract, not real-world AML superiority.
+- **Dev-benchmark:** a benchmark run or proof pack on a visible/dev partition can guide engineering, but cannot support paper-grade claims by itself.
+- **Holdout-benchmark:** a held-out benchmark partition can support stronger evidence if the claim guards, leakage audits, and benchmark-environment score pass.
+- **Paper-ready:** reserved for the later Slice 15Z-R release-freeze pack, where the benchmark catalog, result table, claim-boundary report, reproducibility attestation, environment scorecard, and release-safety scan agree.
+
+More context:
+
+- [Why Relaytic-AML](docs/why_relaytic_aml.md)
+- [Product Story](docs/product_story.md)
+- [Paper Benchmark Runbook](docs/paper_benchmark_runbook.md)
+- [UI Frontier Review](docs/relaytic_ui_frontier_review.md)
+
 ## Current Product Baseline
 
 The repository already supports a working early product baseline:
@@ -71,14 +133,15 @@ The repository already supports a working early product baseline:
 - AML business-value surfaces through `relaytic aml business-value`, with analyst-hour savings, false-positive reduction, review-capacity metrics, incumbent capacity tradeoffs, and an operational guard that blocks model-score overclaims
 - AML baseline and ablation surfaces through `relaytic aml baselines`, with baseline matrices, optional-adapter fallback reporting, no-graph/no-temporal/no-review-budget/no-calibration/no-typology-prior ablations, and supported/proxy/blocked benchmark relevance scorecards
 - AML temporal weak-label surfaces through `relaytic aml temporal`, with delayed-label evaluation, positive-unlabeled posture, threshold-drift reporting, rowless time-window scorecards, and temporal public-claim gates
+- AML evaluation-environment surfaces through `relaytic aml environment`, with model-vs-environment score separation, workflow task matrices, unsafe-steering rejection evidence, benchmark-environment scoring, and failure reports
 - a one-command Relaytic-AML review-queue demo bundle through `relaytic demo aml-review-queue`, with a flow report, business-metric table, artifact index, business-value guard, baseline/ablation proof, and mission-control investigation board
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, and 15W are now implemented. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, and temporal weak-label claim gates on the same local-first artifact path.
+Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, 15W, and 15X are now implemented. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, temporal weak-label claim gates, and AML evaluation-environment scorecards on the same local-first artifact path.
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 15X**, because temporal weak-label claim gates now exist and the next leverage point is evaluating Relaytic as a realistic AML workflow environment, not only as a model-score pipeline.
+The next recommended build is **Slice 15Z**, because the first-contact AML demo path is now documented and the next leverage point is repo credibility cleanup before paper-release freezing.
 
 The initial model-competitiveness path through **Slice 15F** is now landed, and the first performance-recovery foundation slice is now landed too:
 
@@ -101,9 +164,9 @@ The broader **Relaytic Academy** now starts at **Slice 16A**, but only after the
 - **Slice 15T** business-value metrics and analyst-hour proof (implemented)
 - **Slice 15U** strong AML baselines and ablations (implemented)
 - **Slice 15V** raw graph and subgraph ingestion (implemented)
-- **Slice 15W** temporal and weak-label upgrade
-- **Slice 15X** AML evaluation-environment reframe
-- **Slice 15Y** demo-first documentation rewrite
+- **Slice 15W** temporal and weak-label upgrade (implemented)
+- **Slice 15X** AML evaluation-environment reframe (implemented)
+- **Slice 15Y** demo-first documentation rewrite (implemented)
 - **Slice 15Z** pre-Academy repo credibility cleanup
 - **Slice 15Z-R** paper benchmark and release freeze
 
@@ -466,6 +529,7 @@ That flow produces:
 - benchmark artifacts such as `reference_approach_matrix.json`, `benchmark_gap_report.json`, and `benchmark_parity_report.json`
 - AML proof-pack artifacts such as `aml_benchmark_manifest.json`, `aml_holdout_claim_report.json`, `aml_demo_scorecard.json`, `aml_public_claim_guard.json`, and `aml_failure_report.json`
 - AML demo-bundle artifacts such as `aml_demo_bundle_manifest.json`, `aml_demo_business_metric_table.json`, `aml_demo_flow_report.md`, `aml_demo_artifact_index.json`, and `aml_investigation_board.json`
+- AML environment artifacts such as `aml_environment_scorecard.json`, `aml_workflow_task_matrix.json`, `aml_environment_failure_report.json`, and `aml_benchmark_environment_scorecard.json`
 - profile and contract artifacts such as `quality_contract.json`, `quality_gate_report.json`, `budget_contract.json`, `budget_consumption_report.json`, `operator_profile.json`, and `lab_operating_profile.json`
 - completion artifacts such as `completion_decision.json`, `run_state.json`, `stage_timeline.json`, `mandate_evidence_review.json`, `blocking_analysis.json`, and `next_action_queue.json`
 - lifecycle artifacts such as `champion_vs_candidate.json`, `recalibration_decision.json`, `retrain_decision.json`, `promotion_decision.json`, and `rollback_decision.json`

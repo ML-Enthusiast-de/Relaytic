@@ -204,7 +204,8 @@ To reduce timeout risk, future CI should support at least:
 - AML baseline and ablation tests
 - AML raw graph/subgraph loader tests
 - AML delayed-label and threshold-drift tests
-- AML evaluation-environment tests for unsafe steering, incumbent challenge, alert-queue optimization, drift recovery, and public-safe claim generation
+- AML evaluation-environment tests for model/environment score separation, unsafe steering, incumbent challenge, alert-queue optimization, drift recovery, public-safe claim generation, and benchmark-environment readiness
+- AML demo-first documentation tests for README command path, proof-artifact links, handbook demo commands, UI surface distinction, and paper benchmark runbook coverage
 - pre-Academy repo credibility tests for module-size and public-surface inventory changes
 - AML paper/release-freeze tests for relevant benchmark catalog coverage, claim-boundary correctness, reproducibility attestation, and release-freeze rerun behavior
 

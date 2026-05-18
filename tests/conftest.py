@@ -48,6 +48,8 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
                 "tests/test_cli_slice15l.py",
                 "tests/test_cli_slice15v_a.py",
                 "tests/test_cli_slice15w.py",
+                "tests/test_cli_slice15x.py",
+                "tests/test_cli_slice15y.py",
             )
         ):
             item.add_marker(pytest.mark.prepush)

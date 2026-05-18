@@ -34,7 +34,30 @@ relaytic guide ask --run-dir <run_dir> --message "what should I do now?"
 
 The guide tells you where Relaytic is, the best next move, what is blocked, which files matter, what not to claim yet, and how to export safe context for another LLM.
 
+## Relaytic-AML Demo Path
+
+If you are seeing Relaytic for the first time, run the AML review-queue demo before reading the long roadmap:
+
+```powershell
+relaytic demo aml-review-queue --run-dir artifacts\relaytic_aml_demo --format json
+relaytic mission-control launch --run-dir artifacts\relaytic_aml_demo
+relaytic aml environment --run-dir artifacts\relaytic_aml_demo --format json
+```
+
+Look first at:
+
+- `case_packet.json`
+- `alert_queue_rankings.json`
+- `aml_business_value_report.json`
+- `aml_environment_scorecard.json`
+- `aml_benchmark_environment_scorecard.json`
+- `aml_public_claim_guard.json`
+
+This demo is public-safe and workflow-focused. Treat it as demo evidence until a separate benchmark/release-freeze pack says a claim is holdout-backed or paper-ready.
+
 For AML runs with ordered transaction streams, use `relaytic aml temporal --run-dir <run_dir> --format json` when you need to see delayed-label evidence, positive-unlabeled posture, threshold drift, time-window scorecards, and whether temporal public claims are currently allowed.
+
+For AML runs where you want to know whether Relaytic behaved well as a workflow environment, use `relaytic aml environment --run-dir <run_dir> --format json`. It separates model quality from environment readiness and shows unsafe-steering, benchmark-environment, and public-claim blockers.
 
 ## What Relaytic Needs First
 

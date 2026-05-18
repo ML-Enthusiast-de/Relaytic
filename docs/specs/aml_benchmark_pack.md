@@ -140,7 +140,7 @@ The benchmark pack is now part of a broader AML proof/productization sequence. T
 5. **15V**: add raw graph and subgraph ingestion.
 6. **15W**: strengthen temporal and weak-label evaluation.
 7. **15X**: add AML evaluation-environment scorecards.
-8. **15Y**: rewrite first-contact docs around the flagship path.
+8. **15Y**: rewrote first-contact docs around the flagship path and added the paper benchmark runbook.
 9. **15Z**: clean repo credibility risks before capability growth expands.
 10. **15Z-R**: freeze the relevant benchmark and release evidence for paper/demo use.
 
