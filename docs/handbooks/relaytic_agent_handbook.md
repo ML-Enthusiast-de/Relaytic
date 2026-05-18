@@ -29,8 +29,10 @@ Windows PowerShell:
 ```powershell
 .\scripts\bootstrap.ps1 -Profile full -LaunchControlCenter:$false --format json
 relaytic doctor --expected-profile full --format json
+relaytic guide --format json
 relaytic mission-control show --output-dir artifacts\mission_control --format json
 relaytic mission-control chat
+relaytic guide --run-dir artifacts\demo --format json
 relaytic show --run-dir artifacts\demo --format json
 relaytic assist show --run-dir artifacts\demo --format json
 relaytic assist turn --run-dir artifacts\demo --message "what can you do?" --format json
@@ -41,8 +43,10 @@ macOS/Linux:
 ```bash
 bash ./scripts/bootstrap.sh --profile full --no-launch-control-center --format json
 relaytic doctor --expected-profile full --format json
+relaytic guide --format json
 relaytic mission-control show --output-dir artifacts/mission_control --format json
 relaytic mission-control chat
+relaytic guide --run-dir artifacts/demo --format json
 relaytic show --run-dir artifacts/demo --format json
 relaytic assist show --run-dir artifacts/demo --format json
 relaytic assist turn --run-dir artifacts/demo --message "what can you do?" --format json
@@ -57,6 +61,10 @@ If the human is present at first contact, prefer mission-control chat before for
 ### `mission-control show`
 
 Top-level onboarding, capability state, next actions, handbook discovery, and operator-facing truth.
+
+### `guide` / `guide ask` / `guide export-context`
+
+The first fallback when a human or agent is unsure where Relaytic is. It returns current state, best next action, blocking items, safe commands, artifact shortlist, claim boundaries, starter questions, and a redacted external LLM context pack.
 
 ### `mission-control chat`
 

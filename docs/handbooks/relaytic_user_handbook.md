@@ -24,6 +24,16 @@ Relaytic is not meant to be a vague chat shell. Its source of truth is the local
 
 For first-contact UX, Relaytic can also use a lightweight local onboarding helper on the full install profile. That helper is there to understand messy human onboarding messages, not to replace deterministic run control.
 
+If you ever feel lost, use the guide first:
+
+```powershell
+relaytic guide
+relaytic guide --run-dir <run_dir>
+relaytic guide ask --run-dir <run_dir> --message "what should I do now?"
+```
+
+The guide tells you where Relaytic is, the best next move, what is blocked, which files matter, what not to claim yet, and how to export safe context for another LLM.
+
 ## What Relaytic Needs First
 
 Relaytic becomes meaningfully useful after you give it:
@@ -89,6 +99,24 @@ Use this when you want the big picture:
 - what Relaytic thinks should happen next
 - what capabilities are available
 - what is blocked and why
+
+### Guide
+
+`relaytic guide` or `relaytic guide --run-dir <run_dir>`
+
+Use this when you want the shortest answer to:
+
+- where am I?
+- what can I do now?
+- which artifact should I look at?
+- what is blocked?
+- what can I safely give another LLM?
+
+For another LLM or agent, use:
+
+```powershell
+relaytic guide export-context --run-dir <run_dir> --audience external-llm --format json
+```
 
 ### Mission Control Chat
 

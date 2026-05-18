@@ -26,6 +26,10 @@ Relaytic is the local inference-engineering system in this workspace.
 ## Core commands
 
 - `relaytic run --data-path <data.csv> --text "<intent>"`
+- `relaytic guide --format json`
+- `relaytic guide --run-dir <run_dir> --format json`
+- `relaytic guide ask --run-dir <run_dir> --message "<question>" --format json`
+- `relaytic guide export-context --run-dir <run_dir> --audience external-llm --format json`
 - `relaytic show --run-dir <run_dir> --format json`
 - `relaytic status --run-dir <run_dir> --format json`
 - `relaytic assist show --run-dir <run_dir> --format json`
@@ -38,4 +42,5 @@ Relaytic is the local inference-engineering system in this workspace.
 - Keep Relaytic local-first by default.
 - Do not expose `/mcp` publicly without trusted HTTPS and auth controls.
 - Treat `run_summary.json`, `completion_decision.json`, and lifecycle artifacts as the machine-facing source of truth.
+- Use `relaytic guide` first when the user or agent is unsure where the run is, which artifact matters, what action is safe, or what context can be handed to another LLM.
 - Use the assist surface when a human or external agent needs explanations, stage navigation, or safe takeover rather than inventing ad hoc chat behavior.

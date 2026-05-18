@@ -576,6 +576,18 @@ def render_assist_markdown(*args: Any, **kwargs: Any) -> Any:
     return _render_assist_markdown(*args, **kwargs)
 
 
+def run_guide_review(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.guide import run_guide_review as _run_guide_review
+
+    return _run_guide_review(*args, **kwargs)
+
+
+def export_external_context_pack(*args: Any, **kwargs: Any) -> Any:
+    from relaytic.guide import export_external_context_pack as _export_external_context_pack
+
+    return _export_external_context_pack(*args, **kwargs)
+
+
 def render_intelligence_review_markdown(*args: Any, **kwargs: Any) -> Any:
     from relaytic.intelligence import (
         render_intelligence_review_markdown as _render_intelligence_review_markdown,
@@ -2255,6 +2267,84 @@ def build_parser() -> argparse.ArgumentParser:
     assist_chat.add_argument("--config", default=None, help="Optional config/policy source.")
     assist_chat.add_argument("--show-json", action="store_true", help="Print structured JSON payloads after each turn.")
     assist_chat.add_argument("--max-turns", type=int, default=0, help="Optional positive turn cap. 0 means unlimited until /exit.")
+
+    guide_surface = sub.add_parser(
+        "guide",
+        help="Show the no-lost guide: current state, safe next actions, useful artifacts, and external context export.",
+    )
+    guide_surface.add_argument("--run-dir", default=None, help="Optional run directory containing Relaytic artifacts.")
+    guide_surface.add_argument("--output-dir", default=None, help="Optional state directory for onboarding-only guide output.")
+    guide_surface.add_argument("--config", default=None, help="Optional config/policy source.")
+    guide_surface.add_argument(
+        "--use-local-llm",
+        action="store_true",
+        help="Use a configured local LLM only for advisory wording; deterministic actions remain authoritative.",
+    )
+    guide_surface.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+    guide_sub = guide_surface.add_subparsers(dest="guide_command")
+
+    guide_show = guide_sub.add_parser(
+        "show",
+        help="Render the guide for onboarding or an existing run.",
+    )
+    guide_show.add_argument("--run-dir", default=None, help="Optional run directory containing Relaytic artifacts.")
+    guide_show.add_argument("--output-dir", default=None, help="Optional state directory for onboarding-only guide output.")
+    guide_show.add_argument("--config", default=None, help="Optional config/policy source.")
+    guide_show.add_argument(
+        "--use-local-llm",
+        action="store_true",
+        help="Use a configured local LLM only for advisory wording; deterministic actions remain authoritative.",
+    )
+    guide_show.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    guide_ask = guide_sub.add_parser(
+        "ask",
+        help="Ask one question about where Relaytic is, what options exist, or which artifact to inspect.",
+    )
+    guide_ask.add_argument("--run-dir", default=None, help="Optional run directory containing Relaytic artifacts.")
+    guide_ask.add_argument("--output-dir", default=None, help="Optional state directory for onboarding-only guide output.")
+    guide_ask.add_argument("--message", required=True, help="Human or agent question for the guide.")
+    guide_ask.add_argument("--config", default=None, help="Optional config/policy source.")
+    guide_ask.add_argument(
+        "--use-local-llm",
+        action="store_true",
+        help="Use a configured local LLM only for advisory wording; deterministic actions remain authoritative.",
+    )
+    guide_ask.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
+    guide_export = guide_sub.add_parser(
+        "export-context",
+        help="Write a rowless, redacted context pack suitable for another LLM or external agent.",
+    )
+    guide_export.add_argument("--run-dir", required=True, help="Run directory containing Relaytic artifacts.")
+    guide_export.add_argument("--audience", choices=["external-llm"], default="external-llm", help="Context-pack audience.")
+    guide_export.add_argument("--config", default=None, help="Optional config/policy source.")
+    guide_export.add_argument(
+        "--use-local-llm",
+        action="store_true",
+        help="Use a configured local LLM only for advisory wording; deterministic actions remain authoritative.",
+    )
+    guide_export.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     runtime_surface = sub.add_parser(
         "runtime",
@@ -4328,6 +4418,44 @@ def main(argv: list[str] | None = None) -> int:
             )
         parser.error("Unsupported assist subcommand.")
         return 2
+
+    if args.command == "guide":
+        try:
+            if args.guide_command in {None, "show"}:
+                payload = _show_guide_surface(
+                    run_dir=args.run_dir,
+                    output_dir=args.output_dir,
+                    config_path=args.config,
+                    message=None,
+                    use_local_llm=bool(args.use_local_llm),
+                )
+            elif args.guide_command == "ask":
+                payload = _show_guide_surface(
+                    run_dir=args.run_dir,
+                    output_dir=args.output_dir,
+                    config_path=args.config,
+                    message=args.message,
+                    use_local_llm=bool(args.use_local_llm),
+                )
+            elif args.guide_command == "export-context":
+                payload = _export_guide_context_surface(
+                    run_dir=args.run_dir,
+                    audience=args.audience,
+                    config_path=args.config,
+                    use_local_llm=bool(args.use_local_llm),
+                )
+            else:
+                parser.error("Unsupported guide subcommand.")
+                return 2
+        except ValueError as exc:
+            parser.error(str(exc))
+            return 2
+        _emit_structured_surface_output(
+            payload=payload["surface_payload"],
+            human_text=payload["human_output"],
+            output_format=args.format,
+        )
+        return 0
 
     if args.command == "plan":
         if args.plan_command == "show":
@@ -6439,6 +6567,50 @@ def _show_assist_surface(*, run_dir: str | Path, config_path: str | None) -> dic
         },
         "human_output": render_assist_markdown(assist_payload["bundle"]),
     }
+
+
+def _show_guide_surface(
+    *,
+    run_dir: str | Path | None,
+    output_dir: str | Path | None,
+    config_path: str | None,
+    message: str | None,
+    use_local_llm: bool,
+) -> dict[str, Any]:
+    payload = run_guide_review(
+        run_dir=run_dir,
+        output_dir=output_dir,
+        config_path=config_path,
+        message=message,
+        use_local_llm=use_local_llm,
+    )
+    root = Path(run_dir) if run_dir is not None else None
+    state_dir = Path(str(payload["surface_payload"].get("state_dir", "")))
+    if root is not None and root.exists() and _paths_match(root, state_dir):
+        manifest_path = _refresh_guide_manifest(root)
+        payload["surface_payload"]["manifest_path"] = str(manifest_path)
+    return payload
+
+
+def _export_guide_context_surface(
+    *,
+    run_dir: str | Path,
+    audience: str,
+    config_path: str | None,
+    use_local_llm: bool,
+) -> dict[str, Any]:
+    root = Path(run_dir)
+    if not root.exists():
+        raise ValueError(f"Run directory does not exist: {root}")
+    payload = export_external_context_pack(
+        run_dir=root,
+        audience=audience,
+        config_path=config_path,
+        use_local_llm=use_local_llm,
+    )
+    manifest_path = _refresh_guide_manifest(root)
+    payload["surface_payload"]["manifest_path"] = str(manifest_path)
+    return payload
 
 
 def _run_assist_turn(
@@ -12685,7 +12857,31 @@ def _show_completion_status(*, run_dir: str | Path) -> dict[str, Any]:
         raise ValueError(f"Run directory does not exist: {root}")
     completion_bundle = _ensure_completion_present(root)
     if not completion_bundle:
-        raise ValueError(f"No Slice 07 completion artifacts found or materializable in {root}.")
+        guide_payload = _show_guide_surface(
+            run_dir=root,
+            output_dir=None,
+            config_path=None,
+            message="where is this run and what can I do now?",
+            use_local_llm=False,
+        )
+        guide_surface = dict(guide_payload["surface_payload"])
+        return {
+            "surface_payload": {
+                "status": "partial",
+                "run_dir": str(root),
+                "fallback_source": "guide",
+                "reason": "completion_artifacts_unavailable",
+                "message": "Completion-governor artifacts are not available yet, so Relaytic returned the no-lost guide.",
+                "manifest_path": guide_surface.get("manifest_path"),
+                "guide": guide_surface.get("guide"),
+                "bundle": guide_surface.get("bundle"),
+            },
+            "human_output": (
+                "# Relaytic Status\n\n"
+                "Completion-governor artifacts are not available yet, so Relaytic is showing the no-lost guide.\n\n"
+                + str(guide_payload["human_output"]).rstrip()
+            ),
+        }
     summary_materialized = materialize_run_summary(run_dir=root)
     sync_materialization_runtime_artifacts(root)
     manifest_path = _refresh_completion_manifest(root)
@@ -13626,6 +13822,24 @@ def _assist_output_paths(run_dir: Path) -> dict[str, Path]:
         "assistant_connection_guide": run_dir / "assistant_connection_guide.json",
         "assist_turn_log": run_dir / "assist_turn_log.jsonl",
     }
+
+
+def _guide_output_paths(run_dir: Path) -> dict[str, Path]:
+    return {
+        "guide_state": run_dir / "guide_state.json",
+        "guide_action_menu": run_dir / "guide_action_menu.json",
+        "guide_artifact_shortlist": run_dir / "guide_artifact_shortlist.json",
+        "guide_question_starters": run_dir / "guide_question_starters.json",
+        "guide_local_llm_summary": run_dir / "guide_local_llm_summary.json",
+        "external_llm_context_pack": run_dir / "external_llm_context_pack.json",
+        "external_llm_context_pack_md": run_dir / "external_llm_context_pack.md",
+        "external_llm_artifact_index": run_dir / "external_llm_artifact_index.json",
+        "external_llm_redaction_report": run_dir / "external_llm_redaction_report.json",
+    }
+
+
+def _paths_match(left: Path, right: Path) -> bool:
+    return left.resolve(strict=False) == right.resolve(strict=False)
 
 
 def _mission_control_output_paths(run_dir: Path) -> dict[str, Path]:
@@ -14722,6 +14936,64 @@ def _refresh_assist_manifest(
                     run_dir=root,
                     kind="assist",
                     required=key != "assist_turn_log",
+                )
+            )
+    deduped_entries: list[Any] = []
+    seen_paths: set[str] = set()
+    for entry in entries:
+        if entry.path in seen_paths:
+            continue
+        seen_paths.add(entry.path)
+        deduped_entries.append(entry)
+    return write_manifest(
+        run_dir=root,
+        run_id=run_id or existing.get("run_id"),
+        policy_source=policy_source or existing.get("policy_source"),
+        labels=merged_labels,
+        entries=deduped_entries,
+    )
+
+
+def _refresh_guide_manifest(
+    run_dir: str | Path,
+    *,
+    run_id: str | None = None,
+    policy_source: str | Path | None = None,
+    labels: dict[str, str] | None = None,
+) -> Path:
+    root = Path(run_dir)
+    _refresh_access_manifest(
+        root,
+        run_id=run_id,
+        policy_source=policy_source,
+        labels=labels,
+    )
+    existing = _read_existing_manifest_metadata(root)
+    merged_labels = dict(existing.get("labels", {}))
+    merged_labels.update(labels or {})
+    entries = []
+    for item in existing.get("entries", []):
+        if not isinstance(item, dict):
+            continue
+        path = str(item.get("path", "")).strip()
+        if not path:
+            continue
+        entries.append(
+            artifact_entry(
+                path,
+                run_dir=root,
+                kind=str(item.get("kind", "artifact") or "artifact"),
+                required=bool(item.get("required", False)),
+            )
+        )
+    for key, path in _guide_output_paths(root).items():
+        if path.exists():
+            entries.append(
+                artifact_entry(
+                    path.name,
+                    run_dir=root,
+                    kind="guide",
+                    required=key.startswith("guide_"),
                 )
             )
     deduped_entries: list[Any] = []
