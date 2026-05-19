@@ -1,0 +1,30 @@
+{
+  "acceptance_status": {
+    "claim_boundaries_complete": true,
+    "release_attention_pack_safe": true,
+    "relevant_catalog_coverage": {
+      "all_labels_allowed": true,
+      "generic_supporting_structured_data": true,
+      "graph_aml": true,
+      "subgraph_or_synthetic_bank_graph": true,
+      "transaction_fraud_temporal": true
+    },
+    "reproducibility_attestation_complete": true,
+    "rerun_contract_present": true,
+    "result_table_multidimensional": true
+  },
+  "artifact_paths": {
+    "aml_relevant_benchmark_catalog": "docs/reports/aml_relevant_benchmark_catalog.json",
+    "paper_benchmark_runbook": "docs/reports/paper_benchmark_runbook.md",
+    "paper_claim_boundary_report": "docs/reports/paper_claim_boundary_report.json",
+    "paper_release_freeze_manifest": "docs/reports/paper_release_freeze_manifest.json",
+    "paper_result_table": "docs/reports/paper_result_table.json",
+    "release_attention_pack_manifest": "docs/reports/release_attention_pack_manifest.json",
+    "reproducibility_attestation": "docs/reports/reproducibility_attestation.json"
+  },
+  "hard_performance_claims_allowed": false,
+  "release_posture": "safe_for_attention_without_hard_performance_claims",
+  "schema_version": "relaytic.paper_release_freeze.v1",
+  "slice": "15Z-R",
+  "status": "frozen_supporting_release_pack"
+}

@@ -260,10 +260,26 @@ Avoid introducing new references to:
 - upgraded `docs/relaytic_ui_frontier_review.md` so mission-control docs distinguish the static fallback, AML investigation board, Agent Console, and later local live UI server
 - no new code package boundary was introduced; Slice 15Y is a public documentation and proof-path boundary
 
+### Slice 15Z
+
+- introduced `src/relaytic/ui/aml_environment.py` as the focused UI helper boundary for `relaytic aml environment` execution, artifact summary shaping, and run-summary refresh behavior previously embedded in the oversized CLI module
+- introduced `src/relaytic/release_safety/repo_credibility.py` for deterministic pre-Academy repo credibility reports
+- introduced repo-level report artifacts under `docs/reports/`: `pre_academy_repo_audit.json`, `module_extraction_plan.json`, `public_surface_inventory.json`, `module_split_report.json`, and `benchmark_surface_cleanup_report.json`
+- preserved the public `relaytic aml environment` command while documenting retained oversized modules and the next extraction boundaries
+- future Slice 15Z-R paper-freeze work should consume the public-surface inventory and benchmark cleanup debt report rather than rediscovering repo credibility risks from scratch
+
+### Slice 15Z-R
+
+- introduced `src/relaytic/release_safety/paper_freeze.py` for deterministic paper/release freeze pack generation
+- introduced the public command `relaytic release-safety paper-freeze` for regenerating the freeze pack locally
+- introduced repo-level release-freeze artifacts under `docs/reports/`: `paper_release_freeze_manifest.json`, `aml_relevant_benchmark_catalog.json`, `paper_benchmark_runbook.md`, `paper_result_table.json`, `paper_claim_boundary_report.json`, `reproducibility_attestation.json`, and `release_attention_pack_manifest.json`
+- froze PaySim-style, flattened Elliptic-style, subgraph/synthetic-bank graph, and generic supporting tracks with explicit `dev`, `proxy`, or `blocked` posture rather than hard public AML superiority claims
+- future academy work should consume the release-freeze pack as the public-claim boundary before adding capability-growth surfaces
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
-- future productization work should land through bounded slices `15Z` through `15Z-R` before the academy work begins, with Slice 15Y now serving as the demo-first public documentation bridge before repo credibility cleanup and paper-freeze work
+- the AML productization and paper-freeze bridge is now landed through Slice 15Z-R; future capability-academy work starts from Slice 16A
 - future AML boundaries should concentrate under `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/graph_fabric/`, `src/relaytic/stream_risk/`, and any focused future AML loader or release-freeze package rather than scattering domain logic across unrelated generic packages
 - future public AML artifacts should remain additive and must not break the canonical `relaytic` package or CLI surface
 
@@ -618,7 +634,7 @@ The following boundaries are reserved for the next frontier slices so later impl
 - `src/relaytic/modeling/families/`, if introduced during Slice 15H, for first-class family-owned trainers, search spaces, adapter shims, and specialization logic rather than one generic trainer path
 - `src/relaytic/modeling/portfolio/`, if introduced during Slice 15I, for staged family probing, racing, finalist search, pruning, and budget-envelope logic
 - `src/relaytic/temporal/`, if introduced after Slice 15J, for deeper temporal family ownership beyond the currently shipped temporal-engine surfaces in `src/relaytic/analytics/`, `src/relaytic/modeling/`, and `src/relaytic/benchmark/`
-- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader or release-freeze package for the remaining AML productization and paper-freeze track in Slices 15Z through 15Z-R
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/graph_fabric/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, and any focused future AML loader or release-freeze package for the remaining AML paper-freeze track in Slice 15Z-R
 - `src/relaytic/capability_academy/` for Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, and non-core specialist recruitment or retirement after the AML pivot lands
 - `src/relaytic/representation/` for Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
 - Slice 18 should avoid creating a new package boundary unless absolutely necessary; its job is to remove misleading, duplicated, or legacy boundaries, split oversized modules, retire compatibility shims when the removal criteria are met, and leave the public surface cleaner than before

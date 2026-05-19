@@ -1,0 +1,154 @@
+{
+  "benchmark_and_public_claim_commands": [
+    {
+      "claim_posture": "claim_gated",
+      "command": "relaytic benchmark run",
+      "compatibility_only_legacy_surface": false,
+      "family": "benchmark",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "paper_evidence_builder"
+    },
+    {
+      "claim_posture": "claim_gated",
+      "command": "relaytic benchmark show",
+      "compatibility_only_legacy_surface": false,
+      "family": "benchmark",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "paper_evidence_reader"
+    },
+    {
+      "claim_posture": "demo_only",
+      "command": "relaytic demo aml-review-queue",
+      "compatibility_only_legacy_surface": false,
+      "family": "demo",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "first_contact_aml_demo"
+    },
+    {
+      "claim_posture": "supporting_evidence",
+      "command": "relaytic aml graph-loader",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "graph_workload_ingestion"
+    },
+    {
+      "claim_posture": "guarded_metric",
+      "command": "relaytic aml business-value",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "operational_metric_builder"
+    },
+    {
+      "claim_posture": "claim_gated",
+      "command": "relaytic aml baselines",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "baseline_and_ablation_builder"
+    },
+    {
+      "claim_posture": "supporting_or_blocked",
+      "command": "relaytic aml temporal",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "temporal_weak_label_gate"
+    },
+    {
+      "claim_posture": "claim_gated",
+      "command": "relaytic aml environment",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "model_environment_separation"
+    },
+    {
+      "claim_posture": "release_gate",
+      "command": "relaytic release-safety scan",
+      "compatibility_only_legacy_surface": false,
+      "family": "release_safety",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "leak_and_release_gate"
+    },
+    {
+      "claim_posture": "claim_boundary_freeze",
+      "command": "relaytic release-safety paper-freeze",
+      "compatibility_only_legacy_surface": false,
+      "family": "release_safety",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "paper_release_freeze_builder"
+    },
+    {
+      "claim_posture": "auditability",
+      "command": "relaytic trace show",
+      "compatibility_only_legacy_surface": false,
+      "family": "trace",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "trace_identity_reader"
+    },
+    {
+      "claim_posture": "auditability",
+      "command": "relaytic evals run",
+      "compatibility_only_legacy_surface": false,
+      "family": "evals",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "surface_parity_check"
+    }
+  ],
+  "retained_cleanup_debt": [
+    {
+      "debt_id": "paper_freeze_not_yet_materialized",
+      "next_action": "Build the paper/release benchmark pack in Slice 15Z-R from this public-surface inventory.",
+      "paper_reproduction_impact": "Medium until Slice 15Z-R writes a frozen benchmark result table and reproducibility attestation.",
+      "status": "retained_for_slice_15z_r"
+    },
+    {
+      "debt_id": "benchmark_agents_still_oversized",
+      "next_action": "Move paper-freeze pack assembly and benchmark-family adapters into focused modules during Slice 15Z-R.",
+      "paper_reproduction_impact": "Low for current behavior, medium for reviewer code-reading speed.",
+      "status": "documented_boundary"
+    },
+    {
+      "debt_id": "cli_entrypoint_still_oversized",
+      "line_count_after_split": 20820,
+      "next_action": "Continue extracting command-family helpers and manifest refresh chains into focused UI modules while retaining parser and top-level dispatch ownership.",
+      "paper_reproduction_impact": "Low for command behavior because the AML environment path has regression coverage.",
+      "status": "partially_reduced"
+    },
+    {
+      "debt_id": "optional_dependency_profile_needs_freeze",
+      "next_action": "Record install profile, Python versions, dataset access notes, and exact benchmark command sequence in Slice 15Z-R.",
+      "paper_reproduction_impact": "Medium until exact paper commands name the `.[full]` dependency profile and Python version.",
+      "status": "retained_for_release_freeze"
+    }
+  ],
+  "schema_version": "relaytic.repo_credibility.v1",
+  "slice": "15Z",
+  "stale_public_surface_language_detected": false
+}

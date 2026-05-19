@@ -1,0 +1,23 @@
+{
+  "retained_source_boundary": "Continue extracting command-family helpers and manifest refresh chains into focused UI modules while retaining parser and top-level dispatch ownership.",
+  "schema_version": "relaytic.repo_credibility.v1",
+  "slice": "15Z",
+  "split_modules": [
+    {
+      "extracted_module": "src/relaytic/ui/aml_environment.py",
+      "extracted_module_lines": 182,
+      "extracted_responsibility": "AML environment CLI surface execution, summary shaping, and run-summary refresh.",
+      "public_behavior_preserved": true,
+      "public_commands_preserved": [
+        "relaytic aml environment"
+      ],
+      "regression_tests": [
+        "tests/test_cli_slice15x.py::test_cli_slice15x_materializes_aml_environment_scorecards",
+        "tests/test_cli_slice15z.py::test_slice15z_import_boundary_smoke",
+        "tests/test_cli_slice15z.py::test_slice15z_public_surface_inventory_is_clean"
+      ],
+      "source_module": "src/relaytic/ui/cli.py",
+      "source_module_lines_after_split": 20820
+    }
+  ]
+}

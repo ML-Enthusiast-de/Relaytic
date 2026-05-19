@@ -1,0 +1,121 @@
+{
+  "commands": [
+    {
+      "command": "python -m pip install -e \".[full]\"",
+      "command_id": "install_full_profile",
+      "output_artifacts": [],
+      "purpose": "Install the same full dependency profile used by CI."
+    },
+    {
+      "command": "relaytic release-safety paper-freeze --format json",
+      "command_id": "generate_release_freeze_pack",
+      "output_artifacts": [
+        "paper_release_freeze_manifest.json",
+        "aml_relevant_benchmark_catalog.json",
+        "paper_benchmark_runbook.md",
+        "paper_result_table.json",
+        "paper_claim_boundary_report.json",
+        "reproducibility_attestation.json",
+        "release_attention_pack_manifest.json"
+      ],
+      "purpose": "Regenerate the machine-readable paper/release freeze artifacts."
+    },
+    {
+      "command": "relaytic release-safety scan --format json",
+      "command_id": "run_release_safety_scan",
+      "output_artifacts": [
+        "release_safety_scan.json"
+      ],
+      "purpose": "Verify release-safety posture before public use."
+    },
+    {
+      "command": "relaytic demo aml-review-queue --run-dir artifacts/relaytic_aml_demo --format json",
+      "command_id": "run_aml_demo_path",
+      "output_artifacts": [
+        "aml_demo_bundle_manifest.json",
+        "aml_investigation_board.json"
+      ],
+      "purpose": "Regenerate the public-safe demo path that anchors the product story."
+    },
+    {
+      "command": "relaytic aml environment --run-dir artifacts/relaytic_aml_demo --format json",
+      "command_id": "run_aml_environment_gate",
+      "output_artifacts": [
+        "aml_environment_scorecard.json",
+        "aml_benchmark_environment_scorecard.json"
+      ],
+      "purpose": "Regenerate model/environment score separation and benchmark-environment posture."
+    }
+  ],
+  "dataset_source_posture": [
+    {
+      "hard_claim_allowed": false,
+      "label": "proxy",
+      "source_posture": "public_synthetic_schema_or_local_equivalent",
+      "track_id": "paysim_temporal_transaction_fraud"
+    },
+    {
+      "hard_claim_allowed": false,
+      "label": "proxy",
+      "source_posture": "flattened_public_graph_snapshot_or_local_equivalent",
+      "track_id": "elliptic_flattened_graph_aml"
+    },
+    {
+      "hard_claim_allowed": false,
+      "label": "blocked",
+      "source_posture": "not_yet_frozen_for_local_release_profile",
+      "track_id": "elliptic2_subgraph_aml"
+    },
+    {
+      "hard_claim_allowed": false,
+      "label": "blocked",
+      "source_posture": "generator_not_yet_frozen_in_release_profile",
+      "track_id": "amlsim_synthetic_bank_graph"
+    },
+    {
+      "hard_claim_allowed": false,
+      "label": "dev",
+      "source_posture": "bundled_or_public_structured_data_fixture",
+      "track_id": "generic_structured_supporting_pack"
+    }
+  ],
+  "host_assumptions": {
+    "cpu_safe_profile": true,
+    "network_required_for_freeze_command": false,
+    "optional_adapters_must_not_pollute_json_stdout": true,
+    "tokens_or_api_keys_required": false
+  },
+  "install_profile": {
+    "ci_workflow": ".github/workflows/ci.yml",
+    "dependency_profile": ".[full]",
+    "local_first_required": true,
+    "python_versions": [
+      "3.10",
+      "3.11"
+    ]
+  },
+  "release_safety_scan_state": {
+    "clean_state_required": true,
+    "command": "relaytic release-safety scan --format json",
+    "required_before_public_use": true
+  },
+  "rerun_policy": {
+    "clean_local_rerun_command": "relaytic release-safety paper-freeze --format json",
+    "deterministic_blocked_rerun_reasons": [
+      "dataset_unavailable_or_license_unclear",
+      "loader_not_supported_for_track",
+      "holdout_partition_not_frozen",
+      "claim_gate_or_environment_gate_failed",
+      "release_safety_scan_not_clean"
+    ],
+    "reproduces_report_table_or_blocks": true
+  },
+  "runtime_budget": {
+    "prepush_profile": "can_be_long_when_optional_model_adapters_are_installed",
+    "release_freeze_pack": "seconds",
+    "targeted_slice_tests": "under_two_minutes"
+  },
+  "schema_version": "relaytic.paper_release_freeze.v1",
+  "slice": "15Z-R",
+  "status": "rerunnable_with_blocked_claim_fallbacks"
+}

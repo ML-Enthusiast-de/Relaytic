@@ -323,8 +323,8 @@ Why:
 - Slice 15W is now implemented and adds delayed-label, positive-unlabeled, threshold-drift, and time-window proof before production-shaped temporal claims expand
 - Slice 15X is now implemented and reframes Relaytic runs as evaluation environments with scorecards for messy task detection, unsafe steering rejection, incumbent challenge, alert-queue optimization, drift recovery, public-safe claims, benchmark-environment readiness, and model/environment score separation
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
-- Slice 15Z should clean credibility-damaging repo structure, especially oversized modules, before Academy work increases surface area again
-- Slice 15Z-R should freeze the relevant benchmark and release evidence so public paper/demo claims are reproducible, claim-gated, and tied to PaySim-style, Elliptic-style, Elliptic2/subgraph or AMLSim-style, and generic supporting benchmark families instead of one easy dataset
+- Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
+- Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -337,8 +337,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Y. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, and Slice 15Y demo-first public documentation.
-- next execution target: Slice 15Z
+- implemented baseline: Slice 00 through Slice 15Z-R. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, and Slice 15Z-R paper/release freeze.
+- next execution target: Slice 16A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -347,7 +347,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on after the AML productization and paper-freeze track: Slice 16A, after Slices 15Z through 15Z-R
+- next planned academy follow-on: Slice 16A
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3343,6 +3343,13 @@ Minimum proof:
 - public CLI and import-boundary smoke tests still pass
 - benchmark/demo/public-claim commands are inventoried without stale prototype language
 
+Implemented by:
+
+- extracting AML environment CLI execution helpers into `src/relaytic/ui/aml_environment.py`
+- adding `src/relaytic/release_safety/repo_credibility.py`
+- materializing `docs/reports/pre_academy_repo_audit.json`, `docs/reports/module_extraction_plan.json`, `docs/reports/public_surface_inventory.json`, `docs/reports/module_split_report.json`, and `docs/reports/benchmark_surface_cleanup_report.json`
+- adding `tests/test_cli_slice15z.py` coverage for module split evidence, retained extraction boundaries, import-boundary smoke, and public-surface hygiene
+
 ## Slice 15Z-R - Paper benchmark and release freeze
 
 Goal:
@@ -3383,6 +3390,13 @@ Minimum proof:
 - the benchmark catalog includes at least one transaction-fraud temporal track, one graph AML track, one subgraph or synthetic-bank-graph AML track, and one generic supporting structured-data track, each labeled as `dev`, `holdout`, `paper`, `proxy`, or `blocked`
 - every public-facing claim cites the exact artifact path and is labeled hard, supporting-only, or blocked
 - a clean local rerun regenerates the release-freeze manifest or emits a deterministic blocked-rerun reason
+
+Implemented by:
+
+- adding `src/relaytic/release_safety/paper_freeze.py`
+- adding the public command `relaytic release-safety paper-freeze`
+- materializing `docs/reports/paper_release_freeze_manifest.json`, `docs/reports/aml_relevant_benchmark_catalog.json`, `docs/reports/paper_benchmark_runbook.md`, `docs/reports/paper_result_table.json`, `docs/reports/paper_claim_boundary_report.json`, `docs/reports/reproducibility_attestation.json`, and `docs/reports/release_attention_pack_manifest.json`
+- adding `tests/test_cli_slice15zr.py` coverage for catalog coverage, multidimensional result rows, claim boundaries, reproducibility attestation, and command rerun smoke
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

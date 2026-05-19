@@ -137,12 +137,12 @@ The benchmark pack is now part of a broader AML proof/productization sequence. T
 2. **15S**: created the public-safe flagship AML demo bundle.
 3. **15T**: added operational business-value metrics, analyst-hour proof, and guarded overclaim blocking.
 4. **15U**: added strong AML baselines, ablations, adapter fallback reporting, contribution summaries, and benchmark relevance scorecards.
-5. **15V**: add raw graph and subgraph ingestion.
-6. **15W**: strengthen temporal and weak-label evaluation.
-7. **15X**: add AML evaluation-environment scorecards.
+5. **15V**: added raw graph and subgraph ingestion.
+6. **15W**: strengthened temporal and weak-label evaluation.
+7. **15X**: added AML evaluation-environment scorecards.
 8. **15Y**: rewrote first-contact docs around the flagship path and added the paper benchmark runbook.
-9. **15Z**: clean repo credibility risks before capability growth expands.
-10. **15Z-R**: freeze the relevant benchmark and release evidence for paper/demo use.
+9. **15Z**: cleaned repo credibility risks with module-split evidence, public-surface inventory, and retained benchmark cleanup debt.
+10. **15Z-R**: froze the relevant benchmark and release evidence with a rerunnable paper-freeze command, claim boundaries, reproducibility attestation, and hard-performance-claim blocking.
 
 Benchmark success must stay separated from:
 

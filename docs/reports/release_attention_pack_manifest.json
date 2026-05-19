@@ -1,0 +1,27 @@
+{
+  "allowed_outreach_claims": [
+    "claim_release_freeze_pack_exists",
+    "claim_paysim_temporal_transaction_fraud",
+    "claim_elliptic_flattened_graph_aml",
+    "claim_generic_structured_supporting_pack"
+  ],
+  "benchmark_track_count": 5,
+  "blocked_outreach_claims": [
+    "claim_sota_or_hard_aml_superiority",
+    "claim_subgraph_or_synthetic_bank_graph"
+  ],
+  "hard_performance_claims_allowed": false,
+  "primary_attention_angle": "Relaytic-AML is a local-first AML investigation system with explicit benchmark relevance, environment scoring, operational-value gates, and blocked-claim discipline.",
+  "safe_public_assets": [
+    "README.md",
+    "docs/why_relaytic_aml.md",
+    "docs/product_story.md",
+    "docs/paper_benchmark_runbook.md",
+    "docs/reports/paper_release_freeze_manifest.json",
+    "docs/reports/paper_claim_boundary_report.json",
+    "docs/reports/reproducibility_attestation.json"
+  ],
+  "schema_version": "relaytic.paper_release_freeze.v1",
+  "slice": "15Z-R",
+  "status": "safe_attention_pack_ready"
+}

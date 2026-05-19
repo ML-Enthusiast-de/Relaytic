@@ -2,7 +2,17 @@
 
 This runbook defines the public benchmark path reviewers should expect before Relaytic-AML makes paper-facing claims.
 
-The current public-safe AML review-queue demo is demo-only. The paper-ready path is reserved for the later release-freeze pack, but this document names the benchmark families, artifacts, blocked-claim conditions, and reproducibility sequence now so the next slices have a stable target.
+The current public-safe AML review-queue demo is demo-only. Slice 15Z-R now emits the release-freeze pack, and hard AML performance claims remain blocked until a true paper/holdout track has numeric evidence, passing environment scorecards, passing claim gates, and clean release safety.
+
+Generated freeze artifacts live under `docs/reports/`:
+
+- `paper_release_freeze_manifest.json`
+- `aml_relevant_benchmark_catalog.json`
+- `paper_benchmark_runbook.md`
+- `paper_result_table.json`
+- `paper_claim_boundary_report.json`
+- `reproducibility_attestation.json`
+- `release_attention_pack_manifest.json`
 
 ## Benchmark Families
 
@@ -53,6 +63,7 @@ relaytic aml environment --run-dir artifacts\aml_benchmark_run --format json
 Release hygiene before public use:
 
 ```powershell
+relaytic release-safety paper-freeze --format json
 relaytic release-safety scan --format json
 relaytic doctor --expected-profile full --format json
 ```
@@ -115,4 +126,4 @@ For any paper-facing table, record:
 - release-safety scan result
 - claim-boundary artifact paths
 
-Slice 15Z-R will turn this runbook into machine-readable freeze artifacts. Until then, this runbook is the human and agent contract for what the benchmark pack must prove.
+Slice 15Z-R turned this runbook into machine-readable freeze artifacts. Treat `docs/reports/paper_claim_boundary_report.json` and `docs/reports/reproducibility_attestation.json` as the public-claim and rerun truth before publishing paper-facing language.

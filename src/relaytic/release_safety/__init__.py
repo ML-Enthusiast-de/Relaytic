@@ -33,6 +33,21 @@ from .models import (
     SensitiveStringAuditArtifact,
     SourceMapAuditArtifact,
 )
+from .paper_freeze import (
+    PAPER_FREEZE_FILENAMES,
+    PAPER_FREEZE_REPORT_DIR,
+    PAPER_FREEZE_SCHEMA_VERSION,
+    build_paper_freeze_pack,
+    render_paper_freeze_markdown,
+    sync_paper_freeze_pack,
+)
+from .repo_credibility import (
+    REPO_CREDIBILITY_FILENAMES,
+    REPO_CREDIBILITY_REPORT_DIR,
+    REPO_CREDIBILITY_SCHEMA_VERSION,
+    build_repo_credibility_reports,
+    sync_repo_credibility_reports,
+)
 from .storage import RELEASE_SAFETY_FILENAMES, read_release_safety_bundle, write_release_safety_bundle
 
 __all__ = [
@@ -42,10 +57,16 @@ __all__ = [
     "DISTRIBUTION_MANIFEST_SCHEMA_VERSION",
     "LATEST_RELEASE_SAFETY_STATE_DIR",
     "PACKAGING_REGRESSION_REPORT_SCHEMA_VERSION",
+    "PAPER_FREEZE_FILENAMES",
+    "PAPER_FREEZE_REPORT_DIR",
+    "PAPER_FREEZE_SCHEMA_VERSION",
     "RELEASE_BUNDLE_REPORT_SCHEMA_VERSION",
     "RELEASE_SAFETY_CONTROLS_SCHEMA_VERSION",
     "RELEASE_SAFETY_FILENAMES",
     "RELEASE_SAFETY_SCAN_SCHEMA_VERSION",
+    "REPO_CREDIBILITY_FILENAMES",
+    "REPO_CREDIBILITY_REPORT_DIR",
+    "REPO_CREDIBILITY_SCHEMA_VERSION",
     "SENSITIVE_STRING_AUDIT_SCHEMA_VERSION",
     "SOURCE_MAP_AUDIT_SCHEMA_VERSION",
     "ArtifactAttestationArtifact",
@@ -62,10 +83,15 @@ __all__ = [
     "SensitiveStringAuditArtifact",
     "SourceMapAuditArtifact",
     "build_release_safety_controls_from_policy",
+    "build_paper_freeze_pack",
+    "build_repo_credibility_reports",
     "default_release_safety_state_dir",
     "latest_release_safety_state_dir",
     "read_release_safety_bundle",
+    "render_paper_freeze_markdown",
     "render_release_safety_markdown",
     "run_release_safety_scan",
+    "sync_paper_freeze_pack",
+    "sync_repo_credibility_reports",
     "write_release_safety_bundle",
 ]

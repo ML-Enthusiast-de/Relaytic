@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Intent
 
@@ -56,3 +56,10 @@ This slice should leave the repository clean enough that a benchmark reviewer ca
 - import-boundary smoke test
 - targeted public CLI regression
 - benchmark surface inventory regression
+
+## Implementation Notes
+
+- extracted the `relaytic aml environment` execution helpers from the oversized CLI into `src/relaytic/ui/aml_environment.py` while preserving the public command surface
+- added `src/relaytic/release_safety/repo_credibility.py` to build deterministic pre-Academy repo credibility reports
+- materialized the required machine-readable reports under `docs/reports/`
+- added Slice 15Z regression coverage for report presence, import-boundary smoke, public-surface inventory hygiene, module-split evidence, and retained benchmark cleanup debt

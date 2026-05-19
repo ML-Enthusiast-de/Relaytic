@@ -1,0 +1,194 @@
+{
+  "metric_columns_required_for_hard_claim": [
+    "model_metrics",
+    "operational_metrics",
+    "ablation_posture",
+    "environment_score",
+    "public_claim_status"
+  ],
+  "rows": [
+    {
+      "ablation_posture": {
+        "source_artifact": "aml_ablation_matrix.json",
+        "status": "required_for_aml_claim"
+      },
+      "claim_boundary_ref": "paper_claim_boundary_report.json#claim_paysim_temporal_transaction_fraud",
+      "environment_score": {
+        "source_artifact": "aml_environment_scorecard.json",
+        "status": "required_pass_for_public_claim",
+        "value": null
+      },
+      "model_metrics": {
+        "metric_state": "not_frozen_as_numeric_public_result",
+        "pr_auc": null,
+        "precision_at_k": null,
+        "primary_metric": "pr_auc",
+        "recall_at_review_budget": null,
+        "source_artifact": "benchmark_release_gate.json"
+      },
+      "operational_metrics": {
+        "analyst_hour_savings": null,
+        "false_positive_reduction": null,
+        "metric_state": "required_for_hard_claim",
+        "review_capacity_metric": null,
+        "source_artifacts": [
+          "review_capacity_metric_report.json",
+          "aml_business_value_report.json",
+          "operational_metric_guard.json"
+        ]
+      },
+      "public_claim_status": "supporting-only",
+      "result_state": "numeric_holdout_rerun_required",
+      "track_id": "paysim_temporal_transaction_fraud",
+      "track_label": "proxy",
+      "track_type": "transaction_fraud_temporal"
+    },
+    {
+      "ablation_posture": {
+        "source_artifact": "aml_ablation_matrix.json",
+        "status": "required_for_aml_claim"
+      },
+      "claim_boundary_ref": "paper_claim_boundary_report.json#claim_elliptic_flattened_graph_aml",
+      "environment_score": {
+        "source_artifact": "aml_environment_scorecard.json",
+        "status": "required_pass_for_public_claim",
+        "value": null
+      },
+      "model_metrics": {
+        "metric_state": "not_frozen_as_numeric_public_result",
+        "pr_auc": null,
+        "precision_at_k": null,
+        "primary_metric": "pr_auc",
+        "recall_at_review_budget": null,
+        "source_artifact": "benchmark_release_gate.json"
+      },
+      "operational_metrics": {
+        "analyst_hour_savings": null,
+        "false_positive_reduction": null,
+        "metric_state": "required_for_hard_claim",
+        "review_capacity_metric": null,
+        "source_artifacts": [
+          "review_capacity_metric_report.json",
+          "aml_business_value_report.json",
+          "operational_metric_guard.json"
+        ]
+      },
+      "public_claim_status": "supporting-only",
+      "result_state": "numeric_holdout_rerun_required",
+      "track_id": "elliptic_flattened_graph_aml",
+      "track_label": "proxy",
+      "track_type": "graph_aml"
+    },
+    {
+      "ablation_posture": {
+        "source_artifact": "aml_ablation_matrix.json",
+        "status": "blocked_until_track_available"
+      },
+      "claim_boundary_ref": "paper_claim_boundary_report.json#claim_subgraph_or_synthetic_bank_graph",
+      "environment_score": {
+        "source_artifact": "aml_environment_scorecard.json",
+        "status": "required_pass_for_public_claim",
+        "value": null
+      },
+      "model_metrics": {
+        "metric_state": "not_frozen_as_numeric_public_result",
+        "pr_auc": null,
+        "precision_at_k": null,
+        "primary_metric": "pr_auc",
+        "recall_at_review_budget": null,
+        "source_artifact": "benchmark_release_gate.json"
+      },
+      "operational_metrics": {
+        "analyst_hour_savings": null,
+        "false_positive_reduction": null,
+        "metric_state": "required_for_hard_claim",
+        "review_capacity_metric": null,
+        "source_artifacts": [
+          "review_capacity_metric_report.json",
+          "aml_business_value_report.json",
+          "operational_metric_guard.json"
+        ]
+      },
+      "public_claim_status": "blocked",
+      "result_state": "blocked_rerun_reason_recorded",
+      "track_id": "elliptic2_subgraph_aml",
+      "track_label": "blocked",
+      "track_type": "subgraph_aml"
+    },
+    {
+      "ablation_posture": {
+        "source_artifact": "aml_ablation_matrix.json",
+        "status": "blocked_until_track_available"
+      },
+      "claim_boundary_ref": "paper_claim_boundary_report.json#claim_subgraph_or_synthetic_bank_graph",
+      "environment_score": {
+        "source_artifact": "aml_environment_scorecard.json",
+        "status": "required_pass_for_public_claim",
+        "value": null
+      },
+      "model_metrics": {
+        "metric_state": "not_frozen_as_numeric_public_result",
+        "pr_auc": null,
+        "precision_at_k": null,
+        "primary_metric": "pr_auc",
+        "recall_at_review_budget": null,
+        "source_artifact": "benchmark_release_gate.json"
+      },
+      "operational_metrics": {
+        "analyst_hour_savings": null,
+        "false_positive_reduction": null,
+        "metric_state": "required_for_hard_claim",
+        "review_capacity_metric": null,
+        "source_artifacts": [
+          "review_capacity_metric_report.json",
+          "aml_business_value_report.json",
+          "operational_metric_guard.json"
+        ]
+      },
+      "public_claim_status": "blocked",
+      "result_state": "blocked_rerun_reason_recorded",
+      "track_id": "amlsim_synthetic_bank_graph",
+      "track_label": "blocked",
+      "track_type": "synthetic_bank_graph_aml"
+    },
+    {
+      "ablation_posture": {
+        "source_artifact": "aml_ablation_matrix.json",
+        "status": "required_for_aml_claim"
+      },
+      "claim_boundary_ref": "paper_claim_boundary_report.json#claim_generic_structured_supporting_pack",
+      "environment_score": {
+        "source_artifact": "aml_environment_scorecard.json",
+        "status": "required_pass_for_public_claim",
+        "value": null
+      },
+      "model_metrics": {
+        "metric_state": "not_frozen_as_numeric_public_result",
+        "pr_auc": null,
+        "precision_at_k": null,
+        "primary_metric": "task_metric",
+        "recall_at_review_budget": null,
+        "source_artifact": "benchmark_release_gate.json"
+      },
+      "operational_metrics": {
+        "analyst_hour_savings": null,
+        "false_positive_reduction": null,
+        "metric_state": "required_for_hard_claim",
+        "review_capacity_metric": null,
+        "source_artifacts": [
+          "review_capacity_metric_report.json",
+          "aml_business_value_report.json",
+          "operational_metric_guard.json"
+        ]
+      },
+      "public_claim_status": "supporting-only",
+      "result_state": "numeric_holdout_rerun_required",
+      "track_id": "generic_structured_supporting_pack",
+      "track_label": "dev",
+      "track_type": "generic_supporting_structured_data"
+    }
+  ],
+  "schema_version": "relaytic.paper_release_freeze.v1",
+  "slice": "15Z-R",
+  "status": "no_hard_numeric_performance_claims_frozen"
+}

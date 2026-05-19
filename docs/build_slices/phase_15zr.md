@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Implemented.
 
 ## Intent
 
@@ -61,3 +61,11 @@ This is the release-readiness slice for attention-seeking public work: it should
 - public-claim boundary regression
 - reproducibility attestation regression
 - release-freeze command smoke test
+
+## Implementation Notes
+
+- introduced `src/relaytic/release_safety/paper_freeze.py` for deterministic paper/release freeze pack generation
+- added `relaytic release-safety paper-freeze` so a clean local rerun can regenerate the freeze artifacts or preserve deterministic blocked-claim reasons
+- materialized the Slice 15Z-R freeze pack under `docs/reports/`
+- froze hard AML performance claims as blocked until a true paper/holdout track has numeric evidence, passing environment scorecards, passing claim gates, and clean release safety
+- added `tests/test_cli_slice15zr.py` coverage for catalog coverage, result-table shape, claim boundaries, reproducibility attestation, and command smoke

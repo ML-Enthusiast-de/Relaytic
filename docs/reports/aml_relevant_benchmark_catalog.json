@@ -1,0 +1,114 @@
+{
+  "allowed_labels": [
+    "blocked",
+    "dev",
+    "holdout",
+    "paper",
+    "proxy"
+  ],
+  "schema_version": "relaytic.paper_release_freeze.v1",
+  "slice": "15Z-R",
+  "status": "frozen_with_blocked_hard_performance_claims",
+  "track_count": 5,
+  "tracks": [
+    {
+      "benchmark_relevance": "high_for_transaction_monitoring_shape",
+      "commands": [
+        "relaytic run --run-dir artifacts/aml_benchmark_run --data-path <paysim_like.csv> --timestamp-column step --format json",
+        "relaytic benchmark run --run-dir artifacts/aml_benchmark_run --data-path <paysim_like.csv> --format json",
+        "relaytic aml temporal --run-dir artifacts/aml_benchmark_run --format json",
+        "relaytic aml environment --run-dir artifacts/aml_benchmark_run --format json"
+      ],
+      "dataset_source_posture": "public_synthetic_schema_or_local_equivalent",
+      "evidence_state": "dev_fixture_and_cli_path_supported",
+      "hard_claim_allowed": false,
+      "hard_claim_blocked_reason": "PaySim-style evidence is synthetic/proxy until a frozen holdout partition and release gate pass.",
+      "label": "proxy",
+      "required_artifacts": [
+        "aml_benchmark_manifest.json",
+        "aml_temporal_benchmark_claim_report.json",
+        "aml_time_window_scorecard.json",
+        "aml_environment_scorecard.json"
+      ],
+      "track_id": "paysim_temporal_transaction_fraud",
+      "track_type": "transaction_fraud_temporal"
+    },
+    {
+      "benchmark_relevance": "high_for_temporal_graph_aml_shape",
+      "commands": [
+        "relaytic run --run-dir artifacts/aml_graph_benchmark_run --data-path <elliptic_flattened.csv> --timestamp-column time_step --format json",
+        "relaytic aml graph-loader --run-dir artifacts/aml_graph_benchmark_run --graph-path <graph_bundle_or_subgraph_pack> --format json",
+        "relaytic aml baselines --run-dir artifacts/aml_graph_benchmark_run --format json",
+        "relaytic aml environment --run-dir artifacts/aml_graph_benchmark_run --format json"
+      ],
+      "dataset_source_posture": "flattened_public_graph_snapshot_or_local_equivalent",
+      "evidence_state": "flattened_graph_and_graph_loader_paths_supported",
+      "hard_claim_allowed": false,
+      "hard_claim_blocked_reason": "Flattened graph evidence is proxy until raw graph provenance, holdout posture, and claim scope pass together.",
+      "label": "proxy",
+      "required_artifacts": [
+        "aml_graph_loader_manifest.json",
+        "aml_graph_provenance_report.json",
+        "aml_graph_claim_scope.json",
+        "aml_benchmark_relevance_scorecard.json"
+      ],
+      "track_id": "elliptic_flattened_graph_aml",
+      "track_type": "graph_aml"
+    },
+    {
+      "benchmark_relevance": "high_but_not_currently_claimable",
+      "commands": [
+        "relaytic aml graph-loader --run-dir artifacts/aml_subgraph_benchmark_run --graph-path <subgraph_pack> --format json"
+      ],
+      "dataset_source_posture": "not_yet_frozen_for_local_release_profile",
+      "evidence_state": "blocked_until_loader_data_access_and_claim_scope_are_reproducible",
+      "hard_claim_allowed": false,
+      "hard_claim_blocked_reason": "Subgraph-centric paper claims need explicit data access posture, loader support, and rerunnable holdout evidence.",
+      "label": "blocked",
+      "required_artifacts": [
+        "aml_subgraph_task_manifest.json",
+        "aml_public_graph_benchmark_catalog.json",
+        "aml_environment_failure_report.json"
+      ],
+      "track_id": "elliptic2_subgraph_aml",
+      "track_type": "subgraph_aml"
+    },
+    {
+      "benchmark_relevance": "medium_to_high_for_typology_and_queue_workflow",
+      "commands": [
+        "relaytic aml graph-loader --run-dir artifacts/amlsim_benchmark_run --graph-path <generated_amlsim_bundle> --format json"
+      ],
+      "dataset_source_posture": "generator_not_yet_frozen_in_release_profile",
+      "evidence_state": "blocked_until_reproducible_generation_and_source_manifest_exist",
+      "hard_claim_allowed": false,
+      "hard_claim_blocked_reason": "Synthetic-bank graph evidence needs a frozen generator command and typology manifest before it can support even proxy benchmark claims.",
+      "label": "blocked",
+      "required_artifacts": [
+        "aml_public_graph_benchmark_catalog.json",
+        "entity_graph_profile.json",
+        "subgraph_risk_report.json",
+        "case_packet.json"
+      ],
+      "track_id": "amlsim_synthetic_bank_graph",
+      "track_type": "synthetic_bank_graph_aml"
+    },
+    {
+      "benchmark_relevance": "supporting_only_for_general_structured_data_competence",
+      "commands": [
+        "relaytic benchmark run --run-dir artifacts/generic_supporting_benchmark --data-path <structured_dataset.csv> --format json"
+      ],
+      "dataset_source_posture": "bundled_or_public_structured_data_fixture",
+      "evidence_state": "supported_as_non_flagship_breadth_evidence",
+      "hard_claim_allowed": false,
+      "hard_claim_blocked_reason": "Generic structured-data wins cannot substitute for AML-specific temporal, graph, and operational evidence.",
+      "label": "dev",
+      "required_artifacts": [
+        "paper_benchmark_manifest.json",
+        "paper_benchmark_table.json",
+        "benchmark_release_gate.json"
+      ],
+      "track_id": "generic_structured_supporting_pack",
+      "track_type": "generic_supporting_structured_data"
+    }
+  ]
+}

@@ -53,6 +53,8 @@ The shortest proof tour is:
 - `aml_environment_scorecard.json`, `aml_workflow_task_matrix.json`, and `aml_benchmark_environment_scorecard.json` for whether Relaytic behaved well as an AML workflow environment, not only as a model scorer.
 - `benchmark_release_gate.json`, `paper_claim_guard_report.json`, and `aml_public_claim_guard.json` for what can be claimed publicly.
 - `trace_model.json`, `agent_eval_matrix.json`, `security_eval_report.json`, and `eval_surface_parity_report.json` when present for trace/eval posture.
+- `docs/reports/public_surface_inventory.json`, `docs/reports/module_split_report.json`, and `docs/reports/benchmark_surface_cleanup_report.json` for the pre-Academy repo credibility audit before paper-freeze work.
+- `docs/reports/paper_release_freeze_manifest.json`, `docs/reports/paper_result_table.json`, `docs/reports/paper_claim_boundary_report.json`, and `docs/reports/reproducibility_attestation.json` for the Slice 15Z-R paper/release freeze pack.
 
 ## Claim Boundaries
 
@@ -135,13 +137,15 @@ The repository already supports a working early product baseline:
 - AML temporal weak-label surfaces through `relaytic aml temporal`, with delayed-label evaluation, positive-unlabeled posture, threshold-drift reporting, rowless time-window scorecards, and temporal public-claim gates
 - AML evaluation-environment surfaces through `relaytic aml environment`, with model-vs-environment score separation, workflow task matrices, unsafe-steering rejection evidence, benchmark-environment scoring, and failure reports
 - a one-command Relaytic-AML review-queue demo bundle through `relaytic demo aml-review-queue`, with a flow report, business-metric table, artifact index, business-value guard, baseline/ablation proof, and mission-control investigation board
+- pre-Academy repo credibility reports under `docs/reports/`, including module-size audit, public-surface inventory, module-split evidence, extraction boundaries, and benchmark cleanup debt before the paper/release freeze
+- a paper/release freeze surface through `relaytic release-safety paper-freeze`, with relevant benchmark catalog, multidimensional result table, claim-boundary report, reproducibility attestation, and a safe attention-pack manifest that blocks hard AML performance claims until holdout evidence is frozen
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, 15W, and 15X are now implemented. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, temporal weak-label claim gates, and AML evaluation-environment scorecards on the same local-first artifact path.
+Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, 15W, 15X, 15Y, 15Z, and 15Z-R are now implemented. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, temporal weak-label claim gates, AML evaluation-environment scorecards, demo-first documentation, pre-Academy repo credibility reports, and a paper/release freeze pack on the same local-first artifact path.
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 15Z**, because the first-contact AML demo path is now documented and the next leverage point is repo credibility cleanup before paper-release freezing.
+The next recommended build is **Slice 16A**, because the AML productization and paper-freeze track is now landed and capability-academy work needs one governed registry before replay, promotion, or hunt mechanics expand.
 
 The initial model-competitiveness path through **Slice 15F** is now landed, and the first performance-recovery foundation slice is now landed too:
 
@@ -167,8 +171,8 @@ The broader **Relaytic Academy** now starts at **Slice 16A**, but only after the
 - **Slice 15W** temporal and weak-label upgrade (implemented)
 - **Slice 15X** AML evaluation-environment reframe (implemented)
 - **Slice 15Y** demo-first documentation rewrite (implemented)
-- **Slice 15Z** pre-Academy repo credibility cleanup
-- **Slice 15Z-R** paper benchmark and release freeze
+- **Slice 15Z** pre-Academy repo credibility cleanup (implemented)
+- **Slice 15Z-R** paper benchmark and release freeze (implemented)
 
 That ordering is deliberate. Relaytic is more interesting as a world-class AML system than as a generic capability-evolution project with no sharp domain wedge.
 

@@ -1,0 +1,258 @@
+{
+  "acceptance_status": {
+    "benchmark_cleanup_debt_listed": true,
+    "oversized_module_split": true,
+    "public_surface_inventory_clean": true,
+    "retained_oversized_modules_documented": true
+  },
+  "benchmark_surface_cleanup_report_path": "docs/reports/benchmark_surface_cleanup_report.json",
+  "module_extraction_plan_path": "docs/reports/module_extraction_plan.json",
+  "module_size_audit": {
+    "module_count": 261,
+    "oversized_count": 19,
+    "oversized_modules": [
+      {
+        "line_count": 20820,
+        "next_extraction_boundary": "Continue extracting command-family helpers and manifest refresh chains into focused UI modules while retaining parser and top-level dispatch ownership.",
+        "oversized": true,
+        "path": "src/relaytic/ui/cli.py"
+      },
+      {
+        "line_count": 4432,
+        "next_extraction_boundary": "Split board assembly, chat-turn handling, and launch-surface rendering once mission control changes again.",
+        "oversized": true,
+        "path": "src/relaytic/mission_control/agents.py"
+      },
+      {
+        "line_count": 4278,
+        "next_extraction_boundary": "Separate candidate-family adapters, validation plumbing, and training report assembly when the next model-family slice touches this module.",
+        "oversized": true,
+        "path": "src/relaytic/modeling/training.py"
+      },
+      {
+        "line_count": 4012,
+        "next_extraction_boundary": "Move paper-freeze pack assembly and benchmark-family adapters into focused modules during Slice 15Z-R.",
+        "oversized": true,
+        "path": "src/relaytic/benchmark/agents.py"
+      },
+      {
+        "line_count": 3848,
+        "next_extraction_boundary": "Extract AML summary sections and generic summary rendering into focused builders after the benchmark freeze stabilizes summary contracts.",
+        "oversized": true,
+        "path": "src/relaytic/runs/summary.py"
+      },
+      {
+        "line_count": 2132,
+        "next_extraction_boundary": "Split source profiling, question generation, and intake report rendering on the next intake behavior change.",
+        "oversized": true,
+        "path": "src/relaytic/intake/agents.py"
+      },
+      {
+        "line_count": 1891,
+        "next_extraction_boundary": "Separate specialist synthesis, evidence joins, and report rendering when investigation depth expands.",
+        "oversized": true,
+        "path": "src/relaytic/investigation/agents.py"
+      },
+      {
+        "line_count": 1524,
+        "next_extraction_boundary": "Separate protocol adapters from artifact serialization if the MCP or external agent surface changes.",
+        "oversized": true,
+        "path": "src/relaytic/interoperability/service.py"
+      },
+      {
+        "line_count": 1478,
+        "next_extraction_boundary": "Split decision review assembly, rollback planning, and markdown rendering on the next decision-surface slice.",
+        "oversized": true,
+        "path": "src/relaytic/decision/agents.py"
+      },
+      {
+        "line_count": 1457,
+        "next_extraction_boundary": "Split registry construction by tool family when tool registration changes.",
+        "oversized": true,
+        "path": "src/relaytic/orchestration/default_tools.py"
+      },
+      {
+        "line_count": 1400,
+        "next_extraction_boundary": "Separate routing feature extraction, eligibility gates, and explanation rendering when architecture routing changes again.",
+        "oversized": true,
+        "path": "src/relaytic/analytics/architecture_routing.py"
+      },
+      {
+        "line_count": 1393,
+        "next_extraction_boundary": "Separate deterministic answer planning, artifact lookup, and response rendering when assist evolves beyond bounded guidance.",
+        "oversized": true,
+        "path": "src/relaytic/assist/agents.py"
+      },
+      {
+        "line_count": 1381,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/evidence/agents.py"
+      },
+      {
+        "line_count": 1347,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/analytics/task_contracts.py"
+      },
+      {
+        "line_count": 1327,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/aml/environment.py"
+      },
+      {
+        "line_count": 1307,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/search/agents.py"
+      },
+      {
+        "line_count": 1273,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/aml/graph_loader.py"
+      },
+      {
+        "line_count": 1247,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/planning/agents.py"
+      },
+      {
+        "line_count": 1201,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/benchmark/incumbents.py"
+      }
+    ],
+    "threshold_lines": 1200,
+    "top_modules": [
+      {
+        "line_count": 20820,
+        "next_extraction_boundary": "Continue extracting command-family helpers and manifest refresh chains into focused UI modules while retaining parser and top-level dispatch ownership.",
+        "oversized": true,
+        "path": "src/relaytic/ui/cli.py"
+      },
+      {
+        "line_count": 4432,
+        "next_extraction_boundary": "Split board assembly, chat-turn handling, and launch-surface rendering once mission control changes again.",
+        "oversized": true,
+        "path": "src/relaytic/mission_control/agents.py"
+      },
+      {
+        "line_count": 4278,
+        "next_extraction_boundary": "Separate candidate-family adapters, validation plumbing, and training report assembly when the next model-family slice touches this module.",
+        "oversized": true,
+        "path": "src/relaytic/modeling/training.py"
+      },
+      {
+        "line_count": 4012,
+        "next_extraction_boundary": "Move paper-freeze pack assembly and benchmark-family adapters into focused modules during Slice 15Z-R.",
+        "oversized": true,
+        "path": "src/relaytic/benchmark/agents.py"
+      },
+      {
+        "line_count": 3848,
+        "next_extraction_boundary": "Extract AML summary sections and generic summary rendering into focused builders after the benchmark freeze stabilizes summary contracts.",
+        "oversized": true,
+        "path": "src/relaytic/runs/summary.py"
+      },
+      {
+        "line_count": 2132,
+        "next_extraction_boundary": "Split source profiling, question generation, and intake report rendering on the next intake behavior change.",
+        "oversized": true,
+        "path": "src/relaytic/intake/agents.py"
+      },
+      {
+        "line_count": 1891,
+        "next_extraction_boundary": "Separate specialist synthesis, evidence joins, and report rendering when investigation depth expands.",
+        "oversized": true,
+        "path": "src/relaytic/investigation/agents.py"
+      },
+      {
+        "line_count": 1524,
+        "next_extraction_boundary": "Separate protocol adapters from artifact serialization if the MCP or external agent surface changes.",
+        "oversized": true,
+        "path": "src/relaytic/interoperability/service.py"
+      },
+      {
+        "line_count": 1478,
+        "next_extraction_boundary": "Split decision review assembly, rollback planning, and markdown rendering on the next decision-surface slice.",
+        "oversized": true,
+        "path": "src/relaytic/decision/agents.py"
+      },
+      {
+        "line_count": 1457,
+        "next_extraction_boundary": "Split registry construction by tool family when tool registration changes.",
+        "oversized": true,
+        "path": "src/relaytic/orchestration/default_tools.py"
+      },
+      {
+        "line_count": 1400,
+        "next_extraction_boundary": "Separate routing feature extraction, eligibility gates, and explanation rendering when architecture routing changes again.",
+        "oversized": true,
+        "path": "src/relaytic/analytics/architecture_routing.py"
+      },
+      {
+        "line_count": 1393,
+        "next_extraction_boundary": "Separate deterministic answer planning, artifact lookup, and response rendering when assist evolves beyond bounded guidance.",
+        "oversized": true,
+        "path": "src/relaytic/assist/agents.py"
+      },
+      {
+        "line_count": 1381,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/evidence/agents.py"
+      },
+      {
+        "line_count": 1347,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/analytics/task_contracts.py"
+      },
+      {
+        "line_count": 1327,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/aml/environment.py"
+      },
+      {
+        "line_count": 1307,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/search/agents.py"
+      },
+      {
+        "line_count": 1273,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/aml/graph_loader.py"
+      },
+      {
+        "line_count": 1247,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/planning/agents.py"
+      },
+      {
+        "line_count": 1201,
+        "next_extraction_boundary": "Retain temporarily with explicit ownership; split the next behavior-specific helper set when this module changes.",
+        "oversized": true,
+        "path": "src/relaytic/benchmark/incumbents.py"
+      },
+      {
+        "line_count": 1153,
+        "next_extraction_boundary": null,
+        "oversized": false,
+        "path": "src/relaytic/aml/baselines.py"
+      }
+    ]
+  },
+  "module_split_report_path": "docs/reports/module_split_report.json",
+  "public_surface_inventory_path": "docs/reports/public_surface_inventory.json",
+  "schema_version": "relaytic.repo_credibility.v1",
+  "slice": "15Z",
+  "status": "implemented"
+}

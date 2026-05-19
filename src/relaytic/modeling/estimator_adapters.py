@@ -289,6 +289,7 @@ def build_regression_estimator_surrogate(
             "min_child_samples": int(params.get("min_child_samples", 20)),
             "random_state": 42,
             "n_jobs": 1,
+            "verbosity": -1,
         }
         estimator = LGBMRegressor(**params)
     else:
@@ -371,6 +372,7 @@ def build_classification_estimator_surrogate(
             "min_child_samples": int(params.get("min_child_samples", 20)),
             "random_state": 42,
             "n_jobs": 1,
+            "verbosity": -1,
         }
         if (class_count or 2) > 2:
             params["objective"] = str(params.get("objective", "multiclass"))
@@ -688,7 +690,14 @@ def _optional_regression_variants(
     if family_adapter_available("lightgbm_ensemble"):
         from lightgbm import LGBMRegressor
 
-        params = {"n_estimators": 240, "learning_rate": 0.06, "num_leaves": 31, "random_state": 42, "n_jobs": 1}
+        params = {
+            "n_estimators": 240,
+            "learning_rate": 0.06,
+            "num_leaves": 31,
+            "random_state": 42,
+            "n_jobs": 1,
+            "verbosity": -1,
+        }
         variants.append(
             _regression_variant(
                 family="lightgbm_ensemble",
@@ -749,7 +758,14 @@ def _optional_classification_variants(
     if family_adapter_available("lightgbm_classifier"):
         from lightgbm import LGBMClassifier
 
-        params = {"n_estimators": 240, "learning_rate": 0.06, "num_leaves": 31, "random_state": 42, "n_jobs": 1}
+        params = {
+            "n_estimators": 240,
+            "learning_rate": 0.06,
+            "num_leaves": 31,
+            "random_state": 42,
+            "n_jobs": 1,
+            "verbosity": -1,
+        }
         variants.append(
             _classification_variant(
                 family="lightgbm_classifier",

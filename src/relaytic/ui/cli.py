@@ -1110,6 +1110,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
 
+    release_safety_paper_freeze = release_safety_sub.add_parser(
+        "paper-freeze",
+        help="Regenerate the Relaytic-AML paper/release freeze pack and claim-boundary artifacts.",
+    )
+    release_safety_paper_freeze.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for paper-freeze artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_paper_freeze.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+
     doctor = sub.add_parser(
         "doctor",
         help="Verify install health, required dependencies, and wired integration compatibility.",
@@ -3065,6 +3081,8 @@ def main(argv: list[str] | None = None) -> int:
                 )
             elif args.release_safety_command == "show":
                 payload = _show_release_safety_surface(state_dir=args.state_dir)
+            elif args.release_safety_command == "paper-freeze":
+                payload = _run_paper_release_freeze_surface(output_dir=args.output_dir)
             else:
                 parser.error("Unsupported release-safety subcommand.")
                 return 2
@@ -5882,135 +5900,30 @@ def _run_aml_environment_phase(
     overwrite: bool,
     labels: dict[str, str] | None,
 ) -> dict[str, Any]:
-    from relaytic.aml import render_aml_environment_markdown, sync_aml_environment_artifacts
+    from relaytic.ui.aml_environment import run_aml_environment_phase
 
-    root = Path(run_dir)
-    if not root.exists():
-        raise ValueError(f"Run directory does not exist: {root}")
-    targets = _aml_environment_output_paths(root)
-    if not overwrite and all(path.exists() for path in targets.values()):
-        return _show_aml_environment_surface(run_dir=root)
-    _ensure_paths_absent(list(targets.values()), overwrite=overwrite)
-    written = sync_aml_environment_artifacts(root)
-    manifest_path = _refresh_aml_environment_manifest(
-        root,
+    return run_aml_environment_phase(
+        run_dir=run_dir,
+        config_path=config_path,
         run_id=run_id,
-        policy_source=config_path,
+        overwrite=overwrite,
         labels=labels,
+        output_paths=_aml_environment_output_paths,
+        ensure_paths_absent=_ensure_paths_absent,
+        refresh_manifest=_refresh_aml_environment_manifest,
+        resolve_run_data_path=_resolve_run_data_path,
     )
-    summary_materialized = _refresh_run_summary_from_current_artifacts(root)
-    bundle = _read_aml_environment_bundle(root)
-    return {
-        "surface_payload": {
-            "status": "ok",
-            "run_dir": str(root),
-            "manifest_path": str(manifest_path),
-            "paths": {key: str(value) for key, value in written.items()},
-            "aml_environment": _aml_environment_surface_summary(bundle),
-            "bundle": bundle,
-            "run_summary": summary_materialized["summary"],
-        },
-        "human_output": render_aml_environment_markdown(bundle),
-    }
 
 
 def _show_aml_environment_surface(*, run_dir: str | Path) -> dict[str, Any]:
-    from relaytic.aml import render_aml_environment_markdown, sync_aml_environment_artifacts
+    from relaytic.ui.aml_environment import show_aml_environment_surface
 
-    root = Path(run_dir)
-    if not root.exists():
-        raise ValueError(f"Run directory does not exist: {root}")
-    bundle = _read_aml_environment_bundle(root)
-    if not all(path.exists() for path in _aml_environment_output_paths(root).values()):
-        sync_aml_environment_artifacts(root)
-        bundle = _read_aml_environment_bundle(root)
-    if not bundle:
-        raise ValueError(f"No AML environment artifacts could be built in {root}.")
-    bundle = _read_aml_environment_bundle(root)
-    manifest_path = _refresh_aml_environment_manifest(root)
-    summary_materialized = _refresh_run_summary_from_current_artifacts(root)
-    return {
-        "surface_payload": {
-            "status": "ok",
-            "run_dir": str(root),
-            "manifest_path": str(manifest_path),
-            "aml_environment": _aml_environment_surface_summary(bundle),
-            "bundle": bundle,
-            "run_summary": summary_materialized["summary"],
-        },
-        "human_output": render_aml_environment_markdown(bundle),
-    }
-
-
-def _read_aml_environment_bundle(root: Path) -> dict[str, Any]:
-    from relaytic.aml import read_aml_environment_artifacts
-
-    return read_aml_environment_artifacts(root)
-
-
-def _aml_environment_surface_summary(bundle: dict[str, Any]) -> dict[str, Any]:
-    manifest = dict(bundle.get("aml_eval_environment_manifest", {}))
-    scorecard = dict(bundle.get("aml_environment_scorecard", {}))
-    matrix = dict(bundle.get("aml_workflow_task_matrix", {}))
-    failure = dict(bundle.get("aml_environment_failure_report", {}))
-    benchmark = dict(bundle.get("aml_benchmark_environment_scorecard", {}))
-    rows = matrix.get("rows", []) if isinstance(matrix.get("rows"), list) else []
-    return {
-        "status": scorecard.get("overall_environment_status") or manifest.get("status"),
-        "environment_score": scorecard.get("environment_score"),
-        "model_quality_score": scorecard.get("model_quality_score"),
-        "workflow_safety_score": scorecard.get("workflow_safety_score"),
-        "model_score_and_environment_score_separate": scorecard.get("model_score_and_environment_score_separate"),
-        "model_success_environment_success_disagreement": scorecard.get("model_success_environment_success_disagreement")
-        or failure.get("model_success_environment_success_disagreement"),
-        "unsafe_steering_status": scorecard.get("unsafe_steering_status"),
-        "unsafe_steering_trace_backed": scorecard.get("unsafe_steering_trace_backed"),
-        "benchmark_environment_status": benchmark.get("overall_benchmark_environment_status")
-        or scorecard.get("benchmark_environment_status"),
-        "named_benchmark_family": benchmark.get("named_benchmark_family"),
-        "reproducibility_status": benchmark.get("reproducibility_status"),
-        "claim_safety_status": benchmark.get("claim_safety_status"),
-        "benchmark_relevance_status": benchmark.get("benchmark_relevance_status"),
-        "task_count": matrix.get("task_count"),
-        "pass_count": matrix.get("pass_count"),
-        "fail_count": matrix.get("fail_count"),
-        "incomplete_count": matrix.get("incomplete_count"),
-        "primary_failure_kind": failure.get("primary_failure_kind"),
-        "recommended_next_action": scorecard.get("recommended_next_action") or failure.get("recommended_next_step"),
-        "task_statuses": {
-            str(item.get("task_id")): item.get("status")
-            for item in rows
-            if isinstance(item, dict) and item.get("task_id")
-        },
-        "summary": scorecard.get("summary") or manifest.get("summary"),
-    }
-
-
-def _refresh_run_summary_from_current_artifacts(root: Path) -> dict[str, Any]:
-    from relaytic.core.json_utils import write_json
-    from relaytic.runs.summary import (
-        RUN_REPORT_RELATIVE_PATH,
-        RUN_SUMMARY_FILENAME,
-        build_run_summary,
-        render_run_summary_markdown,
+    return show_aml_environment_surface(
+        run_dir=run_dir,
+        output_paths=_aml_environment_output_paths,
+        refresh_manifest=_refresh_aml_environment_manifest,
+        resolve_run_data_path=_resolve_run_data_path,
     )
-
-    summary = build_run_summary(run_dir=root, data_path=_resolve_run_data_path(root))
-    summary_path = write_json(
-        root / RUN_SUMMARY_FILENAME,
-        summary,
-        indent=2,
-        ensure_ascii=False,
-        sort_keys=True,
-    )
-    report_path = root / RUN_REPORT_RELATIVE_PATH
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(render_run_summary_markdown(summary), encoding="utf-8")
-    return {
-        "summary": summary,
-        "summary_path": summary_path,
-        "report_path": report_path,
-    }
 
 
 def _read_aml_temporal_operating_point_bundle(root: Path) -> dict[str, Any]:
@@ -6794,6 +6707,29 @@ def _show_release_safety_surface(*, state_dir: str | None) -> dict[str, Any]:
             "bundle": bundle,
         },
         "human_output": render_release_safety_markdown(bundle),
+    }
+
+
+def _run_paper_release_freeze_surface(*, output_dir: str | None) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        build_paper_freeze_pack,
+        render_paper_freeze_markdown,
+        sync_paper_freeze_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_freeze_pack(root, output_dir=output_dir)
+    pack = build_paper_freeze_pack(root, output_dir=Path(output_dir) if output_dir else None)
+    manifest = dict(pack["paper_release_freeze_manifest"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_release_freeze": manifest,
+            "bundle": pack,
+        },
+        "human_output": render_paper_freeze_markdown(pack),
     }
 
 

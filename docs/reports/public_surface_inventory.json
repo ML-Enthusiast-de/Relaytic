@@ -1,0 +1,182 @@
+{
+  "command_count": 17,
+  "commands": [
+    {
+      "claim_posture": "claim_gated",
+      "command": "relaytic benchmark run",
+      "compatibility_only_legacy_surface": false,
+      "family": "benchmark",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "paper_evidence_builder"
+    },
+    {
+      "claim_posture": "claim_gated",
+      "command": "relaytic benchmark show",
+      "compatibility_only_legacy_surface": false,
+      "family": "benchmark",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "paper_evidence_reader"
+    },
+    {
+      "claim_posture": "demo_only",
+      "command": "relaytic demo aml-review-queue",
+      "compatibility_only_legacy_surface": false,
+      "family": "demo",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "first_contact_aml_demo"
+    },
+    {
+      "claim_posture": "supporting_evidence",
+      "command": "relaytic aml graph-loader",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "graph_workload_ingestion"
+    },
+    {
+      "claim_posture": "guarded_metric",
+      "command": "relaytic aml business-value",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "operational_metric_builder"
+    },
+    {
+      "claim_posture": "claim_gated",
+      "command": "relaytic aml baselines",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "baseline_and_ablation_builder"
+    },
+    {
+      "claim_posture": "supporting_or_blocked",
+      "command": "relaytic aml temporal",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "temporal_weak_label_gate"
+    },
+    {
+      "claim_posture": "claim_gated",
+      "command": "relaytic aml environment",
+      "compatibility_only_legacy_surface": false,
+      "family": "aml",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "model_environment_separation"
+    },
+    {
+      "claim_posture": "navigation",
+      "command": "relaytic guide show",
+      "compatibility_only_legacy_surface": false,
+      "family": "guide",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "operator_status_and_next_options"
+    },
+    {
+      "claim_posture": "navigation",
+      "command": "relaytic guide ask",
+      "compatibility_only_legacy_surface": false,
+      "family": "guide",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "guided_status_question"
+    },
+    {
+      "claim_posture": "redacted_context_export",
+      "command": "relaytic guide export-context",
+      "compatibility_only_legacy_surface": false,
+      "family": "guide",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "external_llm_context_pack"
+    },
+    {
+      "claim_posture": "release_gate",
+      "command": "relaytic release-safety scan",
+      "compatibility_only_legacy_surface": false,
+      "family": "release_safety",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "leak_and_release_gate"
+    },
+    {
+      "claim_posture": "claim_boundary_freeze",
+      "command": "relaytic release-safety paper-freeze",
+      "compatibility_only_legacy_surface": false,
+      "family": "release_safety",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "paper_release_freeze_builder"
+    },
+    {
+      "claim_posture": "auditability",
+      "command": "relaytic trace show",
+      "compatibility_only_legacy_surface": false,
+      "family": "trace",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "trace_identity_reader"
+    },
+    {
+      "claim_posture": "auditability",
+      "command": "relaytic evals run",
+      "compatibility_only_legacy_surface": false,
+      "family": "evals",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "surface_parity_check"
+    },
+    {
+      "claim_posture": "navigation",
+      "command": "relaytic mission-control show",
+      "compatibility_only_legacy_surface": false,
+      "family": "mission_control",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "workspace_status_board"
+    },
+    {
+      "claim_posture": "navigation",
+      "command": "relaytic handoff show",
+      "compatibility_only_legacy_surface": false,
+      "family": "handoff",
+      "package_name": "relaytic",
+      "public_name": "Relaytic",
+      "stale_surface_language_detected": false,
+      "surface_role": "human_agent_result_handoff"
+    }
+  ],
+  "schema_version": "relaytic.repo_credibility.v1",
+  "slice": "15Z",
+  "stale_public_surface_terms_checked": [
+    "corr2surrogate",
+    "prototype",
+    "toy demo"
+  ]
+}
