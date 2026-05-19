@@ -256,15 +256,29 @@ Stable slice numbering stays the same, but the preferred execution order after S
 59. Slice 15Y
 60. Slice 15Z
 60A. Slice 15Z-R
-61. Slice 16
-62. Slice 16A
-63. Slice 16B
-64. Slice 16C
-65. Slice 16D
-66. Slice 16E
-67. Slice 16F
-68. Slice 17
-69. Slice 18
+61. Paper Track P0 - freeze and commit the 15Z-R baseline
+62. Paper Track P1 - legacy public-surface cleanup
+63. Paper Track P2 - paper thesis and claim contract
+64. Paper Track P3 - benchmark dataset registry and access manifest
+65. Paper Track P4 - PaySim-style temporal benchmark runner
+66. Paper Track P5 - Elliptic graph benchmark loader and provenance
+67. Paper Track P6 - strong tabular baseline suite
+68. Paper Track P7 - graph baseline suite
+69. Paper Track P8 - AMLSim and Elliptic2 blocked-or-supported track
+70. Paper Track P9 - operational AML evaluation layer
+71. Paper Track P10 - reproducible paper table generator
+72. Paper Track P11 - paper draft and figure pack
+73. Paper Track P12 - external dry run and clean-clone proof
+74. Paper Track P13 - arXiv release and attention pack
+75. Slice 16
+76. Slice 16A
+77. Slice 16B
+78. Slice 16C
+79. Slice 16D
+80. Slice 16E
+81. Slice 16F
+82. Slice 17
+83. Slice 18
 
 Why:
 
@@ -325,6 +339,7 @@ Why:
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
+- Paper Track P0 through P13 now come before Academy work because the current freeze pack deliberately blocks hard AML and SOTA claims; Relaytic must first clean public surfaces, run relevant benchmark tracks, generate real numeric evidence, and draft a claim-safe paper before expanding into capability evolution
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -338,7 +353,7 @@ Why:
 ## Current execution state
 
 - implemented baseline: Slice 00 through Slice 15Z-R. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, and Slice 15Z-R paper/release freeze.
-- next execution target: Slice 16A
+- next execution target: Paper Track P0
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -347,7 +362,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A
+- next planned academy follow-on: Slice 16A, after Paper Track P0 through P13 prove a clean repo, relevant benchmarks, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3397,6 +3412,466 @@ Implemented by:
 - adding the public command `relaytic release-safety paper-freeze`
 - materializing `docs/reports/paper_release_freeze_manifest.json`, `docs/reports/aml_relevant_benchmark_catalog.json`, `docs/reports/paper_benchmark_runbook.md`, `docs/reports/paper_result_table.json`, `docs/reports/paper_claim_boundary_report.json`, `docs/reports/reproducibility_attestation.json`, and `docs/reports/release_attention_pack_manifest.json`
 - adding `tests/test_cli_slice15zr.py` coverage for catalog coverage, multidimensional result rows, claim boundaries, reproducibility attestation, and command rerun smoke
+
+## Paper Track - Relaytic-AML arXiv benchmark path
+
+Status:
+- planned and mandatory before Slice 16A
+
+Paper thesis:
+- Relaytic-AML should be presented as a claim-gated local evaluation environment for temporal, graph, and operational financial-crime ML, not as a raw "we beat SOTA" leaderboard wrapper.
+- The paper should argue that credible AML evaluation needs model metrics, temporal leakage checks, graph provenance, review-budget metrics, case-packet utility, reproducibility, and public-claim gates in one rerunnable local system.
+- Hard performance claims remain blocked until Paper Track P10 through P12 generate numeric holdout evidence and the release-freeze, benchmark-environment, temporal, graph, and release-safety gates agree.
+
+Target paper title:
+- `Relaytic-AML: Claim-Gated Evaluation Environments for Temporal Graph Financial-Crime ML`
+
+Target benchmark families:
+- PaySim-style temporal transaction fraud for chronological split, review-budget, and operational queue proof
+- Elliptic-style temporal graph AML for raw or flattened graph provenance, time-step stability, and structural-vs-model comparison
+- Elliptic2-style subgraph AML for the hard modern subgraph track, treated as blocked until access, loader, and claim-scope proof are real
+- AMLSim-style synthetic bank graph for seeded typology and analyst-case workflow proof, treated as synthetic/proxy unless stronger evidence is available
+- generic structured-data benchmarks only as supporting breadth evidence, never as the flagship AML claim
+
+Non-negotiable paper gates:
+- public docs and CLI help must not expand stale `corr2surrogate`, prototype, toy, or unsupported SOTA language
+- every table row must cite exact commands, dataset posture, split posture, artifacts, metric columns, runtime profile, and claim boundary
+- no single proxy dataset can unlock a broader AML superiority claim
+- optional baselines such as LightGBM, CatBoost, XGBoost, TabPFN, PyG, or graph-mining adapters must capture version and fallback state
+- arXiv release is allowed only after a clean-clone dry run reproduces the paper table or emits deterministic blocked reasons
+
+### Paper Track P0 - Freeze and commit the 15Z-R baseline
+
+Goal:
+- freeze the current 15Z-R paper-freeze state and make the repo safe to extend without losing the known-good baseline
+
+Load-bearing improvement:
+- Relaytic starts the paper track from a committed, tested, claim-blocked release state instead of layering paper work on a dirty tree
+
+Human surface:
+- humans can see one clean starting point, one verification transcript, and one explicit next paper slice
+
+Agent surface:
+- external agents can inspect the commit, test wall, freeze manifest, and next-slice pointer without guessing whether the current artifacts are provisional
+
+Intelligence source:
+- deterministic git status, test results, release-safety scan, and paper-freeze artifacts
+
+Fallback rule:
+- if the full prepush wall is too expensive, P0 may record a targeted wall plus the skipped full-wall reason, but it cannot allow hard claims
+
+Required outputs:
+- `paper_track_baseline_manifest.json`
+- `paper_track_verification_report.json`
+- updated `IMPLEMENTATION_STATUS.md`
+
+Minimum proof:
+- clean `git status` after commit or an explicit uncommitted-work ledger
+- targeted paper-freeze and release-safety tests pass
+- `relaytic release-safety paper-freeze --format json` still blocks hard claims honestly
+
+### Paper Track P1 - Legacy public-surface cleanup
+
+Goal:
+- make the repo read like current Relaytic-AML, not inherited `corr2surrogate` or generic surrogate-era scaffolding
+
+Load-bearing improvement:
+- public docs, CLI help, reports, and paper-facing artifacts become internally consistent enough for a reviewer to trust the project direction
+
+Human surface:
+- humans see Relaytic-AML naming, paper commands, and benchmark boundaries without stale prototype vocabulary
+
+Agent surface:
+- external agents get a machine-readable public-surface hygiene report and a stable compatibility-retention ledger
+
+Intelligence source:
+- deterministic text scans, import-boundary checks, CLI-help captures, public docs inventory, and compatibility retention rules
+
+Fallback rule:
+- legacy imports may remain only behind the explicit compatibility shim and must be hidden from new public surfaces
+
+Required outputs:
+- `paper_public_surface_hygiene_report.json`
+- `legacy_compatibility_retention_report.json`
+- `paper_repo_cleanup_scorecard.json`
+
+Minimum proof:
+- no stale public-surface language outside migration, compatibility, or history files
+- old `surrogate` APIs have public Relaytic aliases where they affect paper or agent-facing flows
+- tests prove compatibility remains narrow and new docs target `relaytic`
+
+### Paper Track P2 - Paper thesis and claim contract
+
+Goal:
+- freeze the exact paper question, contribution story, allowed claims, blocked claims, and benchmark acceptance doctrine
+
+Load-bearing improvement:
+- Relaytic stops letting paper scope drift and gives every later benchmark slice one claim contract to satisfy
+
+Human surface:
+- humans can read one short thesis contract that says what the paper is about and what it refuses to claim
+
+Agent surface:
+- external agents can consume JSON claim contracts and reject paper text or benchmark rows that overreach
+
+Intelligence source:
+- current AML artifacts, external benchmark research notes, paper-freeze claim boundaries, and dataset availability evidence
+
+Fallback rule:
+- if a hot benchmark cannot be accessed or rerun locally, it becomes a named blocked or future track, not a substitute claim
+
+Required outputs:
+- `docs/paper/paper_thesis.md`
+- `paper_thesis_contract.json`
+- `paper_claim_taxonomy.json`
+- `paper_related_work_seed.json`
+
+Minimum proof:
+- the paper title, research questions, contributions, metrics, and blocked claims are written before new benchmark implementation begins
+- paper claim taxonomy agrees with `paper_claim_boundary_report.json`
+
+### Paper Track P3 - Benchmark dataset registry and access manifest
+
+Goal:
+- create one source-of-truth registry for all paper datasets, licenses, access methods, split posture, hashes, and blocked reasons
+
+Load-bearing improvement:
+- Relaytic can tell whether a benchmark is paper-ready, proxy-only, dev-only, or blocked before training anything
+
+Human surface:
+- humans see which datasets to fetch, where to place them, what license/access caveats apply, and which claims each can support
+
+Agent surface:
+- external agents can inspect dataset manifests and choose the next benchmark action without scraping markdown
+
+Intelligence source:
+- deterministic file inspection, source manifests, license/access notes, split-contract rules, and benchmark-family cataloging
+
+Fallback rule:
+- network-backed or login-gated datasets stay optional and blocked unless local source files and access posture are explicit
+
+Required outputs:
+- `paper_dataset_registry.json`
+- `paper_dataset_access_manifest.json`
+- `paper_split_contracts.json`
+- `paper_dataset_blockers.json`
+
+Minimum proof:
+- PaySim-style, Elliptic-style, Elliptic2-style, AMLSim-style, and generic support tracks all have source posture and claim posture
+- missing datasets yield precise setup or blocked-reason artifacts
+
+### Paper Track P4 - PaySim-style temporal benchmark runner
+
+Goal:
+- turn the proxy temporal transaction-fraud track into a rerunnable benchmark path with real temporal and review-budget metrics
+
+Load-bearing improvement:
+- Relaytic can generate a paper table row for PaySim-style data without treating synthetic evidence as real-world AML superiority
+
+Human surface:
+- humans can run one command sequence and inspect PR-AUC, precision@k, recall@review_budget, fixed-FPR recall, and threshold drift
+
+Agent surface:
+- external agents can consume the PaySim result row, split proof, temporal scorecard, and public-claim status
+
+Intelligence source:
+- chronological split contracts, rare-event metrics, review-budget operating points, baseline adapters, and existing AML temporal artifacts
+
+Fallback rule:
+- if only fixture or synthetic/proxy data exists, results are allowed as proxy or dev evidence only
+
+Required outputs:
+- `paysim_benchmark_manifest.json`
+- `paysim_temporal_split_report.json`
+- `paysim_operating_point_table.json`
+- `paysim_paper_result_row.json`
+
+Minimum proof:
+- one chronological PaySim-style run completes
+- threshold tuning uses validation and reports fixed test behavior
+- paper result row remains supporting-only unless holdout and claim gates pass
+
+### Paper Track P5 - Elliptic graph benchmark loader and provenance
+
+Goal:
+- make Elliptic-style graph AML evidence credible by separating raw graph, flattened graph, and unsupported subgraph claims
+
+Load-bearing improvement:
+- Relaytic can ingest or explicitly block raw Elliptic-style graph bundles with node, edge, feature, time, and label provenance
+
+Human surface:
+- humans can see exactly whether a run used raw graph evidence, flattened proxy evidence, or blocked graph support
+
+Agent surface:
+- external agents can consume graph provenance, loader manifests, and graph claim scope directly
+
+Intelligence source:
+- graph loader detection, provenance reports, temporal split checks, structural graph features, and current AML graph artifacts
+
+Fallback rule:
+- flattened graph snapshots remain valid proxy evidence but must not be described as raw graph or subgraph benchmark support
+
+Required outputs:
+- `elliptic_graph_loader_manifest.json`
+- `elliptic_graph_provenance_report.json`
+- `elliptic_temporal_split_report.json`
+- `elliptic_graph_claim_scope.json`
+- `elliptic_paper_result_row.json`
+
+Minimum proof:
+- one raw or flattened Elliptic-style track materializes graph provenance
+- incomplete raw bundles produce precise recovery instructions
+- graph claims are blocked unless loader, split, and claim-scope checks pass
+
+### Paper Track P6 - Strong tabular baseline suite
+
+Goal:
+- upgrade the paper comparison set so Relaytic is judged against current strong tabular baselines, not only legacy local models
+
+Load-bearing improvement:
+- Relaytic can compare rules, calibrated linear models, tree ensembles, boosted trees, and optional tabular foundation-model adapters under the same split and metric contract
+
+Human surface:
+- humans see which baselines ran, which fell back, what versions were used, and where Relaytic won or lost
+
+Agent surface:
+- external agents can consume baseline eligibility, fallback, version, runtime, and metric rows without inferring adapter state
+
+Intelligence source:
+- mature optional adapters, deterministic fallback baselines, calibration/threshold contracts, and benchmark-truth gates
+
+Fallback rule:
+- optional libraries may strengthen evidence but cannot become required for the deterministic floor or hidden sources of truth
+
+Required outputs:
+- `paper_baseline_suite_manifest.json`
+- `paper_baseline_version_matrix.json`
+- `paper_tabular_baseline_table.json`
+- `paper_baseline_fallback_report.json`
+
+Minimum proof:
+- at least three baseline families run on one AML benchmark or emit explicit fallback states
+- optional adapters capture version and eligibility
+- result rows share the same split and metric contract
+
+### Paper Track P7 - Graph baseline suite
+
+Goal:
+- add graph-aware baselines while keeping structural graph features, graph neural models, and graph-mining approaches separated
+
+Load-bearing improvement:
+- Relaytic can compare flattened tabular features, deterministic structural graph features, and optional graph model candidates honestly
+
+Human surface:
+- humans see whether graph evidence came from structural features, graph-shadow models, or raw graph neural baselines
+
+Agent surface:
+- external agents can consume graph baseline rows, eligibility, fallback, and claim posture from stable artifacts
+
+Intelligence source:
+- graph feature extraction, optional graph ML adapters, graph-shadow scorecards, and current graph claim scope
+
+Fallback rule:
+- if PyG or a graph adapter is unavailable, structural graph baselines remain the supported floor and graph-neural claims stay blocked
+
+Required outputs:
+- `paper_graph_baseline_manifest.json`
+- `paper_graph_feature_table.json`
+- `paper_graph_model_shadow_scorecard.json`
+- `paper_graph_baseline_fallback_report.json`
+
+Minimum proof:
+- one structural graph baseline runs on Elliptic-style evidence
+- optional graph models either run shadow-only or record fallback
+- graph model claims stay separate from graph environment claims
+
+### Paper Track P8 - AMLSim and Elliptic2 blocked-or-supported track
+
+Goal:
+- decide whether AMLSim-style synthetic bank graphs and Elliptic2-style subgraph AML can enter the first paper or must remain future work
+
+Load-bearing improvement:
+- Relaytic stops hand-waving about the hardest relevant tracks and records either runnable support or precise blockers
+
+Human surface:
+- humans know whether to spend time setting up AMLSim or Elliptic2 for this paper, and what each track can claim
+
+Agent surface:
+- external agents can consume supported, proxy, or blocked state with exact next actions
+
+Intelligence source:
+- dataset registry, graph loader, generator manifests, source availability, local resource checks, and claim contract rules
+
+Fallback rule:
+- if these tracks are blocked, the paper must mention them as limitations or future benchmarks, not silently replace them with easier evidence
+
+Required outputs:
+- `amlsim_generation_manifest.json`
+- `amlsim_typology_manifest.json`
+- `elliptic2_subgraph_access_report.json`
+- `subgraph_benchmark_blocker_report.json`
+
+Minimum proof:
+- each track is labeled supported, proxy, or blocked
+- blocked tracks include access, scale, loader, license, or claim-scope reasons
+- no paper table implies support without a corresponding artifact
+
+### Paper Track P9 - Operational AML evaluation layer
+
+Goal:
+- make analyst-review utility a primary evaluation axis rather than an after-the-fact product demo metric
+
+Load-bearing improvement:
+- Relaytic can evaluate AML systems by review capacity, false-positive reduction, case-packet completeness, and queue usefulness as well as model score
+
+Human surface:
+- humans can inspect top cases, review-budget tradeoffs, analyst-hour assumptions, and operational guardrails
+
+Agent surface:
+- external agents can consume operational metric rows and compare model wins against workflow value
+
+Intelligence source:
+- casework artifacts, operating-point contracts, review-capacity sensitivity, business-value reports, and public-claim guards
+
+Fallback rule:
+- if operational assumptions are missing, Relaytic records unknown or not claimable rather than inventing analyst-hour claims
+
+Required outputs:
+- `paper_operational_metric_table.json`
+- `paper_review_budget_curve.json`
+- `paper_case_packet_completeness_report.json`
+- `paper_operational_claim_guard.json`
+
+Minimum proof:
+- at least one AML benchmark row includes review-budget metrics
+- operational metrics cite assumptions and artifacts
+- public claims fail closed when business-value assumptions are incomplete
+
+### Paper Track P10 - Reproducible paper table generator
+
+Goal:
+- generate all paper tables from artifacts and rerunnable commands instead of hand-maintained numbers
+
+Load-bearing improvement:
+- Relaytic can produce a paper-ready result pack whose numbers, blockers, and claim labels are traceable to local runs
+
+Human surface:
+- humans can regenerate tables and see why any row is numeric, proxy-only, or blocked
+
+Agent surface:
+- external agents can inspect table provenance and verify that every metric cell has an artifact source
+
+Intelligence source:
+- paper dataset registry, benchmark result rows, baseline tables, operational metrics, environment scorecards, and claim gates
+
+Fallback rule:
+- missing metrics become empty or blocked cells with reasons, never manually filled placeholders
+
+Required outputs:
+- `paper_result_table_final.json`
+- `paper_table_provenance.json`
+- `paper_reproduction_commands.md`
+- `paper_metric_cell_audit.json`
+
+Minimum proof:
+- one command regenerates the paper table pack from existing run artifacts
+- every numeric cell cites dataset, split, command, run directory, artifact, and claim state
+- hard claims remain blocked unless all required gates pass
+
+### Paper Track P11 - Paper draft and figure pack
+
+Goal:
+- write the first paper draft and generate figures from the same evidence pack
+
+Load-bearing improvement:
+- Relaytic turns benchmark artifacts into a coherent arXiv-ready argument without drifting beyond the claim contract
+
+Human surface:
+- humans can read a paper draft, inspect figures, and see limitations before public release
+
+Agent surface:
+- external agents can lint paper claims against the contract and table provenance
+
+Intelligence source:
+- paper thesis contract, benchmark tables, operational metrics, related-work notes, figure generators, and claim taxonomy
+
+Fallback rule:
+- sections that depend on blocked benchmarks must be written as limitations or future work
+
+Required outputs:
+- `docs/paper/relaytic_aml_draft.md`
+- `docs/paper/figures/`
+- `paper_claim_lint_report.json`
+- `paper_limitations_matrix.json`
+
+Minimum proof:
+- draft contains abstract, intro, related work, method, benchmarks, results, limitations, and reproducibility appendix
+- claim lint passes against the claim contract
+- figures are generated from artifacts or explicitly marked schematic
+
+### Paper Track P12 - External dry run and clean-clone proof
+
+Goal:
+- prove that a fresh reviewer or external agent can reproduce the paper path without local tribal knowledge
+
+Load-bearing improvement:
+- Relaytic earns the right to call the paper reproducible by testing the repository as an outsider would use it
+
+Human surface:
+- humans get a clean-clone checklist and one clear pass/fail report before arXiv submission
+
+Agent surface:
+- external agents can run the dry-run checklist, inspect failures, and propose concrete repairs
+
+Intelligence source:
+- clean environment install checks, dataset registry, benchmark commands, release-safety scans, claim gates, and paper table regeneration
+
+Fallback rule:
+- if the full benchmark is too heavy, P12 must still reproduce a declared paper-smoke subset and record what remains non-reproduced
+
+Required outputs:
+- `paper_external_dry_run_report.json`
+- `paper_clean_clone_install_report.json`
+- `paper_reproduction_failure_report.json`
+- `paper_release_go_no_go.json`
+
+Minimum proof:
+- clean clone installs with the documented profile
+- paper-smoke benchmark subset regenerates expected artifacts
+- leak scan and claim lint pass
+- arXiv release is blocked on unresolved dry-run failures
+
+### Paper Track P13 - arXiv release and attention pack
+
+Goal:
+- release the paper, repo tag, benchmark pack, and public attention materials only after gates pass
+
+Load-bearing improvement:
+- Relaytic converts technical benchmark proof into a credible public artifact without overclaiming
+
+Human surface:
+- humans get a release checklist, paper link plan, README update, and concise public summary
+
+Agent surface:
+- external agents can verify release tag, paper version, benchmark artifacts, and allowed public wording
+
+Intelligence source:
+- final paper table, dry-run report, claim lint, release-safety scan, and attention-pack manifest
+
+Fallback rule:
+- if gates fail, P13 becomes a release-blocker report and schedules the next repair slice instead of publishing
+
+Required outputs:
+- `paper_release_manifest.json`
+- `paper_arxiv_submission_checklist.md`
+- `paper_attention_pack.md`
+- `paper_public_claims_allowed.json`
+
+Minimum proof:
+- P10 through P12 pass
+- release tag and paper draft cite the same artifact set
+- README and public post text use only allowed wording
+- no hard AML/SOTA claim appears without passing holdout, environment, claim, and reproducibility gates
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

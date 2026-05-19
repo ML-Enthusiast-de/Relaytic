@@ -143,6 +143,7 @@ The benchmark pack is now part of a broader AML proof/productization sequence. T
 8. **15Y**: rewrote first-contact docs around the flagship path and added the paper benchmark runbook.
 9. **15Z**: cleaned repo credibility risks with module-split evidence, public-surface inventory, and retained benchmark cleanup debt.
 10. **15Z-R**: froze the relevant benchmark and release evidence with a rerunnable paper-freeze command, claim boundaries, reproducibility attestation, and hard-performance-claim blocking.
+11. **Paper Track P0-P13**: turns the frozen but claim-blocked release pack into a paper-ready path: commit the baseline, clean public surfaces, freeze the paper thesis, register datasets, run PaySim-style and Elliptic-style evidence, add strong tabular and graph baselines, decide AMLSim/Elliptic2 support honestly, generate reproducible tables, draft the paper, dry-run from a clean clone, and release to arXiv only if gates pass.
 
 Benchmark success must stay separated from:
 
@@ -152,9 +153,9 @@ Benchmark success must stay separated from:
 - public-claim readiness
 - paper-safe broader claims
 
-## Release-freeze relevance gate
+## Paper-track relevance gate
 
-The final pre-Academy paper/release freeze must not rely on one easy or repeatedly inspected dataset.
+The final pre-Academy paper track must not rely on one easy or repeatedly inspected dataset.
 
 The relevant benchmark catalog should include:
 
@@ -164,4 +165,4 @@ The relevant benchmark catalog should include:
 - AMLSim-style synthetic bank graph evidence when reproducible local generation is available
 - the generic paper benchmark pack only as supporting structured-data evidence, not as the flagship AML proof
 
-Public claims require the benchmark catalog, holdout/partition posture, operational business-value guard, benchmark truth gate, environment scorecard, and release-safety scan to agree.
+Public claims require the benchmark catalog, holdout/partition posture, operational business-value guard, benchmark truth gate, environment scorecard, release-safety scan, paper table provenance, claim lint, and external dry run to agree.

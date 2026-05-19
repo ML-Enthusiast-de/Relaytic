@@ -17,7 +17,7 @@ Intended package boundaries:
 
 Slice 16 is the future umbrella track where Relaytic learns new non-core capabilities without turning into an uncontrolled self-modifying system.
 
-It should start only after the full performance-recovery track in Slices 15A through 15M, the AML foundation track in Slices 15N through 15Q, the AML proof alignment in Slice 15R-A, the flagship demo packaging in Slice 15S, the business-value guard in Slice 15T, the baseline/ablation relevance layer in Slice 15U, and the remaining AML productization plus paper-freeze track in Slices 15V through 15Z-R have landed.
+It should start only after the full performance-recovery track in Slices 15A through 15M, the AML foundation track in Slices 15N through 15Q, the AML proof alignment in Slice 15R-A, the flagship demo packaging in Slice 15S, the business-value guard in Slice 15T, the baseline/ablation relevance layer in Slice 15U, the remaining AML productization plus paper-freeze track in Slices 15V through 15Z-R, and Paper Track P0 through P13 have landed or explicitly blocked arXiv release with a documented go/no-go reason.
 
 This is not a single coding pass. It is a governed program delivered through:
 
@@ -29,8 +29,8 @@ This is not a single coding pass. It is a governed program delivered through:
 - Slice 16F academy mission control and explainability surfaces
 
 The academy is intentionally not the next move anymore.
-Relaytic first needs to become genuinely interesting as **Relaytic-AML**, with domain contracts, graph-aware reasoning, analyst-review optimization, streaming AML posture, and hard AML proof packs.
-After Slice 15Z-R, academy work must treat the frozen relevant benchmark catalog as a target and guardrail: new capabilities can attack benchmark gaps, but they must not redefine the benchmark story or bypass paper-claim gates.
+Relaytic first needs to become genuinely interesting as **Relaytic-AML**, with a clean public surface, claim-gated paper thesis, relevant AML benchmarks, strong baselines, reproducible tables, and an external dry run.
+After Paper Track P0 through P13, academy work must treat the frozen relevant benchmark catalog and paper go/no-go report as targets and guardrails: new capabilities can attack benchmark gaps, but they must not redefine the benchmark story or bypass paper-claim gates.
 
 This slice family must continue obeying:
 

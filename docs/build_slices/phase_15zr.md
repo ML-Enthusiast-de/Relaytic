@@ -6,9 +6,11 @@ Implemented.
 
 ## Intent
 
-Slice 15Z-R freezes the public benchmark and release evidence after the AML productization track and before the Academy track.
+Slice 15Z-R freezes the public benchmark and release evidence after the AML productization track and before the Paper Track.
 
 This is the release-readiness slice for attention-seeking public work: it should prove that Relaytic-AML can run relevant benchmarks, reproduce the artifacts, and state public claims without overreach.
+
+It is not the final arXiv release gate. Paper Track P0 through P13 must still clean public surfaces, freeze the paper thesis, run real benchmark rows, add strong baselines, generate reproducible paper tables, draft and lint the paper, and pass an external dry run before Academy work or public hard-performance claims resume.
 
 ## Load-Bearing Improvement
 
