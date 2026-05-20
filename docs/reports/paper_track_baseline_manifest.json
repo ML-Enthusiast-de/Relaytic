@@ -1,0 +1,43 @@
+{
+  "schema_version": "relaytic.paper_track_baseline.v1",
+  "slice": "Paper Track P0",
+  "status": "baseline_frozen_for_paper_track",
+  "baseline": {
+    "baseline_git_commit": "8b9c9aca723bae0f56bccab8b950689d5202b27a",
+    "baseline_git_commit_short": "8b9c9ac",
+    "baseline_recorded_on": "2026-05-20",
+    "baseline_scope": "Relaytic implemented through Slice 15Z-R plus the mandatory Paper Track P0-P13 roadmap.",
+    "claim_posture": "hard_performance_claims_blocked",
+    "next_slice": "Paper Track P1"
+  },
+  "paper_track": {
+    "current_slice": "Paper Track P0",
+    "next_slice": "Paper Track P1",
+    "academy_blocked_until": "Paper Track P0 through P13 complete the benchmark, paper, dry-run, and claim-gate path or explicitly block release with a go/no-go artifact.",
+    "p0_load_bearing_result": "Relaytic starts paper implementation from a recorded, tested, claim-blocked baseline instead of an ambiguous dirty tree."
+  },
+  "paper_freeze_refs": {
+    "paper_release_freeze_manifest": "docs/reports/paper_release_freeze_manifest.json",
+    "aml_relevant_benchmark_catalog": "docs/reports/aml_relevant_benchmark_catalog.json",
+    "paper_result_table": "docs/reports/paper_result_table.json",
+    "paper_claim_boundary_report": "docs/reports/paper_claim_boundary_report.json",
+    "reproducibility_attestation": "docs/reports/reproducibility_attestation.json",
+    "release_attention_pack_manifest": "docs/reports/release_attention_pack_manifest.json"
+  },
+  "claim_gate_snapshot": {
+    "release_posture": "safe_for_attention_without_hard_performance_claims",
+    "hard_performance_claims_allowed": false,
+    "blocked_hard_claim_id": "claim_sota_or_hard_aml_superiority",
+    "blocked_hard_claim_reason": "No frozen numeric holdout or paper track result has passed the model, operational, environment, claim, and reproducibility gates."
+  },
+  "required_next_artifacts": {
+    "paper_track_p1": [
+      "paper_public_surface_hygiene_report.json",
+      "legacy_compatibility_retention_report.json",
+      "paper_repo_cleanup_scorecard.json"
+    ]
+  },
+  "verification_refs": {
+    "paper_track_verification_report": "docs/reports/paper_track_verification_report.json"
+  }
+}

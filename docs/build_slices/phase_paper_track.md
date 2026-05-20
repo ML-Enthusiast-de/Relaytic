@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+P0 implemented. P1 through P13 planned.
 
 ## Intent
 
@@ -26,7 +26,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
 
 ## Required Order
 
-1. **P0 - Freeze and commit the 15Z-R baseline**
+1. **P0 - Freeze and commit the 15Z-R baseline** - implemented
    Commit the current paper-freeze state, record verification, and block new benchmark work until the baseline is stable.
 2. **P1 - Legacy public-surface cleanup**
    Remove stale `corr2surrogate`, prototype, toy, and unsupported SOTA language from public surfaces while retaining only explicit compatibility shims.
@@ -64,8 +64,18 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
 - blocked datasets are reported as blocked, not replaced silently by easier evidence
 - arXiv release requires a clean-clone dry run or a documented release blocker
 
-## First Implementation Target
+## Implementation Notes
 
-The next implementation target is **Paper Track P0**.
+P0 added:
 
-P0 should not implement new modeling behavior. It should freeze and commit the 15Z-R baseline, record verification, and make the next paper slice unambiguous.
+- `docs/reports/paper_track_baseline_manifest.json`
+- `docs/reports/paper_track_verification_report.json`
+- `tests/test_paper_track_p0.py`
+
+P0 keeps hard AML and SOTA performance claims blocked and records Paper Track P1 as the next paper implementation slice.
+
+## Next Implementation Target
+
+The next implementation target is **Paper Track P1**.
+
+P1 should not add benchmark modeling behavior yet. It should clean stale public-surface language and compatibility leakage so the repo reads like current Relaytic-AML before the paper thesis and benchmark dataset registry are implemented.

@@ -1,0 +1,51 @@
+{
+  "schema_version": "relaytic.paper_track_verification.v1",
+  "slice": "Paper Track P0",
+  "status": "p0_targeted_verification_recorded",
+  "verified_on": "2026-05-20",
+  "baseline_git_commit": "8b9c9aca723bae0f56bccab8b950689d5202b27a",
+  "baseline_git_commit_short": "8b9c9ac",
+  "verification_summary": {
+    "paper_freeze_rerun_passed": true,
+    "release_safety_scan_passed": true,
+    "targeted_regression_command_recorded": true,
+    "hard_performance_claims_allowed": false,
+    "next_slice": "Paper Track P1"
+  },
+  "commands": [
+    {
+      "command_id": "paper_freeze_rerun",
+      "command": "py -3.11 -m relaytic.ui.cli release-safety paper-freeze --output-dir docs\\reports --format json",
+      "status": "passed",
+      "observed_status": "frozen_supporting_release_pack",
+      "observed_hard_performance_claims_allowed": false,
+      "purpose": "Regenerate the Slice 15Z-R paper-freeze artifacts in place and confirm hard performance claims remain blocked."
+    },
+    {
+      "command_id": "release_safety_scan",
+      "command": "py -3.11 -m relaytic.ui.cli scan-git-safety",
+      "status": "passed",
+      "observed_status": "No leak patterns detected.",
+      "purpose": "Verify the current workspace does not contain known leak patterns before freezing the paper baseline."
+    },
+    {
+      "command_id": "targeted_p0_regression",
+      "command": "py -3.11 -m pytest -q tests\\test_paper_track_p0.py tests\\test_cli_slice15zr.py",
+      "status": "passed",
+      "observed_status": "8 passed in 0.59s",
+      "purpose": "Verify the P0 baseline artifacts and the existing paper-freeze pack together."
+    }
+  ],
+  "claim_gate_snapshot": {
+    "paper_freeze_manifest": "docs/reports/paper_release_freeze_manifest.json",
+    "paper_claim_boundary_report": "docs/reports/paper_claim_boundary_report.json",
+    "hard_performance_claims_allowed": false,
+    "blocked_claim_id": "claim_sota_or_hard_aml_superiority"
+  },
+  "git_policy": {
+    "p0_requires_clean_baseline": true,
+    "baseline_started_clean": true,
+    "post_p0_clean_status_expected_after_commit": true,
+    "uncommitted_work_ledger_allowed_only_if_commit_is_deferred": true
+  }
+}
