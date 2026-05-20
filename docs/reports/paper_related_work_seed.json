@@ -1,0 +1,106 @@
+{
+  "schema_version": "relaytic.paper_thesis_contract.v1",
+  "slice": "Paper Track P2",
+  "source_count": 8,
+  "sources": [
+    {
+      "paper_relevance": "Anchor for Elliptic-style temporal graph AML evidence and the need to compare graph methods against strong simpler baselines.",
+      "source_id": "elliptic_bitcoin_aml_2019",
+      "source_type": "paper",
+      "title": "Anti-Money Laundering in Bitcoin: Experimenting with Graph Convolutional Networks for Financial Forensics",
+      "topic": "Temporal graph AML benchmark",
+      "url": "https://arxiv.org/abs/1908.02591"
+    },
+    {
+      "paper_relevance": "Justifies treating the hardest AML graph track as subgraph-centric and blocking claims until subgraph support is reproducible.",
+      "source_id": "elliptic2_subgraph_2024",
+      "source_type": "paper",
+      "title": "The Shape of Money Laundering: Subgraph Representation Learning on the Blockchain with the Elliptic2 Dataset",
+      "topic": "Subgraph AML benchmark",
+      "url": "https://arxiv.org/abs/2404.19109"
+    },
+    {
+      "paper_relevance": "Supports a synthetic-bank graph track while keeping synthetic evidence separate from hard real-world AML superiority claims.",
+      "source_id": "amlsim_amlworld_neurips_2023",
+      "source_type": "paper_and_dataset_generator",
+      "title": "Realistic Synthetic Financial Transactions for Anti-Money Laundering Models",
+      "topic": "Synthetic AML transaction generation",
+      "url": "https://research.ibm.com/publications/realistic-synthetic-financial-transactions-for-anti-money-laundering-models"
+    },
+    {
+      "paper_relevance": "Supports the PaySim-style temporal transaction-fraud proxy track and its synthetic-source caveat.",
+      "source_id": "paysim_2016",
+      "source_type": "conference_paper",
+      "title": "PaySim: A financial mobile money simulator for fraud detection",
+      "topic": "Mobile-money transaction fraud simulator",
+      "url": "https://www.diva-portal.org/smash/record.jsf?pid=diva2:1058442"
+    },
+    {
+      "paper_relevance": "Motivates evaluating modern tabular baselines instead of comparing only against older local models.",
+      "source_id": "tabpfn_nature_2025",
+      "source_type": "paper",
+      "title": "Accurate predictions on small data with a tabular foundation model",
+      "topic": "Tabular foundation model baseline pressure",
+      "url": "https://www.nature.com/articles/s41586-024-08328-6"
+    },
+    {
+      "paper_relevance": "Provides adjacent dynamic financial-graph benchmark pressure while staying separate from AML-specific claims until data access and task posture are frozen.",
+      "source_id": "dgraph_finance_graph_2022",
+      "source_type": "paper",
+      "title": "DGraph: A Large-Scale Financial Dataset for Graph Anomaly Detection",
+      "topic": "Dynamic financial graph fraud benchmark",
+      "url": "https://arxiv.org/abs/2207.03579"
+    },
+    {
+      "paper_relevance": "Motivates machine-readable reproduction commands, table provenance, and claim linting.",
+      "source_id": "paperbench_2025",
+      "source_type": "paper",
+      "title": "PaperBench: Evaluating AI's Ability to Replicate AI Research",
+      "topic": "Research reproducibility and agent evaluation",
+      "url": "https://arxiv.org/abs/2504.01848"
+    },
+    {
+      "paper_relevance": "Reinforces that research systems should expose executable evidence rather than narrative-only claims.",
+      "source_id": "mlr_bench_2025",
+      "source_type": "paper",
+      "title": "MLR-Bench: Evaluating AI Agents on Open-Ended Machine Learning Research",
+      "topic": "Open-ended ML research evaluation",
+      "url": "https://arxiv.org/abs/2505.19955"
+    }
+  ],
+  "status": "related_work_seed_frozen",
+  "topic_clusters": [
+    {
+      "cluster_id": "temporal_graph_aml",
+      "paper_angle": "AML graph evidence must distinguish node, edge, temporal, and subgraph claims.",
+      "source_ids": [
+        "elliptic_bitcoin_aml_2019",
+        "elliptic2_subgraph_2024"
+      ]
+    },
+    {
+      "cluster_id": "synthetic_proxy_data",
+      "paper_angle": "Synthetic evidence is useful for workflow and proxy proof but cannot unlock hard real-world AML claims alone.",
+      "source_ids": [
+        "amlsim_amlworld_neurips_2023",
+        "paysim_2016"
+      ]
+    },
+    {
+      "cluster_id": "strong_tabular_baselines",
+      "paper_angle": "Modern tabular baselines put pressure on Relaytic to compare against stronger references.",
+      "source_ids": [
+        "tabpfn_nature_2025",
+        "dgraph_finance_graph_2022"
+      ]
+    },
+    {
+      "cluster_id": "research_reproducibility",
+      "paper_angle": "Machine-readable reproduction and claim linting are part of the paper contribution.",
+      "source_ids": [
+        "paperbench_2025",
+        "mlr_bench_2025"
+      ]
+    }
+  ]
+}

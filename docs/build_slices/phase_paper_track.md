@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 and P1 implemented. P2 through P13 planned.
+P0 through P2 implemented. P3 through P13 planned.
 
 ## Intent
 
@@ -30,7 +30,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Commit the current paper-freeze state, record verification, and block new benchmark work until the baseline is stable.
 2. **P1 - Legacy public-surface cleanup** - implemented
    Remove stale `corr2surrogate`, prototype, toy, and unsupported SOTA language from public surfaces while retaining only explicit compatibility shims.
-3. **P2 - Paper thesis and claim contract**
+3. **P2 - Paper thesis and claim contract** - implemented
    Freeze the paper title, research questions, contribution story, allowed claims, blocked claims, and related-work seed.
 4. **P3 - Benchmark dataset registry and access manifest**
    Record dataset sources, licenses, hashes, split posture, access blockers, and claim posture for each track.
@@ -82,10 +82,21 @@ P1 added:
 - modern Relaytic aliases for old model-training and target-ranking API/tool names
 - `tests/test_paper_track_p1.py`
 
-P1 keeps hard AML and SOTA performance claims blocked and records Paper Track P2 as the next paper implementation slice.
+P1 kept hard AML and SOTA performance claims blocked before P2 froze the paper thesis contract.
+
+P2 added:
+
+- `docs/paper/paper_thesis.md`
+- `docs/reports/paper_thesis_contract.json`
+- `docs/reports/paper_claim_taxonomy.json`
+- `docs/reports/paper_related_work_seed.json`
+- `src/relaytic/release_safety/paper_thesis.py`
+- `tests/test_paper_track_p2.py`
+
+P2 freezes the paper story as a claim-gated AML evaluation environment, keeps SOTA and hard AML performance claims blocked, and records Paper Track P3 as the next paper implementation slice.
 
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P2**.
+The next implementation target is **Paper Track P3**.
 
-P2 should not add benchmark modeling behavior yet. It should freeze the paper title, research questions, contribution story, allowed claims, blocked claims, benchmark acceptance doctrine, and related-work seed before dataset registry or benchmark implementation begins.
+P3 should not add benchmark modeling behavior yet. It should freeze dataset sources, licenses, access posture, split contracts, local file expectations, hashes when available, and blocked reasons before any runner is treated as paper evidence.

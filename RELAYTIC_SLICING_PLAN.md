@@ -341,7 +341,8 @@ Why:
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
 - Paper Track P0 through P13 now come before Academy work because the current freeze pack deliberately blocks hard AML and SOTA claims; Relaytic must first clean public surfaces, run relevant benchmark tracks, generate real numeric evidence, and draft a claim-safe paper before expanding into capability evolution
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
-- Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, adds Relaytic aliases for legacy API/tool names, and marks Paper Track P2 as the next slice
+- Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, and adds Relaytic aliases for legacy API/tool names
+- Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -354,8 +355,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 and P1. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, and Paper Track P1 public-surface cleanup.
-- next execution target: Paper Track P2
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P2. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, and Paper Track P2 thesis/claim contract.
+- next execution target: Paper Track P3
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -364,7 +365,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P2 through P13 prove the paper thesis, relevant benchmarks, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P3 through P13 prove relevant benchmarks, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3546,6 +3547,16 @@ Required outputs:
 Minimum proof:
 - the paper title, research questions, contributions, metrics, and blocked claims are written before new benchmark implementation begins
 - paper claim taxonomy agrees with `paper_claim_boundary_report.json`
+
+Implemented by:
+- adding `src/relaytic/release_safety/paper_thesis.py`
+- adding `docs/paper/paper_thesis.md`
+- adding `docs/reports/paper_thesis_contract.json`
+- adding `docs/reports/paper_claim_taxonomy.json`
+- adding `docs/reports/paper_related_work_seed.json`
+- adding `tests/test_paper_track_p2.py`
+
+P2 keeps hard AML and SOTA performance claims blocked and records Paper Track P3 as the next paper implementation slice.
 
 ### Paper Track P3 - Benchmark dataset registry and access manifest
 

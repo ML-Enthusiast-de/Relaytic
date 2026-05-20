@@ -55,6 +55,18 @@ from .paper_surface_hygiene import (
     build_paper_surface_hygiene_reports,
     sync_paper_surface_hygiene_reports,
 )
+from .paper_thesis import (
+    PAPER_THESIS_DOC_DIR,
+    PAPER_THESIS_DOC_FILENAME,
+    PAPER_THESIS_FILENAMES,
+    PAPER_THESIS_REPORT_DIR,
+    PAPER_THESIS_SCHEMA_VERSION,
+    build_paper_thesis_artifacts,
+    build_paper_thesis_pack,
+    render_paper_thesis_markdown,
+    sync_paper_thesis_artifacts,
+    sync_paper_thesis_pack,
+)
 from .storage import RELEASE_SAFETY_FILENAMES, read_release_safety_bundle, write_release_safety_bundle
 
 __all__ = [
@@ -70,6 +82,11 @@ __all__ = [
     "PAPER_SURFACE_HYGIENE_FILENAMES",
     "PAPER_SURFACE_HYGIENE_REPORT_DIR",
     "PAPER_SURFACE_HYGIENE_SCHEMA_VERSION",
+    "PAPER_THESIS_DOC_DIR",
+    "PAPER_THESIS_DOC_FILENAME",
+    "PAPER_THESIS_FILENAMES",
+    "PAPER_THESIS_REPORT_DIR",
+    "PAPER_THESIS_SCHEMA_VERSION",
     "RELEASE_BUNDLE_REPORT_SCHEMA_VERSION",
     "RELEASE_SAFETY_CONTROLS_SCHEMA_VERSION",
     "RELEASE_SAFETY_FILENAMES",
@@ -95,15 +112,20 @@ __all__ = [
     "build_release_safety_controls_from_policy",
     "build_paper_freeze_pack",
     "build_paper_surface_hygiene_reports",
+    "build_paper_thesis_artifacts",
+    "build_paper_thesis_pack",
     "build_repo_credibility_reports",
     "default_release_safety_state_dir",
     "latest_release_safety_state_dir",
     "read_release_safety_bundle",
     "render_paper_freeze_markdown",
+    "render_paper_thesis_markdown",
     "render_release_safety_markdown",
     "run_release_safety_scan",
     "sync_paper_freeze_pack",
     "sync_paper_surface_hygiene_reports",
+    "sync_paper_thesis_artifacts",
+    "sync_paper_thesis_pack",
     "sync_repo_credibility_reports",
     "write_release_safety_bundle",
 ]

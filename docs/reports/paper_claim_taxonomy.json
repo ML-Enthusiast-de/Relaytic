@@ -1,0 +1,111 @@
+{
+  "agrees_with_release_freeze_claim_boundaries": true,
+  "allowed_boundaries": [
+    "blocked",
+    "hard",
+    "supporting-only"
+  ],
+  "blocked_claim_ids": [
+    "claim_sota_or_hard_aml_superiority",
+    "claim_subgraph_or_synthetic_bank_graph"
+  ],
+  "claim_count": 6,
+  "claims": [
+    {
+      "allowed_public_wording": "Relaytic-AML includes a local release-freeze pack that records benchmark relevance, reproducibility posture, and blocked claims.",
+      "artifact_paths": [
+        "docs/reports/paper_release_freeze_manifest.json",
+        "docs/reports/reproducibility_attestation.json",
+        "docs/reports/release_attention_pack_manifest.json"
+      ],
+      "boundary": "hard",
+      "claim_id": "claim_release_freeze_pack_exists",
+      "claim_text": "Relaytic-AML emits a reproducible local paper/release freeze pack with explicit claim gates.",
+      "paper_section": "system",
+      "taxonomy_role": "product_surface_claim_only"
+    },
+    {
+      "allowed_public_wording": "PaySim-style evidence is a relevant proxy/dev workflow, not a hard real-world AML superiority result.",
+      "artifact_paths": [
+        "docs/reports/aml_relevant_benchmark_catalog.json",
+        "tests/test_cli_aml_realworld.py",
+        "aml_temporal_benchmark_claim_report.json",
+        "aml_environment_scorecard.json"
+      ],
+      "boundary": "supporting-only",
+      "claim_id": "claim_paysim_temporal_transaction_fraud",
+      "claim_text": "Relaytic-AML can run a PaySim-style temporal transaction-fraud workflow and emit AML temporal/environment gates.",
+      "paper_section": "benchmarks_pay_sim",
+      "taxonomy_role": "supporting_evidence_claim"
+    },
+    {
+      "allowed_public_wording": "Flattened Elliptic-style evidence is supporting proxy graph AML evidence until raw graph/holdout gates pass.",
+      "artifact_paths": [
+        "docs/reports/aml_relevant_benchmark_catalog.json",
+        "tests/test_cli_aml_realworld.py",
+        "aml_graph_loader_manifest.json",
+        "aml_graph_claim_scope.json"
+      ],
+      "boundary": "supporting-only",
+      "claim_id": "claim_elliptic_flattened_graph_aml",
+      "claim_text": "Relaytic-AML can run flattened Elliptic-style graph AML evidence and expose graph claim-scope artifacts.",
+      "paper_section": "benchmarks_elliptic",
+      "taxonomy_role": "supporting_evidence_claim"
+    },
+    {
+      "allowed_public_wording": "Hard AML performance claims are blocked until a frozen holdout/paper track reports numeric evidence and all claim gates pass.",
+      "artifact_paths": [
+        "docs/reports/paper_result_table.json",
+        "docs/reports/aml_relevant_benchmark_catalog.json",
+        "docs/reports/reproducibility_attestation.json"
+      ],
+      "boundary": "blocked",
+      "claim_id": "claim_sota_or_hard_aml_superiority",
+      "claim_text": "Relaytic-AML is a SOTA or hard public AML benchmark winner.",
+      "paper_section": "limitations",
+      "taxonomy_role": "blocked_until_later_paper_gate"
+    },
+    {
+      "allowed_public_wording": "Generic structured-data benchmark evidence is supporting breadth context and is not the flagship AML proof.",
+      "artifact_paths": [
+        "docs/reports/aml_relevant_benchmark_catalog.json",
+        "benchmark_release_gate.json",
+        "paper_benchmark_table.json"
+      ],
+      "boundary": "supporting-only",
+      "claim_id": "claim_generic_structured_supporting_pack",
+      "claim_text": "Relaytic has generic structured-data benchmark evidence that can support the AML story as breadth context.",
+      "paper_section": "supporting_breadth",
+      "taxonomy_role": "supporting_evidence_claim"
+    },
+    {
+      "allowed_public_wording": "Subgraph and synthetic-bank graph tracks are cataloged and blocked until data access, loader support, and reproducible generation are frozen.",
+      "artifact_paths": [
+        "docs/reports/aml_relevant_benchmark_catalog.json",
+        "aml_subgraph_task_manifest.json",
+        "aml_public_graph_benchmark_catalog.json"
+      ],
+      "boundary": "blocked",
+      "claim_id": "claim_subgraph_or_synthetic_bank_graph",
+      "claim_text": "Relaytic-AML has paper-ready subgraph AML or AMLSim-style synthetic-bank graph evidence.",
+      "paper_section": "future_work",
+      "taxonomy_role": "blocked_until_later_paper_gate"
+    }
+  ],
+  "hard_non_performance_claim_ids": [
+    "claim_release_freeze_pack_exists"
+  ],
+  "hard_performance_claims_allowed": false,
+  "schema_version": "relaytic.paper_thesis_contract.v1",
+  "slice": "Paper Track P2",
+  "source_claim_boundary_report": "docs/reports/paper_claim_boundary_report.json",
+  "source_claim_boundary_schema_version": "relaytic.paper_release_freeze.v1",
+  "source_claim_boundary_status": "claim_boundaries_frozen",
+  "status": "claim_taxonomy_frozen",
+  "supporting_only_claim_ids": [
+    "claim_paysim_temporal_transaction_fraud",
+    "claim_elliptic_flattened_graph_aml",
+    "claim_generic_structured_supporting_pack"
+  ],
+  "taxonomy_agrees_with_claim_boundary_report": true
+}
