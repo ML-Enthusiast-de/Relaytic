@@ -1,0 +1,14 @@
+{
+  "blocked_claim_posture": "Hard AML and SOTA performance claims remain blocked until later paper-track gates pass.",
+  "next_slice": "Paper Track P2",
+  "schema_version": "relaytic.paper_surface_hygiene.v1",
+  "scorecard": {
+    "academy_still_blocked": true,
+    "compatibility_boundary_retained": true,
+    "hard_performance_claims_still_blocked": true,
+    "public_surface_clean": true,
+    "relaytic_aliases_available_for_legacy_api_names": true
+  },
+  "slice": "Paper Track P1",
+  "status": "ready_for_paper_track_p2"
+}

@@ -1,0 +1,99 @@
+{
+  "all_compatibility_files_present": true,
+  "all_required_aliases_present": true,
+  "legacy_api_aliases": [
+    {
+      "alias": "train_model_candidates",
+      "alias_present": true,
+      "compatibility_posture": "modern_alias_added_legacy_name_retained",
+      "export_module": "src/relaytic/modeling/__init__.py",
+      "legacy_name": "train_surrogate_candidates",
+      "legacy_name_present": true,
+      "module": "src/relaytic/modeling/training.py",
+      "surface": "modeling_python_api"
+    },
+    {
+      "alias": "rank_candidate_targets",
+      "alias_present": true,
+      "compatibility_posture": "modern_alias_added_legacy_name_retained",
+      "export_module": "src/relaytic/analytics/__init__.py",
+      "legacy_name": "rank_surrogate_candidates",
+      "legacy_name_present": true,
+      "module": "src/relaytic/analytics/ranking.py",
+      "surface": "analytics_python_api"
+    },
+    {
+      "alias": "train_model_candidates",
+      "alias_present": true,
+      "compatibility_posture": "modern_alias_added_legacy_name_retained",
+      "export_module": "src/relaytic/orchestration/default_tools.py",
+      "legacy_name": "train_surrogate_candidates",
+      "legacy_name_present": true,
+      "module": "src/relaytic/orchestration/default_tools.py",
+      "surface": "agent_tool_registry"
+    },
+    {
+      "alias": "train_incremental_linear_model",
+      "alias_present": true,
+      "compatibility_posture": "modern_alias_added_legacy_name_retained",
+      "export_module": "src/relaytic/orchestration/default_tools.py",
+      "legacy_name": "train_incremental_linear_surrogate",
+      "legacy_name_present": true,
+      "module": "src/relaytic/orchestration/default_tools.py",
+      "surface": "agent_tool_registry"
+    },
+    {
+      "alias": "resume_incremental_linear_model",
+      "alias_present": true,
+      "compatibility_posture": "modern_alias_added_legacy_name_retained",
+      "export_module": "src/relaytic/orchestration/default_tools.py",
+      "legacy_name": "resume_incremental_linear_surrogate",
+      "legacy_name_present": true,
+      "module": "src/relaytic/orchestration/default_tools.py",
+      "surface": "agent_tool_registry"
+    }
+  ],
+  "legacy_import_boundary": "src/corr2surrogate is retained only as a compatibility shim.",
+  "legacy_names_still_accepted": true,
+  "new_code_target": "relaytic",
+  "retained_compatibility_files": [
+    {
+      "exists": true,
+      "path": "src/corr2surrogate/__init__.py",
+      "public_expansion_allowed": false,
+      "removal_condition": "Remove after downstream compatibility promises expire and tests no longer need legacy import smoke coverage.",
+      "retention_reason": "Legacy import forwarding only; new code and docs must target relaytic."
+    },
+    {
+      "exists": true,
+      "path": "src/corr2surrogate/ui/__init__.py",
+      "public_expansion_allowed": false,
+      "removal_condition": "Remove after downstream compatibility promises expire and tests no longer need legacy import smoke coverage.",
+      "retention_reason": "Legacy import forwarding only; new code and docs must target relaytic."
+    },
+    {
+      "exists": true,
+      "path": "src/corr2surrogate/ui/cli.py",
+      "public_expansion_allowed": false,
+      "removal_condition": "Remove after downstream compatibility promises expire and tests no longer need legacy import smoke coverage.",
+      "retention_reason": "Legacy import forwarding only; new code and docs must target relaytic."
+    },
+    {
+      "exists": true,
+      "path": "src/corr2surrogate/security/__init__.py",
+      "public_expansion_allowed": false,
+      "removal_condition": "Remove after downstream compatibility promises expire and tests no longer need legacy import smoke coverage.",
+      "retention_reason": "Legacy import forwarding only; new code and docs must target relaytic."
+    },
+    {
+      "exists": true,
+      "path": "src/corr2surrogate/security/git_guard.py",
+      "public_expansion_allowed": false,
+      "removal_condition": "Remove after downstream compatibility promises expire and tests no longer need legacy import smoke coverage.",
+      "retention_reason": "Legacy import forwarding only; new code and docs must target relaytic."
+    }
+  ],
+  "schema_version": "relaytic.paper_surface_hygiene.v1",
+  "slice": "Paper Track P1",
+  "status": "compatibility_retained_without_public_expansion"
+}

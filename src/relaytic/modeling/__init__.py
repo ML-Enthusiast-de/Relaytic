@@ -25,6 +25,7 @@ from .training import (
     LaggedTreeClassifierSurrogate,
     LaggedTreeEnsembleSurrogate,
     normalize_candidate_model_family,
+    train_model_candidates,
     train_surrogate_candidates,
 )
 
@@ -52,5 +53,6 @@ __all__ = [
     "build_train_validation_test_split",
     "normalize_candidate_model_family",
     "run_inference_from_artifacts",
+    "train_model_candidates",
     "train_surrogate_candidates",
 ]

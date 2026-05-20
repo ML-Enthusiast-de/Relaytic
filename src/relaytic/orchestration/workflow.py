@@ -209,7 +209,7 @@ def _build_recommendations(
 
     if sample_count is not None and sample_count < 500:
         recommendations.append(
-            "Dataset appears small for robust surrogate quality. Collect more representative data."
+            "Dataset appears small for robust model quality. Collect more representative data."
         )
     classification_like = any(
         token in name.lower()

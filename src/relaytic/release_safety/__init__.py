@@ -48,6 +48,13 @@ from .repo_credibility import (
     build_repo_credibility_reports,
     sync_repo_credibility_reports,
 )
+from .paper_surface_hygiene import (
+    PAPER_SURFACE_HYGIENE_FILENAMES,
+    PAPER_SURFACE_HYGIENE_REPORT_DIR,
+    PAPER_SURFACE_HYGIENE_SCHEMA_VERSION,
+    build_paper_surface_hygiene_reports,
+    sync_paper_surface_hygiene_reports,
+)
 from .storage import RELEASE_SAFETY_FILENAMES, read_release_safety_bundle, write_release_safety_bundle
 
 __all__ = [
@@ -60,6 +67,9 @@ __all__ = [
     "PAPER_FREEZE_FILENAMES",
     "PAPER_FREEZE_REPORT_DIR",
     "PAPER_FREEZE_SCHEMA_VERSION",
+    "PAPER_SURFACE_HYGIENE_FILENAMES",
+    "PAPER_SURFACE_HYGIENE_REPORT_DIR",
+    "PAPER_SURFACE_HYGIENE_SCHEMA_VERSION",
     "RELEASE_BUNDLE_REPORT_SCHEMA_VERSION",
     "RELEASE_SAFETY_CONTROLS_SCHEMA_VERSION",
     "RELEASE_SAFETY_FILENAMES",
@@ -84,6 +94,7 @@ __all__ = [
     "SourceMapAuditArtifact",
     "build_release_safety_controls_from_policy",
     "build_paper_freeze_pack",
+    "build_paper_surface_hygiene_reports",
     "build_repo_credibility_reports",
     "default_release_safety_state_dir",
     "latest_release_safety_state_dir",
@@ -92,6 +103,7 @@ __all__ = [
     "render_release_safety_markdown",
     "run_release_safety_scan",
     "sync_paper_freeze_pack",
+    "sync_paper_surface_hygiene_reports",
     "sync_repo_credibility_reports",
     "write_release_safety_bundle",
 ]

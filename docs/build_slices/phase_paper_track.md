@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 implemented. P1 through P13 planned.
+P0 and P1 implemented. P2 through P13 planned.
 
 ## Intent
 
@@ -28,7 +28,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
 
 1. **P0 - Freeze and commit the 15Z-R baseline** - implemented
    Commit the current paper-freeze state, record verification, and block new benchmark work until the baseline is stable.
-2. **P1 - Legacy public-surface cleanup**
+2. **P1 - Legacy public-surface cleanup** - implemented
    Remove stale `corr2surrogate`, prototype, toy, and unsupported SOTA language from public surfaces while retaining only explicit compatibility shims.
 3. **P2 - Paper thesis and claim contract**
    Freeze the paper title, research questions, contribution story, allowed claims, blocked claims, and related-work seed.
@@ -74,8 +74,18 @@ P0 added:
 
 P0 keeps hard AML and SOTA performance claims blocked and records Paper Track P1 as the next paper implementation slice.
 
+P1 added:
+
+- `docs/reports/paper_public_surface_hygiene_report.json`
+- `docs/reports/legacy_compatibility_retention_report.json`
+- `docs/reports/paper_repo_cleanup_scorecard.json`
+- modern Relaytic aliases for old model-training and target-ranking API/tool names
+- `tests/test_paper_track_p1.py`
+
+P1 keeps hard AML and SOTA performance claims blocked and records Paper Track P2 as the next paper implementation slice.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P1**.
+The next implementation target is **Paper Track P2**.
 
-P1 should not add benchmark modeling behavior yet. It should clean stale public-surface language and compatibility leakage so the repo reads like current Relaytic-AML before the paper thesis and benchmark dataset registry are implemented.
+P2 should not add benchmark modeling behavior yet. It should freeze the paper title, research questions, contribution story, allowed claims, blocked claims, benchmark acceptance doctrine, and related-work seed before dataset registry or benchmark implementation begins.

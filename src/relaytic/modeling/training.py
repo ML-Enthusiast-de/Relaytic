@@ -4276,3 +4276,6 @@ def _is_number(value: Any) -> bool:
         return False
     return True
 
+
+train_model_candidates = train_surrogate_candidates
+

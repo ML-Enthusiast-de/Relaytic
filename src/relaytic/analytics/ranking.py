@@ -141,3 +141,6 @@ def build_forced_directive(
         force_run_regardless_of_correlation=True,
         user_reason=user_reason,
     )
+
+
+rank_candidate_targets = rank_surrogate_candidates

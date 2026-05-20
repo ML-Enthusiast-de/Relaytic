@@ -17685,7 +17685,7 @@ def _execute_modeler_build_request(
         response = (
             f"Requested model `{requested_model}` is not implemented yet. "
             "Currently available: `auto`, `linear_ridge` "
-            "(aliases: `ridge`, `linear`, `incremental_linear_surrogate`), "
+            "(aliases: `ridge`, `linear`), "
             "`logistic_regression` (aliases: `logistic`, `logit`, `linear_classifier`, `classifier`), "
             "`lagged_logistic_regression` (aliases: `lagged_logistic`, `lagged_logit`, `temporal_classifier`), "
             "`lagged_linear` (aliases: `lagged`, `temporal_linear`, `arx`), "
@@ -19213,7 +19213,7 @@ def _prompt_modeler_feature_override(
 
 def _prompt_modeler_model_override(*, default_model: str) -> tuple[str, bool]:
     available = (
-        "auto, linear_ridge (aliases: ridge, linear, incremental_linear_surrogate), "
+        "auto, linear_ridge (aliases: ridge, linear), "
         "logistic_regression (aliases: logistic, logit, linear_classifier, classifier), "
         "lagged_logistic_regression (aliases: lagged_logistic, lagged_logit, temporal_classifier), "
         "lagged_linear (aliases: lagged, temporal_linear, arx), "

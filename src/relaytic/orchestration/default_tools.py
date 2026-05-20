@@ -183,9 +183,9 @@ def build_default_registry() -> ToolRegistry:
     )
 
     registry.register_function(
-        name="train_incremental_linear_surrogate",
+        name="train_incremental_linear_model",
         description=(
-            "Train a baseline surrogate, create a savepoint, and persist model metadata."
+            "Train a baseline linear model, create a savepoint, and persist model metadata."
         ),
         input_schema={
             "type": "object",
@@ -208,11 +208,36 @@ def build_default_registry() -> ToolRegistry:
     )
 
     registry.register_function(
-        name="train_surrogate_candidates",
+        name="train_incremental_linear_surrogate",
+        description=(
+            "Compatibility alias for train_incremental_linear_model."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "data_path": {"type": "string"},
+                "target_column": {"type": "string"},
+                "feature_columns": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                },
+                "sheet_name": {"type": "string"},
+                "run_id": {"type": "string"},
+                "checkpoint_tag": {"type": "string"},
+            },
+            "required": ["data_path", "target_column", "feature_columns"],
+            "additionalProperties": False,
+        },
+        handler=_tool_train_incremental_linear_surrogate,
+        risk_level="low",
+    )
+
+    registry.register_function(
+        name="train_model_candidates",
         description=(
             "Run split-safe train/validation/test training for regression or classification: "
-            "linear/logistic baselines, lagged temporal baselines when applicable, and the first "
-            "nonlinear tree baselines, compare them, and persist the selected model."
+            "linear/logistic baselines, lagged temporal baselines when applicable, and tree "
+            "baselines, compare them, and persist the selected model."
         ),
         input_schema={
             "type": "object",
@@ -245,9 +270,65 @@ def build_default_registry() -> ToolRegistry:
     )
 
     registry.register_function(
+        name="train_surrogate_candidates",
+        description=(
+            "Compatibility alias for train_model_candidates."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "data_path": {"type": "string"},
+                "target_column": {"type": "string"},
+                "feature_columns": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                },
+                "requested_model_family": {"type": "string"},
+                "sheet_name": {"type": "string"},
+                "timestamp_column": {"type": "string"},
+                "run_id": {"type": "string"},
+                "checkpoint_tag": {"type": "string"},
+                "normalize": {"type": "boolean"},
+                "missing_data_strategy": {"type": "string"},
+                "fill_constant_value": {"type": "number"},
+                "compare_against_baseline": {"type": "boolean"},
+                "lag_horizon_samples": {"type": "integer"},
+                "threshold_policy": {"type": "string"},
+                "decision_threshold": {"type": "number"},
+                "task_type_hint": {"type": "string"},
+            },
+            "required": ["data_path", "target_column", "feature_columns", "requested_model_family"],
+            "additionalProperties": False,
+        },
+        handler=_tool_train_surrogate_candidates,
+        risk_level="low",
+    )
+
+    registry.register_function(
+        name="resume_incremental_linear_model",
+        description=(
+            "Load a savepoint, add new data, retrain model statistics, and create a child savepoint."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "checkpoint_id": {"type": "string"},
+                "additional_data_path": {"type": "string"},
+                "sheet_name": {"type": "string"},
+                "run_id": {"type": "string"},
+                "note": {"type": "string"},
+            },
+            "required": ["checkpoint_id", "additional_data_path"],
+            "additionalProperties": False,
+        },
+        handler=_tool_resume_incremental_linear_surrogate,
+        risk_level="low",
+    )
+
+    registry.register_function(
         name="resume_incremental_linear_surrogate",
         description=(
-            "Load a savepoint, add new data, retrain model statistics, and create child savepoint."
+            "Compatibility alias for resume_incremental_linear_model."
         ),
         input_schema={
             "type": "object",

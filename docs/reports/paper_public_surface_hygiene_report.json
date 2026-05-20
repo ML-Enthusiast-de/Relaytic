@@ -1,0 +1,36 @@
+{
+  "agent_prompt_files_scanned": [
+    "src/relaytic/agents/prompts/modeler_system.txt"
+  ],
+  "allowed_claim_discipline_language": [
+    "SOTA may appear only when explicitly blocking or limiting unsupported claims.",
+    "Compatibility terms may appear only in migration, compatibility, history, or generated retention reports."
+  ],
+  "cli_public_help_checks": [
+    {
+      "legacy_alias_visible": false,
+      "replacement_public_aliases": [
+        "linear_ridge",
+        "ridge",
+        "linear"
+      ],
+      "surface": "model_family_help"
+    }
+  ],
+  "public_surface_files_scanned": [
+    "README.md",
+    "docs/why_relaytic_aml.md",
+    "docs/product_story.md",
+    "docs/paper_benchmark_runbook.md",
+    "docs/handbooks/relaytic_user_handbook.md",
+    "docs/handbooks/relaytic_agent_handbook.md",
+    "docs/handbooks/relaytic_demo_walkthrough.md",
+    ".agents/skills/relaytic/SKILL.md"
+  ],
+  "schema_version": "relaytic.paper_surface_hygiene.v1",
+  "slice": "Paper Track P1",
+  "stale_language_findings": [],
+  "stale_public_surface_language_detected": false,
+  "status": "clean",
+  "unsupported_sota_language_detected": false
+}

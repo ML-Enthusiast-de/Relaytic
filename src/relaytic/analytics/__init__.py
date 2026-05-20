@@ -32,6 +32,7 @@ from .ranking import (
     ForcedModelingDirective,
     RankedSignal,
     build_forced_directive,
+    rank_candidate_targets,
     rank_surrogate_candidates,
 )
 from .reporting import (
@@ -129,6 +130,7 @@ __all__ = [
     "build_candidate_signals_from_correlations",
     "build_forced_directive",
     "discover_feature_engineering_opportunities",
+    "rank_candidate_targets",
     "rank_surrogate_candidates",
     "run_correlation_analysis",
     "run_quality_checks",
