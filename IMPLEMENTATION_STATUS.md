@@ -33,13 +33,14 @@ This document tracks the operational state of the repository. It is an implement
 - latest repo-credibility slice: 15Z, AML environment CLI helper extraction, deterministic repo audit reports, public-surface inventory, module extraction plan, and benchmark cleanup debt report
 - latest paper-freeze slice: 15Z-R, `relaytic release-safety paper-freeze`, AML relevant benchmark catalog, paper result table, public claim boundaries, reproducibility attestation, and safe attention pack
 - latest roadmap update: Paper Track P0 through P13 is now the required path before Academy work, with `docs/build_slices/phase_paper_track.md` as the execution brief
+- latest paper-benchmark doctrine update: future paper rows must separate smoke, baseline, competitive, and release budgets; weak first-pass rows stay baseline-only or failure-analysis evidence unless leakage-safe competitive reruns, HPO/search-budget accounting, adapter/version capture, and publishability gates promote them
 - latest paper-track slice: P4, `paysim_benchmark_manifest.json`, `paysim_temporal_split_report.json`, `paysim_operating_point_table.json`, `paysim_paper_result_row.json`, and Paper Track P5 as the next target
 - latest paper-PaySim slice: P4, full 6,362,620-row chronological PaySim run with validation-only threshold selection, fixed test evaluation, review-budget/fixed-FPR metrics, supporting-only claim posture, and hard AML/SOTA performance claims still blocked
 - latest paper-thesis slice: P2, claim-gated AML evaluation-environment thesis, research questions, contributions, metric doctrine, blocked-claim taxonomy, and related-work seed
 - latest paper-dataset slice: P3, deterministic dataset source/access registry, local file hash checks, split contracts, blocked reasons, and no-auto-download policy
 - latest paper-surface cleanup slice: P1, `paper_public_surface_hygiene_report.json`, `legacy_compatibility_retention_report.json`, `paper_repo_cleanup_scorecard.json`, and modern Relaytic aliases for legacy API/tool names
 - latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, broader human-chaos coverage, and a prepared paper-grade benchmark/eval pack
-- next planned academy follow-on: 16A, capability registry and capability cards, after Paper Track P5 through P13 complete the graph benchmark, baseline suite, paper draft, dry run, and arXiv proof path
+- next planned academy follow-on: 16A, capability registry and capability cards, after Paper Track P5 through P13 complete the graph benchmark, baseline and competitive-budget suites, paper draft, dry run, and arXiv proof path
 - final planned cleanup follow-on after Slice 17: 18, endgame consolidation, legacy removal, and repo-quality hardening
 - current public package: `relaytic`
 - current public CLI: `relaytic`
@@ -173,7 +174,7 @@ The most important not-yet-implemented shifts after the current baseline are:
 - broader human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy across more datasets and host paths
 - later academy-aware mission-control surfaces that explain capability promotion, shadow trials, hunt campaigns, and roster changes to both humans and external agents
 - a completed pre-Academy AML productization and paper-freeze track through Slice 15Z-R, with hard performance claims still blocked until a true paper/holdout benchmark row is frozen
-- a mandatory Paper Track P0 through P13 before Academy work, covering repo/public-surface cleanup, paper thesis contract, benchmark dataset registry, PaySim-style temporal evidence, Elliptic-style graph evidence, strong tabular and graph baselines, AMLSim/Elliptic2 support decisions, operational AML metrics, reproducible paper tables, paper drafting, clean-clone dry run, and arXiv release gating
+- a mandatory Paper Track P0 through P13 before Academy work, covering repo/public-surface cleanup, paper thesis contract, benchmark dataset registry, PaySim-style temporal evidence, Elliptic-style graph evidence, strong tabular and graph baselines, a dedicated PaySim competitive rerun/publishability gate, AMLSim/Elliptic2 support decisions, operational AML metrics, reproducible paper tables, paper drafting, clean-clone dry run, and arXiv release gating
 - a Slice 16A+ capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement after the Paper Track completes or explicitly blocks release
 - a later optional representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family after the academy track
 
@@ -526,5 +527,5 @@ The repository is not yet at the final product state. The main remaining gaps ar
 With Slice 15Z-R and Paper Track P0-P4 now landed, the next high-leverage frontier follow-ons are:
 
 - Paper Track P5, build the Elliptic-style graph loader/provenance path that can produce an honest graph paper row
-- Paper Track P6 through P13, add strong baselines, graph baselines, AMLSim/Elliptic2 support decisions, operational metrics, reproducible tables, a claim-linted paper draft, clean-clone dry run, and only then an arXiv release
+- Paper Track P6 through P13, add strong baselines, the PaySim competitive rerun/publishability gate, graph baselines, AMLSim/Elliptic2 support decisions, operational metrics, reproducible tables, a claim-linted paper draft, clean-clone dry run, and only then an arXiv release
 - Slice 16A capability registry and capability cards after the Paper Track, so future academy work starts from one governed source of truth without distracting from the benchmark/paper proof path

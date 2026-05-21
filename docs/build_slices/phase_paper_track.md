@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P4 implemented. P5 through P13 planned.
+P0 through P4 implemented. P5 through P13, including P6-A, planned.
 
 ## Intent
 
@@ -39,30 +39,51 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
 6. **P5 - Elliptic graph benchmark loader and provenance**
    Produce raw or flattened Elliptic-style graph provenance, split proof, and graph claim scope.
 7. **P6 - Strong tabular baseline suite**
-   Compare deterministic baselines plus optional LightGBM, CatBoost, XGBoost, TabPFN-style, or other strong tabular adapters under one split contract.
-8. **P7 - Graph baseline suite**
+   Compare deterministic baselines plus optional LightGBM, CatBoost, XGBoost, TabPFN-style, or other strong tabular adapters under one split contract and explicit budget ladder.
+8. **P6-A - PaySim competitive rerun and publishability gate**
+   Rerun PaySim under a paper-grade competitive budget before any PaySim metric can enter a headline table.
+9. **P7 - Graph baseline suite**
    Compare flattened tabular, structural graph-feature, and optional graph-model baselines without conflating their claims.
-9. **P8 - AMLSim and Elliptic2 blocked-or-supported track**
+10. **P8 - AMLSim and Elliptic2 blocked-or-supported track**
    Decide whether synthetic-bank and subgraph AML tracks are runnable for the first paper or explicitly blocked with exact reasons.
-10. **P9 - Operational AML evaluation layer**
+11. **P9 - Operational AML evaluation layer**
     Add review-budget, analyst-hour, false-positive reduction, case-packet completeness, and operational claim guards to paper rows.
-11. **P10 - Reproducible paper table generator**
+12. **P10 - Reproducible paper table generator**
     Generate all paper tables from run artifacts, not hand-maintained numbers.
-12. **P11 - Paper draft and figure pack**
+13. **P11 - Paper draft and figure pack**
     Draft the arXiv paper and generate figures from artifacts or clearly mark schematic figures.
-13. **P12 - External dry run and clean-clone proof**
+14. **P12 - External dry run and clean-clone proof**
     Reproduce the install, paper-smoke benchmark, table generation, claim lint, and leak scan from a clean clone.
-14. **P13 - arXiv release and attention pack**
+15. **P13 - arXiv release and attention pack**
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
 
 ## Non-Negotiable Gates
 
 - no hard AML or SOTA claim without numeric holdout evidence and passing paper gates
 - no single proxy dataset unlocks a broader AML superiority claim
+- no first runnable benchmark row is allowed to become a final paper headline row without a competitive rerun under a declared paper budget
+- every benchmark must report both a conservative baseline budget and a stronger competitive budget, or explain exactly why the stronger budget was blocked
+- every competitive budget must include leakage audits, temporal/graph split checks, adapter/version capture, HPO/search-budget accounting, and validation-only threshold selection before test evaluation
+- weak but honest results remain useful as baseline or failure-analysis rows, not as evidence of model quality or SOTA competitiveness
 - every table cell cites dataset, split, command, run directory, artifact path, and claim posture
 - every optional adapter captures version, eligibility, and fallback state
 - blocked datasets are reported as blocked, not replaced silently by easier evidence
 - arXiv release requires a clean-clone dry run or a documented release blocker
+
+## Benchmark Ambition Doctrine
+
+Every paper benchmark must run through a staged evidence ladder:
+
+1. **Smoke budget**
+   Tiny or fixture-backed run that proves the command, artifacts, and claim gates work. This is never paper performance evidence.
+2. **Baseline budget**
+   Full dataset where possible, conservative leakage-safe features, deterministic or low-cost models, and fixed split/metric contracts. This establishes the honest floor.
+3. **Competitive budget**
+   Full dataset, strong feature generation, strong tabular or graph baselines, train-only imbalance handling, calibration, threshold optimization on validation only, and budgeted HPO/search. This is the minimum candidate for a paper performance table.
+4. **Release budget**
+   Frozen configs, clean-clone reproduction, rerun variance where practical, exact version capture, and claim linting. This is required before arXiv or public attention materials.
+
+If a benchmark looks weak after the baseline budget, Relaytic must treat that as a challenge signal: widen the candidate family, improve leakage-safe feature engineering, raise the search budget, or mark the track as non-competitive. It must not rationalize weak numbers into a headline claim.
 
 ## Implementation Notes
 

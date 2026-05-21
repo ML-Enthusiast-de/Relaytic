@@ -143,6 +143,8 @@ From Slice 05 onward, Relaytic should keep these cross-cutting proof tracks aliv
   formal benchmark parity is Slice 11, but benchmark harness stubs and reference logging should start earlier whenever route, evidence, or completion logic changes
 - **paper-release benchmark path**
   later AML/paper claims must end in a release-freeze bundle that names relevant public benchmark families, records proxy or blocked status honestly, and ties every claim to reproducible artifacts
+- **paper-competitiveness path**
+  every publishable benchmark must separate smoke, baseline, competitive, and release budgets; weak first-pass rows are allowed as honest baselines or failure analysis only, never as headline model-quality evidence without budgeted SOTA-candidate reruns, leakage audits, split checks, HPO/search-budget accounting, adapter/version capture, and validation-only threshold selection before final test evaluation
 
 If a later slice adds "smartness" without strengthening at least one of those proof tracks, it is not sharp enough.
 
@@ -263,6 +265,7 @@ Stable slice numbering stays the same, but the preferred execution order after S
 65. Paper Track P4 - PaySim-style temporal benchmark runner
 66. Paper Track P5 - Elliptic graph benchmark loader and provenance
 67. Paper Track P6 - strong tabular baseline suite
+67A. Paper Track P6-A - PaySim competitive rerun and publishability gate
 68. Paper Track P7 - graph baseline suite
 69. Paper Track P8 - AMLSim and Elliptic2 blocked-or-supported track
 70. Paper Track P9 - operational AML evaluation layer
@@ -339,7 +342,7 @@ Why:
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
-- Paper Track P0 through P13 now come before Academy work because the current freeze pack deliberately blocks hard AML and SOTA claims; Relaytic must first clean public surfaces, run relevant benchmark tracks, generate real numeric evidence, and draft a claim-safe paper before expanding into capability evolution
+- Paper Track P0 through P13 now come before Academy work because the current freeze pack deliberately blocks hard AML and SOTA claims; Relaytic must first clean public surfaces, run relevant benchmark tracks, challenge weak first-pass rows with competitive leakage-safe budgets, generate real numeric evidence, and draft a claim-safe paper before expanding into capability evolution
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
 - Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, and adds Relaytic aliases for legacy API/tool names
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
@@ -367,7 +370,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P5 through P13 prove relevant graph benchmarks, baseline suites, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P5 through P13 prove relevant graph benchmarks, baseline and competitive-budget suites, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3680,30 +3683,71 @@ Goal:
 - upgrade the paper comparison set so Relaytic is judged against current strong tabular baselines, not only legacy local models
 
 Load-bearing improvement:
-- Relaytic can compare rules, calibrated linear models, tree ensembles, boosted trees, and optional tabular foundation-model adapters under the same split and metric contract
+- Relaytic can compare rules, calibrated linear models, tree ensembles, boosted trees, optional tabular foundation-model adapters, and budgeted SOTA-candidate tabular routines under the same split, leakage, metric, and threshold contract
 
 Human surface:
-- humans see which baselines ran, which fell back, what versions were used, and where Relaytic won or lost
+- humans see which baselines ran at smoke, baseline, competitive, and release budgets; which fell back; what versions were used; what search budget was consumed; and where Relaytic won, lost, or remains non-competitive
 
 Agent surface:
-- external agents can consume baseline eligibility, fallback, version, runtime, and metric rows without inferring adapter state
+- external agents can consume baseline eligibility, budget tier, fallback, version, runtime, HPO/search trace, leakage posture, and metric rows without inferring adapter state
 
 Intelligence source:
-- mature optional adapters, deterministic fallback baselines, calibration/threshold contracts, and benchmark-truth gates
+- mature optional adapters, deterministic fallback baselines, leakage-safe feature generation, train-only imbalance handling, calibration/threshold contracts, HPO/search-controller budgets, rerun variance where practical, and benchmark-truth gates
 
 Fallback rule:
-- optional libraries may strengthen evidence but cannot become required for the deterministic floor or hidden sources of truth
+- optional libraries may strengthen evidence but cannot become required for the deterministic floor or hidden sources of truth; if competitive adapters are unavailable or underperform, the result is recorded as non-competitive or baseline-only rather than promoted into the headline paper table
 
 Required outputs:
 - `paper_baseline_suite_manifest.json`
 - `paper_baseline_version_matrix.json`
 - `paper_tabular_baseline_table.json`
 - `paper_baseline_fallback_report.json`
+- `paper_benchmark_budget_contract.json`
+- `paper_competitive_search_trace.json`
+- `paper_leakage_safe_feature_report.json`
+- `paper_publishability_gate.json`
 
 Minimum proof:
 - at least three baseline families run on one AML benchmark or emit explicit fallback states
 - optional adapters capture version and eligibility
 - result rows share the same split and metric contract
+- every reported benchmark row is labeled `smoke`, `baseline`, `competitive`, or `release`
+- no weak first-pass result can enter the headline table unless the competitive budget either improves it or emits a documented non-competitive blocker
+
+### Paper Track P6-A - PaySim competitive rerun and publishability gate
+
+Goal:
+- rerun PaySim under a real paper-grade competitive budget before PaySim performance is used as more than a baseline/provenance row
+
+Load-bearing improvement:
+- Relaytic stops treating the P4 leakage-safe logistic row as sufficient performance evidence and instead challenges it with strong leakage-safe feature engineering, boosted/tree ensembles, calibration, and budgeted HPO
+
+Human surface:
+- humans see the PaySim smoke, baseline, competitive, and release-candidate rows side by side, with exact feature exclusions, search budget, adapter versions, validation-selected thresholds, and reasons any result is or is not publishable
+
+Agent surface:
+- external agents can inspect the PaySim competitive search trace, feature report, leakage audit, model-family table, operating-point table, and publishability gate without reading code or markdown
+
+Intelligence source:
+- P3 source/split contracts, P4 temporal benchmark artifacts, P6 strong tabular adapters, search-controller budget doctrine, leakage audits, validation-only threshold optimization, and review-budget operating points
+
+Fallback rule:
+- if strong adapters are unavailable, runtime budget is insufficient, or the best clean model remains weak, PaySim stays baseline-only or non-competitive and the paper must frame it as failure analysis or supporting proxy evidence, not a model-quality headline
+
+Required outputs:
+- `paysim_competitive_benchmark_manifest.json`
+- `paysim_competitive_budget_contract.json`
+- `paysim_competitive_search_trace.json`
+- `paysim_leakage_safe_feature_report.json`
+- `paysim_competitive_baseline_table.json`
+- `paysim_publishability_gate.json`
+
+Minimum proof:
+- at least one deterministic baseline and at least three strong tabular families run or emit precise fallback states on the same chronological split
+- HPO/search budget, candidate count, runtime, random seeds, adapter versions, and train-only imbalance handling are recorded
+- all feature engineering is point-in-time or leakage-safe, with forbidden PaySim balance fields and invalid split methods blocked from paper claims
+- thresholds and calibration are selected only on validation and applied unchanged to test
+- the result is promoted to paper-table candidate only if the publishability gate passes; otherwise the weak or non-competitive result is explicitly reported as such
 
 ### Paper Track P7 - Graph baseline suite
 
@@ -3711,30 +3755,35 @@ Goal:
 - add graph-aware baselines while keeping structural graph features, graph neural models, and graph-mining approaches separated
 
 Load-bearing improvement:
-- Relaytic can compare flattened tabular features, deterministic structural graph features, and optional graph model candidates honestly
+- Relaytic can compare flattened tabular features, deterministic structural graph features, and optional graph model candidates honestly under baseline and competitive graph budgets
 
 Human surface:
-- humans see whether graph evidence came from structural features, graph-shadow models, or raw graph neural baselines
+- humans see whether graph evidence came from structural features, graph-shadow models, or raw graph neural baselines, and whether each row is baseline-only, competitive, blocked, or release-candidate
 
 Agent surface:
-- external agents can consume graph baseline rows, eligibility, fallback, and claim posture from stable artifacts
+- external agents can consume graph baseline rows, budget tiers, eligibility, fallback, version/runtime state, leakage/split posture, and claim posture from stable artifacts
 
 Intelligence source:
-- graph feature extraction, optional graph ML adapters, graph-shadow scorecards, and current graph claim scope
+- graph feature extraction, optional graph ML adapters, graph-shadow scorecards, graph HPO/search budgets, split/leakage audits, and current graph claim scope
 
 Fallback rule:
-- if PyG or a graph adapter is unavailable, structural graph baselines remain the supported floor and graph-neural claims stay blocked
+- if PyG or a graph adapter is unavailable, structural graph baselines remain the supported floor and graph-neural claims stay blocked; if competitive graph models underperform clean baselines, the paper must report the loss rather than hide it
 
 Required outputs:
 - `paper_graph_baseline_manifest.json`
 - `paper_graph_feature_table.json`
 - `paper_graph_model_shadow_scorecard.json`
 - `paper_graph_baseline_fallback_report.json`
+- `paper_graph_budget_contract.json`
+- `paper_graph_competitive_search_trace.json`
+- `paper_graph_publishability_gate.json`
 
 Minimum proof:
 - one structural graph baseline runs on Elliptic-style evidence
 - optional graph models either run shadow-only or record fallback
 - graph model claims stay separate from graph environment claims
+- graph rows are labeled baseline, competitive, blocked, or release-candidate
+- headline graph claims are blocked unless the competitive graph budget and graph claim-scope gate pass
 
 ### Paper Track P8 - AMLSim and Elliptic2 blocked-or-supported track
 
@@ -3807,26 +3856,28 @@ Load-bearing improvement:
 - Relaytic can produce a paper-ready result pack whose numbers, blockers, and claim labels are traceable to local runs
 
 Human surface:
-- humans can regenerate tables and see why any row is numeric, proxy-only, or blocked
+- humans can regenerate tables and see why any row is numeric, proxy-only, baseline-only, competitive, release-candidate, non-competitive, or blocked
 
 Agent surface:
-- external agents can inspect table provenance and verify that every metric cell has an artifact source
+- external agents can inspect table provenance and verify that every metric cell has an artifact source, budget tier, leakage posture, and publishability-gate state
 
 Intelligence source:
-- paper dataset registry, benchmark result rows, baseline tables, operational metrics, environment scorecards, and claim gates
+- paper dataset registry, benchmark result rows, baseline tables, competitive search traces, budget contracts, leakage audits, operational metrics, environment scorecards, and claim gates
 
 Fallback rule:
-- missing metrics become empty or blocked cells with reasons, never manually filled placeholders
+- missing metrics become empty or blocked cells with reasons, never manually filled placeholders; baseline-only or weak first-pass metrics are excluded from headline tables unless the publishability gate explicitly promotes them
 
 Required outputs:
 - `paper_result_table_final.json`
 - `paper_table_provenance.json`
 - `paper_reproduction_commands.md`
 - `paper_metric_cell_audit.json`
+- `paper_publishability_matrix.json`
 
 Minimum proof:
 - one command regenerates the paper table pack from existing run artifacts
 - every numeric cell cites dataset, split, command, run directory, artifact, and claim state
+- every headline metric cites a competitive or release budget row, not only a smoke or baseline row
 - hard claims remain blocked unless all required gates pass
 
 ### Paper Track P11 - Paper draft and figure pack
