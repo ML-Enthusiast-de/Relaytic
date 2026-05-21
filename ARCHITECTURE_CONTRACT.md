@@ -68,7 +68,7 @@ Current canonical boundaries:
 Reserved future boundaries:
 
 - `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15M task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, replay/shadow-tested imported-model, objective/split/metric-truth, first-class family-stack, staged portfolio-search, temporal-engine, operating-point, benchmark-truth-gate, competitive-specialization, and benchmark-generalization responsibilities; later work may introduce focused subpackages such as `src/relaytic/modeling/families/`, `src/relaytic/modeling/portfolio/`, or `src/relaytic/temporal/` only if they sharpen responsibility instead of forking a disconnected parallel stack
-- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, focused UI helpers such as `src/relaytic/ui/aml_environment.py`, and `src/relaytic/release_safety/paper_freeze.py` now absorb the shipped AML productization and paper-freeze work before Academy expansion resumes
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, focused UI helpers such as `src/relaytic/ui/aml_environment.py`, and `src/relaytic/release_safety/paper_freeze.py` plus paper-track release-safety helpers now absorb the shipped AML productization, paper-freeze, and PaySim temporal benchmark work before Academy expansion resumes
 - `src/relaytic/graph_fabric/` may still absorb richer graph and subgraph reasoning where it sharpens responsibility beyond the shipped `src/relaytic/aml/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` slices
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
@@ -517,6 +517,13 @@ Current paper-freeze artifact names from Slice 15Z-R:
 - `reproducibility_attestation.json`
 - `release_attention_pack_manifest.json`
 
+Current paper-track PaySim artifact names from Paper Track P4:
+
+- `paysim_benchmark_manifest.json`
+- `paysim_temporal_split_report.json`
+- `paysim_operating_point_table.json`
+- `paysim_paper_result_row.json`
+
 Current trace and eval artifact names:
 
 - `trace_model.json`
@@ -713,6 +720,8 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic run-agent-session`
 - `relaytic run-agent1-analysis`
 - `relaytic run-inference`
+- `relaytic release-safety paper-freeze`
+- `relaytic release-safety paysim-benchmark`
 - `relaytic scan-git-safety`
 
 ## Slice 05 Planning Contract

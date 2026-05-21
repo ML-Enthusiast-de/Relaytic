@@ -1125,6 +1125,26 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_paysim = release_safety_sub.add_parser(
+        "paysim-benchmark",
+        help="Run the Paper Track P4 PaySim temporal benchmark and write paper artifacts.",
+    )
+    release_safety_paysim.add_argument(
+        "--data-path",
+        default=None,
+        help="Optional PaySim CSV path. Defaults to data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv.",
+    )
+    release_safety_paysim.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for PaySim benchmark artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_paysim.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3083,6 +3103,11 @@ def main(argv: list[str] | None = None) -> int:
                 payload = _show_release_safety_surface(state_dir=args.state_dir)
             elif args.release_safety_command == "paper-freeze":
                 payload = _run_paper_release_freeze_surface(output_dir=args.output_dir)
+            elif args.release_safety_command == "paysim-benchmark":
+                payload = _run_paysim_benchmark_surface(
+                    data_path=args.data_path,
+                    output_dir=args.output_dir,
+                )
             else:
                 parser.error("Unsupported release-safety subcommand.")
                 return 2
@@ -6730,6 +6755,31 @@ def _run_paper_release_freeze_surface(*, output_dir: str | None) -> dict[str, An
             "bundle": pack,
         },
         "human_output": render_paper_freeze_markdown(pack),
+    }
+
+
+def _run_paysim_benchmark_surface(*, data_path: str | None, output_dir: str | None) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paysim_benchmark_markdown,
+        sync_paysim_benchmark_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paysim_benchmark_pack(root, data_path=data_path, output_dir=output_dir)
+    pack = {
+        key: json.loads(path.read_text(encoding="utf-8"))
+        for key, path in written.items()
+    }
+    manifest = dict(pack["paysim_benchmark_manifest"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paysim_benchmark": manifest,
+            "bundle": pack,
+        },
+        "human_output": render_paysim_benchmark_markdown(pack),
     }
 
 

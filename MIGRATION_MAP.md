@@ -276,6 +276,14 @@ Avoid introducing new references to:
 - froze PaySim-style, flattened Elliptic-style, subgraph/synthetic-bank graph, and generic supporting tracks with explicit `dev`, `proxy`, or `blocked` posture rather than hard public AML superiority claims
 - future academy work should consume the release-freeze pack as the public-claim boundary before adding capability-growth surfaces
 
+### Paper Track P4
+
+- introduced `src/relaytic/release_safety/paysim_benchmark.py` under the existing release-safety boundary for deterministic PaySim temporal benchmark artifact generation
+- introduced the public command `relaytic release-safety paysim-benchmark` for regenerating PaySim paper artifacts locally
+- introduced paper-track benchmark artifacts under `docs/reports/`: `paysim_benchmark_manifest.json`, `paysim_temporal_split_report.json`, `paysim_operating_point_table.json`, and `paysim_paper_result_row.json`
+- preserved supporting-only claim posture for PaySim-style proxy evidence and kept hard AML/SOTA performance claims blocked until later paper gates pass
+- future Paper Track P5 work should consume the P3 dataset registry and P4 result-row contract before adding Elliptic graph provenance
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
@@ -648,6 +656,10 @@ Implemented release-safety artifact names:
 - `sensitive_string_audit.json`
 - `release_bundle_report.json`
 - `packaging_regression_report.json`
+- `paysim_benchmark_manifest.json`
+- `paysim_temporal_split_report.json`
+- `paysim_operating_point_table.json`
+- `paysim_paper_result_row.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

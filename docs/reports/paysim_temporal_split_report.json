@@ -1,0 +1,105 @@
+{
+  "chronological_order_ok": true,
+  "class_coverage_ok": true,
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "forbidden_feature_check_passed": true,
+  "forbidden_model_columns_used": [],
+  "forbidden_source_columns_present": [
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "nameOrig",
+    "nameDest",
+    "isFlaggedFraud"
+  ],
+  "model_feature_columns": [
+    "log1p_amount",
+    "sqrt_amount",
+    "step_fraction",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER",
+    "log1p_amount_x_CASH_OUT",
+    "log1p_amount_x_TRANSFER"
+  ],
+  "rare_event_rate": 0.001290820448180152,
+  "row_count": 6362620,
+  "schema_version": "relaytic.paysim_temporal_benchmark.v1",
+  "slice": "Paper Track P4",
+  "source_path": "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv",
+  "source_sha256": "16910f90577b0d981bf8ff289714510bb89bc71bff7d3f220f024e287e4eea6b",
+  "split_contract": {
+    "claim_posture": "supporting-only",
+    "dataset_id": "paysim_temporal_transaction_fraud",
+    "forbidden_feature_fields": [
+      "oldbalanceOrg",
+      "newbalanceOrig",
+      "oldbalanceDest",
+      "newbalanceDest"
+    ],
+    "forbidden_split_methods": [
+      "random_row_shuffle",
+      "stratified_random_without_time"
+    ],
+    "label_fields": [
+      "isFraud"
+    ],
+    "paper_readiness": "supporting_ready",
+    "primary_metrics": [
+      "pr_auc",
+      "precision_at_k",
+      "recall_at_review_budget"
+    ],
+    "required_audits": [
+      "temporal_order_check",
+      "rare_event_rate_by_window",
+      "forbidden_feature_check"
+    ],
+    "required_order_fields": [
+      "step"
+    ],
+    "split_contract_id": "split_paysim_chronological_step_v1",
+    "split_type": "chronological_by_step",
+    "test_window": "latest 20 percent of ordered steps",
+    "train_window": "earliest 60 percent of ordered steps",
+    "validation_window": "next 20 percent of ordered steps"
+  },
+  "split_contract_id": "split_paysim_chronological_step_v1",
+  "split_rows": [
+    {
+      "negative_count": 6005930,
+      "positive_count": 5007,
+      "positive_rate": 0.000833,
+      "row_count": 6010937,
+      "split": "train",
+      "step_max": 445,
+      "step_min": 1
+    },
+    {
+      "negative_count": 226551,
+      "positive_count": 1552,
+      "positive_rate": 0.006804,
+      "row_count": 228103,
+      "split": "validation",
+      "step_max": 594,
+      "step_min": 446
+    },
+    {
+      "negative_count": 121926,
+      "positive_count": 1654,
+      "positive_rate": 0.013384,
+      "row_count": 123580,
+      "split": "test",
+      "step_max": 743,
+      "step_min": 595
+    }
+  ],
+  "status": "ok",
+  "step_max": 743,
+  "step_min": 1,
+  "summary": "PaySim was split chronologically by `step` into train/validation/test windows.",
+  "unique_step_count": 743
+}

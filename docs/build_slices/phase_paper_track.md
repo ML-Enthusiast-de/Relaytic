@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P3 implemented. P4 through P13 planned.
+P0 through P4 implemented. P5 through P13 planned.
 
 ## Intent
 
@@ -34,7 +34,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Freeze the paper title, research questions, contribution story, allowed claims, blocked claims, and related-work seed.
 4. **P3 - Benchmark dataset registry and access manifest** - implemented
    Record dataset sources, licenses, hashes, split posture, access blockers, and claim posture for each track.
-5. **P4 - PaySim-style temporal benchmark runner**
+5. **P4 - PaySim-style temporal benchmark runner** - implemented
    Produce a chronological temporal transaction-fraud result row with review-budget metrics and proxy/holdout posture.
 6. **P5 - Elliptic graph benchmark loader and provenance**
    Produce raw or flattened Elliptic-style graph provenance, split proof, and graph claim scope.
@@ -106,8 +106,20 @@ P3 added:
 
 P3 freezes dataset source/access posture, license notes, local file expectations, hashes for present local fixtures, split contracts, blocked reasons, and no-auto-download policy. It keeps hard AML and SOTA performance claims blocked and records Paper Track P4 as the next paper implementation slice.
 
+P4 added:
+
+- `docs/reports/paysim_benchmark_manifest.json`
+- `docs/reports/paysim_temporal_split_report.json`
+- `docs/reports/paysim_operating_point_table.json`
+- `docs/reports/paysim_paper_result_row.json`
+- `src/relaytic/release_safety/paysim_benchmark.py`
+- `relaytic release-safety paysim-benchmark --format json`
+- `tests/test_paper_track_p4.py`
+
+P4 runs the full 6,362,620-row PaySim source through a chronological `step` split, uses validation-only threshold selection, applies thresholds fixed to test, reports review-budget and fixed-FPR operating points, and keeps hard AML/SOTA performance claims blocked. The result is supporting proxy evidence for the paper path, not a primary real-world AML superiority claim.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P4**.
+The next implementation target is **Paper Track P5**.
 
-P4 should implement the PaySim-style temporal benchmark runner against the P3 source and split contracts. If the external PaySim source is still missing, it should emit precise setup/blocker artifacts and keep any fixture-only path as dev evidence, not paper evidence.
+P5 should implement the Elliptic-style graph loader and provenance path against the P3 source and split contracts. It should distinguish raw graph evidence, flattened proxy evidence, temporal split proof, and graph claim scope before any graph benchmark row is treated as paper evidence.

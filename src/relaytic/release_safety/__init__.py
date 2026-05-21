@@ -74,6 +74,15 @@ from .paper_thesis import (
     sync_paper_thesis_artifacts,
     sync_paper_thesis_pack,
 )
+from .paysim_benchmark import (
+    PAYSIM_BENCHMARK_FILENAMES,
+    PAYSIM_BENCHMARK_REPORT_DIR,
+    PAYSIM_BENCHMARK_SCHEMA_VERSION,
+    PAYSIM_DEFAULT_DATA_PATH,
+    build_paysim_benchmark_pack,
+    render_paysim_benchmark_markdown,
+    sync_paysim_benchmark_pack,
+)
 from .storage import RELEASE_SAFETY_FILENAMES, read_release_safety_bundle, write_release_safety_bundle
 
 __all__ = [
@@ -97,6 +106,10 @@ __all__ = [
     "PAPER_THESIS_FILENAMES",
     "PAPER_THESIS_REPORT_DIR",
     "PAPER_THESIS_SCHEMA_VERSION",
+    "PAYSIM_BENCHMARK_FILENAMES",
+    "PAYSIM_BENCHMARK_REPORT_DIR",
+    "PAYSIM_BENCHMARK_SCHEMA_VERSION",
+    "PAYSIM_DEFAULT_DATA_PATH",
     "RELEASE_BUNDLE_REPORT_SCHEMA_VERSION",
     "RELEASE_SAFETY_CONTROLS_SCHEMA_VERSION",
     "RELEASE_SAFETY_FILENAMES",
@@ -125,12 +138,14 @@ __all__ = [
     "build_paper_surface_hygiene_reports",
     "build_paper_thesis_artifacts",
     "build_paper_thesis_pack",
+    "build_paysim_benchmark_pack",
     "build_repo_credibility_reports",
     "default_release_safety_state_dir",
     "latest_release_safety_state_dir",
     "read_release_safety_bundle",
     "render_paper_freeze_markdown",
     "render_paper_thesis_markdown",
+    "render_paysim_benchmark_markdown",
     "render_release_safety_markdown",
     "run_release_safety_scan",
     "sync_paper_freeze_pack",
@@ -138,6 +153,7 @@ __all__ = [
     "sync_paper_surface_hygiene_reports",
     "sync_paper_thesis_artifacts",
     "sync_paper_thesis_pack",
+    "sync_paysim_benchmark_pack",
     "sync_repo_credibility_reports",
     "write_release_safety_bundle",
 ]

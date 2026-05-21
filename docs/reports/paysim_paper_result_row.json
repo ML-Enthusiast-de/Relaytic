@@ -1,0 +1,44 @@
+{
+  "artifact_refs": {
+    "claim_taxonomy": "docs/reports/paper_claim_taxonomy.json",
+    "manifest": "docs/reports/paysim_benchmark_manifest.json",
+    "operating_point_table": "docs/reports/paysim_operating_point_table.json",
+    "paper_result_row": "docs/reports/paysim_paper_result_row.json",
+    "split_contracts": "docs/reports/paper_split_contracts.json",
+    "split_report": "docs/reports/paysim_temporal_split_report.json"
+  },
+  "blocked_claims": [
+    "hard_real_world_aml_superiority",
+    "sota_aml_benchmark_winner",
+    "real_bank_holdout_claim"
+  ],
+  "claim_boundary_from_taxonomy": "supporting-only",
+  "claim_posture": "supporting-only",
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "dataset_sha256": "16910f90577b0d981bf8ff289714510bb89bc71bff7d3f220f024e287e4eea6b",
+  "dataset_source_path": "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv",
+  "evidence_partition": "development_proxy",
+  "hard_performance_claims_allowed": false,
+  "metrics": {
+    "fixed_fpr_target": 0.001,
+    "review_budget_fraction": 0.005,
+    "test_fpr_at_fixed_validation_threshold": 0.001722,
+    "test_pr_auc": 0.215852,
+    "test_precision_at_review_budget": 0.344304,
+    "test_recall_at_fixed_fpr_threshold": 0.116082,
+    "test_recall_at_review_budget": 0.16445,
+    "test_roc_auc": 0.911151,
+    "validation_pr_auc": 0.122782,
+    "validation_precision_at_review_budget": 0.191937,
+    "validation_recall_at_review_budget": 0.141108,
+    "validation_roc_auc": 0.915618
+  },
+  "model_family": "sklearn_sgd_logistic_leakage_safe",
+  "paper_primary_claim_allowed": false,
+  "public_claim_wording": "Relaytic-AML can run a PaySim-style chronological transaction-fraud benchmark and emit review-budget, temporal split, and claim-gated paper artifacts. This is supporting proxy evidence, not a hard real-world AML or SOTA superiority claim.",
+  "schema_version": "relaytic.paysim_temporal_benchmark.v1",
+  "slice": "Paper Track P4",
+  "status": "ok",
+  "supporting_public_claim_allowed": true,
+  "track_id": "paysim_temporal_transaction_fraud"
+}

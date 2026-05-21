@@ -1,0 +1,221 @@
+{
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "fixed_fpr": {
+    "selection_surface": "validation_only",
+    "target_fpr": 0.001,
+    "test": {
+      "false_positive_count": 210,
+      "false_positive_rate": 0.001722,
+      "precision_at_k": 0.477612,
+      "recall_at_review_budget": 0.116082,
+      "requested_review_fraction": null,
+      "review_fraction": 0.003253,
+      "reviewed_count": 402,
+      "true_positive_count": 192
+    },
+    "test_threshold_policy": "fixed_from_validation",
+    "validation": {
+      "false_positive_count": 226,
+      "false_positive_rate": 0.000998,
+      "precision_at_k": 0.365169,
+      "recall_at_review_budget": 0.083763,
+      "requested_review_fraction": null,
+      "review_fraction": 0.001561,
+      "reviewed_count": 356,
+      "true_positive_count": 130
+    },
+    "validation_threshold": 0.999692
+  },
+  "model_family": "sklearn_sgd_logistic_leakage_safe",
+  "review_budget_rows": [
+    {
+      "review_budget_fraction": 0.001,
+      "selection_surface": "validation_only",
+      "test": {
+        "false_positive_count": 155,
+        "false_positive_rate": 0.001271,
+        "precision_at_k": 0.531722,
+        "recall_at_review_budget": 0.106409,
+        "requested_review_fraction": 0.001,
+        "review_fraction": 0.002678,
+        "reviewed_count": 331,
+        "true_positive_count": 176
+      },
+      "test_threshold_policy": "fixed_from_validation",
+      "validation": {
+        "false_positive_count": 123,
+        "false_positive_rate": 0.000543,
+        "precision_at_k": 0.462882,
+        "recall_at_review_budget": 0.068299,
+        "requested_review_fraction": 0.001,
+        "review_fraction": 0.001004,
+        "reviewed_count": 229,
+        "true_positive_count": 106
+      },
+      "validation_threshold": 0.999877
+    },
+    {
+      "review_budget_fraction": 0.002,
+      "selection_surface": "validation_only",
+      "test": {
+        "false_positive_count": 272,
+        "false_positive_rate": 0.002231,
+        "precision_at_k": 0.441478,
+        "recall_at_review_budget": 0.129988,
+        "requested_review_fraction": 0.002,
+        "review_fraction": 0.003941,
+        "reviewed_count": 487,
+        "true_positive_count": 215
+      },
+      "test_threshold_policy": "fixed_from_validation",
+      "validation": {
+        "false_positive_count": 314,
+        "false_positive_rate": 0.001386,
+        "precision_at_k": 0.31291,
+        "recall_at_review_budget": 0.092139,
+        "requested_review_fraction": 0.002,
+        "review_fraction": 0.002003,
+        "reviewed_count": 457,
+        "true_positive_count": 143
+      },
+      "validation_threshold": 0.999387
+    },
+    {
+      "review_budget_fraction": 0.005,
+      "selection_surface": "validation_only",
+      "test": {
+        "false_positive_count": 518,
+        "false_positive_rate": 0.004248,
+        "precision_at_k": 0.344304,
+        "recall_at_review_budget": 0.16445,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.006393,
+        "reviewed_count": 790,
+        "true_positive_count": 272
+      },
+      "test_threshold_policy": "fixed_from_validation",
+      "validation": {
+        "false_positive_count": 922,
+        "false_positive_rate": 0.00407,
+        "precision_at_k": 0.191937,
+        "recall_at_review_budget": 0.141108,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.005002,
+        "reviewed_count": 1141,
+        "true_positive_count": 219
+      },
+      "validation_threshold": 0.995818
+    },
+    {
+      "review_budget_fraction": 0.01,
+      "selection_surface": "validation_only",
+      "test": {
+        "false_positive_count": 893,
+        "false_positive_rate": 0.007324,
+        "precision_at_k": 0.291832,
+        "recall_at_review_budget": 0.222491,
+        "requested_review_fraction": 0.01,
+        "review_fraction": 0.010204,
+        "reviewed_count": 1261,
+        "true_positive_count": 368
+      },
+      "test_threshold_policy": "fixed_from_validation",
+      "validation": {
+        "false_positive_count": 1946,
+        "false_positive_rate": 0.00859,
+        "precision_at_k": 0.147239,
+        "recall_at_review_budget": 0.216495,
+        "requested_review_fraction": 0.01,
+        "review_fraction": 0.010004,
+        "reviewed_count": 2282,
+        "true_positive_count": 336
+      },
+      "validation_threshold": 0.98446
+    },
+    {
+      "review_budget_fraction": 0.02,
+      "selection_surface": "validation_only",
+      "test": {
+        "false_positive_count": 1721,
+        "false_positive_rate": 0.014115,
+        "precision_at_k": 0.231696,
+        "recall_at_review_budget": 0.313785,
+        "requested_review_fraction": 0.02,
+        "review_fraction": 0.018126,
+        "reviewed_count": 2240,
+        "true_positive_count": 519
+      },
+      "test_threshold_policy": "fixed_from_validation",
+      "validation": {
+        "false_positive_count": 4102,
+        "false_positive_rate": 0.018106,
+        "precision_at_k": 0.10103,
+        "recall_at_review_budget": 0.297036,
+        "requested_review_fraction": 0.02,
+        "review_fraction": 0.020004,
+        "reviewed_count": 4563,
+        "true_positive_count": 461
+      },
+      "validation_threshold": 0.951812
+    }
+  ],
+  "schema_version": "relaytic.paysim_temporal_benchmark.v1",
+  "selected_operating_point": {
+    "review_budget_fraction": 0.005,
+    "selection_surface": "validation_only",
+    "test": {
+      "false_positive_count": 518,
+      "false_positive_rate": 0.004248,
+      "precision_at_k": 0.344304,
+      "recall_at_review_budget": 0.16445,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.006393,
+      "reviewed_count": 790,
+      "true_positive_count": 272
+    },
+    "test_threshold_policy": "fixed_from_validation",
+    "validation": {
+      "false_positive_count": 922,
+      "false_positive_rate": 0.00407,
+      "precision_at_k": 0.191937,
+      "recall_at_review_budget": 0.141108,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.005002,
+      "reviewed_count": 1141,
+      "true_positive_count": 219
+    },
+    "validation_threshold": 0.995818
+  },
+  "selected_review_budget_fraction": 0.005,
+  "slice": "Paper Track P4",
+  "status": "ok",
+  "test_score_metrics": {
+    "log_loss": 0.321072,
+    "n_samples": 123580,
+    "positive_count": 1654,
+    "positive_rate": 0.013384,
+    "pr_auc": 0.215852,
+    "roc_auc": 0.911151
+  },
+  "threshold_drift_report": {
+    "alert_rate_delta_test_minus_validation": 0.00139,
+    "drift_state": "low",
+    "positive_rate_delta_test_minus_validation": 0.00658,
+    "selected_validation_threshold": 0.995818,
+    "test_alert_rate_at_selected_threshold": 0.006393,
+    "test_positive_rate": 0.013384,
+    "test_threshold_for_same_review_fraction": 0.998322,
+    "threshold_delta_test_equivalent_minus_validation": 0.002504,
+    "validation_alert_rate_at_selected_threshold": 0.005002,
+    "validation_positive_rate": 0.006804
+  },
+  "threshold_selection_rule": "Choose thresholds on validation only by review-budget fraction; apply the selected threshold unchanged to test.",
+  "validation_score_metrics": {
+    "log_loss": 0.357044,
+    "n_samples": 228103,
+    "positive_count": 1552,
+    "positive_rate": 0.006804,
+    "pr_auc": 0.122782,
+    "roc_auc": 0.915618
+  }
+}
