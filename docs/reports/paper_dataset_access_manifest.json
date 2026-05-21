@@ -1,0 +1,373 @@
+{
+  "access_entries": [
+    {
+      "access_posture": "manual_kaggle_download_required",
+      "dataset_id": "paysim_temporal_transaction_fraud",
+      "display_name": "PaySim synthetic mobile-money transaction fraud",
+      "expected_local_root": "data/paper_benchmarks/paysim",
+      "license": {
+        "commercial_use": "allowed_with_sharealike_constraints",
+        "redistribution": "allowed_with_attribution_and_sharealike",
+        "requires_legal_review_before_bundling": true,
+        "spdx_or_name": "CC-BY-SA-4.0"
+      },
+      "local_source_ready": false,
+      "manual_action_required": true,
+      "optional_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/paysim/dataset-metadata.json",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/paysim/README.md",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "paper_readiness": "source_missing",
+      "relaytic_auto_download_allowed": false,
+      "required_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "setup_steps": [
+        "Create or authenticate a Kaggle account/API token outside the repository.",
+        "Download `ealaxi/paysim1` into `data/paper_benchmarks/paysim` and unzip locally.",
+        "Keep raw source files out of git unless their license and file size are explicitly approved."
+      ],
+      "source_urls": {
+        "dataset_landing": "https://www.kaggle.com/datasets/ealaxi/paysim1/data",
+        "paper_or_record": "https://www.diva-portal.org/smash/record.jsf?pid=diva2:1058442"
+      }
+    },
+    {
+      "access_posture": "manual_kaggle_download_required",
+      "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+      "display_name": "Elliptic Bitcoin transaction graph",
+      "expected_local_root": "data/paper_benchmarks/elliptic",
+      "license": {
+        "commercial_use": "not_allowed",
+        "redistribution": "no_derivatives_noncommercial_only",
+        "requires_legal_review_before_bundling": true,
+        "spdx_or_name": "CC-BY-NC-ND-4.0"
+      },
+      "local_source_ready": false,
+      "manual_action_required": true,
+      "optional_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic/dataset-metadata.json",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic/README.md",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "paper_readiness": "source_missing",
+      "relaytic_auto_download_allowed": false,
+      "required_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic/elliptic_txs_classes.csv",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic/elliptic_txs_edgelist.csv",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic/elliptic_txs_features.csv",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "setup_steps": [
+        "Create or authenticate a Kaggle account/API token outside the repository.",
+        "Download `ellipticco/elliptic-data-set` into `data/paper_benchmarks/elliptic` and unzip locally.",
+        "Do not redistribute raw files in the repository; cite the source and record local hashes."
+      ],
+      "source_urls": {
+        "dataset_landing": "https://www.kaggle.com/datasets/ellipticco/elliptic-data-set/data",
+        "paper": "https://arxiv.org/abs/1908.02591",
+        "release_note": "https://www.elliptic.co/media-center/elliptic-releases-bitcoin-transactions-data"
+      }
+    },
+    {
+      "access_posture": "manual_kaggle_download_required_large_dataset",
+      "dataset_id": "elliptic2_subgraph_aml",
+      "display_name": "Elliptic2 large Bitcoin subgraph AML dataset",
+      "expected_local_root": "data/paper_benchmarks/elliptic2",
+      "license": {
+        "code_license": "Apache-2.0 for the official guide repository",
+        "commercial_use": "not_allowed",
+        "redistribution": "no_derivatives_noncommercial_only",
+        "requires_legal_review_before_bundling": true,
+        "spdx_or_name": "CC-BY-NC-ND-4.0"
+      },
+      "local_source_ready": false,
+      "manual_action_required": true,
+      "optional_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic2/dataset-metadata.json",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic2/README.md",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "paper_readiness": "blocked",
+      "relaytic_auto_download_allowed": false,
+      "required_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic2/background_edges.csv",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic2/background_nodes.csv",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic2/connected_components.csv",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic2/edges.csv",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/elliptic2/nodes.csv",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "setup_steps": [
+        "Create or authenticate a Kaggle account/API token outside the repository.",
+        "Download `ellipticco/elliptic2-data-set` into `data/paper_benchmarks/elliptic2` and unzip locally.",
+        "Run only after a resource budget and subgraph-loader contract are accepted."
+      ],
+      "source_urls": {
+        "dataset_landing": "https://www.kaggle.com/datasets/ellipticco/elliptic2-data-set",
+        "official_guide": "https://github.com/MITIBMxGraph/Elliptic2",
+        "paper": "https://arxiv.org/abs/2404.19109"
+      }
+    },
+    {
+      "access_posture": "public_git_repository_generator_required",
+      "dataset_id": "amlsim_synthetic_bank_graph",
+      "display_name": "AMLSim synthetic banking transaction generator",
+      "expected_local_root": "data/paper_benchmarks/amlsim",
+      "license": {
+        "commercial_use": "allowed_for_code_under_apache_2_0",
+        "generated_data_license": "must_be_recorded_for_each_generated_release_pack",
+        "redistribution": "code_redistribution_allowed_with_notice",
+        "requires_legal_review_before_bundling": false,
+        "spdx_or_name": "Apache-2.0 for generator code"
+      },
+      "local_source_ready": false,
+      "manual_action_required": true,
+      "optional_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/amlsim/generator_commit.txt",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/amlsim/generated_dataset_manifest.json",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "paper_readiness": "blocked",
+      "relaytic_auto_download_allowed": false,
+      "required_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/amlsim/conf.json",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/amlsim/tx_log.csv",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/amlsim/alert_transactions.csv",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/amlsim/sar_accounts.csv",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "setup_steps": [
+        "Clone or vendor the AMLSim generator outside committed source unless license review approves vendoring.",
+        "Freeze `conf.json`, generator commit, random seed, and generated output hashes.",
+        "Keep generated data local until a release-pack license decision is recorded."
+      ],
+      "source_urls": {
+        "generator_repository": "https://github.com/IBM/AMLSim",
+        "ibm_paper": "https://research.ibm.com/publications/realistic-synthetic-financial-transactions-for-anti-money-laundering-models",
+        "paper": "https://arxiv.org/abs/2306.16424"
+      }
+    },
+    {
+      "access_posture": "local_ready_if_files_present",
+      "dataset_id": "generic_structured_support_pack",
+      "display_name": "Relaytic repo-local public structured support fixtures",
+      "expected_local_root": "data/public",
+      "license": {
+        "commercial_use": "inherits_repository_terms",
+        "redistribution": "already_repo_local",
+        "requires_legal_review_before_bundling": false,
+        "spdx_or_name": "repository_license"
+      },
+      "local_source_ready": true,
+      "manual_action_required": false,
+      "optional_file_checks": [],
+      "paper_readiness": "supporting_ready",
+      "relaytic_auto_download_allowed": false,
+      "required_file_checks": [
+        {
+          "exists": true,
+          "path": "data/public/public_fraud_screening_dataset.csv",
+          "sha256": "ebde0cd0c0fe01fdb59eafa7fe71720596e568d8f8423ea9edf9885ef34e35bd",
+          "size_bytes": 93665
+        },
+        {
+          "exists": true,
+          "path": "data/public/public_binary_classification_dataset.csv",
+          "sha256": "12993c7f807605475ab75a00cf60895e7f534d7942431712433ae7a8e65ed7cb",
+          "size_bytes": 37246
+        },
+        {
+          "exists": true,
+          "path": "data/public/public_testbench_dataset_20k_minmax.csv",
+          "sha256": "630a5b9706794f86108398b84a3496ac465bf253444424934f7e62fb09e76273",
+          "size_bytes": 5152207
+        },
+        {
+          "exists": true,
+          "path": "data/public/public_testbench_dataset_20k_minmax.meta.json",
+          "sha256": "459b57041f673e489303f8a66229be6aea84526c8fa75da82df3129d7f26db2a",
+          "size_bytes": 1128
+        }
+      ],
+      "setup_steps": [
+        "No external setup required when repository public fixture files are present."
+      ],
+      "source_urls": {
+        "repository_path": "data/public"
+      }
+    },
+    {
+      "access_posture": "account_gated_noncommercial_download_required",
+      "dataset_id": "dgraph_finance_graph_context",
+      "display_name": "DGraphFin large dynamic financial fraud graph",
+      "expected_local_root": "data/paper_benchmarks/dgraphfin",
+      "license": {
+        "commercial_use": "not_allowed_or_requires_separate_permission",
+        "redistribution": "restricted_by_official_terms",
+        "requires_legal_review_before_bundling": true,
+        "spdx_or_name": "custom_noncommercial"
+      },
+      "local_source_ready": false,
+      "manual_action_required": true,
+      "optional_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/dgraphfin/license_or_terms_snapshot.txt",
+          "sha256": null,
+          "size_bytes": null
+        },
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/dgraphfin/README.md",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "paper_readiness": "blocked_context_only",
+      "relaytic_auto_download_allowed": false,
+      "required_file_checks": [
+        {
+          "exists": false,
+          "path": "data/paper_benchmarks/dgraphfin/dgraphfin.npz",
+          "sha256": null,
+          "size_bytes": null
+        }
+      ],
+      "setup_steps": [
+        "Register on the official DGraph site if legal/research use permits it.",
+        "Record the non-commercial terms snapshot and local file hash before using as context evidence.",
+        "Keep this as context-only unless the paper claim contract is expanded deliberately."
+      ],
+      "source_urls": {
+        "dataset_landing": "https://dgraph.xinye.com",
+        "openreview": "https://openreview.net/forum?id=2rQPxsmjKF",
+        "paper": "https://arxiv.org/abs/2207.03579"
+      }
+    }
+  ],
+  "kaggle_or_account_gated_dataset_ids": [
+    "paysim_temporal_transaction_fraud",
+    "elliptic_bitcoin_flattened_graph_aml",
+    "elliptic2_subgraph_aml",
+    "dgraph_finance_graph_context"
+  ],
+  "local_ready_dataset_ids": [
+    "generic_structured_support_pack"
+  ],
+  "manual_action_required_dataset_ids": [
+    "paysim_temporal_transaction_fraud",
+    "elliptic_bitcoin_flattened_graph_aml",
+    "elliptic2_subgraph_aml",
+    "amlsim_synthetic_bank_graph",
+    "dgraph_finance_graph_context"
+  ],
+  "policy": {
+    "no_auto_download_from_authenticated_sources": true,
+    "no_secret_storage": true,
+    "raw_dataset_files_not_committed_by_default": true
+  },
+  "schema_version": "relaytic.paper_dataset_registry.v1",
+  "slice": "Paper Track P3",
+  "source_review_date": "2026-05-21",
+  "status": "dataset_access_manifest_frozen"
+}

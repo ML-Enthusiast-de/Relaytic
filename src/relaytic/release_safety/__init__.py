@@ -55,6 +55,13 @@ from .paper_surface_hygiene import (
     build_paper_surface_hygiene_reports,
     sync_paper_surface_hygiene_reports,
 )
+from .paper_dataset_registry import (
+    PAPER_DATASET_REGISTRY_FILENAMES,
+    PAPER_DATASET_REGISTRY_REPORT_DIR,
+    PAPER_DATASET_REGISTRY_SCHEMA_VERSION,
+    build_paper_dataset_registry_pack,
+    sync_paper_dataset_registry_pack,
+)
 from .paper_thesis import (
     PAPER_THESIS_DOC_DIR,
     PAPER_THESIS_DOC_FILENAME,
@@ -79,6 +86,9 @@ __all__ = [
     "PAPER_FREEZE_FILENAMES",
     "PAPER_FREEZE_REPORT_DIR",
     "PAPER_FREEZE_SCHEMA_VERSION",
+    "PAPER_DATASET_REGISTRY_FILENAMES",
+    "PAPER_DATASET_REGISTRY_REPORT_DIR",
+    "PAPER_DATASET_REGISTRY_SCHEMA_VERSION",
     "PAPER_SURFACE_HYGIENE_FILENAMES",
     "PAPER_SURFACE_HYGIENE_REPORT_DIR",
     "PAPER_SURFACE_HYGIENE_SCHEMA_VERSION",
@@ -110,6 +120,7 @@ __all__ = [
     "SensitiveStringAuditArtifact",
     "SourceMapAuditArtifact",
     "build_release_safety_controls_from_policy",
+    "build_paper_dataset_registry_pack",
     "build_paper_freeze_pack",
     "build_paper_surface_hygiene_reports",
     "build_paper_thesis_artifacts",
@@ -123,6 +134,7 @@ __all__ = [
     "render_release_safety_markdown",
     "run_release_safety_scan",
     "sync_paper_freeze_pack",
+    "sync_paper_dataset_registry_pack",
     "sync_paper_surface_hygiene_reports",
     "sync_paper_thesis_artifacts",
     "sync_paper_thesis_pack",

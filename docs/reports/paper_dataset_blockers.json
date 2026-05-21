@@ -1,0 +1,168 @@
+{
+  "dataset_blockers": [
+    {
+      "blocked": true,
+      "blockers": [
+        {
+          "blocker_id": "paysim_temporal_transaction_fraud_license_bundling_review",
+          "reason": "Raw source files must not be bundled without explicit license review.",
+          "repair": "Store only local hashes, setup instructions, and source citations in the repo.",
+          "severity": "gating"
+        },
+        {
+          "blocker_id": "paysim_temporal_transaction_fraud_local_source_missing",
+          "missing_paths": [
+            "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv"
+          ],
+          "reason": "Required local source files are missing.",
+          "repair": "Follow dataset setup steps and rerun the registry sync.",
+          "severity": "blocking"
+        }
+      ],
+      "dataset_id": "paysim_temporal_transaction_fraud",
+      "paper_claim_posture": "supporting-only",
+      "paper_readiness": "source_missing"
+    },
+    {
+      "blocked": true,
+      "blockers": [
+        {
+          "blocker_id": "elliptic_bitcoin_flattened_graph_aml_license_bundling_review",
+          "reason": "Raw source files must not be bundled without explicit license review.",
+          "repair": "Store only local hashes, setup instructions, and source citations in the repo.",
+          "severity": "gating"
+        },
+        {
+          "blocker_id": "elliptic_bitcoin_flattened_graph_aml_local_source_missing",
+          "missing_paths": [
+            "data/paper_benchmarks/elliptic/elliptic_txs_classes.csv",
+            "data/paper_benchmarks/elliptic/elliptic_txs_edgelist.csv",
+            "data/paper_benchmarks/elliptic/elliptic_txs_features.csv"
+          ],
+          "reason": "Required local source files are missing.",
+          "repair": "Follow dataset setup steps and rerun the registry sync.",
+          "severity": "blocking"
+        }
+      ],
+      "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+      "paper_claim_posture": "supporting-only",
+      "paper_readiness": "source_missing"
+    },
+    {
+      "blocked": true,
+      "blockers": [
+        {
+          "blocker_id": "elliptic2_subgraph_aml_claim_boundary_blocked",
+          "reason": "P2 claim taxonomy blocks this dataset from paper-ready claims until later gates pass.",
+          "repair": "Implement the corresponding loader/generator, split proof, and claim-scope report first.",
+          "severity": "blocking"
+        },
+        {
+          "blocker_id": "elliptic2_subgraph_aml_license_bundling_review",
+          "reason": "Raw source files must not be bundled without explicit license review.",
+          "repair": "Store only local hashes, setup instructions, and source citations in the repo.",
+          "severity": "gating"
+        },
+        {
+          "blocker_id": "elliptic2_subgraph_aml_local_source_missing",
+          "missing_paths": [
+            "data/paper_benchmarks/elliptic2/background_edges.csv",
+            "data/paper_benchmarks/elliptic2/background_nodes.csv",
+            "data/paper_benchmarks/elliptic2/connected_components.csv",
+            "data/paper_benchmarks/elliptic2/edges.csv",
+            "data/paper_benchmarks/elliptic2/nodes.csv"
+          ],
+          "reason": "Required local source files are missing.",
+          "repair": "Follow dataset setup steps and rerun the registry sync.",
+          "severity": "blocking"
+        }
+      ],
+      "dataset_id": "elliptic2_subgraph_aml",
+      "paper_claim_posture": "blocked",
+      "paper_readiness": "blocked"
+    },
+    {
+      "blocked": true,
+      "blockers": [
+        {
+          "blocker_id": "amlsim_synthetic_bank_graph_claim_boundary_blocked",
+          "reason": "P2 claim taxonomy blocks this dataset from paper-ready claims until later gates pass.",
+          "repair": "Implement the corresponding loader/generator, split proof, and claim-scope report first.",
+          "severity": "blocking"
+        },
+        {
+          "blocker_id": "amlsim_synthetic_bank_graph_local_source_missing",
+          "missing_paths": [
+            "data/paper_benchmarks/amlsim/conf.json",
+            "data/paper_benchmarks/amlsim/tx_log.csv",
+            "data/paper_benchmarks/amlsim/alert_transactions.csv",
+            "data/paper_benchmarks/amlsim/sar_accounts.csv"
+          ],
+          "reason": "Required local source files are missing.",
+          "repair": "Follow dataset setup steps and rerun the registry sync.",
+          "severity": "blocking"
+        }
+      ],
+      "dataset_id": "amlsim_synthetic_bank_graph",
+      "paper_claim_posture": "blocked",
+      "paper_readiness": "blocked"
+    },
+    {
+      "blocked": false,
+      "blockers": [],
+      "dataset_id": "generic_structured_support_pack",
+      "paper_claim_posture": "supporting-only",
+      "paper_readiness": "supporting_ready"
+    },
+    {
+      "blocked": true,
+      "blockers": [
+        {
+          "blocker_id": "dgraph_finance_graph_context_context_only",
+          "reason": "Dataset is adjacent context, not part of the P2 core paper claim contract.",
+          "repair": "Keep out of flagship result tables unless a later claim-contract revision adds it.",
+          "severity": "blocking"
+        },
+        {
+          "blocker_id": "dgraph_finance_graph_context_license_bundling_review",
+          "reason": "Raw source files must not be bundled without explicit license review.",
+          "repair": "Store only local hashes, setup instructions, and source citations in the repo.",
+          "severity": "gating"
+        },
+        {
+          "blocker_id": "dgraph_finance_graph_context_local_source_missing",
+          "missing_paths": [
+            "data/paper_benchmarks/dgraphfin/dgraphfin.npz"
+          ],
+          "reason": "Required local source files are missing.",
+          "repair": "Follow dataset setup steps and rerun the registry sync.",
+          "severity": "blocking"
+        }
+      ],
+      "dataset_id": "dgraph_finance_graph_context",
+      "paper_claim_posture": "blocked-context-only",
+      "paper_readiness": "blocked_context_only"
+    }
+  ],
+  "global_blockers": [
+    {
+      "blocker_id": "no_numeric_holdout_paper_rows_yet",
+      "reason": "P3 only freezes dataset access and split posture; benchmark rows start in P4.",
+      "repair": "Implement P4 and P5 runners only for datasets whose source and split contracts pass.",
+      "severity": "blocking"
+    },
+    {
+      "blocker_id": "hard_aml_claims_still_blocked",
+      "reason": "The P2/P3 claim contracts do not allow hard AML or SOTA superiority claims.",
+      "repair": "Do not change public claims until P10-P12 provide reproducible tables and dry-run proof.",
+      "severity": "blocking"
+    }
+  ],
+  "hard_performance_claims_allowed": false,
+  "next_slice": "Paper Track P4",
+  "schema_version": "relaytic.paper_dataset_registry.v1",
+  "slice": "Paper Track P3",
+  "source_review_date": "2026-05-21",
+  "split_contract_count": 6,
+  "status": "dataset_blockers_frozen"
+}

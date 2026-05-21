@@ -343,6 +343,7 @@ Why:
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
 - Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, and adds Relaytic aliases for legacy API/tool names
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
+- Paper Track P3 is now implemented and freezes dataset source/access posture, license notes, local file expectations, hashes for present local fixtures, split contracts, blocked reasons, and no-auto-download policy before benchmark runners start
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -355,8 +356,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P2. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, and Paper Track P2 thesis/claim contract.
-- next execution target: Paper Track P3
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P3. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, and Paper Track P3 dataset registry.
+- next execution target: Paper Track P4
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -365,7 +366,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P3 through P13 prove relevant benchmarks, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P4 through P13 prove relevant benchmarks, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3556,7 +3557,7 @@ Implemented by:
 - adding `docs/reports/paper_related_work_seed.json`
 - adding `tests/test_paper_track_p2.py`
 
-P2 keeps hard AML and SOTA performance claims blocked and records Paper Track P3 as the next paper implementation slice.
+P2 kept hard AML and SOTA performance claims blocked before Paper Track P3 froze dataset posture.
 
 ### Paper Track P3 - Benchmark dataset registry and access manifest
 
@@ -3587,6 +3588,16 @@ Required outputs:
 Minimum proof:
 - PaySim-style, Elliptic-style, Elliptic2-style, AMLSim-style, and generic support tracks all have source posture and claim posture
 - missing datasets yield precise setup or blocked-reason artifacts
+
+Implemented by:
+- adding `src/relaytic/release_safety/paper_dataset_registry.py`
+- adding `docs/reports/paper_dataset_registry.json`
+- adding `docs/reports/paper_dataset_access_manifest.json`
+- adding `docs/reports/paper_split_contracts.json`
+- adding `docs/reports/paper_dataset_blockers.json`
+- adding `tests/test_paper_track_p3.py`
+
+P3 keeps hard AML and SOTA performance claims blocked, records local file hashes for repo-local support fixtures, blocks or gates missing/login-gated datasets with exact setup paths, and records Paper Track P4 as the next paper implementation slice.
 
 ### Paper Track P4 - PaySim-style temporal benchmark runner
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P2 implemented. P3 through P13 planned.
+P0 through P3 implemented. P4 through P13 planned.
 
 ## Intent
 
@@ -32,7 +32,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Remove stale `corr2surrogate`, prototype, toy, and unsupported SOTA language from public surfaces while retaining only explicit compatibility shims.
 3. **P2 - Paper thesis and claim contract** - implemented
    Freeze the paper title, research questions, contribution story, allowed claims, blocked claims, and related-work seed.
-4. **P3 - Benchmark dataset registry and access manifest**
+4. **P3 - Benchmark dataset registry and access manifest** - implemented
    Record dataset sources, licenses, hashes, split posture, access blockers, and claim posture for each track.
 5. **P4 - PaySim-style temporal benchmark runner**
    Produce a chronological temporal transaction-fraud result row with review-budget metrics and proxy/holdout posture.
@@ -93,10 +93,21 @@ P2 added:
 - `src/relaytic/release_safety/paper_thesis.py`
 - `tests/test_paper_track_p2.py`
 
-P2 freezes the paper story as a claim-gated AML evaluation environment, keeps SOTA and hard AML performance claims blocked, and records Paper Track P3 as the next paper implementation slice.
+P2 froze the paper story as a claim-gated AML evaluation environment and kept SOTA plus hard AML performance claims blocked before P3 froze dataset posture.
+
+P3 added:
+
+- `docs/reports/paper_dataset_registry.json`
+- `docs/reports/paper_dataset_access_manifest.json`
+- `docs/reports/paper_split_contracts.json`
+- `docs/reports/paper_dataset_blockers.json`
+- `src/relaytic/release_safety/paper_dataset_registry.py`
+- `tests/test_paper_track_p3.py`
+
+P3 freezes dataset source/access posture, license notes, local file expectations, hashes for present local fixtures, split contracts, blocked reasons, and no-auto-download policy. It keeps hard AML and SOTA performance claims blocked and records Paper Track P4 as the next paper implementation slice.
 
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P3**.
+The next implementation target is **Paper Track P4**.
 
-P3 should not add benchmark modeling behavior yet. It should freeze dataset sources, licenses, access posture, split contracts, local file expectations, hashes when available, and blocked reasons before any runner is treated as paper evidence.
+P4 should implement the PaySim-style temporal benchmark runner against the P3 source and split contracts. If the external PaySim source is still missing, it should emit precise setup/blocker artifacts and keep any fixture-only path as dev evidence, not paper evidence.
