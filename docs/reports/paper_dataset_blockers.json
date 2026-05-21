@@ -1,52 +1,19 @@
 {
+  "artifact_scope": "Environment snapshot: dataset-local blockers clear only when required ignored raw files exist on the machine that generated the artifact.",
   "dataset_blockers": [
     {
-      "blocked": true,
-      "blockers": [
-        {
-          "blocker_id": "paysim_temporal_transaction_fraud_license_bundling_review",
-          "reason": "Raw source files must not be bundled without explicit license review.",
-          "repair": "Store only local hashes, setup instructions, and source citations in the repo.",
-          "severity": "gating"
-        },
-        {
-          "blocker_id": "paysim_temporal_transaction_fraud_local_source_missing",
-          "missing_paths": [
-            "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv"
-          ],
-          "reason": "Required local source files are missing.",
-          "repair": "Follow dataset setup steps and rerun the registry sync.",
-          "severity": "blocking"
-        }
-      ],
+      "blocked": false,
+      "blockers": [],
       "dataset_id": "paysim_temporal_transaction_fraud",
       "paper_claim_posture": "supporting-only",
-      "paper_readiness": "source_missing"
+      "paper_readiness": "supporting_ready"
     },
     {
-      "blocked": true,
-      "blockers": [
-        {
-          "blocker_id": "elliptic_bitcoin_flattened_graph_aml_license_bundling_review",
-          "reason": "Raw source files must not be bundled without explicit license review.",
-          "repair": "Store only local hashes, setup instructions, and source citations in the repo.",
-          "severity": "gating"
-        },
-        {
-          "blocker_id": "elliptic_bitcoin_flattened_graph_aml_local_source_missing",
-          "missing_paths": [
-            "data/paper_benchmarks/elliptic/elliptic_txs_classes.csv",
-            "data/paper_benchmarks/elliptic/elliptic_txs_edgelist.csv",
-            "data/paper_benchmarks/elliptic/elliptic_txs_features.csv"
-          ],
-          "reason": "Required local source files are missing.",
-          "repair": "Follow dataset setup steps and rerun the registry sync.",
-          "severity": "blocking"
-        }
-      ],
+      "blocked": false,
+      "blockers": [],
       "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
       "paper_claim_posture": "supporting-only",
-      "paper_readiness": "source_missing"
+      "paper_readiness": "supporting_ready"
     },
     {
       "blocked": true,

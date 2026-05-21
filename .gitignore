@@ -182,6 +182,8 @@ cython_debug/
 
 # Relaytic local private data
 data/private/
+data/paper_benchmarks/*
+!data/paper_benchmarks/README.md
 
 # Relaytic generated outputs (can contain derived sensitive info)
 artifacts/*

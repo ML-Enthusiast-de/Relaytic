@@ -1,4 +1,5 @@
 {
+  "artifact_scope": "Environment-independent split doctrine with local readiness echoed from the registry snapshot.",
   "contract_count": 6,
   "contracts": [
     {
@@ -17,7 +18,7 @@
       "label_fields": [
         "isFraud"
       ],
-      "paper_readiness": "source_missing",
+      "paper_readiness": "supporting_ready",
       "primary_metrics": [
         "pr_auc",
         "precision_at_k",
@@ -48,7 +49,7 @@
       "label_fields": [
         "class"
       ],
-      "paper_readiness": "source_missing",
+      "paper_readiness": "supporting_ready",
       "primary_metrics": [
         "pr_auc",
         "precision_at_k",

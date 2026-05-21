@@ -433,6 +433,11 @@ def _build_registry(p2_contract: dict[str, Any], datasets: list[dict[str, Any]])
         "slice": "Paper Track P3",
         "status": "dataset_registry_frozen",
         "source_review_date": SOURCE_REVIEW_DATE,
+        "artifact_scope": (
+            "Environment snapshot: local_source_ready and file hashes reflect the machine where this "
+            "artifact was generated. Raw benchmark files are intentionally not committed; clean clones "
+            "must fetch the sources and rerun the registry sync."
+        ),
         "source_contract_refs": {
             "paper_thesis_contract": "docs/reports/paper_thesis_contract.json",
             "paper_claim_taxonomy": "docs/reports/paper_claim_taxonomy.json",
@@ -476,6 +481,10 @@ def _build_access_manifest(datasets: list[dict[str, Any]]) -> dict[str, Any]:
         "slice": "Paper Track P3",
         "status": "dataset_access_manifest_frozen",
         "source_review_date": SOURCE_REVIEW_DATE,
+        "artifact_scope": (
+            "Environment snapshot: access readiness reflects local files present during generation, "
+            "not a guarantee that ignored raw data exists in a clean clone."
+        ),
         "access_entries": entries,
         "local_ready_dataset_ids": [
             item["dataset_id"] for item in datasets if item["local_source_ready"]
@@ -509,6 +518,7 @@ def _build_split_contracts(datasets: list[dict[str, Any]]) -> dict[str, Any]:
         "slice": "Paper Track P3",
         "status": "split_contracts_frozen",
         "source_review_date": SOURCE_REVIEW_DATE,
+        "artifact_scope": "Environment-independent split doctrine with local readiness echoed from the registry snapshot.",
         "contracts": contracts,
         "contract_count": len(contracts),
         "global_split_doctrine": {
@@ -552,6 +562,10 @@ def _build_blockers(
         "slice": "Paper Track P3",
         "status": "dataset_blockers_frozen",
         "source_review_date": SOURCE_REVIEW_DATE,
+        "artifact_scope": (
+            "Environment snapshot: dataset-local blockers clear only when required ignored raw files "
+            "exist on the machine that generated the artifact."
+        ),
         "hard_performance_claims_allowed": False,
         "dataset_blockers": dataset_blockers,
         "global_blockers": [

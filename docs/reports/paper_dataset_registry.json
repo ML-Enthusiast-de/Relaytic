@@ -1,12 +1,11 @@
 {
+  "artifact_scope": "Environment snapshot: local_source_ready and file hashes reflect the machine where this artifact was generated. Raw benchmark files are intentionally not committed; clean clones must fetch the sources and rerun the registry sync.",
   "blocked_claim_dataset_ids": [
     "elliptic2_subgraph_aml",
     "amlsim_synthetic_bank_graph",
     "dgraph_finance_graph_context"
   ],
   "blocked_or_missing_dataset_ids": [
-    "paysim_temporal_transaction_fraud",
-    "elliptic_bitcoin_flattened_graph_aml",
     "elliptic2_subgraph_aml",
     "amlsim_synthetic_bank_graph",
     "dgraph_finance_graph_context"
@@ -23,14 +22,7 @@
     {
       "access_posture": "manual_kaggle_download_required",
       "benchmark_role": "proxy temporal transaction-fraud workflow",
-      "blocked_reasons": [
-        {
-          "blocker_id": "paysim_temporal_transaction_fraud_license_bundling_review",
-          "reason": "Raw source files must not be bundled without explicit license review.",
-          "repair": "Store only local hashes, setup instructions, and source citations in the repo.",
-          "severity": "gating"
-        }
-      ],
+      "blocked_reasons": [],
       "claim_boundary_from_taxonomy": "supporting-only",
       "claim_id": "claim_paysim_temporal_transaction_fraud",
       "dataset_id": "paysim_temporal_transaction_fraud",
@@ -49,7 +41,7 @@
         "requires_legal_review_before_bundling": true,
         "spdx_or_name": "CC-BY-SA-4.0"
       },
-      "local_source_ready": false,
+      "local_source_ready": true,
       "optional_file_checks": [
         {
           "exists": false,
@@ -69,13 +61,13 @@
         "data/paper_benchmarks/paysim/README.md"
       ],
       "paper_claim_posture": "supporting-only",
-      "paper_readiness": "source_missing",
+      "paper_readiness": "supporting_ready",
       "required_file_checks": [
         {
-          "exists": false,
+          "exists": true,
           "path": "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv",
-          "sha256": null,
-          "size_bytes": null
+          "sha256": "16910f90577b0d981bf8ff289714510bb89bc71bff7d3f220f024e287e4eea6b",
+          "size_bytes": 493534783
         }
       ],
       "required_files": [
@@ -98,14 +90,7 @@
     {
       "access_posture": "manual_kaggle_download_required",
       "benchmark_role": "flattened or raw temporal graph AML evidence",
-      "blocked_reasons": [
-        {
-          "blocker_id": "elliptic_bitcoin_flattened_graph_aml_license_bundling_review",
-          "reason": "Raw source files must not be bundled without explicit license review.",
-          "repair": "Store only local hashes, setup instructions, and source citations in the repo.",
-          "severity": "gating"
-        }
-      ],
+      "blocked_reasons": [],
       "claim_boundary_from_taxonomy": "supporting-only",
       "claim_id": "claim_elliptic_flattened_graph_aml",
       "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
@@ -125,7 +110,7 @@
         "requires_legal_review_before_bundling": true,
         "spdx_or_name": "CC-BY-NC-ND-4.0"
       },
-      "local_source_ready": false,
+      "local_source_ready": true,
       "optional_file_checks": [
         {
           "exists": false,
@@ -145,25 +130,25 @@
         "data/paper_benchmarks/elliptic/README.md"
       ],
       "paper_claim_posture": "supporting-only",
-      "paper_readiness": "source_missing",
+      "paper_readiness": "supporting_ready",
       "required_file_checks": [
         {
-          "exists": false,
+          "exists": true,
           "path": "data/paper_benchmarks/elliptic/elliptic_txs_classes.csv",
-          "sha256": null,
-          "size_bytes": null
+          "sha256": "93e2e7b2405c735ba752bf6ba06b947561deddd1f5a8fc91e46f6a4c0e439493",
+          "size_bytes": 3305144
         },
         {
-          "exists": false,
+          "exists": true,
           "path": "data/paper_benchmarks/elliptic/elliptic_txs_edgelist.csv",
-          "sha256": null,
-          "size_bytes": null
+          "sha256": "a35053ba68a98e4382cae2ba65b9d9e36b23b6439e02dff084971b1b72a5156e",
+          "size_bytes": 4470584
         },
         {
-          "exists": false,
+          "exists": true,
           "path": "data/paper_benchmarks/elliptic/elliptic_txs_features.csv",
-          "sha256": null,
-          "size_bytes": null
+          "sha256": "fd7f83573443c9e302e371d3f110e3b6224160f5d1ed8a287757936127800ff0",
+          "size_bytes": 689683771
         }
       ],
       "required_files": [
@@ -548,6 +533,8 @@
   ],
   "hard_performance_claims_allowed": false,
   "local_ready_dataset_ids": [
+    "paysim_temporal_transaction_fraud",
+    "elliptic_bitcoin_flattened_graph_aml",
     "generic_structured_support_pack"
   ],
   "next_slice": "Paper Track P4",

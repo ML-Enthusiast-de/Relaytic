@@ -11,8 +11,8 @@
         "requires_legal_review_before_bundling": true,
         "spdx_or_name": "CC-BY-SA-4.0"
       },
-      "local_source_ready": false,
-      "manual_action_required": true,
+      "local_source_ready": true,
+      "manual_action_required": false,
       "optional_file_checks": [
         {
           "exists": false,
@@ -27,14 +27,14 @@
           "size_bytes": null
         }
       ],
-      "paper_readiness": "source_missing",
+      "paper_readiness": "supporting_ready",
       "relaytic_auto_download_allowed": false,
       "required_file_checks": [
         {
-          "exists": false,
+          "exists": true,
           "path": "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv",
-          "sha256": null,
-          "size_bytes": null
+          "sha256": "16910f90577b0d981bf8ff289714510bb89bc71bff7d3f220f024e287e4eea6b",
+          "size_bytes": 493534783
         }
       ],
       "setup_steps": [
@@ -58,8 +58,8 @@
         "requires_legal_review_before_bundling": true,
         "spdx_or_name": "CC-BY-NC-ND-4.0"
       },
-      "local_source_ready": false,
-      "manual_action_required": true,
+      "local_source_ready": true,
+      "manual_action_required": false,
       "optional_file_checks": [
         {
           "exists": false,
@@ -74,26 +74,26 @@
           "size_bytes": null
         }
       ],
-      "paper_readiness": "source_missing",
+      "paper_readiness": "supporting_ready",
       "relaytic_auto_download_allowed": false,
       "required_file_checks": [
         {
-          "exists": false,
+          "exists": true,
           "path": "data/paper_benchmarks/elliptic/elliptic_txs_classes.csv",
-          "sha256": null,
-          "size_bytes": null
+          "sha256": "93e2e7b2405c735ba752bf6ba06b947561deddd1f5a8fc91e46f6a4c0e439493",
+          "size_bytes": 3305144
         },
         {
-          "exists": false,
+          "exists": true,
           "path": "data/paper_benchmarks/elliptic/elliptic_txs_edgelist.csv",
-          "sha256": null,
-          "size_bytes": null
+          "sha256": "a35053ba68a98e4382cae2ba65b9d9e36b23b6439e02dff084971b1b72a5156e",
+          "size_bytes": 4470584
         },
         {
-          "exists": false,
+          "exists": true,
           "path": "data/paper_benchmarks/elliptic/elliptic_txs_features.csv",
-          "sha256": null,
-          "size_bytes": null
+          "sha256": "fd7f83573443c9e302e371d3f110e3b6224160f5d1ed8a287757936127800ff0",
+          "size_bytes": 689683771
         }
       ],
       "setup_steps": [
@@ -345,6 +345,7 @@
       }
     }
   ],
+  "artifact_scope": "Environment snapshot: access readiness reflects local files present during generation, not a guarantee that ignored raw data exists in a clean clone.",
   "kaggle_or_account_gated_dataset_ids": [
     "paysim_temporal_transaction_fraud",
     "elliptic_bitcoin_flattened_graph_aml",
@@ -352,11 +353,11 @@
     "dgraph_finance_graph_context"
   ],
   "local_ready_dataset_ids": [
+    "paysim_temporal_transaction_fraud",
+    "elliptic_bitcoin_flattened_graph_aml",
     "generic_structured_support_pack"
   ],
   "manual_action_required_dataset_ids": [
-    "paysim_temporal_transaction_fraud",
-    "elliptic_bitcoin_flattened_graph_aml",
     "elliptic2_subgraph_aml",
     "amlsim_synthetic_bank_graph",
     "dgraph_finance_graph_context"

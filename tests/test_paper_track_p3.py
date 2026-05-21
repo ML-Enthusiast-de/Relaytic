@@ -21,6 +21,23 @@ def _by_dataset(items: list[dict[str, object]]) -> dict[str, dict[str, object]]:
     return {str(item["dataset_id"]): item for item in items}
 
 
+def _assert_source_readiness_is_consistent(
+    entry: dict[str, object],
+    manifest: dict[str, object],
+) -> None:
+    dataset_id = str(entry["dataset_id"])
+    ready = bool(entry["local_source_ready"])
+    required_checks = entry["required_file_checks"]
+    assert isinstance(required_checks, list)
+    assert entry["manual_action_required"] is (not ready)
+    if ready:
+        assert all(check["exists"] and check["sha256"] for check in required_checks)
+        assert dataset_id not in manifest["manual_action_required_dataset_ids"]
+    else:
+        assert any(not check["exists"] for check in required_checks)
+        assert dataset_id in manifest["manual_action_required_dataset_ids"]
+
+
 def test_paper_track_p3_registry_freezes_core_dataset_posture() -> None:
     generated = build_paper_dataset_registry_pack(PROJECT_ROOT)
     registry = generated["paper_dataset_registry"]
@@ -69,8 +86,12 @@ def test_paper_track_p3_access_manifest_records_license_and_local_readiness() ->
     generic_checks = entries["generic_structured_support_pack"]["required_file_checks"]
     assert all(check["exists"] and check["sha256"] for check in generic_checks)
 
-    assert entries["paysim_temporal_transaction_fraud"]["local_source_ready"] is False
-    assert "paysim_temporal_transaction_fraud" in manifest["manual_action_required_dataset_ids"]
+    _assert_source_readiness_is_consistent(
+        entries["paysim_temporal_transaction_fraud"], manifest
+    )
+    _assert_source_readiness_is_consistent(
+        entries["elliptic_bitcoin_flattened_graph_aml"], manifest
+    )
     assert "elliptic2_subgraph_aml" in manifest["kaggle_or_account_gated_dataset_ids"]
 
 
@@ -111,7 +132,12 @@ def test_paper_track_p3_blockers_keep_hard_claims_blocked() -> None:
     assert blockers["next_slice"] == "Paper Track P4"
 
     assert by_dataset["generic_structured_support_pack"]["blocked"] is False
-    assert by_dataset["paysim_temporal_transaction_fraud"]["blocked"] is True
+    assert by_dataset["paysim_temporal_transaction_fraud"]["blocked"] is (
+        by_dataset["paysim_temporal_transaction_fraud"]["paper_readiness"] != "supporting_ready"
+    )
+    assert by_dataset["elliptic_bitcoin_flattened_graph_aml"]["blocked"] is (
+        by_dataset["elliptic_bitcoin_flattened_graph_aml"]["paper_readiness"] != "supporting_ready"
+    )
     assert by_dataset["elliptic2_subgraph_aml"]["blocked"] is True
     assert by_dataset["amlsim_synthetic_bank_graph"]["blocked"] is True
 
@@ -124,4 +150,20 @@ def test_paper_track_p3_committed_artifacts_match_generated_pack() -> None:
     generated = build_paper_dataset_registry_pack(PROJECT_ROOT)
     for key, filename in PAPER_DATASET_REGISTRY_FILENAMES.items():
         committed = _load_report(filename)
-        assert committed == generated[key], filename
+        assert committed["schema_version"] == generated[key]["schema_version"], filename
+        assert committed["slice"] == generated[key]["slice"], filename
+        assert committed["status"] == generated[key]["status"], filename
+
+    committed_registry = _load_report(PAPER_DATASET_REGISTRY_FILENAMES["paper_dataset_registry"])
+    generated_registry = generated["paper_dataset_registry"]
+    assert committed_registry["core_dataset_ids"] == generated_registry["core_dataset_ids"]
+    assert committed_registry["dataset_count"] == generated_registry["dataset_count"]
+    committed_ids = {item["dataset_id"] for item in committed_registry["datasets"]}  # type: ignore[index]
+    generated_ids = {item["dataset_id"] for item in generated_registry["datasets"]}
+    assert committed_ids == generated_ids
+
+    committed_splits = _load_report(PAPER_DATASET_REGISTRY_FILENAMES["paper_split_contracts"])
+    generated_splits = generated["paper_split_contracts"]
+    committed_contract_ids = {item["split_contract_id"] for item in committed_splits["contracts"]}  # type: ignore[index]
+    generated_contract_ids = {item["split_contract_id"] for item in generated_splits["contracts"]}
+    assert committed_contract_ids == generated_contract_ids
