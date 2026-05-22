@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P4 implemented. P5 through P13, including P6-A, planned.
+P0 through P5 implemented. P6 through P13, including P6-A, planned.
 
 ## Intent
 
@@ -36,7 +36,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Record dataset sources, licenses, hashes, split posture, access blockers, and claim posture for each track.
 5. **P4 - PaySim-style temporal benchmark runner** - implemented
    Produce a chronological temporal transaction-fraud result row with review-budget metrics and proxy/holdout posture.
-6. **P5 - Elliptic graph benchmark loader and provenance**
+6. **P5 - Elliptic graph benchmark loader and provenance** - implemented
    Produce raw or flattened Elliptic-style graph provenance, split proof, and graph claim scope.
 7. **P6 - Strong tabular baseline suite**
    Compare deterministic baselines plus optional LightGBM, CatBoost, XGBoost, TabPFN-style, or other strong tabular adapters under one split contract and explicit budget ladder.
@@ -139,8 +139,21 @@ P4 added:
 
 P4 runs the full 6,362,620-row PaySim source through a chronological `step` split, uses validation-only threshold selection, applies thresholds fixed to test, reports review-budget and fixed-FPR operating points, and keeps hard AML/SOTA performance claims blocked. The result is supporting proxy evidence for the paper path, not a primary real-world AML superiority claim.
 
+P5 added:
+
+- `docs/reports/elliptic_graph_loader_manifest.json`
+- `docs/reports/elliptic_graph_provenance_report.json`
+- `docs/reports/elliptic_temporal_split_report.json`
+- `docs/reports/elliptic_graph_claim_scope.json`
+- `docs/reports/elliptic_paper_result_row.json`
+- `src/relaytic/release_safety/elliptic_graph.py`
+- `relaytic release-safety elliptic-graph --format json`
+- `tests/test_paper_track_p5.py`
+
+P5 inspects the local raw Elliptic graph bundle, records 203,769 nodes, 234,355 edges, 49 time steps, and a chronological train/validation/test split by `time_step`. It keeps unknown labels out of supervised metric scope, allows supporting loader/provenance wording only, and blocks graph performance, graph SOTA, paper-primary, and hard AML claims until P7 graph baselines run.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P5**.
+The next implementation target is **Paper Track P6**.
 
-P5 should implement the Elliptic-style graph loader and provenance path against the P3 source and split contracts. It should distinguish raw graph evidence, flattened proxy evidence, temporal split proof, and graph claim scope before any graph benchmark row is treated as paper evidence.
+P6 should implement the strong tabular baseline suite against the P3/P4/P5 artifact contracts. It should report deterministic baseline floors, optional-adapter eligibility, explicit smoke/baseline/competitive/release budget labels, leakage-safe feature posture, fallback states, and publishability gates before any metric row is eligible for a headline paper table.

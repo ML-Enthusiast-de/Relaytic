@@ -282,7 +282,14 @@ Avoid introducing new references to:
 - introduced the public command `relaytic release-safety paysim-benchmark` for regenerating PaySim paper artifacts locally
 - introduced paper-track benchmark artifacts under `docs/reports/`: `paysim_benchmark_manifest.json`, `paysim_temporal_split_report.json`, `paysim_operating_point_table.json`, and `paysim_paper_result_row.json`
 - preserved supporting-only claim posture for PaySim-style proxy evidence and kept hard AML/SOTA performance claims blocked until later paper gates pass
-- future Paper Track P5 work should consume the P3 dataset registry and P4 result-row contract before adding Elliptic graph provenance
+- future Paper Track P6 work should consume the P3 dataset registry, P4 result-row contract, and P5 graph provenance before adding strong baseline suites
+
+### Paper Track P5
+
+- introduced `src/relaytic/release_safety/elliptic_graph.py` under the existing release-safety boundary for deterministic Elliptic graph provenance and temporal split artifact generation
+- introduced the public command `relaytic release-safety elliptic-graph` for regenerating Elliptic graph paper artifacts locally
+- introduced paper-track graph artifacts under `docs/reports/`: `elliptic_graph_loader_manifest.json`, `elliptic_graph_provenance_report.json`, `elliptic_temporal_split_report.json`, `elliptic_graph_claim_scope.json`, and `elliptic_paper_result_row.json`
+- preserved supporting-only loader/provenance posture for Elliptic-style graph evidence and kept graph benchmark performance, graph SOTA, paper-primary, and hard AML claims blocked until later graph baselines and competitive paper gates pass
 
 ### AML Pivot Track
 
@@ -660,6 +667,11 @@ Implemented release-safety artifact names:
 - `paysim_temporal_split_report.json`
 - `paysim_operating_point_table.json`
 - `paysim_paper_result_row.json`
+- `elliptic_graph_loader_manifest.json`
+- `elliptic_graph_provenance_report.json`
+- `elliptic_temporal_split_report.json`
+- `elliptic_graph_claim_scope.json`
+- `elliptic_paper_result_row.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

@@ -1145,6 +1145,26 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_elliptic = release_safety_sub.add_parser(
+        "elliptic-graph",
+        help="Build the Paper Track P5 Elliptic graph provenance and temporal split artifacts.",
+    )
+    release_safety_elliptic.add_argument(
+        "--data-dir",
+        default=None,
+        help="Optional Elliptic raw bundle directory. Defaults to data/paper_benchmarks/elliptic.",
+    )
+    release_safety_elliptic.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for Elliptic graph artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_elliptic.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3106,6 +3126,11 @@ def main(argv: list[str] | None = None) -> int:
             elif args.release_safety_command == "paysim-benchmark":
                 payload = _run_paysim_benchmark_surface(
                     data_path=args.data_path,
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "elliptic-graph":
+                payload = _run_elliptic_graph_surface(
+                    data_dir=args.data_dir,
                     output_dir=args.output_dir,
                 )
             else:
@@ -6780,6 +6805,31 @@ def _run_paysim_benchmark_surface(*, data_path: str | None, output_dir: str | No
             "bundle": pack,
         },
         "human_output": render_paysim_benchmark_markdown(pack),
+    }
+
+
+def _run_elliptic_graph_surface(*, data_dir: str | None, output_dir: str | None) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_elliptic_graph_markdown,
+        sync_elliptic_graph_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_elliptic_graph_pack(root, data_dir=data_dir, output_dir=output_dir)
+    pack = {
+        key: json.loads(path.read_text(encoding="utf-8"))
+        for key, path in written.items()
+    }
+    manifest = dict(pack["elliptic_graph_loader_manifest"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "elliptic_graph": manifest,
+            "bundle": pack,
+        },
+        "human_output": render_elliptic_graph_markdown(pack),
     }
 
 

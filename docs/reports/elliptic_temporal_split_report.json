@@ -1,0 +1,121 @@
+{
+  "blocked_reason_codes": [],
+  "chronological_order_ok": true,
+  "class_coverage_ok": true,
+  "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+  "edge_report": {
+    "cross_window_edge_count": 0,
+    "edge_count": 234355,
+    "edge_rows": {
+      "cross_train_test": 0,
+      "cross_train_validation": 0,
+      "cross_validation_test": 0,
+      "missing_time_endpoint": 0,
+      "within_test": 53491,
+      "within_train": 140223,
+      "within_validation": 40641
+    },
+    "edge_split_policy": "Training graph construction may use only edges whose endpoints are both in the train window. Cross-window edges are counted for provenance and excluded from train graph evidence.",
+    "edge_time_coverage_ok": true,
+    "future_to_train_cross_edge_count": 0,
+    "future_to_train_leakage_prevented": true,
+    "test_induced_edge_count": 53491,
+    "train_induced_edge_count": 140223,
+    "validation_induced_edge_count": 40641
+  },
+  "edge_time_coverage_ok": true,
+  "forbidden_split_methods_avoided": [
+    "random_node_split_across_time",
+    "edge_leaking_future_to_train"
+  ],
+  "known_label_count": 46564,
+  "node_count": 203769,
+  "raw_vs_flattened_claim_scope_recorded": true,
+  "schema_version": "relaytic.elliptic_graph_provenance.v1",
+  "slice": "Paper Track P5",
+  "source_path": "data/paper_benchmarks/elliptic",
+  "split_contract": {
+    "claim_posture": "supporting-only",
+    "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+    "forbidden_feature_fields": [],
+    "forbidden_split_methods": [
+      "random_node_split_across_time",
+      "edge_leaking_future_to_train"
+    ],
+    "label_fields": [
+      "class"
+    ],
+    "paper_readiness": "supporting_ready",
+    "primary_metrics": [
+      "pr_auc",
+      "precision_at_k",
+      "fixed_fpr_recall"
+    ],
+    "required_audits": [
+      "time_step_integrity",
+      "unknown_label_scope",
+      "raw_vs_flattened_claim_scope"
+    ],
+    "required_order_fields": [
+      "time_step"
+    ],
+    "split_contract_id": "split_elliptic_temporal_step_v1",
+    "split_type": "temporal_graph_by_time_step",
+    "test_window": "later time steps only; exact cut frozen by P5 runner",
+    "train_window": "early time steps only; exact cut frozen by P5 runner",
+    "validation_window": "middle time steps only; exact cut frozen by P5 runner"
+  },
+  "split_contract_id": "split_elliptic_temporal_step_v1",
+  "split_rows": [
+    {
+      "class_coverage_ok": true,
+      "illicit_count": 2871,
+      "known_label_count": 26381,
+      "licit_count": 23510,
+      "node_count": 120804,
+      "positive_rate_labeled": 0.108828,
+      "split": "train",
+      "time_step_max": 29,
+      "time_step_min": 1,
+      "unknown_label_count": 94423,
+      "unknown_label_rate": 0.781621
+    },
+    {
+      "class_coverage_ok": true,
+      "illicit_count": 1038,
+      "known_label_count": 8999,
+      "licit_count": 7961,
+      "node_count": 36318,
+      "positive_rate_labeled": 0.115346,
+      "split": "validation",
+      "time_step_max": 39,
+      "time_step_min": 30,
+      "unknown_label_count": 27319,
+      "unknown_label_rate": 0.752217
+    },
+    {
+      "class_coverage_ok": true,
+      "illicit_count": 636,
+      "known_label_count": 11184,
+      "licit_count": 10548,
+      "node_count": 46647,
+      "positive_rate_labeled": 0.056867,
+      "split": "test",
+      "time_step_max": 49,
+      "time_step_min": 40,
+      "unknown_label_count": 35463,
+      "unknown_label_rate": 0.760242
+    }
+  ],
+  "split_type": "temporal_graph_by_time_step",
+  "status": "ok",
+  "summary": "Elliptic raw graph bundle was split by transaction time step with unknown labels excluded from supervised metric scope.",
+  "test_window": "time_step > 39",
+  "time_step_max": 49,
+  "time_step_min": 1,
+  "track_id": "elliptic_flattened_graph_aml",
+  "train_window": "time_step <= 29",
+  "unique_time_step_count": 49,
+  "unknown_label_count": 157205,
+  "validation_window": "29 < time_step <= 39"
+}

@@ -524,6 +524,14 @@ Current paper-track PaySim artifact names from Paper Track P4:
 - `paysim_operating_point_table.json`
 - `paysim_paper_result_row.json`
 
+Current paper-track Elliptic graph artifact names from Paper Track P5:
+
+- `elliptic_graph_loader_manifest.json`
+- `elliptic_graph_provenance_report.json`
+- `elliptic_temporal_split_report.json`
+- `elliptic_graph_claim_scope.json`
+- `elliptic_paper_result_row.json`
+
 Current trace and eval artifact names:
 
 - `trace_model.json`
@@ -722,6 +730,7 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic run-inference`
 - `relaytic release-safety paper-freeze`
 - `relaytic release-safety paysim-benchmark`
+- `relaytic release-safety elliptic-graph`
 - `relaytic scan-git-safety`
 
 ## Slice 05 Planning Contract

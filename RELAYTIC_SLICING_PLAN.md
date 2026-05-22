@@ -348,6 +348,7 @@ Why:
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
 - Paper Track P3 is now implemented and freezes dataset source/access posture, license notes, local file expectations, hashes for present local fixtures, split contracts, blocked reasons, and no-auto-download policy before benchmark runners start
 - Paper Track P4 is now implemented and runs the full PaySim-style chronological temporal benchmark with validation-only threshold selection, fixed test evaluation, review-budget/fixed-FPR metrics, supporting-only paper posture, and hard AML/SOTA performance claims still blocked
+- Paper Track P5 is now implemented and inspects the raw Elliptic graph bundle, freezes graph provenance and temporal split artifacts, records unknown-label scope, allows only supporting loader/provenance wording, and keeps graph benchmark/SOTA claims blocked before numeric graph baselines run
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -360,8 +361,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P4. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, and Paper Track P4 PaySim temporal benchmark.
-- next execution target: Paper Track P5
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P5. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, and Paper Track P5 Elliptic graph provenance.
+- next execution target: Paper Track P6
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -370,7 +371,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P5 through P13 prove relevant graph benchmarks, baseline and competitive-budget suites, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P6 through P13 prove relevant tabular and graph benchmarks, baseline and competitive-budget suites, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3676,6 +3677,18 @@ Minimum proof:
 - one raw or flattened Elliptic-style track materializes graph provenance
 - incomplete raw bundles produce precise recovery instructions
 - graph claims are blocked unless loader, split, and claim-scope checks pass
+
+Implemented by:
+- adding `src/relaytic/release_safety/elliptic_graph.py`
+- adding `docs/reports/elliptic_graph_loader_manifest.json`
+- adding `docs/reports/elliptic_graph_provenance_report.json`
+- adding `docs/reports/elliptic_temporal_split_report.json`
+- adding `docs/reports/elliptic_graph_claim_scope.json`
+- adding `docs/reports/elliptic_paper_result_row.json`
+- adding `relaytic release-safety elliptic-graph --format json`
+- adding `tests/test_paper_track_p5.py`
+
+P5 inspects the local raw Elliptic graph bundle, records 203,769 nodes, 234,355 directed edges, 165 source feature values per node, 49 chronological time steps, unknown-label scope, and a train/validation/test split by `time_step`. It allows only supporting loader/provenance wording, keeps graph benchmark performance, graph SOTA, paper-primary, and hard AML claims blocked, and records Paper Track P6 as the next paper implementation slice.
 
 ### Paper Track P6 - Strong tabular baseline suite
 

@@ -1,0 +1,40 @@
+{
+  "artifact_refs": {
+    "claim_scope": "docs/reports/elliptic_graph_claim_scope.json",
+    "manifest": "docs/reports/elliptic_graph_loader_manifest.json",
+    "paper_result_row": "docs/reports/elliptic_paper_result_row.json",
+    "provenance": "docs/reports/elliptic_graph_provenance_report.json",
+    "split_report": "docs/reports/elliptic_temporal_split_report.json"
+  },
+  "blocked_claims": [
+    "graph_sota_or_leaderboard_claim",
+    "hard_elliptic_performance_claim",
+    "elliptic2_subgraph_claim"
+  ],
+  "claim_boundary_from_taxonomy": "supporting-only",
+  "claim_posture": "supporting-only",
+  "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+  "dataset_source_path": "data/paper_benchmarks/elliptic",
+  "evidence_partition": "loader_and_split_provenance",
+  "graph_summary": {
+    "edge_count": 234355,
+    "feature_value_count": 165,
+    "known_label_count": 46564,
+    "node_count": 203769,
+    "unique_time_step_count": 49,
+    "unknown_label_count": 157205
+  },
+  "hard_performance_claims_allowed": false,
+  "metrics": {},
+  "next_slice": "Paper Track P6",
+  "numeric_model_metrics_available": false,
+  "paper_primary_claim_allowed": false,
+  "paper_table_role": "graph_provenance_and_temporal_split_row",
+  "public_claim_wording": "Relaytic can inspect the raw Elliptic graph bundle, preserve ID/time/label/edge provenance, and emit a chronological graph split proof. This is supporting graph evidence, not a graph SOTA or hard AML performance claim.",
+  "publishable_performance_row_allowed": false,
+  "schema_version": "relaytic.elliptic_graph_provenance.v1",
+  "slice": "Paper Track P5",
+  "status": "ok",
+  "supporting_public_claim_allowed": true,
+  "track_id": "elliptic_flattened_graph_aml"
+}

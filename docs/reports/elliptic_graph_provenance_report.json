@@ -1,0 +1,85 @@
+{
+  "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+  "feature_lineage": {
+    "anonymized_feature_policy": "features are source-provided anonymized transaction features; semantic feature names are unavailable",
+    "feature_file": "elliptic_txs_features.csv",
+    "feature_value_count_excluding_id_and_time": 165,
+    "raw_feature_width": 167
+  },
+  "graph_family": "elliptic_bitcoin_transaction_graph",
+  "graph_input_mode": "raw_graph_bundle",
+  "graph_lineage": {
+    "directed_edge_assumption": "source edgelist is preserved as directed transaction-to-transaction edges for provenance",
+    "edge_count": 234355,
+    "edge_file": "elliptic_txs_edgelist.csv",
+    "node_count": 203769
+  },
+  "label_lineage": {
+    "class_row_count": 203769,
+    "label_field": "class",
+    "negative_class": "2_licit",
+    "positive_class": "1_illicit",
+    "source_file": "elliptic_txs_classes.csv",
+    "unknown_label_policy": "exclude_unknown_from_supervised_metrics_but_count_in_split_scope"
+  },
+  "node_id_lineage": {
+    "edge_destination_field": "txId2",
+    "edge_source_field": "txId1",
+    "join_key": "transaction_id",
+    "node_id_field": "txId"
+  },
+  "privacy_posture": "raw source files remain local and ignored; committed artifacts contain hashes, relative paths, and aggregate counts only",
+  "schema_version": "relaytic.elliptic_graph_provenance.v1",
+  "slice": "Paper Track P5",
+  "source_file_count": 3,
+  "source_files": [
+    {
+      "exists": true,
+      "format": "csv",
+      "path": "data/paper_benchmarks/elliptic/elliptic_txs_classes.csv",
+      "role": "labels",
+      "row_count": 203769,
+      "sha256": "93e2e7b2405c735ba752bf6ba06b947561deddd1f5a8fc91e46f6a4c0e439493",
+      "size_bytes": 3305144
+    },
+    {
+      "exists": true,
+      "format": "csv",
+      "path": "data/paper_benchmarks/elliptic/elliptic_txs_edgelist.csv",
+      "role": "edges",
+      "row_count": 234355,
+      "sha256": "a35053ba68a98e4382cae2ba65b9d9e36b23b6439e02dff084971b1b72a5156e",
+      "size_bytes": 4470584
+    },
+    {
+      "exists": true,
+      "format": "csv",
+      "path": "data/paper_benchmarks/elliptic/elliptic_txs_features.csv",
+      "role": "features",
+      "row_count": 203769,
+      "sha256": "fd7f83573443c9e302e371d3f110e3b6224160f5d1ed8a287757936127800ff0",
+      "size_bytes": 689683771
+    }
+  ],
+  "source_path": "data/paper_benchmarks/elliptic",
+  "status": "ok",
+  "summary": "Relaytic inspected the raw Elliptic classes, edgelist, and features files and preserved ID, edge, time, and label provenance.",
+  "time_lineage": {
+    "source_file": "elliptic_txs_features.csv",
+    "time_field": "time_step",
+    "time_steps_are_ordered": true
+  },
+  "track_id": "elliptic_flattened_graph_aml",
+  "transformations": [
+    {
+      "changes_raw_values": false,
+      "operation": "detect classes, edgelist, features, txId, class, time_step, txId1, and txId2 roles",
+      "transformation_id": "raw_elliptic_role_detection"
+    },
+    {
+      "changes_raw_values": false,
+      "operation": "derive train, validation, and test windows from source time_step without random node shuffling",
+      "transformation_id": "temporal_split_projection"
+    }
+  ]
+}
