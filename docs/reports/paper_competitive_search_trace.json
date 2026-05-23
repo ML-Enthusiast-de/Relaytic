@@ -1,0 +1,128 @@
+{
+  "attempts": [
+    {
+      "candidate_budget_tier": "baseline",
+      "configuration": {
+        "fit_surface": "none",
+        "rule": "rank_by_fixed_sigmoid_of_log_amount_plus_transfer_cashout_flags",
+        "threshold_surface": "validation_only"
+      },
+      "execution_state": "ran",
+      "family_id": "deterministic_transfer_cashout_rule",
+      "runtime_seconds": 0.152861
+    },
+    {
+      "candidate_budget_tier": "baseline",
+      "configuration": {
+        "class_weight": "balanced_train_only",
+        "loss": "log_loss",
+        "max_iter": 25,
+        "random_state": 42,
+        "scaling_fit_surface": "train_only"
+      },
+      "execution_state": "ran",
+      "family_id": "sklearn_sgd_logistic",
+      "runtime_seconds": 70.342015
+    },
+    {
+      "candidate_budget_tier": "baseline",
+      "configuration": {
+        "class_weight": "balanced",
+        "class_weight_fit_surface": "train_only",
+        "l2_regularization": 1.0,
+        "learning_rate": 0.08,
+        "max_iter": 100,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 40,
+        "random_state": 42
+      },
+      "execution_state": "ran",
+      "family_id": "sklearn_hist_gradient_boosting",
+      "runtime_seconds": 121.501819
+    },
+    {
+      "candidate_budget_tier": "baseline",
+      "configuration": {
+        "bootstrap": true,
+        "class_weight": "balanced_subsample",
+        "class_weight_fit_surface": "train_only",
+        "max_depth": 18,
+        "max_samples": 0.25,
+        "min_samples_leaf": 8,
+        "n_estimators": 96,
+        "n_jobs": -1,
+        "random_state": 42,
+        "sample_surface": "train_only"
+      },
+      "execution_state": "ran",
+      "family_id": "sklearn_extra_trees",
+      "runtime_seconds": 162.676345
+    },
+    {
+      "candidate_budget_tier": "baseline",
+      "configuration": {
+        "learning_rate": 0.06,
+        "min_child_samples": 40,
+        "n_estimators": 160,
+        "n_jobs": -1,
+        "num_leaves": 31,
+        "random_state": 42,
+        "scale_pos_weight": 1199.5066906331137,
+        "scale_pos_weight_fit_surface": "train_only",
+        "verbosity": -1
+      },
+      "execution_state": "ran",
+      "family_id": "lightgbm_classifier",
+      "runtime_seconds": 49.683875
+    },
+    {
+      "candidate_budget_tier": "baseline",
+      "configuration": {
+        "colsample_bytree": 0.9,
+        "eval_metric": "logloss",
+        "learning_rate": 0.06,
+        "max_depth": 6,
+        "n_estimators": 160,
+        "n_jobs": -1,
+        "objective": "binary:logistic",
+        "random_state": 42,
+        "scale_pos_weight": 1199.5066906331137,
+        "scale_pos_weight_fit_surface": "train_only",
+        "subsample": 0.9,
+        "tree_method": "hist"
+      },
+      "execution_state": "ran",
+      "family_id": "xgboost_classifier",
+      "runtime_seconds": 74.869467
+    },
+    {
+      "blocked_reason": "optional_adapter_not_installed",
+      "candidate_budget_tier": "competitive",
+      "execution_state": "fallback",
+      "family_id": "catboost_classifier"
+    },
+    {
+      "blocked_reason": "optional_adapter_not_installed",
+      "candidate_budget_tier": "competitive",
+      "execution_state": "fallback",
+      "family_id": "tabpfn_classifier"
+    }
+  ],
+  "candidate_attempt_count": 8,
+  "competitive_next_actions": [
+    "Run P6-A on full PaySim with explicitly bounded HPO/search budgets.",
+    "Audit additional point-in-time features before use; keep prohibited future/post-event fields excluded.",
+    "Select calibration, model, and operating points on validation only before fixed test evaluation."
+  ],
+  "effective_budget_tier": "baseline",
+  "executed_candidate_count": 6,
+  "hpo_trial_count": 0,
+  "optional_execution_requested": true,
+  "random_seeds": [
+    42
+  ],
+  "schema_version": "relaytic.paper_tabular_baseline_suite.v1",
+  "slice": "Paper Track P6",
+  "status": "baseline_executed_competitive_reserved",
+  "summary": "P6 executes fixed baseline configurations only; competitive HPO/search is intentionally reserved for P6-A."
+}

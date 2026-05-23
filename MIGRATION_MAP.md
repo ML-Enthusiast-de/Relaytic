@@ -282,7 +282,7 @@ Avoid introducing new references to:
 - introduced the public command `relaytic release-safety paysim-benchmark` for regenerating PaySim paper artifacts locally
 - introduced paper-track benchmark artifacts under `docs/reports/`: `paysim_benchmark_manifest.json`, `paysim_temporal_split_report.json`, `paysim_operating_point_table.json`, and `paysim_paper_result_row.json`
 - preserved supporting-only claim posture for PaySim-style proxy evidence and kept hard AML/SOTA performance claims blocked until later paper gates pass
-- future Paper Track P6 work should consume the P3 dataset registry, P4 result-row contract, and P5 graph provenance before adding strong baseline suites
+- Paper Track P6 consumes the P3 dataset registry, P4 result-row contract, and P5 graph provenance before adding strong baseline suites; future P6-A work must consume the P6 budget and publishability gates
 
 ### Paper Track P5
 
@@ -290,6 +290,13 @@ Avoid introducing new references to:
 - introduced the public command `relaytic release-safety elliptic-graph` for regenerating Elliptic graph paper artifacts locally
 - introduced paper-track graph artifacts under `docs/reports/`: `elliptic_graph_loader_manifest.json`, `elliptic_graph_provenance_report.json`, `elliptic_temporal_split_report.json`, `elliptic_graph_claim_scope.json`, and `elliptic_paper_result_row.json`
 - preserved supporting-only loader/provenance posture for Elliptic-style graph evidence and kept graph benchmark performance, graph SOTA, paper-primary, and hard AML claims blocked until later graph baselines and competitive paper gates pass
+
+### Paper Track P6
+
+- introduced `src/relaytic/release_safety/paper_baselines.py` under the existing release-safety boundary for deterministic tabular baseline suites, adapter/fallback reporting, explicit budget contracts, leakage-safe feature audits, and publishability gating
+- introduced the public command `relaytic release-safety tabular-baselines` for regenerating P6 paper artifacts locally
+- introduced paper-track baseline artifacts under `docs/reports/`: `paper_baseline_suite_manifest.json`, `paper_baseline_version_matrix.json`, `paper_tabular_baseline_table.json`, `paper_baseline_fallback_report.json`, `paper_benchmark_budget_contract.json`, `paper_competitive_search_trace.json`, `paper_leakage_safe_feature_report.json`, and `paper_publishability_gate.json`
+- executed six full-data PaySim baseline families using the frozen chronological split, train-only feature state, and validation-only thresholds; preserved baseline-only posture and kept headline/hard claims blocked until P6-A
 
 ### AML Pivot Track
 
@@ -672,6 +679,14 @@ Implemented release-safety artifact names:
 - `elliptic_temporal_split_report.json`
 - `elliptic_graph_claim_scope.json`
 - `elliptic_paper_result_row.json`
+- `paper_baseline_suite_manifest.json`
+- `paper_baseline_version_matrix.json`
+- `paper_tabular_baseline_table.json`
+- `paper_baseline_fallback_report.json`
+- `paper_benchmark_budget_contract.json`
+- `paper_competitive_search_trace.json`
+- `paper_leakage_safe_feature_report.json`
+- `paper_publishability_gate.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

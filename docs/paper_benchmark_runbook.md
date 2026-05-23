@@ -14,6 +14,16 @@ Generated freeze artifacts live under `docs/reports/`:
 - `reproducibility_attestation.json`
 - `release_attention_pack_manifest.json`
 
+Current paper-track baseline artifacts also live under `docs/reports/`:
+
+- `paysim_benchmark_manifest.json`
+- `elliptic_graph_loader_manifest.json`
+- `paper_baseline_suite_manifest.json`
+- `paper_tabular_baseline_table.json`
+- `paper_benchmark_budget_contract.json`
+- `paper_leakage_safe_feature_report.json`
+- `paper_publishability_gate.json`
+
 ## Benchmark Families
 
 | Family | Current role | Claim status | Expected evidence |
@@ -63,6 +73,9 @@ relaytic aml environment --run-dir artifacts\aml_benchmark_run --format json
 Release hygiene before public use:
 
 ```powershell
+relaytic release-safety paysim-benchmark --format json
+relaytic release-safety elliptic-graph --format json
+relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json
 relaytic release-safety paper-freeze --format json
 relaytic release-safety scan --format json
 relaytic doctor --expected-profile full --format json
@@ -97,6 +110,15 @@ The release-freeze pack should cite these when available:
 - `aml_environment_scorecard.json`
 - `aml_workflow_task_matrix.json`
 - `aml_benchmark_environment_scorecard.json`
+- `paysim_benchmark_manifest.json`
+- `paysim_temporal_split_report.json`
+- `elliptic_graph_loader_manifest.json`
+- `elliptic_temporal_split_report.json`
+- `paper_baseline_suite_manifest.json`
+- `paper_tabular_baseline_table.json`
+- `paper_baseline_version_matrix.json`
+- `paper_leakage_safe_feature_report.json`
+- `paper_publishability_gate.json`
 - `release_safety_scan.json`
 
 ## Blocked-Claim Conditions
@@ -110,6 +132,7 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `aml_temporal_benchmark_claim_report.json` blocks temporal claims because delayed labels, positive-unlabeled posture, leakage, or threshold drift are unresolved.
 - `aml_environment_scorecard.json` reports `partial`, `fail`, or model/environment disagreement.
 - `aml_benchmark_environment_scorecard.json` reports incomplete reproducibility, claim safety, or benchmark relevance.
+- `paper_publishability_gate.json` blocks a headline performance claim because competitive or release-budget proof has not passed.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record

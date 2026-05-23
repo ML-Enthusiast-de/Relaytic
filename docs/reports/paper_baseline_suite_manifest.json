@@ -1,0 +1,38 @@
+{
+  "command": "relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json",
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "effective_budget_tier": "baseline",
+  "executed_family_count": 6,
+  "fallback_or_reservation_count": 2,
+  "feature_contract_id": "p6_paysim_train_only_row_features_v1",
+  "hard_performance_claims_allowed": false,
+  "headline_performance_claim_allowed": false,
+  "next_slice": "Paper Track P6-A",
+  "output_files": {
+    "paper_baseline_fallback_report": "paper_baseline_fallback_report.json",
+    "paper_baseline_suite_manifest": "paper_baseline_suite_manifest.json",
+    "paper_baseline_version_matrix": "paper_baseline_version_matrix.json",
+    "paper_benchmark_budget_contract": "paper_benchmark_budget_contract.json",
+    "paper_competitive_search_trace": "paper_competitive_search_trace.json",
+    "paper_leakage_safe_feature_report": "paper_leakage_safe_feature_report.json",
+    "paper_publishability_gate": "paper_publishability_gate.json",
+    "paper_tabular_baseline_table": "paper_tabular_baseline_table.json"
+  },
+  "paper_primary_claim_allowed": false,
+  "requested_budget_tier": "baseline",
+  "schema_version": "relaytic.paper_tabular_baseline_suite.v1",
+  "slice": "Paper Track P6",
+  "source_path": "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv",
+  "split_contract_id": "split_paysim_chronological_step_v1",
+  "status": "ok",
+  "summary": "P6 tabular baseline suite completed under a shared chronological, leakage-audited metric contract; competitive promotion remains blocked for P6-A.",
+  "validation_selected_baseline": {
+    "family_id": "sklearn_extra_trees",
+    "paper_use": "baseline_only",
+    "selection_surface": "validation_pr_auc_only",
+    "test_pr_auc": 0.331345,
+    "test_precision_at_review_budget": 0.512605,
+    "test_recall_at_review_budget": 0.258162,
+    "validation_pr_auc": 0.275821
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "executed_family_ids": [
+    "deterministic_transfer_cashout_rule",
+    "sklearn_sgd_logistic",
+    "sklearn_hist_gradient_boosting",
+    "sklearn_extra_trees",
+    "lightgbm_classifier",
+    "xgboost_classifier"
+  ],
+  "fallback_count": 2,
+  "fallback_rows": [
+    {
+      "blocked_reason": "optional_adapter_not_installed",
+      "candidate_budget_tier": "competitive",
+      "execution_state": "fallback",
+      "family_id": "catboost_classifier"
+    },
+    {
+      "blocked_reason": "optional_adapter_not_installed",
+      "candidate_budget_tier": "competitive",
+      "execution_state": "fallback",
+      "family_id": "tabpfn_classifier"
+    }
+  ],
+  "optional_execution_requested": true,
+  "policy": "Optional adapters never disappear silently; unavailable, unrequested, failed, or P6-A-reserved candidates remain explicit.",
+  "schema_version": "relaytic.paper_tabular_baseline_suite.v1",
+  "slice": "Paper Track P6",
+  "status": "ok",
+  "summary": "P6 executed `6` family/families and recorded `2` explicit fallback or reservation state(s)."
+}

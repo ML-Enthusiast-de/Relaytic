@@ -1,0 +1,60 @@
+{
+  "allowed_source_fields": [
+    "step",
+    "type",
+    "amount"
+  ],
+  "balance_fields_used": false,
+  "competitive_expansion_reserved_for_p6_a": [
+    "point_in_time_entity_history_features_if_audited",
+    "calibration_and_threshold_search",
+    "budgeted_hyperparameter_optimization"
+  ],
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "entity_history_features_used": false,
+  "feature_columns": [
+    "log1p_amount",
+    "sqrt_amount",
+    "log1p_amount_squared",
+    "step_over_train_horizon",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER",
+    "risky_transfer_or_cashout",
+    "log1p_amount_x_CASH_OUT",
+    "log1p_amount_x_TRANSFER",
+    "log1p_amount_x_PAYMENT",
+    "amount_gt_train_p90",
+    "amount_gt_train_p99",
+    "amount_gt_train_p999"
+  ],
+  "feature_contract_id": "p6_paysim_train_only_row_features_v1",
+  "feature_derivation_policy": "row_local_features_plus_train_only_amount_quantiles_and_train_only_time_scaling",
+  "forbidden_model_columns_used": [],
+  "forbidden_source_columns_present_but_excluded": [
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "nameOrig",
+    "nameDest",
+    "isFlaggedFraud"
+  ],
+  "imbalance_handling_policy": "class weights or scale_pos_weight are calculated from train labels only",
+  "schema_version": "relaytic.paper_tabular_baseline_suite.v1",
+  "slice": "Paper Track P6",
+  "source_path": "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv",
+  "split_contract_id": "split_paysim_chronological_step_v1",
+  "status": "pass",
+  "summary": "P6 improves the conservative PaySim feature floor using train-only transforms while excluding forbidden balance and identifier fields.",
+  "threshold_policy": "each model selects review and fixed-FPR thresholds on validation only and applies them unchanged to test",
+  "train_only_fit_state": {
+    "amount_p90": 365967.65,
+    "amount_p99": 1613027.185,
+    "amount_p999": 9139007.488001,
+    "train_max_step": 445
+  },
+  "validation_or_test_fit_state_used": false
+}

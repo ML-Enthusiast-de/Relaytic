@@ -1,0 +1,90 @@
+{
+  "executed_family_count": 6,
+  "optional_available_count": 2,
+  "rows": [
+    {
+      "adapter_available": true,
+      "adapter_module": "in_core",
+      "adapter_version": null,
+      "blocked_reason": null,
+      "budget_tier": "baseline",
+      "execution_state": "ran",
+      "family_id": "deterministic_transfer_cashout_rule",
+      "optional_adapter": false
+    },
+    {
+      "adapter_available": true,
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "blocked_reason": null,
+      "budget_tier": "baseline",
+      "execution_state": "ran",
+      "family_id": "sklearn_sgd_logistic",
+      "optional_adapter": false
+    },
+    {
+      "adapter_available": true,
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "blocked_reason": null,
+      "budget_tier": "baseline",
+      "execution_state": "ran",
+      "family_id": "sklearn_hist_gradient_boosting",
+      "optional_adapter": false
+    },
+    {
+      "adapter_available": true,
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "blocked_reason": null,
+      "budget_tier": "baseline",
+      "execution_state": "ran",
+      "family_id": "sklearn_extra_trees",
+      "optional_adapter": false
+    },
+    {
+      "adapter_available": true,
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "blocked_reason": null,
+      "budget_tier": "baseline",
+      "execution_state": "ran",
+      "family_id": "lightgbm_classifier",
+      "optional_adapter": true
+    },
+    {
+      "adapter_available": true,
+      "adapter_module": "xgboost",
+      "adapter_version": "3.0.4",
+      "blocked_reason": null,
+      "budget_tier": "baseline",
+      "execution_state": "ran",
+      "family_id": "xgboost_classifier",
+      "optional_adapter": true
+    },
+    {
+      "adapter_available": false,
+      "adapter_module": "catboost",
+      "adapter_version": null,
+      "blocked_reason": "optional_adapter_not_installed",
+      "budget_tier": "competitive",
+      "execution_state": "fallback",
+      "family_id": "catboost_classifier",
+      "optional_adapter": true
+    },
+    {
+      "adapter_available": false,
+      "adapter_module": "tabpfn",
+      "adapter_version": null,
+      "blocked_reason": "optional_adapter_not_installed",
+      "budget_tier": "competitive",
+      "execution_state": "fallback",
+      "family_id": "tabpfn_classifier",
+      "optional_adapter": true
+    }
+  ],
+  "schema_version": "relaytic.paper_tabular_baseline_suite.v1",
+  "slice": "Paper Track P6",
+  "status": "ok",
+  "summary": "Versions, adapter availability, execution state, and fallback state are explicit for each P6 baseline family."
+}

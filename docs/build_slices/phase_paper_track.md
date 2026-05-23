@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P5 implemented. P6 through P13, including P6-A, planned.
+P0 through P6 implemented. P6-A through P13 planned.
 
 ## Intent
 
@@ -38,7 +38,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Produce a chronological temporal transaction-fraud result row with review-budget metrics and proxy/holdout posture.
 6. **P5 - Elliptic graph benchmark loader and provenance** - implemented
    Produce raw or flattened Elliptic-style graph provenance, split proof, and graph claim scope.
-7. **P6 - Strong tabular baseline suite**
+7. **P6 - Strong tabular baseline suite** - implemented
    Compare deterministic baselines plus optional LightGBM, CatBoost, XGBoost, TabPFN-style, or other strong tabular adapters under one split contract and explicit budget ladder.
 8. **P6-A - PaySim competitive rerun and publishability gate**
    Rerun PaySim under a paper-grade competitive budget before any PaySim metric can enter a headline table.
@@ -152,8 +152,24 @@ P5 added:
 
 P5 inspects the local raw Elliptic graph bundle, records 203,769 nodes, 234,355 edges, 49 time steps, and a chronological train/validation/test split by `time_step`. It keeps unknown labels out of supervised metric scope, allows supporting loader/provenance wording only, and blocks graph performance, graph SOTA, paper-primary, and hard AML claims until P7 graph baselines run.
 
+P6 added:
+
+- `docs/reports/paper_baseline_suite_manifest.json`
+- `docs/reports/paper_baseline_version_matrix.json`
+- `docs/reports/paper_tabular_baseline_table.json`
+- `docs/reports/paper_baseline_fallback_report.json`
+- `docs/reports/paper_benchmark_budget_contract.json`
+- `docs/reports/paper_competitive_search_trace.json`
+- `docs/reports/paper_leakage_safe_feature_report.json`
+- `docs/reports/paper_publishability_gate.json`
+- `src/relaytic/release_safety/paper_baselines.py`
+- `relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json`
+- `tests/test_paper_track_p6.py`
+
+P6 runs six full-data PaySim baseline families with an explicit baseline budget, versions and fallback state, a shared chronological split, train-only feature fitting, and validation-only threshold selection. Extra Trees is selected on validation and reports fixed test PR-AUC `0.331345`; the suite records the improvement as clean baseline evidence only. Headline performance, paper-primary, and hard AML claims remain blocked until P6-A performs the declared competitive rerun and publishability decision.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P6**.
+The next implementation target is **Paper Track P6-A**.
 
-P6 should implement the strong tabular baseline suite against the P3/P4/P5 artifact contracts. It should report deterministic baseline floors, optional-adapter eligibility, explicit smoke/baseline/competitive/release budget labels, leakage-safe feature posture, fallback states, and publishability gates before any metric row is eligible for a headline paper table.
+P6-A should challenge the P6 baseline table with a declared competitive PaySim budget: audited point-in-time feature expansion where valid, strong adapter search, calibration and threshold selection on validation only, exact HPO/runtime accounting, and a gate that either promotes a defensible paper-table candidate or explicitly reports non-competitiveness.

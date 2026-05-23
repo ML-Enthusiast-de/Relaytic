@@ -349,6 +349,7 @@ Why:
 - Paper Track P3 is now implemented and freezes dataset source/access posture, license notes, local file expectations, hashes for present local fixtures, split contracts, blocked reasons, and no-auto-download policy before benchmark runners start
 - Paper Track P4 is now implemented and runs the full PaySim-style chronological temporal benchmark with validation-only threshold selection, fixed test evaluation, review-budget/fixed-FPR metrics, supporting-only paper posture, and hard AML/SOTA performance claims still blocked
 - Paper Track P5 is now implemented and inspects the raw Elliptic graph bundle, freezes graph provenance and temporal split artifacts, records unknown-label scope, allows only supporting loader/provenance wording, and keeps graph benchmark/SOTA claims blocked before numeric graph baselines run
+- Paper Track P6 is now implemented and runs the full PaySim tabular baseline suite under a train-only leakage-safe feature contract with explicit adapter versions, budget tiers, fallback states, and a publishability gate that blocks headline promotion until P6-A
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -361,8 +362,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P5. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, and Paper Track P5 Elliptic graph provenance.
-- next execution target: Paper Track P6
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P6. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, and Paper Track P6 strong tabular baseline suite.
+- next execution target: Paper Track P6-A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -371,7 +372,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P6 through P13 prove relevant tabular and graph benchmarks, baseline and competitive-budget suites, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P6-A through P13 prove competitive tabular and graph benchmarks, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3726,6 +3727,21 @@ Minimum proof:
 - result rows share the same split and metric contract
 - every reported benchmark row is labeled `smoke`, `baseline`, `competitive`, or `release`
 - no weak first-pass result can enter the headline table unless the competitive budget either improves it or emits a documented non-competitive blocker
+
+Implemented by:
+- adding `src/relaytic/release_safety/paper_baselines.py`
+- adding `docs/reports/paper_baseline_suite_manifest.json`
+- adding `docs/reports/paper_baseline_version_matrix.json`
+- adding `docs/reports/paper_tabular_baseline_table.json`
+- adding `docs/reports/paper_baseline_fallback_report.json`
+- adding `docs/reports/paper_benchmark_budget_contract.json`
+- adding `docs/reports/paper_competitive_search_trace.json`
+- adding `docs/reports/paper_leakage_safe_feature_report.json`
+- adding `docs/reports/paper_publishability_gate.json`
+- adding `relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json`
+- adding `tests/test_paper_track_p6.py`
+
+P6 runs six baseline families on the full 6,362,620-row PaySim source: a deterministic rule floor, sklearn linear, histogram boosting, and Extra Trees families plus installed LightGBM and XGBoost adapters. Every row shares the chronological split contract and validation-only threshold policy; feature transforms are row-local or fit from training data only, with prohibited balance fields excluded. Extra Trees is selected using validation PR-AUC and records fixed test PR-AUC `0.331345`, improving the earlier conservative floor while remaining explicitly baseline-only. CatBoost and TabPFN are recorded as unavailable fallbacks, LightGBM's poor observed result remains visible, and all headline/hard claims remain blocked until P6-A executes the competitive budget.
 
 ### Paper Track P6-A - PaySim competitive rerun and publishability gate
 

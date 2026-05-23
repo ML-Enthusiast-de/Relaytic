@@ -1,0 +1,21 @@
+{
+  "baseline_family_minimum_met": true,
+  "baseline_protocol_clean": true,
+  "blocked_reason_codes": [
+    "competitive_budget_not_executed_p6_a_required",
+    "paysim_is_supporting_proxy_not_real_bank_holdout",
+    "release_budget_and_clean_clone_proof_not_executed"
+  ],
+  "claim_boundary_from_taxonomy": "supporting-only",
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "effective_budget_tier": "baseline",
+  "hard_performance_claims_allowed": false,
+  "headline_performance_claim_allowed": false,
+  "next_slice": "Paper Track P6-A",
+  "paper_primary_claim_allowed": false,
+  "public_claim_wording": "Relaytic runs a leakage-audited, chronological PaySim baseline suite with explicit budgets, adapter states, and validation-only threshold selection. These are supporting baseline results, not a headline AML or SOTA claim.",
+  "schema_version": "relaytic.paper_tabular_baseline_suite.v1",
+  "slice": "Paper Track P6",
+  "status": "blocked",
+  "summary": "P6 baseline evidence is useful and auditable, but promotion is blocked until a clean competitive rerun and later release proof pass."
+}

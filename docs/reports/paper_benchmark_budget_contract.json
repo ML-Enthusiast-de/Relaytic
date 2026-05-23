@@ -1,0 +1,35 @@
+{
+  "dataset_row_count": 6362620,
+  "effective_budget_reason": "requested_budget_supported_for_dataset_scope",
+  "effective_budget_tier": "baseline",
+  "optional_adapter_execution_requested": true,
+  "requested_budget_tier": "baseline",
+  "schema_version": "relaytic.paper_tabular_baseline_suite.v1",
+  "slice": "Paper Track P6",
+  "status": "frozen",
+  "summary": "P6 runs only smoke and baseline evidence; competitive promotion must be executed and audited in P6-A.",
+  "tiers": [
+    {
+      "budget_tier": "smoke",
+      "publishable_performance_candidate": false,
+      "purpose": "verify commands, artifacts, and gates on fixture-sized data"
+    },
+    {
+      "budget_tier": "baseline",
+      "publishable_performance_candidate": false,
+      "purpose": "run clean conservative full-data reference families under one protocol"
+    },
+    {
+      "budget_tier": "competitive",
+      "execution_state": "reserved_for_p6_a",
+      "publishable_performance_candidate": true,
+      "purpose": "P6-A leakage-safe feature expansion, strong adapters, calibration, and recorded HPO"
+    },
+    {
+      "budget_tier": "release",
+      "execution_state": "future_gate",
+      "publishable_performance_candidate": true,
+      "purpose": "clean-clone reproduction, frozen configs, variance and claim lint before arXiv"
+    }
+  ]
+}

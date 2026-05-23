@@ -1165,6 +1165,37 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_baselines = release_safety_sub.add_parser(
+        "tabular-baselines",
+        help="Run the Paper Track P6 tabular baseline suite with explicit budget and publishability gates.",
+    )
+    release_safety_baselines.add_argument(
+        "--data-path",
+        default=None,
+        help="Optional PaySim CSV path. Defaults to data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv.",
+    )
+    release_safety_baselines.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P6 baseline artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_baselines.add_argument(
+        "--budget-tier",
+        choices=["smoke", "baseline"],
+        default="smoke",
+        help="Execution tier. Competitive and release promotion are deliberately reserved for later paper gates.",
+    )
+    release_safety_baselines.add_argument(
+        "--run-optional",
+        action="store_true",
+        help="Run installed optional LightGBM and XGBoost baseline adapters in addition to deterministic families.",
+    )
+    release_safety_baselines.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3132,6 +3163,13 @@ def main(argv: list[str] | None = None) -> int:
                 payload = _run_elliptic_graph_surface(
                     data_dir=args.data_dir,
                     output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "tabular-baselines":
+                payload = _run_paper_baseline_suite_surface(
+                    data_path=args.data_path,
+                    output_dir=args.output_dir,
+                    budget_tier=args.budget_tier,
+                    run_optional=args.run_optional,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -6830,6 +6868,43 @@ def _run_elliptic_graph_surface(*, data_dir: str | None, output_dir: str | None)
             "bundle": pack,
         },
         "human_output": render_elliptic_graph_markdown(pack),
+    }
+
+
+def _run_paper_baseline_suite_surface(
+    *,
+    data_path: str | None,
+    output_dir: str | None,
+    budget_tier: str,
+    run_optional: bool,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_baseline_suite_markdown,
+        sync_paper_baseline_suite_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_baseline_suite_pack(
+        root,
+        data_path=data_path,
+        output_dir=output_dir,
+        budget_tier=budget_tier,
+        run_optional=run_optional,
+    )
+    pack = {
+        key: json.loads(path.read_text(encoding="utf-8"))
+        for key, path in written.items()
+    }
+    manifest = dict(pack["paper_baseline_suite_manifest"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_tabular_baselines": manifest,
+            "bundle": pack,
+        },
+        "human_output": render_paper_baseline_suite_markdown(pack),
     }
 
 
