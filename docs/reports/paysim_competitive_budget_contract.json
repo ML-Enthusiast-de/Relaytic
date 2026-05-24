@@ -1,0 +1,28 @@
+{
+  "calibration_policy": "validation_only_partitioned_platt_or_identity_selection",
+  "dataset_row_count": 6362620,
+  "effective_budget_reason": "requested_budget_executed",
+  "effective_budget_tier": "competitive",
+  "finalist_fit_count": 5,
+  "optional_adapter_execution_requested": true,
+  "probe_policy": {
+    "finalist_refit_policy": "full_training_rows_only",
+    "full_training_row_count": 6010937,
+    "positive_rows_retained": 5007,
+    "probe_training_row_count": 750000,
+    "random_seed": 42,
+    "sampling_policy": "train_only_all_positives_plus_seeded_negative_subsample_for_probe"
+  },
+  "probe_trial_count": 14,
+  "random_seeds": [
+    42
+  ],
+  "release_proof_required": true,
+  "requested_budget_tier": "competitive",
+  "schema_version": "relaytic.paysim_competitive_benchmark.v1",
+  "slice": "Paper Track P6-A",
+  "status": "executed",
+  "summary": "P6-A records a multi-fidelity competitive budget with validation-only selection and one deferred test evaluation.",
+  "test_evaluation_policy": "only_validation_selected_finalist_is_evaluated_on_test",
+  "threshold_policy": "validation_operating_partition_only_then_fixed_test_application"
+}

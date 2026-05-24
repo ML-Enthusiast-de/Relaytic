@@ -23,6 +23,11 @@ Current paper-track baseline artifacts also live under `docs/reports/`:
 - `paper_benchmark_budget_contract.json`
 - `paper_leakage_safe_feature_report.json`
 - `paper_publishability_gate.json`
+- `paysim_competitive_benchmark_manifest.json`
+- `paysim_competitive_baseline_table.json`
+- `paysim_competitive_search_trace.json`
+- `paysim_leakage_safe_feature_report.json`
+- `paysim_publishability_gate.json`
 
 ## Benchmark Families
 
@@ -76,6 +81,7 @@ Release hygiene before public use:
 relaytic release-safety paysim-benchmark --format json
 relaytic release-safety elliptic-graph --format json
 relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json
+relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json
 relaytic release-safety paper-freeze --format json
 relaytic release-safety scan --format json
 relaytic doctor --expected-profile full --format json
@@ -119,6 +125,12 @@ The release-freeze pack should cite these when available:
 - `paper_baseline_version_matrix.json`
 - `paper_leakage_safe_feature_report.json`
 - `paper_publishability_gate.json`
+- `paysim_competitive_benchmark_manifest.json`
+- `paysim_competitive_budget_contract.json`
+- `paysim_competitive_search_trace.json`
+- `paysim_leakage_safe_feature_report.json`
+- `paysim_competitive_baseline_table.json`
+- `paysim_publishability_gate.json`
 - `release_safety_scan.json`
 
 ## Blocked-Claim Conditions
@@ -133,6 +145,7 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `aml_environment_scorecard.json` reports `partial`, `fail`, or model/environment disagreement.
 - `aml_benchmark_environment_scorecard.json` reports incomplete reproducibility, claim safety, or benchmark relevance.
 - `paper_publishability_gate.json` blocks a headline performance claim because competitive or release-budget proof has not passed.
+- `paysim_publishability_gate.json` does not admit even a supporting PaySim paper-table candidate, or is cited as permitting real-world/headline AML performance.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record

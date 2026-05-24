@@ -91,6 +91,14 @@ from .paper_baselines import (
     render_paper_baseline_suite_markdown,
     sync_paper_baseline_suite_pack,
 )
+from .paysim_competitive import (
+    PAYSIM_COMPETITIVE_FILENAMES,
+    PAYSIM_COMPETITIVE_REPORT_DIR,
+    PAYSIM_COMPETITIVE_SCHEMA_VERSION,
+    build_paysim_competitive_pack,
+    render_paysim_competitive_markdown,
+    sync_paysim_competitive_pack,
+)
 from .paysim_benchmark import (
     PAYSIM_BENCHMARK_FILENAMES,
     PAYSIM_BENCHMARK_REPORT_DIR,
@@ -133,6 +141,9 @@ __all__ = [
     "PAYSIM_BENCHMARK_FILENAMES",
     "PAYSIM_BENCHMARK_REPORT_DIR",
     "PAYSIM_BENCHMARK_SCHEMA_VERSION",
+    "PAYSIM_COMPETITIVE_FILENAMES",
+    "PAYSIM_COMPETITIVE_REPORT_DIR",
+    "PAYSIM_COMPETITIVE_SCHEMA_VERSION",
     "PAYSIM_DEFAULT_DATA_PATH",
     "RELEASE_BUNDLE_REPORT_SCHEMA_VERSION",
     "RELEASE_SAFETY_CONTROLS_SCHEMA_VERSION",
@@ -165,6 +176,7 @@ __all__ = [
     "build_paper_thesis_artifacts",
     "build_paper_thesis_pack",
     "build_paysim_benchmark_pack",
+    "build_paysim_competitive_pack",
     "build_repo_credibility_reports",
     "default_release_safety_state_dir",
     "latest_release_safety_state_dir",
@@ -174,6 +186,7 @@ __all__ = [
     "render_paper_thesis_markdown",
     "render_elliptic_graph_markdown",
     "render_paysim_benchmark_markdown",
+    "render_paysim_competitive_markdown",
     "render_release_safety_markdown",
     "run_release_safety_scan",
     "sync_paper_freeze_pack",
@@ -184,6 +197,7 @@ __all__ = [
     "sync_paper_thesis_artifacts",
     "sync_paper_thesis_pack",
     "sync_paysim_benchmark_pack",
+    "sync_paysim_competitive_pack",
     "sync_repo_credibility_reports",
     "write_release_safety_bundle",
 ]

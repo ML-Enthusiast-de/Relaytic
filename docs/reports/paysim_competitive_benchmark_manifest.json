@@ -1,0 +1,86 @@
+{
+  "command": "relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json",
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "effective_budget_tier": "competitive",
+  "feature_contract_id": "p6a_paysim_point_in_time_destination_history_v1",
+  "finalist_family_count": 5,
+  "hard_performance_claims_allowed": false,
+  "headline_performance_claim_allowed": false,
+  "hpo_trial_count": 14,
+  "next_slice": "Paper Track P7",
+  "output_files": {
+    "paysim_competitive_baseline_table": "paysim_competitive_baseline_table.json",
+    "paysim_competitive_benchmark_manifest": "paysim_competitive_benchmark_manifest.json",
+    "paysim_competitive_budget_contract": "paysim_competitive_budget_contract.json",
+    "paysim_competitive_search_trace": "paysim_competitive_search_trace.json",
+    "paysim_leakage_safe_feature_report": "paysim_leakage_safe_feature_report.json",
+    "paysim_publishability_gate": "paysim_publishability_gate.json"
+  },
+  "paper_primary_claim_allowed": false,
+  "requested_budget_tier": "competitive",
+  "schema_version": "relaytic.paysim_competitive_benchmark.v1",
+  "slice": "Paper Track P6-A",
+  "source_path": "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv",
+  "source_sha256": "16910f90577b0d981bf8ff289714510bb89bc71bff7d3f220f024e287e4eea6b",
+  "split_contract_id": "split_paysim_chronological_step_v1",
+  "status": "ok",
+  "summary": "P6-A competitive PaySim evaluation completed under an untouched-test, leakage-audited, supporting-only paper contract.",
+  "supporting_paper_table_candidate_allowed": true,
+  "validation_selected_competitive_model": {
+    "calibration_method": "platt_sigmoid",
+    "configuration": {
+      "bootstrap": true,
+      "class_weight": "balanced_subsample",
+      "imbalance_fit_surface": "train_only",
+      "max_depth": 18,
+      "max_samples": 0.35,
+      "min_samples_leaf": 4,
+      "n_estimators": 160,
+      "n_jobs": -1,
+      "random_state": 42
+    },
+    "family_id": "sklearn_extra_trees",
+    "fixed_fpr": {
+      "target_fpr": 0.001,
+      "test": {
+        "false_positive_count": 125,
+        "false_positive_rate": 0.001025,
+        "precision_at_k": 0.841572,
+        "recall_at_review_budget": 0.401451,
+        "requested_review_fraction": null,
+        "review_fraction": 0.006385,
+        "reviewed_count": 789,
+        "true_positive_count": 664
+      },
+      "validation_threshold": 0.558862
+    },
+    "raw_test_pr_auc": 0.638773,
+    "review_budget_fraction": 0.005,
+    "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+    "test_operating_point": {
+      "false_positive_count": 329,
+      "false_positive_rate": 0.002698,
+      "precision_at_k": 0.703336,
+      "recall_at_review_budget": 0.471584,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.008974,
+      "reviewed_count": 1109,
+      "true_positive_count": 780
+    },
+    "test_pr_auc": 0.638773,
+    "test_roc_auc": 0.968282,
+    "threshold_selection_surface": "validation_operating_partition_only",
+    "validation_operating_point": {
+      "false_positive_count": 272,
+      "false_positive_rate": 0.00245,
+      "precision_at_k": 0.513417,
+      "recall_at_review_budget": 0.505282,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.005009,
+      "reviewed_count": 559,
+      "true_positive_count": 287
+    },
+    "validation_pr_auc": 0.568725,
+    "validation_threshold": 0.404453
+  }
+}

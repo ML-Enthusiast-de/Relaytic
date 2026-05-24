@@ -1196,6 +1196,37 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_competitive = release_safety_sub.add_parser(
+        "paysim-competitive",
+        help="Run the Paper Track P6-A competitive PaySim rerun and publishability gate.",
+    )
+    release_safety_competitive.add_argument(
+        "--data-path",
+        default=None,
+        help="Optional PaySim CSV path. Defaults to data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv.",
+    )
+    release_safety_competitive.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P6-A artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_competitive.add_argument(
+        "--budget-tier",
+        choices=["smoke", "competitive"],
+        default="smoke",
+        help="Execution tier. Full-data paper-table candidacy requires the competitive tier.",
+    )
+    release_safety_competitive.add_argument(
+        "--run-optional",
+        action="store_true",
+        help="Run installed LightGBM and XGBoost candidates within the declared competitive search budget.",
+    )
+    release_safety_competitive.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3166,6 +3197,13 @@ def main(argv: list[str] | None = None) -> int:
                 )
             elif args.release_safety_command == "tabular-baselines":
                 payload = _run_paper_baseline_suite_surface(
+                    data_path=args.data_path,
+                    output_dir=args.output_dir,
+                    budget_tier=args.budget_tier,
+                    run_optional=args.run_optional,
+                )
+            elif args.release_safety_command == "paysim-competitive":
+                payload = _run_paysim_competitive_surface(
                     data_path=args.data_path,
                     output_dir=args.output_dir,
                     budget_tier=args.budget_tier,
@@ -6905,6 +6943,43 @@ def _run_paper_baseline_suite_surface(
             "bundle": pack,
         },
         "human_output": render_paper_baseline_suite_markdown(pack),
+    }
+
+
+def _run_paysim_competitive_surface(
+    *,
+    data_path: str | None,
+    output_dir: str | None,
+    budget_tier: str,
+    run_optional: bool,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paysim_competitive_markdown,
+        sync_paysim_competitive_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paysim_competitive_pack(
+        root,
+        data_path=data_path,
+        output_dir=output_dir,
+        budget_tier=budget_tier,
+        run_optional=run_optional,
+    )
+    pack = {
+        key: json.loads(path.read_text(encoding="utf-8"))
+        for key, path in written.items()
+    }
+    manifest = dict(pack["paysim_competitive_benchmark_manifest"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paysim_competitive": manifest,
+            "bundle": pack,
+        },
+        "human_output": render_paysim_competitive_markdown(pack),
     }
 
 

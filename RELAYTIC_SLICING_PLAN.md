@@ -350,6 +350,7 @@ Why:
 - Paper Track P4 is now implemented and runs the full PaySim-style chronological temporal benchmark with validation-only threshold selection, fixed test evaluation, review-budget/fixed-FPR metrics, supporting-only paper posture, and hard AML/SOTA performance claims still blocked
 - Paper Track P5 is now implemented and inspects the raw Elliptic graph bundle, freezes graph provenance and temporal split artifacts, records unknown-label scope, allows only supporting loader/provenance wording, and keeps graph benchmark/SOTA claims blocked before numeric graph baselines run
 - Paper Track P6 is now implemented and runs the full PaySim tabular baseline suite under a train-only leakage-safe feature contract with explicit adapter versions, budget tiers, fallback states, and a publishability gate that blocks headline promotion until P6-A
+- Paper Track P6-A is now implemented and runs a competitive PaySim rerun with audited prior-step destination-history features, 14 recorded probe trials, five full-training finalists, validation-only calibration/threshold selection, and a supporting-only publishability pass for validation-selected Extra Trees (`test_pr_auc=0.638773`) while retaining hard-claim blockers before P7
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -362,8 +363,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P6. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, and Paper Track P6 strong tabular baseline suite.
-- next execution target: Paper Track P6-A
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P6-A. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, and Paper Track P6-A competitive PaySim rerun.
+- next execution target: Paper Track P7
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -372,7 +373,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P6-A through P13 prove competitive tabular and graph benchmarks, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P7 through P13 prove graph benchmarks, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3777,6 +3778,19 @@ Minimum proof:
 - all feature engineering is point-in-time or leakage-safe, with forbidden PaySim balance fields and invalid split methods blocked from paper claims
 - thresholds and calibration are selected only on validation and applied unchanged to test
 - the result is promoted to paper-table candidate only if the publishability gate passes; otherwise the weak or non-competitive result is explicitly reported as such
+
+Implemented by:
+- adding `src/relaytic/release_safety/paysim_competitive.py`
+- adding `docs/reports/paysim_competitive_benchmark_manifest.json`
+- adding `docs/reports/paysim_competitive_budget_contract.json`
+- adding `docs/reports/paysim_competitive_search_trace.json`
+- adding `docs/reports/paysim_leakage_safe_feature_report.json`
+- adding `docs/reports/paysim_competitive_baseline_table.json`
+- adding `docs/reports/paysim_publishability_gate.json`
+- adding `relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json`
+- adding `tests/test_paper_track_p6a.py`
+
+P6-A runs on the full 6,362,620-row PaySim source with balance fields excluded and `nameDest` used only as a grouping key for history aggregated strictly before each time step. It executes 14 probe trials on a declared 750,000-row train-only probe set, refits five family finalists on all 6,010,937 training rows, selects Extra Trees from validation PR-AUC `0.568725`, fits Platt calibration and thresholds on validation-only subwindows, and reports one fixed test evaluation with PR-AUC `0.638773` versus the P6 baseline `0.331345`. The publishability gate passes this as a supporting-only PaySim table candidate; headline, real-world AML, and SOTA claims remain blocked until graph evidence and release proof land.
 
 ### Paper Track P7 - Graph baseline suite
 

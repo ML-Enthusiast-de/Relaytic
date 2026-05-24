@@ -1,0 +1,72 @@
+{
+  "balance_fields_used": false,
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "feature_columns": [
+    "log1p_amount",
+    "sqrt_amount",
+    "log1p_amount_squared",
+    "step_over_train_horizon",
+    "hour_of_day_sin",
+    "hour_of_day_cos",
+    "day_of_week_sin",
+    "day_of_week_cos",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER",
+    "risky_transfer_or_cashout",
+    "log1p_amount_x_CASH_OUT",
+    "log1p_amount_x_TRANSFER",
+    "amount_gt_train_p90",
+    "amount_gt_train_p99",
+    "amount_gt_train_p999",
+    "destination_unseen_before_step",
+    "log1p_destination_prior_transaction_count",
+    "log1p_destination_prior_amount_sum",
+    "destination_prior_risky_fraction",
+    "destination_prior_transfer_fraction",
+    "destination_prior_cashout_fraction",
+    "amount_vs_destination_prior_mean"
+  ],
+  "feature_contract_id": "p6a_paysim_point_in_time_destination_history_v1",
+  "feature_derivation_policy": "row_local_amount_type_time_features_plus_train_only_amount_thresholds_plus_destination_aggregates_shifted_before_each_step",
+  "forbidden_balance_columns_used": [],
+  "forbidden_source_columns_present_but_excluded": [
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "nameOrig",
+    "nameDest",
+    "isFlaggedFraud"
+  ],
+  "identifier_policy": "nameDest_is_used_only_as_a_prior_step_grouping_key_never_as_a_raw_model_feature",
+  "label_derived_history_used": false,
+  "nameOrig_used": false,
+  "raw_identifier_encoding_used": false,
+  "raw_modeled_source_fields": [
+    "step",
+    "type",
+    "amount"
+  ],
+  "same_step_entity_information_used": false,
+  "schema_version": "relaytic.paysim_competitive_benchmark.v1",
+  "slice": "Paper Track P6-A",
+  "source_path": "data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv",
+  "source_sha256": "16910f90577b0d981bf8ff289714510bb89bc71bff7d3f220f024e287e4eea6b",
+  "split_contract_id": "split_paysim_chronological_step_v1",
+  "state_key_source_fields": [
+    "nameDest"
+  ],
+  "status": "pass",
+  "summary": "P6-A adds auditable prior-step destination behavior without balance leakage, raw account encoding, or test-driven selection.",
+  "threshold_and_calibration_policy": "candidate selection uses validation PR-AUC; calibration and thresholds use validation-only partitions; test is evaluated once after winner selection",
+  "train_only_fit_state": {
+    "amount_p90": 365967.65,
+    "amount_p99": 1613027.185,
+    "amount_p999": 9139007.488001,
+    "train_max_step": 445
+  },
+  "validation_or_test_labels_used_for_features": false
+}

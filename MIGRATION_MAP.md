@@ -282,7 +282,7 @@ Avoid introducing new references to:
 - introduced the public command `relaytic release-safety paysim-benchmark` for regenerating PaySim paper artifacts locally
 - introduced paper-track benchmark artifacts under `docs/reports/`: `paysim_benchmark_manifest.json`, `paysim_temporal_split_report.json`, `paysim_operating_point_table.json`, and `paysim_paper_result_row.json`
 - preserved supporting-only claim posture for PaySim-style proxy evidence and kept hard AML/SOTA performance claims blocked until later paper gates pass
-- Paper Track P6 consumes the P3 dataset registry, P4 result-row contract, and P5 graph provenance before adding strong baseline suites; future P6-A work must consume the P6 budget and publishability gates
+- Paper Track P6 consumes the P3 dataset registry, P4 result-row contract, and P5 graph provenance before adding strong baseline suites; P6-A now consumes the P6 budget and publishability gates before P7 adds numeric graph evidence
 
 ### Paper Track P5
 
@@ -297,6 +297,13 @@ Avoid introducing new references to:
 - introduced the public command `relaytic release-safety tabular-baselines` for regenerating P6 paper artifacts locally
 - introduced paper-track baseline artifacts under `docs/reports/`: `paper_baseline_suite_manifest.json`, `paper_baseline_version_matrix.json`, `paper_tabular_baseline_table.json`, `paper_baseline_fallback_report.json`, `paper_benchmark_budget_contract.json`, `paper_competitive_search_trace.json`, `paper_leakage_safe_feature_report.json`, and `paper_publishability_gate.json`
 - executed six full-data PaySim baseline families using the frozen chronological split, train-only feature state, and validation-only thresholds; preserved baseline-only posture and kept headline/hard claims blocked until P6-A
+
+### Paper Track P6-A
+
+- introduced `src/relaytic/release_safety/paysim_competitive.py` under the existing release-safety boundary for competitive PaySim search, prior-step destination-history features, validation-only calibration/threshold selection, and supporting-only publishability gating
+- introduced the public command `relaytic release-safety paysim-competitive` for regenerating P6-A competitive artifacts locally
+- introduced paper-track competitive artifacts under `docs/reports/`: `paysim_competitive_benchmark_manifest.json`, `paysim_competitive_budget_contract.json`, `paysim_competitive_search_trace.json`, `paysim_leakage_safe_feature_report.json`, `paysim_competitive_baseline_table.json`, and `paysim_publishability_gate.json`
+- executed 14 full-data-compatible probe trials and five full-training finalists under the frozen chronological split; validation-selected Extra Trees reports fixed test PR-AUC `0.638773`, passes as a supporting-only PaySim table candidate, and keeps headline/hard claims blocked before P7 and release proof
 
 ### AML Pivot Track
 
@@ -687,6 +694,12 @@ Implemented release-safety artifact names:
 - `paper_competitive_search_trace.json`
 - `paper_leakage_safe_feature_report.json`
 - `paper_publishability_gate.json`
+- `paysim_competitive_benchmark_manifest.json`
+- `paysim_competitive_budget_contract.json`
+- `paysim_competitive_search_trace.json`
+- `paysim_leakage_safe_feature_report.json`
+- `paysim_competitive_baseline_table.json`
+- `paysim_publishability_gate.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

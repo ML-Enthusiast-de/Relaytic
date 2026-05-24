@@ -1,0 +1,29 @@
+{
+  "blocked_reason_codes": [
+    "paysim_is_supporting_proxy_not_real_bank_holdout",
+    "release_budget_and_clean_clone_proof_not_executed",
+    "graph_benchmark_evidence_not_yet_executed_p7_required"
+  ],
+  "claim_boundary_from_taxonomy": "supporting-only",
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "hard_performance_claims_allowed": false,
+  "headline_performance_claim_allowed": false,
+  "next_slice": "Paper Track P7",
+  "paper_primary_claim_allowed": false,
+  "protocol_checks": {
+    "chronological_split_passed": true,
+    "competitive_budget_executed": true,
+    "forbidden_balance_fields_excluded": true,
+    "prior_step_only_entity_history": true,
+    "same_source_baseline_linked": true,
+    "strong_finalist_selected": true,
+    "test_not_used_for_model_or_calibration_selection": true,
+    "validation_improves_on_p6_baseline": true
+  },
+  "public_claim_wording": "Relaytic completed a leakage-audited competitive PaySim rerun with prior-step destination features, recorded search budget, and validation-only selection. PaySim remains supporting synthetic evidence, not a real-world AML or SOTA headline.",
+  "schema_version": "relaytic.paysim_competitive_benchmark.v1",
+  "slice": "Paper Track P6-A",
+  "status": "pass_supporting_only",
+  "summary": "P6-A admits a supporting PaySim paper-table candidate while keeping headline and hard AML claims blocked for graph and release proof.",
+  "supporting_paper_table_candidate_allowed": true
+}

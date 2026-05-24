@@ -1,0 +1,325 @@
+{
+  "comparison_metric": "validation_pr_auc",
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "effective_budget_tier": "competitive",
+  "feature_contract_id": "p6a_paysim_point_in_time_destination_history_v1",
+  "p4_reference_row": {
+    "artifact_ref": "docs/reports/paysim_paper_result_row.json",
+    "model_family": "sklearn_sgd_logistic_leakage_safe",
+    "test_pr_auc": 0.215852
+  },
+  "p6_validation_selected_baseline": {
+    "family_id": "sklearn_extra_trees",
+    "paper_use": "baseline_only",
+    "selection_surface": "validation_pr_auc_only",
+    "test_pr_auc": 0.331345,
+    "test_precision_at_review_budget": 0.512605,
+    "test_recall_at_review_budget": 0.258162,
+    "validation_pr_auc": 0.275821
+  },
+  "rows": [
+    {
+      "budget_tier": "competitive",
+      "configuration": {
+        "fit_surface": "none",
+        "rule": "fixed_sigmoid_log_amount_plus_transfer_cashout_flags"
+      },
+      "eligible_for_model_selection": false,
+      "execution_state": "ran",
+      "family_id": "deterministic_transfer_cashout_rule",
+      "family_role": "rules_reference",
+      "selection_surface": "reference_only_not_a_search_candidate",
+      "stage": "fixed_reference",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "validation_metrics": {
+        "log_loss": 1.89015,
+        "n_samples": 228103,
+        "positive_count": 1552,
+        "positive_rate": 0.006804,
+        "pr_auc": 0.071952,
+        "roc_auc": 0.858376
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "budget_tier": "competitive",
+      "configuration": {
+        "class_weight": "balanced",
+        "imbalance_fit_surface": "train_only",
+        "l2_regularization": 0.5,
+        "learning_rate": 0.08,
+        "max_iter": 160,
+        "max_leaf_nodes": 63,
+        "min_samples_leaf": 50,
+        "random_state": 42
+      },
+      "eligible_for_model_selection": true,
+      "execution_state": "ran",
+      "family_id": "sklearn_hist_gradient_boosting",
+      "family_role": "strong_boosted_tree",
+      "random_seed": 42,
+      "runtime_seconds": 104.226588,
+      "selection_surface": "validation_pr_auc_only",
+      "source_probe_trial_id": "sklearn_hist_gradient_boosting_probe_3",
+      "stage": "full_train_finalist",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "training_row_count": 6010937,
+      "validation_metrics": {
+        "log_loss": 0.39302,
+        "n_samples": 228103,
+        "positive_count": 1552,
+        "positive_rate": 0.006804,
+        "pr_auc": 0.467368,
+        "roc_auc": 0.970059
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "budget_tier": "competitive",
+      "calibration_method": "platt_sigmoid",
+      "configuration": {
+        "bootstrap": true,
+        "class_weight": "balanced_subsample",
+        "imbalance_fit_surface": "train_only",
+        "max_depth": 18,
+        "max_samples": 0.35,
+        "min_samples_leaf": 4,
+        "n_estimators": 160,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "eligible_for_model_selection": true,
+      "execution_state": "ran",
+      "family_id": "sklearn_extra_trees",
+      "family_role": "strong_tree_ensemble",
+      "random_seed": 42,
+      "runtime_seconds": 340.167852,
+      "selected_for_test_evaluation": true,
+      "selected_review_budget": {
+        "false_positive_count": 329,
+        "false_positive_rate": 0.002698,
+        "precision_at_k": 0.703336,
+        "recall_at_review_budget": 0.471584,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.008974,
+        "reviewed_count": 1109,
+        "true_positive_count": 780
+      },
+      "selection_surface": "validation_pr_auc_only",
+      "source_probe_trial_id": "sklearn_extra_trees_probe_1",
+      "stage": "full_train_finalist",
+      "test_evaluated": true,
+      "test_metrics": {
+        "post_calibration": {
+          "log_loss": 0.030104,
+          "n_samples": 123580,
+          "positive_count": 1654,
+          "positive_rate": 0.013384,
+          "pr_auc": 0.638773,
+          "roc_auc": 0.968282
+        },
+        "raw": {
+          "log_loss": 0.073079,
+          "n_samples": 123580,
+          "positive_count": 1654,
+          "positive_rate": 0.013384,
+          "pr_auc": 0.638773,
+          "roc_auc": 0.968282
+        }
+      },
+      "training_row_count": 6010937,
+      "validation_metrics": {
+        "log_loss": 0.068329,
+        "n_samples": 228103,
+        "positive_count": 1552,
+        "positive_rate": 0.006804,
+        "pr_auc": 0.568725,
+        "roc_auc": 0.97027
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "budget_tier": "competitive",
+      "configuration": {
+        "bootstrap": true,
+        "class_weight": "balanced_subsample",
+        "imbalance_fit_surface": "train_only",
+        "max_depth": 18,
+        "max_samples": 0.35,
+        "min_samples_leaf": 5,
+        "n_estimators": 120,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "eligible_for_model_selection": true,
+      "execution_state": "ran",
+      "family_id": "sklearn_random_forest",
+      "family_role": "strong_tree_ensemble",
+      "random_seed": 42,
+      "runtime_seconds": 486.122975,
+      "selection_surface": "validation_pr_auc_only",
+      "source_probe_trial_id": "sklearn_random_forest_probe_1",
+      "stage": "full_train_finalist",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "training_row_count": 6010937,
+      "validation_metrics": {
+        "log_loss": 0.039886,
+        "n_samples": 228103,
+        "positive_count": 1552,
+        "positive_rate": 0.006804,
+        "pr_auc": 0.540468,
+        "roc_auc": 0.967461
+      }
+    },
+    {
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "budget_tier": "competitive",
+      "configuration": {
+        "colsample_bytree": 0.9,
+        "imbalance_fit_surface": "train_only",
+        "learning_rate": 0.03,
+        "min_child_samples": 30,
+        "n_estimators": 300,
+        "n_jobs": -1,
+        "num_leaves": 63,
+        "random_state": 42,
+        "scale_pos_weight": 12.197962681897966,
+        "subsample": 0.9,
+        "verbosity": -1
+      },
+      "eligible_for_model_selection": true,
+      "execution_state": "ran",
+      "family_id": "lightgbm_classifier",
+      "family_role": "optional_boosted_tree_adapter",
+      "random_seed": 42,
+      "runtime_seconds": 80.460187,
+      "selection_surface": "validation_pr_auc_only",
+      "source_probe_trial_id": "lightgbm_classifier_probe_2",
+      "stage": "full_train_finalist",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "training_row_count": 6010937,
+      "validation_metrics": {
+        "log_loss": 8.747463,
+        "n_samples": 228103,
+        "positive_count": 1552,
+        "positive_rate": 0.006804,
+        "pr_auc": 0.062345,
+        "roc_auc": 0.84581
+      }
+    },
+    {
+      "adapter_module": "xgboost",
+      "adapter_version": "3.0.4",
+      "budget_tier": "competitive",
+      "configuration": {
+        "colsample_bytree": 0.9,
+        "eval_metric": "logloss",
+        "imbalance_fit_surface": "train_only",
+        "learning_rate": 0.06,
+        "max_depth": 4,
+        "min_child_weight": 2.0,
+        "n_estimators": 220,
+        "n_jobs": -1,
+        "objective": "binary:logistic",
+        "random_state": 42,
+        "scale_pos_weight": 1.0,
+        "subsample": 0.9,
+        "tree_method": "hist"
+      },
+      "eligible_for_model_selection": true,
+      "execution_state": "ran",
+      "family_id": "xgboost_classifier",
+      "family_role": "optional_boosted_tree_adapter",
+      "random_seed": 42,
+      "runtime_seconds": 104.916489,
+      "selection_surface": "validation_pr_auc_only",
+      "source_probe_trial_id": "xgboost_classifier_probe_3",
+      "stage": "full_train_finalist",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "training_row_count": 6010937,
+      "validation_metrics": {
+        "log_loss": 0.020744,
+        "n_samples": 228103,
+        "positive_count": 1552,
+        "positive_rate": 0.006804,
+        "pr_auc": 0.540486,
+        "roc_auc": 0.963127
+      }
+    }
+  ],
+  "same_source_baseline_linked": true,
+  "schema_version": "relaytic.paysim_competitive_benchmark.v1",
+  "selection_rule": "rank_full_train_finalists_on_validation_pr_auc_then_evaluate_only_the_selected_finalist_on_test",
+  "slice": "Paper Track P6-A",
+  "source_sha256": "16910f90577b0d981bf8ff289714510bb89bc71bff7d3f220f024e287e4eea6b",
+  "split_contract_id": "split_paysim_chronological_step_v1",
+  "status": "ok",
+  "summary": "P6-A places prior baseline evidence beside a validation-selected competitive finalist without searching over test outcomes.",
+  "test_visibility_policy": "nonselected_competitive_finalists_have_no_test_metrics",
+  "validation_selected_competitive_model": {
+    "calibration_method": "platt_sigmoid",
+    "configuration": {
+      "bootstrap": true,
+      "class_weight": "balanced_subsample",
+      "imbalance_fit_surface": "train_only",
+      "max_depth": 18,
+      "max_samples": 0.35,
+      "min_samples_leaf": 4,
+      "n_estimators": 160,
+      "n_jobs": -1,
+      "random_state": 42
+    },
+    "family_id": "sklearn_extra_trees",
+    "fixed_fpr": {
+      "target_fpr": 0.001,
+      "test": {
+        "false_positive_count": 125,
+        "false_positive_rate": 0.001025,
+        "precision_at_k": 0.841572,
+        "recall_at_review_budget": 0.401451,
+        "requested_review_fraction": null,
+        "review_fraction": 0.006385,
+        "reviewed_count": 789,
+        "true_positive_count": 664
+      },
+      "validation_threshold": 0.558862
+    },
+    "raw_test_pr_auc": 0.638773,
+    "review_budget_fraction": 0.005,
+    "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+    "test_operating_point": {
+      "false_positive_count": 329,
+      "false_positive_rate": 0.002698,
+      "precision_at_k": 0.703336,
+      "recall_at_review_budget": 0.471584,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.008974,
+      "reviewed_count": 1109,
+      "true_positive_count": 780
+    },
+    "test_pr_auc": 0.638773,
+    "test_roc_auc": 0.968282,
+    "threshold_selection_surface": "validation_operating_partition_only",
+    "validation_operating_point": {
+      "false_positive_count": 272,
+      "false_positive_rate": 0.00245,
+      "precision_at_k": 0.513417,
+      "recall_at_review_budget": 0.505282,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.005009,
+      "reviewed_count": 559,
+      "true_positive_count": 287
+    },
+    "validation_pr_auc": 0.568725,
+    "validation_threshold": 0.404453
+  }
+}
