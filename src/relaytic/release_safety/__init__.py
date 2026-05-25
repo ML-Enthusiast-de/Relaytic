@@ -99,6 +99,14 @@ from .paysim_competitive import (
     render_paysim_competitive_markdown,
     sync_paysim_competitive_pack,
 )
+from .graph_baselines import (
+    PAPER_GRAPH_FILENAMES,
+    PAPER_GRAPH_REPORT_DIR,
+    PAPER_GRAPH_SCHEMA_VERSION,
+    build_paper_graph_baseline_pack,
+    render_paper_graph_baseline_markdown,
+    sync_paper_graph_baseline_pack,
+)
 from .paysim_benchmark import (
     PAYSIM_BENCHMARK_FILENAMES,
     PAYSIM_BENCHMARK_REPORT_DIR,
@@ -127,6 +135,9 @@ __all__ = [
     "PAPER_FREEZE_FILENAMES",
     "PAPER_FREEZE_REPORT_DIR",
     "PAPER_FREEZE_SCHEMA_VERSION",
+    "PAPER_GRAPH_FILENAMES",
+    "PAPER_GRAPH_REPORT_DIR",
+    "PAPER_GRAPH_SCHEMA_VERSION",
     "PAPER_DATASET_REGISTRY_FILENAMES",
     "PAPER_DATASET_REGISTRY_REPORT_DIR",
     "PAPER_DATASET_REGISTRY_SCHEMA_VERSION",
@@ -172,6 +183,7 @@ __all__ = [
     "build_paper_dataset_registry_pack",
     "build_elliptic_graph_pack",
     "build_paper_freeze_pack",
+    "build_paper_graph_baseline_pack",
     "build_paper_surface_hygiene_reports",
     "build_paper_thesis_artifacts",
     "build_paper_thesis_pack",
@@ -182,6 +194,7 @@ __all__ = [
     "latest_release_safety_state_dir",
     "read_release_safety_bundle",
     "render_paper_freeze_markdown",
+    "render_paper_graph_baseline_markdown",
     "render_paper_baseline_suite_markdown",
     "render_paper_thesis_markdown",
     "render_elliptic_graph_markdown",
@@ -190,6 +203,7 @@ __all__ = [
     "render_release_safety_markdown",
     "run_release_safety_scan",
     "sync_paper_freeze_pack",
+    "sync_paper_graph_baseline_pack",
     "sync_paper_baseline_suite_pack",
     "sync_elliptic_graph_pack",
     "sync_paper_dataset_registry_pack",

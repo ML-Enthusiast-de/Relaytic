@@ -1227,6 +1227,37 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_graph_baselines = release_safety_sub.add_parser(
+        "graph-baselines",
+        help="Run the Paper Track P7 Elliptic graph baseline suite and publishability gate.",
+    )
+    release_safety_graph_baselines.add_argument(
+        "--data-dir",
+        default=None,
+        help="Optional Elliptic raw bundle directory. Defaults to data/paper_benchmarks/elliptic.",
+    )
+    release_safety_graph_baselines.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P7 graph baseline artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_graph_baselines.add_argument(
+        "--budget-tier",
+        choices=["smoke", "baseline", "competitive"],
+        default="smoke",
+        help="Execution tier. Supporting paper-table candidacy requires the competitive tier.",
+    )
+    release_safety_graph_baselines.add_argument(
+        "--run-optional",
+        action="store_true",
+        help="Run installed LightGBM, XGBoost, and PyG graph-shadow candidates.",
+    )
+    release_safety_graph_baselines.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3205,6 +3236,13 @@ def main(argv: list[str] | None = None) -> int:
             elif args.release_safety_command == "paysim-competitive":
                 payload = _run_paysim_competitive_surface(
                     data_path=args.data_path,
+                    output_dir=args.output_dir,
+                    budget_tier=args.budget_tier,
+                    run_optional=args.run_optional,
+                )
+            elif args.release_safety_command == "graph-baselines":
+                payload = _run_paper_graph_baseline_surface(
+                    data_dir=args.data_dir,
                     output_dir=args.output_dir,
                     budget_tier=args.budget_tier,
                     run_optional=args.run_optional,
@@ -6980,6 +7018,43 @@ def _run_paysim_competitive_surface(
             "bundle": pack,
         },
         "human_output": render_paysim_competitive_markdown(pack),
+    }
+
+
+def _run_paper_graph_baseline_surface(
+    *,
+    data_dir: str | None,
+    output_dir: str | None,
+    budget_tier: str,
+    run_optional: bool,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_graph_baseline_markdown,
+        sync_paper_graph_baseline_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_graph_baseline_pack(
+        root,
+        data_dir=data_dir,
+        output_dir=output_dir,
+        budget_tier=budget_tier,
+        run_optional=run_optional,
+    )
+    pack = {
+        key: json.loads(path.read_text(encoding="utf-8"))
+        for key, path in written.items()
+    }
+    manifest = dict(pack["paper_graph_baseline_manifest"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_graph_baselines": manifest,
+            "bundle": pack,
+        },
+        "human_output": render_paper_graph_baseline_markdown(pack),
     }
 
 

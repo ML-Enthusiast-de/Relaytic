@@ -282,7 +282,7 @@ Avoid introducing new references to:
 - introduced the public command `relaytic release-safety paysim-benchmark` for regenerating PaySim paper artifacts locally
 - introduced paper-track benchmark artifacts under `docs/reports/`: `paysim_benchmark_manifest.json`, `paysim_temporal_split_report.json`, `paysim_operating_point_table.json`, and `paysim_paper_result_row.json`
 - preserved supporting-only claim posture for PaySim-style proxy evidence and kept hard AML/SOTA performance claims blocked until later paper gates pass
-- Paper Track P6 consumes the P3 dataset registry, P4 result-row contract, and P5 graph provenance before adding strong baseline suites; P6-A now consumes the P6 budget and publishability gates before P7 adds numeric graph evidence
+- Paper Track P6 consumes the P3 dataset registry, P4 result-row contract, and P5 graph provenance before adding strong baseline suites; P6-A consumes the P6 budget and publishability gates, and P7 now adds claim-gated numeric graph evidence before P8 decides harder graph-track support
 
 ### Paper Track P5
 
@@ -304,6 +304,13 @@ Avoid introducing new references to:
 - introduced the public command `relaytic release-safety paysim-competitive` for regenerating P6-A competitive artifacts locally
 - introduced paper-track competitive artifacts under `docs/reports/`: `paysim_competitive_benchmark_manifest.json`, `paysim_competitive_budget_contract.json`, `paysim_competitive_search_trace.json`, `paysim_leakage_safe_feature_report.json`, `paysim_competitive_baseline_table.json`, and `paysim_publishability_gate.json`
 - executed 14 full-data-compatible probe trials and five full-training finalists under the frozen chronological split; validation-selected Extra Trees reports fixed test PR-AUC `0.638773`, passes as a supporting-only PaySim table candidate, and keeps headline/hard claims blocked before P7 and release proof
+
+### Paper Track P7
+
+- introduced `src/relaytic/release_safety/graph_baselines.py` under the existing release-safety boundary for temporal-safe Elliptic graph feature views, optional graph-model shadows, explicit graph budgets, and publishability gating
+- introduced the public command `relaytic release-safety graph-baselines` for regenerating P7 graph baseline artifacts locally
+- introduced paper-track graph baseline artifacts under `docs/reports/`: `paper_graph_baseline_manifest.json`, `paper_graph_feature_table.json`, `paper_graph_model_shadow_scorecard.json`, `paper_graph_baseline_fallback_report.json`, `paper_graph_budget_contract.json`, `paper_graph_competitive_search_trace.json`, and `paper_graph_publishability_gate.json`
+- executed the full raw Elliptic bundle after verifying all edges are same-time-step observable; selected LightGBM on source-plus-structural features with test PR-AUC `0.668756` and recorded the modest paired source-only delta (`+0.004588`) without promoting the weaker GraphSAGE shadow or any headline/SOTA claim
 
 ### AML Pivot Track
 
@@ -700,6 +707,13 @@ Implemented release-safety artifact names:
 - `paysim_leakage_safe_feature_report.json`
 - `paysim_competitive_baseline_table.json`
 - `paysim_publishability_gate.json`
+- `paper_graph_baseline_manifest.json`
+- `paper_graph_feature_table.json`
+- `paper_graph_model_shadow_scorecard.json`
+- `paper_graph_baseline_fallback_report.json`
+- `paper_graph_budget_contract.json`
+- `paper_graph_competitive_search_trace.json`
+- `paper_graph_publishability_gate.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

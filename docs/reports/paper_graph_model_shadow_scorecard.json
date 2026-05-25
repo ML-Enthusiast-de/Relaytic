@@ -1,0 +1,54 @@
+{
+  "adapter_versions": {
+    "torch": "2.8.0+cpu",
+    "torch_geometric": "2.7.0"
+  },
+  "blocked_reason": "shadow_result_requires_repeated_seed_and_release_claim_gate_before_promotion",
+  "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+  "graph_model_execution_state": "ran_shadow_only",
+  "graph_neural_claim_allowed": false,
+  "model_claim_scope": "shadow_only_not_promoted_to_public_graph_model_claim",
+  "model_family": "pyg_graphsage",
+  "protocol": "inductive_same_time_step_snapshot_edges_with_train_label_loss_only",
+  "rows": [
+    {
+      "claim_role": "graph_model_shadow_only",
+      "configuration": {
+        "class_weight_policy": "train_labeled_nodes_only",
+        "early_stopping_patience": 16,
+        "hidden_channels": 64,
+        "learning_rate": 0.008,
+        "max_epochs": 90,
+        "optimizer": "adam",
+        "random_seed": 42,
+        "selected_epoch": 31,
+        "weight_decay": 0.0001
+      },
+      "family_id": "pyg_graphsage",
+      "feature_view_id": "source_features_plus_structural_snapshot",
+      "row_status": "blocked",
+      "test_evaluation_policy": "one_evaluation_after_validation_selected_epoch",
+      "test_metrics": {
+        "log_loss": 0.429617,
+        "n_samples": 11184,
+        "positive_count": 636,
+        "positive_rate": 0.056867,
+        "pr_auc": 0.388907,
+        "roc_auc": 0.834888
+      },
+      "validation_metrics": {
+        "log_loss": 0.409871,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.76591,
+        "roc_auc": 0.950357
+      }
+    }
+  ],
+  "runtime_seconds": 92.186264,
+  "schema_version": "relaytic.paper_graph_baseline_suite.v1",
+  "slice": "Paper Track P7",
+  "status": "ok",
+  "unknown_label_policy": "unknown_nodes_may_contribute_observable_features_and_topology_but_never_loss_or_metrics"
+}

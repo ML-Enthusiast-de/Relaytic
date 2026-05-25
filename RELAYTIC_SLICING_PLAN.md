@@ -363,8 +363,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P6-A. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, and Paper Track P6-A competitive PaySim rerun.
-- next execution target: Paper Track P7
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P7. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, and Paper Track P7 Elliptic graph baseline suite.
+- next execution target: Paper Track P8
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -373,7 +373,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P7 through P13 prove graph benchmarks, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P8 through P13 prove benchmark breadth, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3827,6 +3827,20 @@ Minimum proof:
 - graph model claims stay separate from graph environment claims
 - graph rows are labeled baseline, competitive, blocked, or release-candidate
 - headline graph claims are blocked unless the competitive graph budget and graph claim-scope gate pass
+
+Implemented by:
+- adding `src/relaytic/release_safety/graph_baselines.py`
+- adding `docs/reports/paper_graph_baseline_manifest.json`
+- adding `docs/reports/paper_graph_feature_table.json`
+- adding `docs/reports/paper_graph_model_shadow_scorecard.json`
+- adding `docs/reports/paper_graph_baseline_fallback_report.json`
+- adding `docs/reports/paper_graph_budget_contract.json`
+- adding `docs/reports/paper_graph_competitive_search_trace.json`
+- adding `docs/reports/paper_graph_publishability_gate.json`
+- adding `relaytic release-safety graph-baselines --budget-tier competitive --run-optional --format json`
+- adding `tests/test_paper_track_p7.py`
+
+P7 runs the full 203,769-node, 234,355-edge Elliptic source under a frozen batch-snapshot protocol after verifying that every source edge remains inside one `time_step`. It evaluates one validation-selected winner per declared feature view without using test outcomes for selection. LightGBM on source features plus 12 label-free same-step structural features is selected on validation (`PR-AUC=0.976654`) and reports fixed test `PR-AUC=0.668756`, versus paired source-feature-only test `PR-AUC=0.664168` (`+0.004588` descriptive structural lift). A PyG GraphSAGE candidate runs shadow-only and underperforms the selected baseline on test (`PR-AUC=0.388907`), so graph-neural, SOTA, headline, and hard AML claims remain blocked. Before P10 can present any graph-neural row as more than failure-analysis evidence, a repeated-seed recovery or explicit non-competitive finding is required.
 
 ### Paper Track P8 - AMLSim and Elliptic2 blocked-or-supported track
 

@@ -188,7 +188,7 @@ The exact pack can evolve, but the roadmap should be designed around public or r
 Near-term practical rule:
 
 - PaySim-style and flattened Elliptic-style snapshots should work now through the existing local file contract
-- raw multi-file graph bundles and labeled subgraph packs now have dedicated loader/provenance artifacts, but public graph benchmark or SOTA claims remain blocked until benchmarked and claim-gated
+- raw multi-file Elliptic graph bundles now have dedicated loader/provenance artifacts and a supporting-only P7 numeric graph-feature row; graph-neural, SOTA, headline, and hard AML claims remain blocked pending stronger claim-gated proof
 
 Relaytic-AML must never silently optimize on dataset identity. Public claims require holdout verification and a benchmark-generalization audit.
 

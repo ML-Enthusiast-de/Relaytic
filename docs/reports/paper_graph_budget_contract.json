@@ -1,0 +1,25 @@
+{
+  "budget_ladder": [
+    "smoke",
+    "baseline",
+    "competitive",
+    "release"
+  ],
+  "effective_budget_tier": "competitive",
+  "graph_model_shadow_policy": "shadow_only_not_promoted_to_public_graph_model_claim",
+  "graph_observation_policy": "same_time_step_topology_observable_at_batch_snapshot_scoring_only",
+  "optional_adapters_requested": true,
+  "random_seeds": [
+    42
+  ],
+  "release_budget_required_for_headline_claims": true,
+  "requested_budget_tier": "competitive",
+  "schema_version": "relaytic.paper_graph_baseline_suite.v1",
+  "slice": "Paper Track P7",
+  "split_policy": "chronological_time_step_windows_frozen_by_p5",
+  "status": "ok",
+  "successful_validation_trial_count": 16,
+  "test_evaluation_policy": "predeclared_structural_floor_plus_one_validation_selected_winner_per_predeclared_feature_view",
+  "threshold_policy": "validation_operating_partition_only_then_fixed_test_application",
+  "validation_search_trial_count": 16
+}

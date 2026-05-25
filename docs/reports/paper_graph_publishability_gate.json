@@ -1,0 +1,23 @@
+{
+  "allowed_public_wording": "Under the frozen chronological Elliptic split and same-time-step snapshot protocol, Relaytic produced a supporting graph-feature baseline row with descriptive paired structural lift. This is not a graph-neural, SOTA, or real-world AML superiority claim.",
+  "blocked_reason_codes": [
+    "headline_graph_claim_requires_release_budget_and_repeated_seed_proof",
+    "graph_sota_claim_not_benchmarked",
+    "hard_aml_claim_requires_broader_holdout_and_operational_proof",
+    "graph_neural_shadow_candidate_not_promoted"
+  ],
+  "claim_posture": "supporting-only",
+  "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+  "graph_benchmark_performance_claim_allowed": true,
+  "graph_neural_model_claim_allowed": false,
+  "graph_sota_claim_allowed": false,
+  "hard_performance_claims_allowed": false,
+  "headline_graph_claim_allowed": false,
+  "paper_primary_claim_allowed": false,
+  "same_time_step_topology_gate_passed": true,
+  "schema_version": "relaytic.paper_graph_baseline_suite.v1",
+  "slice": "Paper Track P7",
+  "status": "pass_supporting_only",
+  "structural_incremental_lift_claim_allowed": true,
+  "supporting_graph_table_candidate_allowed": true
+}

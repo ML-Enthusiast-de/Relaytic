@@ -1,0 +1,10 @@
+{
+  "fallback_rows": [],
+  "graph_model_blocked_reason": "shadow_result_requires_repeated_seed_and_release_claim_gate_before_promotion",
+  "graph_model_execution_state": "ran_shadow_only",
+  "optional_execution_requested": true,
+  "schema_version": "relaytic.paper_graph_baseline_suite.v1",
+  "slice": "Paper Track P7",
+  "status": "ok",
+  "structural_floor_available_even_if_optional_models_fail": true
+}

@@ -1,0 +1,69 @@
+{
+  "command": "relaytic release-safety graph-baselines --budget-tier competitive --run-optional --format json",
+  "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+  "effective_budget_tier": "competitive",
+  "evidence_refs": {
+    "feature_table": "docs/reports/paper_graph_feature_table.json",
+    "graph_model_shadow_scorecard": "docs/reports/paper_graph_model_shadow_scorecard.json",
+    "p5_provenance": "docs/reports/elliptic_graph_provenance_report.json",
+    "p5_temporal_split": "docs/reports/elliptic_temporal_split_report.json",
+    "publishability_gate": "docs/reports/paper_graph_publishability_gate.json"
+  },
+  "excluded_cross_step_edge_count": 0,
+  "feature_contract_id": "p7_elliptic_same_step_observable_graph_features_v1",
+  "graph_model_execution_state": "ran_shadow_only",
+  "hard_performance_claims_allowed": false,
+  "headline_graph_claim_allowed": false,
+  "next_slice": "Paper Track P8",
+  "node_count": 203769,
+  "official_feature_count": 165,
+  "output_files": {
+    "paper_graph_baseline_fallback_report": "paper_graph_baseline_fallback_report.json",
+    "paper_graph_baseline_manifest": "paper_graph_baseline_manifest.json",
+    "paper_graph_budget_contract": "paper_graph_budget_contract.json",
+    "paper_graph_competitive_search_trace": "paper_graph_competitive_search_trace.json",
+    "paper_graph_feature_table": "paper_graph_feature_table.json",
+    "paper_graph_model_shadow_scorecard": "paper_graph_model_shadow_scorecard.json",
+    "paper_graph_publishability_gate": "paper_graph_publishability_gate.json"
+  },
+  "raw_edge_count": 234355,
+  "runtime_environment": {
+    "numpy": "2.1.2",
+    "pandas": "2.3.2",
+    "python": "3.11.0",
+    "scikit_learn": "1.7.1"
+  },
+  "same_step_edge_count": 234355,
+  "schema_version": "relaytic.paper_graph_baseline_suite.v1",
+  "selected_family_id": "lightgbm_classifier",
+  "selected_feature_view_id": "source_features_plus_structural_snapshot",
+  "selected_test_pr_auc": 0.668756,
+  "slice": "Paper Track P7",
+  "source_files": [
+    {
+      "path": "data/paper_benchmarks/elliptic/elliptic_txs_classes.csv",
+      "role": "classes",
+      "sha256": "93e2e7b2405c735ba752bf6ba06b947561deddd1f5a8fc91e46f6a4c0e439493",
+      "size_bytes": 3305144
+    },
+    {
+      "path": "data/paper_benchmarks/elliptic/elliptic_txs_edgelist.csv",
+      "role": "edges",
+      "sha256": "a35053ba68a98e4382cae2ba65b9d9e36b23b6439e02dff084971b1b72a5156e",
+      "size_bytes": 4470584
+    },
+    {
+      "path": "data/paper_benchmarks/elliptic/elliptic_txs_features.csv",
+      "role": "features",
+      "sha256": "fd7f83573443c9e302e371d3f110e3b6224160f5d1ed8a287757936127800ff0",
+      "size_bytes": 689683771
+    }
+  ],
+  "source_path": "data/paper_benchmarks/elliptic",
+  "split_contract_id": "split_elliptic_temporal_step_v1",
+  "status": "ok",
+  "structural_feature_count": 12,
+  "summary": "P7 evaluated source-provided Elliptic snapshot features and Relaytic-derived same-step structural graph features under a chronological protocol, with graph-neural candidates kept in a separate shadow scorecard.",
+  "supporting_graph_table_candidate_allowed": true,
+  "track_id": "elliptic_flattened_graph_aml"
+}

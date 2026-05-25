@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P6-A implemented. P7 through P13 planned.
+P0 through P7 implemented. P8 through P13 planned.
 
 ## Intent
 
@@ -42,7 +42,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Compare deterministic baselines plus optional LightGBM, CatBoost, XGBoost, TabPFN-style, or other strong tabular adapters under one split contract and explicit budget ladder.
 8. **P6-A - PaySim competitive rerun and publishability gate** - implemented
    Rerun PaySim under a paper-grade competitive budget before any PaySim metric can enter a headline table.
-9. **P7 - Graph baseline suite**
+9. **P7 - Graph baseline suite** - implemented
    Compare flattened tabular, structural graph-feature, and optional graph-model baselines without conflating their claims.
 10. **P8 - AMLSim and Elliptic2 blocked-or-supported track**
    Decide whether synthetic-bank and subgraph AML tracks are runnable for the first paper or explicitly blocked with exact reasons.
@@ -182,8 +182,23 @@ P6-A added:
 
 P6-A runs the full PaySim source with balance fields excluded and destination histories derived strictly from prior steps. It records 14 probe trials and five full-training finalists, selects Extra Trees on validation PR-AUC `0.568725`, performs validation-only Platt calibration and operating-point selection, and reports fixed test PR-AUC `0.638773` versus the P6 baseline `0.331345`. Its gate admits a supporting-only PaySim paper-table candidate while continuing to block headline, hard AML, and SOTA language until graph and release proof pass.
 
+P7 added:
+
+- `docs/reports/paper_graph_baseline_manifest.json`
+- `docs/reports/paper_graph_feature_table.json`
+- `docs/reports/paper_graph_model_shadow_scorecard.json`
+- `docs/reports/paper_graph_baseline_fallback_report.json`
+- `docs/reports/paper_graph_budget_contract.json`
+- `docs/reports/paper_graph_competitive_search_trace.json`
+- `docs/reports/paper_graph_publishability_gate.json`
+- `src/relaytic/release_safety/graph_baselines.py`
+- `relaytic release-safety graph-baselines --budget-tier competitive --run-optional --format json`
+- `tests/test_paper_track_p7.py`
+
+P7 verifies that all raw Elliptic edges are same-time-step observable, runs a competitive paired feature-view evaluation without test-driven selection, and selects LightGBM over source features plus label-free structural snapshot features (`validation_pr_auc=0.976654`, `test_pr_auc=0.668756`). The paired source-feature-only row reports `test_pr_auc=0.664168`, so the measured structural lift is modest (`+0.004588`). PyG GraphSAGE runs shadow-only and reports weaker test `PR-AUC=0.388907`; it remains failure-analysis evidence until recovery and repeated-seed proof exist. The selected graph-feature row is supporting-only; graph-neural, SOTA, headline, paper-primary, and hard AML claims remain blocked.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P7**.
+The next implementation target is **Paper Track P8**.
 
-P7 should produce actual non-PaySim performance evidence on raw Elliptic graph data: structural graph baselines, clearly separated optional graph-model candidates, temporal graph-safe evaluation, budget/runtime/version reporting, and a graph publishability gate that does not conflate graph provenance with model-quality claims.
+P8 should decide whether AMLSim and Elliptic2 can enter the first paper with runnable, reproducible evidence or must remain explicit limitations. It must also preserve P7's finding that the current graph-neural shadow is not competitive rather than silently promoting it.

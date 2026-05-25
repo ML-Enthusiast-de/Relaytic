@@ -1,0 +1,919 @@
+{
+  "dataset_id": "elliptic_bitcoin_flattened_graph_aml",
+  "effective_budget_tier": "competitive",
+  "evaluation_protocol": "time_step_batch_snapshot_inductive_evaluation",
+  "feature_contract_id": "p7_elliptic_same_step_observable_graph_features_v1",
+  "feature_views": [
+    {
+      "claim_scope": "relaytic_derived_label_free_graph_structure",
+      "feature_columns": [
+        "in_degree_same_step",
+        "out_degree_same_step",
+        "total_degree_same_step",
+        "log1p_in_degree_same_step",
+        "log1p_out_degree_same_step",
+        "log1p_total_degree_same_step",
+        "reciprocal_in_degree_same_step",
+        "reciprocal_out_degree_same_step",
+        "has_reciprocal_edge_same_step",
+        "component_size_same_step",
+        "log1p_component_size_same_step",
+        "isolated_in_snapshot"
+      ],
+      "feature_count": 12,
+      "feature_view_id": "structural_same_snapshot_only"
+    },
+    {
+      "claim_scope": "source_provided_anonymized_snapshot_features_may_include_source_aggregates_not_relabelled_as_relaytic_graph_engineering",
+      "feature_count": 165,
+      "feature_view_id": "source_provided_flattened_features"
+    },
+    {
+      "claim_scope": "source_features_augmented_with_relaytic_label_free_graph_structure",
+      "feature_count": 177,
+      "feature_view_id": "source_features_plus_structural_snapshot"
+    }
+  ],
+  "incremental_claim_policy": "paired_test_rows_are_descriptive_only_and_never_override_validation_selected_promotion",
+  "predeclared_structural_floor": {
+    "configuration": {
+      "class_weight": "balanced_subsample",
+      "imbalance_fit_surface": "train_labels_only",
+      "max_depth": 18,
+      "min_samples_leaf": 3,
+      "n_estimators": 240,
+      "n_jobs": -1,
+      "random_state": 42
+    },
+    "evidence_type": "deterministic_label_free_structural_graph_features",
+    "family_id": "sklearn_extra_trees",
+    "feature_view_id": "structural_same_snapshot_only",
+    "row_id": "structural_same_snapshot_extra_trees_floor",
+    "row_status": "baseline",
+    "runtime_seconds": 1.097327,
+    "selection_role": "predeclared_structural_floor",
+    "test_evaluated": true,
+    "test_metrics": {
+      "log_loss": 0.661893,
+      "n_samples": 11184,
+      "positive_count": 636,
+      "positive_rate": 0.056867,
+      "pr_auc": 0.053397,
+      "roc_auc": 0.463107
+    },
+    "test_operating_point": {
+      "false_positive_count": 723,
+      "false_positive_rate": 0.068544,
+      "precision_at_k": 0.004132,
+      "recall_at_review_budget": 0.004717,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.064914,
+      "reviewed_count": 726,
+      "true_positive_count": 3
+    },
+    "validation_metrics": {
+      "log_loss": 0.722025,
+      "n_samples": 8999,
+      "positive_count": 1038,
+      "positive_rate": 0.115346,
+      "pr_auc": 0.196117,
+      "roc_auc": 0.695775
+    }
+  },
+  "rows": [
+    {
+      "configuration": {
+        "class_weight": "balanced_subsample",
+        "imbalance_fit_surface": "train_labels_only",
+        "max_depth": 18,
+        "min_samples_leaf": 3,
+        "n_estimators": 240,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "evidence_type": "deterministic_label_free_structural_graph_features",
+      "family_id": "sklearn_extra_trees",
+      "feature_view_id": "structural_same_snapshot_only",
+      "row_id": "structural_same_snapshot_extra_trees_floor",
+      "row_status": "baseline",
+      "runtime_seconds": 1.097327,
+      "selection_role": "predeclared_structural_floor",
+      "test_evaluated": true,
+      "test_metrics": {
+        "log_loss": 0.661893,
+        "n_samples": 11184,
+        "positive_count": 636,
+        "positive_rate": 0.056867,
+        "pr_auc": 0.053397,
+        "roc_auc": 0.463107
+      },
+      "test_operating_point": {
+        "false_positive_count": 723,
+        "false_positive_rate": 0.068544,
+        "precision_at_k": 0.004132,
+        "recall_at_review_budget": 0.004717,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.064914,
+        "reviewed_count": 726,
+        "true_positive_count": 3
+      },
+      "validation_metrics": {
+        "log_loss": 0.722025,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.196117,
+        "roc_auc": 0.695775
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "configuration": {
+        "class_weight": "balanced_subsample",
+        "imbalance_fit_surface": "train_labels_only",
+        "max_depth": 18,
+        "min_samples_leaf": 3,
+        "n_estimators": 200,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "evidence_type": "deterministic_label_free_structural_graph_features",
+      "family_id": "sklearn_extra_trees",
+      "feature_view_id": "structural_same_snapshot_only",
+      "row_status": "competitive",
+      "runtime_seconds": 0.832561,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "structural_same_snapshot_only::sklearn_extra_trees::1",
+      "validation_metrics": {
+        "log_loss": 0.724745,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.195929,
+        "roc_auc": 0.694483
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "configuration": {
+        "class_weight": "balanced_subsample",
+        "imbalance_fit_surface": "train_labels_only",
+        "max_depth": null,
+        "min_samples_leaf": 8,
+        "n_estimators": 260,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "evidence_type": "deterministic_label_free_structural_graph_features",
+      "family_id": "sklearn_extra_trees",
+      "feature_view_id": "structural_same_snapshot_only",
+      "row_status": "competitive",
+      "runtime_seconds": 0.965391,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "structural_same_snapshot_only::sklearn_extra_trees::2",
+      "validation_metrics": {
+        "log_loss": 0.702203,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.219559,
+        "roc_auc": 0.705596
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "configuration": {
+        "class_weight": "balanced_subsample",
+        "imbalance_fit_surface": "train_labels_only",
+        "max_depth": 22,
+        "min_samples_leaf": 3,
+        "n_estimators": 240,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "evidence_type": "source_provided_anonymized_feature_snapshot",
+      "family_id": "sklearn_extra_trees",
+      "feature_view_id": "source_provided_flattened_features",
+      "row_status": "competitive",
+      "runtime_seconds": 6.348718,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_provided_flattened_features::sklearn_extra_trees::3",
+      "validation_metrics": {
+        "log_loss": 0.119994,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.956692,
+        "roc_auc": 0.990056
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "configuration": {
+        "class_weight": "balanced_subsample",
+        "imbalance_fit_surface": "train_labels_only",
+        "max_depth": 22,
+        "min_samples_leaf": 3,
+        "n_estimators": 240,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "evidence_type": "source_features_augmented_with_structural_graph_features",
+      "family_id": "sklearn_extra_trees",
+      "feature_view_id": "source_features_plus_structural_snapshot",
+      "row_status": "competitive",
+      "runtime_seconds": 6.917278,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_features_plus_structural_snapshot::sklearn_extra_trees::4",
+      "validation_metrics": {
+        "log_loss": 0.12397,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.953295,
+        "roc_auc": 0.989307
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "configuration": {
+        "class_weight": "balanced",
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.06,
+        "max_iter": 180,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 20,
+        "random_state": 42
+      },
+      "evidence_type": "source_provided_anonymized_feature_snapshot",
+      "family_id": "sklearn_hist_gradient_boosting",
+      "feature_view_id": "source_provided_flattened_features",
+      "row_status": "competitive",
+      "runtime_seconds": 11.01993,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_provided_flattened_features::sklearn_hist_gradient_boosting::5",
+      "validation_metrics": {
+        "log_loss": 0.057882,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.974331,
+        "roc_auc": 0.993134
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "configuration": {
+        "class_weight": "balanced",
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.05,
+        "max_iter": 220,
+        "max_leaf_nodes": 63,
+        "min_samples_leaf": 20,
+        "random_state": 42
+      },
+      "evidence_type": "source_features_augmented_with_structural_graph_features",
+      "family_id": "sklearn_hist_gradient_boosting",
+      "feature_view_id": "source_features_plus_structural_snapshot",
+      "row_status": "competitive",
+      "runtime_seconds": 8.252029,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_features_plus_structural_snapshot::sklearn_hist_gradient_boosting::6",
+      "validation_metrics": {
+        "log_loss": 0.059132,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.972482,
+        "roc_auc": 0.991667
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "configuration": {
+        "class_weight": "balanced_subsample",
+        "imbalance_fit_surface": "train_labels_only",
+        "max_depth": null,
+        "min_samples_leaf": 6,
+        "n_estimators": 360,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "evidence_type": "source_provided_anonymized_feature_snapshot",
+      "family_id": "sklearn_extra_trees",
+      "feature_view_id": "source_provided_flattened_features",
+      "row_status": "competitive",
+      "runtime_seconds": 9.686054,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_provided_flattened_features::sklearn_extra_trees::7",
+      "validation_metrics": {
+        "log_loss": 0.148323,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.960893,
+        "roc_auc": 0.990439
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "configuration": {
+        "class_weight": "balanced_subsample",
+        "imbalance_fit_surface": "train_labels_only",
+        "max_depth": null,
+        "min_samples_leaf": 6,
+        "n_estimators": 360,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "evidence_type": "source_features_augmented_with_structural_graph_features",
+      "family_id": "sklearn_extra_trees",
+      "feature_view_id": "source_features_plus_structural_snapshot",
+      "row_status": "competitive",
+      "runtime_seconds": 10.50047,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_features_plus_structural_snapshot::sklearn_extra_trees::8",
+      "validation_metrics": {
+        "log_loss": 0.145935,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.962348,
+        "roc_auc": 0.990315
+      }
+    },
+    {
+      "adapter_module": "scikit-learn",
+      "adapter_version": "1.7.1",
+      "configuration": {
+        "class_weight": "balanced",
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.035,
+        "max_iter": 300,
+        "max_leaf_nodes": 63,
+        "min_samples_leaf": 30,
+        "random_state": 42
+      },
+      "evidence_type": "source_features_augmented_with_structural_graph_features",
+      "family_id": "sklearn_hist_gradient_boosting",
+      "feature_view_id": "source_features_plus_structural_snapshot",
+      "row_status": "competitive",
+      "runtime_seconds": 10.965492,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_features_plus_structural_snapshot::sklearn_hist_gradient_boosting::9",
+      "validation_metrics": {
+        "log_loss": 0.062976,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.971746,
+        "roc_auc": 0.991648
+      }
+    },
+    {
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.9,
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.04,
+        "min_child_samples": 20,
+        "n_estimators": 220,
+        "n_jobs": -1,
+        "num_leaves": 31,
+        "random_state": 42,
+        "subsample": 0.9,
+        "verbosity": -1
+      },
+      "evidence_type": "deterministic_label_free_structural_graph_features",
+      "family_id": "lightgbm_classifier",
+      "feature_view_id": "structural_same_snapshot_only",
+      "row_status": "competitive",
+      "runtime_seconds": 0.896955,
+      "selected_for_view_test_evaluation": true,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": true,
+      "test_metrics": {
+        "pr_auc": 0.058018,
+        "roc_auc": 0.495392
+      },
+      "trial_id": "structural_same_snapshot_only::lightgbm_classifier::10",
+      "validation_metrics": {
+        "log_loss": 0.790915,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.226946,
+        "roc_auc": 0.699882
+      }
+    },
+    {
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.9,
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.04,
+        "min_child_samples": 20,
+        "n_estimators": 260,
+        "n_jobs": -1,
+        "num_leaves": 31,
+        "random_state": 42,
+        "subsample": 0.9,
+        "verbosity": -1
+      },
+      "evidence_type": "source_provided_anonymized_feature_snapshot",
+      "family_id": "lightgbm_classifier",
+      "feature_view_id": "source_provided_flattened_features",
+      "row_status": "competitive",
+      "runtime_seconds": 5.714453,
+      "selected_for_view_test_evaluation": true,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": true,
+      "test_metrics": {
+        "pr_auc": 0.664168,
+        "roc_auc": 0.888775
+      },
+      "trial_id": "source_provided_flattened_features::lightgbm_classifier::11",
+      "validation_metrics": {
+        "log_loss": 0.055704,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.975675,
+        "roc_auc": 0.993154
+      }
+    },
+    {
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.9,
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.04,
+        "min_child_samples": 20,
+        "n_estimators": 260,
+        "n_jobs": -1,
+        "num_leaves": 31,
+        "random_state": 42,
+        "subsample": 0.9,
+        "verbosity": -1
+      },
+      "evidence_type": "source_features_augmented_with_structural_graph_features",
+      "family_id": "lightgbm_classifier",
+      "feature_view_id": "source_features_plus_structural_snapshot",
+      "row_status": "competitive",
+      "runtime_seconds": 5.966298,
+      "selected_for_view_test_evaluation": true,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": true,
+      "test_metrics": {
+        "pr_auc": 0.668756,
+        "roc_auc": 0.892915
+      },
+      "trial_id": "source_features_plus_structural_snapshot::lightgbm_classifier::12",
+      "validation_metrics": {
+        "log_loss": 0.053599,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.976654,
+        "roc_auc": 0.993737
+      }
+    },
+    {
+      "adapter_module": "xgboost",
+      "adapter_version": "3.0.4",
+      "configuration": {
+        "colsample_bytree": 0.9,
+        "eval_metric": "logloss",
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.04,
+        "max_depth": 6,
+        "min_child_weight": 3.0,
+        "n_estimators": 260,
+        "n_jobs": -1,
+        "objective": "binary:logistic",
+        "random_state": 42,
+        "scale_pos_weight": 3.0,
+        "subsample": 0.9,
+        "tree_method": "hist"
+      },
+      "evidence_type": "source_features_augmented_with_structural_graph_features",
+      "family_id": "xgboost_classifier",
+      "feature_view_id": "source_features_plus_structural_snapshot",
+      "row_status": "competitive",
+      "runtime_seconds": 5.59584,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_features_plus_structural_snapshot::xgboost_classifier::13",
+      "validation_metrics": {
+        "log_loss": 0.074197,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.947345,
+        "roc_auc": 0.989428
+      }
+    },
+    {
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.9,
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.025,
+        "min_child_samples": 30,
+        "n_estimators": 360,
+        "n_jobs": -1,
+        "num_leaves": 63,
+        "random_state": 42,
+        "subsample": 0.9,
+        "verbosity": -1
+      },
+      "evidence_type": "source_provided_anonymized_feature_snapshot",
+      "family_id": "lightgbm_classifier",
+      "feature_view_id": "source_provided_flattened_features",
+      "row_status": "competitive",
+      "runtime_seconds": 11.089943,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_provided_flattened_features::lightgbm_classifier::14",
+      "validation_metrics": {
+        "log_loss": 0.054413,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.975011,
+        "roc_auc": 0.992641
+      }
+    },
+    {
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.9,
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.025,
+        "min_child_samples": 30,
+        "n_estimators": 360,
+        "n_jobs": -1,
+        "num_leaves": 63,
+        "random_state": 42,
+        "subsample": 0.9,
+        "verbosity": -1
+      },
+      "evidence_type": "source_features_augmented_with_structural_graph_features",
+      "family_id": "lightgbm_classifier",
+      "feature_view_id": "source_features_plus_structural_snapshot",
+      "row_status": "competitive",
+      "runtime_seconds": 11.342454,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_features_plus_structural_snapshot::lightgbm_classifier::15",
+      "validation_metrics": {
+        "log_loss": 0.052399,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.975202,
+        "roc_auc": 0.992725
+      }
+    },
+    {
+      "adapter_module": "xgboost",
+      "adapter_version": "3.0.4",
+      "configuration": {
+        "colsample_bytree": 0.9,
+        "eval_metric": "logloss",
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.03,
+        "max_depth": 7,
+        "min_child_weight": 4.0,
+        "n_estimators": 340,
+        "n_jobs": -1,
+        "objective": "binary:logistic",
+        "random_state": 42,
+        "scale_pos_weight": 3.0,
+        "subsample": 0.9,
+        "tree_method": "hist"
+      },
+      "evidence_type": "source_provided_anonymized_feature_snapshot",
+      "family_id": "xgboost_classifier",
+      "feature_view_id": "source_provided_flattened_features",
+      "row_status": "competitive",
+      "runtime_seconds": 7.674496,
+      "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+      "stage": "validation_search",
+      "test_evaluated": false,
+      "test_metrics": null,
+      "trial_id": "source_provided_flattened_features::xgboost_classifier::16",
+      "validation_metrics": {
+        "log_loss": 0.064042,
+        "n_samples": 8999,
+        "positive_count": 1038,
+        "positive_rate": 0.115346,
+        "pr_auc": 0.962038,
+        "roc_auc": 0.991863
+      }
+    }
+  ],
+  "schema_version": "relaytic.paper_graph_baseline_suite.v1",
+  "slice": "Paper Track P7",
+  "split_contract_id": "split_elliptic_temporal_step_v1",
+  "status": "ok",
+  "structural_incremental_test_lift_observed": true,
+  "structural_incremental_test_pr_auc_delta_vs_source_features": 0.004588,
+  "supporting_candidate_quality_check_passed": true,
+  "test_label_prevalence": 0.056867,
+  "track_id": "elliptic_flattened_graph_aml",
+  "validation_selected_competitive_baseline": {
+    "adapter_module": "lightgbm",
+    "adapter_version": "4.6.0",
+    "calibration": {
+      "identity_operating_log_loss": 0.068903,
+      "partition_policy": "chronological_validation_calibration_then_operating_subwindows",
+      "platt_operating_log_loss": 0.059654,
+      "selected_method": "platt_sigmoid",
+      "test_used_for_selection": false
+    },
+    "configuration": {
+      "class_weight": "balanced",
+      "colsample_bytree": 0.9,
+      "imbalance_fit_surface": "train_labels_only",
+      "learning_rate": 0.04,
+      "min_child_samples": 20,
+      "n_estimators": 260,
+      "n_jobs": -1,
+      "num_leaves": 31,
+      "random_state": 42,
+      "subsample": 0.9,
+      "verbosity": -1
+    },
+    "evidence_type": "source_features_augmented_with_structural_graph_features",
+    "family_id": "lightgbm_classifier",
+    "feature_view_id": "source_features_plus_structural_snapshot",
+    "fixed_fpr": {
+      "target_fpr": 0.001,
+      "test": {
+        "false_positive_count": 19,
+        "false_positive_rate": 0.001801,
+        "precision_at_k": 0.951031,
+        "recall_at_review_budget": 0.580189,
+        "requested_review_fraction": null,
+        "review_fraction": 0.034692,
+        "reviewed_count": 388,
+        "true_positive_count": 369
+      }
+    },
+    "global_validation_selected": true,
+    "raw_test_pr_auc": 0.668756,
+    "review_budget_fraction": 0.005,
+    "row_status": "release-candidate",
+    "selection_surface": "validation_pr_auc_within_predeclared_feature_view_before_test_evaluation",
+    "test_evaluation_role": "paired_feature_view_comparison_not_test_driven_model_selection",
+    "test_operating_point": {
+      "false_positive_count": 0,
+      "false_positive_rate": 0.0,
+      "precision_at_k": 1.0,
+      "recall_at_review_budget": 0.056604,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.003219,
+      "reviewed_count": 36,
+      "true_positive_count": 36
+    },
+    "test_pr_auc": 0.668756,
+    "test_roc_auc": 0.892915,
+    "trial_id": "source_features_plus_structural_snapshot::lightgbm_classifier::12",
+    "validation_pr_auc": 0.976654
+  },
+  "validation_selected_view_rows": [
+    {
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "calibration": {
+        "identity_operating_log_loss": 0.69914,
+        "partition_policy": "chronological_validation_calibration_then_operating_subwindows",
+        "platt_operating_log_loss": 0.246464,
+        "selected_method": "platt_sigmoid",
+        "test_used_for_selection": false
+      },
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.9,
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.04,
+        "min_child_samples": 20,
+        "n_estimators": 220,
+        "n_jobs": -1,
+        "num_leaves": 31,
+        "random_state": 42,
+        "subsample": 0.9,
+        "verbosity": -1
+      },
+      "evidence_type": "deterministic_label_free_structural_graph_features",
+      "family_id": "lightgbm_classifier",
+      "feature_view_id": "structural_same_snapshot_only",
+      "fixed_fpr": {
+        "target_fpr": 0.001,
+        "test": {
+          "false_positive_count": 1855,
+          "false_positive_rate": 0.175863,
+          "precision_at_k": 0.077114,
+          "recall_at_review_budget": 0.243711,
+          "requested_review_fraction": null,
+          "review_fraction": 0.179721,
+          "reviewed_count": 2010,
+          "true_positive_count": 155
+        }
+      },
+      "raw_test_pr_auc": 0.058018,
+      "review_budget_fraction": 0.005,
+      "row_status": "competitive",
+      "selection_surface": "validation_pr_auc_within_predeclared_feature_view_before_test_evaluation",
+      "test_evaluation_role": "paired_feature_view_comparison_not_test_driven_model_selection",
+      "test_operating_point": {
+        "false_positive_count": 1855,
+        "false_positive_rate": 0.175863,
+        "precision_at_k": 0.077114,
+        "recall_at_review_budget": 0.243711,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.179721,
+        "reviewed_count": 2010,
+        "true_positive_count": 155
+      },
+      "test_pr_auc": 0.058018,
+      "test_roc_auc": 0.495392,
+      "trial_id": "structural_same_snapshot_only::lightgbm_classifier::10",
+      "validation_pr_auc": 0.226946
+    },
+    {
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "calibration": {
+        "identity_operating_log_loss": 0.071541,
+        "partition_policy": "chronological_validation_calibration_then_operating_subwindows",
+        "platt_operating_log_loss": 0.061613,
+        "selected_method": "platt_sigmoid",
+        "test_used_for_selection": false
+      },
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.9,
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.04,
+        "min_child_samples": 20,
+        "n_estimators": 260,
+        "n_jobs": -1,
+        "num_leaves": 31,
+        "random_state": 42,
+        "subsample": 0.9,
+        "verbosity": -1
+      },
+      "evidence_type": "source_provided_anonymized_feature_snapshot",
+      "family_id": "lightgbm_classifier",
+      "feature_view_id": "source_provided_flattened_features",
+      "fixed_fpr": {
+        "target_fpr": 0.001,
+        "test": {
+          "false_positive_count": 18,
+          "false_positive_rate": 0.001706,
+          "precision_at_k": 0.95288,
+          "recall_at_review_budget": 0.572327,
+          "requested_review_fraction": null,
+          "review_fraction": 0.034156,
+          "reviewed_count": 382,
+          "true_positive_count": 364
+        }
+      },
+      "raw_test_pr_auc": 0.664168,
+      "review_budget_fraction": 0.005,
+      "row_status": "competitive",
+      "selection_surface": "validation_pr_auc_within_predeclared_feature_view_before_test_evaluation",
+      "test_evaluation_role": "paired_feature_view_comparison_not_test_driven_model_selection",
+      "test_operating_point": {
+        "false_positive_count": 0,
+        "false_positive_rate": 0.0,
+        "precision_at_k": 1.0,
+        "recall_at_review_budget": 0.04717,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.002682,
+        "reviewed_count": 30,
+        "true_positive_count": 30
+      },
+      "test_pr_auc": 0.664168,
+      "test_roc_auc": 0.888775,
+      "trial_id": "source_provided_flattened_features::lightgbm_classifier::11",
+      "validation_pr_auc": 0.975675
+    },
+    {
+      "adapter_module": "lightgbm",
+      "adapter_version": "4.6.0",
+      "calibration": {
+        "identity_operating_log_loss": 0.068903,
+        "partition_policy": "chronological_validation_calibration_then_operating_subwindows",
+        "platt_operating_log_loss": 0.059654,
+        "selected_method": "platt_sigmoid",
+        "test_used_for_selection": false
+      },
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.9,
+        "imbalance_fit_surface": "train_labels_only",
+        "learning_rate": 0.04,
+        "min_child_samples": 20,
+        "n_estimators": 260,
+        "n_jobs": -1,
+        "num_leaves": 31,
+        "random_state": 42,
+        "subsample": 0.9,
+        "verbosity": -1
+      },
+      "evidence_type": "source_features_augmented_with_structural_graph_features",
+      "family_id": "lightgbm_classifier",
+      "feature_view_id": "source_features_plus_structural_snapshot",
+      "fixed_fpr": {
+        "target_fpr": 0.001,
+        "test": {
+          "false_positive_count": 19,
+          "false_positive_rate": 0.001801,
+          "precision_at_k": 0.951031,
+          "recall_at_review_budget": 0.580189,
+          "requested_review_fraction": null,
+          "review_fraction": 0.034692,
+          "reviewed_count": 388,
+          "true_positive_count": 369
+        }
+      },
+      "global_validation_selected": true,
+      "raw_test_pr_auc": 0.668756,
+      "review_budget_fraction": 0.005,
+      "row_status": "release-candidate",
+      "selection_surface": "validation_pr_auc_within_predeclared_feature_view_before_test_evaluation",
+      "test_evaluation_role": "paired_feature_view_comparison_not_test_driven_model_selection",
+      "test_operating_point": {
+        "false_positive_count": 0,
+        "false_positive_rate": 0.0,
+        "precision_at_k": 1.0,
+        "recall_at_review_budget": 0.056604,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.003219,
+        "reviewed_count": 36,
+        "true_positive_count": 36
+      },
+      "test_pr_auc": 0.668756,
+      "test_roc_auc": 0.892915,
+      "trial_id": "source_features_plus_structural_snapshot::lightgbm_classifier::12",
+      "validation_pr_auc": 0.976654
+    }
+  ]
+}

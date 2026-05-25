@@ -18,15 +18,16 @@ Those workload families are closer to the user's existing fraud projects and to 
 
 ## Current public support boundary
 
-Today Relaytic's public ingestion contract is still a local single-snapshot file.
+Relaytic's paper path now supports both local transaction snapshots and the raw three-file Elliptic graph bundle.
 
 That means:
 
 - PaySim-style CSV snapshots are in scope now
 - flattened Elliptic-style graph snapshots are in scope now
-- raw multi-file graph bundles such as the full Elliptic triplet should be treated as a future dedicated loader path
+- raw multi-file Elliptic bundles are in scope through provenance, temporal split, and P7 graph-baseline artifacts
+- larger subgraph packs such as Elliptic2 remain blocked until P8 records runnable support or exact blockers
 
-Relaytic-AML must be honest about that boundary. It should not imply that raw graph bundles are first-class if it still expects a flattened local snapshot.
+Relaytic-AML must be honest about that boundary. Raw Elliptic support is now real, but it does not imply Elliptic2-scale subgraph support or graph-neural superiority.
 
 ## Canonical workload tracks
 
@@ -52,7 +53,7 @@ What Relaytic-AML should prove here:
 
 ### 2. Elliptic-style temporal graph AML
 
-Expected flattened shape:
+Expected raw-bundle or flattened shape:
 
 - `src`
 - `dst`
@@ -125,7 +126,7 @@ Supporting a PaySim-like or Elliptic-like dataset shape is not the same as winni
 Before the AML flagship paper/demo pack is considered credible, Relaytic-AML should be able to show:
 
 1. PaySim-like runs work end to end through the current CLI
-2. Elliptic-like flattened graph runs work end to end through the current CLI
+2. Elliptic raw graph provenance and graph-baseline runs work end to end through the current CLI
 3. both workload families materialize AML contracts plus graph/case artifacts
 4. benchmark doctrine for both is explicit and honest
 

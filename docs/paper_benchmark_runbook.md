@@ -28,6 +28,13 @@ Current paper-track baseline artifacts also live under `docs/reports/`:
 - `paysim_competitive_search_trace.json`
 - `paysim_leakage_safe_feature_report.json`
 - `paysim_publishability_gate.json`
+- `paper_graph_baseline_manifest.json`
+- `paper_graph_feature_table.json`
+- `paper_graph_model_shadow_scorecard.json`
+- `paper_graph_baseline_fallback_report.json`
+- `paper_graph_budget_contract.json`
+- `paper_graph_competitive_search_trace.json`
+- `paper_graph_publishability_gate.json`
 
 ## Benchmark Families
 
@@ -82,6 +89,7 @@ relaytic release-safety paysim-benchmark --format json
 relaytic release-safety elliptic-graph --format json
 relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json
 relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json
+relaytic release-safety graph-baselines --budget-tier competitive --run-optional --format json
 relaytic release-safety paper-freeze --format json
 relaytic release-safety scan --format json
 relaytic doctor --expected-profile full --format json
@@ -131,6 +139,13 @@ The release-freeze pack should cite these when available:
 - `paysim_leakage_safe_feature_report.json`
 - `paysim_competitive_baseline_table.json`
 - `paysim_publishability_gate.json`
+- `paper_graph_baseline_manifest.json`
+- `paper_graph_feature_table.json`
+- `paper_graph_model_shadow_scorecard.json`
+- `paper_graph_baseline_fallback_report.json`
+- `paper_graph_budget_contract.json`
+- `paper_graph_competitive_search_trace.json`
+- `paper_graph_publishability_gate.json`
 - `release_safety_scan.json`
 
 ## Blocked-Claim Conditions
@@ -146,6 +161,7 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `aml_benchmark_environment_scorecard.json` reports incomplete reproducibility, claim safety, or benchmark relevance.
 - `paper_publishability_gate.json` blocks a headline performance claim because competitive or release-budget proof has not passed.
 - `paysim_publishability_gate.json` does not admit even a supporting PaySim paper-table candidate, or is cited as permitting real-world/headline AML performance.
+- `paper_graph_publishability_gate.json` is cited as permitting graph-neural, SOTA, headline, or hard AML claims; P7 currently admits only a supporting graph-feature row.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record
