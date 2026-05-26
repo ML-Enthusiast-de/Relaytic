@@ -571,6 +571,17 @@ Current paper-track hard graph decision artifact names from Paper Track P8:
 
 Paper Track P8 extends `src/relaytic/release_safety/` with a local-only decision boundary for hard graph tracks. It may verify seeded AMLSim generated outputs as synthetic `proxy` evidence, but it cannot promote AMLSim to real-world AML evidence. It may detect Elliptic2 source availability, but it must keep Elliptic2 `blocked` until an official-schema loader, subgraph split/overlap audit, resource budget, and license-safe release boundary are proven.
 
+Current paper-track Elliptic2 modern recovery artifact names from Paper Track P8-A:
+
+- `elliptic2_recovery_manifest.json`
+- `elliptic2_schema_overlap_audit.json`
+- `elliptic2_protocol_audit.json`
+- `elliptic2_modern_reference_contract.json`
+- `elliptic2_context_pilot_result.json`
+- `elliptic2_recovery_gate.json`
+
+Paper Track P8-A extends `src/relaytic/release_safety/` with a source-redacted, hash-audited modern benchmark recovery boundary. Official Elliptic2 and RevTrack assets remain external local data; only provenance, aggregate counts, protocol audit, resource-aware derivation evidence, and guarded pilot metrics may be committed. A P8-A `pass_pilot_only` gate proves feasibility but never authorizes a paper-table, SOTA, end-to-end Relaytic, or hard AML claim. Those claims require P8-B competitive and robustness evidence.
+
 Current trace and eval artifact names:
 
 - `trace_model.json`

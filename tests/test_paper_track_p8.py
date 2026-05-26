@@ -91,9 +91,9 @@ def test_paper_track_p8_blocks_missing_hard_sources_with_exact_actions(tmp_path:
     assert "elliptic2_local_source_missing" in access["blocked_reason_codes"]
     assert report["blocked_track_count"] == 2
     assert report["proxy_track_count"] == 0
-    assert report["paper_can_continue_to_p9"] is True
+    assert report["paper_can_continue_to_p9"] is False
     assert report["hard_performance_claims_allowed"] is False
-    assert report["next_slice"] == "Paper Track P9"
+    assert report["next_slice"].startswith("Paper Track P8-B")
 
 
 def test_paper_track_p8_accepts_audited_amlsim_only_as_proxy(tmp_path: Path) -> None:
@@ -151,7 +151,7 @@ def test_paper_track_p8_sync_writes_required_artifacts(tmp_path: Path) -> None:
     assert set(written) == set(PAPER_HARD_GRAPH_FILENAMES)
     assert all(path.exists() for path in written.values())
     report = json.loads((output_dir / "subgraph_benchmark_blocker_report.json").read_text(encoding="utf-8"))
-    assert report["decision_state"] == "hard_tracks_blocked_recorded"
+    assert report["decision_state"] == "hard_tracks_blocked_with_elliptic2_pilot_recovery_recorded"
 
 
 def test_paper_track_p8_cli_exposes_machine_readable_surface(
@@ -180,7 +180,7 @@ def test_paper_track_p8_cli_exposes_machine_readable_surface(
     assert exit_code == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == "ok"
-    assert payload["paper_hard_graph_tracks"]["next_slice"] == "Paper Track P9"
+    assert payload["paper_hard_graph_tracks"]["next_slice"].startswith("Paper Track P8-B")
     assert (output_dir / "elliptic2_subgraph_access_report.json").exists()
 
 
@@ -197,4 +197,6 @@ def test_paper_track_p8_committed_artifacts_keep_absent_hard_tracks_out_of_claim
     assert report["blocked_track_count"] == 2
     assert report["headline_or_sota_claim_allowed"] is False
     assert report["p7_context"]["supporting_graph_table_candidate_allowed"] is True
-    assert report["next_slice"] == "Paper Track P9"
+    assert report["subsequent_elliptic2_recovery"]["status"] == "pass_pilot_only"
+    assert report["paper_can_continue_to_p9"] is False
+    assert report["next_slice"].startswith("Paper Track P8-B")

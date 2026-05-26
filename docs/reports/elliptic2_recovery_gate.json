@@ -1,0 +1,21 @@
+{
+  "allowed_wording": "Relaytic recovered executable Elliptic2 modern-context evidence and completed a strong exploratory pilot on the pinned RevTrack partition; competitive repeated-seed and robustness proof remain required before paper-table or superiority claims.",
+  "blocked_reason_codes": [
+    "official_revtrack_preprocessing_consumed_not_recomputed_by_relaytic",
+    "robustness_partition_not_yet_executed",
+    "single_pilot_configuration_not_release_budget"
+  ],
+  "claim_posture": "modern_context_pilot_only",
+  "hard_aml_claim_allowed": false,
+  "headline_or_sota_claim_allowed": false,
+  "mandatory_next_slice": "Paper Track P8-B - Elliptic2 competitive and robustness suite",
+  "modern_context_pilot_available": true,
+  "modern_reference_assets_ready": true,
+  "official_core_source_ready": true,
+  "p9_blocked_until_p8b_decision": true,
+  "paper_performance_row_allowed": false,
+  "protocol_discrepancy_recorded": true,
+  "schema_version": "relaytic.elliptic2_recovery.v1",
+  "slice": "Paper Track P8-A",
+  "status": "pass_pilot_only"
+}

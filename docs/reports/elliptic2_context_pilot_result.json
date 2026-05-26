@@ -1,0 +1,79 @@
+{
+  "blocked_reason_codes": [
+    "single_pilot_configuration_not_release_budget",
+    "official_revtrack_preprocessing_consumed_not_recomputed_by_relaytic",
+    "robustness_partition_not_yet_executed"
+  ],
+  "claim_scope": "exploratory_modern_context_pilot_not_paper_table",
+  "context_minus_structure_test_pr_auc": 0.907482,
+  "dataset_id": "elliptic2_subgraph_aml",
+  "feature_contract_id": "p8a_revtrack_pooled_context_features_v1",
+  "headline_or_sota_claim_allowed": false,
+  "model_contract": {
+    "class_weight": "balanced",
+    "colsample_bytree": 0.8,
+    "early_stopping_rounds": 75,
+    "family_id": "lightgbm_classifier",
+    "learning_rate": 0.03,
+    "n_estimators": 1200,
+    "num_leaves": 31,
+    "random_seed": 42,
+    "reg_lambda": 1.0,
+    "subsample": 0.9
+  },
+  "paper_table_candidate_allowed": false,
+  "primary_pilot_result": {
+    "best_iteration": 785,
+    "feature_count": 176,
+    "feature_view_id": "context_pooled_official_revtrack_embeddings",
+    "selection_scope": "predeclared_view_with_validation_only_early_stopping",
+    "test_count": 11105,
+    "test_positive_count": 272,
+    "test_pr_auc": 0.935255,
+    "test_roc_auc": 0.996062,
+    "validation_count": 11059,
+    "validation_positive_count": 252,
+    "validation_pr_auc": 0.95244,
+    "validation_roc_auc": 0.995597
+  },
+  "primary_pilot_view_id": "context_pooled_official_revtrack_embeddings",
+  "protocol_id": "p8a_revtrack_official_partition_comparability_v1",
+  "rows": [
+    {
+      "best_iteration": 36,
+      "feature_count": 4,
+      "feature_view_id": "structure_only_revtrack_roles",
+      "selection_scope": "predeclared_view_with_validation_only_early_stopping",
+      "test_count": 11105,
+      "test_positive_count": 272,
+      "test_pr_auc": 0.027773,
+      "test_roc_auc": 0.547518,
+      "validation_count": 11059,
+      "validation_positive_count": 252,
+      "validation_pr_auc": 0.028779,
+      "validation_roc_auc": 0.555123
+    },
+    {
+      "best_iteration": 785,
+      "feature_count": 176,
+      "feature_view_id": "context_pooled_official_revtrack_embeddings",
+      "selection_scope": "predeclared_view_with_validation_only_early_stopping",
+      "test_count": 11105,
+      "test_positive_count": 272,
+      "test_pr_auc": 0.935255,
+      "test_roc_auc": 0.996062,
+      "validation_count": 11059,
+      "validation_positive_count": 252,
+      "validation_pr_auc": 0.95244,
+      "validation_roc_auc": 0.995597
+    }
+  ],
+  "runtime_environment": {
+    "execution_posture": "cpu_bounded_selected_embedding_cache",
+    "python": "3.11.0"
+  },
+  "runtime_seconds": 74.228893,
+  "schema_version": "relaytic.elliptic2_recovery.v1",
+  "slice": "Paper Track P8-A",
+  "status": "pilot_complete"
+}

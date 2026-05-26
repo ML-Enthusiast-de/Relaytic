@@ -1,0 +1,127 @@
+{
+  "asset_checks": [
+    {
+      "exists": true,
+      "filename": "data_df.pkl",
+      "hash_status": "recorded",
+      "path": "<external-local-source>/data_df.pkl",
+      "sha256": "2baa712b67382aeade8d5e72dd07ddbffb1029b359a048c80a2300a3e3abc220",
+      "size_bytes": 22539586
+    },
+    {
+      "exists": true,
+      "filename": "node_idx_map.pt",
+      "hash_status": "recorded",
+      "path": "<external-local-source>/node_idx_map.pt",
+      "sha256": "dbb87889aa4aa90e0da558035cba27b2371590c2228ce4c2cdc708c35f23eddb",
+      "size_bytes": 727152
+    },
+    {
+      "exists": true,
+      "filename": "raw_emb.pt",
+      "hash_status": "recorded",
+      "path": "<external-local-source>/raw_emb.pt",
+      "sha256": "03083aa9ae6133c32979289804e83206f21a7b1db1b8138b432f36a4dc4e0bfa",
+      "size_bytes": 8479577363
+    },
+    {
+      "exists": true,
+      "filename": "selected_emb_numpy.npy",
+      "hash_status": "recorded",
+      "path": "<external-local-source>/selected_emb_numpy.npy",
+      "sha256": "8df91479e87164759c8805ae503260490390004e465eed329369f84d3be5b3b3",
+      "size_bytes": 15608268
+    },
+    {
+      "exists": true,
+      "filename": "selected_emb_provenance.json",
+      "hash_status": "recorded",
+      "path": "<external-local-source>/selected_emb_provenance.json",
+      "sha256": "cfc115fd648f1031b684f4ada2aec8a12901324bb82f4f41f94858440529bfa7",
+      "size_bytes": 432
+    }
+  ],
+  "blocked_reason_codes": [],
+  "claim_scope": "modern_official_reference_execution_input_not_relaytic_superiority",
+  "metric_contract": [
+    "pr_auc",
+    "roc_auc"
+  ],
+  "official_model_targets": [
+    "RevClassify_BP",
+    "RevClassify_DS"
+  ],
+  "partition_summary": {
+    "row_count": 110902,
+    "split_rows": {
+      "TRN": {
+        "positive_count": 2054,
+        "positive_rate": 0.02314679,
+        "row_count": 88738
+      },
+      "TST": {
+        "positive_count": 272,
+        "positive_rate": 0.02449347,
+        "row_count": 11105
+      },
+      "VAL": {
+        "positive_count": 252,
+        "positive_rate": 0.02278687,
+        "row_count": 11059
+      }
+    }
+  },
+  "pilot_allowed": true,
+  "raw_embedding_hash_policy": "sha256_recorded_for_this_recovery_run",
+  "reference_code_url": "https://github.com/MITIBMxGraph/RevTrack",
+  "reference_commit": "f2111c8a1bafd84ebaa5a04e5caca8f1f0ed7ac0",
+  "reference_id": "revtrack_revclassify_icaif_2024",
+  "reference_paper_url": "https://arxiv.org/abs/2410.08394",
+  "reference_title": "Identifying Money Laundering Subgraphs on the Blockchain",
+  "schema_version": "relaytic.elliptic2_recovery.v1",
+  "selected_embedding_cache_derivation": {
+    "algorithm": "read the uncompressed float32 `archive/data/0` tensor payload in `raw_emb.pt` by memory map and select rows from pinned `node_idx_map.pt`",
+    "extraction_report": {
+      "node_idx_sha256": "dbb87889aa4aa90e0da558035cba27b2371590c2228ce4c2cdc708c35f23eddb",
+      "output_filename": "selected_emb_numpy.npy",
+      "output_sha256": "8df91479e87164759c8805ae503260490390004e465eed329369f84d3be5b3b3",
+      "raw_source_size_bytes": 8479577363,
+      "raw_tensor_shape": [
+        49299864,
+        43
+      ],
+      "runtime_seconds": 303.786109,
+      "selected_tensor_shape": [
+        90745,
+        43
+      ],
+      "status": "ok"
+    },
+    "provenance_validation": {
+      "blocked_reason_codes": [],
+      "provenance": {
+        "node_idx_sha256": "dbb87889aa4aa90e0da558035cba27b2371590c2228ce4c2cdc708c35f23eddb",
+        "output_filename": "selected_emb_numpy.npy",
+        "output_sha256": "8df91479e87164759c8805ae503260490390004e465eed329369f84d3be5b3b3",
+        "raw_source_size_bytes": 8479577363,
+        "raw_tensor_shape": [
+          49299864,
+          43
+        ],
+        "runtime_seconds": 303.786109,
+        "selected_tensor_shape": [
+          90745,
+          43
+        ],
+        "status": "ok"
+      },
+      "provenance_filename": "selected_emb_provenance.json",
+      "status": "verified"
+    },
+    "purpose": "CPU/RAM-bounded execution cache; it does not alter official features or labels.",
+    "status": "available"
+  },
+  "slice": "Paper Track P8-A",
+  "source_path": "<external-local-source>/official_repo",
+  "status": "ready_for_context_pilot"
+}

@@ -1283,6 +1283,46 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_elliptic2_recovery = release_safety_sub.add_parser(
+        "elliptic2-recovery",
+        help="Build Paper Track P8-A Elliptic2 modern-reference recovery and context-pilot artifacts.",
+    )
+    release_safety_elliptic2_recovery.add_argument(
+        "--core-data-dir",
+        default=None,
+        help="Optional official labeled-subgraph core directory. Defaults to data/paper_benchmarks/elliptic2.",
+    )
+    release_safety_elliptic2_recovery.add_argument(
+        "--revtrack-dir",
+        default=None,
+        help="Optional official RevTrack checkout directory. Defaults to data/paper_benchmarks/elliptic2_revtrack.",
+    )
+    release_safety_elliptic2_recovery.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P8-A recovery artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_elliptic2_recovery.add_argument(
+        "--prepare-selected-embeddings",
+        action="store_true",
+        help="Build a low-memory selected-node embedding cache from official RevTrack assets before a pilot.",
+    )
+    release_safety_elliptic2_recovery.add_argument(
+        "--run-pilot",
+        action="store_true",
+        help="Run the predeclared modern-context pilot after official assets are verified.",
+    )
+    release_safety_elliptic2_recovery.add_argument(
+        "--hash-large-assets",
+        action="store_true",
+        help="Hash the multi-gigabyte raw embedding source for paper-facing provenance.",
+    )
+    release_safety_elliptic2_recovery.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3277,6 +3317,15 @@ def main(argv: list[str] | None = None) -> int:
                     elliptic2_dir=args.elliptic2_dir,
                     amlsim_dir=args.amlsim_dir,
                     output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "elliptic2-recovery":
+                payload = _run_elliptic2_recovery_surface(
+                    core_data_dir=args.core_data_dir,
+                    revtrack_dir=args.revtrack_dir,
+                    output_dir=args.output_dir,
+                    prepare_selected_embeddings=args.prepare_selected_embeddings,
+                    run_pilot=args.run_pilot,
+                    hash_large_assets=args.hash_large_assets,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -7121,6 +7170,41 @@ def _run_paper_hard_graph_track_surface(
             "bundle": pack,
         },
         "human_output": render_paper_hard_graph_track_markdown(pack),
+    }
+
+
+def _run_elliptic2_recovery_surface(
+    *,
+    core_data_dir: str | None,
+    revtrack_dir: str | None,
+    output_dir: str | None,
+    prepare_selected_embeddings: bool,
+    run_pilot: bool,
+    hash_large_assets: bool,
+) -> dict[str, Any]:
+    from relaytic.release_safety import render_elliptic2_recovery_markdown, sync_elliptic2_recovery_pack
+
+    root = Path.cwd()
+    written = sync_elliptic2_recovery_pack(
+        root,
+        core_data_dir=core_data_dir,
+        revtrack_dir=revtrack_dir,
+        output_dir=output_dir,
+        prepare_selected_embeddings=prepare_selected_embeddings,
+        run_pilot=run_pilot,
+        hash_large_assets=hash_large_assets,
+    )
+    pack = {key: json.loads(path.read_text(encoding="utf-8")) for key, path in written.items()}
+    manifest = dict(pack["elliptic2_recovery_manifest"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "elliptic2_recovery": manifest,
+            "bundle": pack,
+        },
+        "human_output": render_elliptic2_recovery_markdown(pack),
     }
 
 

@@ -1,0 +1,67 @@
+{
+  "background_file_checks": [
+    {
+      "exists": false,
+      "filename": "background_nodes.csv",
+      "hash_status": "not_requested",
+      "path": "<external-local-source>/background_nodes.csv",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "background_edges.csv",
+      "hash_status": "not_requested",
+      "path": "<external-local-source>/background_edges.csv",
+      "sha256": null,
+      "size_bytes": null
+    }
+  ],
+  "blocked_reason_codes": [],
+  "claim_scope": "official_labeled_subgraph_core_audit_and_pilot_only",
+  "cross_component_edge_count": 0,
+  "full_background_model_allowed": false,
+  "label_counts": {
+    "licit": 119047,
+    "suspicious": 2763
+  },
+  "node_membership_row_count": 444521,
+  "nodes_in_multiple_components": 0,
+  "positive_label": "suspicious",
+  "positive_rate": 0.02268287,
+  "required_file_checks": [
+    {
+      "exists": true,
+      "filename": "connected_components.csv",
+      "hash_status": "recorded",
+      "path": "<external-local-source>/connected_components.csv",
+      "sha256": "79511c49f76110d0feae7feda7e85279bc442efe31f5e7a9f53b2caf0019062b",
+      "size_bytes": 1610070
+    },
+    {
+      "exists": true,
+      "filename": "nodes.csv",
+      "hash_status": "recorded",
+      "path": "<external-local-source>/nodes.csv",
+      "sha256": "c39fe3ac90da31b0684ec2c55d52225aa41a8fa1edccff8aff5ae1fd8817de18",
+      "size_bytes": 7470115
+    },
+    {
+      "exists": true,
+      "filename": "edges.csv",
+      "hash_status": "recorded",
+      "path": "<external-local-source>/edges.csv",
+      "sha256": "cd5706110242ddb5505074f65287c45f1ff7dbfb52a0ef1c2e6a45da569e3ad0",
+      "size_bytes": 11356690
+    }
+  ],
+  "schema_failures": {},
+  "schema_version": "relaytic.elliptic2_recovery.v1",
+  "slice": "Paper Track P8-A",
+  "source_path": "<external-local-source>/official_raw_extracted",
+  "status": "core_ready",
+  "subgraph_core_pilot_allowed": true,
+  "subgraph_count": 121810,
+  "subgraph_edge_row_count": 367137,
+  "unknown_edge_endpoint_count": 0
+}

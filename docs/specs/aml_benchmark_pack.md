@@ -25,7 +25,7 @@ That means:
 - PaySim-style CSV snapshots are in scope now
 - flattened Elliptic-style graph snapshots are in scope now
 - raw multi-file Elliptic bundles are in scope through provenance, temporal split, and P7 graph-baseline artifacts
-- P8 records larger subgraph packs such as Elliptic2 as blocked until local acquisition plus official-loader, split/overlap, resource-budget, and license-safe release proof exist
+- P8 initially recorded Elliptic2 as blocked, and P8-A now recovers its official labeled core plus pinned RevTrack modern-reference assets into a hash-audited pilot path; paper-table promotion remains blocked until P8-B competitive and robustness proof
 - P8 records AMLSim as blocked until a seeded generated bundle, generator revision, output hashes, generated-data license, and typology audit exist; once verified it remains synthetic `proxy` evidence only
 
 Relaytic-AML must be honest about that boundary. Raw Elliptic support is now real, but it does not imply Elliptic2-scale subgraph support or graph-neural superiority.
@@ -74,7 +74,7 @@ What Relaytic-AML should prove here:
 
 This is the harder public-proof track.
 
-P8 identifies it as the highest-upside scientific breadth recovery. It should be used only after Relaytic-AML can support official-schema subgraph packaging, overlap-safe splits, a feasible execution budget, and claim gates.
+P8-A confirms it as the highest-upside scientific breadth recovery: official core audit and a RevTrack-context pilot are now executable. The modern evidence path must still pass repeated-seed, validation-only competitive, and split-robust P8-B gates before publication.
 
 ### 4. AMLSim-style synthetic bank-transaction graph
 

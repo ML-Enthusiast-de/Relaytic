@@ -319,6 +319,13 @@ Avoid introducing new references to:
 - introduced paper-track hard-graph decision artifacts under `docs/reports/`: `amlsim_generation_manifest.json`, `amlsim_typology_manifest.json`, `elliptic2_subgraph_access_report.json`, and `subgraph_benchmark_blocker_report.json`
 - recorded both current hard tracks as blocked: AMLSim lacks an audited generated proxy bundle, and Elliptic2 lacks local source plus official-loader, overlap/split, and resource proof; neither can be used for paper performance or SOTA claims
 
+### Paper Track P8-A
+
+- introduced `src/relaytic/release_safety/elliptic2_recovery.py` under the existing release-safety boundary for official Elliptic2 labeled-core audit, RevTrack/RevClassify source pinning, low-memory selected-embedding derivation, protocol-discrepancy reporting, and an exploratory context pilot
+- introduced the public command `relaytic release-safety elliptic2-recovery` for regenerating P8-A artifacts against external local official sources without committing raw assets or revealing machine paths
+- introduced paper-track modern graph recovery artifacts under `docs/reports/`: `elliptic2_recovery_manifest.json`, `elliptic2_schema_overlap_audit.json`, `elliptic2_protocol_audit.json`, `elliptic2_modern_reference_contract.json`, `elliptic2_context_pilot_result.json`, and `elliptic2_recovery_gate.json`
+- recovered Elliptic2 from source-blocked to pilot-ready with official labeled-core audit and a strong context pilot (`test_pr_auc=0.935255`), while keeping public paper/SOTA claims blocked until P8-B performs competitive, repeated-seed, and split-robust proof
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
@@ -725,6 +732,12 @@ Implemented release-safety artifact names:
 - `amlsim_typology_manifest.json`
 - `elliptic2_subgraph_access_report.json`
 - `subgraph_benchmark_blocker_report.json`
+- `elliptic2_recovery_manifest.json`
+- `elliptic2_schema_overlap_audit.json`
+- `elliptic2_protocol_audit.json`
+- `elliptic2_modern_reference_contract.json`
+- `elliptic2_context_pilot_result.json`
+- `elliptic2_recovery_gate.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

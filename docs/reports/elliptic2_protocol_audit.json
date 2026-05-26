@@ -1,0 +1,38 @@
+{
+  "claim_rule": "A single official-partition pilot may establish feasibility, but modern paper claims require P8-B competitive and robustness proof.",
+  "modern_reference": {
+    "metrics": [
+      "pr_auc",
+      "roc_auc"
+    ],
+    "partition_state": "pinned_official_TRN_VAL_TST_available",
+    "reference_commit": "f2111c8a1bafd84ebaa5a04e5caca8f1f0ed7ac0",
+    "reference_id": "revtrack_revclassify_icaif_2024"
+  },
+  "original_elliptic2_reference": {
+    "audit_finding": "paper prose and public preprocessing code do not define the same split construction; direct comparison must identify which protocol is reproduced.",
+    "observed_public_preprocessor_split": "subgraph insertion-order modulo-10 assignment in `preprocess_glass.py`",
+    "official_guide_commit": "370f62655e60af63b8fdc0b95bb2191a5f19c9e8",
+    "official_guide_url": "https://github.com/MITIBMxGraph/Elliptic2",
+    "paper_url": "https://arxiv.org/abs/2404.19109",
+    "reported_paper_split": "random 80:10:10 train/validation/test partition"
+  },
+  "publication_protocols_required": [
+    {
+      "protocol_id": "p8a_revtrack_official_partition_comparability_v1",
+      "role": "modern reference comparability",
+      "selection_rule": "model configuration and early stopping selected on validation only; test evaluated after selection",
+      "split": "official RevTrack `TRN`/`VAL`/`TST` labels from pinned preprocessed artifact"
+    },
+    {
+      "protocol_id": "p8b_label_stratified_hash_robustness_v1",
+      "role": "Relaytic robustness check independent of original row order",
+      "selection_rule": "all budget and HPO decisions validation-only; report repeated-seed uncertainty",
+      "split": "predeclared label-stratified deterministic hash split with frozen seeds and overlap audit"
+    }
+  ],
+  "schema_version": "relaytic.elliptic2_recovery.v1",
+  "slice": "Paper Track P8-A",
+  "source_core_ready": true,
+  "status": "protocol_recovery_required_and_frozen"
+}

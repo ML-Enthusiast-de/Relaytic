@@ -268,6 +268,8 @@ Stable slice numbering stays the same, but the preferred execution order after S
 67A. Paper Track P6-A - PaySim competitive rerun and publishability gate
 68. Paper Track P7 - graph baseline suite
 69. Paper Track P8 - AMLSim and Elliptic2 blocked-or-supported track
+69A. Paper Track P8-A - Elliptic2 modern-benchmark recovery pilot
+69B. Paper Track P8-B - Elliptic2 competitive and robustness suite
 70. Paper Track P9 - operational AML evaluation layer
 71. Paper Track P10 - reproducible paper table generator
 72. Paper Track P11 - paper draft and figure pack
@@ -363,8 +365,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P8. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, and Paper Track P8 hard graph-track decision reports.
-- next execution target: Paper Track P9
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P8-A. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, and Paper Track P8-A Elliptic2 modern recovery pilot.
+- next execution target: Paper Track P8-B
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -373,7 +375,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P9 through P13 prove operational breadth, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P8-B through P13 prove modern graph competitiveness, operational breadth, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3882,7 +3884,63 @@ Implemented by:
 - adding `docs/reports/elliptic2_subgraph_access_report.json`
 - adding `docs/reports/subgraph_benchmark_blocker_report.json`
 
-P8 records both hard tracks as `blocked` in the current local state. Elliptic2 has no local source bundle and still requires an official-schema loader, subgraph overlap/split audit, accepted resource budget, and license-safe release boundary. AMLSim has no seeded generated bundle, generator revision, output-hash manifest, generated-data license, or typology audit. Consequently neither track can contribute a performance row, graph SOTA claim, or hard AML claim. P9 may proceed with operational evaluation, but before P10 tables the paper should make an explicit decision on a bounded Elliptic2 acquisition/pilot recovery because that track has the greatest scientific upside; AMLSim is useful only as a reproducible synthetic proxy.
+P8 recorded both hard tracks as `blocked` in the then-current local state. AMLSim remains blocked pending a reproducible synthetic proxy audit. Elliptic2's access decision is now superseded by P8-A recovery evidence; because the paper must be modern, P9 does not proceed until P8-B determines whether that recovered context result survives competitive and robustness proof.
+
+### Paper Track P8-A - Elliptic2 modern-benchmark recovery pilot
+
+Goal:
+- remove the practical Elliptic2 access/execution block and determine whether a modern context-aware result is viable on this machine
+
+Load-bearing improvement:
+- Relaytic no longer treats the hardest relevant graph track as hypothetical; it verifies official source material, pins the modern RevTrack/RevClassify reference, audits protocol discrepancies, and runs one carefully bounded feasibility pilot
+
+Required outputs:
+- `elliptic2_recovery_manifest.json`
+- `elliptic2_schema_overlap_audit.json`
+- `elliptic2_protocol_audit.json`
+- `elliptic2_modern_reference_contract.json`
+- `elliptic2_context_pilot_result.json`
+- `elliptic2_recovery_gate.json`
+
+Minimum proof:
+- official Elliptic2 labeled-subgraph core is hash-recorded and schema/overlap audited without committing raw source files
+- official RevTrack assets and a CPU-bounded selected-embedding derivation are hash-recorded with a provenance sidecar
+- the original Elliptic2 paper/code split discrepancy is visible and cannot be silently mistaken for a clean comparable protocol
+- a pilot result is labelled exploratory and cannot become a paper row, headline, SOTA, or hard AML claim
+
+Implemented by:
+- adding `src/relaytic/release_safety/elliptic2_recovery.py`
+- adding `relaytic release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --prepare-selected-embeddings --run-pilot --hash-large-assets --format json`
+- adding `tests/test_paper_track_p8a.py`
+- adding all six P8-A reports under `docs/reports/`
+
+P8-A downloads the public official labeled-subgraph core outside git, audits `121810` subgraphs (`2763` suspicious), `444521` node memberships, and `367137` in-subgraph edges with no detected membership overlap or cross-component edge. It pins RevTrack/RevClassify as the modern reference, records its official `TRN`/`VAL`/`TST` partition, and exposes the mismatch between the original Elliptic2 paper's stated random split and the public preprocessing code's insertion-order modulo split. On CPU-only local hardware, P8-A verifies a low-memory derivation from the official `49299864 x 43` raw embedding tensor to the `90745 x 43` used-node cache, then runs a predeclared LightGBM pilot over pooled official RevTrack embeddings. The structural-only view reports test `PR-AUC=0.027773`, while the context view reports validation `PR-AUC=0.952440` and fixed test `PR-AUC=0.935255`. This establishes feasibility, not publishability: P8-B remains mandatory.
+
+### Paper Track P8-B - Elliptic2 competitive and robustness suite
+
+Goal:
+- turn the promising modern-context pilot into defensible paper evidence or explicitly reject it
+
+Load-bearing improvement:
+- Relaytic tests modern subgraph evidence against the actual frontier reference and against split fragility rather than accepting one attractive pilot row
+
+Required outputs:
+- `elliptic2_competitive_budget_contract.json`
+- `elliptic2_revclassify_reference_scorecard.json`
+- `elliptic2_relaytic_candidate_search_trace.json`
+- `elliptic2_repeated_seed_scorecard.json`
+- `elliptic2_split_robustness_report.json`
+- `elliptic2_publishability_gate.json`
+
+Minimum proof:
+- run or rigorously document the official RevClassify BP/DS comparison path and its dependency/resource posture
+- freeze a validation-only competitive budget for Relaytic candidates over official RevTrack context features
+- report repeated-seed mean, dispersion, and failure cases for promoted candidates
+- evaluate both the pinned official RevTrack partition and a predeclared deterministic robustness partition independent of row-order artifacts
+- allow a paper row only when performance survives the gate; never imply end-to-end Relaytic superiority while consuming official RevTrack preprocessing unless that boundary is explicit
+
+Fallback rule:
+- if P8-B cannot promote the pilot, the paper must state that modern Elliptic2 execution was recovered but not sufficiently robust for a competitive claim; P9 and paper assembly remain blocked until that claim posture is accepted deliberately
 
 ### Paper Track P9 - Operational AML evaluation layer
 

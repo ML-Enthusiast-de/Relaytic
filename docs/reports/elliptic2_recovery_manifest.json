@@ -1,0 +1,29 @@
+{
+  "claim_posture": "modern_context_pilot_only",
+  "command_template": "relaytic release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --run-pilot --hash-large-assets --format json",
+  "core_source_state": "core_ready",
+  "dataset_id": "elliptic2_subgraph_aml",
+  "evidence_refs": {
+    "elliptic2_context_pilot_result": "docs/reports/elliptic2_context_pilot_result.json",
+    "elliptic2_modern_reference_contract": "docs/reports/elliptic2_modern_reference_contract.json",
+    "elliptic2_protocol_audit": "docs/reports/elliptic2_protocol_audit.json",
+    "elliptic2_recovery_gate": "docs/reports/elliptic2_recovery_gate.json",
+    "elliptic2_schema_overlap_audit": "docs/reports/elliptic2_schema_overlap_audit.json"
+  },
+  "headline_or_sota_claim_allowed": false,
+  "mandatory_next_slice": "Paper Track P8-B - Elliptic2 competitive and robustness suite",
+  "modern_reference_family": "RevClassify and RevTrack",
+  "modern_reference_state": "ready_for_context_pilot",
+  "output_files": {
+    "elliptic2_context_pilot_result": "elliptic2_context_pilot_result.json",
+    "elliptic2_modern_reference_contract": "elliptic2_modern_reference_contract.json",
+    "elliptic2_protocol_audit": "elliptic2_protocol_audit.json",
+    "elliptic2_recovery_gate": "elliptic2_recovery_gate.json",
+    "elliptic2_recovery_manifest": "elliptic2_recovery_manifest.json",
+    "elliptic2_schema_overlap_audit": "elliptic2_schema_overlap_audit.json"
+  },
+  "pilot_state": "pilot_complete",
+  "schema_version": "relaytic.elliptic2_recovery.v1",
+  "slice": "Paper Track P8-A",
+  "status": "pass_pilot_only"
+}

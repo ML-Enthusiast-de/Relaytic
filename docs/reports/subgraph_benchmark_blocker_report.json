@@ -1,10 +1,10 @@
 {
   "blocked_track_count": 2,
   "command": "relaytic release-safety hard-graph-tracks --format json",
-  "decision_state": "hard_tracks_blocked_recorded",
+  "decision_state": "hard_tracks_blocked_with_elliptic2_pilot_recovery_recorded",
   "hard_performance_claims_allowed": false,
   "headline_or_sota_claim_allowed": false,
-  "next_slice": "Paper Track P9",
+  "next_slice": "Paper Track P8-B - Elliptic2 competitive and robustness suite",
   "p7_context": {
     "graph_neural_claim_allowed": false,
     "graph_shadow_test_pr_auc": 0.388907,
@@ -12,17 +12,23 @@
     "selected_graph_test_pr_auc": 0.668756,
     "supporting_graph_table_candidate_allowed": true
   },
-  "paper_can_continue_to_p9": true,
-  "paper_limitation_text": "Elliptic2 and AMLSim were evaluated as candidate hard tracks but excluded from first-paper performance claims pending, respectively, validated subgraph execution proof and reproducible synthetic-generation proof.",
+  "paper_can_continue_to_p9": false,
+  "paper_limitation_text": "Elliptic2 access was repaired to exploratory modern-context pilot evidence in P8-A, but paper performance claims remain excluded pending competitive and robustness proof; AMLSim remains excluded pending reproducible synthetic-generation proof.",
   "paper_strategy_recommendation": [
-    "Continue to P9 operational evaluation without presenting either hard track as implemented evidence.",
-    "Before final result tables, choose a bounded Elliptic2 acquisition and pilot slice if resources permit; it offers the strongest scientific breadth upside.",
-    "Use AMLSim only as seeded synthetic typology and operations evidence after its proxy audit passes; it cannot replace a real subgraph benchmark."
+    "Do not proceed to P9 paper assembly before P8-B tests the recovered Elliptic2 context pilot competitively and under a robustness split.",
+    "Treat P8-A as strong feasibility evidence only: its official RevTrack preprocessing dependency and single pilot configuration still block superiority claims.",
+    "Use AMLSim only as seeded synthetic typology and operations evidence after its proxy audit passes; it cannot replace real subgraph evidence."
   ],
   "proxy_track_count": 0,
   "schema_version": "relaytic.paper_hard_graph_track_decision.v1",
   "slice": "Paper Track P8",
   "status": "ok",
+  "subsequent_elliptic2_recovery": {
+    "artifact_ref": "docs/reports/elliptic2_recovery_gate.json",
+    "claim_posture": "modern_context_pilot_only",
+    "interpretation": "P8-A supersedes the Elliptic2 access blocker only to pilot-only evidence; it does not permit paper performance or superiority claims.",
+    "status": "pass_pilot_only"
+  },
   "supported_track_count": 0,
   "track_decisions": [
     {

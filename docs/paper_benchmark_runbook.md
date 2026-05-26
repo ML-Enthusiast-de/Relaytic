@@ -39,6 +39,12 @@ Current paper-track baseline artifacts also live under `docs/reports/`:
 - `amlsim_typology_manifest.json`
 - `elliptic2_subgraph_access_report.json`
 - `subgraph_benchmark_blocker_report.json`
+- `elliptic2_recovery_manifest.json`
+- `elliptic2_schema_overlap_audit.json`
+- `elliptic2_protocol_audit.json`
+- `elliptic2_modern_reference_contract.json`
+- `elliptic2_context_pilot_result.json`
+- `elliptic2_recovery_gate.json`
 
 ## Benchmark Families
 
@@ -95,6 +101,7 @@ relaytic release-safety tabular-baselines --budget-tier baseline --run-optional 
 relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json
 relaytic release-safety graph-baselines --budget-tier competitive --run-optional --format json
 relaytic release-safety hard-graph-tracks --format json
+relaytic release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --prepare-selected-embeddings --run-pilot --hash-large-assets --format json
 relaytic release-safety paper-freeze --format json
 relaytic release-safety scan --format json
 relaytic doctor --expected-profile full --format json
@@ -155,6 +162,12 @@ The release-freeze pack should cite these when available:
 - `amlsim_typology_manifest.json`
 - `elliptic2_subgraph_access_report.json`
 - `subgraph_benchmark_blocker_report.json`
+- `elliptic2_recovery_manifest.json`
+- `elliptic2_schema_overlap_audit.json`
+- `elliptic2_protocol_audit.json`
+- `elliptic2_modern_reference_contract.json`
+- `elliptic2_context_pilot_result.json`
+- `elliptic2_recovery_gate.json`
 - `release_safety_scan.json`
 
 ## Blocked-Claim Conditions
@@ -171,7 +184,8 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `paper_publishability_gate.json` blocks a headline performance claim because competitive or release-budget proof has not passed.
 - `paysim_publishability_gate.json` does not admit even a supporting PaySim paper-table candidate, or is cited as permitting real-world/headline AML performance.
 - `paper_graph_publishability_gate.json` is cited as permitting graph-neural, SOTA, headline, or hard AML claims; P7 currently admits only a supporting graph-feature row.
-- `subgraph_benchmark_blocker_report.json` labels Elliptic2 or AMLSim `blocked`; P8 currently blocks both from performance rows and hard graph claims.
+- `subgraph_benchmark_blocker_report.json` labels Elliptic2 or AMLSim `blocked` without a later recovery artifact; P8-A now supersedes Elliptic2's access blocker only to `modern_context_pilot_only`, while AMLSim remains blocked.
+- `elliptic2_recovery_gate.json` is only `pass_pilot_only`; P8-A recovers a strong modern-context feasibility result but blocks paper-table, headline, SOTA, and hard AML claims until the P8-B competitive and robustness suite passes.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record

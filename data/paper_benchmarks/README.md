@@ -17,4 +17,12 @@ Optional hard-track layouts evaluated by Paper Track P8:
 
 Run `relaytic release-safety hard-graph-tracks --format json` to record whether these tracks are usable, proxy-only, or blocked. Source presence alone does not make Elliptic2 a supported benchmark, and AMLSim remains synthetic proxy evidence even after reproducible generation.
 
+P8-A modern Elliptic2 recovery may point at external local storage instead of placing large assets under this repository:
+
+- official labeled core: `connected_components.csv`, `nodes.csv`, `edges.csv`
+- official RevTrack checkout: `data/elliptic/raw/data_df.pkl`, `node_idx_map.pt`, `raw_emb.pt`
+- Relaytic-derived local cache beside RevTrack data: `selected_emb_numpy.npy`, `selected_emb_provenance.json`
+
+Use `relaytic release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --prepare-selected-embeddings --run-pilot --hash-large-assets --format json`. Committed reports redact machine locations and retain only source hashes, aggregates, protocol findings, and guarded metrics.
+
 Use `docs/reports/paper_dataset_access_manifest.json` for source URLs, license posture, and setup notes.

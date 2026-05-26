@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P8 implemented. P9 through P13 planned.
+P0 through P8-A implemented. P8-B through P13 planned.
 
 ## Intent
 
@@ -46,15 +46,19 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Compare flattened tabular, structural graph-feature, and optional graph-model baselines without conflating their claims.
 10. **P8 - AMLSim and Elliptic2 blocked-or-supported track** - implemented
    Decide whether synthetic-bank and subgraph AML tracks are runnable for the first paper or explicitly blocked with exact reasons.
-11. **P9 - Operational AML evaluation layer**
+11. **P8-A - Elliptic2 modern-benchmark recovery pilot** - implemented
+   Acquire and audit official Elliptic2/RevTrack evidence outside git, freeze protocol discrepancies, and run a strictly exploratory modern-context pilot.
+12. **P8-B - Elliptic2 competitive and robustness suite**
+   Challenge the recovered pilot against RevClassify, repeated seeds, validation-only search, and a row-order-independent robustness split before paper promotion.
+13. **P9 - Operational AML evaluation layer**
     Add review-budget, analyst-hour, false-positive reduction, case-packet completeness, and operational claim guards to paper rows.
-12. **P10 - Reproducible paper table generator**
+14. **P10 - Reproducible paper table generator**
     Generate all paper tables from run artifacts, not hand-maintained numbers.
-13. **P11 - Paper draft and figure pack**
+15. **P11 - Paper draft and figure pack**
     Draft the arXiv paper and generate figures from artifacts or clearly mark schematic figures.
-14. **P12 - External dry run and clean-clone proof**
+16. **P12 - External dry run and clean-clone proof**
     Reproduce the install, paper-smoke benchmark, table generation, claim lint, and leak scan from a clean clone.
-15. **P13 - arXiv release and attention pack**
+17. **P13 - arXiv release and attention pack**
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
 
 ## Non-Negotiable Gates
@@ -207,10 +211,24 @@ P8 added:
 - `relaytic release-safety hard-graph-tracks --format json`
 - `tests/test_paper_track_p8.py`
 
-P8 records both current hard graph tracks as blocked from performance claims. Elliptic2 is the most valuable scientific breadth recovery, but requires local acquisition plus official-loader, split/overlap, resource-budget, and license proof. AMLSim can become a reproducible synthetic typology and workflow proxy after seeded generation and hash audits; it cannot replace real subgraph evidence. P9 can proceed, while a bounded Elliptic2 pilot decision must be made before final paper tables.
+P8 recorded both current hard graph tracks as blocked from performance claims. AMLSim remains a future reproducible synthetic typology/workflow proxy; it cannot replace real subgraph evidence. P8-A now supersedes Elliptic2's access-blocked state, so P9 no longer proceeds before modern graph recovery is tested competitively.
+
+P8-A added:
+
+- `docs/reports/elliptic2_recovery_manifest.json`
+- `docs/reports/elliptic2_schema_overlap_audit.json`
+- `docs/reports/elliptic2_protocol_audit.json`
+- `docs/reports/elliptic2_modern_reference_contract.json`
+- `docs/reports/elliptic2_context_pilot_result.json`
+- `docs/reports/elliptic2_recovery_gate.json`
+- `src/relaytic/release_safety/elliptic2_recovery.py`
+- `relaytic release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --prepare-selected-embeddings --run-pilot --hash-large-assets --format json`
+- `tests/test_paper_track_p8a.py`
+
+P8-A audits the official labeled Elliptic2 core over 121,810 subgraphs and pins the ICAIF 2024 RevTrack/RevClassify reference. It records a nontrivial comparability issue: the original paper states a random `80:10:10` split while its public preprocessor assigns subgraphs by insertion-order modulo. After deriving a CPU-bounded, hash-audited selected-node cache from official RevTrack embeddings, the predeclared context pilot reports test `PR-AUC=0.935255`, versus `0.027773` for structure-only role counts. This is promising modern evidence, not yet a publishable Relaytic result, because it consumes official RevTrack preprocessing and has not passed repeated-seed or alternate-split proof.
 
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P9**.
+The next implementation target is **Paper Track P8-B**.
 
-P9 should make operational AML evidence measurable through review-budget curves, false-positive reduction, case-packet completeness, and guarded analyst-value assumptions while retaining P8's blocked hard-track boundary.
+P8-B must run competitive and repeated-seed modern-context comparisons, measure the official RevClassify path, and execute an independent robustness split before any Elliptic2 row reaches the paper or P9 resumes.
