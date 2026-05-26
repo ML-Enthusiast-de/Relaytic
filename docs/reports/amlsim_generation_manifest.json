@@ -1,0 +1,96 @@
+{
+  "blocked_reason_codes": [
+    "amlsim_local_generated_bundle_missing",
+    "amlsim_generator_commit_not_frozen",
+    "amlsim_seed_manifest_not_frozen"
+  ],
+  "blockers": [
+    {
+      "code": "amlsim_local_generated_bundle_missing",
+      "next_action": "Generate a frozen AMLSim bundle locally with one declared configuration and temporal split contract.",
+      "reason": "Generated AMLSim files are not locally present and cannot support a paper run."
+    },
+    {
+      "code": "amlsim_generator_commit_not_frozen",
+      "next_action": "Write the exact generator commit to `generator_commit.txt` beside generated files.",
+      "reason": "The AMLSim generator revision has not been recorded."
+    },
+    {
+      "code": "amlsim_seed_manifest_not_frozen",
+      "next_action": "Create `generated_dataset_manifest.json` with generator commit, seed, data license, config hash, and output hashes.",
+      "reason": "No generated dataset manifest records the random seed, license posture, and output hashes."
+    }
+  ],
+  "claim_id": "claim_subgraph_or_synthetic_bank_graph",
+  "dataset_id": "amlsim_synthetic_bank_graph",
+  "generated_data_license": null,
+  "generator_commit": null,
+  "hard_aml_claim_allowed": false,
+  "local_generated_bundle_present": false,
+  "next_action": "Generate a seeded AMLSim bundle and freeze commit, configuration, output hashes, typologies, and generated-data license.",
+  "optional_file_checks": [
+    {
+      "exists": false,
+      "filename": "generator_commit.txt",
+      "path": "data/paper_benchmarks/amlsim/generator_commit.txt",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "generated_dataset_manifest.json",
+      "path": "data/paper_benchmarks/amlsim/generated_dataset_manifest.json",
+      "sha256": null,
+      "size_bytes": null
+    }
+  ],
+  "paper_role": "excluded_pending_reproducible_generation",
+  "public_performance_claim_allowed": false,
+  "random_seed": null,
+  "random_seeds": null,
+  "registry_paper_claim_posture": "blocked",
+  "reproducibility_validation_errors": [],
+  "required_audits": [
+    "generator_commit",
+    "config_hash",
+    "seed_manifest",
+    "typology_distribution"
+  ],
+  "required_file_checks": [
+    {
+      "exists": false,
+      "filename": "conf.json",
+      "path": "data/paper_benchmarks/amlsim/conf.json",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "tx_log.csv",
+      "path": "data/paper_benchmarks/amlsim/tx_log.csv",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "alert_transactions.csv",
+      "path": "data/paper_benchmarks/amlsim/alert_transactions.csv",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "sar_accounts.csv",
+      "path": "data/paper_benchmarks/amlsim/sar_accounts.csv",
+      "sha256": null,
+      "size_bytes": null
+    }
+  ],
+  "schema_version": "relaytic.paper_hard_graph_track_decision.v1",
+  "slice": "Paper Track P8",
+  "source_path": "data/paper_benchmarks/amlsim",
+  "source_posture": "generator_not_static_dataset",
+  "split_contract_id": "split_amlsim_seeded_temporal_v1",
+  "status": "blocked",
+  "support_level": "blocked"
+}

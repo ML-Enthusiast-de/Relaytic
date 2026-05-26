@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P7 implemented. P8 through P13 planned.
+P0 through P8 implemented. P9 through P13 planned.
 
 ## Intent
 
@@ -44,7 +44,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Rerun PaySim under a paper-grade competitive budget before any PaySim metric can enter a headline table.
 9. **P7 - Graph baseline suite** - implemented
    Compare flattened tabular, structural graph-feature, and optional graph-model baselines without conflating their claims.
-10. **P8 - AMLSim and Elliptic2 blocked-or-supported track**
+10. **P8 - AMLSim and Elliptic2 blocked-or-supported track** - implemented
    Decide whether synthetic-bank and subgraph AML tracks are runnable for the first paper or explicitly blocked with exact reasons.
 11. **P9 - Operational AML evaluation layer**
     Add review-budget, analyst-hour, false-positive reduction, case-packet completeness, and operational claim guards to paper rows.
@@ -197,8 +197,20 @@ P7 added:
 
 P7 verifies that all raw Elliptic edges are same-time-step observable, runs a competitive paired feature-view evaluation without test-driven selection, and selects LightGBM over source features plus label-free structural snapshot features (`validation_pr_auc=0.976654`, `test_pr_auc=0.668756`). The paired source-feature-only row reports `test_pr_auc=0.664168`, so the measured structural lift is modest (`+0.004588`). PyG GraphSAGE runs shadow-only and reports weaker test `PR-AUC=0.388907`; it remains failure-analysis evidence until recovery and repeated-seed proof exist. The selected graph-feature row is supporting-only; graph-neural, SOTA, headline, paper-primary, and hard AML claims remain blocked.
 
+P8 added:
+
+- `docs/reports/amlsim_generation_manifest.json`
+- `docs/reports/amlsim_typology_manifest.json`
+- `docs/reports/elliptic2_subgraph_access_report.json`
+- `docs/reports/subgraph_benchmark_blocker_report.json`
+- `src/relaytic/release_safety/hard_graph_tracks.py`
+- `relaytic release-safety hard-graph-tracks --format json`
+- `tests/test_paper_track_p8.py`
+
+P8 records both current hard graph tracks as blocked from performance claims. Elliptic2 is the most valuable scientific breadth recovery, but requires local acquisition plus official-loader, split/overlap, resource-budget, and license proof. AMLSim can become a reproducible synthetic typology and workflow proxy after seeded generation and hash audits; it cannot replace real subgraph evidence. P9 can proceed, while a bounded Elliptic2 pilot decision must be made before final paper tables.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P8**.
+The next implementation target is **Paper Track P9**.
 
-P8 should decide whether AMLSim and Elliptic2 can enter the first paper with runnable, reproducible evidence or must remain explicit limitations. It must also preserve P7's finding that the current graph-neural shadow is not competitive rather than silently promoting it.
+P9 should make operational AML evidence measurable through review-budget curves, false-positive reduction, case-packet completeness, and guarded analyst-value assumptions while retaining P8's blocked hard-track boundary.

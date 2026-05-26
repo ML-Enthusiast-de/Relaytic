@@ -35,6 +35,10 @@ Current paper-track baseline artifacts also live under `docs/reports/`:
 - `paper_graph_budget_contract.json`
 - `paper_graph_competitive_search_trace.json`
 - `paper_graph_publishability_gate.json`
+- `amlsim_generation_manifest.json`
+- `amlsim_typology_manifest.json`
+- `elliptic2_subgraph_access_report.json`
+- `subgraph_benchmark_blocker_report.json`
 
 ## Benchmark Families
 
@@ -90,6 +94,7 @@ relaytic release-safety elliptic-graph --format json
 relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json
 relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json
 relaytic release-safety graph-baselines --budget-tier competitive --run-optional --format json
+relaytic release-safety hard-graph-tracks --format json
 relaytic release-safety paper-freeze --format json
 relaytic release-safety scan --format json
 relaytic doctor --expected-profile full --format json
@@ -146,6 +151,10 @@ The release-freeze pack should cite these when available:
 - `paper_graph_budget_contract.json`
 - `paper_graph_competitive_search_trace.json`
 - `paper_graph_publishability_gate.json`
+- `amlsim_generation_manifest.json`
+- `amlsim_typology_manifest.json`
+- `elliptic2_subgraph_access_report.json`
+- `subgraph_benchmark_blocker_report.json`
 - `release_safety_scan.json`
 
 ## Blocked-Claim Conditions
@@ -162,6 +171,7 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `paper_publishability_gate.json` blocks a headline performance claim because competitive or release-budget proof has not passed.
 - `paysim_publishability_gate.json` does not admit even a supporting PaySim paper-table candidate, or is cited as permitting real-world/headline AML performance.
 - `paper_graph_publishability_gate.json` is cited as permitting graph-neural, SOTA, headline, or hard AML claims; P7 currently admits only a supporting graph-feature row.
+- `subgraph_benchmark_blocker_report.json` labels Elliptic2 or AMLSim `blocked`; P8 currently blocks both from performance rows and hard graph claims.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record

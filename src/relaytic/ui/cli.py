@@ -1258,6 +1258,31 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_hard_graph = release_safety_sub.add_parser(
+        "hard-graph-tracks",
+        help="Build Paper Track P8 AMLSim and Elliptic2 supported-or-blocked decision artifacts.",
+    )
+    release_safety_hard_graph.add_argument(
+        "--elliptic2-dir",
+        default=None,
+        help="Optional Elliptic2 source directory. Defaults to data/paper_benchmarks/elliptic2.",
+    )
+    release_safety_hard_graph.add_argument(
+        "--amlsim-dir",
+        default=None,
+        help="Optional generated AMLSim directory. Defaults to data/paper_benchmarks/amlsim.",
+    )
+    release_safety_hard_graph.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P8 hard-track artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_hard_graph.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3246,6 +3271,12 @@ def main(argv: list[str] | None = None) -> int:
                     output_dir=args.output_dir,
                     budget_tier=args.budget_tier,
                     run_optional=args.run_optional,
+                )
+            elif args.release_safety_command == "hard-graph-tracks":
+                payload = _run_paper_hard_graph_track_surface(
+                    elliptic2_dir=args.elliptic2_dir,
+                    amlsim_dir=args.amlsim_dir,
+                    output_dir=args.output_dir,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -7055,6 +7086,41 @@ def _run_paper_graph_baseline_surface(
             "bundle": pack,
         },
         "human_output": render_paper_graph_baseline_markdown(pack),
+    }
+
+
+def _run_paper_hard_graph_track_surface(
+    *,
+    elliptic2_dir: str | None,
+    amlsim_dir: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_hard_graph_track_markdown,
+        sync_paper_hard_graph_track_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_hard_graph_track_pack(
+        root,
+        elliptic2_dir=elliptic2_dir,
+        amlsim_dir=amlsim_dir,
+        output_dir=output_dir,
+    )
+    pack = {
+        key: json.loads(path.read_text(encoding="utf-8"))
+        for key, path in written.items()
+    }
+    report = dict(pack["subgraph_benchmark_blocker_report"])
+    return {
+        "surface_payload": {
+            "status": report["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_hard_graph_tracks": report,
+            "bundle": pack,
+        },
+        "human_output": render_paper_hard_graph_track_markdown(pack),
     }
 
 

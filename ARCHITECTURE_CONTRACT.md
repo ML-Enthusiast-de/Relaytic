@@ -562,6 +562,15 @@ Current paper-track Elliptic graph baseline artifact names from Paper Track P7:
 - `paper_graph_competitive_search_trace.json`
 - `paper_graph_publishability_gate.json`
 
+Current paper-track hard graph decision artifact names from Paper Track P8:
+
+- `amlsim_generation_manifest.json`
+- `amlsim_typology_manifest.json`
+- `elliptic2_subgraph_access_report.json`
+- `subgraph_benchmark_blocker_report.json`
+
+Paper Track P8 extends `src/relaytic/release_safety/` with a local-only decision boundary for hard graph tracks. It may verify seeded AMLSim generated outputs as synthetic `proxy` evidence, but it cannot promote AMLSim to real-world AML evidence. It may detect Elliptic2 source availability, but it must keep Elliptic2 `blocked` until an official-schema loader, subgraph split/overlap audit, resource budget, and license-safe release boundary are proven.
+
 Current trace and eval artifact names:
 
 - `trace_model.json`

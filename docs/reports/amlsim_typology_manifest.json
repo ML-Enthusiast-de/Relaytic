@@ -1,0 +1,26 @@
+{
+  "alert_transaction_row_count": 0,
+  "blocked_reason_codes": [
+    "amlsim_generation_not_proxy_ready"
+  ],
+  "blockers": [
+    {
+      "code": "amlsim_generation_not_proxy_ready",
+      "next_action": "Resolve generation-manifest blockers before attempting a typology audit.",
+      "reason": "Typology evidence requires a reproducibly generated AMLSim proxy bundle."
+    }
+  ],
+  "claim_scope": "synthetic_typology_workflow_proxy_only",
+  "dataset_id": "amlsim_synthetic_bank_graph",
+  "hard_aml_claim_allowed": false,
+  "public_performance_claim_allowed": false,
+  "sar_account_row_count": 0,
+  "schema_version": "relaytic.paper_hard_graph_track_decision.v1",
+  "slice": "Paper Track P8",
+  "source_path": "data/paper_benchmarks/amlsim",
+  "split_contract_id": "split_amlsim_seeded_temporal_v1",
+  "status": "blocked",
+  "support_level": "blocked",
+  "typology_distribution": {},
+  "typology_field": null
+}

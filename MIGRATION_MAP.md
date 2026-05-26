@@ -312,6 +312,13 @@ Avoid introducing new references to:
 - introduced paper-track graph baseline artifacts under `docs/reports/`: `paper_graph_baseline_manifest.json`, `paper_graph_feature_table.json`, `paper_graph_model_shadow_scorecard.json`, `paper_graph_baseline_fallback_report.json`, `paper_graph_budget_contract.json`, `paper_graph_competitive_search_trace.json`, and `paper_graph_publishability_gate.json`
 - executed the full raw Elliptic bundle after verifying all edges are same-time-step observable; selected LightGBM on source-plus-structural features with test PR-AUC `0.668756` and recorded the modest paired source-only delta (`+0.004588`) without promoting the weaker GraphSAGE shadow or any headline/SOTA claim
 
+### Paper Track P8
+
+- introduced `src/relaytic/release_safety/hard_graph_tracks.py` under the existing release-safety boundary for AMLSim generation/typology verification and Elliptic2 acquisition, loader, split, resource, and license decisions
+- introduced the public command `relaytic release-safety hard-graph-tracks` for regenerating P8 supported/proxy/blocked artifacts locally
+- introduced paper-track hard-graph decision artifacts under `docs/reports/`: `amlsim_generation_manifest.json`, `amlsim_typology_manifest.json`, `elliptic2_subgraph_access_report.json`, and `subgraph_benchmark_blocker_report.json`
+- recorded both current hard tracks as blocked: AMLSim lacks an audited generated proxy bundle, and Elliptic2 lacks local source plus official-loader, overlap/split, and resource proof; neither can be used for paper performance or SOTA claims
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
@@ -714,6 +721,10 @@ Implemented release-safety artifact names:
 - `paper_graph_budget_contract.json`
 - `paper_graph_competitive_search_trace.json`
 - `paper_graph_publishability_gate.json`
+- `amlsim_generation_manifest.json`
+- `amlsim_typology_manifest.json`
+- `elliptic2_subgraph_access_report.json`
+- `subgraph_benchmark_blocker_report.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

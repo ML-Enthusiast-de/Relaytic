@@ -1,0 +1,133 @@
+{
+  "access_state": "source_not_present",
+  "blocked_reason_codes": [
+    "elliptic2_local_source_missing",
+    "elliptic2_authenticated_manual_download_required",
+    "elliptic2_official_loader_not_validated",
+    "elliptic2_split_and_overlap_audit_not_run",
+    "elliptic2_resource_budget_not_frozen",
+    "elliptic2_noncommercial_no_derivatives_claim_boundary"
+  ],
+  "blockers": [
+    {
+      "code": "elliptic2_local_source_missing",
+      "next_action": "Acquire the dataset outside git and place the five official CSV files in the expected local directory.",
+      "reason": "The official Elliptic2 local source bundle is not present."
+    },
+    {
+      "code": "elliptic2_authenticated_manual_download_required",
+      "next_action": "Download only after accepting the dataset terms and keep raw files outside version control.",
+      "reason": "Elliptic2 acquisition requires an authenticated manual download and license-aware handling."
+    },
+    {
+      "code": "elliptic2_official_loader_not_validated",
+      "next_action": "Implement and fixture-test an official-schema loader before executing performance experiments.",
+      "reason": "P8 has not validated an official-schema Elliptic2 subgraph loader."
+    },
+    {
+      "code": "elliptic2_split_and_overlap_audit_not_run",
+      "next_action": "Freeze an official or deterministic subgraph split and prove overlap controls before model comparison.",
+      "reason": "The subgraph split and overlap audit required by the claim contract have not run."
+    },
+    {
+      "code": "elliptic2_resource_budget_not_frozen",
+      "next_action": "Measure ingestion and training memory/runtime on a pilot, then freeze the feasible model budget.",
+      "reason": "The large Elliptic2 workload has no accepted local execution budget."
+    },
+    {
+      "code": "elliptic2_noncommercial_no_derivatives_claim_boundary",
+      "next_action": "Retain license and redistribution boundaries in every release and paper artifact.",
+      "reason": "The dataset license requires noncommercial, no-derivatives handling and prevents bundling raw data."
+    }
+  ],
+  "claim_id": "claim_subgraph_or_synthetic_bank_graph",
+  "dataset_id": "elliptic2_subgraph_aml",
+  "forbidden_split_methods": [
+    "node_level_split_for_subgraph_task",
+    "subgraph_overlap_without_audit"
+  ],
+  "hard_aml_claim_allowed": false,
+  "known_source_facts": {
+    "background_edge_transactions": 196000000,
+    "background_node_clusters": 49000000,
+    "labeled_subgraphs": 122000,
+    "source_caveat": "Large subgraph workload; paper claim remains blocked until loader, split, and resource gates are frozen.",
+    "task": "binary suspicious-versus-licit subgraph classification"
+  },
+  "license": {
+    "code_license": "Apache-2.0 for the official guide repository",
+    "commercial_use": "not_allowed",
+    "redistribution": "no_derivatives_noncommercial_only",
+    "requires_legal_review_before_bundling": true,
+    "spdx_or_name": "CC-BY-NC-ND-4.0"
+  },
+  "local_source_ready": false,
+  "next_action": "Treat Elliptic2 as the highest-upside hard graph recovery track: acquire it only with an official-loader, overlap-audit, and resource-budget implementation slice.",
+  "optional_file_checks": [
+    {
+      "exists": false,
+      "filename": "dataset-metadata.json",
+      "path": "data/paper_benchmarks/elliptic2/dataset-metadata.json",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "README.md",
+      "path": "data/paper_benchmarks/elliptic2/README.md",
+      "sha256": null,
+      "size_bytes": null
+    }
+  ],
+  "public_performance_claim_allowed": false,
+  "registry_paper_claim_posture": "blocked",
+  "required_audits": [
+    "subgraph_overlap_audit",
+    "resource_budget_audit",
+    "loader_provenance"
+  ],
+  "required_file_checks": [
+    {
+      "exists": false,
+      "filename": "background_edges.csv",
+      "path": "data/paper_benchmarks/elliptic2/background_edges.csv",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "background_nodes.csv",
+      "path": "data/paper_benchmarks/elliptic2/background_nodes.csv",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "connected_components.csv",
+      "path": "data/paper_benchmarks/elliptic2/connected_components.csv",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "edges.csv",
+      "path": "data/paper_benchmarks/elliptic2/edges.csv",
+      "sha256": null,
+      "size_bytes": null
+    },
+    {
+      "exists": false,
+      "filename": "nodes.csv",
+      "path": "data/paper_benchmarks/elliptic2/nodes.csv",
+      "sha256": null,
+      "size_bytes": null
+    }
+  ],
+  "schema_version": "relaytic.paper_hard_graph_track_decision.v1",
+  "slice": "Paper Track P8",
+  "source_hashing_posture": "deferred_until_official_loader_and_resource_pilot_due_to_large_source_bundle",
+  "source_path": "data/paper_benchmarks/elliptic2",
+  "split_contract_id": "split_elliptic2_subgraph_fixed_seed_v1",
+  "status": "blocked",
+  "support_level": "blocked"
+}

@@ -363,8 +363,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P7. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, and Paper Track P7 Elliptic graph baseline suite.
-- next execution target: Paper Track P8
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P8. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, and Paper Track P8 hard graph-track decision reports.
+- next execution target: Paper Track P9
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -373,7 +373,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P8 through P13 prove benchmark breadth, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P9 through P13 prove operational breadth, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3872,6 +3872,17 @@ Minimum proof:
 - each track is labeled supported, proxy, or blocked
 - blocked tracks include access, scale, loader, license, or claim-scope reasons
 - no paper table implies support without a corresponding artifact
+
+Implemented by:
+- adding `src/relaytic/release_safety/hard_graph_tracks.py`
+- adding `relaytic release-safety hard-graph-tracks --format json`
+- adding `tests/test_paper_track_p8.py`
+- adding `docs/reports/amlsim_generation_manifest.json`
+- adding `docs/reports/amlsim_typology_manifest.json`
+- adding `docs/reports/elliptic2_subgraph_access_report.json`
+- adding `docs/reports/subgraph_benchmark_blocker_report.json`
+
+P8 records both hard tracks as `blocked` in the current local state. Elliptic2 has no local source bundle and still requires an official-schema loader, subgraph overlap/split audit, accepted resource budget, and license-safe release boundary. AMLSim has no seeded generated bundle, generator revision, output-hash manifest, generated-data license, or typology audit. Consequently neither track can contribute a performance row, graph SOTA claim, or hard AML claim. P9 may proceed with operational evaluation, but before P10 tables the paper should make an explicit decision on a bounded Elliptic2 acquisition/pilot recovery because that track has the greatest scientific upside; AMLSim is useful only as a reproducible synthetic proxy.
 
 ### Paper Track P9 - Operational AML evaluation layer
 

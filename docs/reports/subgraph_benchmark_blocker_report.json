@@ -1,0 +1,60 @@
+{
+  "blocked_track_count": 2,
+  "command": "relaytic release-safety hard-graph-tracks --format json",
+  "decision_state": "hard_tracks_blocked_recorded",
+  "hard_performance_claims_allowed": false,
+  "headline_or_sota_claim_allowed": false,
+  "next_slice": "Paper Track P9",
+  "p7_context": {
+    "graph_neural_claim_allowed": false,
+    "graph_shadow_test_pr_auc": 0.388907,
+    "interpretation": "P7 supplies supporting flattened-graph evidence only; it does not substitute for modern subgraph AML evidence.",
+    "selected_graph_test_pr_auc": 0.668756,
+    "supporting_graph_table_candidate_allowed": true
+  },
+  "paper_can_continue_to_p9": true,
+  "paper_limitation_text": "Elliptic2 and AMLSim were evaluated as candidate hard tracks but excluded from first-paper performance claims pending, respectively, validated subgraph execution proof and reproducible synthetic-generation proof.",
+  "paper_strategy_recommendation": [
+    "Continue to P9 operational evaluation without presenting either hard track as implemented evidence.",
+    "Before final result tables, choose a bounded Elliptic2 acquisition and pilot slice if resources permit; it offers the strongest scientific breadth upside.",
+    "Use AMLSim only as seeded synthetic typology and operations evidence after its proxy audit passes; it cannot replace a real subgraph benchmark."
+  ],
+  "proxy_track_count": 0,
+  "schema_version": "relaytic.paper_hard_graph_track_decision.v1",
+  "slice": "Paper Track P8",
+  "status": "ok",
+  "supported_track_count": 0,
+  "track_decisions": [
+    {
+      "artifact_refs": [
+        "docs/reports/elliptic2_subgraph_access_report.json"
+      ],
+      "blocked_reason_codes": [
+        "elliptic2_local_source_missing",
+        "elliptic2_authenticated_manual_download_required",
+        "elliptic2_official_loader_not_validated",
+        "elliptic2_split_and_overlap_audit_not_run",
+        "elliptic2_resource_budget_not_frozen",
+        "elliptic2_noncommercial_no_derivatives_claim_boundary"
+      ],
+      "dataset_id": "elliptic2_subgraph_aml",
+      "first_paper_inclusion_decision": "exclude_pending_loader_split_resource_proof",
+      "support_level": "blocked"
+    },
+    {
+      "artifact_refs": [
+        "docs/reports/amlsim_generation_manifest.json",
+        "docs/reports/amlsim_typology_manifest.json"
+      ],
+      "blocked_reason_codes": [
+        "amlsim_generation_not_proxy_ready",
+        "amlsim_generator_commit_not_frozen",
+        "amlsim_local_generated_bundle_missing",
+        "amlsim_seed_manifest_not_frozen"
+      ],
+      "dataset_id": "amlsim_synthetic_bank_graph",
+      "first_paper_inclusion_decision": "exclude_pending_reproducible_generation",
+      "support_level": "blocked"
+    }
+  ]
+}
