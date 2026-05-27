@@ -368,6 +368,8 @@ def _build_blocker_report(
     graph_shadow = _read_json_if_exists(root / "docs" / "reports" / "paper_graph_model_shadow_scorecard.json")
     elliptic2_recovery_gate = _read_json_if_exists(root / "docs" / "reports" / "elliptic2_recovery_gate.json")
     pilot_recovered = elliptic2_recovery_gate.get("status") == "pass_pilot_only"
+    elliptic2_competitive_gate = _read_json_if_exists(root / "docs" / "reports" / "elliptic2_publishability_gate.json")
+    competitive_recorded = elliptic2_competitive_gate.get("slice") == "Paper Track P8-B"
     amlsim_support = "proxy" if (
         amlsim_generation["support_level"] == "proxy" and amlsim_typology["support_level"] == "proxy"
     ) else "blocked"
@@ -403,6 +405,12 @@ def _build_blocker_report(
     if shadow_rows:
         graph_shadow_test_pr_auc = dict(shadow_rows[0].get("test_metrics", {})).get("pr_auc")
     decision_state = (
+        "hard_tracks_blocked_with_elliptic2_supporting_competitive_evidence_recorded"
+        if competitive_recorded and elliptic2_competitive_gate.get("supporting_paper_row_allowed")
+        else
+        "hard_tracks_blocked_with_elliptic2_competitive_failure_recorded"
+        if competitive_recorded
+        else
         "hard_tracks_blocked_with_elliptic2_pilot_recovery_recorded"
         if pilot_recovered
         else
@@ -421,7 +429,9 @@ def _build_blocker_report(
         "blocked_track_count": counts["blocked"],
         "hard_performance_claims_allowed": False,
         "headline_or_sota_claim_allowed": False,
-        "paper_can_continue_to_p9": not pilot_recovered,
+        "paper_can_continue_to_p9": (
+            bool(elliptic2_competitive_gate.get("p9_allowed")) if competitive_recorded else not pilot_recovered
+        ),
         "p7_context": {
             "supporting_graph_table_candidate_allowed": graph_gate.get("supporting_graph_table_candidate_allowed", False),
             "selected_graph_test_pr_auc": graph_manifest.get("selected_test_pr_auc"),
@@ -431,6 +441,12 @@ def _build_blocker_report(
         },
         "paper_strategy_recommendation": (
             [
+                "Do not proceed to P9 before P8-C closes or formally accepts the modern reference-parity and leakage-resistant cohort gap.",
+                "Treat P8-B as supporting modern-context evidence only: it survives repeated-seed and row-order-independent checks, but remains below reported RevClassifyDS performance and consumes official RevTrack preprocessing.",
+                "Use AMLSim only as seeded synthetic typology and operations evidence after its proxy audit passes; it cannot replace real subgraph evidence.",
+            ]
+            if competitive_recorded
+            else [
                 "Do not proceed to P9 paper assembly before P8-B tests the recovered Elliptic2 context pilot competitively and under a robustness split.",
                 "Treat P8-A as strong feasibility evidence only: its official RevTrack preprocessing dependency and single pilot configuration still block superiority claims.",
                 "Use AMLSim only as seeded synthetic typology and operations evidence after its proxy audit passes; it cannot replace real subgraph evidence.",
@@ -443,7 +459,9 @@ def _build_blocker_report(
             ]
         ),
         "paper_limitation_text": (
-            "Elliptic2 access was repaired to exploratory modern-context pilot evidence in P8-A, but paper performance claims remain excluded pending competitive and robustness proof; AMLSim remains excluded pending reproducible synthetic-generation proof."
+            "P8-B records stable supporting modern-context Elliptic2 evidence on the RevTrack-evaluable cohort, but it is below the reported RevClassifyDS reference, does not prove equivalence to the full current official core, and does not establish entity-disjoint generalization; AMLSim remains excluded pending reproducible synthetic-generation proof."
+            if competitive_recorded
+            else "Elliptic2 access was repaired to exploratory modern-context pilot evidence in P8-A, but paper performance claims remain excluded pending competitive and robustness proof; AMLSim remains excluded pending reproducible synthetic-generation proof."
             if pilot_recovered
             else "Elliptic2 and AMLSim were evaluated as candidate hard tracks but excluded from first-paper performance claims pending, respectively, validated subgraph execution proof and reproducible synthetic-generation proof."
         ),
@@ -453,8 +471,17 @@ def _build_blocker_report(
             "artifact_ref": "docs/reports/elliptic2_recovery_gate.json",
             "interpretation": "P8-A supersedes the Elliptic2 access blocker only to pilot-only evidence; it does not permit paper performance or superiority claims.",
         } if pilot_recovered else None,
+        "subsequent_elliptic2_competitive_evidence": {
+            "status": elliptic2_competitive_gate.get("status"),
+            "supporting_paper_row_allowed": elliptic2_competitive_gate.get("supporting_paper_row_allowed"),
+            "reference_parity_claim_allowed": elliptic2_competitive_gate.get("reference_parity_claim_allowed"),
+            "artifact_ref": "docs/reports/elliptic2_publishability_gate.json",
+            "interpretation": "P8-B permits supporting modern-context evidence only when its gate passes; it does not authorize headline, SOTA, full-core, or end-to-end Relaytic claims.",
+        } if competitive_recorded else None,
         "next_slice": (
-            "Paper Track P8-B - Elliptic2 competitive and robustness suite"
+            elliptic2_competitive_gate.get("next_slice")
+            if competitive_recorded
+            else "Paper Track P8-B - Elliptic2 competitive and robustness suite"
             if pilot_recovered
             else "Paper Track P9"
         ),

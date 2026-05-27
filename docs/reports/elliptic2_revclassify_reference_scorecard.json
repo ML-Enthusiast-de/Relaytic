@@ -1,0 +1,44 @@
+{
+  "claim_scope": "reported_modern_reference_and_evaluable_cohort_comparison_not_official_reference_reproduction",
+  "cohort_coverage": {
+    "cohort_equivalence_proven": false,
+    "finding": "The pinned RevTrack evaluation table is smaller than the audited official Elliptic2 labeled core; modern-context results describe the RevTrack-evaluable cohort only.",
+    "official_core_positive_count": 2763,
+    "official_core_subgraph_count": 121810,
+    "positive_coverage_fraction": 0.93304379,
+    "revtrack_evaluable_positive_count": 2578,
+    "revtrack_evaluable_row_count": 110902,
+    "row_coverage_fraction": 0.9104507
+  },
+  "official_reproduction_blocked_reason_codes": [
+    "official_revclassify_classification_checkpoints_not_distributed_in_pinned_repository",
+    "published_reference_used_single_v100_while_local_execution_is_cpu_only",
+    "exact_official_training_sweep_not_executed_locally"
+  ],
+  "official_reproduction_status": "not_locally_reproduced",
+  "reference": {
+    "RevClassify_BP": {
+      "f1": 0.954,
+      "pr_auc": 0.972
+    },
+    "RevClassify_DS": {
+      "f1": 0.953,
+      "pr_auc": 0.974
+    },
+    "metric": "pr_auc",
+    "paper_url": "https://arxiv.org/abs/2410.08394",
+    "reference_id": "revclassify_icaif_2024_full_shot",
+    "source": "official paper Table 2, full-shot subgraph classification"
+  },
+  "reference_repository": {
+    "classification_checkpoint_count": 0,
+    "commit": "f2111c8a1bafd84ebaa5a04e5caca8f1f0ed7ac0",
+    "local_runtime_posture": "CPU-only verification and Relaytic candidate execution",
+    "published_training_resource": "single V100 GPU for paper experiments",
+    "source_path": "<external-local-source>/official_repo",
+    "url": "https://github.com/MITIBMxGraph/RevTrack"
+  },
+  "schema_version": "relaytic.elliptic2_competitive.v1",
+  "slice": "Paper Track P8-B",
+  "status": "reported_reference_with_local_path_audit"
+}

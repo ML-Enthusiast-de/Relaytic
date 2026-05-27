@@ -152,6 +152,7 @@ Paper P7. graph baseline suite
 Paper P8. AMLSim and Elliptic2 blocked-or-supported track
 Paper P8-A. Elliptic2 modern-benchmark recovery pilot
 Paper P8-B. Elliptic2 competitive and robustness suite
+Paper P8-C. modern subgraph reference parity and leakage-resistant cohort protocol
 Paper P9. operational AML evaluation layer
 Paper P10. reproducible paper table generator
 Paper P11. paper draft and figure pack
@@ -243,6 +244,9 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 67A. Paper Track P6-A
 68. Paper Track P7
 69. Paper Track P8
+69A. Paper Track P8-A
+69B. Paper Track P8-B
+69C. Paper Track P8-C
 70. Paper Track P9
 71. Paper Track P10
 72. Paper Track P11
@@ -330,6 +334,7 @@ Reason:
 - Paper Track P7 is now implemented and runs the full raw Elliptic bundle under a same-time-step snapshot protocol; validation-selected LightGBM over source plus structural features reports test PR-AUC `0.668756` versus paired source-only `0.664168`, while a weaker PyG GraphSAGE shadow (`0.388907`) remains blocked from graph-neural claims
 - Paper Track P8 is now implemented and emits explicit AMLSim/Elliptic2 track decisions: both are currently blocked from first-paper performance claims, with Elliptic2 identified as the highest-upside conditional recovery track and AMLSim reserved for reproducible synthetic proxy evidence
 - Paper Track P8-A is now implemented and recovers the Elliptic2 modern path: official labeled-core audit passes over 121,810 subgraphs, RevTrack/RevClassify assets and low-memory embedding derivation are pinned, the original paper/code split discrepancy is recorded, and an exploratory context pilot reports test PR-AUC `0.935255` while remaining blocked from paper-table or SOTA claims until P8-B
+- Paper Track P8-B is now implemented and tests that modern path honestly: the validation-selected pooled-moments candidate records repeated official test PR-AUC `0.943240 +/- 0.000882` and row-order-independent content-hash test PR-AUC `0.929669 +/- 0.000538`, while remaining below reported full-shot `RevClassifyDS=0.974` and exposing that the RevTrack-evaluable cohort covers only `110902/121810` audited current-core rows; P8-C is mandatory before P9
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so later post-AML capability-evolution work has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -342,8 +347,8 @@ Reason:
 
 Current repo state:
 
-- implemented through Slice 15Z-R plus Paper Track P0 through P8-A, with Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U AML baseline and ablation relevance proof, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 tabular baseline suite, Paper Track P6-A competitive PaySim gate, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard-track decisions, and Paper Track P8-A Elliptic2 modern recovery now landed
-- next execution target: Paper Track P8-B
+- implemented through Slice 15Z-R plus Paper Track P0 through P8-B, with Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U AML baseline and ablation relevance proof, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 tabular baseline suite, Paper Track P6-A competitive PaySim gate, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard-track decisions, Paper Track P8-A Elliptic2 modern recovery, and Paper Track P8-B competitive/robustness evidence now landed
+- next execution target: Paper Track P8-C
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
 - latest handoff-and-learnings slice: Slice 12D
@@ -352,7 +357,7 @@ Current repo state:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P8-B through P13 complete competitive modern-graph evidence, operational evidence, paper-draft, dry-run, and arXiv release gates
+- next planned academy follow-on: Slice 16A, after Paper Track P8-C through P13 complete modern-reference parity and cohort evidence, operational evidence, paper-draft, dry-run, and arXiv release gates
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces rather than leaving the UI stale until late polish
 - the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [aml_frontier_contract.md](docs/specs/aml_frontier_contract.md), [aml_benchmark_pack.md](docs/specs/aml_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, performance recovery, AML proof/productization, academy, handoff, learnings, and external-agent continuation surfaces

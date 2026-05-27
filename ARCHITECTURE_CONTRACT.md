@@ -582,6 +582,17 @@ Current paper-track Elliptic2 modern recovery artifact names from Paper Track P8
 
 Paper Track P8-A extends `src/relaytic/release_safety/` with a source-redacted, hash-audited modern benchmark recovery boundary. Official Elliptic2 and RevTrack assets remain external local data; only provenance, aggregate counts, protocol audit, resource-aware derivation evidence, and guarded pilot metrics may be committed. A P8-A `pass_pilot_only` gate proves feasibility but never authorizes a paper-table, SOTA, end-to-end Relaytic, or hard AML claim. Those claims require P8-B competitive and robustness evidence.
 
+Current paper-track Elliptic2 competitive and robustness artifact names from Paper Track P8-B:
+
+- `elliptic2_competitive_budget_contract.json`
+- `elliptic2_revclassify_reference_scorecard.json`
+- `elliptic2_relaytic_candidate_search_trace.json`
+- `elliptic2_repeated_seed_scorecard.json`
+- `elliptic2_split_robustness_report.json`
+- `elliptic2_publishability_gate.json`
+
+Paper Track P8-B extends `src/relaytic/release_safety/` with validation-only candidate selection, repeated-seed scoring, reported RevClassify reference comparison, and a deterministic content-hash robustness split. P8-B metrics must identify the pinned RevTrack-evaluable cohort separately from the audited full current Elliptic2 core, disclose prior official-test exposure from P8-A, and disclose entity overlap. A supporting-row gate never authorizes headline, SOTA, full-core, or end-to-end Relaytic claims; failure to reach reported modern-reference parity requires P8-C before P9.
+
 Current trace and eval artifact names:
 
 - `trace_model.json`

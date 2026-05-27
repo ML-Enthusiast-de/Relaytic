@@ -25,4 +25,10 @@ P8-A modern Elliptic2 recovery may point at external local storage instead of pl
 
 Use `relaytic release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --prepare-selected-embeddings --run-pilot --hash-large-assets --format json`. Committed reports redact machine locations and retain only source hashes, aggregates, protocol findings, and guarded metrics.
 
+P8-B competitive and robustness evidence reuses the externally retained pinned RevTrack assets:
+
+- `relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --format json`
+
+P8-B commits aggregate competitive metrics, reported-reference provenance, cohort coverage, repeated-seed evidence, and split/identity-overlap audits only. It does not commit embedding assets or raw Elliptic2 data.
+
 Use `docs/reports/paper_dataset_access_manifest.json` for source URLs, license posture, and setup notes.

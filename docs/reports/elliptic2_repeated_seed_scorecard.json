@@ -1,0 +1,121 @@
+{
+  "candidate_id": "p8b_pooled_moments_lgbm",
+  "feature_view_id": "pooled_moments_counts",
+  "official_partition": {
+    "failure_case_count": 0,
+    "rows": [
+      {
+        "best_iteration": 636,
+        "feature_count": 348,
+        "runtime_seconds": 166.053105,
+        "seed": 11,
+        "test_count": 11105,
+        "test_positive_count": 272,
+        "test_pr_auc": 0.943865,
+        "test_roc_auc": 0.995772,
+        "validation_count": 11059,
+        "validation_positive_count": 252,
+        "validation_pr_auc": 0.960464,
+        "validation_roc_auc": 0.997622
+      },
+      {
+        "best_iteration": 559,
+        "feature_count": 348,
+        "runtime_seconds": 120.804298,
+        "seed": 42,
+        "test_count": 11105,
+        "test_positive_count": 272,
+        "test_pr_auc": 0.941992,
+        "test_roc_auc": 0.995324,
+        "validation_count": 11059,
+        "validation_positive_count": 252,
+        "validation_pr_auc": 0.957245,
+        "validation_roc_auc": 0.997336
+      },
+      {
+        "best_iteration": 657,
+        "feature_count": 348,
+        "runtime_seconds": 137.107668,
+        "seed": 73,
+        "test_count": 11105,
+        "test_positive_count": 272,
+        "test_pr_auc": 0.943862,
+        "test_roc_auc": 0.995935,
+        "validation_count": 11059,
+        "validation_positive_count": 252,
+        "validation_pr_auc": 0.960353,
+        "validation_roc_auc": 0.997411
+      }
+    ],
+    "seed_count": 3,
+    "test_pr_auc_max": 0.943865,
+    "test_pr_auc_mean": 0.94324,
+    "test_pr_auc_min": 0.941992,
+    "test_pr_auc_std": 0.000882,
+    "validation_pr_auc_mean": 0.959354,
+    "validation_pr_auc_std": 0.001492
+  },
+  "robustness_partition": {
+    "failure_case_count": 0,
+    "rows": [
+      {
+        "best_iteration": 569,
+        "feature_count": 348,
+        "runtime_seconds": 299.831881,
+        "seed": 11,
+        "test_count": 11092,
+        "test_positive_count": 259,
+        "test_pr_auc": 0.930264,
+        "test_roc_auc": 0.99436,
+        "validation_count": 11089,
+        "validation_positive_count": 257,
+        "validation_pr_auc": 0.952283,
+        "validation_roc_auc": 0.995173
+      },
+      {
+        "best_iteration": 522,
+        "feature_count": 348,
+        "runtime_seconds": 339.183508,
+        "seed": 42,
+        "test_count": 11092,
+        "test_positive_count": 259,
+        "test_pr_auc": 0.929783,
+        "test_roc_auc": 0.993984,
+        "validation_count": 11089,
+        "validation_positive_count": 257,
+        "validation_pr_auc": 0.950819,
+        "validation_roc_auc": 0.995329
+      },
+      {
+        "best_iteration": 536,
+        "feature_count": 348,
+        "runtime_seconds": 131.424659,
+        "seed": 73,
+        "test_count": 11092,
+        "test_positive_count": 259,
+        "test_pr_auc": 0.928961,
+        "test_roc_auc": 0.993683,
+        "validation_count": 11089,
+        "validation_positive_count": 257,
+        "validation_pr_auc": 0.951303,
+        "validation_roc_auc": 0.995634
+      }
+    ],
+    "seed_count": 3,
+    "test_pr_auc_max": 0.930264,
+    "test_pr_auc_mean": 0.929669,
+    "test_pr_auc_min": 0.928961,
+    "test_pr_auc_std": 0.000538,
+    "validation_pr_auc_mean": 0.951468,
+    "validation_pr_auc_std": 0.000609
+  },
+  "schema_version": "relaytic.elliptic2_competitive.v1",
+  "seeds": [
+    11,
+    42,
+    73
+  ],
+  "slice": "Paper Track P8-B",
+  "status": "complete",
+  "test_exposure_disclosure": "The official RevTrack test split was previously observed in P8-A; repeated official-partition scoring is confirmatory. The content-hash partition is the newly predeclared robustness check."
+}

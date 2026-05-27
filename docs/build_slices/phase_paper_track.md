@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P8-A implemented. P8-B through P13 planned.
+P0 through P8-B implemented. P8-C through P13 planned.
 
 ## Intent
 
@@ -48,17 +48,19 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Decide whether synthetic-bank and subgraph AML tracks are runnable for the first paper or explicitly blocked with exact reasons.
 11. **P8-A - Elliptic2 modern-benchmark recovery pilot** - implemented
    Acquire and audit official Elliptic2/RevTrack evidence outside git, freeze protocol discrepancies, and run a strictly exploratory modern-context pilot.
-12. **P8-B - Elliptic2 competitive and robustness suite**
+12. **P8-B - Elliptic2 competitive and robustness suite** - implemented
    Challenge the recovered pilot against RevClassify, repeated seeds, validation-only search, and a row-order-independent robustness split before paper promotion.
-13. **P9 - Operational AML evaluation layer**
+13. **P8-C - Modern subgraph reference parity and leakage-resistant cohort protocol**
+    Close or explicitly reject the gap to modern RevClassify evidence, reconcile the official-core versus RevTrack-evaluable cohort boundary, and require a stronger identity-aware split before the performance story advances.
+14. **P9 - Operational AML evaluation layer**
     Add review-budget, analyst-hour, false-positive reduction, case-packet completeness, and operational claim guards to paper rows.
-14. **P10 - Reproducible paper table generator**
+15. **P10 - Reproducible paper table generator**
     Generate all paper tables from run artifacts, not hand-maintained numbers.
-15. **P11 - Paper draft and figure pack**
+16. **P11 - Paper draft and figure pack**
     Draft the arXiv paper and generate figures from artifacts or clearly mark schematic figures.
-16. **P12 - External dry run and clean-clone proof**
+17. **P12 - External dry run and clean-clone proof**
     Reproduce the install, paper-smoke benchmark, table generation, claim lint, and leak scan from a clean clone.
-17. **P13 - arXiv release and attention pack**
+18. **P13 - arXiv release and attention pack**
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
 
 ## Non-Negotiable Gates
@@ -211,7 +213,7 @@ P8 added:
 - `relaytic release-safety hard-graph-tracks --format json`
 - `tests/test_paper_track_p8.py`
 
-P8 recorded both current hard graph tracks as blocked from performance claims. AMLSim remains a future reproducible synthetic typology/workflow proxy; it cannot replace real subgraph evidence. P8-A now supersedes Elliptic2's access-blocked state, so P9 no longer proceeds before modern graph recovery is tested competitively.
+P8 recorded both current hard graph tracks as blocked from performance claims. AMLSim remains a future reproducible synthetic typology/workflow proxy; it cannot replace real subgraph evidence. P8-A superseded Elliptic2's access-blocked state and P8-B tested the recovered path competitively; P9 now remains blocked on P8-C reference-parity and stronger cohort/leakage evidence.
 
 P8-A added:
 
@@ -227,8 +229,22 @@ P8-A added:
 
 P8-A audits the official labeled Elliptic2 core over 121,810 subgraphs and pins the ICAIF 2024 RevTrack/RevClassify reference. It records a nontrivial comparability issue: the original paper states a random `80:10:10` split while its public preprocessor assigns subgraphs by insertion-order modulo. After deriving a CPU-bounded, hash-audited selected-node cache from official RevTrack embeddings, the predeclared context pilot reports test `PR-AUC=0.935255`, versus `0.027773` for structure-only role counts. This is promising modern evidence, not yet a publishable Relaytic result, because it consumes official RevTrack preprocessing and has not passed repeated-seed or alternate-split proof.
 
+P8-B added:
+
+- `docs/reports/elliptic2_competitive_budget_contract.json`
+- `docs/reports/elliptic2_revclassify_reference_scorecard.json`
+- `docs/reports/elliptic2_relaytic_candidate_search_trace.json`
+- `docs/reports/elliptic2_repeated_seed_scorecard.json`
+- `docs/reports/elliptic2_split_robustness_report.json`
+- `docs/reports/elliptic2_publishability_gate.json`
+- `src/relaytic/release_safety/elliptic2_competitive.py`
+- `relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --format json`
+- `tests/test_paper_track_p8b.py`
+
+P8-B rigorously records the published full-shot reference (`RevClassifyBP PR-AUC=0.972`, `RevClassifyDS PR-AUC=0.974`) and documents that the pinned public repository does not distribute classification checkpoints and reports single-V100 training. It also discovers a material cohort boundary: the pinned RevTrack table evaluates 110,902 rows and 2,578 positives versus the audited current official core of 121,810 rows and 2,763 suspicious labels. Under a validation-only three-candidate CPU budget, pooled moments are selected and produce repeated official test `PR-AUC=0.943240 +/- 0.000882` and deterministic content-hash test `PR-AUC=0.929669 +/- 0.000538`. The hash partition passes row-order-independence, but the result remains below RevClassifyDS, consumes official preprocessing/embeddings, follows an already exposed official test partition, and does not prove entity-disjoint generalization. P8-B permits a supporting modern-context row only and blocks P9 until P8-C addresses reference parity and stronger cohort/leakage evidence.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P8-B**.
+The next implementation target is **Paper Track P8-C**.
 
-P8-B must run competitive and repeated-seed modern-context comparisons, measure the official RevClassify path, and execute an independent robustness split before any Elliptic2 row reaches the paper or P9 resumes.
+P8-C must implement or faithfully reproduce a neural RevClassify-style comparison path, reconcile the RevTrack-evaluable subset against the audited current Elliptic2 core, and run an entity-disjoint or comparably leakage-resistant protocol before P9 or headline modern-subgraph framing resumes.

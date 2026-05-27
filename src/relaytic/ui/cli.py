@@ -1323,6 +1323,37 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_elliptic2_competitive = release_safety_sub.add_parser(
+        "elliptic2-competitive",
+        help="Run Paper Track P8-B Elliptic2 competitive and robustness evidence with a claim gate.",
+    )
+    release_safety_elliptic2_competitive.add_argument(
+        "--revtrack-dir",
+        default=None,
+        help="Optional official RevTrack checkout directory. Defaults to data/paper_benchmarks/elliptic2_revtrack.",
+    )
+    release_safety_elliptic2_competitive.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P8-B artifacts. Competitive execution defaults to docs/reports/; previews default under artifacts/.",
+    )
+    release_safety_elliptic2_competitive.add_argument(
+        "--budget-tier",
+        choices=["smoke", "competitive"],
+        default="smoke",
+        help="Execution tier. Competitive paper evidence requires the competitive tier.",
+    )
+    release_safety_elliptic2_competitive.add_argument(
+        "--run-suite",
+        action="store_true",
+        help="Execute candidates, repeated seeds, and the deterministic hash robustness partition.",
+    )
+    release_safety_elliptic2_competitive.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3326,6 +3357,13 @@ def main(argv: list[str] | None = None) -> int:
                     prepare_selected_embeddings=args.prepare_selected_embeddings,
                     run_pilot=args.run_pilot,
                     hash_large_assets=args.hash_large_assets,
+                )
+            elif args.release_safety_command == "elliptic2-competitive":
+                payload = _run_elliptic2_competitive_surface(
+                    revtrack_dir=args.revtrack_dir,
+                    output_dir=args.output_dir,
+                    budget_tier=args.budget_tier,
+                    run_suite=args.run_suite,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -7205,6 +7243,45 @@ def _run_elliptic2_recovery_surface(
             "bundle": pack,
         },
         "human_output": render_elliptic2_recovery_markdown(pack),
+    }
+
+
+def _run_elliptic2_competitive_surface(
+    *,
+    revtrack_dir: str | None,
+    output_dir: str | None,
+    budget_tier: str,
+    run_suite: bool,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_elliptic2_competitive_markdown,
+        sync_elliptic2_competitive_pack,
+    )
+
+    root = Path.cwd()
+    resolved_output_dir = output_dir
+    if output_dir is None and not (budget_tier == "competitive" and run_suite):
+        resolved_output_dir = str(root / "artifacts" / "release_safety" / "elliptic2_competitive_preview")
+    written = sync_elliptic2_competitive_pack(
+        root,
+        revtrack_dir=revtrack_dir,
+        output_dir=resolved_output_dir,
+        budget_tier=budget_tier,
+        run_suite=run_suite,
+    )
+    pack = {key: json.loads(path.read_text(encoding="utf-8")) for key, path in written.items()}
+    gate = dict(pack["elliptic2_publishability_gate"])
+    return {
+        "surface_payload": {
+            "status": gate["status"],
+            "output_dir": str(
+                Path(resolved_output_dir) if resolved_output_dir else root / "docs" / "reports"
+            ),
+            "paths": {key: str(path) for key, path in written.items()},
+            "elliptic2_competitive": gate,
+            "bundle": pack,
+        },
+        "human_output": render_elliptic2_competitive_markdown(pack),
     }
 
 

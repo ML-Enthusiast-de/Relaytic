@@ -326,6 +326,13 @@ Avoid introducing new references to:
 - introduced paper-track modern graph recovery artifacts under `docs/reports/`: `elliptic2_recovery_manifest.json`, `elliptic2_schema_overlap_audit.json`, `elliptic2_protocol_audit.json`, `elliptic2_modern_reference_contract.json`, `elliptic2_context_pilot_result.json`, and `elliptic2_recovery_gate.json`
 - recovered Elliptic2 from source-blocked to pilot-ready with official labeled-core audit and a strong context pilot (`test_pr_auc=0.935255`), while keeping public paper/SOTA claims blocked until P8-B performs competitive, repeated-seed, and split-robust proof
 
+### Paper Track P8-B
+
+- introduced `src/relaytic/release_safety/elliptic2_competitive.py` under the existing release-safety boundary for modern-reference comparison, validation-only pooled-context candidate search, repeated-seed scoring, content-hash split robustness, cohort-coverage auditing, and publishability gating
+- introduced the public command `relaytic release-safety elliptic2-competitive` for regenerating P8-B artifacts from external local pinned RevTrack assets without committing raw data or machine paths
+- introduced paper-track competitive subgraph artifacts under `docs/reports/`: `elliptic2_competitive_budget_contract.json`, `elliptic2_revclassify_reference_scorecard.json`, `elliptic2_relaytic_candidate_search_trace.json`, `elliptic2_repeated_seed_scorecard.json`, `elliptic2_split_robustness_report.json`, and `elliptic2_publishability_gate.json`
+- promoted only a supporting modern-context row: pooled-moments LightGBM reports repeated official test `PR-AUC=0.943240 +/- 0.000882` and deterministic hash-split test `PR-AUC=0.929669 +/- 0.000538`, below reported `RevClassifyDS=0.974`; P8-C is required before P9
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
@@ -738,6 +745,12 @@ Implemented release-safety artifact names:
 - `elliptic2_modern_reference_contract.json`
 - `elliptic2_context_pilot_result.json`
 - `elliptic2_recovery_gate.json`
+- `elliptic2_competitive_budget_contract.json`
+- `elliptic2_revclassify_reference_scorecard.json`
+- `elliptic2_relaytic_candidate_search_trace.json`
+- `elliptic2_repeated_seed_scorecard.json`
+- `elliptic2_split_robustness_report.json`
+- `elliptic2_publishability_gate.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

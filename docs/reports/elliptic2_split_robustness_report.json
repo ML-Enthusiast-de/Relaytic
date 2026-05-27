@@ -1,0 +1,81 @@
+{
+  "cohort_scope": {
+    "claim_boundary": "All P8-B metrics are measured on the pinned RevTrack-evaluable cohort, not proven equivalent to the full current Elliptic2 core.",
+    "official_core_subgraph_count": 121810,
+    "revtrack_evaluable_row_count": 110902
+  },
+  "generalization_interpretation": "Hash splitting removes row-order dependence but does not eliminate sender/receiver identity overlap; entity-disjoint and newly curated cohort proof remains a stronger future requirement.",
+  "official_minus_robust_test_pr_auc_mean": 0.013571,
+  "official_partition": {
+    "row_summary": {
+      "test": {
+        "positive_count": 272,
+        "positive_rate": 0.02449347,
+        "row_count": 11105
+      },
+      "train": {
+        "positive_count": 2054,
+        "positive_rate": 0.02314679,
+        "row_count": 88738
+      },
+      "validation": {
+        "positive_count": 252,
+        "positive_rate": 0.02278687,
+        "row_count": 11059
+      }
+    },
+    "sender_receiver_identity_overlap": {
+      "train_to_test": {
+        "evaluation_entity_count": 10266,
+        "overlap_entity_count": 957,
+        "overlap_fraction": 0.09322034
+      },
+      "train_to_validation": {
+        "evaluation_entity_count": 9835,
+        "overlap_entity_count": 899,
+        "overlap_fraction": 0.09140824
+      }
+    },
+    "split_contract_id": "p8a_revtrack_official_partition_comparability_v1",
+    "test_previously_exposed_in_p8a": true
+  },
+  "robustness_partition": {
+    "duplicate_content_key_count": 0,
+    "identity_basis": "sha256 over sorted original sender, source, sink, receiver, node, and edge identifiers; label used only for strata allocation",
+    "protocol_repair_note": "A provisional boundary-only hash omitted source/sink identifiers and failed uniqueness; the accepted predeclared content key includes all available subgraph role and edge identifiers and passes with zero duplicate keys.",
+    "row_order_independent": true,
+    "row_summary": {
+      "test": {
+        "positive_count": 259,
+        "positive_rate": 0.02335016,
+        "row_count": 11092
+      },
+      "train": {
+        "positive_count": 2062,
+        "positive_rate": 0.0232414,
+        "row_count": 88721
+      },
+      "validation": {
+        "positive_count": 257,
+        "positive_rate": 0.02317612,
+        "row_count": 11089
+      }
+    },
+    "sender_receiver_identity_overlap": {
+      "train_to_test": {
+        "evaluation_entity_count": 10308,
+        "overlap_entity_count": 1002,
+        "overlap_fraction": 0.09720605
+      },
+      "train_to_validation": {
+        "evaluation_entity_count": 9548,
+        "overlap_entity_count": 892,
+        "overlap_fraction": 0.09342271
+      }
+    },
+    "split_contract_id": "p8b_label_stratified_content_hash_v1"
+  },
+  "schema_version": "relaytic.elliptic2_competitive.v1",
+  "slice": "Paper Track P8-B",
+  "status": "pass"
+}

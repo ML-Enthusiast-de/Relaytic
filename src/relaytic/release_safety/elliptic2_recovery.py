@@ -9,6 +9,7 @@ import platform
 import struct
 from time import perf_counter
 from typing import Any
+import warnings
 from zipfile import ZIP_STORED, ZipFile
 
 import numpy as np
@@ -441,7 +442,13 @@ def _build_context_pilot_result(
             "selection_scope": "predeclared_view_with_validation_only_early_stopping",
         }
         for split in ["validation", "test"]:
-            probability = model.predict_proba(features[masks[split]])[:, 1]
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message="X does not have valid feature names, but LGBMClassifier was fitted with feature names",
+                    category=UserWarning,
+                )
+                probability = model.predict_proba(features[masks[split]])[:, 1]
             row[f"{split}_pr_auc"] = round(float(average_precision_score(y[masks[split]], probability)), 6)
             row[f"{split}_roc_auc"] = round(float(roc_auc_score(y[masks[split]], probability)), 6)
             row[f"{split}_count"] = int(masks[split].sum())

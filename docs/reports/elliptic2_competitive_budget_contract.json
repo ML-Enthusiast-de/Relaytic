@@ -1,0 +1,77 @@
+{
+  "candidate_count": 3,
+  "candidate_family": "LightGBM over explicitly pooled official RevTrack node embeddings",
+  "candidate_specs": [
+    {
+      "candidate_id": "p8a_pooled_mean_max_lgbm",
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.8,
+        "early_stopping_rounds": 75,
+        "family_id": "lightgbm_classifier",
+        "learning_rate": 0.03,
+        "n_estimators": 1200,
+        "num_leaves": 31,
+        "reg_lambda": 1.0,
+        "subsample": 0.9,
+        "subsample_freq": 1
+      },
+      "feature_contract": "official_embeddings_sender_receiver_mean_max_plus_log_counts",
+      "feature_view_id": "pooled_mean_max_counts"
+    },
+    {
+      "candidate_id": "p8b_pooled_moments_lgbm",
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.8,
+        "early_stopping_rounds": 75,
+        "family_id": "lightgbm_classifier",
+        "learning_rate": 0.025,
+        "n_estimators": 1400,
+        "num_leaves": 63,
+        "reg_lambda": 1.0,
+        "subsample": 0.9,
+        "subsample_freq": 1
+      },
+      "feature_contract": "official_embeddings_sender_receiver_mean_max_min_std_plus_log_counts",
+      "feature_view_id": "pooled_moments_counts"
+    },
+    {
+      "candidate_id": "p8b_pooled_moment_relations_lgbm",
+      "configuration": {
+        "class_weight": "balanced",
+        "colsample_bytree": 0.8,
+        "early_stopping_rounds": 75,
+        "family_id": "lightgbm_classifier",
+        "learning_rate": 0.02,
+        "n_estimators": 1500,
+        "num_leaves": 63,
+        "reg_lambda": 1.0,
+        "subsample": 0.9,
+        "subsample_freq": 1
+      },
+      "feature_contract": "pooled_moments_plus_sender_receiver_relations_from_official_embeddings",
+      "feature_view_id": "pooled_moment_relations_counts"
+    }
+  ],
+  "effective_budget_tier": "competitive",
+  "repeated_seed_count": 3,
+  "requested_budget_tier": "competitive",
+  "runtime_environment": {
+    "execution_posture": "local_cpu_bounded",
+    "lightgbm": "4.6.0",
+    "python": "3.11.0"
+  },
+  "runtime_seconds": 1628.653827,
+  "schema_version": "relaytic.elliptic2_competitive.v1",
+  "seeds": [
+    11,
+    42,
+    73
+  ],
+  "selection_rule": "choose the candidate with highest official-validation PR-AUC; evaluate official test only for that candidate; freeze it for repeated and robustness runs",
+  "slice": "Paper Track P8-B",
+  "status": "executed",
+  "test_exposure_disclosure": "P8-A exposed the official test metrics before this competitive suite; the alternate content-hash partition supplies new robustness evidence, not a pristine benchmark replacement.",
+  "validation_selected_candidate_id": "p8b_pooled_moments_lgbm"
+}
