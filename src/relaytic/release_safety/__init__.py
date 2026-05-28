@@ -135,6 +135,14 @@ from .elliptic2_competitive import (
     render_elliptic2_competitive_markdown,
     sync_elliptic2_competitive_pack,
 )
+from .elliptic2_reference_parity import (
+    ELLIPTIC2_REFERENCE_PARITY_FILENAMES,
+    ELLIPTIC2_REFERENCE_PARITY_REPORT_DIR,
+    ELLIPTIC2_REFERENCE_PARITY_SCHEMA_VERSION,
+    build_elliptic2_reference_parity_pack,
+    render_elliptic2_reference_parity_markdown,
+    sync_elliptic2_reference_parity_pack,
+)
 from .paysim_benchmark import (
     PAYSIM_BENCHMARK_FILENAMES,
     PAYSIM_BENCHMARK_REPORT_DIR,
@@ -197,6 +205,9 @@ __all__ = [
     "ELLIPTIC2_COMPETITIVE_FILENAMES",
     "ELLIPTIC2_COMPETITIVE_REPORT_DIR",
     "ELLIPTIC2_COMPETITIVE_SCHEMA_VERSION",
+    "ELLIPTIC2_REFERENCE_PARITY_FILENAMES",
+    "ELLIPTIC2_REFERENCE_PARITY_REPORT_DIR",
+    "ELLIPTIC2_REFERENCE_PARITY_SCHEMA_VERSION",
     "RELEASE_BUNDLE_REPORT_SCHEMA_VERSION",
     "RELEASE_SAFETY_CONTROLS_SCHEMA_VERSION",
     "RELEASE_SAFETY_FILENAMES",
@@ -228,6 +239,7 @@ __all__ = [
     "build_paper_hard_graph_track_pack",
     "build_elliptic2_recovery_pack",
     "build_elliptic2_competitive_pack",
+    "build_elliptic2_reference_parity_pack",
     "build_paper_surface_hygiene_reports",
     "build_paper_thesis_artifacts",
     "build_paper_thesis_pack",
@@ -242,6 +254,7 @@ __all__ = [
     "render_paper_hard_graph_track_markdown",
     "render_elliptic2_recovery_markdown",
     "render_elliptic2_competitive_markdown",
+    "render_elliptic2_reference_parity_markdown",
     "render_paper_baseline_suite_markdown",
     "render_paper_thesis_markdown",
     "render_elliptic_graph_markdown",
@@ -254,6 +267,7 @@ __all__ = [
     "sync_paper_hard_graph_track_pack",
     "sync_elliptic2_recovery_pack",
     "sync_elliptic2_competitive_pack",
+    "sync_elliptic2_reference_parity_pack",
     "sync_paper_baseline_suite_pack",
     "sync_elliptic_graph_pack",
     "sync_paper_dataset_registry_pack",

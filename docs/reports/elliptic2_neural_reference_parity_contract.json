@@ -1,0 +1,144 @@
+{
+  "blocked_reason_codes": [
+    "local_accelerator_not_available_for_faithful_revclassify_budget",
+    "official_revclassify_classification_checkpoints_not_distributed",
+    "official_revclassify_dependency_hydra-core_missing",
+    "official_revclassify_dependency_lightning_missing",
+    "official_revclassify_dependency_omegaconf_missing",
+    "official_revclassify_dependency_torchmetrics_missing"
+  ],
+  "claim_scope": "reference_parity_contract_only_until_faithful_neural_execution_and_split_gate_pass",
+  "faithful_execution_budget_contract": {
+    "expected_accelerator": "CUDA-class GPU; paper describes single-V100 experiments",
+    "local_run_requested": true,
+    "minimum_seed_count_for_claim": 3,
+    "official_command_templates": [
+      "python main.py --multirun +sweep=subgraph_classification/full_shot/BP",
+      "python main.py --multirun +sweep=subgraph_classification/full_shot/DS"
+    ],
+    "reference_parity_margin": 0.01,
+    "required_metric": "final_test/prauc",
+    "selection_surface": "official validation/prauc only; test is not a tuning surface"
+  },
+  "faithful_neural_execution_preconditions_met": false,
+  "published_reference": {
+    "RevClassify_BP": {
+      "f1": 0.954,
+      "pr_auc": 0.972
+    },
+    "RevClassify_DS": {
+      "f1": 0.953,
+      "pr_auc": 0.974
+    },
+    "metric": "pr_auc",
+    "paper_url": "https://arxiv.org/abs/2410.08394",
+    "reference_id": "revclassify_icaif_2024_full_shot",
+    "source": "official paper Table 2, full-shot subgraph classification"
+  },
+  "reference_id": "revclassify_icaif_2024_full_shot",
+  "reference_repository": {
+    "classification_checkpoint_count": 0,
+    "commit": "f2111c8a1bafd84ebaa5a04e5caca8f1f0ed7ac0",
+    "official_full_shot_configuration_checks": [
+      {
+        "exists": true,
+        "path": "<external-local-source>/official_repo/configurations/sweep/subgraph_classification/full_shot/BP.yaml",
+        "size_bytes": 452
+      },
+      {
+        "exists": true,
+        "path": "<external-local-source>/official_repo/configurations/sweep/subgraph_classification/full_shot/DS.yaml",
+        "size_bytes": 442
+      }
+    ],
+    "recommendation_checkpoint_count": 15,
+    "source_path": "<external-local-source>/official_repo",
+    "url": "https://github.com/MITIBMxGraph/RevTrack"
+  },
+  "required_reference_candidates": [
+    {
+      "candidate_id": "official_revclassify_bp_full_shot",
+      "configuration_path": "configurations/sweep/subgraph_classification/full_shot/BP.yaml",
+      "family": "RevClassifyBP",
+      "reported_f1": 0.954,
+      "reported_pr_auc": 0.972
+    },
+    {
+      "candidate_id": "official_revclassify_ds_full_shot",
+      "configuration_path": "configurations/sweep/subgraph_classification/full_shot/DS.yaml",
+      "family": "RevClassifyDS",
+      "reported_f1": 0.953,
+      "reported_pr_auc": 0.974
+    }
+  ],
+  "runtime_environment": {
+    "package_matrix": {
+      "hydra-core": {
+        "available": false,
+        "module": "hydra",
+        "package_id": "hydra-core",
+        "version": null
+      },
+      "lightning": {
+        "available": false,
+        "module": "lightning",
+        "package_id": "lightning",
+        "version": null
+      },
+      "omegaconf": {
+        "available": false,
+        "module": "omegaconf",
+        "package_id": "omegaconf",
+        "version": null
+      },
+      "torch": {
+        "available": true,
+        "module": "torch",
+        "package_id": "torch",
+        "version": "2.8.0+cpu"
+      },
+      "torch-geometric": {
+        "available": true,
+        "module": "torch_geometric",
+        "package_id": "torch-geometric",
+        "version": "2.7.0"
+      },
+      "torch-scatter": {
+        "available": true,
+        "module": "torch_scatter",
+        "package_id": "torch-scatter",
+        "version": "2.1.2+pt28cpu"
+      },
+      "torch-sparse": {
+        "available": true,
+        "module": "torch_sparse",
+        "package_id": "torch-sparse",
+        "version": "0.6.18+pt28cpu"
+      },
+      "torchmetrics": {
+        "available": false,
+        "module": "torchmetrics",
+        "package_id": "torchmetrics",
+        "version": null
+      },
+      "wandb": {
+        "available": false,
+        "module": "wandb",
+        "package_id": "wandb",
+        "version": null
+      }
+    },
+    "platform": "Windows-10-10.0.26100-SP0",
+    "python": "3.11.0",
+    "torch": {
+      "available": true,
+      "cuda_available": false,
+      "cuda_device_count": 0,
+      "mps_available": false,
+      "version": "2.8.0+cpu"
+    }
+  },
+  "schema_version": "relaytic.elliptic2_reference_parity.v1",
+  "slice": "Paper Track P8-C",
+  "status": "blocked_or_not_requested"
+}

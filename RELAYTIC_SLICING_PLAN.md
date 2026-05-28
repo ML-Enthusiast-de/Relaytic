@@ -271,6 +271,7 @@ Stable slice numbering stays the same, but the preferred execution order after S
 69A. Paper Track P8-A - Elliptic2 modern-benchmark recovery pilot
 69B. Paper Track P8-B - Elliptic2 competitive and robustness suite
 69C. Paper Track P8-C - modern subgraph reference parity and leakage-resistant cohort protocol
+69D. Paper Track P8-D - paper thesis narrowing and alternative evidence decision
 70. Paper Track P9 - operational AML evaluation layer
 71. Paper Track P10 - reproducible paper table generator
 72. Paper Track P11 - paper draft and figure pack
@@ -366,8 +367,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P8-B. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, and Paper Track P8-B competitive/robustness evidence.
-- next execution target: Paper Track P8-C
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P8-C. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, and Paper Track P8-C reference-parity/cohort gate.
+- next execution target: Paper Track P8-D
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -376,7 +377,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P8-C through P13 prove modern graph reference parity or an accepted bounded alternative, operational breadth, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P8-D through P13 prove an accepted thesis boundary, operational breadth, reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -3885,7 +3886,7 @@ Implemented by:
 - adding `docs/reports/elliptic2_subgraph_access_report.json`
 - adding `docs/reports/subgraph_benchmark_blocker_report.json`
 
-P8 recorded both hard tracks as `blocked` in the then-current local state. AMLSim remains blocked pending a reproducible synthetic proxy audit. Elliptic2's access decision is now superseded by P8-A recovery evidence and P8-B supporting modern-context evidence; because the paper must be modern, P9 does not proceed until P8-C addresses the remaining reference-parity and stronger cohort/leakage protocol requirements.
+P8 recorded both hard tracks as `blocked` in the then-current local state. AMLSim remains blocked pending a reproducible synthetic proxy audit. Elliptic2's access decision is now superseded by P8-A recovery evidence, P8-B supporting modern-context evidence, and P8-C reference-parity/cohort blockers; because the paper must be modern and honest, P9 does not proceed until P8-D accepts thesis narrowing or reprovisions the benchmark path.
 
 ### Paper Track P8-A - Elliptic2 modern-benchmark recovery pilot
 
@@ -3975,6 +3976,37 @@ Minimum proof:
 
 Fallback rule:
 - if local hardware cannot support faithful neural parity, P8-C must emit a resource-backed blocker and revise the paper to present the Elliptic2 result as stable supporting context evidence only, not as a performance contribution
+
+Implemented by:
+- adding `src/relaytic/release_safety/elliptic2_reference_parity.py`
+- adding `relaytic release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json`
+- adding `tests/test_paper_track_p8c.py`
+- adding all five P8-C reports under `docs/reports/`
+
+P8-C requested faithful RevClassify parity execution and recorded the exact blocker set instead of turning the supporting P8-B row into an overclaim. The pinned RevTrack checkout contains the full-shot BP/DS configurations and 15 recommendation checkpoints, but no distributed RevClassify classification checkpoints; the local environment is CPU-only and lacks the official Lightning/Hydra/OmegaConf/TorchMetrics stack needed for faithful replay. Cohort reconciliation keeps every modern-subgraph claim narrowed to the pinned RevTrack-evaluable table (`110902` rows, `2578` positives) because the current audited official core has `121810` subgraphs and `2763` suspicious labels and the RevTrack table does not expose original component IDs. The strict component-grouped entity-disjoint audit is also not a meaningful evaluation split: the largest identity component contains `110889/110902` rows (`0.99988278`), leaving only 7 validation rows and 6 test rows under a zero-overlap component split. P8-C therefore blocks reference-parity, SOTA, full-core, entity-disjoint, hard AML, and end-to-end Relaytic claims; P8-B remains supporting modern-context evidence only. P8-D is now required before P9 to either reprovision a faithful benchmark environment/cohort protocol or narrow the paper thesis deliberately.
+
+### Paper Track P8-D - Paper thesis narrowing and alternative evidence decision
+
+Goal:
+- decide the first paper's honest post-P8-C story before adding operational metrics or assembling tables
+
+Load-bearing improvement:
+- Relaytic records whether the paper will reprovision modern-subgraph parity or deliberately narrow to a claim-gated AML evaluation-environment thesis that uses Elliptic2 as supporting context only
+
+Required outputs:
+- `paper_p8d_thesis_decision.json`
+- `paper_p8d_evidence_role_matrix.json`
+- `paper_p8d_reprovisioning_decision.json`
+- `paper_p8d_claim_rewrite_plan.json`
+
+Minimum proof:
+- consume P8-B and P8-C gates directly rather than prose summaries
+- choose one explicit route: reprovision faithful RevClassify parity resources, or narrow the paper so P8-B is supporting context only
+- update allowed/blocked claim language before P9 operational metrics can proceed
+- preserve the option to return to modern-subgraph parity later without blocking the first paper indefinitely
+
+Fallback rule:
+- if no thesis route is accepted, P9 remains blocked and no reproducible paper table may include Elliptic2 as a performance contribution
 
 ### Paper Track P9 - Operational AML evaluation layer
 

@@ -1,0 +1,223 @@
+{
+  "blocked_reason_codes": [
+    "largest_component_fits_train_budget",
+    "validation_positive_minimum_met",
+    "test_positive_minimum_met",
+    "train_fraction_reasonable"
+  ],
+  "boundary_entity_columns": [
+    "senders",
+    "receivers"
+  ],
+  "candidate_component_grouped_split": {
+    "assignment_rule": "deterministic largest-components-first greedy allocation after grouping rows by shared entity identity; no row can cross splits if it shares a grouped entity",
+    "minimum_eval_positive_count": 50,
+    "row_summary": {
+      "test": {
+        "component_split_label": "TST",
+        "official_split_labels_present": {
+          "TRN": 4,
+          "TST": 1,
+          "VAL": 1
+        },
+        "positive_count": 4,
+        "positive_rate": 0.66666667,
+        "row_count": 6,
+        "row_fraction": 5.41e-05
+      },
+      "train": {
+        "component_split_label": "TRN",
+        "official_split_labels_present": {
+          "TRN": 88728,
+          "TST": 11103,
+          "VAL": 11058
+        },
+        "positive_count": 2570,
+        "positive_rate": 0.02317633,
+        "row_count": 110889,
+        "row_fraction": 0.99988278
+      },
+      "validation": {
+        "component_split_label": "VAL",
+        "official_split_labels_present": {
+          "TRN": 6,
+          "TST": 1
+        },
+        "positive_count": 4,
+        "positive_rate": 0.57142857,
+        "row_count": 7,
+        "row_fraction": 6.312e-05
+      }
+    },
+    "train_to_eval_entity_overlap": {
+      "train_to_test": {
+        "evaluation_entity_count": 29,
+        "overlap_entity_count": 0,
+        "overlap_fraction": 0.0
+      },
+      "train_to_validation": {
+        "evaluation_entity_count": 22,
+        "overlap_entity_count": 0,
+        "overlap_fraction": 0.0
+      }
+    }
+  },
+  "claim_scope": "strict_entity_disjoint_feasibility_audit_not_a_performance_row",
+  "finding": "Strict entity-disjoint splitting is not meaningful on the pinned RevTrack-evaluable table because nearly all rows collapse into one shared-identity component; any component-grouped holdout would have too little evaluation support.",
+  "identity_columns": [
+    "senders",
+    "source",
+    "sink",
+    "receivers",
+    "node_ids"
+  ],
+  "protocol_checks": {
+    "component_grouping_entity_overlap_is_zero": true,
+    "largest_component_fits_train_budget": false,
+    "test_positive_minimum_met": false,
+    "train_fraction_reasonable": false,
+    "validation_positive_minimum_met": false
+  },
+  "schema_version": "relaytic.elliptic2_reference_parity.v1",
+  "slice": "Paper Track P8-C",
+  "split_contract_id": "p8c_component_grouped_entity_disjoint_v1",
+  "status": "blocked_degenerate_component_structure",
+  "strict_component_protocol": {
+    "all_role_entity_components": {
+      "component_count": 13,
+      "identity_columns": [
+        "senders",
+        "source",
+        "sink",
+        "receivers",
+        "node_ids"
+      ],
+      "largest_component_positive_count": 2570,
+      "largest_component_row_count": 110889,
+      "largest_component_row_fraction": 0.99988278,
+      "positive_component_count": 8,
+      "positive_count": 2578,
+      "row_count": 110902,
+      "singleton_component_count": 11,
+      "top_components": [
+        {
+          "component_id": "21c402c93ede",
+          "positive_count": 2570,
+          "row_count": 110889
+        },
+        {
+          "component_id": "a60522590457",
+          "positive_count": 2,
+          "row_count": 2
+        },
+        {
+          "component_id": "21695efe4852",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "9627a7fd0421",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "d8ae8df4c5a3",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "d01c033966c0",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "b5e502addd51",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "05d18079e8e7",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "71583b7283ef",
+          "positive_count": 0,
+          "row_count": 1
+        },
+        {
+          "component_id": "de2aecde8788",
+          "positive_count": 0,
+          "row_count": 1
+        }
+      ]
+    },
+    "boundary_entity_components": {
+      "component_count": 13,
+      "identity_columns": [
+        "senders",
+        "receivers"
+      ],
+      "largest_component_positive_count": 2570,
+      "largest_component_row_count": 110889,
+      "largest_component_row_fraction": 0.99988278,
+      "positive_component_count": 8,
+      "positive_count": 2578,
+      "row_count": 110902,
+      "singleton_component_count": 11,
+      "top_components": [
+        {
+          "component_id": "21c402c93ede",
+          "positive_count": 2570,
+          "row_count": 110889
+        },
+        {
+          "component_id": "a60522590457",
+          "positive_count": 2,
+          "row_count": 2
+        },
+        {
+          "component_id": "21695efe4852",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "9627a7fd0421",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "d8ae8df4c5a3",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "d01c033966c0",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "b5e502addd51",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "05d18079e8e7",
+          "positive_count": 1,
+          "row_count": 1
+        },
+        {
+          "component_id": "71583b7283ef",
+          "positive_count": 0,
+          "row_count": 1
+        },
+        {
+          "component_id": "de2aecde8788",
+          "positive_count": 0,
+          "row_count": 1
+        }
+      ]
+    }
+  },
+  "strict_entity_disjoint_split_viable": false
+}

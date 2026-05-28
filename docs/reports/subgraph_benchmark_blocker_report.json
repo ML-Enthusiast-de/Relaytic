@@ -1,10 +1,10 @@
 {
   "blocked_track_count": 2,
   "command": "relaytic release-safety hard-graph-tracks --format json",
-  "decision_state": "hard_tracks_blocked_with_elliptic2_supporting_competitive_evidence_recorded",
+  "decision_state": "hard_tracks_blocked_with_elliptic2_reference_parity_gap_recorded",
   "hard_performance_claims_allowed": false,
   "headline_or_sota_claim_allowed": false,
-  "next_slice": "Paper Track P8-C - modern subgraph reference parity and leakage-resistant cohort protocol",
+  "next_slice": "Paper Track P8-D - paper thesis narrowing and alternative evidence decision",
   "p7_context": {
     "graph_neural_claim_allowed": false,
     "graph_shadow_test_pr_auc": 0.388907,
@@ -13,11 +13,11 @@
     "supporting_graph_table_candidate_allowed": true
   },
   "paper_can_continue_to_p9": false,
-  "paper_limitation_text": "P8-B records stable supporting modern-context Elliptic2 evidence on the RevTrack-evaluable cohort, but it is below the reported RevClassifyDS reference, does not prove equivalence to the full current official core, and does not establish entity-disjoint generalization; AMLSim remains excluded pending reproducible synthetic-generation proof.",
+  "paper_limitation_text": "P8-C records that faithful local RevClassify parity is not currently executable, the RevTrack-evaluable cohort is smaller than the audited current official core, and a strict entity-disjoint component split is degenerate because nearly all rows share one identity component; Elliptic2 may be used only as supporting modern-context evidence unless P8-D deliberately narrows the thesis or reprovisions the benchmark.",
   "paper_strategy_recommendation": [
-    "Do not proceed to P9 before P8-C closes or formally accepts the modern reference-parity and leakage-resistant cohort gap.",
-    "Treat P8-B as supporting modern-context evidence only: it survives repeated-seed and row-order-independent checks, but remains below reported RevClassifyDS performance and consumes official RevTrack preprocessing.",
-    "Use AMLSim only as seeded synthetic typology and operations evidence after its proxy audit passes; it cannot replace real subgraph evidence."
+    "Do not proceed to P9 until P8-D either reprovisions faithful neural parity evidence or deliberately narrows the paper thesis.",
+    "Treat P8-B as supporting modern-context evidence only; P8-C blocks reference parity because faithful neural replay is not locally ready and strict entity-disjoint splitting is degenerate on the pinned cohort.",
+    "Move the first paper story away from a modern-subgraph SOTA claim unless a GPU-backed faithful RevClassify environment and a defensible cohort protocol are added."
   ],
   "proxy_track_count": 0,
   "schema_version": "relaytic.paper_hard_graph_track_decision.v1",
@@ -35,6 +35,13 @@
     "claim_posture": "modern_context_pilot_only",
     "interpretation": "P8-A supersedes the Elliptic2 access blocker only to pilot-only evidence; it does not permit paper performance or superiority claims.",
     "status": "pass_pilot_only"
+  },
+  "subsequent_elliptic2_reference_parity_evidence": {
+    "artifact_ref": "docs/reports/elliptic2_reference_parity_gate.json",
+    "interpretation": "P8-C is the current modern-subgraph gate; it blocks P9/headline claims unless faithful neural parity and stronger cohort/leakage proof pass or the thesis is narrowed deliberately.",
+    "reference_parity_claim_allowed": false,
+    "status": "blocked_supporting_only_thesis_narrowing_required",
+    "supporting_modern_context_row_allowed": true
   },
   "supported_track_count": 0,
   "track_decisions": [

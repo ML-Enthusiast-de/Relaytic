@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P8-B implemented. P8-C through P13 planned.
+P0 through P8-C implemented. P8-D through P13 planned.
 
 ## Intent
 
@@ -50,17 +50,19 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Acquire and audit official Elliptic2/RevTrack evidence outside git, freeze protocol discrepancies, and run a strictly exploratory modern-context pilot.
 12. **P8-B - Elliptic2 competitive and robustness suite** - implemented
    Challenge the recovered pilot against RevClassify, repeated seeds, validation-only search, and a row-order-independent robustness split before paper promotion.
-13. **P8-C - Modern subgraph reference parity and leakage-resistant cohort protocol**
+13. **P8-C - Modern subgraph reference parity and leakage-resistant cohort protocol** - implemented
     Close or explicitly reject the gap to modern RevClassify evidence, reconcile the official-core versus RevTrack-evaluable cohort boundary, and require a stronger identity-aware split before the performance story advances.
-14. **P9 - Operational AML evaluation layer**
+14. **P8-D - Paper thesis narrowing and alternative evidence decision**
+    Decide whether to reprovision faithful modern-subgraph parity or narrow the paper around claim-gated AML evaluation with Elliptic2 as supporting context.
+15. **P9 - Operational AML evaluation layer**
     Add review-budget, analyst-hour, false-positive reduction, case-packet completeness, and operational claim guards to paper rows.
-15. **P10 - Reproducible paper table generator**
+16. **P10 - Reproducible paper table generator**
     Generate all paper tables from run artifacts, not hand-maintained numbers.
-16. **P11 - Paper draft and figure pack**
+17. **P11 - Paper draft and figure pack**
     Draft the arXiv paper and generate figures from artifacts or clearly mark schematic figures.
-17. **P12 - External dry run and clean-clone proof**
+18. **P12 - External dry run and clean-clone proof**
     Reproduce the install, paper-smoke benchmark, table generation, claim lint, and leak scan from a clean clone.
-18. **P13 - arXiv release and attention pack**
+19. **P13 - arXiv release and attention pack**
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
 
 ## Non-Negotiable Gates
@@ -213,7 +215,7 @@ P8 added:
 - `relaytic release-safety hard-graph-tracks --format json`
 - `tests/test_paper_track_p8.py`
 
-P8 recorded both current hard graph tracks as blocked from performance claims. AMLSim remains a future reproducible synthetic typology/workflow proxy; it cannot replace real subgraph evidence. P8-A superseded Elliptic2's access-blocked state and P8-B tested the recovered path competitively; P9 now remains blocked on P8-C reference-parity and stronger cohort/leakage evidence.
+P8 recorded both current hard graph tracks as blocked from performance claims. AMLSim remains a future reproducible synthetic typology/workflow proxy; it cannot replace real subgraph evidence. P8-A superseded Elliptic2's access-blocked state, P8-B tested the recovered path competitively, and P8-C recorded the reference-parity/cohort blocker. P9 now remains blocked on P8-D thesis narrowing or reprovisioning.
 
 P8-A added:
 
@@ -241,10 +243,23 @@ P8-B added:
 - `relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --format json`
 - `tests/test_paper_track_p8b.py`
 
-P8-B rigorously records the published full-shot reference (`RevClassifyBP PR-AUC=0.972`, `RevClassifyDS PR-AUC=0.974`) and documents that the pinned public repository does not distribute classification checkpoints and reports single-V100 training. It also discovers a material cohort boundary: the pinned RevTrack table evaluates 110,902 rows and 2,578 positives versus the audited current official core of 121,810 rows and 2,763 suspicious labels. Under a validation-only three-candidate CPU budget, pooled moments are selected and produce repeated official test `PR-AUC=0.943240 +/- 0.000882` and deterministic content-hash test `PR-AUC=0.929669 +/- 0.000538`. The hash partition passes row-order-independence, but the result remains below RevClassifyDS, consumes official preprocessing/embeddings, follows an already exposed official test partition, and does not prove entity-disjoint generalization. P8-B permits a supporting modern-context row only and blocks P9 until P8-C addresses reference parity and stronger cohort/leakage evidence.
+P8-B rigorously records the published full-shot reference (`RevClassifyBP PR-AUC=0.972`, `RevClassifyDS PR-AUC=0.974`) and documents that the pinned public repository does not distribute classification checkpoints and reports single-V100 training. It also discovers a material cohort boundary: the pinned RevTrack table evaluates 110,902 rows and 2,578 positives versus the audited current official core of 121,810 rows and 2,763 suspicious labels. Under a validation-only three-candidate CPU budget, pooled moments are selected and produce repeated official test `PR-AUC=0.943240 +/- 0.000882` and deterministic content-hash test `PR-AUC=0.929669 +/- 0.000538`. The hash partition passes row-order-independence, but the result remains below RevClassifyDS, consumes official preprocessing/embeddings, follows an already exposed official test partition, and does not prove entity-disjoint generalization. P8-B permits a supporting modern-context row only; P8-C now confirms it cannot become a central parity claim in the current environment.
+
+P8-C added:
+
+- `docs/reports/elliptic2_neural_reference_parity_contract.json`
+- `docs/reports/elliptic2_evaluable_cohort_reconciliation.json`
+- `docs/reports/elliptic2_entity_disjoint_split_report.json`
+- `docs/reports/elliptic2_neural_candidate_scorecard.json`
+- `docs/reports/elliptic2_reference_parity_gate.json`
+- `src/relaytic/release_safety/elliptic2_reference_parity.py`
+- `relaytic release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json`
+- `tests/test_paper_track_p8c.py`
+
+P8-C requested faithful RevClassify parity execution and blocked it with exact evidence: the local environment is CPU-only, lacks the official Lightning/Hydra/OmegaConf/TorchMetrics stack, and the pinned repository does not distribute RevClassify classification checkpoints. It narrows every modern-subgraph claim to the RevTrack-evaluable table because current-core equivalence is not proven (`110902/121810` rows, `2578/2763` positives). Its strict entity-disjoint component split is degenerate: `110889/110902` rows collapse into the largest identity component, leaving only 7 validation rows and 6 test rows under a zero-overlap split. P8-C therefore keeps P8-B as supporting context only and blocks P9 until P8-D decides whether to reprovision parity or narrow the paper thesis.
 
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P8-C**.
+The next implementation target is **Paper Track P8-D**.
 
-P8-C must implement or faithfully reproduce a neural RevClassify-style comparison path, reconcile the RevTrack-evaluable subset against the audited current Elliptic2 core, and run an entity-disjoint or comparably leakage-resistant protocol before P9 or headline modern-subgraph framing resumes.
+P8-D must consume the P8-B/P8-C gates and choose the first-paper route: reprovision faithful modern-subgraph parity resources, or narrow the paper around claim-gated AML evaluation where Elliptic2 is supporting context rather than the central performance contribution.

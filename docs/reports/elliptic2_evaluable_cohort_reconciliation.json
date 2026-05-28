@@ -1,0 +1,49 @@
+{
+  "blocked_reason_codes": [
+    "full_core_row_mapping_not_proven",
+    "revtrack_evaluable_cohort_smaller_than_current_official_core",
+    "revtrack_positive_count_differs_from_current_official_core",
+    "revtrack_table_does_not_expose_official_component_ids"
+  ],
+  "claims_permanently_narrowed_to_revtrack_evaluable_cohort": true,
+  "direct_official_component_id_columns": [],
+  "finding": "The pinned RevTrack table is evaluable and stable, but it is smaller than the audited current official core and does not expose original component IDs; claims must be narrowed to the RevTrack-evaluable cohort unless a future mapping proof is added.",
+  "full_core_equivalence_proven": false,
+  "official_core_positive_count": 2763,
+  "official_core_subgraph_count": 121810,
+  "positive_coverage_fraction": 0.93304379,
+  "positive_gap_current_core_minus_revtrack": 185,
+  "revtrack_evaluable_positive_count": 2578,
+  "revtrack_evaluable_row_count": 110902,
+  "revtrack_subg_examples": [
+    "TRN0",
+    "TRN1",
+    "TRN2",
+    "TRN3",
+    "TRN4"
+  ],
+  "revtrack_table_columns": [
+    "senders",
+    "source",
+    "sink",
+    "receivers",
+    "subg",
+    "labels",
+    "senders_len",
+    "source_len",
+    "sink_len",
+    "receivers_len",
+    "node_ids",
+    "split",
+    "senders_mapped",
+    "receivers_mapped",
+    "node_ids_mapped",
+    "edge_index_mapped",
+    "edge_index"
+  ],
+  "row_coverage_fraction": 0.9104507,
+  "row_gap_current_core_minus_revtrack": 10908,
+  "schema_version": "relaytic.elliptic2_reference_parity.v1",
+  "slice": "Paper Track P8-C",
+  "status": "narrowed_to_revtrack_evaluable_cohort"
+}

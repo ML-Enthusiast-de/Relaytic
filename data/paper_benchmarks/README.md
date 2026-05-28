@@ -31,4 +31,10 @@ P8-B competitive and robustness evidence reuses the externally retained pinned R
 
 P8-B commits aggregate competitive metrics, reported-reference provenance, cohort coverage, repeated-seed evidence, and split/identity-overlap audits only. It does not commit embedding assets or raw Elliptic2 data.
 
+P8-C reference-parity and leakage-resistance evidence also reuses the externally retained pinned RevTrack assets:
+
+- `relaytic release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json`
+
+P8-C commits only dependency/resource posture, cohort aggregate reconciliation, strict entity-component split feasibility, and claim gates. It does not commit raw rows, embeddings, checkpoints, or local machine paths.
+
 Use `docs/reports/paper_dataset_access_manifest.json` for source URLs, license posture, and setup notes.

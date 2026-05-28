@@ -25,7 +25,7 @@ That means:
 - PaySim-style CSV snapshots are in scope now
 - flattened Elliptic-style graph snapshots are in scope now
 - raw multi-file Elliptic bundles are in scope through provenance, temporal split, and P7 graph-baseline artifacts
-- P8 initially recorded Elliptic2 as blocked, P8-A recovered its official labeled core plus pinned RevTrack modern-reference assets into a hash-audited pilot path, and P8-B now admits a supporting repeated-seed/context row only; P8-C remains mandatory before modern reference-parity or headline paper claims
+- P8 initially recorded Elliptic2 as blocked, P8-A recovered its official labeled core plus pinned RevTrack modern-reference assets into a hash-audited pilot path, P8-B admits a supporting repeated-seed/context row only, and P8-C blocks reference-parity/headline claims pending P8-D thesis narrowing or reprovisioning
 - P8 records AMLSim as blocked until a seeded generated bundle, generator revision, output hashes, generated-data license, and typology audit exist; once verified it remains synthetic `proxy` evidence only
 
 Relaytic-AML must be honest about that boundary. Raw Elliptic support is now real, but it does not imply Elliptic2-scale subgraph support or graph-neural superiority.
@@ -74,7 +74,7 @@ What Relaytic-AML should prove here:
 
 This is the harder public-proof track.
 
-P8-A confirmed it as the highest-upside scientific breadth recovery, and P8-B now records stable supporting evidence: official-partition repeated test `PR-AUC=0.943240 +/- 0.000882` and row-order-independent content-hash test `PR-AUC=0.929669 +/- 0.000538`. P8-B also finds that the RevTrack-evaluable cohort (`110902` rows) is not proven equivalent to the audited current official core (`121810` rows) and remains below reported full-shot `RevClassifyDS PR-AUC=0.974`. P8-C must attempt neural reference parity and a stronger identity/leakage-resistant cohort protocol before the modern graph result becomes a central paper contribution.
+P8-A confirmed it as the highest-upside scientific breadth recovery, and P8-B records stable supporting evidence: official-partition repeated test `PR-AUC=0.943240 +/- 0.000882` and row-order-independent content-hash test `PR-AUC=0.929669 +/- 0.000538`. P8-C then blocks stronger claims: faithful RevClassify parity is not locally executable in the current environment, the RevTrack-evaluable cohort (`110902` rows) is not proven equivalent to the audited current official core (`121810` rows), and a strict entity-disjoint component split is degenerate because `110889/110902` rows share one identity component. P8-D must decide whether to reprovision parity or narrow the paper so this track remains supporting context only.
 
 ### 4. AMLSim-style synthetic bank-transaction graph
 
@@ -145,7 +145,7 @@ The benchmark pack is now part of a broader AML proof/productization sequence. T
 8. **15Y**: rewrote first-contact docs around the flagship path and added the paper benchmark runbook.
 9. **15Z**: cleaned repo credibility risks with module-split evidence, public-surface inventory, and retained benchmark cleanup debt.
 10. **15Z-R**: froze the relevant benchmark and release evidence with a rerunnable paper-freeze command, claim boundaries, reproducibility attestation, and hard-performance-claim blocking.
-11. **Paper Track P0-P13, with P8-C inserted after P8-B**: turns the frozen but claim-blocked release pack into a paper-ready path: commit the baseline, clean public surfaces, freeze the paper thesis, register datasets, run PaySim-style and Elliptic-style evidence, add strong tabular and graph baselines, recover and challenge modern Elliptic2 evidence, close or explicitly narrow its neural-reference/cohort gap, generate reproducible tables, draft the paper, dry-run from a clean clone, and release to arXiv only if gates pass.
+11. **Paper Track P0-P13, with P8-C/P8-D inserted after P8-B**: turns the frozen but claim-blocked release pack into a paper-ready path: commit the baseline, clean public surfaces, freeze the paper thesis, register datasets, run PaySim-style and Elliptic-style evidence, add strong tabular and graph baselines, recover and challenge modern Elliptic2 evidence, close or explicitly narrow its neural-reference/cohort gap, generate reproducible tables, draft the paper, dry-run from a clean clone, and release to arXiv only if gates pass.
 
 Benchmark success must stay separated from:
 

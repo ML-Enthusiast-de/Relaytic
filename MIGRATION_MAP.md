@@ -333,6 +333,13 @@ Avoid introducing new references to:
 - introduced paper-track competitive subgraph artifacts under `docs/reports/`: `elliptic2_competitive_budget_contract.json`, `elliptic2_revclassify_reference_scorecard.json`, `elliptic2_relaytic_candidate_search_trace.json`, `elliptic2_repeated_seed_scorecard.json`, `elliptic2_split_robustness_report.json`, and `elliptic2_publishability_gate.json`
 - promoted only a supporting modern-context row: pooled-moments LightGBM reports repeated official test `PR-AUC=0.943240 +/- 0.000882` and deterministic hash-split test `PR-AUC=0.929669 +/- 0.000538`, below reported `RevClassifyDS=0.974`; P8-C is required before P9
 
+### Paper Track P8-C
+
+- introduced `src/relaytic/release_safety/elliptic2_reference_parity.py` under the existing release-safety boundary for faithful RevClassify precondition auditing, current-core versus RevTrack-evaluable cohort reconciliation, strict entity-disjoint split feasibility, neural candidate scorecard blocking, and reference-parity gating
+- introduced the public command `relaytic release-safety elliptic2-reference-parity` for regenerating P8-C artifacts from external local pinned RevTrack assets without committing raw data or machine paths
+- introduced paper-track reference-parity artifacts under `docs/reports/`: `elliptic2_neural_reference_parity_contract.json`, `elliptic2_evaluable_cohort_reconciliation.json`, `elliptic2_entity_disjoint_split_report.json`, `elliptic2_neural_candidate_scorecard.json`, and `elliptic2_reference_parity_gate.json`
+- recorded that P8-B remains supporting-only: faithful RevClassify parity is blocked by missing local dependencies/accelerator and absent distributed classification checkpoints, cohort equivalence to the current official core is not proven, and strict entity-disjoint splitting degenerates with `110889/110902` rows in the largest identity component; P8-D is required before P9
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
@@ -751,6 +758,11 @@ Implemented release-safety artifact names:
 - `elliptic2_repeated_seed_scorecard.json`
 - `elliptic2_split_robustness_report.json`
 - `elliptic2_publishability_gate.json`
+- `elliptic2_neural_reference_parity_contract.json`
+- `elliptic2_evaluable_cohort_reconciliation.json`
+- `elliptic2_entity_disjoint_split_report.json`
+- `elliptic2_neural_candidate_scorecard.json`
+- `elliptic2_reference_parity_gate.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

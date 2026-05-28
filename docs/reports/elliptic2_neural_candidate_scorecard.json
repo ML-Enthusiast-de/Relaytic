@@ -1,0 +1,66 @@
+{
+  "best_local_neural_official_test_pr_auc_mean": null,
+  "blocked_reason_codes": [
+    "local_accelerator_not_available_for_faithful_revclassify_budget",
+    "official_revclassify_classification_checkpoints_not_distributed",
+    "official_revclassify_dependency_hydra-core_missing",
+    "official_revclassify_dependency_lightning_missing",
+    "official_revclassify_dependency_omegaconf_missing",
+    "official_revclassify_dependency_torchmetrics_missing"
+  ],
+  "finding": "Faithful RevClassifyBP/DS parity was not executed locally; P8-B remains the only numeric modern-context evidence and stays supporting-only.",
+  "metric": "pr_auc",
+  "p8b_supporting_context_baseline": {
+    "candidate_family": "LightGBM over official RevTrack embeddings",
+    "claim_scope": "supporting_modern_context_baseline_only",
+    "hash_split_test_pr_auc_mean": 0.929669,
+    "official_test_pr_auc_mean": 0.94324,
+    "official_test_pr_auc_std": 0.000882,
+    "reference_gap": -0.03076,
+    "supporting_paper_row_allowed": true
+  },
+  "published_revclassify_ds_pr_auc": 0.974,
+  "reference_candidates": [
+    {
+      "blocked_reason_codes": [
+        "local_accelerator_not_available_for_faithful_revclassify_budget",
+        "official_revclassify_classification_checkpoints_not_distributed",
+        "official_revclassify_dependency_hydra-core_missing",
+        "official_revclassify_dependency_lightning_missing",
+        "official_revclassify_dependency_omegaconf_missing",
+        "official_revclassify_dependency_torchmetrics_missing"
+      ],
+      "candidate_id": "official_revclassify_bp_full_shot",
+      "configuration_path": "configurations/sweep/subgraph_classification/full_shot/BP.yaml",
+      "family": "RevClassifyBP",
+      "local_execution_status": "blocked",
+      "local_repeated_seed_pr_auc_mean": null,
+      "local_repeated_seed_pr_auc_std": null,
+      "reported_f1": 0.954,
+      "reported_pr_auc": 0.972
+    },
+    {
+      "blocked_reason_codes": [
+        "local_accelerator_not_available_for_faithful_revclassify_budget",
+        "official_revclassify_classification_checkpoints_not_distributed",
+        "official_revclassify_dependency_hydra-core_missing",
+        "official_revclassify_dependency_lightning_missing",
+        "official_revclassify_dependency_omegaconf_missing",
+        "official_revclassify_dependency_torchmetrics_missing"
+      ],
+      "candidate_id": "official_revclassify_ds_full_shot",
+      "configuration_path": "configurations/sweep/subgraph_classification/full_shot/DS.yaml",
+      "family": "RevClassifyDS",
+      "local_execution_status": "blocked",
+      "local_repeated_seed_pr_auc_mean": null,
+      "local_repeated_seed_pr_auc_std": null,
+      "reported_f1": 0.953,
+      "reported_pr_auc": 0.974
+    }
+  ],
+  "run_neural_requested": true,
+  "schema_version": "relaytic.elliptic2_reference_parity.v1",
+  "selection_policy": "no P8-C candidate is selected from the already exposed official test partition",
+  "slice": "Paper Track P8-C",
+  "status": "blocked_resource_or_protocol_gap"
+}

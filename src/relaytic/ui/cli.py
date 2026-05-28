@@ -1354,6 +1354,36 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_elliptic2_reference = release_safety_sub.add_parser(
+        "elliptic2-reference-parity",
+        help="Build Paper Track P8-C Elliptic2 neural reference-parity, cohort, and entity-disjoint-split gates.",
+    )
+    release_safety_elliptic2_reference.add_argument(
+        "--core-data-dir",
+        default=None,
+        help="Optional official labeled-subgraph core directory. Defaults to existing P8-A reports or data/paper_benchmarks/elliptic2.",
+    )
+    release_safety_elliptic2_reference.add_argument(
+        "--revtrack-dir",
+        default=None,
+        help="Optional official RevTrack checkout directory. Defaults to data/paper_benchmarks/elliptic2_revtrack.",
+    )
+    release_safety_elliptic2_reference.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P8-C artifacts. Runs without --revtrack-dir default to an artifacts preview directory.",
+    )
+    release_safety_elliptic2_reference.add_argument(
+        "--run-neural",
+        action="store_true",
+        help="Attempt faithful local RevClassify neural parity execution only when dependency and accelerator preconditions pass.",
+    )
+    release_safety_elliptic2_reference.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3364,6 +3394,13 @@ def main(argv: list[str] | None = None) -> int:
                     output_dir=args.output_dir,
                     budget_tier=args.budget_tier,
                     run_suite=args.run_suite,
+                )
+            elif args.release_safety_command == "elliptic2-reference-parity":
+                payload = _run_elliptic2_reference_parity_surface(
+                    core_data_dir=args.core_data_dir,
+                    revtrack_dir=args.revtrack_dir,
+                    output_dir=args.output_dir,
+                    run_neural=args.run_neural,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -7282,6 +7319,45 @@ def _run_elliptic2_competitive_surface(
             "bundle": pack,
         },
         "human_output": render_elliptic2_competitive_markdown(pack),
+    }
+
+
+def _run_elliptic2_reference_parity_surface(
+    *,
+    core_data_dir: str | None,
+    revtrack_dir: str | None,
+    output_dir: str | None,
+    run_neural: bool,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_elliptic2_reference_parity_markdown,
+        sync_elliptic2_reference_parity_pack,
+    )
+
+    root = Path.cwd()
+    resolved_output_dir = output_dir
+    if output_dir is None and revtrack_dir is None:
+        resolved_output_dir = str(root / "artifacts" / "release_safety" / "elliptic2_reference_parity_preview")
+    written = sync_elliptic2_reference_parity_pack(
+        root,
+        core_data_dir=core_data_dir,
+        revtrack_dir=revtrack_dir,
+        output_dir=resolved_output_dir,
+        run_neural=run_neural,
+    )
+    pack = {key: json.loads(path.read_text(encoding="utf-8")) for key, path in written.items()}
+    gate = dict(pack["elliptic2_reference_parity_gate"])
+    return {
+        "surface_payload": {
+            "status": gate["status"],
+            "output_dir": str(
+                Path(resolved_output_dir) if resolved_output_dir else root / "docs" / "reports"
+            ),
+            "paths": {key: str(path) for key, path in written.items()},
+            "elliptic2_reference_parity": gate,
+            "bundle": pack,
+        },
+        "human_output": render_elliptic2_reference_parity_markdown(pack),
     }
 
 

@@ -591,7 +591,17 @@ Current paper-track Elliptic2 competitive and robustness artifact names from Pap
 - `elliptic2_split_robustness_report.json`
 - `elliptic2_publishability_gate.json`
 
-Paper Track P8-B extends `src/relaytic/release_safety/` with validation-only candidate selection, repeated-seed scoring, reported RevClassify reference comparison, and a deterministic content-hash robustness split. P8-B metrics must identify the pinned RevTrack-evaluable cohort separately from the audited full current Elliptic2 core, disclose prior official-test exposure from P8-A, and disclose entity overlap. A supporting-row gate never authorizes headline, SOTA, full-core, or end-to-end Relaytic claims; failure to reach reported modern-reference parity requires P8-C before P9.
+Paper Track P8-B extends `src/relaytic/release_safety/` with validation-only candidate selection, repeated-seed scoring, reported RevClassify reference comparison, and a deterministic content-hash robustness split. P8-B metrics must identify the pinned RevTrack-evaluable cohort separately from the audited full current Elliptic2 core, disclose prior official-test exposure from P8-A, and disclose entity overlap. A supporting-row gate never authorizes headline, SOTA, full-core, or end-to-end Relaytic claims; P8-C is the subsequent reference-parity and stronger-cohort gate.
+
+Current paper-track Elliptic2 reference-parity artifact names from Paper Track P8-C:
+
+- `elliptic2_neural_reference_parity_contract.json`
+- `elliptic2_evaluable_cohort_reconciliation.json`
+- `elliptic2_entity_disjoint_split_report.json`
+- `elliptic2_neural_candidate_scorecard.json`
+- `elliptic2_reference_parity_gate.json`
+
+Paper Track P8-C extends `src/relaytic/release_safety/` with a faithful RevClassify parity precondition contract, a current-core versus RevTrack-evaluable cohort reconciliation, a component-grouped entity-disjoint split feasibility audit, and a final reference-parity gate. It may record P8-B as supporting modern-context evidence, but it must block reference-parity, SOTA, full-core, entity-disjoint, and end-to-end Relaytic claims when faithful neural replay is not locally executable or when the strict split degenerates. If P8-C blocks, P9 remains blocked until a thesis-narrowing or reprovisioning slice records the accepted paper strategy.
 
 Current trace and eval artifact names:
 
@@ -794,6 +804,11 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic release-safety elliptic-graph`
 - `relaytic release-safety tabular-baselines`
 - `relaytic release-safety paysim-competitive`
+- `relaytic release-safety graph-baselines`
+- `relaytic release-safety hard-graph-tracks`
+- `relaytic release-safety elliptic2-recovery`
+- `relaytic release-safety elliptic2-competitive`
+- `relaytic release-safety elliptic2-reference-parity`
 - `relaytic scan-git-safety`
 
 ## Slice 05 Planning Contract

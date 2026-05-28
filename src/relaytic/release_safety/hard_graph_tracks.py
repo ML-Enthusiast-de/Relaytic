@@ -370,6 +370,10 @@ def _build_blocker_report(
     pilot_recovered = elliptic2_recovery_gate.get("status") == "pass_pilot_only"
     elliptic2_competitive_gate = _read_json_if_exists(root / "docs" / "reports" / "elliptic2_publishability_gate.json")
     competitive_recorded = elliptic2_competitive_gate.get("slice") == "Paper Track P8-B"
+    elliptic2_reference_parity_gate = _read_json_if_exists(
+        root / "docs" / "reports" / "elliptic2_reference_parity_gate.json"
+    )
+    reference_parity_recorded = elliptic2_reference_parity_gate.get("slice") == "Paper Track P8-C"
     amlsim_support = "proxy" if (
         amlsim_generation["support_level"] == "proxy" and amlsim_typology["support_level"] == "proxy"
     ) else "blocked"
@@ -405,6 +409,12 @@ def _build_blocker_report(
     if shadow_rows:
         graph_shadow_test_pr_auc = dict(shadow_rows[0].get("test_metrics", {})).get("pr_auc")
     decision_state = (
+        "hard_tracks_blocked_with_elliptic2_reference_parity_gap_recorded"
+        if reference_parity_recorded and not elliptic2_reference_parity_gate.get("reference_parity_claim_allowed")
+        else
+        "hard_tracks_reference_parity_ready_for_operational_layer"
+        if reference_parity_recorded
+        else
         "hard_tracks_blocked_with_elliptic2_supporting_competitive_evidence_recorded"
         if competitive_recorded and elliptic2_competitive_gate.get("supporting_paper_row_allowed")
         else
@@ -430,7 +440,11 @@ def _build_blocker_report(
         "hard_performance_claims_allowed": False,
         "headline_or_sota_claim_allowed": False,
         "paper_can_continue_to_p9": (
-            bool(elliptic2_competitive_gate.get("p9_allowed")) if competitive_recorded else not pilot_recovered
+            bool(elliptic2_reference_parity_gate.get("p9_allowed"))
+            if reference_parity_recorded
+            else bool(elliptic2_competitive_gate.get("p9_allowed"))
+            if competitive_recorded
+            else not pilot_recovered
         ),
         "p7_context": {
             "supporting_graph_table_candidate_allowed": graph_gate.get("supporting_graph_table_candidate_allowed", False),
@@ -440,6 +454,13 @@ def _build_blocker_report(
             "interpretation": "P7 supplies supporting flattened-graph evidence only; it does not substitute for modern subgraph AML evidence.",
         },
         "paper_strategy_recommendation": (
+            [
+                "Do not proceed to P9 until P8-D either reprovisions faithful neural parity evidence or deliberately narrows the paper thesis.",
+                "Treat P8-B as supporting modern-context evidence only; P8-C blocks reference parity because faithful neural replay is not locally ready and strict entity-disjoint splitting is degenerate on the pinned cohort.",
+                "Move the first paper story away from a modern-subgraph SOTA claim unless a GPU-backed faithful RevClassify environment and a defensible cohort protocol are added.",
+            ]
+            if reference_parity_recorded
+            else
             [
                 "Do not proceed to P9 before P8-C closes or formally accepts the modern reference-parity and leakage-resistant cohort gap.",
                 "Treat P8-B as supporting modern-context evidence only: it survives repeated-seed and row-order-independent checks, but remains below reported RevClassifyDS performance and consumes official RevTrack preprocessing.",
@@ -459,6 +480,9 @@ def _build_blocker_report(
             ]
         ),
         "paper_limitation_text": (
+            "P8-C records that faithful local RevClassify parity is not currently executable, the RevTrack-evaluable cohort is smaller than the audited current official core, and a strict entity-disjoint component split is degenerate because nearly all rows share one identity component; Elliptic2 may be used only as supporting modern-context evidence unless P8-D deliberately narrows the thesis or reprovisions the benchmark."
+            if reference_parity_recorded
+            else
             "P8-B records stable supporting modern-context Elliptic2 evidence on the RevTrack-evaluable cohort, but it is below the reported RevClassifyDS reference, does not prove equivalence to the full current official core, and does not establish entity-disjoint generalization; AMLSim remains excluded pending reproducible synthetic-generation proof."
             if competitive_recorded
             else "Elliptic2 access was repaired to exploratory modern-context pilot evidence in P8-A, but paper performance claims remain excluded pending competitive and robustness proof; AMLSim remains excluded pending reproducible synthetic-generation proof."
@@ -478,8 +502,21 @@ def _build_blocker_report(
             "artifact_ref": "docs/reports/elliptic2_publishability_gate.json",
             "interpretation": "P8-B permits supporting modern-context evidence only when its gate passes; it does not authorize headline, SOTA, full-core, or end-to-end Relaytic claims.",
         } if competitive_recorded else None,
+        "subsequent_elliptic2_reference_parity_evidence": {
+            "status": elliptic2_reference_parity_gate.get("status"),
+            "supporting_modern_context_row_allowed": elliptic2_reference_parity_gate.get(
+                "supporting_modern_context_row_allowed"
+            ),
+            "reference_parity_claim_allowed": elliptic2_reference_parity_gate.get(
+                "reference_parity_claim_allowed"
+            ),
+            "artifact_ref": "docs/reports/elliptic2_reference_parity_gate.json",
+            "interpretation": "P8-C is the current modern-subgraph gate; it blocks P9/headline claims unless faithful neural parity and stronger cohort/leakage proof pass or the thesis is narrowed deliberately.",
+        } if reference_parity_recorded else None,
         "next_slice": (
-            elliptic2_competitive_gate.get("next_slice")
+            elliptic2_reference_parity_gate.get("next_slice")
+            if reference_parity_recorded
+            else elliptic2_competitive_gate.get("next_slice")
             if competitive_recorded
             else "Paper Track P8-B - Elliptic2 competitive and robustness suite"
             if pilot_recovered
