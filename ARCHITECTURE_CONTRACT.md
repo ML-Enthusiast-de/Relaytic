@@ -603,6 +603,15 @@ Current paper-track Elliptic2 reference-parity artifact names from Paper Track P
 
 Paper Track P8-C extends `src/relaytic/release_safety/` with a faithful RevClassify parity precondition contract, a current-core versus RevTrack-evaluable cohort reconciliation, a component-grouped entity-disjoint split feasibility audit, and a final reference-parity gate. It may record P8-B as supporting modern-context evidence, but it must block reference-parity, SOTA, full-core, entity-disjoint, and end-to-end Relaytic claims when faithful neural replay is not locally executable or when the strict split degenerates. If P8-C blocks, P9 remains blocked until a thesis-narrowing or reprovisioning slice records the accepted paper strategy.
 
+Current paper-track thesis narrowing artifact names from Paper Track P8-D:
+
+- `paper_p8d_thesis_decision.json`
+- `paper_p8d_evidence_role_matrix.json`
+- `paper_p8d_reprovisioning_decision.json`
+- `paper_p8d_claim_rewrite_plan.json`
+
+Paper Track P8-D extends `src/relaytic/release_safety/` with the accepted first-paper thesis boundary after P8-C. It consumes the P8-B and P8-C gates directly, accepts the narrowed claim-gated AML evaluation-environment thesis for the first paper, permits P9 operational metrics to proceed, keeps Elliptic2 as supporting context and limitation evidence only, and preserves a later faithful RevClassify reprovisioning track without letting it block the first paper indefinitely.
+
 Current trace and eval artifact names:
 
 - `trace_model.json`
@@ -809,6 +818,7 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic release-safety elliptic2-recovery`
 - `relaytic release-safety elliptic2-competitive`
 - `relaytic release-safety elliptic2-reference-parity`
+- `relaytic release-safety paper-thesis-decision`
 - `relaytic scan-git-safety`
 
 ## Slice 05 Planning Contract

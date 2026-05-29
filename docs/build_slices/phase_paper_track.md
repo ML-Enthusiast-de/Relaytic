@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P8-C implemented. P8-D through P13 planned.
+P0 through P8-D implemented. P9 through P13 planned.
 
 ## Intent
 
@@ -52,7 +52,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
    Challenge the recovered pilot against RevClassify, repeated seeds, validation-only search, and a row-order-independent robustness split before paper promotion.
 13. **P8-C - Modern subgraph reference parity and leakage-resistant cohort protocol** - implemented
     Close or explicitly reject the gap to modern RevClassify evidence, reconcile the official-core versus RevTrack-evaluable cohort boundary, and require a stronger identity-aware split before the performance story advances.
-14. **P8-D - Paper thesis narrowing and alternative evidence decision**
+14. **P8-D - Paper thesis narrowing and alternative evidence decision** - implemented
     Decide whether to reprovision faithful modern-subgraph parity or narrow the paper around claim-gated AML evaluation with Elliptic2 as supporting context.
 15. **P9 - Operational AML evaluation layer**
     Add review-budget, analyst-hour, false-positive reduction, case-packet completeness, and operational claim guards to paper rows.
@@ -215,7 +215,7 @@ P8 added:
 - `relaytic release-safety hard-graph-tracks --format json`
 - `tests/test_paper_track_p8.py`
 
-P8 recorded both current hard graph tracks as blocked from performance claims. AMLSim remains a future reproducible synthetic typology/workflow proxy; it cannot replace real subgraph evidence. P8-A superseded Elliptic2's access-blocked state, P8-B tested the recovered path competitively, and P8-C recorded the reference-parity/cohort blocker. P9 now remains blocked on P8-D thesis narrowing or reprovisioning.
+P8 recorded both current hard graph tracks as blocked from performance claims. AMLSim remains a future reproducible synthetic typology/workflow proxy; it cannot replace real subgraph evidence. P8-A superseded Elliptic2's access-blocked state, P8-B tested the recovered path competitively, P8-C recorded the reference-parity/cohort blocker, and P8-D accepted thesis narrowing so P9 can proceed without treating Elliptic2 as a performance contribution.
 
 P8-A added:
 
@@ -256,10 +256,22 @@ P8-C added:
 - `relaytic release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json`
 - `tests/test_paper_track_p8c.py`
 
-P8-C requested faithful RevClassify parity execution and blocked it with exact evidence: the local environment is CPU-only, lacks the official Lightning/Hydra/OmegaConf/TorchMetrics stack, and the pinned repository does not distribute RevClassify classification checkpoints. It narrows every modern-subgraph claim to the RevTrack-evaluable table because current-core equivalence is not proven (`110902/121810` rows, `2578/2763` positives). Its strict entity-disjoint component split is degenerate: `110889/110902` rows collapse into the largest identity component, leaving only 7 validation rows and 6 test rows under a zero-overlap split. P8-C therefore keeps P8-B as supporting context only and blocks P9 until P8-D decides whether to reprovision parity or narrow the paper thesis.
+P8-C requested faithful RevClassify parity execution and blocked it with exact evidence: the local environment is CPU-only, lacks the official Lightning/Hydra/OmegaConf/TorchMetrics stack, and the pinned repository does not distribute RevClassify classification checkpoints. It narrows every modern-subgraph claim to the RevTrack-evaluable table because current-core equivalence is not proven (`110902/121810` rows, `2578/2763` positives). Its strict entity-disjoint component split is degenerate: `110889/110902` rows collapse into the largest identity component, leaving only 7 validation rows and 6 test rows under a zero-overlap split. P8-C therefore keeps P8-B as supporting context only and blocked P9 until P8-D recorded the accepted thesis boundary.
+
+P8-D added:
+
+- `docs/reports/paper_p8d_thesis_decision.json`
+- `docs/reports/paper_p8d_evidence_role_matrix.json`
+- `docs/reports/paper_p8d_reprovisioning_decision.json`
+- `docs/reports/paper_p8d_claim_rewrite_plan.json`
+- `src/relaytic/release_safety/paper_thesis_decision.py`
+- `relaytic release-safety paper-thesis-decision --format json`
+- `tests/test_paper_track_p8d.py`
+
+P8-D accepts the narrowed first-paper route: Relaytic-AML is framed as a claim-gated AML evaluation environment with operational evidence, not as a modern subgraph SOTA model paper. P8-B remains supporting modern-context evidence only, P8-C becomes the limitation and claim-firewall evidence, Elliptic2 is excluded from performance-contribution claims, and faithful RevClassify reprovisioning is preserved as a later extension instead of blocking P9.
 
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P8-D**.
+The next implementation target is **Paper Track P9**.
 
-P8-D must consume the P8-B/P8-C gates and choose the first-paper route: reprovision faithful modern-subgraph parity resources, or narrow the paper around claim-gated AML evaluation where Elliptic2 is supporting context rather than the central performance contribution.
+P9 must add operational AML evaluation rows under the P8-D thesis boundary, including review-budget curves, case-packet completeness, false-positive burden, and claim guards that fail closed when business-value assumptions are incomplete.

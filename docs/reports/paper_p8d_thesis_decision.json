@@ -1,0 +1,150 @@
+{
+  "accepted_first_paper_thesis": "Relaytic-AML is a local-first, claim-gated evaluation environment for AML-relevant temporal, graph, operational, and reproducibility evidence; it is not presented as a modern subgraph SOTA model paper.",
+  "claim_boundary": {
+    "allowed": [
+      "claim_gated_aml_evaluation_environment",
+      "benchmark_track_discipline_with_explicit_supporting_proxy_and_blocked_roles",
+      "p8b_as_modern_context_supporting_evidence_only",
+      "p8c_as_auditable_limitation_and_claim-firewall_evidence",
+      "p9_operational_metrics_after_their_own_assumption_and_claim_guards_pass"
+    ],
+    "blocked": [
+      "elliptic2_or_modern_subgraph_sota_claim",
+      "revclassify_reference_parity_claim",
+      "full_current_core_elliptic2_claim",
+      "entity_disjoint_generalization_claim",
+      "hard_real_world_aml_superiority_claim",
+      "end_to_end_relaytic_superiority_on_elliptic2",
+      "elliptic2_primary_performance_contribution_in_first_paper"
+    ]
+  },
+  "direct_gate_consumption": [
+    {
+      "artifact_ref": "docs/reports/elliptic2_publishability_gate.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-B",
+      "input_id": "p8b_gate",
+      "observed_slice": "Paper Track P8-B",
+      "status": "pass_supporting_modern_context_only",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_reference_parity_gate.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-C",
+      "input_id": "p8c_gate",
+      "observed_slice": "Paper Track P8-C",
+      "status": "blocked_supporting_only_thesis_narrowing_required",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_entity_disjoint_split_report.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-C",
+      "input_id": "p8c_split",
+      "observed_slice": "Paper Track P8-C",
+      "status": "blocked_degenerate_component_structure",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_evaluable_cohort_reconciliation.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-C",
+      "input_id": "p8c_cohort",
+      "observed_slice": "Paper Track P8-C",
+      "status": "narrowed_to_revtrack_evaluable_cohort",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_neural_candidate_scorecard.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-C",
+      "input_id": "p8c_neural",
+      "observed_slice": "Paper Track P8-C",
+      "status": "blocked_resource_or_protocol_gap",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_repeated_seed_scorecard.json",
+      "exists": true,
+      "expected_slice": null,
+      "input_id": "p8b_repeated",
+      "observed_slice": "Paper Track P8-B",
+      "status": "complete",
+      "used_as_gate_input": false
+    }
+  ],
+  "elliptic2_performance_contribution_allowed": false,
+  "elliptic2_role_after_decision": "supporting_context_and_limitation_only",
+  "future_return_path": {
+    "first_paper_blocked_by_return_path": false,
+    "modern_subgraph_parity_can_return": true,
+    "return_condition": "Run a faithful RevClassify BP/DS replay or stronger candidate under an accepted cohort protocol, three or more seeds, no test-selection leakage, and a compute/dependency environment recorded outside git."
+  },
+  "gate_summary": {
+    "cohort": {
+      "artifact_ref": "docs/reports/elliptic2_evaluable_cohort_reconciliation.json",
+      "exists": true,
+      "full_core_equivalence_proven": false,
+      "official_core_subgraph_count": 121810,
+      "revtrack_evaluable_row_count": 110902
+    },
+    "entity_split": {
+      "artifact_ref": "docs/reports/elliptic2_entity_disjoint_split_report.json",
+      "exists": true,
+      "largest_component_row_count": 110889,
+      "largest_component_row_fraction": 0.99988278,
+      "status": "blocked_degenerate_component_structure",
+      "strict_entity_disjoint_split_viable": false
+    },
+    "neural_replay": {
+      "artifact_ref": "docs/reports/elliptic2_neural_candidate_scorecard.json",
+      "best_local_neural_pr_auc_mean": null,
+      "exists": true,
+      "neural_reference_parity_met": false,
+      "run_neural_requested": true,
+      "status": "blocked_resource_or_protocol_gap"
+    },
+    "p8b": {
+      "artifact_ref": "docs/reports/elliptic2_publishability_gate.json",
+      "exists": true,
+      "headline_or_sota_claim_allowed": false,
+      "official_gap_to_published_revclassify_ds": -0.03076,
+      "published_reference_pr_auc": 0.974,
+      "reference_parity_claim_allowed": false,
+      "selected_official_test_pr_auc_mean": 0.94324,
+      "status": "pass_supporting_modern_context_only",
+      "supporting_paper_row_allowed": true
+    },
+    "p8c": {
+      "artifact_ref": "docs/reports/elliptic2_reference_parity_gate.json",
+      "exists": true,
+      "full_core_modern_subgraph_claim_allowed": false,
+      "headline_or_sota_claim_allowed": false,
+      "p9_allowed_before_p8d": false,
+      "paper_strategy_decision": "narrow_or_reprovision_before_p9",
+      "reference_parity_claim_allowed": false,
+      "status": "blocked_supporting_only_thesis_narrowing_required",
+      "supporting_modern_context_row_allowed": true
+    }
+  },
+  "hard_aml_claim_allowed": false,
+  "headline_or_sota_claim_allowed": false,
+  "minimum_proof_checks": {
+    "allowed_blocked_claim_language_updated": true,
+    "explicit_route_chosen": true,
+    "future_modern_subgraph_parity_option_preserved": true,
+    "p8b_gate_consumed": true,
+    "p8c_gate_consumed": true
+  },
+  "next_slice": "Paper Track P9 - operational AML evaluation layer",
+  "p9_allowed": true,
+  "reference_parity_claim_allowed": false,
+  "route_accepted": true,
+  "route_requested": "narrow",
+  "schema_version": "relaytic.paper_p8d_thesis_decision.v1",
+  "selected_route": "narrow_first_paper_to_claim_gated_evaluation_environment",
+  "slice": "Paper Track P8-D",
+  "status": "accepted_thesis_narrowing",
+  "summary": "P8-D accepts the narrowed first-paper thesis: P8-B remains supporting modern-context evidence, P8-C is used as a claim-firewall and limitation, and P9 may now add operational AML metrics without presenting Elliptic2 as a performance contribution."
+}

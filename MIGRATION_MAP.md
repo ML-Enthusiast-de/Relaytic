@@ -340,6 +340,13 @@ Avoid introducing new references to:
 - introduced paper-track reference-parity artifacts under `docs/reports/`: `elliptic2_neural_reference_parity_contract.json`, `elliptic2_evaluable_cohort_reconciliation.json`, `elliptic2_entity_disjoint_split_report.json`, `elliptic2_neural_candidate_scorecard.json`, and `elliptic2_reference_parity_gate.json`
 - recorded that P8-B remains supporting-only: faithful RevClassify parity is blocked by missing local dependencies/accelerator and absent distributed classification checkpoints, cohort equivalence to the current official core is not proven, and strict entity-disjoint splitting degenerates with `110889/110902` rows in the largest identity component; P8-D is required before P9
 
+### Paper Track P8-D
+
+- introduced `src/relaytic/release_safety/paper_thesis_decision.py` under the existing release-safety boundary for post-P8-C thesis narrowing, evidence-role freezing, reprovisioning decision, and claim-rewrite planning
+- introduced the public command `relaytic release-safety paper-thesis-decision` for regenerating the P8-D paper strategy gate from committed P8-B/P8-C artifacts
+- introduced paper-track thesis-decision artifacts under `docs/reports/`: `paper_p8d_thesis_decision.json`, `paper_p8d_evidence_role_matrix.json`, `paper_p8d_reprovisioning_decision.json`, and `paper_p8d_claim_rewrite_plan.json`
+- accepted the narrowed first-paper thesis around claim-gated AML evaluation and operational evidence: P8-B remains supporting modern-context evidence only, P8-C remains a limitation and claim-firewall, Elliptic2 is not a performance contribution, and P9 is now unblocked
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
@@ -763,6 +770,10 @@ Implemented release-safety artifact names:
 - `elliptic2_entity_disjoint_split_report.json`
 - `elliptic2_neural_candidate_scorecard.json`
 - `elliptic2_reference_parity_gate.json`
+- `paper_p8d_thesis_decision.json`
+- `paper_p8d_evidence_role_matrix.json`
+- `paper_p8d_reprovisioning_decision.json`
+- `paper_p8d_claim_rewrite_plan.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

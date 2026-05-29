@@ -1384,6 +1384,27 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p8d = release_safety_sub.add_parser(
+        "paper-thesis-decision",
+        help="Build Paper Track P8-D thesis narrowing, evidence-role, and reprovisioning decision artifacts.",
+    )
+    release_safety_p8d.add_argument(
+        "--route",
+        choices=["narrow", "reprovision", "blocked"],
+        default="narrow",
+        help="P8-D strategy to record. The default narrows the first paper and preserves later reprovisioning.",
+    )
+    release_safety_p8d.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P8-D artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p8d.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3401,6 +3422,11 @@ def main(argv: list[str] | None = None) -> int:
                     revtrack_dir=args.revtrack_dir,
                     output_dir=args.output_dir,
                     run_neural=args.run_neural,
+                )
+            elif args.release_safety_command == "paper-thesis-decision":
+                payload = _run_paper_p8d_thesis_surface(
+                    route=args.route,
+                    output_dir=args.output_dir,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -7358,6 +7384,32 @@ def _run_elliptic2_reference_parity_surface(
             "bundle": pack,
         },
         "human_output": render_elliptic2_reference_parity_markdown(pack),
+    }
+
+
+def _run_paper_p8d_thesis_surface(
+    *,
+    route: str,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_p8d_thesis_markdown,
+        sync_paper_p8d_thesis_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_p8d_thesis_pack(root, route=route, output_dir=output_dir)
+    pack = {key: json.loads(path.read_text(encoding="utf-8")) for key, path in written.items()}
+    decision = dict(pack["paper_p8d_thesis_decision"])
+    return {
+        "surface_payload": {
+            "status": decision["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_p8d_thesis_decision": decision,
+            "bundle": pack,
+        },
+        "human_output": render_paper_p8d_thesis_markdown(pack),
     }
 
 

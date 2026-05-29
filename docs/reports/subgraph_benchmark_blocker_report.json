@@ -1,10 +1,10 @@
 {
   "blocked_track_count": 2,
   "command": "relaytic release-safety hard-graph-tracks --format json",
-  "decision_state": "hard_tracks_blocked_with_elliptic2_reference_parity_gap_recorded",
+  "decision_state": "hard_tracks_blocked_with_p8d_thesis_narrowing_accepted",
   "hard_performance_claims_allowed": false,
   "headline_or_sota_claim_allowed": false,
-  "next_slice": "Paper Track P8-D - paper thesis narrowing and alternative evidence decision",
+  "next_slice": "Paper Track P9 - operational AML evaluation layer",
   "p7_context": {
     "graph_neural_claim_allowed": false,
     "graph_shadow_test_pr_auc": 0.388907,
@@ -12,12 +12,12 @@
     "selected_graph_test_pr_auc": 0.668756,
     "supporting_graph_table_candidate_allowed": true
   },
-  "paper_can_continue_to_p9": false,
-  "paper_limitation_text": "P8-C records that faithful local RevClassify parity is not currently executable, the RevTrack-evaluable cohort is smaller than the audited current official core, and a strict entity-disjoint component split is degenerate because nearly all rows share one identity component; Elliptic2 may be used only as supporting modern-context evidence unless P8-D deliberately narrows the thesis or reprovisions the benchmark.",
+  "paper_can_continue_to_p9": true,
+  "paper_limitation_text": "P8-D accepts the first-paper thesis narrowing: Elliptic2 is supporting modern-context and limitation evidence only, not a primary performance contribution; the paper proceeds toward operational AML evaluation while preserving a later faithful RevClassify parity/reprovisioning extension.",
   "paper_strategy_recommendation": [
-    "Do not proceed to P9 until P8-D either reprovisions faithful neural parity evidence or deliberately narrows the paper thesis.",
-    "Treat P8-B as supporting modern-context evidence only; P8-C blocks reference parity because faithful neural replay is not locally ready and strict entity-disjoint splitting is degenerate on the pinned cohort.",
-    "Move the first paper story away from a modern-subgraph SOTA claim unless a GPU-backed faithful RevClassify environment and a defensible cohort protocol are added."
+    "Proceed to P9 under the P8-D narrowed thesis: operational AML evaluation is now the primary next evidence layer.",
+    "Keep P8-B as supporting modern-context evidence only and cite P8-C as the reason modern-subgraph SOTA, full-core, entity-disjoint, and RevClassify parity claims are blocked.",
+    "Return to modern-subgraph parity later only with a faithful GPU/dependency environment, accepted cohort protocol, and leakage-resistant split proof."
   ],
   "proxy_track_count": 0,
   "schema_version": "relaytic.paper_hard_graph_track_decision.v1",
@@ -43,6 +43,14 @@
     "status": "blocked_supporting_only_thesis_narrowing_required",
     "supporting_modern_context_row_allowed": true
   },
+  "subsequent_p8d_thesis_decision": {
+    "artifact_ref": "docs/reports/paper_p8d_thesis_decision.json",
+    "elliptic2_performance_contribution_allowed": false,
+    "interpretation": "P8-D is the current paper-strategy gate; accepted thesis narrowing lets P9 proceed without promoting Elliptic2 to a performance contribution.",
+    "p9_allowed": true,
+    "selected_route": "narrow_first_paper_to_claim_gated_evaluation_environment",
+    "status": "accepted_thesis_narrowing"
+  },
   "supported_track_count": 0,
   "track_decisions": [
     {
@@ -58,7 +66,7 @@
         "elliptic2_noncommercial_no_derivatives_claim_boundary"
       ],
       "dataset_id": "elliptic2_subgraph_aml",
-      "first_paper_inclusion_decision": "exclude_pending_loader_split_resource_proof",
+      "first_paper_inclusion_decision": "supporting_context_only_after_p8d_not_performance_contribution",
       "support_level": "blocked"
     },
     {

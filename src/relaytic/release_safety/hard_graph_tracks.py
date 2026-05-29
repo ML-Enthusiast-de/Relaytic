@@ -374,6 +374,16 @@ def _build_blocker_report(
         root / "docs" / "reports" / "elliptic2_reference_parity_gate.json"
     )
     reference_parity_recorded = elliptic2_reference_parity_gate.get("slice") == "Paper Track P8-C"
+    paper_p8d_thesis_decision = _read_json_if_exists(
+        root / "docs" / "reports" / "paper_p8d_thesis_decision.json"
+    )
+    p8d_thesis_recorded = paper_p8d_thesis_decision.get("slice") == "Paper Track P8-D"
+    p8d_narrowing_accepted = (
+        p8d_thesis_recorded
+        and paper_p8d_thesis_decision.get("status") == "accepted_thesis_narrowing"
+        and bool(paper_p8d_thesis_decision.get("p9_allowed"))
+        and not bool(paper_p8d_thesis_decision.get("elliptic2_performance_contribution_allowed"))
+    )
     amlsim_support = "proxy" if (
         amlsim_generation["support_level"] == "proxy" and amlsim_typology["support_level"] == "proxy"
     ) else "blocked"
@@ -381,7 +391,11 @@ def _build_blocker_report(
         {
             "dataset_id": "elliptic2_subgraph_aml",
             "support_level": elliptic2_access["support_level"],
-            "first_paper_inclusion_decision": "exclude_pending_loader_split_resource_proof",
+            "first_paper_inclusion_decision": (
+                "supporting_context_only_after_p8d_not_performance_contribution"
+                if p8d_narrowing_accepted
+                else "exclude_pending_loader_split_resource_proof"
+            ),
             "artifact_refs": ["docs/reports/elliptic2_subgraph_access_report.json"],
             "blocked_reason_codes": elliptic2_access["blocked_reason_codes"],
         },
@@ -409,6 +423,9 @@ def _build_blocker_report(
     if shadow_rows:
         graph_shadow_test_pr_auc = dict(shadow_rows[0].get("test_metrics", {})).get("pr_auc")
     decision_state = (
+        "hard_tracks_blocked_with_p8d_thesis_narrowing_accepted"
+        if p8d_narrowing_accepted
+        else
         "hard_tracks_blocked_with_elliptic2_reference_parity_gap_recorded"
         if reference_parity_recorded and not elliptic2_reference_parity_gate.get("reference_parity_claim_allowed")
         else
@@ -440,7 +457,9 @@ def _build_blocker_report(
         "hard_performance_claims_allowed": False,
         "headline_or_sota_claim_allowed": False,
         "paper_can_continue_to_p9": (
-            bool(elliptic2_reference_parity_gate.get("p9_allowed"))
+            True
+            if p8d_narrowing_accepted
+            else bool(elliptic2_reference_parity_gate.get("p9_allowed"))
             if reference_parity_recorded
             else bool(elliptic2_competitive_gate.get("p9_allowed"))
             if competitive_recorded
@@ -454,6 +473,13 @@ def _build_blocker_report(
             "interpretation": "P7 supplies supporting flattened-graph evidence only; it does not substitute for modern subgraph AML evidence.",
         },
         "paper_strategy_recommendation": (
+            [
+                "Proceed to P9 under the P8-D narrowed thesis: operational AML evaluation is now the primary next evidence layer.",
+                "Keep P8-B as supporting modern-context evidence only and cite P8-C as the reason modern-subgraph SOTA, full-core, entity-disjoint, and RevClassify parity claims are blocked.",
+                "Return to modern-subgraph parity later only with a faithful GPU/dependency environment, accepted cohort protocol, and leakage-resistant split proof.",
+            ]
+            if p8d_narrowing_accepted
+            else
             [
                 "Do not proceed to P9 until P8-D either reprovisions faithful neural parity evidence or deliberately narrows the paper thesis.",
                 "Treat P8-B as supporting modern-context evidence only; P8-C blocks reference parity because faithful neural replay is not locally ready and strict entity-disjoint splitting is degenerate on the pinned cohort.",
@@ -480,6 +506,9 @@ def _build_blocker_report(
             ]
         ),
         "paper_limitation_text": (
+            "P8-D accepts the first-paper thesis narrowing: Elliptic2 is supporting modern-context and limitation evidence only, not a primary performance contribution; the paper proceeds toward operational AML evaluation while preserving a later faithful RevClassify parity/reprovisioning extension."
+            if p8d_narrowing_accepted
+            else
             "P8-C records that faithful local RevClassify parity is not currently executable, the RevTrack-evaluable cohort is smaller than the audited current official core, and a strict entity-disjoint component split is degenerate because nearly all rows share one identity component; Elliptic2 may be used only as supporting modern-context evidence unless P8-D deliberately narrows the thesis or reprovisions the benchmark."
             if reference_parity_recorded
             else
@@ -513,8 +542,20 @@ def _build_blocker_report(
             "artifact_ref": "docs/reports/elliptic2_reference_parity_gate.json",
             "interpretation": "P8-C is the current modern-subgraph gate; it blocks P9/headline claims unless faithful neural parity and stronger cohort/leakage proof pass or the thesis is narrowed deliberately.",
         } if reference_parity_recorded else None,
+        "subsequent_p8d_thesis_decision": {
+            "status": paper_p8d_thesis_decision.get("status"),
+            "selected_route": paper_p8d_thesis_decision.get("selected_route"),
+            "p9_allowed": paper_p8d_thesis_decision.get("p9_allowed"),
+            "elliptic2_performance_contribution_allowed": paper_p8d_thesis_decision.get(
+                "elliptic2_performance_contribution_allowed"
+            ),
+            "artifact_ref": "docs/reports/paper_p8d_thesis_decision.json",
+            "interpretation": "P8-D is the current paper-strategy gate; accepted thesis narrowing lets P9 proceed without promoting Elliptic2 to a performance contribution.",
+        } if p8d_thesis_recorded else None,
         "next_slice": (
-            elliptic2_reference_parity_gate.get("next_slice")
+            "Paper Track P9 - operational AML evaluation layer"
+            if p8d_narrowing_accepted
+            else elliptic2_reference_parity_gate.get("next_slice")
             if reference_parity_recorded
             else elliptic2_competitive_gate.get("next_slice")
             if competitive_recorded

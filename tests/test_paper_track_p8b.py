@@ -8,7 +8,6 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import pytest
-import torch
 
 import relaytic.release_safety.elliptic2_competitive as competitive
 import relaytic.release_safety.elliptic2_recovery as recovery
@@ -26,6 +25,7 @@ def _hash(path: Path) -> str:
 
 
 def _write_revtrack_fixture(root: Path, monkeypatch: pytest.MonkeyPatch, rows_per_split: int = 80) -> Path:
+    torch = pytest.importorskip("torch")
     directory = root / "revtrack"
     raw_dir = directory / "data" / "elliptic" / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)

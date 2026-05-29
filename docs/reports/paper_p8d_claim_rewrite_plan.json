@@ -1,0 +1,135 @@
+{
+  "allowed_claim_language": [
+    "Relaytic-AML is a claim-gated AML evaluation environment that binds benchmark evidence, operational metrics, reproducibility, and public-claim boundaries to local artifacts.",
+    "P8-B provides stable supporting modern-context Elliptic2 evidence on the pinned RevTrack-evaluable cohort.",
+    "P8-C documents why modern-subgraph reference parity, full-core, and entity-disjoint claims are not currently supported.",
+    "P9 may evaluate review capacity, case-packet completeness, false-positive burden, and analyst-facing utility as primary paper axes after its own gates pass."
+  ],
+  "blocked_claim_language": [
+    "Relaytic-AML is state of the art on Elliptic2.",
+    "Relaytic matches or beats RevClassifyDS on the official Elliptic2 benchmark.",
+    "Relaytic proves full-current-core Elliptic2 performance.",
+    "Relaytic proves entity-disjoint modern-subgraph generalization.",
+    "Relaytic has hard real-world AML superiority evidence.",
+    "The P8-B Elliptic2 number is a primary performance contribution."
+  ],
+  "claim_language_updated": true,
+  "claim_lint_rules": [
+    {
+      "allowed_context": "Only allowed when the same sentence says the claim is blocked or unsupported.",
+      "blocked_terms": [
+        "SOTA",
+        "state-of-the-art",
+        "best",
+        "beats RevClassify"
+      ],
+      "rule_id": "no_unqualified_sota"
+    },
+    {
+      "allowed_context": "Only context, limitation, or appendix wording is permitted before a later parity gate passes.",
+      "blocked_terms": [
+        "Elliptic2 performance contribution",
+        "official Elliptic2 winner"
+      ],
+      "rule_id": "elliptic2_context_only"
+    },
+    {
+      "allowed_context": "Allowed only when backed by P9 operational artifacts and assumptions.",
+      "blocked_terms": [
+        "analyst-hour savings",
+        "false-positive reduction",
+        "review-capacity gain"
+      ],
+      "rule_id": "operational_claims_need_p9"
+    }
+  ],
+  "downstream_consumers": [
+    "Paper Track P9 operational metric gate",
+    "Paper Track P10 reproducible table generator",
+    "Paper Track P11 claim-linted paper draft",
+    "Paper Track P12 external dry run"
+  ],
+  "p9_allowed": true,
+  "schema_version": "relaytic.paper_p8d_thesis_decision.v1",
+  "section_rewrite_plan": [
+    {
+      "paper_section": "title_and_abstract",
+      "rewrite_action": "center claim-gated evaluation environments and operational AML evidence; avoid model-SOTA framing"
+    },
+    {
+      "paper_section": "results",
+      "rewrite_action": "separate supporting proxy/graph numbers from blocked modern-subgraph parity claims"
+    },
+    {
+      "paper_section": "tables",
+      "rewrite_action": "label every row by evidence role, budget tier, leakage posture, and publishability gate; keep Elliptic2 out of primary performance-contribution columns"
+    },
+    {
+      "paper_section": "limitations",
+      "rewrite_action": "state the P8-C faithful-replay, cohort-equivalence, and entity-disjoint blockers explicitly"
+    },
+    {
+      "paper_section": "future_work",
+      "rewrite_action": "describe a GPU-backed RevClassify parity/reprovisioning extension without making it a first-paper dependency"
+    }
+  ],
+  "selected_route": "narrow_first_paper_to_claim_gated_evaluation_environment",
+  "slice": "Paper Track P8-D",
+  "source_gate_refs": [
+    {
+      "artifact_ref": "docs/reports/elliptic2_publishability_gate.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-B",
+      "input_id": "p8b_gate",
+      "observed_slice": "Paper Track P8-B",
+      "status": "pass_supporting_modern_context_only",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_reference_parity_gate.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-C",
+      "input_id": "p8c_gate",
+      "observed_slice": "Paper Track P8-C",
+      "status": "blocked_supporting_only_thesis_narrowing_required",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_entity_disjoint_split_report.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-C",
+      "input_id": "p8c_split",
+      "observed_slice": "Paper Track P8-C",
+      "status": "blocked_degenerate_component_structure",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_evaluable_cohort_reconciliation.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-C",
+      "input_id": "p8c_cohort",
+      "observed_slice": "Paper Track P8-C",
+      "status": "narrowed_to_revtrack_evaluable_cohort",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_neural_candidate_scorecard.json",
+      "exists": true,
+      "expected_slice": "Paper Track P8-C",
+      "input_id": "p8c_neural",
+      "observed_slice": "Paper Track P8-C",
+      "status": "blocked_resource_or_protocol_gap",
+      "used_as_gate_input": true
+    },
+    {
+      "artifact_ref": "docs/reports/elliptic2_repeated_seed_scorecard.json",
+      "exists": true,
+      "expected_slice": null,
+      "input_id": "p8b_repeated",
+      "observed_slice": "Paper Track P8-B",
+      "status": "complete",
+      "used_as_gate_input": false
+    }
+  ],
+  "status": "claim_rewrite_ready"
+}

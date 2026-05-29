@@ -1,0 +1,123 @@
+{
+  "p9_allowed": true,
+  "rows": [
+    {
+      "artifact_refs": [
+        "docs/reports/paysim_publishability_gate.json",
+        "docs/reports/paysim_competitive_baseline_table.json",
+        "docs/reports/paysim_competitive_budget_contract.json"
+      ],
+      "can_appear_in_headline": false,
+      "claim_level": "proxy_supporting_only",
+      "evidence_id": "paysim_competitive_p6a",
+      "operational_metric_candidate": true,
+      "paper_table_eligibility": "supporting_numeric_table_candidate",
+      "performance_contribution_allowed": false,
+      "rationale": "Useful temporal rare-event proxy evidence, but synthetic PaySim cannot carry hard real-world AML superiority.",
+      "role": "supporting_temporal_proxy_numeric_and_operational_seed",
+      "supporting_metric_snapshot": {},
+      "track_id": "paysim_temporal_transaction_fraud"
+    },
+    {
+      "artifact_refs": [
+        "docs/reports/paper_graph_publishability_gate.json",
+        "docs/reports/paper_graph_feature_table.json",
+        "docs/reports/paper_graph_budget_contract.json"
+      ],
+      "can_appear_in_headline": false,
+      "claim_level": "supporting_only",
+      "evidence_id": "elliptic_raw_graph_p7",
+      "operational_metric_candidate": true,
+      "paper_table_eligibility": "supporting_graph_table_candidate",
+      "performance_contribution_allowed": false,
+      "rationale": "P7 records real raw-graph provenance and a strong classical graph-feature baseline, but graph-neural/SOTA claims remain blocked.",
+      "role": "supporting_temporal_graph_numeric_candidate",
+      "supporting_metric_snapshot": {},
+      "track_id": "elliptic_flattened_graph_aml"
+    },
+    {
+      "artifact_refs": [
+        "docs/reports/elliptic2_publishability_gate.json",
+        "docs/reports/elliptic2_repeated_seed_scorecard.json",
+        "docs/reports/elliptic2_split_robustness_report.json"
+      ],
+      "can_appear_in_headline": false,
+      "claim_level": "supporting_context_only",
+      "evidence_id": "elliptic2_modern_context_p8b",
+      "operational_metric_candidate": false,
+      "paper_table_eligibility": "context_or_limitations_table_only",
+      "performance_contribution_allowed": false,
+      "rationale": "P8-B is stable and relevant but below reported RevClassifyDS, consumes official preprocessing, and does not prove full-core or entity-disjoint generalization.",
+      "role": "modern_subgraph_context_only",
+      "supporting_metric_snapshot": {
+        "gap_to_published_reference": -0.03076,
+        "official_partition_pr_auc_mean": 0.94324,
+        "published_reference_pr_auc": 0.974
+      },
+      "track_id": "elliptic2_subgraph_aml"
+    },
+    {
+      "artifact_refs": [
+        "docs/reports/elliptic2_reference_parity_gate.json",
+        "docs/reports/elliptic2_entity_disjoint_split_report.json",
+        "docs/reports/elliptic2_evaluable_cohort_reconciliation.json"
+      ],
+      "can_appear_in_headline": false,
+      "claim_level": "blocked_claim_evidence",
+      "evidence_id": "elliptic2_reference_parity_blocker_p8c",
+      "operational_metric_candidate": false,
+      "paper_table_eligibility": "limitations_or_methodology_table_only",
+      "performance_contribution_allowed": false,
+      "rationale": "P8-C directly blocks reference parity, SOTA, full-core, and entity-disjoint claims; it is evidence of claim discipline, not a performance win.",
+      "role": "limitation_and_claim_firewall",
+      "supporting_metric_snapshot": {
+        "largest_component_row_fraction": 0.99988278,
+        "p8c_status": "blocked_supporting_only_thesis_narrowing_required",
+        "strict_entity_disjoint_split_viable": false
+      },
+      "track_id": "elliptic2_subgraph_aml"
+    },
+    {
+      "artifact_refs": [
+        "docs/reports/amlsim_generation_manifest.json",
+        "docs/reports/amlsim_typology_manifest.json"
+      ],
+      "can_appear_in_headline": false,
+      "claim_level": "blocked_or_proxy_future",
+      "evidence_id": "amlsim_p8",
+      "operational_metric_candidate": true,
+      "paper_table_eligibility": "blocked_until_reproducible_generation_or_proxy_appendix_only",
+      "performance_contribution_allowed": false,
+      "rationale": "AMLSim can support typology/workflow proof only after seeded generation, hashes, license, and typology distribution are frozen.",
+      "role": "future_synthetic_typology_proxy",
+      "supporting_metric_snapshot": {},
+      "track_id": "amlsim_synthetic_bank_graph"
+    },
+    {
+      "artifact_refs": [
+        "docs/specs/paper_benchmark_pack.md",
+        "tests/test_paper_benchmark_pack.py"
+      ],
+      "can_appear_in_headline": false,
+      "claim_level": "supporting_breadth_only",
+      "evidence_id": "generic_structured_support_pack",
+      "operational_metric_candidate": false,
+      "paper_table_eligibility": "supporting_appendix_only",
+      "performance_contribution_allowed": false,
+      "rationale": "Generic structured-data evidence supports breadth and reliability context, not the flagship AML proof.",
+      "role": "breadth_and_sanity_context",
+      "supporting_metric_snapshot": {},
+      "track_id": "generic_structured_supporting_pack"
+    }
+  ],
+  "schema_version": "relaytic.paper_p8d_thesis_decision.v1",
+  "selected_route": "narrow_first_paper_to_claim_gated_evaluation_environment",
+  "slice": "Paper Track P8-D",
+  "status": "evidence_roles_frozen",
+  "table_rules": {
+    "all_numeric_rows_need_budget_split_leakage_and_gate_refs": true,
+    "elliptic2_allowed_table_context": "supporting context, blocker, limitation, or appendix only",
+    "operational_rows_require_p9_claim_guard": true,
+    "primary_performance_table_can_include_elliptic2": false
+  }
+}

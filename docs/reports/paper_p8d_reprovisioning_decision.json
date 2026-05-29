@@ -1,0 +1,55 @@
+{
+  "direct_blocker_refs": {
+    "entity_split_status": "blocked_degenerate_component_structure",
+    "largest_component_row_fraction": 0.99988278,
+    "neural_scorecard_status": "blocked_resource_or_protocol_gap",
+    "p8c_blocked_reason_codes": [
+      "faithful_revclassify_execution_preconditions_met",
+      "full_core_equivalence_proven",
+      "full_core_row_mapping_not_proven",
+      "largest_component_fits_train_budget",
+      "local_accelerator_not_available_for_faithful_revclassify_budget",
+      "neural_reference_parity_met",
+      "neural_repeated_seed_scorecard_available",
+      "official_revclassify_classification_checkpoints_not_distributed",
+      "official_revclassify_dependency_hydra-core_missing",
+      "official_revclassify_dependency_lightning_missing",
+      "official_revclassify_dependency_omegaconf_missing",
+      "official_revclassify_dependency_torchmetrics_missing",
+      "revtrack_evaluable_cohort_smaller_than_current_official_core",
+      "revtrack_positive_count_differs_from_current_official_core",
+      "revtrack_table_does_not_expose_official_component_ids",
+      "strict_entity_disjoint_split_viable",
+      "test_positive_minimum_met",
+      "train_fraction_reasonable",
+      "validation_positive_minimum_met"
+    ],
+    "p8c_gate_status": "blocked_supporting_only_thesis_narrowing_required"
+  },
+  "first_paper_dependency": "not_required",
+  "future_reprovision_requirements": [
+    "Record a GPU/dependency environment capable of faithful RevClassify BP and DS replay.",
+    "Install and version the official Lightning, Hydra, OmegaConf, TorchMetrics, PyTorch, and graph dependency stack outside git.",
+    "Obtain or train reference classification checkpoints under a declared budget; never commit raw checkpoints if license or size disallows it.",
+    "Run at least three seeds for the accepted reference and Relaytic candidate paths.",
+    "Predeclare the cohort mapping from RevTrack rows to the current official Elliptic2 core, or explicitly define a defensible fixed cohort.",
+    "Use validation-only model and threshold selection; keep the official test partition out of candidate selection.",
+    "Adopt a leakage-resistant split protocol that is meaningful for the observed identity-component structure.",
+    "Emit a new publishability gate before any modern-subgraph performance contribution is allowed."
+  ],
+  "p9_unblocked_by_thesis_narrowing": true,
+  "reprovision_now": false,
+  "return_path_name": "post_first_paper_modern_subgraph_parity_extension",
+  "schema_version": "relaytic.paper_p8d_thesis_decision.v1",
+  "selected_strategy": "defer_faithful_revclassify_reprovisioning_for_first_paper",
+  "slice": "Paper Track P8-D",
+  "status": "reprovisioning_deferred_with_return_path",
+  "why_not_reprovision_before_first_paper": [
+    "P8-C already records missing faithful RevClassify local preconditions.",
+    "The pinned public repository does not distribute RevClassify classification checkpoints.",
+    "The current local environment lacks a CUDA-class accelerator for the reference-scale budget.",
+    "The RevTrack-evaluable cohort is not proven equivalent to the audited current official core.",
+    "The strict component-grouped entity-disjoint split degenerates and is not a meaningful evaluation protocol.",
+    "Waiting for reprovisioning would block operational-evaluation evidence that is central to the narrower paper thesis."
+  ]
+}

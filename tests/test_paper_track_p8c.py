@@ -8,7 +8,6 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import pytest
-import torch
 
 import relaytic.release_safety.elliptic2_recovery as recovery
 from relaytic.release_safety import (
@@ -28,6 +27,7 @@ def _hash(path: Path) -> str:
 
 
 def _write_fixture_root(root: Path, monkeypatch: pytest.MonkeyPatch, *, degenerate: bool = True) -> Path:
+    torch = pytest.importorskip("torch")
     reports = root / "docs" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
     (reports / "elliptic2_schema_overlap_audit.json").write_text(
