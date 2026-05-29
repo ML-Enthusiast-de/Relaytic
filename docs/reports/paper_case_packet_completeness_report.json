@@ -1,0 +1,121 @@
+{
+  "claim_boundary": "Aggregate paper benchmark rows need materialized case packets before analyst-workflow value can become a hard claim.",
+  "hard_business_value_claim_allowed": false,
+  "required_fields": [
+    "case_id",
+    "focal_entity",
+    "review_action",
+    "priority_score",
+    "top_typologies",
+    "linked_entities",
+    "counterparty_edges",
+    "analyst_questions",
+    "recommended_next_steps",
+    "evidence_refs"
+  ],
+  "rows": [
+    {
+      "blocked_reason_codes": [
+        "case_packet_not_materialized_for_aggregate_benchmark"
+      ],
+      "case_packet_artifact_ref": null,
+      "case_packet_materialized": false,
+      "claim_role": "blocks_hard_business_value_claims",
+      "completeness_score": 0.0,
+      "dataset_id": "paysim_temporal_transaction_fraud",
+      "hard_business_value_claim_allowed": false,
+      "missing_fields": [
+        "case_id",
+        "focal_entity",
+        "review_action",
+        "priority_score",
+        "top_typologies",
+        "linked_entities",
+        "counterparty_edges",
+        "analyst_questions",
+        "recommended_next_steps",
+        "evidence_refs"
+      ],
+      "present_fields": [],
+      "source": "aggregate_benchmark_row"
+    },
+    {
+      "blocked_reason_codes": [
+        "case_packet_not_materialized_for_aggregate_benchmark"
+      ],
+      "case_packet_artifact_ref": null,
+      "case_packet_materialized": false,
+      "claim_role": "blocks_hard_business_value_claims",
+      "completeness_score": 0.0,
+      "dataset_id": "elliptic_flattened_graph_aml",
+      "hard_business_value_claim_allowed": false,
+      "missing_fields": [
+        "case_id",
+        "focal_entity",
+        "review_action",
+        "priority_score",
+        "top_typologies",
+        "linked_entities",
+        "counterparty_edges",
+        "analyst_questions",
+        "recommended_next_steps",
+        "evidence_refs"
+      ],
+      "present_fields": [],
+      "source": "aggregate_benchmark_row"
+    },
+    {
+      "blocked_reason_codes": [
+        "case_packet_not_materialized_for_aggregate_benchmark"
+      ],
+      "case_packet_artifact_ref": null,
+      "case_packet_materialized": false,
+      "claim_role": "blocks_hard_business_value_claims",
+      "completeness_score": 0.0,
+      "dataset_id": "elliptic2_subgraph_aml",
+      "hard_business_value_claim_allowed": false,
+      "missing_fields": [
+        "case_id",
+        "focal_entity",
+        "review_action",
+        "priority_score",
+        "top_typologies",
+        "linked_entities",
+        "counterparty_edges",
+        "analyst_questions",
+        "recommended_next_steps",
+        "evidence_refs"
+      ],
+      "present_fields": [],
+      "source": "context_only_after_p8d"
+    },
+    {
+      "blocked_reason_codes": [
+        "case_packet_not_materialized_for_aggregate_benchmark"
+      ],
+      "case_packet_artifact_ref": null,
+      "case_packet_materialized": false,
+      "claim_role": "blocks_hard_business_value_claims",
+      "completeness_score": 0.0,
+      "dataset_id": "amlsim_synthetic_bank_graph",
+      "hard_business_value_claim_allowed": false,
+      "missing_fields": [
+        "case_id",
+        "focal_entity",
+        "review_action",
+        "priority_score",
+        "top_typologies",
+        "linked_entities",
+        "counterparty_edges",
+        "analyst_questions",
+        "recommended_next_steps",
+        "evidence_refs"
+      ],
+      "present_fields": [],
+      "source": "blocked_pending_reproducible_generation"
+    }
+  ],
+  "schema_version": "relaytic.paper_operational_metrics.v1",
+  "slice": "Paper Track P9",
+  "status": "case_packets_missing_for_paper_benchmark_rows"
+}

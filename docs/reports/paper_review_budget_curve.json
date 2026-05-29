@@ -1,0 +1,150 @@
+{
+  "artifact_refs": [
+    "docs/reports/paysim_operating_point_table.json",
+    "docs/reports/paysim_competitive_benchmark_manifest.json",
+    "docs/reports/paper_graph_feature_table.json"
+  ],
+  "claim_boundary": "Review-budget curves are operational evaluation evidence; they do not authorize hard business-value or SOTA claims.",
+  "curve_count": 3,
+  "curves": [
+    {
+      "artifact_ref": "docs/reports/paysim_operating_point_table.json",
+      "budget_tier": "baseline",
+      "curve_id": "paysim_p4_leakage_safe_review_budget_curve",
+      "dataset_id": "paysim_temporal_transaction_fraud",
+      "model_family": "sklearn_sgd_logistic_leakage_safe",
+      "points": [
+        {
+          "false_positive_count": 155,
+          "false_positive_rate": 0.001271,
+          "point_id": "p4_budget_0.001",
+          "precision_at_k": 0.531722,
+          "recall_at_review_budget": 0.106409,
+          "review_budget_fraction": 0.001,
+          "review_fraction": 0.002678,
+          "reviewed_count": 331,
+          "target_fpr": null,
+          "true_positive_count": 176
+        },
+        {
+          "false_positive_count": 272,
+          "false_positive_rate": 0.002231,
+          "point_id": "p4_budget_0.002",
+          "precision_at_k": 0.441478,
+          "recall_at_review_budget": 0.129988,
+          "review_budget_fraction": 0.002,
+          "review_fraction": 0.003941,
+          "reviewed_count": 487,
+          "target_fpr": null,
+          "true_positive_count": 215
+        },
+        {
+          "false_positive_count": 518,
+          "false_positive_rate": 0.004248,
+          "point_id": "p4_budget_0.005",
+          "precision_at_k": 0.344304,
+          "recall_at_review_budget": 0.16445,
+          "review_budget_fraction": 0.005,
+          "review_fraction": 0.006393,
+          "reviewed_count": 790,
+          "target_fpr": null,
+          "true_positive_count": 272
+        },
+        {
+          "false_positive_count": 893,
+          "false_positive_rate": 0.007324,
+          "point_id": "p4_budget_0.01",
+          "precision_at_k": 0.291832,
+          "recall_at_review_budget": 0.222491,
+          "review_budget_fraction": 0.01,
+          "review_fraction": 0.010204,
+          "reviewed_count": 1261,
+          "target_fpr": null,
+          "true_positive_count": 368
+        },
+        {
+          "false_positive_count": 1721,
+          "false_positive_rate": 0.014115,
+          "point_id": "p4_budget_0.02",
+          "precision_at_k": 0.231696,
+          "recall_at_review_budget": 0.313785,
+          "review_budget_fraction": 0.02,
+          "review_fraction": 0.018126,
+          "reviewed_count": 2240,
+          "target_fpr": null,
+          "true_positive_count": 519
+        }
+      ]
+    },
+    {
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "budget_tier": "competitive",
+      "curve_id": "paysim_p6a_competitive_selected_operating_points",
+      "dataset_id": "paysim_temporal_transaction_fraud",
+      "model_family": "sklearn_extra_trees",
+      "points": [
+        {
+          "false_positive_count": 329,
+          "false_positive_rate": 0.002698,
+          "point_id": "p6a_selected_review_budget",
+          "precision_at_k": 0.703336,
+          "recall_at_review_budget": 0.471584,
+          "review_budget_fraction": 0.005,
+          "review_fraction": 0.008974,
+          "reviewed_count": 1109,
+          "target_fpr": null,
+          "true_positive_count": 780
+        },
+        {
+          "false_positive_count": 125,
+          "false_positive_rate": 0.001025,
+          "point_id": "p6a_fixed_fpr_0_001",
+          "precision_at_k": 0.841572,
+          "recall_at_review_budget": 0.401451,
+          "review_budget_fraction": null,
+          "review_fraction": 0.006385,
+          "reviewed_count": 789,
+          "target_fpr": 0.001,
+          "true_positive_count": 664
+        }
+      ]
+    },
+    {
+      "artifact_ref": "docs/reports/paper_graph_feature_table.json",
+      "budget_tier": "competitive",
+      "curve_id": "elliptic_p7_graph_selected_operating_points",
+      "dataset_id": "elliptic_flattened_graph_aml",
+      "model_family": "lightgbm_classifier",
+      "points": [
+        {
+          "false_positive_count": 0,
+          "false_positive_rate": 0.0,
+          "point_id": "p7_selected_review_budget",
+          "precision_at_k": 1.0,
+          "recall_at_review_budget": 0.056604,
+          "review_budget_fraction": 0.005,
+          "review_fraction": 0.003219,
+          "reviewed_count": 36,
+          "target_fpr": null,
+          "true_positive_count": 36
+        },
+        {
+          "false_positive_count": 19,
+          "false_positive_rate": 0.001801,
+          "point_id": "p7_fixed_fpr_0_001",
+          "precision_at_k": 0.951031,
+          "recall_at_review_budget": 0.580189,
+          "review_budget_fraction": null,
+          "review_fraction": 0.034692,
+          "reviewed_count": 388,
+          "target_fpr": 0.001,
+          "true_positive_count": 369
+        }
+      ]
+    }
+  ],
+  "schema_version": "relaytic.paper_operational_metrics.v1",
+  "slice": "Paper Track P9",
+  "source_metric_table_status": "operational_metrics_reported_with_claim_guard",
+  "status": "review_budget_curves_materialized"
+}

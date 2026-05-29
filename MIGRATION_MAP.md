@@ -347,6 +347,13 @@ Avoid introducing new references to:
 - introduced paper-track thesis-decision artifacts under `docs/reports/`: `paper_p8d_thesis_decision.json`, `paper_p8d_evidence_role_matrix.json`, `paper_p8d_reprovisioning_decision.json`, and `paper_p8d_claim_rewrite_plan.json`
 - accepted the narrowed first-paper thesis around claim-gated AML evaluation and operational evidence: P8-B remains supporting modern-context evidence only, P8-C remains a limitation and claim-firewall, Elliptic2 is not a performance contribution, and P9 is now unblocked
 
+### Paper Track P9
+
+- introduced `src/relaytic/release_safety/paper_operational_metrics.py` under the existing release-safety boundary for operational AML metric tables, review-budget curves, case-packet completeness reporting, and claim-guarded analyst-workflow evidence
+- introduced the public command `relaytic release-safety paper-operational-metrics` for regenerating P9 artifacts from committed paper-track evidence, with optional run-specific casework context via `--run-dir`
+- introduced paper-track operational metric artifacts under `docs/reports/`: `paper_operational_metric_table.json`, `paper_review_budget_curve.json`, `paper_case_packet_completeness_report.json`, and `paper_operational_claim_guard.json`
+- materialized PaySim and Elliptic supporting review-budget rows with false-positive burden proxies while keeping hard business-value, headline operational, Elliptic2 performance-contribution, and SOTA claims blocked until case packets, explicit analyst assumptions, and same-queue baseline evidence are complete; P10 is now unblocked for reproducible table generation
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`

@@ -68,7 +68,7 @@ Current canonical boundaries:
 Reserved future boundaries:
 
 - `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15M task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, replay/shadow-tested imported-model, objective/split/metric-truth, first-class family-stack, staged portfolio-search, temporal-engine, operating-point, benchmark-truth-gate, competitive-specialization, and benchmark-generalization responsibilities; later work may introduce focused subpackages such as `src/relaytic/modeling/families/`, `src/relaytic/modeling/portfolio/`, or `src/relaytic/temporal/` only if they sharpen responsibility instead of forking a disconnected parallel stack
-- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, focused UI helpers such as `src/relaytic/ui/aml_environment.py`, and `src/relaytic/release_safety/paper_freeze.py` plus paper-track release-safety helpers now absorb the shipped AML productization, paper-freeze, PaySim temporal benchmark, Elliptic graph provenance, tabular baseline-suite, competitive PaySim gate, and Elliptic graph-baseline work before Academy expansion resumes
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, focused UI helpers such as `src/relaytic/ui/aml_environment.py`, and `src/relaytic/release_safety/paper_freeze.py` plus paper-track release-safety helpers now absorb the shipped AML productization, paper-freeze, PaySim temporal benchmark, Elliptic graph provenance, tabular baseline-suite, competitive PaySim gate, Elliptic graph-baseline work, thesis narrowing, and operational paper metrics before Academy expansion resumes
 - `src/relaytic/graph_fabric/` may still absorb richer graph and subgraph reasoning where it sharpens responsibility beyond the shipped `src/relaytic/aml/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` slices
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
@@ -612,6 +612,15 @@ Current paper-track thesis narrowing artifact names from Paper Track P8-D:
 
 Paper Track P8-D extends `src/relaytic/release_safety/` with the accepted first-paper thesis boundary after P8-C. It consumes the P8-B and P8-C gates directly, accepts the narrowed claim-gated AML evaluation-environment thesis for the first paper, permits P9 operational metrics to proceed, keeps Elliptic2 as supporting context and limitation evidence only, and preserves a later faithful RevClassify reprovisioning track without letting it block the first paper indefinitely.
 
+Current paper-track operational metric artifact names from Paper Track P9:
+
+- `paper_operational_metric_table.json`
+- `paper_review_budget_curve.json`
+- `paper_case_packet_completeness_report.json`
+- `paper_operational_claim_guard.json`
+
+Paper Track P9 extends `src/relaytic/release_safety/` with claim-guarded operational AML evidence under the P8-D thesis boundary. It materializes review-budget rows, false-positive burden proxies, case-packet completeness state, analyst-hour assumptions, and a fail-closed operational claim guard. P9 may unblock P10 reproducible table generation when supporting review-budget metrics exist, but it does not permit hard business-value, headline operational, Elliptic2 performance-contribution, or SOTA claims while case packets, explicit nondefault analyst assumptions, and same-queue incumbent or human-baseline evidence remain incomplete.
+
 Current trace and eval artifact names:
 
 - `trace_model.json`
@@ -819,6 +828,7 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic release-safety elliptic2-competitive`
 - `relaytic release-safety elliptic2-reference-parity`
 - `relaytic release-safety paper-thesis-decision`
+- `relaytic release-safety paper-operational-metrics`
 - `relaytic scan-git-safety`
 
 ## Slice 05 Planning Contract

@@ -1405,6 +1405,26 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p9 = release_safety_sub.add_parser(
+        "paper-operational-metrics",
+        help="Build Paper Track P9 operational AML metric, review-budget, case-packet, and claim-guard artifacts.",
+    )
+    release_safety_p9.add_argument(
+        "--run-dir",
+        default=None,
+        help="Optional run directory with casework/business-value artifacts to include as run-specific context.",
+    )
+    release_safety_p9.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P9 artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p9.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3426,6 +3446,11 @@ def main(argv: list[str] | None = None) -> int:
             elif args.release_safety_command == "paper-thesis-decision":
                 payload = _run_paper_p8d_thesis_surface(
                     route=args.route,
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-operational-metrics":
+                payload = _run_paper_operational_metrics_surface(
+                    run_dir=args.run_dir,
                     output_dir=args.output_dir,
                 )
             else:
@@ -7410,6 +7435,32 @@ def _run_paper_p8d_thesis_surface(
             "bundle": pack,
         },
         "human_output": render_paper_p8d_thesis_markdown(pack),
+    }
+
+
+def _run_paper_operational_metrics_surface(
+    *,
+    run_dir: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_operational_metrics_markdown,
+        sync_paper_operational_metrics_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_operational_metrics_pack(root, run_dir=run_dir, output_dir=output_dir)
+    pack = {key: json.loads(path.read_text(encoding="utf-8")) for key, path in written.items()}
+    guard = dict(pack["paper_operational_claim_guard"])
+    return {
+        "surface_payload": {
+            "status": guard["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_operational_claim_guard": guard,
+            "bundle": pack,
+        },
+        "human_output": render_paper_operational_metrics_markdown(pack),
     }
 
 

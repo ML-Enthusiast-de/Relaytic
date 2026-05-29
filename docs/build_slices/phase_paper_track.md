@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P8-D implemented. P9 through P13 planned.
+P0 through P9 implemented. P10 through P13 planned.
 
 ## Intent
 
@@ -54,7 +54,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
     Close or explicitly reject the gap to modern RevClassify evidence, reconcile the official-core versus RevTrack-evaluable cohort boundary, and require a stronger identity-aware split before the performance story advances.
 14. **P8-D - Paper thesis narrowing and alternative evidence decision** - implemented
     Decide whether to reprovision faithful modern-subgraph parity or narrow the paper around claim-gated AML evaluation with Elliptic2 as supporting context.
-15. **P9 - Operational AML evaluation layer**
+15. **P9 - Operational AML evaluation layer** - implemented
     Add review-budget, analyst-hour, false-positive reduction, case-packet completeness, and operational claim guards to paper rows.
 16. **P10 - Reproducible paper table generator**
     Generate all paper tables from run artifacts, not hand-maintained numbers.
@@ -270,8 +270,20 @@ P8-D added:
 
 P8-D accepts the narrowed first-paper route: Relaytic-AML is framed as a claim-gated AML evaluation environment with operational evidence, not as a modern subgraph SOTA model paper. P8-B remains supporting modern-context evidence only, P8-C becomes the limitation and claim-firewall evidence, Elliptic2 is excluded from performance-contribution claims, and faithful RevClassify reprovisioning is preserved as a later extension instead of blocking P9.
 
+P9 added:
+
+- `docs/reports/paper_operational_metric_table.json`
+- `docs/reports/paper_review_budget_curve.json`
+- `docs/reports/paper_case_packet_completeness_report.json`
+- `docs/reports/paper_operational_claim_guard.json`
+- `src/relaytic/release_safety/paper_operational_metrics.py`
+- `relaytic release-safety paper-operational-metrics --format json`
+- `tests/test_paper_track_p9.py`
+
+P9 materializes the operational layer promised by the narrowed thesis. PaySim and Elliptic supporting rows now include review-budget metrics, prevalence-matched false-positive burden proxies, analyst-hour assumptions, and artifact citations. Aggregate case packets are still missing, so the claim guard blocks hard business-value and headline operational claims while allowing P10 table generation to proceed.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P9**.
+The next implementation target is **Paper Track P10**.
 
-P9 must add operational AML evaluation rows under the P8-D thesis boundary, including review-budget curves, case-packet completeness, false-positive burden, and claim guards that fail closed when business-value assumptions are incomplete.
+P10 must generate the paper tables from artifacts instead of hand-maintained numbers, including provenance for every metric cell, budget tier, leakage posture, operational claim state, and publishability gate.

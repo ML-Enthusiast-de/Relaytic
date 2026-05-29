@@ -1,0 +1,31 @@
+{
+  "blocked_reason_codes": [
+    "paper_benchmark_case_packets_missing",
+    "analyst_hour_assumption_defaulted",
+    "same_queue_incumbent_or_human_baseline_missing",
+    "operational_metrics_supporting_only_not_hard_claims",
+    "elliptic2_excluded_from_operational_performance_contribution_by_p8d"
+  ],
+  "claim_guard_thresholds": {
+    "elliptic2_must_remain_non_contribution_until_later_parity_gate": true,
+    "requires_explicit_nondefault_analyst_hour_assumptions": true,
+    "requires_materialized_case_packets_for_hard_business_value": true,
+    "requires_p8d_thesis_boundary": true,
+    "requires_review_budget_metrics": true,
+    "requires_same_queue_incumbent_or_human_baseline_for_value_claim": true
+  },
+  "hard_business_value_claim_allowed": false,
+  "headline_operational_claim_allowed": false,
+  "next_slice": "Paper Track P10 - reproducible paper table generator",
+  "paper_can_continue_to_p10": true,
+  "safe_operational_claims": [
+    "review_budget_metrics_reported_for_supporting_paper_rows",
+    "false_positive_burden_estimates_reported_as_claim_guarded_operational_proxies",
+    "case_packet_completeness_missingness_reported_instead_of_invented"
+  ],
+  "schema_version": "relaytic.paper_operational_metrics.v1",
+  "slice": "Paper Track P9",
+  "status": "supporting_operational_metrics_ready_hard_claims_blocked",
+  "summary": "P9 reports operational metrics as supporting evidence and deliberately blocks hard business-value claims.",
+  "supporting_operational_metric_rows_allowed": true
+}

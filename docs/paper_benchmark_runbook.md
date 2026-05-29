@@ -2,7 +2,7 @@
 
 This runbook defines the public benchmark path reviewers should expect before Relaytic-AML makes paper-facing claims.
 
-The current public-safe AML review-queue demo is demo-only. Slice 15Z-R now emits the release-freeze pack, and hard AML performance claims remain blocked until a true paper/holdout track has numeric evidence, passing environment scorecards, passing claim gates, and clean release safety.
+The current public-safe AML review-queue demo is demo-only. Slice 15Z-R now emits the release-freeze pack, and P9 emits the operational metric pack. Hard AML performance and business-value claims remain blocked until true paper/holdout evidence, complete operational assumptions, passing environment scorecards, passing claim gates, and clean release safety all exist.
 
 Generated freeze artifacts live under `docs/reports/`:
 
@@ -60,13 +60,17 @@ Current paper-track baseline artifacts also live under `docs/reports/`:
 - `paper_p8d_evidence_role_matrix.json`
 - `paper_p8d_reprovisioning_decision.json`
 - `paper_p8d_claim_rewrite_plan.json`
+- `paper_operational_metric_table.json`
+- `paper_review_budget_curve.json`
+- `paper_case_packet_completeness_report.json`
+- `paper_operational_claim_guard.json`
 
 ## Benchmark Families
 
 | Family | Current role | Claim status | Expected evidence |
 | --- | --- | --- | --- |
-| PaySim-style transaction fraud | Temporal transaction-fraud evidence | `dev` or `proxy` until holdout and claim gates pass | `aml_benchmark_manifest.json`, `aml_temporal_benchmark_claim_report.json`, `aml_time_window_scorecard.json`, `aml_environment_scorecard.json` |
-| Elliptic-style graph AML | Flattened and raw-graph AML evidence | `dev`, `proxy`, or `holdout` depending on source and graph-loader posture | `aml_graph_loader_manifest.json`, `aml_graph_provenance_report.json`, `aml_graph_claim_scope.json`, `aml_benchmark_relevance_scorecard.json` |
+| PaySim-style transaction fraud | Temporal transaction-fraud evidence | `dev` or `proxy` until holdout and claim gates pass | `aml_benchmark_manifest.json`, `aml_temporal_benchmark_claim_report.json`, `aml_time_window_scorecard.json`, `aml_environment_scorecard.json`, `paper_operational_metric_table.json` |
+| Elliptic-style graph AML | Flattened and raw-graph AML evidence | `dev`, `proxy`, or `holdout` depending on source and graph-loader posture | `aml_graph_loader_manifest.json`, `aml_graph_provenance_report.json`, `aml_graph_claim_scope.json`, `aml_benchmark_relevance_scorecard.json`, `paper_review_budget_curve.json` |
 | Elliptic2-style subgraph AML | Modern subgraph context and limitation evidence | supporting-only after P8-D thesis narrowing; no performance contribution, headline, SOTA, full-core, or reference-parity claim | `elliptic2_publishability_gate.json`, `elliptic2_reference_parity_gate.json`, `paper_p8d_thesis_decision.json` |
 | AMLSim-style synthetic bank graph | Synthetic bank-network evidence | `proxy` until reproducible generation and benchmark relevance are frozen | `aml_public_graph_benchmark_catalog.json`, `entity_graph_profile.json`, `subgraph_risk_report.json`, `case_packet.json` |
 | Generic structured-data benchmark pack | Supporting breadth evidence | supporting-only, not the flagship AML claim | `paper_benchmark_manifest.json`, `paper_benchmark_table.json`, `benchmark_release_gate.json` |
@@ -120,6 +124,7 @@ relaytic release-safety elliptic2-recovery --core-data-dir <external-local-core-
 relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --format json
 relaytic release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json
 relaytic release-safety paper-thesis-decision --format json
+relaytic release-safety paper-operational-metrics --format json
 relaytic release-safety paper-freeze --format json
 relaytic release-safety scan --format json
 relaytic doctor --expected-profile full --format json
@@ -201,6 +206,10 @@ The release-freeze pack should cite these when available:
 - `paper_p8d_evidence_role_matrix.json`
 - `paper_p8d_reprovisioning_decision.json`
 - `paper_p8d_claim_rewrite_plan.json`
+- `paper_operational_metric_table.json`
+- `paper_review_budget_curve.json`
+- `paper_case_packet_completeness_report.json`
+- `paper_operational_claim_guard.json`
 - `release_safety_scan.json`
 
 ## Blocked-Claim Conditions
@@ -222,6 +231,7 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `elliptic2_publishability_gate.json` permits only supporting modern-context wording: P8-B is stable under repeated seeds and a row-order-independent content-hash partition, but it remains below reported full-shot `RevClassifyDS PR-AUC=0.974`, consumes official RevTrack preprocessing/embeddings, does not prove full-core cohort equivalence, and does not establish entity-disjoint generalization.
 - `elliptic2_reference_parity_gate.json` blocks reference-parity, SOTA, full-core, entity-disjoint, hard AML, and end-to-end Relaytic claims: P8-C requested faithful neural parity but local preconditions are missing, current-core mapping is not proven, and the strict component split is degenerate.
 - `paper_p8d_thesis_decision.json` unblocks P9 only under the narrowed evaluation-environment thesis. It does not permit Elliptic2 as a primary performance contribution, modern-subgraph SOTA result, RevClassify parity result, or full-core/entity-disjoint claim.
+- `paper_operational_claim_guard.json` unblocks P10 table generation only when supporting review-budget metrics exist. It does not permit hard business-value or headline operational claims while case packets, explicit nondefault analyst assumptions, or same-queue incumbent/human-baseline evidence are incomplete.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record

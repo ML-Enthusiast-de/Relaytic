@@ -367,8 +367,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P8-D. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, and Paper Track P8-D thesis narrowing.
-- next execution target: Paper Track P9
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P9. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, and Paper Track P9 operational AML evaluation.
+- next execution target: Paper Track P10
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -377,7 +377,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P9 through P13 prove operational breadth, reproducible tables, claim-safe paper text, and an external dry run
+- next planned academy follow-on: Slice 16A, after Paper Track P10 through P13 prove reproducible tables, claim-safe paper text, and an external dry run
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -4050,6 +4050,17 @@ Minimum proof:
 - at least one AML benchmark row includes review-budget metrics
 - operational metrics cite assumptions and artifacts
 - public claims fail closed when business-value assumptions are incomplete
+
+Implemented by:
+- adding `src/relaytic/release_safety/paper_operational_metrics.py`
+- adding `relaytic release-safety paper-operational-metrics --format json`
+- adding `tests/test_paper_track_p9.py`
+- adding `docs/reports/paper_operational_metric_table.json`
+- adding `docs/reports/paper_review_budget_curve.json`
+- adding `docs/reports/paper_case_packet_completeness_report.json`
+- adding `docs/reports/paper_operational_claim_guard.json`
+
+P9 materializes supporting operational evidence for the narrowed first paper: PaySim and Elliptic rows now expose review-budget performance, prevalence-matched false-positive burden proxies, analyst-hour assumptions, and explicit artifact refs. Case-packet completeness is recorded as missing for aggregate benchmark rows, so hard business-value and headline operational claims remain blocked. The operational claim guard allows P10 to generate reproducible paper tables while keeping Elliptic2 out of performance-contribution claims.
 
 ### Paper Track P10 - Reproducible paper table generator
 
