@@ -1,0 +1,138 @@
+{
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "limitation_count": 5,
+  "limitations": [
+    {
+      "affected_claims": [
+        "claim_paysim_temporal_transaction_fraud",
+        "claim_sota_or_hard_aml_superiority"
+      ],
+      "blocked_reason_codes": [
+        "paysim_is_supporting_proxy_not_real_bank_holdout",
+        "release_budget_and_clean_clone_proof_not_executed"
+      ],
+      "claim_effect": "blocks_headline_or_hard_claims",
+      "dataset_id": "paysim_temporal_transaction_fraud",
+      "evidence_refs": [
+        "docs/reports/paysim_publishability_gate.json",
+        "docs/reports/paper_dataset_registry.json"
+      ],
+      "limitation_id": "LIM-01-paysim-proxy",
+      "limitation_text": "PaySim is synthetic mobile-money fraud evidence. It is useful for a temporal proxy workflow, but it is not real-bank AML superiority evidence.",
+      "paper_section": "Limitations",
+      "required_repair": "Add a real financial-crime holdout or partner-approved private evaluation before making hard AML claims."
+    },
+    {
+      "affected_claims": [
+        "claim_elliptic_flattened_graph_aml",
+        "claim_sota_or_hard_aml_superiority"
+      ],
+      "blocked_reason_codes": [
+        "headline_graph_claim_requires_release_budget_and_repeated_seed_proof",
+        "graph_sota_claim_not_benchmarked",
+        "hard_aml_claim_requires_broader_holdout_and_operational_proof",
+        "graph_neural_shadow_candidate_not_promoted"
+      ],
+      "claim_effect": "blocks_headline_or_hard_claims",
+      "dataset_id": "elliptic_flattened_graph_aml",
+      "evidence_refs": [
+        "docs/reports/paper_graph_publishability_gate.json",
+        "docs/reports/paper_graph_model_shadow_scorecard.json"
+      ],
+      "limitation_id": "LIM-02-elliptic-supporting-graph",
+      "limitation_text": "The Elliptic row is a supporting temporal graph-feature result. It does not prove graph-neural or graph-SOTA superiority.",
+      "paper_section": "Limitations",
+      "required_repair": "Run repeated-seed graph baselines and promote a graph-native candidate only if it beats strong feature baselines under the same split."
+    },
+    {
+      "affected_claims": [
+        "claim_subgraph_or_synthetic_bank_graph",
+        "claim_sota_or_hard_aml_superiority"
+      ],
+      "blocked_reason_codes": [
+        "faithful_revclassify_execution_preconditions_met",
+        "full_core_equivalence_proven",
+        "full_core_row_mapping_not_proven",
+        "largest_component_fits_train_budget",
+        "local_accelerator_not_available_for_faithful_revclassify_budget",
+        "neural_reference_parity_met",
+        "neural_repeated_seed_scorecard_available",
+        "official_revclassify_classification_checkpoints_not_distributed",
+        "official_revclassify_dependency_hydra-core_missing",
+        "official_revclassify_dependency_lightning_missing",
+        "official_revclassify_dependency_omegaconf_missing",
+        "official_revclassify_dependency_torchmetrics_missing",
+        "revtrack_evaluable_cohort_smaller_than_current_official_core",
+        "revtrack_positive_count_differs_from_current_official_core",
+        "revtrack_table_does_not_expose_official_component_ids",
+        "strict_entity_disjoint_split_viable",
+        "test_positive_minimum_met",
+        "train_fraction_reasonable",
+        "validation_positive_minimum_met"
+      ],
+      "claim_effect": "blocks_headline_or_hard_claims",
+      "dataset_id": "elliptic2_subgraph_aml",
+      "evidence_refs": [
+        "docs/reports/elliptic2_publishability_gate.json",
+        "docs/reports/elliptic2_reference_parity_gate.json",
+        "docs/reports/paper_p8d_thesis_decision.json"
+      ],
+      "limitation_id": "LIM-03-elliptic2-context-only",
+      "limitation_text": "Elliptic2 is retained as modern context and limitation evidence only; it is not a Relaytic performance contribution in this paper.",
+      "paper_section": "Limitations",
+      "required_repair": "Reproduce a faithful RevClassify parity run or define a new leakage-resistant subgraph protocol with viable cohort proof."
+    },
+    {
+      "affected_claims": [
+        "claim_release_freeze_pack_exists"
+      ],
+      "blocked_reason_codes": [
+        "paper_benchmark_case_packets_missing",
+        "analyst_hour_assumption_defaulted",
+        "same_queue_incumbent_or_human_baseline_missing",
+        "operational_metrics_supporting_only_not_hard_claims",
+        "elliptic2_excluded_from_operational_performance_contribution_by_p8d"
+      ],
+      "claim_effect": "blocks_headline_or_hard_claims",
+      "dataset_id": "paper_operational_layer",
+      "evidence_refs": [
+        "docs/reports/paper_operational_claim_guard.json",
+        "docs/reports/paper_case_packet_completeness_report.json"
+      ],
+      "limitation_id": "LIM-04-operational-assumptions",
+      "limitation_text": "Operational review-budget rows are supporting estimates because aggregate case packets, same-queue incumbent comparisons, and analyst-hour assumptions are not fully frozen.",
+      "paper_section": "Limitations",
+      "required_repair": "Freeze case-packet completeness and compare against the same review queue or an approved incumbent baseline."
+    },
+    {
+      "affected_claims": [
+        "claim_release_freeze_pack_exists"
+      ],
+      "blocked_reason_codes": [
+        "external_dry_run_not_yet_executed_p12_required"
+      ],
+      "claim_effect": "blocks_headline_or_hard_claims",
+      "dataset_id": "paper_reproducibility_path",
+      "evidence_refs": [
+        "docs/reports/paper_metric_cell_audit.json",
+        "docs/reports/paper_table_provenance.json"
+      ],
+      "limitation_id": "LIM-05-clean-clone-pending",
+      "limitation_text": "The first draft is generated from committed evidence, but P12 must still prove clean-clone install, paper-smoke reproduction, leak scan, and claim lint.",
+      "paper_section": "Limitations",
+      "required_repair": "Run Paper Track P12 from a clean clone and record the external dry-run report before arXiv release."
+    }
+  ],
+  "next_slice": "Paper Track P12 - external dry run and clean-clone proof",
+  "paper_must_state": [
+    "No hard real-world AML superiority claim is allowed in the first draft.",
+    "No SOTA, RevClassify parity, graph-neural superiority, or business-value headline claim is allowed.",
+    "PaySim and Elliptic numbers may be used as supporting evidence only.",
+    "Elliptic2 numbers may be used only as modern context and limitation evidence.",
+    "P12 clean-clone proof remains required before public release."
+  ],
+  "schema_version": "relaytic.paper_draft.v1",
+  "slice": "Paper Track P11",
+  "status": "limitations_materialized_claims_guarded"
+}

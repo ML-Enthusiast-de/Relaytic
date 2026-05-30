@@ -131,6 +131,7 @@ relaytic release-safety elliptic2-reference-parity --revtrack-dir <external-loca
 relaytic release-safety paper-thesis-decision --format json
 relaytic release-safety paper-operational-metrics --format json
 relaytic release-safety paper-tables --format json
+relaytic release-safety paper-draft --format json
 relaytic release-safety paper-freeze --format json
 relaytic release-safety scan --format json
 relaytic doctor --expected-profile full --format json
@@ -221,6 +222,10 @@ The release-freeze pack should cite these when available:
 - `paper_reproduction_commands.md`
 - `paper_metric_cell_audit.json`
 - `paper_publishability_matrix.json`
+- `paper_claim_lint_report.json`
+- `paper_limitations_matrix.json`
+- `docs/paper/relaytic_aml_draft.md`
+- `docs/paper/figures/figure_manifest.json`
 - `release_safety_scan.json`
 
 ## Blocked-Claim Conditions
@@ -244,6 +249,7 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `paper_p8d_thesis_decision.json` unblocks P9 only under the narrowed evaluation-environment thesis. It does not permit Elliptic2 as a primary performance contribution, modern-subgraph SOTA result, RevClassify parity result, or full-core/entity-disjoint claim.
 - `paper_operational_claim_guard.json` unblocks P10 table generation only when supporting review-budget metrics exist. It does not permit hard business-value or headline operational claims while case packets, explicit nondefault analyst assumptions, or same-queue incumbent/human-baseline evidence are incomplete.
 - `paper_publishability_matrix.json` reports hard or headline claims as blocked, or `paper_metric_cell_audit.json` contains metric provenance violations.
+- `paper_claim_lint_report.json` fails, reports unknown metric-cell references, missing limitations coverage, invalid figure provenance, missing required draft sections, or unguarded blocked-claim language.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record

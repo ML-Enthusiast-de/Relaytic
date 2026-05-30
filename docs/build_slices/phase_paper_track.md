@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P10 implemented. P11 through P13 planned.
+P0 through P11 implemented. P12 through P13 planned.
 
 ## Intent
 
@@ -58,7 +58,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
     Add review-budget, analyst-hour, false-positive reduction, case-packet completeness, and operational claim guards to paper rows.
 16. **P10 - Reproducible paper table generator** - implemented
     Generate all paper tables from run artifacts, not hand-maintained numbers.
-17. **P11 - Paper draft and figure pack**
+17. **P11 - Paper draft and figure pack** - implemented
     Draft the arXiv paper and generate figures from artifacts or clearly mark schematic figures.
 18. **P12 - External dry run and clean-clone proof**
     Reproduce the install, paper-smoke benchmark, table generation, claim lint, and leak scan from a clean clone.
@@ -295,8 +295,24 @@ P10 added:
 
 P10 turns the paper-track evidence into reproducible supporting tables. Every numeric metric cell now carries dataset, split, command, run-directory, artifact, claim-state, budget-tier, leakage-posture, and publishability-gate provenance. The metric-cell audit passes and P11 is unblocked, but the publishability matrix keeps hard AML, headline, SOTA, and business-value claims blocked.
 
+P11 added:
+
+- `docs/paper/relaytic_aml_draft.md`
+- `docs/paper/figures/figure_manifest.json`
+- `docs/paper/figures/figure_1_claim_gate_flow.svg`
+- `docs/paper/figures/figure_2_supporting_pr_auc.svg`
+- `docs/paper/figures/figure_3_review_budget.svg`
+- `docs/paper/figures/figure_4_publishability_matrix.svg`
+- `docs/reports/paper_claim_lint_report.json`
+- `docs/reports/paper_limitations_matrix.json`
+- `src/relaytic/release_safety/paper_draft.py`
+- `relaytic release-safety paper-draft --format json`
+- `tests/test_paper_track_p11.py`
+
+P11 renders the first Relaytic-AML draft directly from the P10 evidence pack. The draft contains abstract, introduction, related work, method, benchmarks, results, limitations, and reproducibility appendix sections; it cites audited `paper-cell:*` metric references; it names every generated limitation; and its claim lint passes. Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked before P12.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P11**.
+The next implementation target is **Paper Track P12**.
 
-P11 must draft the paper and figure pack from the P10 table pack, then lint every claim against the thesis contract, table provenance, limitations matrix, and publishability gates.
+P12 must reproduce the install, paper-smoke path, table generation, claim lint, and leak scan from a clean clone or emit deterministic release blockers before any arXiv/attention release.

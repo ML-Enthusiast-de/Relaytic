@@ -361,6 +361,13 @@ Avoid introducing new references to:
 - introduced paper-track table artifacts under `docs/reports/`: `paper_result_table_final.json`, `paper_table_provenance.json`, `paper_reproduction_commands.md`, `paper_metric_cell_audit.json`, and `paper_publishability_matrix.json`
 - generated claim-guarded supporting performance, operational, modern-context, and limitation tables where every numeric cell carries artifact, command, split, budget, leakage, run-directory, and claim-state provenance; P11 is now unblocked while headline, hard AML, SOTA, and business-value claims remain blocked
 
+### Paper Track P11
+
+- introduced `src/relaytic/release_safety/paper_draft.py` under the existing release-safety boundary for the first claim-linted Relaytic-AML draft, deterministic SVG figure pack, limitations matrix, and draft claim lint
+- introduced the public command `relaytic release-safety paper-draft` for regenerating the P11 draft, figures, and lint artifacts from committed P10 paper evidence
+- introduced paper-track draft artifacts under `docs/paper/` and `docs/reports/`: `relaytic_aml_draft.md`, `figures/figure_manifest.json`, `figures/figure_1_claim_gate_flow.svg`, `figures/figure_2_supporting_pr_auc.svg`, `figures/figure_3_review_budget.svg`, `figures/figure_4_publishability_matrix.svg`, `paper_claim_lint_report.json`, and `paper_limitations_matrix.json`
+- linted every draft metric reference against P10 metric cells and every limitations row against the generated draft; P12 is now unblocked while hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
@@ -788,6 +795,23 @@ Implemented release-safety artifact names:
 - `paper_p8d_evidence_role_matrix.json`
 - `paper_p8d_reprovisioning_decision.json`
 - `paper_p8d_claim_rewrite_plan.json`
+- `paper_operational_metric_table.json`
+- `paper_review_budget_curve.json`
+- `paper_case_packet_completeness_report.json`
+- `paper_operational_claim_guard.json`
+- `paper_result_table_final.json`
+- `paper_table_provenance.json`
+- `paper_reproduction_commands.md`
+- `paper_metric_cell_audit.json`
+- `paper_publishability_matrix.json`
+- `paper_claim_lint_report.json`
+- `paper_limitations_matrix.json`
+- `docs/paper/relaytic_aml_draft.md`
+- `docs/paper/figures/figure_manifest.json`
+- `docs/paper/figures/figure_1_claim_gate_flow.svg`
+- `docs/paper/figures/figure_2_supporting_pr_auc.svg`
+- `docs/paper/figures/figure_3_review_budget.svg`
+- `docs/paper/figures/figure_4_publishability_matrix.svg`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="330" viewBox="0 0 900 330" role="img"><rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="28" font-size="18" font-weight="700">Figure 4. Publishability gate posture by track</text>
+<text x="310" y="70" font-size="12" font-weight="700">Supporting</text>
+<text x="450" y="70" font-size="12" font-weight="700">Headline</text>
+<text x="585" y="70" font-size="12" font-weight="700">Hard claim</text>
+<text x="720" y="70" font-size="12" font-weight="700">Gate</text>
+<text x="30" y="117" font-size="12">paysim_temporal_transaction_fraud</text>
+<rect x="330" y="95" width="72" height="28" rx="4" fill="#2a9d8f" opacity="0.9"/>
+<text x="366" y="113" text-anchor="middle" font-size="11" fill="#ffffff">yes</text>
+<rect x="480" y="95" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="516" y="113" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<rect x="625" y="95" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="661" y="113" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<text x="720" y="114" font-size="11">pass_supporting_only</text>
+<text x="30" y="159" font-size="12">elliptic_flattened_graph_aml</text>
+<rect x="330" y="137" width="72" height="28" rx="4" fill="#2a9d8f" opacity="0.9"/>
+<text x="366" y="155" text-anchor="middle" font-size="11" fill="#ffffff">yes</text>
+<rect x="480" y="137" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="516" y="155" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<rect x="625" y="137" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="661" y="155" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<text x="720" y="156" font-size="11">pass_supporting_only</text>
+<text x="30" y="201" font-size="12">elliptic2_subgraph_aml</text>
+<rect x="330" y="179" width="72" height="28" rx="4" fill="#2a9d8f" opacity="0.9"/>
+<text x="366" y="197" text-anchor="middle" font-size="11" fill="#ffffff">yes</text>
+<rect x="480" y="179" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="516" y="197" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<rect x="625" y="179" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="661" y="197" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<text x="720" y="198" font-size="11">pass_supporting_modern_context_only</text>
+<text x="30" y="243" font-size="12">elliptic2_subgraph_aml</text>
+<rect x="330" y="221" width="72" height="28" rx="4" fill="#2a9d8f" opacity="0.9"/>
+<text x="366" y="239" text-anchor="middle" font-size="11" fill="#ffffff">yes</text>
+<rect x="480" y="221" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="516" y="239" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<rect x="625" y="221" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="661" y="239" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<text x="720" y="240" font-size="11">blocked_supporting_only_thesis_narrowing_required</text>
+<text x="30" y="285" font-size="12">paper_operational_layer</text>
+<rect x="330" y="263" width="72" height="28" rx="4" fill="#2a9d8f" opacity="0.9"/>
+<text x="366" y="281" text-anchor="middle" font-size="11" fill="#ffffff">yes</text>
+<rect x="480" y="263" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="516" y="281" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<rect x="625" y="263" width="72" height="28" rx="4" fill="#d62828" opacity="0.9"/>
+<text x="661" y="281" text-anchor="middle" font-size="11" fill="#ffffff">no</text>
+<text x="720" y="282" font-size="11">supporting_operational_metrics_ready_hard_claims_blocked</text>
+</svg>

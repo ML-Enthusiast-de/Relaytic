@@ -1,0 +1,52 @@
+{
+  "figure_dir": "docs/paper/figures",
+  "figures": [
+    {
+      "figure_id": "claim_gate_flow",
+      "filename": "figure_1_claim_gate_flow.svg",
+      "paper_claim_role": "method_schematic_not_performance_evidence",
+      "source_refs": [
+        "docs/reports/paper_thesis_contract.json",
+        "docs/reports/paper_table_provenance.json",
+        "docs/reports/paper_publishability_matrix.json"
+      ],
+      "source_type": "schematic_explicit",
+      "title": "Relaytic-AML claim-gated evidence flow"
+    },
+    {
+      "figure_id": "supporting_pr_auc",
+      "filename": "figure_2_supporting_pr_auc.svg",
+      "paper_claim_role": "supporting_numeric_evidence_only",
+      "source_refs": [
+        "docs/reports/paper_metric_cell_audit.json",
+        "docs/reports/paper_result_table_final.json"
+      ],
+      "source_type": "artifact_generated",
+      "title": "Supporting PR-AUC rows with claim posture"
+    },
+    {
+      "figure_id": "review_budget",
+      "filename": "figure_3_review_budget.svg",
+      "paper_claim_role": "supporting_operational_evidence_only",
+      "source_refs": [
+        "docs/reports/paper_operational_metric_table.json",
+        "docs/reports/paper_metric_cell_audit.json"
+      ],
+      "source_type": "artifact_generated",
+      "title": "Review-budget precision and recall"
+    },
+    {
+      "figure_id": "publishability_matrix",
+      "filename": "figure_4_publishability_matrix.svg",
+      "paper_claim_role": "claim_gate_evidence",
+      "source_refs": [
+        "docs/reports/paper_publishability_matrix.json"
+      ],
+      "source_type": "artifact_generated",
+      "title": "Publishability gate posture by track"
+    }
+  ],
+  "schema_version": "relaytic.paper_draft.v1",
+  "slice": "Paper Track P11",
+  "status": "figures_generated"
+}

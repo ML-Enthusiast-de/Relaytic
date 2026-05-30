@@ -1440,6 +1440,26 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p11 = release_safety_sub.add_parser(
+        "paper-draft",
+        help="Build Paper Track P11 claim-linted paper draft, figure pack, limitations matrix, and claim lint.",
+    )
+    release_safety_p11.add_argument(
+        "--paper-dir",
+        default=None,
+        help="Optional output directory for the paper draft and figures. Defaults to docs/paper/.",
+    )
+    release_safety_p11.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P11 report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p11.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3470,6 +3490,11 @@ def main(argv: list[str] | None = None) -> int:
                 )
             elif args.release_safety_command == "paper-tables":
                 payload = _run_paper_tables_surface(output_dir=args.output_dir)
+            elif args.release_safety_command == "paper-draft":
+                payload = _run_paper_draft_surface(
+                    paper_dir=args.paper_dir,
+                    output_dir=args.output_dir,
+                )
             else:
                 parser.error("Unsupported release-safety subcommand.")
                 return 2
@@ -7509,6 +7534,40 @@ def _run_paper_tables_surface(
             "bundle": pack,
         },
         "human_output": render_paper_table_markdown(pack),
+    }
+
+
+def _run_paper_draft_surface(
+    *,
+    paper_dir: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_draft_markdown,
+        sync_paper_draft_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_draft_pack(root, paper_dir=paper_dir, output_dir=output_dir)
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    lint = dict(pack["paper_claim_lint_report"])
+    return {
+        "surface_payload": {
+            "status": lint["status"],
+            "paper_dir": str(Path(paper_dir) if paper_dir else root / "docs" / "paper"),
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_claim_lint_report": lint,
+            "paper_limitations_matrix": pack["paper_limitations_matrix"],
+            "paper_figure_manifest": pack["paper_figure_manifest"],
+            "bundle": pack,
+        },
+        "human_output": render_paper_draft_markdown(pack),
     }
 
 

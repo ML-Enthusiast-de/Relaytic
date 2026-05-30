@@ -367,8 +367,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P10. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, and Paper Track P10 reproducible paper table generation.
-- next execution target: Paper Track P11
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P11. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, and Paper Track P11 claim-linted paper draft generation.
+- next execution target: Paper Track P12
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -377,7 +377,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P11 through P13 prove claim-safe paper text, an external dry run, and release gating
+- next planned academy follow-on: Slice 16A, after Paper Track P12 through P13 prove external dry-run and release gating
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -4137,6 +4137,18 @@ Minimum proof:
 - draft contains abstract, intro, related work, method, benchmarks, results, limitations, and reproducibility appendix
 - claim lint passes against the claim contract
 - figures are generated from artifacts or explicitly marked schematic
+
+Implemented by:
+- adding `src/relaytic/release_safety/paper_draft.py`
+- adding `relaytic release-safety paper-draft --format json`
+- adding `tests/test_paper_track_p11.py`
+- adding `docs/paper/relaytic_aml_draft.md`
+- adding `docs/paper/figures/figure_manifest.json`
+- adding four deterministic SVG figures under `docs/paper/figures/`
+- adding `docs/reports/paper_claim_lint_report.json`
+- adding `docs/reports/paper_limitations_matrix.json`
+
+P11 generates the first Relaytic-AML paper draft from the P10 table pack, not from hand-copied numbers. The draft contains the required paper sections, cites audited `paper-cell:*` metric references, renders artifact-backed or explicitly schematic figures, and names every generated limitation. The claim lint passes and permits P12 clean-clone proof, while hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked.
 
 ### Paper Track P12 - External dry run and clean-clone proof
 

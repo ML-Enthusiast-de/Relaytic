@@ -1,0 +1,106 @@
+{
+  "checks": [
+    {
+      "check_id": "p10_metric_audit_passes",
+      "message": "P10 metric cell audit must pass.",
+      "passed": true
+    },
+    {
+      "check_id": "p10_allows_p11",
+      "message": "P10 must allow P11 drafting.",
+      "passed": true
+    },
+    {
+      "check_id": "section_abstract",
+      "message": "Draft must contain section `Abstract`.",
+      "passed": true
+    },
+    {
+      "check_id": "section_introduction",
+      "message": "Draft must contain section `Introduction`.",
+      "passed": true
+    },
+    {
+      "check_id": "section_related_work",
+      "message": "Draft must contain section `Related Work`.",
+      "passed": true
+    },
+    {
+      "check_id": "section_method",
+      "message": "Draft must contain section `Method`.",
+      "passed": true
+    },
+    {
+      "check_id": "section_benchmarks",
+      "message": "Draft must contain section `Benchmarks`.",
+      "passed": true
+    },
+    {
+      "check_id": "section_results",
+      "message": "Draft must contain section `Results`.",
+      "passed": true
+    },
+    {
+      "check_id": "section_limitations",
+      "message": "Draft must contain section `Limitations`.",
+      "passed": true
+    },
+    {
+      "check_id": "section_reproducibility_appendix",
+      "message": "Draft must contain section `Reproducibility Appendix`.",
+      "passed": true
+    },
+    {
+      "check_id": "metric_cell_refs_known",
+      "message": "Every paper-cell reference must exist in P10 metric-cell audit.",
+      "passed": true
+    },
+    {
+      "check_id": "limitations_covered",
+      "detail": {
+        "missing_limitations": []
+      },
+      "message": "Every limitations-matrix row must be named in the draft limitations section.",
+      "passed": true
+    },
+    {
+      "check_id": "blocked_claim_language_guarded",
+      "message": "No unguarded blocked claim language may appear.",
+      "passed": true
+    },
+    {
+      "check_id": "figures_generated_or_schematic",
+      "detail": {
+        "figure_errors": []
+      },
+      "message": "Figures must be artifact-generated or explicitly schematic, with source references.",
+      "passed": true
+    },
+    {
+      "check_id": "required_p10_inputs_present",
+      "detail": {
+        "missing_input_refs": []
+      },
+      "message": "Required P10 draft inputs must exist.",
+      "passed": true
+    }
+  ],
+  "claim_contract_refs": [
+    "docs/reports/paper_thesis_contract.json",
+    "docs/reports/paper_claim_taxonomy.json",
+    "docs/reports/paper_publishability_matrix.json"
+  ],
+  "draft_ref": "docs/paper/relaytic_aml_draft.md",
+  "figure_manifest_ref": "docs/paper/figures/figure_manifest.json",
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "known_metric_cell_count": 44,
+  "limitation_count": 5,
+  "metric_cell_ref_count": 8,
+  "next_slice": "Paper Track P12 - external dry run and clean-clone proof",
+  "paper_can_continue_to_p12": true,
+  "schema_version": "relaytic.paper_draft.v1",
+  "slice": "Paper Track P11",
+  "status": "pass",
+  "violations": []
+}
