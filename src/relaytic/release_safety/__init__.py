@@ -159,6 +159,14 @@ from .paper_operational_metrics import (
     render_paper_operational_metrics_markdown,
     sync_paper_operational_metrics_pack,
 )
+from .paper_table_generator import (
+    PAPER_TABLE_FILENAMES,
+    PAPER_TABLE_REPORT_DIR,
+    PAPER_TABLE_SCHEMA_VERSION,
+    build_paper_table_pack,
+    render_paper_table_markdown,
+    sync_paper_table_pack,
+)
 from .paysim_benchmark import (
     PAYSIM_BENCHMARK_FILENAMES,
     PAYSIM_BENCHMARK_REPORT_DIR,
@@ -210,6 +218,9 @@ __all__ = [
     "PAPER_OPERATIONAL_METRICS_FILENAMES",
     "PAPER_OPERATIONAL_METRICS_REPORT_DIR",
     "PAPER_OPERATIONAL_METRICS_SCHEMA_VERSION",
+    "PAPER_TABLE_FILENAMES",
+    "PAPER_TABLE_REPORT_DIR",
+    "PAPER_TABLE_SCHEMA_VERSION",
     "PAYSIM_BENCHMARK_FILENAMES",
     "PAYSIM_BENCHMARK_REPORT_DIR",
     "PAYSIM_BENCHMARK_SCHEMA_VERSION",
@@ -264,6 +275,7 @@ __all__ = [
     "build_elliptic2_reference_parity_pack",
     "build_paper_p8d_thesis_pack",
     "build_paper_operational_metrics_pack",
+    "build_paper_table_pack",
     "build_paper_surface_hygiene_reports",
     "build_paper_thesis_artifacts",
     "build_paper_thesis_pack",
@@ -281,6 +293,7 @@ __all__ = [
     "render_elliptic2_reference_parity_markdown",
     "render_paper_p8d_thesis_markdown",
     "render_paper_operational_metrics_markdown",
+    "render_paper_table_markdown",
     "render_paper_baseline_suite_markdown",
     "render_paper_thesis_markdown",
     "render_elliptic_graph_markdown",
@@ -296,6 +309,7 @@ __all__ = [
     "sync_elliptic2_reference_parity_pack",
     "sync_paper_p8d_thesis_pack",
     "sync_paper_operational_metrics_pack",
+    "sync_paper_table_pack",
     "sync_paper_baseline_suite_pack",
     "sync_elliptic_graph_pack",
     "sync_paper_dataset_registry_pack",

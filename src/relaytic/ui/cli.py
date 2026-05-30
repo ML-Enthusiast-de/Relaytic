@@ -1425,6 +1425,21 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p10 = release_safety_sub.add_parser(
+        "paper-tables",
+        help="Build Paper Track P10 reproducible paper table, provenance, audit, and publishability artifacts.",
+    )
+    release_safety_p10.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P10 artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p10.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3453,6 +3468,8 @@ def main(argv: list[str] | None = None) -> int:
                     run_dir=args.run_dir,
                     output_dir=args.output_dir,
                 )
+            elif args.release_safety_command == "paper-tables":
+                payload = _run_paper_tables_surface(output_dir=args.output_dir)
             else:
                 parser.error("Unsupported release-safety subcommand.")
                 return 2
@@ -7461,6 +7478,37 @@ def _run_paper_operational_metrics_surface(
             "bundle": pack,
         },
         "human_output": render_paper_operational_metrics_markdown(pack),
+    }
+
+
+def _run_paper_tables_surface(
+    *,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_table_markdown,
+        sync_paper_table_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_table_pack(root, output_dir=output_dir)
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".md":
+            pack[key] = path.read_text(encoding="utf-8")
+        else:
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+    result = dict(pack["paper_result_table_final"])
+    return {
+        "surface_payload": {
+            "status": result["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_result_table_final": result,
+            "paper_metric_cell_audit": pack["paper_metric_cell_audit"],
+            "bundle": pack,
+        },
+        "human_output": render_paper_table_markdown(pack),
     }
 
 

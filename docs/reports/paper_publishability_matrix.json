@@ -1,0 +1,108 @@
+{
+  "claim_boundary": "P10 permits reproducible supporting tables only; hard claims require later clean-clone and claim-lint gates.",
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "paper_can_continue_to_p11": true,
+  "rows": [
+    {
+      "blocked_reason_codes": [
+        "paysim_is_supporting_proxy_not_real_bank_holdout",
+        "release_budget_and_clean_clone_proof_not_executed"
+      ],
+      "dataset_id": "paysim_temporal_transaction_fraud",
+      "gate_ref": "docs/reports/paysim_publishability_gate.json",
+      "gate_status": "pass_supporting_only",
+      "hard_claim_allowed": false,
+      "headline_claim_allowed": false,
+      "performance_contribution_allowed": false,
+      "role": "publishability_gate",
+      "supporting_table_allowed": true
+    },
+    {
+      "blocked_reason_codes": [
+        "headline_graph_claim_requires_release_budget_and_repeated_seed_proof",
+        "graph_sota_claim_not_benchmarked",
+        "hard_aml_claim_requires_broader_holdout_and_operational_proof",
+        "graph_neural_shadow_candidate_not_promoted"
+      ],
+      "dataset_id": "elliptic_flattened_graph_aml",
+      "gate_ref": "docs/reports/paper_graph_publishability_gate.json",
+      "gate_status": "pass_supporting_only",
+      "hard_claim_allowed": false,
+      "headline_claim_allowed": false,
+      "performance_contribution_allowed": false,
+      "role": "publishability_gate",
+      "supporting_table_allowed": true
+    },
+    {
+      "blocked_reason_codes": [
+        "within_declared_reference_parity_margin",
+        "official_reference_locally_reproduced",
+        "full_official_core_cohort_equivalence_proven",
+        "official_revtrack_preprocessing_and_embeddings_consumed",
+        "official_test_partition_was_exposed_during_p8a",
+        "entity_disjoint_generalization_not_yet_proven"
+      ],
+      "dataset_id": "elliptic2_subgraph_aml",
+      "gate_ref": "docs/reports/elliptic2_publishability_gate.json",
+      "gate_status": "pass_supporting_modern_context_only",
+      "hard_claim_allowed": false,
+      "headline_claim_allowed": false,
+      "performance_contribution_allowed": false,
+      "role": "modern_context_only",
+      "supporting_table_allowed": true
+    },
+    {
+      "blocked_reason_codes": [
+        "faithful_revclassify_execution_preconditions_met",
+        "full_core_equivalence_proven",
+        "full_core_row_mapping_not_proven",
+        "largest_component_fits_train_budget",
+        "local_accelerator_not_available_for_faithful_revclassify_budget",
+        "neural_reference_parity_met",
+        "neural_repeated_seed_scorecard_available",
+        "official_revclassify_classification_checkpoints_not_distributed",
+        "official_revclassify_dependency_hydra-core_missing",
+        "official_revclassify_dependency_lightning_missing",
+        "official_revclassify_dependency_omegaconf_missing",
+        "official_revclassify_dependency_torchmetrics_missing",
+        "revtrack_evaluable_cohort_smaller_than_current_official_core",
+        "revtrack_positive_count_differs_from_current_official_core",
+        "revtrack_table_does_not_expose_official_component_ids",
+        "strict_entity_disjoint_split_viable",
+        "test_positive_minimum_met",
+        "train_fraction_reasonable",
+        "validation_positive_minimum_met"
+      ],
+      "dataset_id": "elliptic2_subgraph_aml",
+      "gate_ref": "docs/reports/elliptic2_reference_parity_gate.json",
+      "gate_status": "blocked_supporting_only_thesis_narrowing_required",
+      "hard_claim_allowed": false,
+      "headline_claim_allowed": false,
+      "performance_contribution_allowed": false,
+      "role": "claim_firewall",
+      "supporting_table_allowed": true
+    },
+    {
+      "blocked_reason_codes": [
+        "paper_benchmark_case_packets_missing",
+        "analyst_hour_assumption_defaulted",
+        "same_queue_incumbent_or_human_baseline_missing",
+        "operational_metrics_supporting_only_not_hard_claims",
+        "elliptic2_excluded_from_operational_performance_contribution_by_p8d"
+      ],
+      "dataset_id": "paper_operational_layer",
+      "gate_ref": "docs/reports/paper_operational_claim_guard.json",
+      "gate_status": "supporting_operational_metrics_ready_hard_claims_blocked",
+      "hard_claim_allowed": false,
+      "headline_claim_allowed": false,
+      "performance_contribution_allowed": false,
+      "role": "operational_claim_guard",
+      "supporting_table_allowed": true
+    }
+  ],
+  "schema_version": "relaytic.paper_table_generator.v1",
+  "slice": "Paper Track P10",
+  "status": "supporting_tables_ready_hard_claims_blocked",
+  "supporting_tables_ready": true
+}

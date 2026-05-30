@@ -64,6 +64,11 @@ Current paper-track baseline artifacts also live under `docs/reports/`:
 - `paper_review_budget_curve.json`
 - `paper_case_packet_completeness_report.json`
 - `paper_operational_claim_guard.json`
+- `paper_result_table_final.json`
+- `paper_table_provenance.json`
+- `paper_reproduction_commands.md`
+- `paper_metric_cell_audit.json`
+- `paper_publishability_matrix.json`
 
 ## Benchmark Families
 
@@ -71,7 +76,7 @@ Current paper-track baseline artifacts also live under `docs/reports/`:
 | --- | --- | --- | --- |
 | PaySim-style transaction fraud | Temporal transaction-fraud evidence | `dev` or `proxy` until holdout and claim gates pass | `aml_benchmark_manifest.json`, `aml_temporal_benchmark_claim_report.json`, `aml_time_window_scorecard.json`, `aml_environment_scorecard.json`, `paper_operational_metric_table.json` |
 | Elliptic-style graph AML | Flattened and raw-graph AML evidence | `dev`, `proxy`, or `holdout` depending on source and graph-loader posture | `aml_graph_loader_manifest.json`, `aml_graph_provenance_report.json`, `aml_graph_claim_scope.json`, `aml_benchmark_relevance_scorecard.json`, `paper_review_budget_curve.json` |
-| Elliptic2-style subgraph AML | Modern subgraph context and limitation evidence | supporting-only after P8-D thesis narrowing; no performance contribution, headline, SOTA, full-core, or reference-parity claim | `elliptic2_publishability_gate.json`, `elliptic2_reference_parity_gate.json`, `paper_p8d_thesis_decision.json` |
+| Elliptic2-style subgraph AML | Modern subgraph context and limitation evidence | supporting-only after P8-D thesis narrowing; no performance contribution, headline, SOTA, full-core, or reference-parity claim | `elliptic2_publishability_gate.json`, `elliptic2_reference_parity_gate.json`, `paper_p8d_thesis_decision.json`, `paper_result_table_final.json` |
 | AMLSim-style synthetic bank graph | Synthetic bank-network evidence | `proxy` until reproducible generation and benchmark relevance are frozen | `aml_public_graph_benchmark_catalog.json`, `entity_graph_profile.json`, `subgraph_risk_report.json`, `case_packet.json` |
 | Generic structured-data benchmark pack | Supporting breadth evidence | supporting-only, not the flagship AML claim | `paper_benchmark_manifest.json`, `paper_benchmark_table.json`, `benchmark_release_gate.json` |
 
@@ -125,6 +130,7 @@ relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-rev
 relaytic release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json
 relaytic release-safety paper-thesis-decision --format json
 relaytic release-safety paper-operational-metrics --format json
+relaytic release-safety paper-tables --format json
 relaytic release-safety paper-freeze --format json
 relaytic release-safety scan --format json
 relaytic doctor --expected-profile full --format json
@@ -210,6 +216,11 @@ The release-freeze pack should cite these when available:
 - `paper_review_budget_curve.json`
 - `paper_case_packet_completeness_report.json`
 - `paper_operational_claim_guard.json`
+- `paper_result_table_final.json`
+- `paper_table_provenance.json`
+- `paper_reproduction_commands.md`
+- `paper_metric_cell_audit.json`
+- `paper_publishability_matrix.json`
 - `release_safety_scan.json`
 
 ## Blocked-Claim Conditions
@@ -232,6 +243,7 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `elliptic2_reference_parity_gate.json` blocks reference-parity, SOTA, full-core, entity-disjoint, hard AML, and end-to-end Relaytic claims: P8-C requested faithful neural parity but local preconditions are missing, current-core mapping is not proven, and the strict component split is degenerate.
 - `paper_p8d_thesis_decision.json` unblocks P9 only under the narrowed evaluation-environment thesis. It does not permit Elliptic2 as a primary performance contribution, modern-subgraph SOTA result, RevClassify parity result, or full-core/entity-disjoint claim.
 - `paper_operational_claim_guard.json` unblocks P10 table generation only when supporting review-budget metrics exist. It does not permit hard business-value or headline operational claims while case packets, explicit nondefault analyst assumptions, or same-queue incumbent/human-baseline evidence are incomplete.
+- `paper_publishability_matrix.json` reports hard or headline claims as blocked, or `paper_metric_cell_audit.json` contains metric provenance violations.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record

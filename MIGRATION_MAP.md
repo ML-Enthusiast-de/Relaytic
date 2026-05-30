@@ -354,6 +354,13 @@ Avoid introducing new references to:
 - introduced paper-track operational metric artifacts under `docs/reports/`: `paper_operational_metric_table.json`, `paper_review_budget_curve.json`, `paper_case_packet_completeness_report.json`, and `paper_operational_claim_guard.json`
 - materialized PaySim and Elliptic supporting review-budget rows with false-positive burden proxies while keeping hard business-value, headline operational, Elliptic2 performance-contribution, and SOTA claims blocked until case packets, explicit analyst assumptions, and same-queue baseline evidence are complete; P10 is now unblocked for reproducible table generation
 
+### Paper Track P10
+
+- introduced `src/relaytic/release_safety/paper_table_generator.py` under the existing release-safety boundary for reproducible paper result tables, metric-cell provenance, reproduction commands, audit reports, and publishability matrices
+- introduced the public command `relaytic release-safety paper-tables` for regenerating P10 table artifacts from committed paper-track evidence
+- introduced paper-track table artifacts under `docs/reports/`: `paper_result_table_final.json`, `paper_table_provenance.json`, `paper_reproduction_commands.md`, `paper_metric_cell_audit.json`, and `paper_publishability_matrix.json`
+- generated claim-guarded supporting performance, operational, modern-context, and limitation tables where every numeric cell carries artifact, command, split, budget, leakage, run-directory, and claim-state provenance; P11 is now unblocked while headline, hard AML, SOTA, and business-value claims remain blocked
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
