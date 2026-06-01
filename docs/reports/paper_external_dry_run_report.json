@@ -1,0 +1,95 @@
+{
+  "checks": [
+    {
+      "check_id": "clean_clone_install_contract_ready",
+      "message": "Clean-clone install contract must be documented and importable from the current checkout.",
+      "passed": true,
+      "repair_action": "Fix pyproject/package/CLI entrypoint drift and rerun P12.",
+      "source_artifact": "docs/reports/paper_clean_clone_install_report.json"
+    },
+    {
+      "check_id": "paper_smoke_tables_regenerated",
+      "message": "P10 table generation must reproduce the expected metric-cell posture.",
+      "passed": true,
+      "repair_action": "Run `python -m relaytic.ui.cli release-safety paper-tables --format json` and repair table provenance.",
+      "source_artifact": "docs/reports/paper_external_dry_run_report.json"
+    },
+    {
+      "check_id": "paper_smoke_draft_regenerated",
+      "message": "P11 draft generation must reproduce a passing claim lint and figure manifest.",
+      "passed": true,
+      "repair_action": "Run `python -m relaytic.ui.cli release-safety paper-draft --format json` and repair draft or lint failures.",
+      "source_artifact": "docs/reports/paper_external_dry_run_report.json"
+    },
+    {
+      "check_id": "live_or_declared_leak_scan_passed",
+      "message": "P12 requires a live leak scan unless this is an explicitly skipped unit/smoke run.",
+      "passed": true,
+      "repair_action": "Run `python -m relaytic.ui.cli scan-git-safety` and fix any findings before P13.",
+      "source_artifact": "artifacts/release_safety/paper_p12/release_safety_scan.json"
+    },
+    {
+      "check_id": "committed_claim_lint_passed",
+      "message": "Committed P11 claim lint must pass before release can continue.",
+      "passed": true,
+      "repair_action": "Regenerate the draft and remove unsupported public claims.",
+      "source_artifact": "docs/reports/paper_claim_lint_report.json"
+    }
+  ],
+  "claim_lint_status": "pass",
+  "dry_run_role": "external_reviewer_paper_smoke",
+  "fallback_rule_applied": true,
+  "fallback_rule_reason": "P12 does not rerun every heavy benchmark by default. It proves the declared paper-smoke subset and records the full benchmark commands that remain outside this dry run.",
+  "full_benchmark_commands_not_reproduced": [
+    "python -m relaytic.ui.cli release-safety paysim-benchmark --format json",
+    "python -m relaytic.ui.cli release-safety elliptic-graph --format json",
+    "python -m relaytic.ui.cli release-safety tabular-baselines --budget-tier baseline --run-optional --format json",
+    "python -m relaytic.ui.cli release-safety paysim-competitive --budget-tier competitive --run-optional --format json",
+    "python -m relaytic.ui.cli release-safety graph-baselines --budget-tier competitive --run-optional --format json",
+    "python -m relaytic.ui.cli release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --prepare-selected-embeddings --run-pilot --hash-large-assets --format json",
+    "python -m relaytic.ui.cli release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --format json",
+    "python -m relaytic.ui.cli release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json"
+  ],
+  "install_status": "pass_clean_clone_ready",
+  "leak_scan": {
+    "command": "python -m relaytic.ui.cli scan-git-safety",
+    "failed_check_count": 0,
+    "finding_count": 0,
+    "passed": true,
+    "scanned_file_count": 720,
+    "ship_readiness": "pre_release_only",
+    "state_dir_ref": "artifacts/release_safety/paper_p12",
+    "status": "workspace_only"
+  },
+  "next_slice": "Paper Track P13 - arXiv release and attention pack",
+  "paper_can_continue_to_p13": true,
+  "paper_smoke_status": "paper_smoke_reproduced",
+  "paper_smoke_subset": {
+    "commands": [
+      "python -m relaytic.ui.cli release-safety paper-tables --format json",
+      "python -m relaytic.ui.cli release-safety paper-draft --format json",
+      "python -m relaytic.ui.cli release-safety paper-dry-run --run-isolated-install --format json",
+      "python -m relaytic.ui.cli scan-git-safety"
+    ],
+    "declared": true,
+    "expected_artifacts": [
+      "docs/reports/paper_result_table_final.json",
+      "docs/reports/paper_table_provenance.json",
+      "docs/reports/paper_reproduction_commands.md",
+      "docs/reports/paper_metric_cell_audit.json",
+      "docs/reports/paper_publishability_matrix.json",
+      "docs/reports/paper_claim_lint_report.json",
+      "docs/reports/paper_limitations_matrix.json",
+      "docs/paper/relaytic_aml_draft.md",
+      "docs/paper/figures/figure_manifest.json",
+      "docs/paper/figures/figure_1_claim_gate_flow.svg",
+      "docs/paper/figures/figure_2_supporting_pr_auc.svg",
+      "docs/paper/figures/figure_3_review_budget.svg",
+      "docs/paper/figures/figure_4_publishability_matrix.svg"
+    ],
+    "reason": "Full public benchmark reruns are heavier and depend on external-local datasets; P12 reproduces the paper transformation path."
+  },
+  "schema_version": "relaytic.paper_dry_run.v1",
+  "slice": "Paper Track P12",
+  "status": "pass_paper_smoke_reproduced_claim_linted"
+}

@@ -185,7 +185,7 @@ def _build_release_safety_posture() -> dict[str, Any]:
             "status": "not_run",
             "ship_readiness": "unknown",
             "state_dir": str(state_dir),
-            "message": "Run `relaytic release-safety scan` before publishing or demo packaging.",
+            "message": "Run `relaytic scan-git-safety` before publishing or demo packaging.",
         }
     return {
         "status": scan.get("status", "unknown"),

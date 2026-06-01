@@ -1460,6 +1460,31 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p12 = release_safety_sub.add_parser(
+        "paper-dry-run",
+        help="Build Paper Track P12 external dry-run, clean-clone checklist, and release go/no-go artifacts.",
+    )
+    release_safety_p12.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P12 artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p12.add_argument(
+        "--skip-live-checks",
+        action="store_true",
+        help="Skip live leak-scan checks. This is intended for isolated unit tests and blocks P13 in the output.",
+    )
+    release_safety_p12.add_argument(
+        "--run-isolated-install",
+        action="store_true",
+        help="Run a temp clean-clone full-profile install probe before writing the P12 reports.",
+    )
+    release_safety_p12.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3494,6 +3519,12 @@ def main(argv: list[str] | None = None) -> int:
                 payload = _run_paper_draft_surface(
                     paper_dir=args.paper_dir,
                     output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-dry-run":
+                payload = _run_paper_dry_run_surface(
+                    output_dir=args.output_dir,
+                    run_live_checks=not args.skip_live_checks,
+                    run_isolated_install=args.run_isolated_install,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -7109,7 +7140,7 @@ def _show_release_safety_surface(*, state_dir: str | None) -> dict[str, Any]:
     bundle = read_release_safety_bundle(resolved_state_dir)
     if not bundle or not isinstance(bundle.get("release_safety_scan"), dict):
         raise ValueError(
-            f"Release-safety artifacts are missing in `{resolved_state_dir}`. Run `relaytic release-safety scan` first."
+            f"Release-safety artifacts are missing in `{resolved_state_dir}`. Run `relaytic scan-git-safety` first."
         )
     return {
         "surface_payload": {
@@ -7568,6 +7599,46 @@ def _run_paper_draft_surface(
             "bundle": pack,
         },
         "human_output": render_paper_draft_markdown(pack),
+    }
+
+
+def _run_paper_dry_run_surface(
+    *,
+    output_dir: str | None,
+    run_live_checks: bool,
+    run_isolated_install: bool,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_dry_run_markdown,
+        sync_paper_dry_run_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_dry_run_pack(
+        root,
+        output_dir=output_dir,
+        run_live_checks=run_live_checks,
+        run_isolated_install=run_isolated_install,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    report = dict(pack["paper_external_dry_run_report"])
+    return {
+        "surface_payload": {
+            "status": report["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_external_dry_run_report": report,
+            "paper_clean_clone_install_report": pack["paper_clean_clone_install_report"],
+            "paper_reproduction_failure_report": pack["paper_reproduction_failure_report"],
+            "paper_release_go_no_go": pack["paper_release_go_no_go"],
+            "bundle": pack,
+        },
+        "human_output": render_paper_dry_run_markdown(pack),
     }
 
 

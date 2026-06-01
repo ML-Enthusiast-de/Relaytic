@@ -1,0 +1,19 @@
+{
+  "arxiv_release_blocked": false,
+  "failure_policy": "Any unresolved P12 failure blocks P13. Heavy full-benchmark reruns are recorded but not required for the P12 smoke pass.",
+  "failures": [],
+  "nonblocking_nonreproduced_full_benchmarks": [
+    "python -m relaytic.ui.cli release-safety paysim-benchmark --format json",
+    "python -m relaytic.ui.cli release-safety elliptic-graph --format json",
+    "python -m relaytic.ui.cli release-safety tabular-baselines --budget-tier baseline --run-optional --format json",
+    "python -m relaytic.ui.cli release-safety paysim-competitive --budget-tier competitive --run-optional --format json",
+    "python -m relaytic.ui.cli release-safety graph-baselines --budget-tier competitive --run-optional --format json",
+    "python -m relaytic.ui.cli release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --prepare-selected-embeddings --run-pilot --hash-large-assets --format json",
+    "python -m relaytic.ui.cli release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --format json",
+    "python -m relaytic.ui.cli release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json"
+  ],
+  "schema_version": "relaytic.paper_dry_run.v1",
+  "slice": "Paper Track P12",
+  "status": "no_failures",
+  "unresolved_failure_count": 0
+}

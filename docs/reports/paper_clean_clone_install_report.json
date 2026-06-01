@@ -1,0 +1,205 @@
+{
+  "checks": [
+    {
+      "check_id": "pyproject_present",
+      "message": "pyproject.toml must exist in a clean clone.",
+      "passed": true,
+      "repair_action": "Restore pyproject.toml before release.",
+      "source_artifact": "pyproject.toml"
+    },
+    {
+      "check_id": "relaytic_package_present",
+      "message": "The canonical relaytic package must be present.",
+      "passed": true,
+      "repair_action": "Restore the canonical package boundary.",
+      "source_artifact": "src/relaytic/__init__.py"
+    },
+    {
+      "check_id": "console_script_declared",
+      "message": "The public relaytic CLI entry point must be declared.",
+      "passed": true,
+      "repair_action": "Restore the relaytic console script in pyproject.toml.",
+      "source_artifact": "pyproject.toml"
+    },
+    {
+      "check_id": "full_install_profile_declared",
+      "message": "The documented full install profile must be declared.",
+      "passed": true,
+      "repair_action": "Restore the `full` optional-dependency profile.",
+      "source_artifact": "pyproject.toml"
+    },
+    {
+      "check_id": "current_checkout_importable",
+      "detail": {
+        "cli_main_callable": true,
+        "loaded_modules": [
+          "relaytic",
+          "relaytic.ui.cli",
+          "relaytic.release_safety"
+        ],
+        "passed": true
+      },
+      "message": "The current checkout must import the CLI and release-safety package.",
+      "passed": true,
+      "repair_action": "Fix import errors before asking reviewers to install the package.",
+      "source_artifact": "src/relaytic/ui/cli.py"
+    },
+    {
+      "check_id": "isolated_clean_clone_full_profile_install",
+      "detail": {
+        "commands": [
+          {
+            "command": "git init",
+            "passed": true,
+            "returncode": 0,
+            "stderr_tail": "",
+            "stdout_tail": "",
+            "step_id": "git_init"
+          },
+          {
+            "command": "git add -A",
+            "passed": true,
+            "returncode": 0,
+            "stderr_tail": "",
+            "stdout_tail": "",
+            "step_id": "git_add"
+          },
+          {
+            "command": "<venv-python> -m pip install -e .[full]",
+            "passed": true,
+            "returncode": 0,
+            "stderr_tail": "",
+            "stdout_tail": "",
+            "step_id": "install_full_profile"
+          },
+          {
+            "command": "<venv-python> -m relaytic.ui.cli doctor --expected-profile full --format json",
+            "passed": true,
+            "returncode": 0,
+            "stderr_tail": "",
+            "stdout_tail": "",
+            "step_id": "doctor_full_profile"
+          },
+          {
+            "command": "<venv-python> -m relaytic.ui.cli release-safety paper-tables --format json",
+            "passed": true,
+            "returncode": 0,
+            "stderr_tail": "",
+            "stdout_tail": "",
+            "step_id": "paper_tables"
+          },
+          {
+            "command": "<venv-python> -m relaytic.ui.cli release-safety paper-draft --format json",
+            "passed": true,
+            "returncode": 0,
+            "stderr_tail": "",
+            "stdout_tail": "",
+            "step_id": "paper_draft"
+          },
+          {
+            "command": "<venv-python> -m relaytic.ui.cli scan-git-safety",
+            "passed": true,
+            "returncode": 0,
+            "stderr_tail": "",
+            "stdout_tail": "",
+            "step_id": "scan_git_safety"
+          }
+        ],
+        "executed": true,
+        "install_profile": "full",
+        "status": "pass",
+        "workspace_file_count": 718
+      },
+      "message": "The temp clean-clone probe must install the full profile and rerun the paper-smoke commands.",
+      "passed": true,
+      "repair_action": "Run `python -m relaytic.ui.cli release-safety paper-dry-run --run-isolated-install --format json`, inspect the isolated probe command statuses, fix install or smoke failures, and rerun P12.",
+      "source_artifact": "docs/reports/paper_clean_clone_install_report.json"
+    }
+  ],
+  "clean_clone_install_verified": true,
+  "documented_clean_clone_commands": [
+    "git clone <repo-url> Relaytic",
+    "cd Relaytic",
+    "python -m venv .venv",
+    "python -m pip install --upgrade pip",
+    "python -m pip install -e \".[full]\"",
+    "python -m relaytic.ui.cli doctor --expected-profile full --format json",
+    "python -m relaytic.ui.cli release-safety paper-tables --format json",
+    "python -m relaytic.ui.cli release-safety paper-draft --format json",
+    "python -m relaytic.ui.cli release-safety paper-dry-run --run-isolated-install --format json",
+    "python -m relaytic.ui.cli scan-git-safety"
+  ],
+  "documented_install_profile": "full",
+  "honesty_note": "P12's committed report proves clean-clone readiness and paper-smoke reproducibility from the current checkout. External reviewers should still run the checklist in a fresh clone; unresolved failures block P13.",
+  "install_verification_level": "isolated_clean_clone_full_profile_probe",
+  "isolated_clean_clone_probe": {
+    "commands": [
+      {
+        "command": "git init",
+        "passed": true,
+        "returncode": 0,
+        "stderr_tail": "",
+        "stdout_tail": "",
+        "step_id": "git_init"
+      },
+      {
+        "command": "git add -A",
+        "passed": true,
+        "returncode": 0,
+        "stderr_tail": "",
+        "stdout_tail": "",
+        "step_id": "git_add"
+      },
+      {
+        "command": "<venv-python> -m pip install -e .[full]",
+        "passed": true,
+        "returncode": 0,
+        "stderr_tail": "",
+        "stdout_tail": "",
+        "step_id": "install_full_profile"
+      },
+      {
+        "command": "<venv-python> -m relaytic.ui.cli doctor --expected-profile full --format json",
+        "passed": true,
+        "returncode": 0,
+        "stderr_tail": "",
+        "stdout_tail": "",
+        "step_id": "doctor_full_profile"
+      },
+      {
+        "command": "<venv-python> -m relaytic.ui.cli release-safety paper-tables --format json",
+        "passed": true,
+        "returncode": 0,
+        "stderr_tail": "",
+        "stdout_tail": "",
+        "step_id": "paper_tables"
+      },
+      {
+        "command": "<venv-python> -m relaytic.ui.cli release-safety paper-draft --format json",
+        "passed": true,
+        "returncode": 0,
+        "stderr_tail": "",
+        "stdout_tail": "",
+        "step_id": "paper_draft"
+      },
+      {
+        "command": "<venv-python> -m relaytic.ui.cli scan-git-safety",
+        "passed": true,
+        "returncode": 0,
+        "stderr_tail": "",
+        "stdout_tail": "",
+        "step_id": "scan_git_safety"
+      }
+    ],
+    "executed": true,
+    "install_profile": "full",
+    "status": "pass",
+    "workspace_file_count": 718
+  },
+  "live_isolated_clean_clone_install_executed": true,
+  "live_isolated_clean_clone_install_passed": true,
+  "python_version": "3.11.0",
+  "schema_version": "relaytic.paper_dry_run.v1",
+  "slice": "Paper Track P12",
+  "status": "pass_clean_clone_ready"
+}

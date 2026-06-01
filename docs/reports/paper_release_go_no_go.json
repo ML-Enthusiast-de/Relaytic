@@ -1,0 +1,33 @@
+{
+  "allowed_release_mode": "claim_safe_evaluation_environment_only",
+  "blocked_public_claims": [
+    "hard real-world AML superiority",
+    "SOTA or leaderboard-winner claim",
+    "RevClassify parity or Elliptic2 performance contribution",
+    "graph-neural superiority",
+    "hard business-value or analyst-hour savings claim"
+  ],
+  "gate_refs": [
+    "docs/reports/paper_publishability_matrix.json",
+    "docs/reports/paper_claim_lint_report.json",
+    "docs/reports/paper_external_dry_run_report.json",
+    "docs/reports/paper_reproduction_failure_report.json"
+  ],
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "next_slice": "Paper Track P13 - arXiv release and attention pack",
+  "paper_can_continue_to_p13": true,
+  "release_decision": "go_for_p13",
+  "required_p13_inputs": [
+    "docs/reports/paper_result_table_final.json",
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_claim_lint_report.json",
+    "docs/reports/paper_external_dry_run_report.json",
+    "docs/reports/paper_release_go_no_go.json",
+    "docs/paper/relaytic_aml_draft.md"
+  ],
+  "schema_version": "relaytic.paper_dry_run.v1",
+  "slice": "Paper Track P12",
+  "status": "go_for_p13_claim_safe_release_pack",
+  "unresolved_failure_count": 0
+}

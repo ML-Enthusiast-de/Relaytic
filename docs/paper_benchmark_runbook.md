@@ -132,8 +132,9 @@ relaytic release-safety paper-thesis-decision --format json
 relaytic release-safety paper-operational-metrics --format json
 relaytic release-safety paper-tables --format json
 relaytic release-safety paper-draft --format json
+relaytic release-safety paper-dry-run --run-isolated-install --format json
 relaytic release-safety paper-freeze --format json
-relaytic release-safety scan --format json
+relaytic scan-git-safety
 relaytic doctor --expected-profile full --format json
 ```
 
@@ -224,6 +225,11 @@ The release-freeze pack should cite these when available:
 - `paper_publishability_matrix.json`
 - `paper_claim_lint_report.json`
 - `paper_limitations_matrix.json`
+- `paper_clean_clone_checklist.md`
+- `paper_external_dry_run_report.json`
+- `paper_clean_clone_install_report.json`
+- `paper_reproduction_failure_report.json`
+- `paper_release_go_no_go.json`
 - `docs/paper/relaytic_aml_draft.md`
 - `docs/paper/figures/figure_manifest.json`
 - `release_safety_scan.json`
@@ -250,6 +256,7 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `paper_operational_claim_guard.json` unblocks P10 table generation only when supporting review-budget metrics exist. It does not permit hard business-value or headline operational claims while case packets, explicit nondefault analyst assumptions, or same-queue incumbent/human-baseline evidence are incomplete.
 - `paper_publishability_matrix.json` reports hard or headline claims as blocked, or `paper_metric_cell_audit.json` contains metric provenance violations.
 - `paper_claim_lint_report.json` fails, reports unknown metric-cell references, missing limitations coverage, invalid figure provenance, missing required draft sections, or unguarded blocked-claim language.
+- `paper_external_dry_run_report.json` fails to reproduce the paper-smoke subset, `paper_reproduction_failure_report.json` lists unresolved failures, or `paper_release_go_no_go.json` blocks P13.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record

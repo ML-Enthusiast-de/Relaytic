@@ -368,6 +368,13 @@ Avoid introducing new references to:
 - introduced paper-track draft artifacts under `docs/paper/` and `docs/reports/`: `relaytic_aml_draft.md`, `figures/figure_manifest.json`, `figures/figure_1_claim_gate_flow.svg`, `figures/figure_2_supporting_pr_auc.svg`, `figures/figure_3_review_budget.svg`, `figures/figure_4_publishability_matrix.svg`, `paper_claim_lint_report.json`, and `paper_limitations_matrix.json`
 - linted every draft metric reference against P10 metric cells and every limitations row against the generated draft; P12 is now unblocked while hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked
 
+### Paper Track P12
+
+- introduced `src/relaytic/release_safety/paper_dry_run.py` under the existing release-safety boundary for external dry-run, clean-clone install, reproduction-failure, and release go/no-go proof
+- introduced the public command `relaytic release-safety paper-dry-run` for regenerating the P12 dry-run artifacts, with `--run-isolated-install` for an optional temp full-profile clean-clone probe and `--skip-live-checks` for unit-test-only dry runs
+- introduced paper-track dry-run artifacts under `docs/reports/`: `paper_clean_clone_checklist.md`, `paper_external_dry_run_report.json`, `paper_clean_clone_install_report.json`, `paper_reproduction_failure_report.json`, and `paper_release_go_no_go.json`
+- reproduced the P10/P11 paper-smoke path, recorded the full heavy benchmark commands left outside the smoke subset, ran release-safety leak scanning, and unblocked P13 only for claim-safe evaluation-environment release language while keeping hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims blocked
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
@@ -812,6 +819,11 @@ Implemented release-safety artifact names:
 - `docs/paper/figures/figure_2_supporting_pr_auc.svg`
 - `docs/paper/figures/figure_3_review_budget.svg`
 - `docs/paper/figures/figure_4_publishability_matrix.svg`
+- `paper_clean_clone_checklist.md`
+- `paper_external_dry_run_report.json`
+- `paper_clean_clone_install_report.json`
+- `paper_reproduction_failure_report.json`
+- `paper_release_go_no_go.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

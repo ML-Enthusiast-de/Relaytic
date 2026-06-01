@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P11 implemented. P12 through P13 planned.
+P0 through P12 implemented. P13 planned.
 
 ## Intent
 
@@ -60,7 +60,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
     Generate all paper tables from run artifacts, not hand-maintained numbers.
 17. **P11 - Paper draft and figure pack** - implemented
     Draft the arXiv paper and generate figures from artifacts or clearly mark schematic figures.
-18. **P12 - External dry run and clean-clone proof**
+18. **P12 - External dry run and clean-clone proof** - implemented
     Reproduce the install, paper-smoke benchmark, table generation, claim lint, and leak scan from a clean clone.
 19. **P13 - arXiv release and attention pack**
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
@@ -311,8 +311,21 @@ P11 added:
 
 P11 renders the first Relaytic-AML draft directly from the P10 evidence pack. The draft contains abstract, introduction, related work, method, benchmarks, results, limitations, and reproducibility appendix sections; it cites audited `paper-cell:*` metric references; it names every generated limitation; and its claim lint passes. Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked before P12.
 
+P12 added:
+
+- `docs/reports/paper_clean_clone_checklist.md`
+- `docs/reports/paper_external_dry_run_report.json`
+- `docs/reports/paper_clean_clone_install_report.json`
+- `docs/reports/paper_reproduction_failure_report.json`
+- `docs/reports/paper_release_go_no_go.json`
+- `src/relaytic/release_safety/paper_dry_run.py`
+- `relaytic release-safety paper-dry-run --run-isolated-install --format json`
+- `tests/test_paper_track_p12.py`
+
+P12 proves the external paper-smoke path. It documents the clean-clone install checklist, verifies the install contract, supports an optional temp isolated full-profile install probe, regenerates the P10 table pack and P11 draft pack, records leak-scan status, and emits a fail-closed go/no-go report. P13 is unblocked only in claim-safe evaluation-environment mode; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P12**.
+The next implementation target is **Paper Track P13**.
 
-P12 must reproduce the install, paper-smoke path, table generation, claim lint, and leak scan from a clean clone or emit deterministic release blockers before any arXiv/attention release.
+P13 must produce the arXiv release checklist, public attention pack, release manifest, and allowed-public-claims report from the P10-P12 gated artifact set. If any P12 dry-run or claim gate fails, P13 must emit a release blocker instead of publishable wording.

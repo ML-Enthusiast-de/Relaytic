@@ -105,7 +105,7 @@ def test_slice15y_paper_runbook_names_families_blockers_and_repro_sequence() -> 
     assert "## Blocked-Claim Conditions" in runbook
     assert "## Reproducibility Record" in runbook
     assert "relaytic benchmark run --run-dir artifacts\\aml_benchmark_run" in runbook
-    assert "relaytic release-safety scan --format json" in runbook
+    assert "relaytic scan-git-safety" in runbook
 
 
 def test_slice15y_ui_doc_distinguishes_public_surfaces() -> None:
