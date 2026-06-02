@@ -63,7 +63,7 @@ Use these labels when discussing results:
 - **Demo-only:** the public-safe fixture proves the product workflow and artifact contract, not real-world AML superiority.
 - **Dev-benchmark:** a benchmark run or proof pack on a visible/dev partition can guide engineering, but cannot support paper-grade claims by itself.
 - **Holdout-benchmark:** a held-out benchmark partition can support stronger evidence if the claim guards, leakage audits, and benchmark-environment score pass.
-- **Paper-ready:** reserved for the later Slice 15Z-R release-freeze pack, where the benchmark catalog, result table, claim-boundary report, reproducibility attestation, environment scorecard, and release-safety scan agree.
+- **Claim-safe paper-ready:** allowed only when the P13 release manifest, public-claims report, table provenance, draft lint, clean-clone proof, and release-safety scan agree. This still does not imply hard AML or headline benchmark superiority.
 
 More context:
 
@@ -71,6 +71,27 @@ More context:
 - [Product Story](docs/product_story.md)
 - [Paper Benchmark Runbook](docs/paper_benchmark_runbook.md)
 - [UI Frontier Review](docs/relaytic_ui_frontier_review.md)
+
+## Paper P13 Claim-Safe Release Status
+
+The current paper package is claim-safe release material for a Relaytic-AML evaluation-environment paper, not a hard AML superiority result.
+
+Inspect:
+
+- `docs/paper/relaytic_aml_arxiv_draft.md` for the P13 paper draft.
+- `docs/paper/references.bib` for citable sources.
+- `docs/paper/figures/` and `docs/paper/tables/` for generated visual/table assets.
+- `docs/reports/paper_release_manifest.json` for the release gate.
+- `docs/reports/paper_public_claims_allowed.json` for allowed and blocked public wording.
+- `docs/reports/paper_attention_pack.md` for claim-safe public post text.
+
+Regenerate:
+
+```bash
+relaytic release-safety paper-release --format json
+```
+
+Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked until later gates explicitly allow them.
 
 ## Current Product Baseline
 
@@ -139,13 +160,14 @@ The repository already supports a working early product baseline:
 - a one-command Relaytic-AML review-queue demo bundle through `relaytic demo aml-review-queue`, with a flow report, business-metric table, artifact index, business-value guard, baseline/ablation proof, and mission-control investigation board
 - pre-Academy repo credibility reports under `docs/reports/`, including module-size audit, public-surface inventory, module-split evidence, extraction boundaries, and benchmark cleanup debt before the paper/release freeze
 - a paper/release freeze surface through `relaytic release-safety paper-freeze`, with relevant benchmark catalog, multidimensional result table, claim-boundary report, reproducibility attestation, and a safe attention-pack manifest that blocks hard AML performance claims until holdout evidence is frozen
+- a claim-safe paper-release surface through `relaytic release-safety paper-release`, with final generated draft, citable references, paper tables, public attention pack, arXiv checklist, release manifest, and allowed-public-claims report
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, 15W, 15X, 15Y, 15Z, and 15Z-R are now implemented. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, temporal weak-label claim gates, AML evaluation-environment scorecards, demo-first documentation, pre-Academy repo credibility reports, and a paper/release freeze pack on the same local-first artifact path.
+Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, 15W, 15X, 15Y, 15Z, and 15Z-R are now implemented, followed by Paper Track P0 through P13. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, temporal weak-label claim gates, AML evaluation-environment scorecards, demo-first documentation, pre-Academy repo credibility reports, a paper/release freeze pack, and a claim-safe P13 arXiv release pack on the same local-first artifact path.
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 16A**, because the AML productization and paper-freeze track is now landed and capability-academy work needs one governed registry before replay, promotion, or hunt mechanics expand.
+The next recommended build is **Slice 16A**, because the AML productization and Paper Track P0-P13 release path is now landed and capability-academy work needs one governed registry before replay, promotion, or hunt mechanics expand.
 
 The initial model-competitiveness path through **Slice 15F** is now landed, and the first performance-recovery foundation slice is now landed too:
 

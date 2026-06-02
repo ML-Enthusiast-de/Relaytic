@@ -1,0 +1,71 @@
+{
+  "allowed_public_claims": [
+    "Relaytic-AML is a local-first, claim-gated evaluation environment for temporal, graph, and operational financial-crime ML.",
+    "The current paper pack generates tables, figures, claim lint, and release manifests from local artifacts.",
+    "PaySim and Elliptic rows may be described as supporting evidence only under their documented proxy and graph-feature boundaries.",
+    "Elliptic2 may be described as modern context and limitation evidence only, not as a Relaytic performance contribution.",
+    "P12 clean-clone and paper-smoke evidence passed before P13 release wording was generated."
+  ],
+  "blocked_public_claims": [
+    "hard real-world AML superiority",
+    "SOTA or leaderboard-winner claim",
+    "RevClassify parity or Elliptic2 performance contribution",
+    "graph-neural superiority",
+    "hard business-value or analyst-hour savings claim",
+    "production-ready AML deployment claim"
+  ],
+  "checks": [
+    {
+      "check_id": "p12_go_no_go_allows_p13",
+      "message": "P12 go/no-go must allow P13 before public release wording is allowed.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_release_go_no_go.json"
+    },
+    {
+      "check_id": "hard_and_headline_claims_blocked",
+      "message": "Claim-safe release requires hard and headline claims to remain blocked.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_release_go_no_go.json"
+    },
+    {
+      "check_id": "readme_release_section_present",
+      "message": "README must expose the P13 claim-safe release status and point to the paper artifacts.",
+      "passed": true,
+      "source_artifact": "README.md"
+    },
+    {
+      "check_id": "public_wording_lint_passed",
+      "detail": {
+        "violation_count": 0
+      },
+      "message": "Draft, attention pack, and README wording must not contain unguarded blocked claims.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_public_claims_allowed.json"
+    }
+  ],
+  "claim_safe_public_wording_allowed": true,
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "metric_wording_boundaries": {
+    "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean": "May be cited as modern context only, below the recorded RevClassifyDS reference and not a parity claim.",
+    "elliptic_p7_selected_graph_feature_baseline.test_pr_auc": "May be cited as supporting temporal graph-feature evidence only.",
+    "paysim_p6a_competitive_selected.test_pr_auc": "May be cited as supporting synthetic temporal-fraud evidence only."
+  },
+  "next_slice": "Slice 16A - capability registry and capability cards",
+  "release_mode": "claim_safe_evaluation_environment_only",
+  "schema_version": "relaytic.paper_release.v1",
+  "slice": "Paper Track P13",
+  "status": "claim_safe_public_wording_allowed",
+  "surfaces_linted": [
+    "docs/paper/relaytic_aml_arxiv_draft.md",
+    "docs/reports/paper_attention_pack.md",
+    "README.md"
+  ],
+  "wording_lint": {
+    "rule_count": 8,
+    "schema_version": "relaytic.paper_release.v1",
+    "status": "pass",
+    "surface_count": 3,
+    "violations": []
+  }
+}

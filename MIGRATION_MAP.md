@@ -375,6 +375,14 @@ Avoid introducing new references to:
 - introduced paper-track dry-run artifacts under `docs/reports/`: `paper_clean_clone_checklist.md`, `paper_external_dry_run_report.json`, `paper_clean_clone_install_report.json`, `paper_reproduction_failure_report.json`, and `paper_release_go_no_go.json`
 - reproduced the P10/P11 paper-smoke path, recorded the full heavy benchmark commands left outside the smoke subset, ran release-safety leak scanning, and unblocked P13 only for claim-safe evaluation-environment release language while keeping hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims blocked
 
+### Paper Track P13
+
+- introduced `src/relaytic/release_safety/paper_release.py` under the existing release-safety boundary for final paper-release manifest generation, public wording lint, citable references, generated paper tables, arXiv checklist, and attention-pack assembly
+- introduced the public command `relaytic release-safety paper-release` for regenerating the P13 release pack from committed P10-P12 artifacts
+- introduced paper-track release artifacts under `docs/reports/`: `paper_release_manifest.json`, `paper_arxiv_submission_checklist.md`, `paper_attention_pack.md`, and `paper_public_claims_allowed.json`
+- introduced final paper artifacts under `docs/paper/`: `relaytic_aml_arxiv_draft.md`, `references.bib`, `tables/table_manifest.json`, `tables/table_1_evidence_summary.md`, `tables/table_2_claim_gate_matrix.md`, and `tables/table_3_release_artifact_set.md`
+- produced a claim-safe evaluation-environment paper package and release tag plan while keeping hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims blocked
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`

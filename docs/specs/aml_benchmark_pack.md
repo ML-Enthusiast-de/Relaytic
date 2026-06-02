@@ -30,6 +30,7 @@ That means:
 - P10 turns those artifacts into reproducible tables with per-cell provenance and a publishability matrix. Passing P10 means the paper can be drafted; it does not mean hard AML, SOTA, headline, or business-value claims are allowed
 - P11 turns the P10 evidence into a claim-linted paper draft and deterministic figure pack. Passing P11 means the draft is internally consistent with the artifact contract; it still does not allow hard AML, SOTA, headline, RevClassify parity, graph-neural superiority, or hard business-value claims before P12/P13 gates
 - P12 turns the P10/P11 evidence into an external dry-run proof. Passing P12 means the clean-clone checklist, optional isolated full-profile install probe, paper-smoke regeneration, leak scan, reproduction failure report, and go/no-go gate agree; it still allows only claim-safe evaluation-environment release language before P13
+- P13 turns the P10-P12 evidence into a claim-safe arXiv release pack: final generated draft, citable references, generated tables, attention pack, checklist, release manifest, and allowed-public-claims report. Passing P13 allows only evaluation-environment public wording; hard AML, SOTA, headline, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked
 - P8 records AMLSim as blocked until a seeded generated bundle, generator revision, output hashes, generated-data license, and typology audit exist; once verified it remains synthetic `proxy` evidence only
 
 Relaytic-AML must be honest about that boundary. Raw Elliptic support is now real, but it does not imply Elliptic2-scale subgraph support or graph-neural superiority.
@@ -137,7 +138,7 @@ Before the AML flagship paper/demo pack is considered credible, Relaytic-AML sho
 
 ## Adopted pre-Academy proof sequence
 
-The benchmark pack is now part of a broader AML proof/productization sequence. The next implementation sessions must follow this order before Academy work resumes:
+The benchmark pack is now part of a broader AML proof/productization sequence. The repository has followed this order before Academy work resumes:
 
 1. **15R-A**: finished AML proof-pack alignment across tests, CLI, run summary, assist, mission control, docs, and claim gates.
 2. **15S**: created the public-safe flagship AML demo bundle.
@@ -149,7 +150,7 @@ The benchmark pack is now part of a broader AML proof/productization sequence. T
 8. **15Y**: rewrote first-contact docs around the flagship path and added the paper benchmark runbook.
 9. **15Z**: cleaned repo credibility risks with module-split evidence, public-surface inventory, and retained benchmark cleanup debt.
 10. **15Z-R**: froze the relevant benchmark and release evidence with a rerunnable paper-freeze command, claim boundaries, reproducibility attestation, and hard-performance-claim blocking.
-11. **Paper Track P0-P13, with P8-C/P8-D inserted after P8-B**: turns the frozen but claim-blocked release pack into a paper-ready path: commit the baseline, clean public surfaces, freeze the paper thesis, register datasets, run PaySim-style and Elliptic-style evidence, add strong tabular and graph baselines, recover and challenge modern Elliptic2 evidence, explicitly narrow its neural-reference/cohort gap for the first paper, add guarded operational evidence, generate reproducible per-cell-provenance tables, draft and lint the paper, dry-run from a clean clone, and release to arXiv only if gates pass.
+11. **Paper Track P0-P13, with P8-C/P8-D inserted after P8-B**: completed the frozen but claim-blocked release pack into a paper-ready path: commit the baseline, clean public surfaces, freeze the paper thesis, register datasets, run PaySim-style and Elliptic-style evidence, add strong tabular and graph baselines, recover and challenge modern Elliptic2 evidence, explicitly narrow its neural-reference/cohort gap for the first paper, add guarded operational evidence, generate reproducible per-cell-provenance tables, draft and lint the paper, dry-run from a clean clone, and release to arXiv only if gates pass.
 
 Benchmark success must stay separated from:
 

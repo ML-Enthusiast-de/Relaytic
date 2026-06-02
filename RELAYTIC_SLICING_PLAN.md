@@ -346,7 +346,7 @@ Why:
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
-- Paper Track P0 through P13 now come before Academy work because the current freeze pack deliberately blocks hard AML and SOTA claims; Relaytic must first clean public surfaces, run relevant benchmark tracks, challenge weak first-pass rows with competitive leakage-safe budgets, generate real numeric evidence, and draft a claim-safe paper before expanding into capability evolution
+- Paper Track P0 through P13 now come before Academy work because the current freeze pack deliberately blocked hard AML and SOTA claims; Relaytic first cleaned public surfaces, ran relevant benchmark tracks, challenged weak first-pass rows with competitive leakage-safe budgets, generated real numeric evidence, drafted a claim-safe paper, proved a clean paper-smoke path, and produced a claim-safe arXiv release pack before expanding into capability evolution
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
 - Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, and adds Relaytic aliases for legacy API/tool names
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
@@ -367,8 +367,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P12. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, Paper Track P11 claim-linted paper draft generation, and Paper Track P12 external dry-run proof.
-- next execution target: Paper Track P13
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P13. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, Paper Track P11 claim-linted paper draft generation, Paper Track P12 external dry-run proof, and Paper Track P13 claim-safe arXiv release pack.
+- next execution target: Slice 16A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -377,7 +377,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, after Paper Track P13 proves release gating
+- next planned academy follow-on: Slice 16A, now that Paper Track P13 has proved claim-safe release gating
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -4198,16 +4198,16 @@ P12 proves the external paper-smoke path without overclaiming full benchmark rer
 ### Paper Track P13 - arXiv release and attention pack
 
 Goal:
-- release the paper, repo tag, benchmark pack, and public attention materials only after gates pass
+- prepare the claim-safe paper, benchmark pack, tag plan, and public attention materials only after gates pass
 
 Load-bearing improvement:
 - Relaytic converts technical benchmark proof into a credible public artifact without overclaiming
 
 Human surface:
-- humans get a release checklist, paper link plan, README update, and concise public summary
+- humans get a release checklist, paper draft, references, generated paper tables, README update, and concise public summary
 
 Agent surface:
-- external agents can verify release tag, paper version, benchmark artifacts, and allowed public wording
+- external agents can verify release tag plan, paper version, benchmark artifacts, and allowed public wording
 
 Intelligence source:
 - final paper table, dry-run report, claim lint, release-safety scan, and attention-pack manifest
@@ -4220,12 +4220,36 @@ Required outputs:
 - `paper_arxiv_submission_checklist.md`
 - `paper_attention_pack.md`
 - `paper_public_claims_allowed.json`
+- `docs/paper/relaytic_aml_arxiv_draft.md`
+- `docs/paper/references.bib`
+- `docs/paper/tables/table_manifest.json`
+- `docs/paper/tables/table_1_evidence_summary.md`
+- `docs/paper/tables/table_2_claim_gate_matrix.md`
+- `docs/paper/tables/table_3_release_artifact_set.md`
 
 Minimum proof:
 - P10 through P12 pass
 - release tag and paper draft cite the same artifact set
 - README and public post text use only allowed wording
 - no hard AML/SOTA claim appears without passing holdout, environment, claim, and reproducibility gates
+
+P13 added:
+
+- `src/relaytic/release_safety/paper_release.py`
+- `relaytic release-safety paper-release --format json`
+- `docs/reports/paper_release_manifest.json`
+- `docs/reports/paper_arxiv_submission_checklist.md`
+- `docs/reports/paper_attention_pack.md`
+- `docs/reports/paper_public_claims_allowed.json`
+- `docs/paper/relaytic_aml_arxiv_draft.md`
+- `docs/paper/references.bib`
+- `docs/paper/tables/table_manifest.json`
+- `docs/paper/tables/table_1_evidence_summary.md`
+- `docs/paper/tables/table_2_claim_gate_matrix.md`
+- `docs/paper/tables/table_3_release_artifact_set.md`
+- `tests/test_paper_track_p13.py`
+
+P13 produces a claim-safe arXiv-ready Markdown draft and attention pack from P10-P12 source artifacts. It writes a release tag plan but does not create or push tags automatically. The public wording lint passes only because hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked. Slice 16A is now the next execution target.
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

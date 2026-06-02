@@ -133,6 +133,7 @@ relaytic release-safety paper-operational-metrics --format json
 relaytic release-safety paper-tables --format json
 relaytic release-safety paper-draft --format json
 relaytic release-safety paper-dry-run --run-isolated-install --format json
+relaytic release-safety paper-release --format json
 relaytic release-safety paper-freeze --format json
 relaytic scan-git-safety
 relaytic doctor --expected-profile full --format json
@@ -230,8 +231,18 @@ The release-freeze pack should cite these when available:
 - `paper_clean_clone_install_report.json`
 - `paper_reproduction_failure_report.json`
 - `paper_release_go_no_go.json`
+- `paper_release_manifest.json`
+- `paper_arxiv_submission_checklist.md`
+- `paper_attention_pack.md`
+- `paper_public_claims_allowed.json`
 - `docs/paper/relaytic_aml_draft.md`
+- `docs/paper/relaytic_aml_arxiv_draft.md`
+- `docs/paper/references.bib`
 - `docs/paper/figures/figure_manifest.json`
+- `docs/paper/tables/table_manifest.json`
+- `docs/paper/tables/table_1_evidence_summary.md`
+- `docs/paper/tables/table_2_claim_gate_matrix.md`
+- `docs/paper/tables/table_3_release_artifact_set.md`
 - `release_safety_scan.json`
 
 ## Blocked-Claim Conditions
@@ -257,6 +268,7 @@ Do not claim paper-ready AML superiority when any of these are true:
 - `paper_publishability_matrix.json` reports hard or headline claims as blocked, or `paper_metric_cell_audit.json` contains metric provenance violations.
 - `paper_claim_lint_report.json` fails, reports unknown metric-cell references, missing limitations coverage, invalid figure provenance, missing required draft sections, or unguarded blocked-claim language.
 - `paper_external_dry_run_report.json` fails to reproduce the paper-smoke subset, `paper_reproduction_failure_report.json` lists unresolved failures, or `paper_release_go_no_go.json` blocks P13.
+- `paper_release_manifest.json` is not `ready_for_claim_safe_arxiv_release`, `paper_public_claims_allowed.json` is not `claim_safe_public_wording_allowed`, or the P13 public wording is cited as allowing hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, or hard business-value claims.
 - The run used a public-safe fixture or synthetic/proxy source and has no holdout or release-freeze evidence.
 
 ## Reproducibility Record
@@ -273,4 +285,4 @@ For any paper-facing table, record:
 - release-safety scan result
 - claim-boundary artifact paths
 
-Slice 15Z-R turned this runbook into machine-readable freeze artifacts. Treat `docs/reports/paper_claim_boundary_report.json` and `docs/reports/reproducibility_attestation.json` as the public-claim and rerun truth before publishing paper-facing language.
+Slice 15Z-R turned this runbook into machine-readable freeze artifacts. Paper Track P13 then turned the P10-P12 evidence into a claim-safe release pack. Treat `docs/reports/paper_claim_boundary_report.json`, `docs/reports/reproducibility_attestation.json`, `docs/reports/paper_release_manifest.json`, and `docs/reports/paper_public_claims_allowed.json` as the public-claim and rerun truth before publishing paper-facing language.

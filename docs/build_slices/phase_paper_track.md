@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P12 implemented. P13 planned.
+P0 through P13 implemented. Slice 16A is the next execution target.
 
 ## Intent
 
@@ -62,7 +62,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
     Draft the arXiv paper and generate figures from artifacts or clearly mark schematic figures.
 18. **P12 - External dry run and clean-clone proof** - implemented
     Reproduce the install, paper-smoke benchmark, table generation, claim lint, and leak scan from a clean clone.
-19. **P13 - arXiv release and attention pack**
+19. **P13 - arXiv release and attention pack** - implemented
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
 
 ## Non-Negotiable Gates
@@ -324,8 +324,26 @@ P12 added:
 
 P12 proves the external paper-smoke path. It documents the clean-clone install checklist, verifies the install contract, supports an optional temp isolated full-profile install probe, regenerates the P10 table pack and P11 draft pack, records leak-scan status, and emits a fail-closed go/no-go report. P13 is unblocked only in claim-safe evaluation-environment mode; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked.
 
+P13 added:
+
+- `docs/reports/paper_release_manifest.json`
+- `docs/reports/paper_arxiv_submission_checklist.md`
+- `docs/reports/paper_attention_pack.md`
+- `docs/reports/paper_public_claims_allowed.json`
+- `docs/paper/relaytic_aml_arxiv_draft.md`
+- `docs/paper/references.bib`
+- `docs/paper/tables/table_manifest.json`
+- `docs/paper/tables/table_1_evidence_summary.md`
+- `docs/paper/tables/table_2_claim_gate_matrix.md`
+- `docs/paper/tables/table_3_release_artifact_set.md`
+- `src/relaytic/release_safety/paper_release.py`
+- `relaytic release-safety paper-release --format json`
+- `tests/test_paper_track_p13.py`
+
+P13 produces the claim-safe arXiv-ready Markdown draft, citable references, generated paper tables, release manifest, public attention pack, submission checklist, and allowed-public-claims report from the P10-P12 gated artifact set. It writes a release tag plan but does not create or push tags automatically. Public wording is allowed only in evaluation-environment mode; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked.
+
 ## Next Implementation Target
 
-The next implementation target is **Paper Track P13**.
+The next implementation target is **Slice 16A**.
 
-P13 must produce the arXiv release checklist, public attention pack, release manifest, and allowed-public-claims report from the P10-P12 gated artifact set. If any P12 dry-run or claim gate fails, P13 must emit a release blocker instead of publishable wording.
+Slice 16A must freeze the governed capability registry and capability-card truth before replay, shadow trials, hunt campaigns, or specialist recruitment logic expands beyond the completed paper path.

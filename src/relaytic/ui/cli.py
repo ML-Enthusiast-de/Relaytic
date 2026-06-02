@@ -1485,6 +1485,31 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p13 = release_safety_sub.add_parser(
+        "paper-release",
+        help="Build Paper Track P13 arXiv checklist, final paper draft, public claims whitelist, and attention pack.",
+    )
+    release_safety_p13.add_argument(
+        "--paper-dir",
+        default=None,
+        help="Optional output directory for the P13 paper draft, references, and tables. Defaults to docs/paper/.",
+    )
+    release_safety_p13.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P13 report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p13.add_argument(
+        "--release-tag",
+        default=None,
+        help="Optional planned release tag. Defaults to the P13 claim-safe tag.",
+    )
+    release_safety_p13.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3525,6 +3550,12 @@ def main(argv: list[str] | None = None) -> int:
                     output_dir=args.output_dir,
                     run_live_checks=not args.skip_live_checks,
                     run_isolated_install=args.run_isolated_install,
+                )
+            elif args.release_safety_command == "paper-release":
+                payload = _run_paper_release_surface(
+                    paper_dir=args.paper_dir,
+                    output_dir=args.output_dir,
+                    release_tag=args.release_tag,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -7639,6 +7670,45 @@ def _run_paper_dry_run_surface(
             "bundle": pack,
         },
         "human_output": render_paper_dry_run_markdown(pack),
+    }
+
+
+def _run_paper_release_surface(
+    *,
+    paper_dir: str | None,
+    output_dir: str | None,
+    release_tag: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_release_markdown,
+        sync_paper_release_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_release_pack(
+        root,
+        paper_dir=paper_dir,
+        output_dir=output_dir,
+        release_tag=release_tag,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    manifest = dict(pack["paper_release_manifest"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "paper_dir": str(Path(paper_dir) if paper_dir else root / "docs" / "paper"),
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_release_manifest": manifest,
+            "paper_public_claims_allowed": pack["paper_public_claims_allowed"],
+            "bundle": pack,
+        },
+        "human_output": render_paper_release_markdown(pack),
     }
 
 

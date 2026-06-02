@@ -1,0 +1,53 @@
+{
+  "schema_version": "relaytic.paper_release.v1",
+  "slice": "Paper Track P13",
+  "status": "tables_materialized",
+  "table_dir": "docs/paper/tables",
+  "tables": [
+    {
+      "artifact_ref": "docs/paper/tables/table_1_evidence_summary.md",
+      "byte_count": 1795,
+      "paper_claim_role": "claim_safe_supporting_evidence_only",
+      "source_refs": [
+        "docs/reports/paper_result_table_final.json",
+        "docs/reports/paper_metric_cell_audit.json",
+        "docs/reports/paper_publishability_matrix.json",
+        "docs/reports/paper_claim_lint_report.json",
+        "docs/reports/paper_external_dry_run_report.json",
+        "docs/reports/paper_reproduction_failure_report.json",
+        "docs/reports/paper_release_go_no_go.json"
+      ],
+      "table_id": "evidence_summary"
+    },
+    {
+      "artifact_ref": "docs/paper/tables/table_2_claim_gate_matrix.md",
+      "byte_count": 1566,
+      "paper_claim_role": "claim_safe_supporting_evidence_only",
+      "source_refs": [
+        "docs/reports/paper_result_table_final.json",
+        "docs/reports/paper_metric_cell_audit.json",
+        "docs/reports/paper_publishability_matrix.json",
+        "docs/reports/paper_claim_lint_report.json",
+        "docs/reports/paper_external_dry_run_report.json",
+        "docs/reports/paper_reproduction_failure_report.json",
+        "docs/reports/paper_release_go_no_go.json"
+      ],
+      "table_id": "claim_gate_matrix"
+    },
+    {
+      "artifact_ref": "docs/paper/tables/table_3_release_artifact_set.md",
+      "byte_count": 1146,
+      "paper_claim_role": "claim_safe_supporting_evidence_only",
+      "source_refs": [
+        "docs/reports/paper_result_table_final.json",
+        "docs/reports/paper_metric_cell_audit.json",
+        "docs/reports/paper_publishability_matrix.json",
+        "docs/reports/paper_claim_lint_report.json",
+        "docs/reports/paper_external_dry_run_report.json",
+        "docs/reports/paper_reproduction_failure_report.json",
+        "docs/reports/paper_release_go_no_go.json"
+      ],
+      "table_id": "release_artifact_set"
+    }
+  ]
+}

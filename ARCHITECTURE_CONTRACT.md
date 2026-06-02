@@ -654,6 +654,21 @@ Current paper-track external dry-run artifact names from Paper Track P12:
 
 Paper Track P12 extends `src/relaytic/release_safety/` with a deterministic external dry-run generator. It verifies the documented clean-clone install contract, can run an optional isolated full-profile clean-clone probe, regenerates the P10/P11 paper-smoke path, runs release-safety leak scanning, records unreproduced heavy benchmark commands, and writes an explicit release go/no-go gate. P12 may unblock P13 only in claim-safe evaluation-environment mode; it still blocks hard AML, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims.
 
+Current paper-track release artifact names from Paper Track P13:
+
+- `paper_release_manifest.json`
+- `paper_arxiv_submission_checklist.md`
+- `paper_attention_pack.md`
+- `paper_public_claims_allowed.json`
+- `docs/paper/relaytic_aml_arxiv_draft.md`
+- `docs/paper/references.bib`
+- `docs/paper/tables/table_manifest.json`
+- `docs/paper/tables/table_1_evidence_summary.md`
+- `docs/paper/tables/table_2_claim_gate_matrix.md`
+- `docs/paper/tables/table_3_release_artifact_set.md`
+
+Paper Track P13 extends `src/relaytic/release_safety/` with a deterministic paper-release generator. It consumes the P10-P12 gated artifact set, renders the final claim-safe arXiv Markdown draft, writes citable references and generated tables, lints public wording against blocked-claim rules, assembles the attention pack and arXiv checklist, and records a release tag plan. P13 does not create or push git tags automatically. It allows only claim-safe evaluation-environment public wording; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked.
+
 Current trace and eval artifact names:
 
 - `trace_model.json`
@@ -865,6 +880,7 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic release-safety paper-tables`
 - `relaytic release-safety paper-draft`
 - `relaytic release-safety paper-dry-run`
+- `relaytic release-safety paper-release`
 - `relaytic scan-git-safety`
 
 ## Slice 05 Planning Contract

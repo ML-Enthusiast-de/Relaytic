@@ -1,0 +1,196 @@
+{
+  "arxiv_submission_checklist_ref": "docs/reports/paper_arxiv_submission_checklist.md",
+  "attention_pack_ref": "docs/reports/paper_attention_pack.md",
+  "checks": [
+    {
+      "check_id": "p10_table_pack_passed",
+      "message": "P10 table pack and metric-cell audit must pass.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_metric_cell_audit.json"
+    },
+    {
+      "check_id": "p11_claim_lint_passed",
+      "message": "P11 claim lint must pass before release.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_claim_lint_report.json"
+    },
+    {
+      "check_id": "p12_external_dry_run_passed",
+      "message": "P12 external dry-run report must pass.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_external_dry_run_report.json"
+    },
+    {
+      "check_id": "p12_reproduction_failures_clear",
+      "message": "P12 reproduction failure report must have zero unresolved failures.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_reproduction_failure_report.json"
+    },
+    {
+      "check_id": "p12_go_no_go_allows_claim_safe_p13",
+      "message": "P12 go/no-go must allow P13 in claim-safe release mode.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_release_go_no_go.json"
+    },
+    {
+      "check_id": "hard_and_headline_claims_remain_blocked",
+      "message": "P13 is allowed only because hard/headline claims remain blocked.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_release_go_no_go.json"
+    },
+    {
+      "check_id": "required_p13_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [],
+        "present_artifact_refs": [
+          "docs/reports/paper_result_table_final.json",
+          "docs/reports/paper_metric_cell_audit.json",
+          "docs/reports/paper_publishability_matrix.json",
+          "docs/reports/paper_claim_lint_report.json",
+          "docs/reports/paper_external_dry_run_report.json",
+          "docs/reports/paper_reproduction_failure_report.json",
+          "docs/reports/paper_release_go_no_go.json"
+        ]
+      },
+      "message": "All P10-P12 source artifacts required by P13 must be present.",
+      "passed": true,
+      "source_artifact": "docs/reports"
+    },
+    {
+      "check_id": "public_claims_allowed",
+      "message": "Public wording must pass the P13 allowed-claims lint.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_public_claims_allowed.json"
+    },
+    {
+      "check_id": "paper_table_refs_align_with_release_artifact_set",
+      "detail": {
+        "table_artifact_refs": [
+          "docs/paper/tables/table_1_evidence_summary.md",
+          "docs/paper/tables/table_2_claim_gate_matrix.md",
+          "docs/paper/tables/table_3_release_artifact_set.md"
+        ]
+      },
+      "message": "Generated paper tables must be included in the release artifact set.",
+      "passed": true,
+      "source_artifact": "docs/paper/tables/table_manifest.json"
+    }
+  ],
+  "claim_safe_public_release_allowed": true,
+  "failed_checks": [],
+  "git_commit": "ee3e1c94bcc1206ab8b427da19f5367127966b25",
+  "git_dirty": true,
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "next_slice": "Slice 16A - capability registry and capability cards",
+  "paper_version": {
+    "artifact_refs": [
+      "docs/paper/relaytic_aml_arxiv_draft.md",
+      "docs/paper/references.bib",
+      "docs/paper/figures/figure_manifest.json",
+      "docs/paper/figures/figure_1_claim_gate_flow.svg",
+      "docs/paper/figures/figure_2_supporting_pr_auc.svg",
+      "docs/paper/figures/figure_3_review_budget.svg",
+      "docs/paper/figures/figure_4_publishability_matrix.svg",
+      "docs/paper/tables/table_manifest.json",
+      "docs/paper/tables/table_1_evidence_summary.md",
+      "docs/paper/tables/table_2_claim_gate_matrix.md",
+      "docs/paper/tables/table_3_release_artifact_set.md",
+      "docs/reports/paper_result_table_final.json",
+      "docs/reports/paper_metric_cell_audit.json",
+      "docs/reports/paper_publishability_matrix.json",
+      "docs/reports/paper_claim_lint_report.json",
+      "docs/reports/paper_external_dry_run_report.json",
+      "docs/reports/paper_reproduction_failure_report.json",
+      "docs/reports/paper_release_go_no_go.json"
+    ],
+    "bib_ref": "docs/paper/references.bib",
+    "draft_ref": "docs/paper/relaytic_aml_arxiv_draft.md",
+    "figure_manifest_ref": "docs/paper/figures/figure_manifest.json",
+    "source_draft_ref": "docs/paper/relaytic_aml_draft.md",
+    "table_manifest_ref": "docs/paper/tables/table_manifest.json"
+  },
+  "public_claims_ref": "docs/reports/paper_public_claims_allowed.json",
+  "release_date": "2026-06-02",
+  "release_mode": "claim_safe_evaluation_environment_only",
+  "release_tag_plan": {
+    "artifact_refs": [
+      "docs/paper/figures/figure_1_claim_gate_flow.svg",
+      "docs/paper/figures/figure_2_supporting_pr_auc.svg",
+      "docs/paper/figures/figure_3_review_budget.svg",
+      "docs/paper/figures/figure_4_publishability_matrix.svg",
+      "docs/paper/figures/figure_manifest.json",
+      "docs/paper/references.bib",
+      "docs/paper/relaytic_aml_arxiv_draft.md",
+      "docs/paper/tables/table_1_evidence_summary.md",
+      "docs/paper/tables/table_2_claim_gate_matrix.md",
+      "docs/paper/tables/table_3_release_artifact_set.md",
+      "docs/paper/tables/table_manifest.json",
+      "docs/reports/paper_claim_lint_report.json",
+      "docs/reports/paper_external_dry_run_report.json",
+      "docs/reports/paper_metric_cell_audit.json",
+      "docs/reports/paper_publishability_matrix.json",
+      "docs/reports/paper_release_go_no_go.json",
+      "docs/reports/paper_reproduction_failure_report.json",
+      "docs/reports/paper_result_table_final.json",
+      "paper_arxiv_submission_checklist.md",
+      "paper_attention_pack.md",
+      "paper_public_claims_allowed.json",
+      "paper_release_manifest.json"
+    ],
+    "creation_command": "git tag -a relaytic-aml-paper-p13-claim-safe -m \"Relaytic-AML claim-safe paper release\"",
+    "note": "P13 writes a tag plan and verifies the artifact set; it does not create or push tags automatically.",
+    "tag": "relaytic-aml-paper-p13-claim-safe",
+    "tag_created_by_this_slice": false
+  },
+  "required_source_artifacts": [
+    "docs/reports/paper_result_table_final.json",
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_publishability_matrix.json",
+    "docs/reports/paper_claim_lint_report.json",
+    "docs/reports/paper_external_dry_run_report.json",
+    "docs/reports/paper_reproduction_failure_report.json",
+    "docs/reports/paper_release_go_no_go.json"
+  ],
+  "schema_version": "relaytic.paper_release.v1",
+  "slice": "Paper Track P13",
+  "source_verification": [
+    {
+      "accessed_date": "2026-06-02",
+      "citation_key": "lopezrojas2016paysim",
+      "source_url": "https://www.msc-les.org/proceedings/emss/2016/EMSS2016_249.pdf",
+      "verified_role": "PaySim synthetic mobile-money simulator source and caveat."
+    },
+    {
+      "accessed_date": "2026-06-02",
+      "citation_key": "weber2019elliptic",
+      "source_url": "https://arxiv.org/abs/1908.02591",
+      "verified_role": "Elliptic transaction graph size, features, and AML benchmark context."
+    },
+    {
+      "accessed_date": "2026-06-02",
+      "citation_key": "bellei2024elliptic2",
+      "source_url": "https://arxiv.org/abs/2404.19109",
+      "verified_role": "Elliptic2 subgraph benchmark scale and task framing."
+    },
+    {
+      "accessed_date": "2026-06-02",
+      "citation_key": "song2024revtrack",
+      "source_url": "https://arxiv.org/abs/2410.08394",
+      "verified_role": "RevTrack/RevClassify modern reference and subgraph-method context."
+    },
+    {
+      "accessed_date": "2026-06-02",
+      "citation_key": "gebru2021datasheets",
+      "source_url": "https://cacm.acm.org/research/datasheets-for-datasets/",
+      "verified_role": "Dataset documentation and transparency context."
+    },
+    {
+      "accessed_date": "2026-06-02",
+      "citation_key": "pineau2021reproducibility",
+      "source_url": "https://www.jmlr.org/papers/v22/20-303.html",
+      "verified_role": "ML reproducibility checklist and code/data discipline context."
+    }
+  ],
+  "status": "ready_for_claim_safe_arxiv_release"
+}
