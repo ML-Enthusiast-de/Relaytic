@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 from typing import Any
 
 import pytest
@@ -38,6 +39,9 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
 
     assert manifest["status"] == "ready_for_claim_safe_arxiv_release"
     assert manifest["claim_safe_public_release_allowed"] is True
+    assert manifest["arxiv_upload_ready"] is False
+    assert manifest["submission_package_state"]["current_format"] == "claim_safe_markdown_draft_pack"
+    assert manifest["next_slice"].startswith("Paper Track P14")
     assert manifest["hard_claims_allowed"] is False
     assert manifest["headline_claims_allowed"] is False
     assert manifest["release_tag_plan"]["tag"] == "relaytic-aml-paper-p13-claim-safe"
@@ -45,12 +49,16 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert public_claims["wording_lint"]["status"] == "pass"
     assert "[@weber2019elliptic]" in draft
     assert "[@song2024revtrack]" in draft
+    assert "[@chen2026transxion]" in draft
+    assert "[@ye2026blazingaml]" in draft
     assert "test PR-AUC 0.638773" in draft
     assert "hard AML superiority" in draft
     assert "SOTA" in "\n".join(public_claims["blocked_public_claims"])
     assert set(tables) == set(PAPER_RELEASE_TABLE_FILENAMES)
     assert "paper-cell:paysim_p6a_competitive_selected.test_pr_auc" in tables["evidence_summary"]
     assert "@misc{weber2019elliptic" in references
+    assert "@misc{chen2026transxion" in references
+    assert "@misc{deprez2025continualaml" in references
     assert any(item["citation_key"] == "song2024revtrack" for item in manifest["source_verification"])
     assert not manifest["failed_checks"]
 
@@ -121,10 +129,21 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
 
     assert manifest["status"] == "ready_for_claim_safe_arxiv_release"
     assert manifest["claim_safe_public_release_allowed"] is True
+    assert manifest["arxiv_upload_ready"] is False
+    assert manifest["git_state_semantics"] == "generation_base_commit_not_manifest_self_hash"
+    assert manifest["next_slice"].startswith("Paper Track P14")
     assert claims["status"] == "claim_safe_public_wording_allowed"
     assert claims["wording_lint"]["status"] == "pass"
     assert claims["hard_claims_allowed"] is False
     assert claims["headline_claims_allowed"] is False
     assert "Relaytic-AML: Claim-Gated Evaluation Environments" in draft
+    assert "arXiv-ready draft" not in draft
     assert "## References" in draft
     assert "No SOTA or leaderboard-winner claim." in attention
+
+    references = (PAPER_DIR / PAPER_REFERENCES_FILENAME).read_text(encoding="utf-8")
+    cited_keys = set()
+    for citation in re.findall(r"\[@([^\]]+)\]", draft):
+        cited_keys.update(part.strip().lstrip("@") for part in citation.split(";"))
+    bib_keys = set(re.findall(r"@\w+\{([^,\s]+)", references))
+    assert cited_keys <= bib_keys

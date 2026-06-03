@@ -51,7 +51,7 @@
     "elliptic_p7_selected_graph_feature_baseline.test_pr_auc": "May be cited as supporting temporal graph-feature evidence only.",
     "paysim_p6a_competitive_selected.test_pr_auc": "May be cited as supporting synthetic temporal-fraud evidence only."
   },
-  "next_slice": "Slice 16A - capability registry and capability cards",
+  "next_slice": "Paper Track P14 - final arXiv source bundle and clean release candidate",
   "release_mode": "claim_safe_evaluation_environment_only",
   "schema_version": "relaytic.paper_release.v1",
   "slice": "Paper Track P13",

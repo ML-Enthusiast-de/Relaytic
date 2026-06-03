@@ -1,6 +1,6 @@
 # Relaytic-AML: Claim-Gated Evaluation Environments for Temporal Graph Financial-Crime ML
 
-P13 arXiv-ready draft. Add author metadata and institutional affiliation before submission.
+P13 claim-safe Markdown draft. Convert to final TeX/PDF source with arXiv-compatible figures, then add author metadata, affiliation, contact, license, and acknowledgements before submission.
 
 ## Abstract
 
@@ -30,6 +30,8 @@ PaySim is a synthetic mobile-money simulator designed to address the scarcity of
 The Elliptic Bitcoin dataset introduced a public transaction graph with more than 200K transaction nodes, 234K directed payment-flow edges, and 166 node features across 49 time steps [@weber2019elliptic]. That work also showed why graph evidence must be compared against strong simpler baselines rather than assumed superior.
 
 Elliptic2 shifts the public AML benchmark center toward subgraph learning, with 121,810 labeled subgraphs inside a background graph of roughly 49M node clusters and 196M edge transactions [@bellei2024elliptic2]. RevTrack and RevClassify further argue that sender and receiver context around a subgraph can be a powerful and scalable signal [@song2024revtrack]. These works motivate Relaytic-AML's modern-context and limitation track, but they do not make the current Relaytic Elliptic2 row a performance contribution.
+
+The 2025/2026 AML graph literature also raises the bar beyond the current Relaytic evidence rows. TransXion frames benchmark realism around profile-aware simulation and out-of-character behavior [@chen2026transxion]. LineMVGNN and ExSTraQt represent detector-focused work on directed money flow, edge-aware graph views, and quasi-temporal transaction representations [@poon2026linemvgnn; @tariq2026extraqt]. BlazingAML stresses throughput and fuzzy multi-stage scheme expression as a systems problem [@ye2026blazingaml], while continual graph-learning reviews emphasize drift, adaptation, class imbalance, and evolving laundering behavior [@deprez2025continualaml]. Relaytic-AML is positioned as complementary infrastructure for such work: it does not claim detector parity with these systems, but it makes dataset posture, split validity, budgets, limitations, and public claims auditable.
 
 The paper also follows broader ML documentation and reproducibility practice. Datasheets for Datasets and Model Cards argue for explicit dataset and model reporting [@gebru2021datasheets; @mitchell2019modelcards]. The NeurIPS reproducibility program highlights the need for code, data, and checklist discipline in ML research [@pineau2021reproducibility]. Recent work on ML research agents warns that coherent papers can still contain invalidated experiments, reinforcing the need for executable artifacts and claim gates [@chen2025mlrbench].
 
@@ -172,6 +174,11 @@ Relaytic-AML should be read as a claim-gated AML evaluation-environment paper. T
 - Weber, M., Domeniconi, G., Chen, J., Weidele, D. K. I., Bellei, C., Robinson, T., and Leiserson, C. E. (2019). Anti-Money Laundering in Bitcoin. arXiv:1908.02591.
 - Bellei, C., Xu, M., Phillips, R., Robinson, T., Weber, M., Kaler, T., Leiserson, C. E., Arvind, and Chen, J. (2024). The Shape of Money Laundering. arXiv:2404.19109.
 - Song, K., Dhraief, M. A., Xu, M., Cai, L., Chen, X., Arvind, and Chen, J. (2024). Identifying Money Laundering Subgraphs on the Blockchain. ICAIF 2024.
+- Chen, K. et al. (2026). TransXion: A High-Fidelity Graph Benchmark for Realistic Anti-Money Laundering. arXiv:2604.17420.
+- Poon, C.-H., Kwok, J., Chow, C., and Choi, J.-H. (2026). LineMVGNN: Anti-Money Laundering with Line-Graph-Assisted Multi-View Graph Neural Networks. arXiv:2603.23584.
+- Tariq, H., and Hassani, M. (2026). Extracting Money Laundering Transactions from Quasi-Temporal Graph Representation. arXiv:2604.02899.
+- Ye, H., Laxman, A., Yuan, Y., Flautner, K., and Talati, N. (2026). BlazingAML: High-Throughput Anti-Money Laundering via Multi-Stage Graph Mining. arXiv:2604.12241.
+- Deprez, B., Wei, W., Verbeke, W., Baesens, B., Mets, K., and Verdonck, T. (2025). Advances in Continual Graph Learning for Anti-Money Laundering Systems. arXiv:2503.24259.
 - Gebru, T. et al. (2021). Datasheets for Datasets. Communications of the ACM.
 - Mitchell, M. et al. (2019). Model Cards for Model Reporting. FAT* 2019.
 - Pineau, J. et al. (2021). Improving Reproducibility in Machine Learning Research. JMLR.

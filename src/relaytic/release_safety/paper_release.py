@@ -1,4 +1,4 @@
-"""Paper Track P13 arXiv release and attention-pack artifacts."""
+"""Paper Track P13 claim-safe paper release and attention-pack artifacts."""
 
 from __future__ import annotations
 
@@ -14,8 +14,9 @@ PAPER_RELEASE_SCHEMA_VERSION = "relaytic.paper_release.v1"
 PAPER_RELEASE_REPORT_DIR = Path("docs") / "reports"
 PAPER_RELEASE_DOC_DIR = Path("docs") / "paper"
 PAPER_RELEASE_TABLE_DIRNAME = "tables"
-PAPER_RELEASE_DATE = "2026-06-02"
+PAPER_RELEASE_DATE = "2026-06-03"
 DEFAULT_RELEASE_TAG = "relaytic-aml-paper-p13-claim-safe"
+NEXT_PAPER_RELEASE_SLICE = "Paper Track P14 - final arXiv source bundle and clean release candidate"
 PAPER_FINAL_DRAFT_FILENAME = "relaytic_aml_arxiv_draft.md"
 PAPER_REFERENCES_FILENAME = "references.bib"
 
@@ -222,7 +223,7 @@ def render_paper_release_markdown(pack: dict[str, Any]) -> str:
             "",
             f"- Release status: `{manifest.get('status') or 'unknown'}`",
             f"- Claim-safe public release allowed: `{manifest.get('claim_safe_public_release_allowed')}`",
-            f"- arXiv-ready draft: `{manifest.get('paper_version', {}).get('draft_ref') or 'unknown'}`",
+            f"- Claim-safe Markdown draft: `{manifest.get('paper_version', {}).get('draft_ref') or 'unknown'}`",
             f"- Planned tag: `{manifest.get('release_tag_plan', {}).get('tag') or 'unknown'}`",
             f"- Hard claims allowed: `{public_claims.get('hard_claims_allowed')}`",
             f"- Headline claims allowed: `{public_claims.get('headline_claims_allowed')}`",
@@ -272,11 +273,22 @@ def _build_release_manifest(
         "status": status,
         "release_mode": "claim_safe_evaluation_environment_only" if status.startswith("ready") else "blocked",
         "claim_safe_public_release_allowed": status.startswith("ready"),
+        "arxiv_upload_ready": False,
         "hard_claims_allowed": False,
         "headline_claims_allowed": False,
         "release_date": PAPER_RELEASE_DATE,
         "git_commit": inputs["git"].get("commit"),
         "git_dirty": inputs["git"].get("dirty"),
+        "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
+        "submission_package_state": {
+            "current_format": "claim_safe_markdown_draft_pack",
+            "required_before_upload": [
+                "convert the Markdown draft into final TeX/PDF source",
+                "convert SVG figures into figure formats accepted by the selected arXiv processor",
+                "fill author metadata, affiliation, contact, license, and acknowledgements",
+                "rerun release-safety checks from the final clean tag target",
+            ],
+        },
         "release_tag_plan": {
             "tag": release_tag,
             "tag_created_by_this_slice": False,
@@ -299,7 +311,7 @@ def _build_release_manifest(
         "arxiv_submission_checklist_ref": "docs/reports/paper_arxiv_submission_checklist.md",
         "checks": checks,
         "failed_checks": [check for check in checks if not check["passed"]],
-        "next_slice": "Slice 16A - capability registry and capability cards" if status.startswith("ready") else "Paper Track P13 repair",
+        "next_slice": NEXT_PAPER_RELEASE_SLICE if status.startswith("ready") else "Paper Track P13 repair",
     }
 
 
@@ -377,7 +389,7 @@ def _build_public_claims_allowed(
         "surfaces_linted": [surface for surface, _ in surfaces],
         "wording_lint": lint,
         "checks": checks,
-        "next_slice": "Slice 16A - capability registry and capability cards" if status.startswith("claim_safe") else "Paper Track P13 repair",
+        "next_slice": NEXT_PAPER_RELEASE_SLICE if status.startswith("claim_safe") else "Paper Track P13 repair",
     }
 
 
@@ -627,7 +639,7 @@ def _render_final_paper(
         [
             "# Relaytic-AML: Claim-Gated Evaluation Environments for Temporal Graph Financial-Crime ML",
             "",
-            "P13 arXiv-ready draft. Add author metadata and institutional affiliation before submission.",
+            "P13 claim-safe Markdown draft. Convert to final TeX/PDF source with arXiv-compatible figures, then add author metadata, affiliation, contact, license, and acknowledgements before submission.",
             "",
             "## Abstract",
             "",
@@ -658,6 +670,8 @@ def _render_final_paper(
             "The Elliptic Bitcoin dataset introduced a public transaction graph with more than 200K transaction nodes, 234K directed payment-flow edges, and 166 node features across 49 time steps [@weber2019elliptic]. That work also showed why graph evidence must be compared against strong simpler baselines rather than assumed superior.",
             "",
             "Elliptic2 shifts the public AML benchmark center toward subgraph learning, with 121,810 labeled subgraphs inside a background graph of roughly 49M node clusters and 196M edge transactions [@bellei2024elliptic2]. RevTrack and RevClassify further argue that sender and receiver context around a subgraph can be a powerful and scalable signal [@song2024revtrack]. These works motivate Relaytic-AML's modern-context and limitation track, but they do not make the current Relaytic Elliptic2 row a performance contribution.",
+            "",
+            "The 2025/2026 AML graph literature also raises the bar beyond the current Relaytic evidence rows. TransXion frames benchmark realism around profile-aware simulation and out-of-character behavior [@chen2026transxion]. LineMVGNN and ExSTraQt represent detector-focused work on directed money flow, edge-aware graph views, and quasi-temporal transaction representations [@poon2026linemvgnn; @tariq2026extraqt]. BlazingAML stresses throughput and fuzzy multi-stage scheme expression as a systems problem [@ye2026blazingaml], while continual graph-learning reviews emphasize drift, adaptation, class imbalance, and evolving laundering behavior [@deprez2025continualaml]. Relaytic-AML is positioned as complementary infrastructure for such work: it does not claim detector parity with these systems, but it makes dataset posture, split validity, budgets, limitations, and public claims auditable.",
             "",
             "The paper also follows broader ML documentation and reproducibility practice. Datasheets for Datasets and Model Cards argue for explicit dataset and model reporting [@gebru2021datasheets; @mitchell2019modelcards]. The NeurIPS reproducibility program highlights the need for code, data, and checklist discipline in ML research [@pineau2021reproducibility]. Recent work on ML research agents warns that coherent papers can still contain invalidated experiments, reinforcing the need for executable artifacts and claim gates [@chen2025mlrbench].",
             "",
@@ -810,7 +824,7 @@ def _render_arxiv_checklist(
             "",
             "- [ ] Convert `docs/paper/relaytic_aml_arxiv_draft.md` into the final arXiv PDF or TeX source.",
             "- [ ] Include `docs/paper/references.bib` and verify every in-text citation has a matching BibTeX key.",
-            "- [ ] Include the four SVG figures from `docs/paper/figures/` or convert them into arXiv-compatible figure files.",
+            "- [ ] Convert the four SVG figures from `docs/paper/figures/` into PDF/PNG/EPS/JPEG files accepted by the selected arXiv processor.",
             "- [ ] Keep the table values synchronized with `docs/paper/tables/table_manifest.json` and `docs/reports/paper_metric_cell_audit.json`.",
             "- [ ] Fill in author name, affiliation, contact, and optional acknowledgements before upload.",
             "",
@@ -829,7 +843,8 @@ def _render_arxiv_checklist(
             "",
             "## Tag And Release",
             "",
-            f"- [ ] Confirm HEAD commit is `{git_commit}` or update the manifest after final edits.",
+            "- [ ] Confirm `git status --short` is empty at the final tag target.",
+            f"- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `{git_commit}`; rerun the manifest after final edits if the source evidence changes.",
             f"- [ ] Create tag after the final PDF/source matches the manifest: `git tag -a {release_tag} -m \"Relaytic-AML claim-safe paper release\"`.",
             "- [ ] Attach or link the paper PDF, release manifest, public claims JSON, and benchmark artifacts.",
             "",
@@ -880,6 +895,61 @@ def _render_references_bib() -> str:
   eprint = {2410.08394},
   archivePrefix = {arXiv},
   url = {https://arxiv.org/abs/2410.08394}
+}
+
+@misc{chen2026transxion,
+  title = {TransXion: A High-Fidelity Graph Benchmark for Realistic Anti-Money Laundering},
+  author = {Chen, Keyang and Jiang, Mingxuan and Zhao, Yongsheng and Li, Zeping and Chen, Zaiyuan and Luo, Weiqi and Li, Zhixin and Liu, Sen and Jing, Yinan and Ye, Guangnan and Wu, Xihong and Chai, Hongfeng},
+  year = {2026},
+  eprint = {2604.17420},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG},
+  doi = {10.48550/arXiv.2604.17420},
+  url = {https://arxiv.org/abs/2604.17420}
+}
+
+@misc{poon2026linemvgnn,
+  title = {LineMVGNN: Anti-Money Laundering with Line-Graph-Assisted Multi-View Graph Neural Networks},
+  author = {Poon, Chung-Hoo and Kwok, James and Chow, Calvin and Choi, Jang-Hyeon},
+  year = {2026},
+  eprint = {2603.23584},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG},
+  doi = {10.48550/arXiv.2603.23584},
+  url = {https://arxiv.org/abs/2603.23584}
+}
+
+@misc{tariq2026extraqt,
+  title = {Extracting Money Laundering Transactions from Quasi-Temporal Graph Representation},
+  author = {Tariq, Haseeb and Hassani, Marwan},
+  year = {2026},
+  eprint = {2604.02899},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG},
+  doi = {10.48550/arXiv.2604.02899},
+  url = {https://arxiv.org/abs/2604.02899}
+}
+
+@misc{ye2026blazingaml,
+  title = {BlazingAML: High-Throughput Anti-Money Laundering (AML) via Multi-Stage Graph Mining},
+  author = {Ye, Haojie and Laxman, Arjun and Yuan, Yichao and Flautner, Krisztian and Talati, Nishil},
+  year = {2026},
+  eprint = {2604.12241},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  doi = {10.48550/arXiv.2604.12241},
+  url = {https://arxiv.org/abs/2604.12241}
+}
+
+@misc{deprez2025continualaml,
+  title = {Advances in Continual Graph Learning for Anti-Money Laundering Systems: A Comprehensive Review},
+  author = {Deprez, Bruno and Wei, Wei and Verbeke, Wouter and Baesens, Bart and Mets, Kevin and Verdonck, Tim},
+  year = {2025},
+  eprint = {2503.24259},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG},
+  doi = {10.48550/arXiv.2503.24259},
+  url = {https://arxiv.org/abs/2503.24259}
 }
 
 @article{gebru2021datasheets,
@@ -934,6 +1004,11 @@ def _render_reference_section() -> str:
             "- Weber, M., Domeniconi, G., Chen, J., Weidele, D. K. I., Bellei, C., Robinson, T., and Leiserson, C. E. (2019). Anti-Money Laundering in Bitcoin. arXiv:1908.02591.",
             "- Bellei, C., Xu, M., Phillips, R., Robinson, T., Weber, M., Kaler, T., Leiserson, C. E., Arvind, and Chen, J. (2024). The Shape of Money Laundering. arXiv:2404.19109.",
             "- Song, K., Dhraief, M. A., Xu, M., Cai, L., Chen, X., Arvind, and Chen, J. (2024). Identifying Money Laundering Subgraphs on the Blockchain. ICAIF 2024.",
+            "- Chen, K. et al. (2026). TransXion: A High-Fidelity Graph Benchmark for Realistic Anti-Money Laundering. arXiv:2604.17420.",
+            "- Poon, C.-H., Kwok, J., Chow, C., and Choi, J.-H. (2026). LineMVGNN: Anti-Money Laundering with Line-Graph-Assisted Multi-View Graph Neural Networks. arXiv:2603.23584.",
+            "- Tariq, H., and Hassani, M. (2026). Extracting Money Laundering Transactions from Quasi-Temporal Graph Representation. arXiv:2604.02899.",
+            "- Ye, H., Laxman, A., Yuan, Y., Flautner, K., and Talati, N. (2026). BlazingAML: High-Throughput Anti-Money Laundering via Multi-Stage Graph Mining. arXiv:2604.12241.",
+            "- Deprez, B., Wei, W., Verbeke, W., Baesens, B., Mets, K., and Verdonck, T. (2025). Advances in Continual Graph Learning for Anti-Money Laundering Systems. arXiv:2503.24259.",
             "- Gebru, T. et al. (2021). Datasheets for Datasets. Communications of the ACM.",
             "- Mitchell, M. et al. (2019). Model Cards for Model Reporting. FAT* 2019.",
             "- Pineau, J. et al. (2021). Improving Reproducibility in Machine Learning Research. JMLR.",
@@ -966,6 +1041,36 @@ def _source_verification_records() -> list[dict[str, str]]:
             "citation_key": "song2024revtrack",
             "source_url": "https://arxiv.org/abs/2410.08394",
             "verified_role": "RevTrack/RevClassify modern reference and subgraph-method context.",
+            "accessed_date": PAPER_RELEASE_DATE,
+        },
+        {
+            "citation_key": "chen2026transxion",
+            "source_url": "https://arxiv.org/abs/2604.17420",
+            "verified_role": "Recent AML benchmark-realism context.",
+            "accessed_date": PAPER_RELEASE_DATE,
+        },
+        {
+            "citation_key": "poon2026linemvgnn",
+            "source_url": "https://arxiv.org/abs/2603.23584",
+            "verified_role": "Recent directed transaction-graph detector context.",
+            "accessed_date": PAPER_RELEASE_DATE,
+        },
+        {
+            "citation_key": "tariq2026extraqt",
+            "source_url": "https://arxiv.org/abs/2604.02899",
+            "verified_role": "Recent quasi-temporal transaction-graph detector context.",
+            "accessed_date": PAPER_RELEASE_DATE,
+        },
+        {
+            "citation_key": "ye2026blazingaml",
+            "source_url": "https://arxiv.org/abs/2604.12241",
+            "verified_role": "Recent high-throughput AML graph-mining systems context.",
+            "accessed_date": PAPER_RELEASE_DATE,
+        },
+        {
+            "citation_key": "deprez2025continualaml",
+            "source_url": "https://arxiv.org/abs/2503.24259",
+            "verified_role": "Recent continual-learning and drift context for AML graph systems.",
             "accessed_date": PAPER_RELEASE_DATE,
         },
         {

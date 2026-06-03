@@ -74,11 +74,11 @@ More context:
 
 ## Paper P13 Claim-Safe Release Status
 
-The current paper package is claim-safe release material for a Relaytic-AML evaluation-environment paper, not a hard AML superiority result.
+The current paper package is claim-safe release material for a Relaytic-AML evaluation-environment paper, not a hard AML superiority result. It is a Markdown draft pack with generated references, tables, figures, and release gates; the final arXiv upload still needs TeX/PDF conversion, arXiv-compatible figure files, and author metadata.
 
 Inspect:
 
-- `docs/paper/relaytic_aml_arxiv_draft.md` for the P13 paper draft.
+- `docs/paper/relaytic_aml_arxiv_draft.md` for the claim-safe P13 Markdown draft.
 - `docs/paper/references.bib` for citable sources.
 - `docs/paper/figures/` and `docs/paper/tables/` for generated visual/table assets.
 - `docs/reports/paper_release_manifest.json` for the release gate.
@@ -160,14 +160,14 @@ The repository already supports a working early product baseline:
 - a one-command Relaytic-AML review-queue demo bundle through `relaytic demo aml-review-queue`, with a flow report, business-metric table, artifact index, business-value guard, baseline/ablation proof, and mission-control investigation board
 - pre-Academy repo credibility reports under `docs/reports/`, including module-size audit, public-surface inventory, module-split evidence, extraction boundaries, and benchmark cleanup debt before the paper/release freeze
 - a paper/release freeze surface through `relaytic release-safety paper-freeze`, with relevant benchmark catalog, multidimensional result table, claim-boundary report, reproducibility attestation, and a safe attention-pack manifest that blocks hard AML performance claims until holdout evidence is frozen
-- a claim-safe paper-release surface through `relaytic release-safety paper-release`, with final generated draft, citable references, paper tables, public attention pack, arXiv checklist, release manifest, and allowed-public-claims report
+- a claim-safe paper-release surface through `relaytic release-safety paper-release`, with generated Markdown draft, citable references, paper tables, public attention pack, arXiv submission checklist, release manifest, and allowed-public-claims report
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, 15W, 15X, 15Y, 15Z, and 15Z-R are now implemented, followed by Paper Track P0 through P13. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, temporal weak-label claim gates, AML evaluation-environment scorecards, demo-first documentation, pre-Academy repo credibility reports, a paper/release freeze pack, and a claim-safe P13 arXiv release pack on the same local-first artifact path.
+Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, 15W, 15X, 15Y, 15Z, and 15Z-R are now implemented, followed by Paper Track P0 through P13. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, temporal weak-label claim gates, AML evaluation-environment scorecards, demo-first documentation, pre-Academy repo credibility reports, a paper/release freeze pack, and a claim-safe P13 paper release pack on the same local-first artifact path.
 
 The next frontier upgrades are:
 
-The next recommended build is **Slice 16A**, because the AML productization and Paper Track P0-P13 release path is now landed and capability-academy work needs one governed registry before replay, promotion, or hunt mechanics expand.
+The next recommended build is **Paper Track P14**, because the claim-safe paper pack still needs a final TeX/PDF arXiv source bundle, converted figures, author metadata, and a clean release-candidate tag before Academy work resumes.
 
 The initial model-competitiveness path through **Slice 15F** is now landed, and the first performance-recovery foundation slice is now landed too:
 
@@ -179,7 +179,7 @@ The full required performance-recovery path is now landed:
 - Slice 15L benchmark truth hardening and paper-claim gates
 - Slice 15M competitive specialization and benchmark-generalization guards
 
-The broader **Relaytic Academy** now starts at **Slice 16A**, but only after the new AML proof, productization, and paper-freeze track lands:
+The broader **Relaytic Academy** starts at **Slice 16A**, but only after Paper Track P14 turns the current claim-safe paper pack into a clean arXiv-source release candidate:
 
 - **Slice 15N** AML domain contract and flagship pivot
 - **Slice 15O** entity, graph, and typology reasoning

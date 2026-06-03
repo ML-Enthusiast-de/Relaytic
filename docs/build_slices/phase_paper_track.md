@@ -2,13 +2,13 @@
 
 ## Status
 
-P0 through P13 implemented. Slice 16A is the next execution target.
+P0 through P13 implemented. Paper Track P14 is the next execution target before Academy work resumes.
 
 ## Intent
 
-Paper Track P0 through P13 is the mandatory path between Slice 15Z-R and Slice 16A.
+Paper Track P0 through P14 is the mandatory path between Slice 15Z-R and Slice 16A.
 
-Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, and arXiv-ready release.
+Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, and claim-safe paper release pack. The final arXiv upload still requires TeX/PDF conversion, accepted figure formats, and author metadata.
 
 ## Paper Thesis
 
@@ -340,10 +340,28 @@ P13 added:
 - `relaytic release-safety paper-release --format json`
 - `tests/test_paper_track_p13.py`
 
-P13 produces the claim-safe arXiv-ready Markdown draft, citable references, generated paper tables, release manifest, public attention pack, submission checklist, and allowed-public-claims report from the P10-P12 gated artifact set. It writes a release tag plan but does not create or push tags automatically. Public wording is allowed only in evaluation-environment mode; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked.
+P13 produces the claim-safe Markdown draft, citable references, generated paper tables, release manifest, public attention pack, submission checklist, and allowed-public-claims report from the P10-P12 gated artifact set. It writes a release tag plan but does not create or push tags automatically. Public wording is allowed only in evaluation-environment mode; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked.
 
 ## Next Implementation Target
 
-The next implementation target is **Slice 16A**.
+The next implementation target is **Paper Track P14**.
 
-Slice 16A must freeze the governed capability registry and capability-card truth before replay, shadow trials, hunt campaigns, or specialist recruitment logic expands beyond the completed paper path.
+### Paper Track P14 - final arXiv source bundle and clean release candidate
+
+P14 must convert the P13 Markdown draft into a final arXiv-compatible source package without changing the claim contract. It should produce TeX/PDF source, converted figure files accepted by the selected arXiv processor, author-metadata placeholders, a clean-clone submission-package audit, and a release-candidate tag plan. P14 must remain blocked if any citation key is missing, any figure cannot be included by the chosen processor, any generated table drifts from `paper_metric_cell_audit.json`, or any public surface adds hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, or hard business-value claims.
+
+P14 target artifacts:
+
+- `docs/paper/arxiv_src/`
+- `docs/reports/paper_arxiv_source_manifest.json`
+- `docs/reports/paper_submission_package_audit.json`
+- `docs/reports/paper_release_candidate_checklist.md`
+- `tests/test_paper_track_p14.py`
+
+Acceptance criteria:
+
+1. The arXiv source package contains a top-level TeX/PDF source, bibliography file, and converted figures with case-matching file references.
+2. A deterministic citation audit confirms every in-text citation has a BibTeX entry and no BibTeX entry used by the paper is malformed.
+3. The submission package audit confirms no local machine paths, external private data paths, secrets, `.env` files, or virtual environments are referenced.
+4. The final checklist records that `git status --short` is empty at the release-candidate tag target.
+5. `paper_release_manifest.json` continues to mark hard/headline claims blocked and keeps `arxiv_upload_ready` false until the P14 source audit passes.

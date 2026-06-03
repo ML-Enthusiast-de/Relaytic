@@ -276,7 +276,8 @@ Stable slice numbering stays the same, but the preferred execution order after S
 71. Paper Track P10 - reproducible paper table generator
 72. Paper Track P11 - paper draft and figure pack
 73. Paper Track P12 - external dry run and clean-clone proof
-74. Paper Track P13 - arXiv release and attention pack
+74. Paper Track P13 - claim-safe paper release and attention pack
+74A. Paper Track P14 - final arXiv source bundle and clean release candidate
 75. Slice 16
 76. Slice 16A
 77. Slice 16B
@@ -346,7 +347,7 @@ Why:
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
-- Paper Track P0 through P13 now come before Academy work because the current freeze pack deliberately blocked hard AML and SOTA claims; Relaytic first cleaned public surfaces, ran relevant benchmark tracks, challenged weak first-pass rows with competitive leakage-safe budgets, generated real numeric evidence, drafted a claim-safe paper, proved a clean paper-smoke path, and produced a claim-safe arXiv release pack before expanding into capability evolution
+- Paper Track P0 through P14 now come before Academy work because the current freeze pack deliberately blocked hard AML and SOTA claims; Relaytic first cleaned public surfaces, ran relevant benchmark tracks, challenged weak first-pass rows with competitive leakage-safe budgets, generated real numeric evidence, drafted a claim-safe paper, proved a clean paper-smoke path, produced a claim-safe P13 paper release pack, and then must produce a P14 arXiv-compatible source bundle before expanding into capability evolution
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
 - Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, and adds Relaytic aliases for legacy API/tool names
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
@@ -367,8 +368,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P13. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, Paper Track P11 claim-linted paper draft generation, Paper Track P12 external dry-run proof, and Paper Track P13 claim-safe arXiv release pack.
-- next execution target: Slice 16A
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P13. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, Paper Track P11 claim-linted paper draft generation, Paper Track P12 external dry-run proof, and Paper Track P13 claim-safe paper release pack. Paper Track P14 is planned next and not yet implemented.
+- next execution target: Paper Track P14
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -377,7 +378,8 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned academy follow-on: Slice 16A, now that Paper Track P13 has proved claim-safe release gating
+- next planned paper follow-on: Paper Track P14, final arXiv source bundle and clean release candidate
+- next planned academy follow-on: Slice 16A, after P14 closes the upload-source and release-candidate gap
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -4113,7 +4115,7 @@ Goal:
 - write the first paper draft and generate figures from the same evidence pack
 
 Load-bearing improvement:
-- Relaytic turns benchmark artifacts into a coherent arXiv-ready argument without drifting beyond the claim contract
+- Relaytic turns benchmark artifacts into a coherent arXiv-facing argument without drifting beyond the claim contract
 
 Human surface:
 - humans can read a paper draft, inspect figures, and see limitations before public release
@@ -4249,7 +4251,31 @@ P13 added:
 - `docs/paper/tables/table_3_release_artifact_set.md`
 - `tests/test_paper_track_p13.py`
 
-P13 produces a claim-safe arXiv-ready Markdown draft and attention pack from P10-P12 source artifacts. It writes a release tag plan but does not create or push tags automatically. The public wording lint passes only because hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked. Slice 16A is now the next execution target.
+P13 produces a claim-safe Markdown draft and attention pack from P10-P12 source artifacts. It writes a release tag plan but does not create or push tags automatically. The final arXiv upload still requires TeX/PDF conversion, accepted figure formats, author metadata, and a clean final tag target. The public wording lint passes only because hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked. Paper Track P14 is now the next execution target.
+
+### Paper Track P14 - final arXiv source bundle and clean release candidate
+
+Goal:
+
+- turn the P13 Markdown draft pack into a final arXiv-compatible source bundle without changing the claim contract
+- verify the paper as a professional release candidate from a clean clone and a clean tag target
+- keep the public story focused on a claim-gated AML evaluation environment unless later benchmark gates unlock stronger language
+
+Deliverables:
+
+- `docs/paper/arxiv_src/`
+- `docs/reports/paper_arxiv_source_manifest.json`
+- `docs/reports/paper_submission_package_audit.json`
+- `docs/reports/paper_release_candidate_checklist.md`
+- `tests/test_paper_track_p14.py`
+
+Acceptance:
+
+1. The source bundle includes top-level TeX/PDF source, bibliography, and converted figures in formats accepted by the selected arXiv processor.
+2. Citation and reference audits prove every in-text citation resolves and every paper-used BibTeX entry is valid enough for the chosen source format.
+3. The package audit blocks local machine paths, external private data paths, secrets, `.env` files, virtual environments, stale prototype language, and unguarded hard claims.
+4. A clean-clone smoke run regenerates P10-P13 artifacts and validates the P14 source package.
+5. The release-candidate checklist requires an empty `git status --short` at the final tag target before upload.
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

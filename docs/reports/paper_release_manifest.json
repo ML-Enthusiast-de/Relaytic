@@ -1,5 +1,6 @@
 {
   "arxiv_submission_checklist_ref": "docs/reports/paper_arxiv_submission_checklist.md",
+  "arxiv_upload_ready": false,
   "attention_pack_ref": "docs/reports/paper_attention_pack.md",
   "checks": [
     {
@@ -78,11 +79,12 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "ee3e1c94bcc1206ab8b427da19f5367127966b25",
+  "git_commit": "85179d87cd9da3d329d6023f44d0e65933e29e0b",
   "git_dirty": true,
+  "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
   "headline_claims_allowed": false,
-  "next_slice": "Slice 16A - capability registry and capability cards",
+  "next_slice": "Paper Track P14 - final arXiv source bundle and clean release candidate",
   "paper_version": {
     "artifact_refs": [
       "docs/paper/relaytic_aml_arxiv_draft.md",
@@ -111,7 +113,7 @@
     "table_manifest_ref": "docs/paper/tables/table_manifest.json"
   },
   "public_claims_ref": "docs/reports/paper_public_claims_allowed.json",
-  "release_date": "2026-06-02",
+  "release_date": "2026-06-03",
   "release_mode": "claim_safe_evaluation_environment_only",
   "release_tag_plan": {
     "artifact_refs": [
@@ -156,41 +158,80 @@
   "slice": "Paper Track P13",
   "source_verification": [
     {
-      "accessed_date": "2026-06-02",
+      "accessed_date": "2026-06-03",
       "citation_key": "lopezrojas2016paysim",
       "source_url": "https://www.msc-les.org/proceedings/emss/2016/EMSS2016_249.pdf",
       "verified_role": "PaySim synthetic mobile-money simulator source and caveat."
     },
     {
-      "accessed_date": "2026-06-02",
+      "accessed_date": "2026-06-03",
       "citation_key": "weber2019elliptic",
       "source_url": "https://arxiv.org/abs/1908.02591",
       "verified_role": "Elliptic transaction graph size, features, and AML benchmark context."
     },
     {
-      "accessed_date": "2026-06-02",
+      "accessed_date": "2026-06-03",
       "citation_key": "bellei2024elliptic2",
       "source_url": "https://arxiv.org/abs/2404.19109",
       "verified_role": "Elliptic2 subgraph benchmark scale and task framing."
     },
     {
-      "accessed_date": "2026-06-02",
+      "accessed_date": "2026-06-03",
       "citation_key": "song2024revtrack",
       "source_url": "https://arxiv.org/abs/2410.08394",
       "verified_role": "RevTrack/RevClassify modern reference and subgraph-method context."
     },
     {
-      "accessed_date": "2026-06-02",
+      "accessed_date": "2026-06-03",
+      "citation_key": "chen2026transxion",
+      "source_url": "https://arxiv.org/abs/2604.17420",
+      "verified_role": "Recent AML benchmark-realism context."
+    },
+    {
+      "accessed_date": "2026-06-03",
+      "citation_key": "poon2026linemvgnn",
+      "source_url": "https://arxiv.org/abs/2603.23584",
+      "verified_role": "Recent directed transaction-graph detector context."
+    },
+    {
+      "accessed_date": "2026-06-03",
+      "citation_key": "tariq2026extraqt",
+      "source_url": "https://arxiv.org/abs/2604.02899",
+      "verified_role": "Recent quasi-temporal transaction-graph detector context."
+    },
+    {
+      "accessed_date": "2026-06-03",
+      "citation_key": "ye2026blazingaml",
+      "source_url": "https://arxiv.org/abs/2604.12241",
+      "verified_role": "Recent high-throughput AML graph-mining systems context."
+    },
+    {
+      "accessed_date": "2026-06-03",
+      "citation_key": "deprez2025continualaml",
+      "source_url": "https://arxiv.org/abs/2503.24259",
+      "verified_role": "Recent continual-learning and drift context for AML graph systems."
+    },
+    {
+      "accessed_date": "2026-06-03",
       "citation_key": "gebru2021datasheets",
       "source_url": "https://cacm.acm.org/research/datasheets-for-datasets/",
       "verified_role": "Dataset documentation and transparency context."
     },
     {
-      "accessed_date": "2026-06-02",
+      "accessed_date": "2026-06-03",
       "citation_key": "pineau2021reproducibility",
       "source_url": "https://www.jmlr.org/papers/v22/20-303.html",
       "verified_role": "ML reproducibility checklist and code/data discipline context."
     }
   ],
-  "status": "ready_for_claim_safe_arxiv_release"
+  "status": "ready_for_claim_safe_arxiv_release",
+  "submission_package_state": {
+    "current_format": "claim_safe_markdown_draft_pack",
+    "required_before_upload": [
+      "convert the Markdown draft into final TeX/PDF source",
+      "convert SVG figures into figure formats accepted by the selected arXiv processor",
+      "fill author metadata, affiliation, contact, license, and acknowledgements",
+      "rerun release-safety checks from the final clean tag target"
+    ]
+  }
 }
