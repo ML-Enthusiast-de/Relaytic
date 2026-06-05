@@ -4283,7 +4283,7 @@ Implemented status:
 - public command: `relaytic release-safety paper-arxiv-source --format json`
 - generated source tree: `docs/paper/arxiv_src/main.tex`, `docs/paper/arxiv_src/references.bib`, and four converted PDF figures under `docs/paper/arxiv_src/figures/`
 - generated audits: `paper_arxiv_source_manifest.json`, `paper_submission_package_audit.json`, and `paper_release_candidate_checklist.md`
-- P14 source release-candidate status is ready; `arxiv_upload_ready` remains false until author metadata is replaced, local TeX/PDF compile is inspected, and the final tag target has empty `git status --short`
+- P14 source release-candidate status is ready; a paper-excellence pass sharpened the thesis around evidence cells, deterministic claim gates, explicit research questions, agentic ML reliability, and company-facing evaluation-lab utility. `arxiv_upload_ready` remains false until author metadata is replaced, local TeX/PDF compile is inspected, and the final tag target has empty `git status --short`
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

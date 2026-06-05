@@ -348,7 +348,7 @@ P13 produces the claim-safe Markdown draft, citable references, generated paper 
 
 ### Paper Track P14 - final arXiv source bundle and clean release candidate
 
-P14 converts the P13 Markdown draft into a deterministic arXiv-compatible source package without changing the claim contract. It produces LaTeX source, converted PDF figure files for the selected pdfLaTeX processor, author-metadata placeholders, a submission-package audit, and a release-candidate tag plan. P14 remains blocked if any citation key is missing, any figure cannot be included by the chosen processor, or any public surface adds hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, or hard business-value claims.
+P14 converts the P13 Markdown draft into a deterministic arXiv-compatible source package without changing the claim contract. It produces LaTeX source, converted PDF figure files for the selected pdfLaTeX processor, author-metadata placeholders, a submission-package audit, and a release-candidate tag plan. A follow-up paper-excellence pass sharpened the paper around evidence cells, deterministic claim gates, explicit research questions, agentic ML reliability, and company-facing evaluation-lab utility. P14 remains blocked if any citation key is missing, any figure cannot be included by the chosen processor, or any public surface adds hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, or hard business-value claims.
 
 P14 added:
 

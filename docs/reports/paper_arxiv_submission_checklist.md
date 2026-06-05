@@ -13,9 +13,9 @@ P13 permits only a claim-safe evaluation-environment release.
 
 ## Paper Package
 
-- [ ] Convert `docs/paper/relaytic_aml_arxiv_draft.md` into the final arXiv PDF or TeX source.
+- [ ] Regenerate `docs/paper/arxiv_src/` with `relaytic release-safety paper-arxiv-source --format json` after any final paper edit.
 - [ ] Include `docs/paper/references.bib` and verify every in-text citation has a matching BibTeX key.
-- [ ] Convert the four SVG figures from `docs/paper/figures/` into PDF/PNG/EPS/JPEG files accepted by the selected arXiv processor.
+- [ ] Verify the converted PDF figures in `docs/paper/arxiv_src/figures/` are accepted by the selected arXiv processor.
 - [ ] Keep the table values synchronized with `docs/paper/tables/table_manifest.json` and `docs/reports/paper_metric_cell_audit.json`.
 - [ ] Fill in author name, affiliation, contact, and optional acknowledgements before upload.
 
@@ -35,7 +35,7 @@ P13 permits only a claim-safe evaluation-environment release.
 ## Tag And Release
 
 - [ ] Confirm `git status --short` is empty at the final tag target.
-- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `9e9ff21a5905e72c7438c5656e33189060c0fe87`; rerun the manifest after final edits if the source evidence changes.
+- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `470e726d5e9bfe74b298e661f16212dac8599eab`; rerun the manifest after final edits if the source evidence changes.
 - [ ] Create tag after the final PDF/source matches the manifest: `git tag -a relaytic-aml-paper-p13-claim-safe -m "Relaytic-AML claim-safe paper release"`.
 - [ ] Attach or link the paper PDF, release manifest, public claims JSON, and benchmark artifacts.
 
