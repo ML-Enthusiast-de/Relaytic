@@ -383,6 +383,14 @@ Avoid introducing new references to:
 - introduced final paper artifacts under `docs/paper/`: `relaytic_aml_arxiv_draft.md`, `references.bib`, `tables/table_manifest.json`, `tables/table_1_evidence_summary.md`, `tables/table_2_claim_gate_matrix.md`, and `tables/table_3_release_artifact_set.md`
 - produced a claim-safe evaluation-environment paper package and release tag plan while keeping hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims blocked
 
+### Paper Track P14
+
+- introduced `src/relaytic/release_safety/paper_arxiv_source.py` under the existing release-safety boundary for deterministic arXiv source-bundle generation, Markdown-to-LaTeX conversion, SVG-to-PDF figure conversion, citation audits, figure audits, package scans, and release-candidate checklist generation
+- introduced the public command `relaytic release-safety paper-arxiv-source` for regenerating the P14 source tree and reports from the committed P13 paper pack
+- introduced paper-track arXiv source artifacts under `docs/paper/arxiv_src/`: `main.tex`, `references.bib`, and converted PDF figures under `figures/`
+- introduced paper-track release-candidate artifacts under `docs/reports/`: `paper_arxiv_source_manifest.json`, `paper_submission_package_audit.json`, and `paper_release_candidate_checklist.md`
+- produced a source release candidate with passing citation, figure, and package audits while keeping `arxiv_upload_ready` false until author metadata, local TeX/PDF inspection, and clean tag-target proof are completed
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`

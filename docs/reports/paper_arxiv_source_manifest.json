@@ -1,0 +1,193 @@
+{
+  "arxiv_processor_contract": {
+    "allowed_graphic_extensions": [
+      ".eps",
+      ".jpeg",
+      ".jpg",
+      ".pdf",
+      ".png"
+    ],
+    "author_metadata_placeholder_present": true,
+    "bibtex_bundle_state": "references.bib included; final upload checklist requires generating and inspecting bibliography output before upload",
+    "graphic_formats_used": [
+      ".pdf"
+    ],
+    "processor": "pdfLaTeX"
+  },
+  "arxiv_upload_ready": false,
+  "checks": [
+    {
+      "check_id": "p13_release_manifest_ready",
+      "message": "P14 source generation requires a ready P13 claim-safe release manifest.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_release_manifest.json"
+    },
+    {
+      "check_id": "p13_public_wording_lint_passed",
+      "message": "P13 public wording lint must pass before P14 source can be a release candidate.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_public_claims_allowed.json"
+    },
+    {
+      "check_id": "hard_and_headline_claims_remain_blocked",
+      "message": "P14 remains claim-safe only while hard and headline claims are blocked.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_public_claims_allowed.json"
+    },
+    {
+      "check_id": "required_p14_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [],
+        "present_artifact_refs": [
+          "docs/reports/paper_release_manifest.json",
+          "docs/reports/paper_public_claims_allowed.json",
+          "docs/paper/relaytic_aml_arxiv_draft.md",
+          "docs/paper/references.bib",
+          "docs/paper/figures/figure_manifest.json"
+        ]
+      },
+      "message": "P14 requires the P13 manifest, public claims, Markdown draft, bibliography, and figure manifest.",
+      "passed": true,
+      "source_artifact": "docs/reports"
+    },
+    {
+      "check_id": "citation_audit_passed",
+      "detail": {
+        "missing_bib_keys": []
+      },
+      "message": "Every generated LaTeX citation must resolve in references.bib.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_arxiv_source_manifest.json"
+    },
+    {
+      "check_id": "figure_audit_passed",
+      "detail": {
+        "missing_figures": []
+      },
+      "message": "Every generated figure reference must exist and use an arXiv-accepted graphic extension.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_arxiv_source_manifest.json"
+    },
+    {
+      "check_id": "submission_package_audit_passed",
+      "detail": {
+        "violation_count": 0
+      },
+      "message": "Generated source must not contain local paths, secrets, stale prototype wording, or unguarded hard claims.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_submission_package_audit.json"
+    }
+  ],
+  "citation_audit": {
+    "bib_key_count": 13,
+    "bib_keys": [
+      "bellei2024elliptic2",
+      "chen2025mlrbench",
+      "chen2026transxion",
+      "deprez2025continualaml",
+      "gebru2021datasheets",
+      "lopezrojas2016paysim",
+      "mitchell2019modelcards",
+      "pineau2021reproducibility",
+      "poon2026linemvgnn",
+      "song2024revtrack",
+      "tariq2026extraqt",
+      "weber2019elliptic",
+      "ye2026blazingaml"
+    ],
+    "cited_key_count": 13,
+    "cited_keys": [
+      "bellei2024elliptic2",
+      "chen2025mlrbench",
+      "chen2026transxion",
+      "deprez2025continualaml",
+      "gebru2021datasheets",
+      "lopezrojas2016paysim",
+      "mitchell2019modelcards",
+      "pineau2021reproducibility",
+      "poon2026linemvgnn",
+      "song2024revtrack",
+      "tariq2026extraqt",
+      "weber2019elliptic",
+      "ye2026blazingaml"
+    ],
+    "missing_bib_keys": [],
+    "schema_version": "relaytic.paper_arxiv_source.v1",
+    "status": "pass",
+    "unused_bib_keys": []
+  },
+  "failed_checks": [],
+  "figure_audit": {
+    "converted_figure_count": 4,
+    "disallowed_extensions": [],
+    "include_refs": [
+      "figures/figure_1_claim_gate_flow.pdf",
+      "figures/figure_2_supporting_pr_auc.pdf",
+      "figures/figure_3_review_budget.pdf",
+      "figures/figure_4_publishability_matrix.pdf"
+    ],
+    "missing_figures": [],
+    "missing_source_svgs": [],
+    "schema_version": "relaytic.paper_arxiv_source.v1",
+    "status": "pass",
+    "svg_references_remaining": []
+  },
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "next_slice": "Slice 16A - capability registry and capability cards",
+  "p13_gate_refs": [
+    "docs/reports/paper_release_manifest.json",
+    "docs/reports/paper_public_claims_allowed.json",
+    "docs/paper/relaytic_aml_arxiv_draft.md",
+    "docs/paper/references.bib",
+    "docs/paper/figures/figure_manifest.json"
+  ],
+  "release_candidate_checklist_ref": "docs/reports/paper_release_candidate_checklist.md",
+  "release_mode": "claim_safe_evaluation_environment_only",
+  "release_tag_plan": {
+    "artifact_refs": [
+      "docs/paper/arxiv_src/main.tex",
+      "docs/paper/arxiv_src/references.bib",
+      "docs/paper/arxiv_src/figures/figure_1_claim_gate_flow.pdf",
+      "docs/paper/arxiv_src/figures/figure_2_supporting_pr_auc.pdf",
+      "docs/paper/arxiv_src/figures/figure_3_review_budget.pdf",
+      "docs/paper/arxiv_src/figures/figure_4_publishability_matrix.pdf",
+      "docs/reports/paper_arxiv_source_manifest.json",
+      "docs/reports/paper_submission_package_audit.json",
+      "docs/reports/paper_release_candidate_checklist.md"
+    ],
+    "creation_command": "git tag -a relaytic-aml-paper-p14-source-rc -m \"Relaytic-AML arXiv source release candidate\"",
+    "requires_clean_status_command": "git status --short",
+    "tag": "relaytic-aml-paper-p14-source-rc",
+    "tag_created_by_this_slice": false
+  },
+  "schema_version": "relaytic.paper_arxiv_source.v1",
+  "slice": "Paper Track P14",
+  "source_hashes": {
+    "main_tex_sha256": "617dab43c2d486c899b5b03e5c2ba41b40d9c2045a9b02cdcad422c969245354",
+    "pdf_figure_sha256": {
+      "figure_1_claim_gate_flow.pdf": "2b48eba136e98a2016bb716b2b23a674ab6b6aa39c7bf4e0650899901b8fff19",
+      "figure_2_supporting_pr_auc.pdf": "b8b1b025041ebdde784b937bd4a9b556e3d22338d9a3920ea073bec3e5e9bf1e",
+      "figure_3_review_budget.pdf": "1a0a14df08451dfec0db44a968eb9cef22a6be924f988336ecee43f41511dada",
+      "figure_4_publishability_matrix.pdf": "1675f269bd5e8ba6b1239923c12223bfeefa3794ab824a75a2cd8da30cdefee3"
+    },
+    "references_bib_sha256": "2049d152162e3d318c7a0cfeea5c8bc5a182a89c9d937da9f649db14a7b4cce1"
+  },
+  "source_release_candidate_ready": true,
+  "source_tree": {
+    "artifact_refs": [
+      "docs/paper/arxiv_src/main.tex",
+      "docs/paper/arxiv_src/references.bib",
+      "docs/paper/arxiv_src/figures/figure_1_claim_gate_flow.pdf",
+      "docs/paper/arxiv_src/figures/figure_2_supporting_pr_auc.pdf",
+      "docs/paper/arxiv_src/figures/figure_3_review_budget.pdf",
+      "docs/paper/arxiv_src/figures/figure_4_publishability_matrix.pdf"
+    ],
+    "bibliography": "docs/paper/arxiv_src/references.bib",
+    "figure_dir": "docs/paper/arxiv_src/figures",
+    "main_tex": "docs/paper/arxiv_src/main.tex",
+    "source_dir": "docs/paper/arxiv_src"
+  },
+  "status": "ready_for_source_release_candidate",
+  "submission_package_audit_ref": "docs/reports/paper_submission_package_audit.json"
+}

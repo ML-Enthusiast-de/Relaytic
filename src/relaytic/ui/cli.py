@@ -1510,6 +1510,26 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p14 = release_safety_sub.add_parser(
+        "paper-arxiv-source",
+        help="Build Paper Track P14 arXiv source tree, converted PDF figures, citation audit, and release-candidate checklist.",
+    )
+    release_safety_p14.add_argument(
+        "--source-dir",
+        default=None,
+        help="Optional output directory for the arXiv source tree. Defaults to docs/paper/arxiv_src/.",
+    )
+    release_safety_p14.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P14 report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p14.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3556,6 +3576,11 @@ def main(argv: list[str] | None = None) -> int:
                     paper_dir=args.paper_dir,
                     output_dir=args.output_dir,
                     release_tag=args.release_tag,
+                )
+            elif args.release_safety_command == "paper-arxiv-source":
+                payload = _run_paper_arxiv_source_surface(
+                    source_dir=args.source_dir,
+                    output_dir=args.output_dir,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -7709,6 +7734,55 @@ def _run_paper_release_surface(
             "bundle": pack,
         },
         "human_output": render_paper_release_markdown(pack),
+    }
+
+
+def _run_paper_arxiv_source_surface(
+    *,
+    source_dir: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_arxiv_source_markdown,
+        sync_paper_arxiv_source_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_arxiv_source_pack(
+        root,
+        source_dir=source_dir,
+        output_dir=output_dir,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        elif path.suffix in {".md", ".tex", ".bib"}:
+            pack[key] = path.read_text(encoding="utf-8")
+        else:
+            pack[key] = {
+                "path": str(path),
+                "suffix": path.suffix,
+                "byte_count": path.stat().st_size if path.exists() else 0,
+            }
+    manifest = dict(pack["paper_arxiv_source_manifest"])
+    audit = dict(pack["paper_submission_package_audit"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "source_dir": str(Path(source_dir) if source_dir else root / "docs" / "paper" / "arxiv_src"),
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_arxiv_source_manifest": manifest,
+            "paper_submission_package_audit": audit,
+            "bundle": pack,
+        },
+        "human_output": render_paper_arxiv_source_markdown(
+            {
+                "paper_arxiv_source_manifest": manifest,
+                "paper_submission_package_audit": audit,
+            }
+        ),
     }
 
 

@@ -1,0 +1,128 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 850.000 360.000] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 1741 >>
+stream
+1.0000 1.0000 1.0000 rg
+0.000 260.000 100.000 100.000 re f
+BT
+/F1 18.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 30.000 332.000 Tm
+(Figure 2. Supporting PR-AUC evidence \(not headline claims\)) Tj
+ET
+0.1608 0.1961 0.2549 RG
+1.200 w
+70.000 69.000 m 810.000 69.000 l S
+0.1608 0.1961 0.2549 RG
+1.200 w
+70.000 304.000 m 70.000 69.000 l S
+BT
+/F1 12.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 20.000 286.000 Tm
+(PR-AUC) Tj
+ET
+0.5529 0.6000 0.6824 rg
+101.500 69.000 85.000 77.900 re f
+BT
+/F1 11.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 120.240 152.900 Tm
+(0.331345) Tj
+ET
+BT
+/F1 10.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 103.500 41.000 Tm
+(PaySim baseline) Tj
+ET
+0.1647 0.6157 0.5608 rg
+249.500 69.000 85.000 150.100 re f
+BT
+/F1 11.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 268.240 225.100 Tm
+(0.638773) Tj
+ET
+BT
+/F1 10.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 243.400 41.000 Tm
+(PaySim competitive) Tj
+ET
+0.2706 0.4824 0.6157 rg
+397.500 69.000 85.000 157.200 re f
+BT
+/F1 11.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 416.240 232.200 Tm
+(0.668756) Tj
+ET
+BT
+/F1 10.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 402.200 41.000 Tm
+(Elliptic graph) Tj
+ET
+0.9137 0.7686 0.4157 rg
+545.500 69.000 85.000 221.700 re f
+BT
+/F1 11.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 567.210 296.700 Tm
+(0.94324) Tj
+ET
+BT
+/F1 10.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 542.100 41.000 Tm
+(Elliptic2 context) Tj
+ET
+0.9059 0.4353 0.3176 rg
+693.500 69.000 85.000 228.900 re f
+BT
+/F1 11.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 721.150 303.900 Tm
+(0.974) Tj
+ET
+BT
+/F1 10.000 Tf
+0.0000 0.0000 0.0000 rg
+1 0 0 1 690.100 41.000 Tm
+(RevClassifyDS ref) Tj
+ET
+BT
+/F1 11.000 Tf
+0.3569 0.3922 0.4471 rg
+1 0 0 1 30.000 20.000 Tm
+(Generated from audited P10 metric cells; claim posture remains supporting-only.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000255 00000 n 
+0000002047 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2117
+%%EOF

@@ -1,14 +1,14 @@
-# Paper Track P0-P13 - Relaytic-AML arXiv benchmark path
+# Paper Track P0-P14 - Relaytic-AML arXiv benchmark path
 
 ## Status
 
-P0 through P13 implemented. Paper Track P14 is the next execution target before Academy work resumes.
+P0 through P14 implemented. Slice 16A is the next execution target before Academy work resumes.
 
 ## Intent
 
 Paper Track P0 through P14 is the mandatory path between Slice 15Z-R and Slice 16A.
 
-Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, and claim-safe paper release pack. The final arXiv upload still requires TeX/PDF conversion, accepted figure formats, and author metadata.
+Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, and final arXiv source release candidate. The final upload still requires author metadata replacement, a local TeX/PDF compile, and human PDF inspection.
 
 ## Paper Thesis
 
@@ -64,6 +64,8 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
     Reproduce the install, paper-smoke benchmark, table generation, claim lint, and leak scan from a clean clone.
 19. **P13 - arXiv release and attention pack** - implemented
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
+20. **P14 - final arXiv source bundle and clean release candidate** - implemented
+    Convert the claim-safe Markdown paper pack into a LaTeX source tree, convert figures into accepted arXiv graphic formats, audit citations and package hygiene, and leave upload blocked until human metadata and TeX/PDF inspection gates are complete.
 
 ## Non-Negotiable Gates
 
@@ -342,26 +344,26 @@ P13 added:
 
 P13 produces the claim-safe Markdown draft, citable references, generated paper tables, release manifest, public attention pack, submission checklist, and allowed-public-claims report from the P10-P12 gated artifact set. It writes a release tag plan but does not create or push tags automatically. Public wording is allowed only in evaluation-environment mode; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked.
 
-## Next Implementation Target
-
-The next implementation target is **Paper Track P14**.
+## Completed Final Source Bundle
 
 ### Paper Track P14 - final arXiv source bundle and clean release candidate
 
-P14 must convert the P13 Markdown draft into a final arXiv-compatible source package without changing the claim contract. It should produce TeX/PDF source, converted figure files accepted by the selected arXiv processor, author-metadata placeholders, a clean-clone submission-package audit, and a release-candidate tag plan. P14 must remain blocked if any citation key is missing, any figure cannot be included by the chosen processor, any generated table drifts from `paper_metric_cell_audit.json`, or any public surface adds hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, or hard business-value claims.
+P14 converts the P13 Markdown draft into a deterministic arXiv-compatible source package without changing the claim contract. It produces LaTeX source, converted PDF figure files for the selected pdfLaTeX processor, author-metadata placeholders, a submission-package audit, and a release-candidate tag plan. P14 remains blocked if any citation key is missing, any figure cannot be included by the chosen processor, or any public surface adds hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, or hard business-value claims.
 
-P14 target artifacts:
+P14 added:
 
 - `docs/paper/arxiv_src/`
 - `docs/reports/paper_arxiv_source_manifest.json`
 - `docs/reports/paper_submission_package_audit.json`
 - `docs/reports/paper_release_candidate_checklist.md`
+- `src/relaytic/release_safety/paper_arxiv_source.py`
+- `relaytic release-safety paper-arxiv-source --format json`
 - `tests/test_paper_track_p14.py`
 
-Acceptance criteria:
+Implemented acceptance:
 
-1. The arXiv source package contains a top-level TeX/PDF source, bibliography file, and converted figures with case-matching file references.
+1. The arXiv source package contains a top-level TeX source, bibliography file, and converted PDF figures with case-matching file references.
 2. A deterministic citation audit confirms every in-text citation has a BibTeX entry and no BibTeX entry used by the paper is malformed.
 3. The submission package audit confirms no local machine paths, external private data paths, secrets, `.env` files, or virtual environments are referenced.
 4. The final checklist records that `git status --short` is empty at the release-candidate tag target.
-5. `paper_release_manifest.json` continues to mark hard/headline claims blocked and keeps `arxiv_upload_ready` false until the P14 source audit passes.
+5. `paper_arxiv_source_manifest.json` marks source release-candidate status ready, keeps hard/headline claims blocked, and keeps `arxiv_upload_ready` false until author metadata and human TeX/PDF inspection gates pass.
