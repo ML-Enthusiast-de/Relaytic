@@ -63,7 +63,7 @@ Use these labels when discussing results:
 - **Demo-only:** the public-safe fixture proves the product workflow and artifact contract, not real-world AML superiority.
 - **Dev-benchmark:** a benchmark run or proof pack on a visible/dev partition can guide engineering, but cannot support paper-grade claims by itself.
 - **Holdout-benchmark:** a held-out benchmark partition can support stronger evidence if the claim guards, leakage audits, and benchmark-environment score pass.
-- **Claim-safe paper-ready:** allowed only when the P13 release manifest, public-claims report, table provenance, draft lint, clean-clone proof, and release-safety scan agree. This still does not imply hard AML or headline benchmark superiority.
+- **Claim-safe paper-ready:** allowed only when the local evidence artifacts, public-claims report, table provenance, source package, and release-safety scan agree. This still does not imply hard AML or headline benchmark superiority.
 
 More context:
 
@@ -72,18 +72,18 @@ More context:
 - [Paper Benchmark Runbook](docs/paper_benchmark_runbook.md)
 - [UI Frontier Review](docs/relaytic_ui_frontier_review.md)
 
-## Paper P13 Claim-Safe Release Status
+## Relaytic-AML Paper Draft
 
-The current paper package is claim-safe release material for a Relaytic-AML evaluation-environment paper, not a hard AML superiority result. It now includes a deterministic arXiv source candidate with generated references, tables, converted PDF figures, source-package audits, and release gates. The final upload still needs author metadata, local TeX/PDF inspection, and a clean tag-target confirmation.
+The current paper draft presents Relaytic-AML as a local-first evaluation lab for financial-crime ML. It is an architecture and evidence-discipline paper, not a hard AML superiority result. Relaytic remains the general package and CLI. Relaytic-AML is the current flagship edition and the focus of the draft because AML makes privacy, temporal validity, graph context, human review, and claim discipline visible in one domain.
+
+The repo includes the Markdown draft, a compiled PDF draft, an arXiv source candidate, references, figures, tables, and the underlying public evidence artifacts. The final upload still needs author metadata, local TeX/PDF inspection, and a clean tag-target confirmation.
 
 Inspect:
 
 - `docs/paper/relaytic_aml_arxiv_draft.md` for the claim-safe paper draft.
-- `docs/paper/arxiv_src/` for the P14 arXiv source bundle.
+- `docs/paper/arxiv_src/` for the arXiv source bundle.
 - `docs/paper/references.bib` for citable sources.
 - `docs/paper/figures/` and `docs/paper/tables/` for generated visual/table assets.
-- `docs/reports/paper_release_manifest.json` for the release gate.
-- `docs/reports/paper_arxiv_source_manifest.json` and `docs/reports/paper_submission_package_audit.json` for source-package readiness.
 - `docs/reports/paper_public_claims_allowed.json` for allowed and blocked public wording.
 - `docs/reports/paper_attention_pack.md` for claim-safe public post text.
 
@@ -163,46 +163,13 @@ The repository already supports a working early product baseline:
 - a one-command Relaytic-AML review-queue demo bundle through `relaytic demo aml-review-queue`, with a flow report, business-metric table, artifact index, business-value guard, baseline/ablation proof, and mission-control investigation board
 - pre-Academy repo credibility reports under `docs/reports/`, including module-size audit, public-surface inventory, module-split evidence, extraction boundaries, and benchmark cleanup debt before the paper/release freeze
 - a paper/release freeze surface through `relaytic release-safety paper-freeze`, with relevant benchmark catalog, multidimensional result table, claim-boundary report, reproducibility attestation, and a safe attention-pack manifest that blocks hard AML performance claims until holdout evidence is frozen
-- a claim-safe paper-release surface through `relaytic release-safety paper-release`, with generated Markdown draft, citable references, paper tables, public attention pack, arXiv submission checklist, release manifest, and allowed-public-claims report
+- a claim-safe paper surface through `relaytic release-safety paper-release`, with Markdown draft, citable references, paper tables, public attention text, arXiv submission notes, and allowed-public-claims report
 - a final paper-source surface through `relaytic release-safety paper-arxiv-source`, with deterministic LaTeX source, converted PDF figures, citation/figure audits, source-package scanning, and a release-candidate checklist
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Slices 10, 10B, 10C, 10A, 11A, 11B, 11C, 11D, 11E, 11F, 11G, 12, 12A, 12B, 12C, 12D, 13, 13A, 13B, 13C, 14, 14A, 15, 15A, 15B, 15C, 15D, 15E, 15F, 15G, 15H, 15I, 15J, 15K, 15L, 15M, 15N, 15O, 15P, 15Q, 15R-A, 15S, 15T, 15U, 15V, 15V-A, 15W, 15X, 15Y, 15Z, and 15Z-R are now implemented, followed by Paper Track P0 through P14. Relaytic-AML now carries domain posture, graph/entity reasoning, analyst casework, weak-label risk, delayed-outcome alignment, rolling alert pressure, drift-triggered recalibration, proof-pack claim posture, one public-safe review-queue demo bundle, guarded analyst-hour business-value evidence, baseline/ablation relevance proof, raw graph/subgraph ingestion evidence, no-lost guide/context export, temporal weak-label claim gates, AML evaluation-environment scorecards, demo-first documentation, pre-Academy repo credibility reports, a paper/release freeze pack, a claim-safe P13 paper release pack, and a P14 arXiv source release candidate on the same local-first artifact path.
+Relaytic has a longer internal build history, but the public story is now simpler: Relaytic is the local-first inference lab, and Relaytic-AML is the flagship edition used to prove the architecture in a demanding domain. Detailed build history lives in `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`. The next product work is capability-card and academy-style hardening, while the paper work is human-facing: replace author metadata, inspect the compiled PDF, confirm a clean tag target, and submit only claim-safe wording.
 
-The next frontier upgrades are:
-
-The next recommended build is **Slice 16A**, while the remaining paper-upload work is human-facing: replace author metadata, compile and inspect the PDF locally, confirm a clean tag target, and then submit the already generated P14 arXiv source candidate.
-
-The initial model-competitiveness path through **Slice 15F** is now landed, and the first performance-recovery foundation slice is now landed too:
-
-- Slice 15F research-imported architecture candidates with replay and shadow trials
-- Slice 15G objective contracts, split correctness, and metric-truth alignment
-
-The full required performance-recovery path is now landed:
-
-- Slice 15L benchmark truth hardening and paper-claim gates
-- Slice 15M competitive specialization and benchmark-generalization guards
-
-The broader **Relaytic Academy** starts at **Slice 16A** after Paper Track P14 turned the claim-safe paper pack into a clean arXiv-source release candidate:
-
-- **Slice 15N** AML domain contract and flagship pivot
-- **Slice 15O** entity, graph, and typology reasoning
-- **Slice 15P** analyst review optimization and casework
-- **Slice 15Q** streaming drift, weak labels, and continual AML learning
-- **Slice 15R-A** finish AML proof pack alignment (implemented)
-- **Slice 15S** flagship AML demo pack (implemented)
-- **Slice 15T** business-value metrics and analyst-hour proof (implemented)
-- **Slice 15U** strong AML baselines and ablations (implemented)
-- **Slice 15V** raw graph and subgraph ingestion (implemented)
-- **Slice 15W** temporal and weak-label upgrade (implemented)
-- **Slice 15X** AML evaluation-environment reframe (implemented)
-- **Slice 15Y** demo-first documentation rewrite (implemented)
-- **Slice 15Z** pre-Academy repo credibility cleanup (implemented)
-- **Slice 15Z-R** paper benchmark and release freeze (implemented)
-
-That ordering is deliberate. Relaytic is more interesting as a world-class AML system than as a generic capability-evolution project with no sharp domain wedge.
-
-After the academy track and the optional representation-engine bet, the roadmap now ends with **Slice 18**, a deliberate consolidation/remediation slice that removes legacy compatibility surfaces, misleading duplicate structure, oversized modules, and stale early-build residue so the finished repo reads like one intentional product rather than a long-lived construction site.
+That ordering is deliberate. Relaytic is more interesting as a world-class AML evaluation lab than as a generic capability-evolution project with no sharp domain wedge.
 
 The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [temporal_benchmark_pack.md](docs/specs/temporal_benchmark_pack.md), [aml_frontier_contract.md](docs/specs/aml_frontier_contract.md), [aml_benchmark_pack.md](docs/specs/aml_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
 

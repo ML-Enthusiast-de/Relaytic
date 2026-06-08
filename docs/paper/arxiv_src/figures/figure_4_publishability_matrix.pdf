@@ -10,7 +10,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 1040.000 376.000] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 4175 >>
+<< /Length 4159 >>
 stream
 1.0000 1.0000 1.0000 rg
 0.000 276.000 100.000 100.000 re f
@@ -54,7 +54,7 @@ BT
 /F1 12.000 Tf
 0.0000 0.0000 0.0000 rg
 1 0 0 1 860.000 282.000 Tm
-(Paper posture) Tj
+(Current posture) Tj
 ET
 0.9843 0.9882 0.9961 rg
 0.8431 0.8667 0.9098 RG
@@ -107,8 +107,8 @@ ET
 BT
 /F1 11.000 Tf
 1.0000 1.0000 1.0000 rg
-1 0 0 1 872.450 251.000 Tm
-(supporting only) Tj
+1 0 0 1 887.300 251.000 Tm
+(supporting) Tj
 ET
 0.9569 0.9686 0.9843 rg
 0.8431 0.8667 0.9098 RG
@@ -161,8 +161,8 @@ ET
 BT
 /F1 11.000 Tf
 1.0000 1.0000 1.0000 rg
-1 0 0 1 872.450 189.000 Tm
-(supporting only) Tj
+1 0 0 1 887.300 189.000 Tm
+(supporting) Tj
 ET
 0.9843 0.9882 0.9961 rg
 0.8431 0.8667 0.9098 RG
@@ -215,8 +215,8 @@ ET
 BT
 /F1 11.000 Tf
 1.0000 1.0000 1.0000 rg
-1 0 0 1 872.450 127.000 Tm
-(supporting only) Tj
+1 0 0 1 881.360 127.000 Tm
+(context only) Tj
 ET
 0.9569 0.9686 0.9843 rg
 0.8431 0.8667 0.9098 RG
@@ -269,8 +269,8 @@ ET
 BT
 /F1 11.000 Tf
 1.0000 1.0000 1.0000 rg
-1 0 0 1 872.450 65.000 Tm
-(supporting only) Tj
+1 0 0 1 887.300 65.000 Tm
+(supporting) Tj
 ET
 endstream
 endobj
@@ -284,9 +284,9 @@ xref
 0000000064 00000 n 
 0000000121 00000 n 
 0000000256 00000 n 
-0000004482 00000 n 
+0000004466 00000 n 
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-4552
+4536
 %%EOF

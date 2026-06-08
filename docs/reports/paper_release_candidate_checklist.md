@@ -19,6 +19,7 @@
 - [ ] Replace placeholder author, affiliation, and contact metadata in `docs/paper/arxiv_src/main.tex`.
 - [ ] Run `pdflatex`, `bibtex`, `pdflatex`, and `pdflatex` from `docs/paper/arxiv_src/`; inspect the generated PDF.
 - [ ] Include generated bibliography output if the final arXiv upload uses BibTeX rather than an inline bibliography.
+- [ ] Confirm the AI-assistance disclosure accurately describes any LLM drafting, editing, or code-review help.
 - [ ] Rerun `relaytic release-safety paper-arxiv-source --format json` after metadata edits.
 - [ ] Rerun `relaytic scan-git-safety` from the tag target.
 - [ ] Confirm `git status --short` is empty before creating `relaytic-aml-paper-p14-source-rc`.

@@ -10,7 +10,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 940.000 390.000] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 2247 >>
+<< /Length 2267 >>
 stream
 1.0000 1.0000 1.0000 rg
 0.000 290.000 100.000 100.000 re f
@@ -142,7 +142,7 @@ BT
 /F1 11.000 Tf
 0.3569 0.3922 0.4471 rg
 1 0 0 1 30.000 20.000 Tm
-(Generated from audited P10 metric cells; claim posture remains supporting-only.) Tj
+(Values come from fixed local evidence cells; the rows are supporting evidence, not headline claims.) Tj
 ET
 endstream
 endobj
@@ -156,9 +156,9 @@ xref
 0000000064 00000 n 
 0000000121 00000 n 
 0000000255 00000 n 
-0000002553 00000 n 
+0000002573 00000 n 
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-2623
+2643
 %%EOF

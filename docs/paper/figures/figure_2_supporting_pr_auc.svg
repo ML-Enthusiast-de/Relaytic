@@ -25,5 +25,5 @@
 <text x="812.2" y="62.1" text-anchor="middle" font-size="11">0.974</text>
 <text x="812.2" y="322.0" text-anchor="middle" font-size="10" fill="#293241">RevClassifyDS</text>
 <text x="812.2" y="334.0" text-anchor="middle" font-size="10" fill="#293241">ref</text>
-<text x="30" y="370" font-size="11" fill="#5b6472">Generated from audited P10 metric cells; claim posture remains supporting-only.</text>
+<text x="30" y="370" font-size="11" fill="#5b6472">Values come from fixed local evidence cells; the rows are supporting evidence, not headline claims.</text>
 </svg>

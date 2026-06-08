@@ -609,7 +609,7 @@ def _claim_gate_flow_svg() -> str:
         ("Source/split\ncontracts", 400, "#ffffff"),
         ("Scorecards +\nablations", 570, "#ffffff"),
         ("Run/model\nartifacts", 740, "#ffffff"),
-        ("Claim lint +\nsource audit", 910, "#ffffff"),
+        ("Claim boundary\n+ source audit", 910, "#ffffff"),
     ]
     parts = [
         _svg_header(1120, 420),
@@ -678,10 +678,10 @@ def _review_budget_svg(cells: list[dict[str, Any]]) -> str:
 def _publishability_matrix_svg(publishability: dict[str, Any]) -> str:
     _ = publishability
     rows = [
-        ("PaySim", "synthetic temporal\nproxy", "real-bank\nsuperiority", "real/partner\nholdout"),
-        ("Elliptic", "graph-feature\nsupport", "graph-neural\nsuperiority", "repeated graph\nrelease budget"),
-        ("Elliptic2", "modern subgraph\ncontext", "RevClassify\nparity", "faithful parity\n+ cohort proof"),
-        ("Operational", "review-budget\nsupport", "hard business\nvalue", "same-queue\nincumbent"),
+        ("PaySim", "synthetic temporal\nproxy", "real-bank\nsuperiority", "real/partner\nholdout", "supporting"),
+        ("Elliptic", "graph-feature\nsupport", "graph-neural\nsuperiority", "repeated graph\nrelease budget", "supporting"),
+        ("Elliptic2", "modern subgraph\ncontext", "RevClassify\nparity", "faithful parity\n+ cohort proof", "context only"),
+        ("Operational", "review-budget\nsupport", "hard business\nvalue", "same-queue\nincumbent", "supporting"),
     ]
     width = 1040
     row_h = 62
@@ -694,9 +694,9 @@ def _publishability_matrix_svg(publishability: dict[str, Any]) -> str:
         '<text x="210" y="94" font-size="12" font-weight="700">Current role</text>',
         '<text x="430" y="94" font-size="12" font-weight="700">Blocked claim</text>',
         '<text x="650" y="94" font-size="12" font-weight="700">Future unlock</text>',
-        '<text x="860" y="94" font-size="12" font-weight="700">Paper posture</text>',
+        '<text x="860" y="94" font-size="12" font-weight="700">Current posture</text>',
     ]
-    for index, (track, role, blocked, unlock) in enumerate(rows):
+    for index, (track, role, blocked, unlock, posture) in enumerate(rows):
         y = 112 + index * row_h
         fill = "#fbfcfe" if index % 2 == 0 else "#f4f7fb"
         parts.append(f'<rect x="30" y="{y - 20}" width="980" height="{row_h - 8}" rx="4" fill="{fill}" stroke="#d7dde8" stroke-width="0.8"/>')
@@ -705,7 +705,7 @@ def _publishability_matrix_svg(publishability: dict[str, Any]) -> str:
         parts.extend(_svg_text_lines(blocked, 430, y + 2, font_size=12, anchor="start", line_height=15, fill="#9b2226"))
         parts.extend(_svg_text_lines(unlock, 650, y + 2, font_size=12, anchor="start", line_height=15))
         parts.append(f'<rect x="855" y="{y - 5}" width="124" height="28" rx="4" fill="#2a9d8f"/>')
-        parts.append(f'<text x="917" y="{y + 13}" text-anchor="middle" font-size="11" fill="#ffffff">supporting only</text>')
+        parts.append(f'<text x="917" y="{y + 13}" text-anchor="middle" font-size="11" fill="#ffffff">{_xml_escape(posture)}</text>')
     parts.append("</svg>")
     return "\n".join(parts)
 
@@ -742,7 +742,7 @@ def _bar_chart_svg(
         parts.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{bar_w}" height="{bar_h:.1f}" fill="{color}"/>')
         parts.append(f'<text x="{x + bar_w / 2:.1f}" y="{y - 6:.1f}" text-anchor="middle" font-size="11">{_format_metric(value)}</text>')
         parts.extend(_svg_text_lines(label.replace(" ", "\n", 1), x + bar_w / 2, plot_y + plot_h + 25, font_size=10, anchor="middle", line_height=12))
-    parts.append('<text x="30" y="{0}" font-size="11" fill="#5b6472">Generated from audited P10 metric cells; claim posture remains supporting-only.</text>'.format(height - 20))
+    parts.append('<text x="30" y="{0}" font-size="11" fill="#5b6472">Values come from fixed local evidence cells; the rows are supporting evidence, not headline claims.</text>'.format(height - 20))
     parts.append("</svg>")
     return "\n".join(parts)
 

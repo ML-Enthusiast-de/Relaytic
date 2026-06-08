@@ -136,7 +136,7 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert claims["wording_lint"]["status"] == "pass"
     assert claims["hard_claims_allowed"] is False
     assert claims["headline_claims_allowed"] is False
-    assert "Relaytic-AML: Claim-Gated Evaluation Environments" in draft
+    assert "Relaytic-AML: A Local-First Evaluation Lab" in draft
     assert "arXiv-ready draft" not in draft
     assert "## References" in draft
     assert "No SOTA or leaderboard-winner claim." in attention

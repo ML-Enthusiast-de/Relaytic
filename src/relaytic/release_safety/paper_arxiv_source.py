@@ -623,22 +623,20 @@ def _render_latex_table(lines: list[str]) -> list[str]:
     col_width = max(0.11, min(0.32, 0.86 / max(1, col_count)))
     spec = " ".join([f">{{\\raggedright\\arraybackslash}}p{{{col_width:.2f}\\linewidth}}" for _ in range(col_count)])
     rendered = [
-        r"\begingroup",
+        r"\begin{center}",
+        r"\setlength{\fboxsep}{8pt}",
+        r"\fbox{\begin{minipage}{0.96\linewidth}",
         r"\small",
         r"\setlength{\tabcolsep}{3pt}",
-        r"\begin{longtable}{" + spec + "}",
+        r"\renewcommand{\arraystretch}{1.14}",
+        r"\begin{tabular}{" + spec + "}",
         r"\toprule",
         " & ".join(_latex_inline(cell) for cell in rows[0]) + r" \\",
         r"\midrule",
-        r"\endfirsthead",
-        r"\toprule",
-        " & ".join(_latex_inline(cell) for cell in rows[0]) + r" \\",
-        r"\midrule",
-        r"\endhead",
     ]
     for row in rows[1:]:
         rendered.append(" & ".join(_latex_inline(cell) for cell in row) + r" \\")
-    rendered.extend([r"\bottomrule", r"\end{longtable}", r"\endgroup", ""])
+    rendered.extend([r"\bottomrule", r"\end{tabular}", r"\end{minipage}}", r"\end{center}", ""])
     return rendered
 
 
@@ -1091,6 +1089,7 @@ def _render_release_candidate_checklist(*, manifest: dict[str, Any], package_aud
             "- [ ] Replace placeholder author, affiliation, and contact metadata in `docs/paper/arxiv_src/main.tex`.",
             "- [ ] Run `pdflatex`, `bibtex`, `pdflatex`, and `pdflatex` from `docs/paper/arxiv_src/`; inspect the generated PDF.",
             "- [ ] Include generated bibliography output if the final arXiv upload uses BibTeX rather than an inline bibliography.",
+            "- [ ] Confirm the AI-assistance disclosure accurately describes any LLM drafting, editing, or code-review help.",
             "- [ ] Rerun `relaytic release-safety paper-arxiv-source --format json` after metadata edits.",
             "- [ ] Rerun `relaytic scan-git-safety` from the tag target.",
             "- [ ] Confirm `git status --short` is empty before creating `relaytic-aml-paper-p14-source-rc`.",

@@ -1,10 +1,10 @@
 {
   "allowed_public_claims": [
     "Relaytic-AML is a local-first, claim-gated evaluation environment for temporal, graph, and operational financial-crime ML.",
-    "The current paper pack generates tables, figures, claim lint, and release manifests from local artifacts.",
+    "The current paper pack presents Relaytic as a local-first AML evaluation lab with local artifacts, specialist roles, redacted context export, and explicit claim boundaries.",
     "PaySim and Elliptic rows may be described as supporting evidence only under their documented proxy and graph-feature boundaries.",
     "Elliptic2 may be described as modern context and limitation evidence only, not as a Relaytic performance contribution.",
-    "P12 clean-clone and paper-smoke evidence passed before P13 release wording was generated."
+    "The public source package and paper assets may be regenerated from the repository commands documented in the paper."
   ],
   "blocked_public_claims": [
     "hard real-world AML superiority",
@@ -29,7 +29,7 @@
     },
     {
       "check_id": "readme_release_section_present",
-      "message": "README must expose the P13 claim-safe release status and point to the paper artifacts.",
+      "message": "README must expose the Relaytic-AML paper status and point to the paper artifacts.",
       "passed": true,
       "source_artifact": "README.md"
     },
