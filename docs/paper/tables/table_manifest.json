@@ -6,7 +6,7 @@
   "tables": [
     {
       "artifact_ref": "docs/paper/tables/table_1_evidence_summary.md",
-      "byte_count": 1795,
+      "byte_count": 1834,
       "paper_claim_role": "claim_safe_supporting_evidence_only",
       "source_refs": [
         "docs/reports/paper_result_table_final.json",
@@ -21,7 +21,7 @@
     },
     {
       "artifact_ref": "docs/paper/tables/table_2_claim_gate_matrix.md",
-      "byte_count": 1566,
+      "byte_count": 943,
       "paper_claim_role": "claim_safe_supporting_evidence_only",
       "source_refs": [
         "docs/reports/paper_result_table_final.json",

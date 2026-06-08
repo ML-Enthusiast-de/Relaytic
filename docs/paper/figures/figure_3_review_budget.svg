@@ -1,19 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="340" viewBox="0 0 760 340" role="img"><rect width="100%" height="100%" fill="#ffffff"/>
-<text x="30" y="28" font-size="18" font-weight="700">Figure 3. Review-budget precision and recall</text>
-<line x1="70" y1="271" x2="720" y2="271" stroke="#293241" stroke-width="1.2"/>
-<line x1="70" y1="56" x2="70" y2="271" stroke="#293241" stroke-width="1.2"/>
-<text x="20" y="74" font-size="12">score</text>
-<rect x="104.2" y="119.8" width="94" height="151.2" fill="#2a9d8f"/>
-<text x="151.2" y="113.8" text-anchor="middle" font-size="11">0.703336</text>
-<text x="151.2" y="299" text-anchor="middle" font-size="10">PaySim precision</text>
-<rect x="266.8" y="169.6" width="94" height="101.4" fill="#80b918"/>
-<text x="313.8" y="163.6" text-anchor="middle" font-size="11">0.471584</text>
-<text x="313.8" y="299" text-anchor="middle" font-size="10">PaySim recall</text>
-<rect x="429.2" y="56.0" width="94" height="215.0" fill="#457b9d"/>
-<text x="476.2" y="50.0" text-anchor="middle" font-size="11">1</text>
-<text x="476.2" y="299" text-anchor="middle" font-size="10">Elliptic precision</text>
-<rect x="591.8" y="258.8" width="94" height="12.2" fill="#f4a261"/>
-<text x="638.8" y="252.8" text-anchor="middle" font-size="11">0.056604</text>
-<text x="638.8" y="299" text-anchor="middle" font-size="10">Elliptic recall</text>
-<text x="30" y="320" font-size="11" fill="#5b6472">Generated from audited P10 metric cells; claim posture remains supporting-only.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="370" viewBox="0 0 880 370" role="img"><rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="28" font-size="18" font-weight="700">Review-budget precision and recall under supporting-only posture</text>
+<line x1="76" y1="277" x2="834" y2="277" stroke="#293241" stroke-width="1.2"/>
+<line x1="76" y1="62" x2="76" y2="277" stroke="#293241" stroke-width="1.2"/>
+<text x="20" y="80" font-size="12">score</text>
+<line x1="76" y1="62" x2="834" y2="62" stroke="#d7dde8" stroke-width="0.8"/>
+<line x1="76" y1="169.5" x2="834" y2="169.5" stroke="#e4e8f0" stroke-width="0.8"/>
+<rect x="116.2" y="125.8" width="109" height="151.2" fill="#2a9d8f"/>
+<text x="170.8" y="119.8" text-anchor="middle" font-size="11">0.703336</text>
+<text x="170.8" y="302.0" text-anchor="middle" font-size="10" fill="#293241">PaySim</text>
+<text x="170.8" y="314.0" text-anchor="middle" font-size="10" fill="#293241">precision</text>
+<rect x="305.8" y="175.6" width="109" height="101.4" fill="#80b918"/>
+<text x="360.2" y="169.6" text-anchor="middle" font-size="11">0.471584</text>
+<text x="360.2" y="302.0" text-anchor="middle" font-size="10" fill="#293241">PaySim</text>
+<text x="360.2" y="314.0" text-anchor="middle" font-size="10" fill="#293241">recall</text>
+<rect x="495.2" y="62.0" width="109" height="215.0" fill="#457b9d"/>
+<text x="549.8" y="56.0" text-anchor="middle" font-size="11">1</text>
+<text x="549.8" y="302.0" text-anchor="middle" font-size="10" fill="#293241">Elliptic</text>
+<text x="549.8" y="314.0" text-anchor="middle" font-size="10" fill="#293241">precision</text>
+<rect x="684.8" y="264.8" width="109" height="12.2" fill="#f4a261"/>
+<text x="739.2" y="258.8" text-anchor="middle" font-size="11">0.056604</text>
+<text x="739.2" y="302.0" text-anchor="middle" font-size="10" fill="#293241">Elliptic</text>
+<text x="739.2" y="314.0" text-anchor="middle" font-size="10" fill="#293241">recall</text>
+<text x="30" y="350" font-size="11" fill="#5b6472">Generated from audited P10 metric cells; claim posture remains supporting-only.</text>
 </svg>

@@ -41,7 +41,7 @@
         "docs/reports/paper_graph_model_shadow_scorecard.json"
       ],
       "limitation_id": "LIM-02-elliptic-supporting-graph",
-      "limitation_text": "The Elliptic row is a supporting temporal graph-feature result. It does not prove graph-neural or graph-SOTA superiority.",
+      "limitation_text": "The Elliptic row is a supporting temporal graph-feature result. It does not prove graph-neural or graph benchmark superiority.",
       "paper_section": "Limitations",
       "required_repair": "Run repeated-seed graph baselines and promote a graph-native candidate only if it beats strong feature baselines under the same split."
     },
@@ -81,7 +81,7 @@
       "limitation_id": "LIM-03-elliptic2-context-only",
       "limitation_text": "Elliptic2 is retained as modern context and limitation evidence only; it is not a Relaytic performance contribution in this paper.",
       "paper_section": "Limitations",
-      "required_repair": "Reproduce a faithful RevClassify parity run or define a new leakage-resistant subgraph protocol with viable cohort proof."
+      "required_repair": "Reproduce the RevClassify reference setup faithfully or define a new leakage-resistant subgraph protocol with viable cohort proof."
     },
     {
       "affected_claims": [
@@ -127,7 +127,7 @@
   "next_slice": "Paper Track P12 - external dry run and clean-clone proof",
   "paper_must_state": [
     "No hard real-world AML superiority claim is allowed in the first draft.",
-    "No SOTA, RevClassify parity, graph-neural superiority, or business-value headline claim is allowed.",
+    "No SOTA, claimed equivalence to RevClassify, graph-neural superiority, or business-value headline claim is allowed.",
     "PaySim and Elliptic numbers may be used as supporting evidence only.",
     "Elliptic2 numbers may be used only as modern context and limitation evidence.",
     "P12 clean-clone proof remains required before public release."

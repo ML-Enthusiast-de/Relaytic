@@ -25,4 +25,4 @@
 
 ## Claim boundary
 
-The source package remains an evaluation-environment release candidate. It still must not claim hard AML superiority, SOTA or leaderboard-winning performance, RevClassify parity, graph-neural superiority, production readiness, or hard business value.
+The source package remains an evaluation-environment release candidate. It still must not claim hard AML superiority, SOTA or leaderboard-winning performance, claimed equivalence to RevClassify, graph-neural superiority, production readiness, or hard business value.

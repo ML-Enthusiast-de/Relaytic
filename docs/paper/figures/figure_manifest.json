@@ -11,7 +11,7 @@
         "docs/reports/paper_publishability_matrix.json"
       ],
       "source_type": "schematic_explicit",
-      "title": "Relaytic-AML claim-gated evidence flow"
+      "title": "Local-first Relaytic agent architecture"
     },
     {
       "figure_id": "supporting_pr_auc",
@@ -43,7 +43,7 @@
         "docs/reports/paper_publishability_matrix.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Publishability gate posture by track"
+      "title": "Claim boundaries and future unlocks"
     }
   ],
   "schema_version": "relaytic.paper_draft.v1",

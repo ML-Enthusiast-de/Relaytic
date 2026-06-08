@@ -429,6 +429,7 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\usepackage[hidelinks]{hyperref}",
         r"\setlength{\parskip}{0.65em}",
         r"\setlength{\parindent}{0pt}",
+        r"\emergencystretch=3em",
         "",
         f"\\title{{{_latex_inline(title)}}}",
         r"\author{Author Name\\Affiliation\\\texttt{contact@example.com}}",
@@ -499,6 +500,11 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
                 in_code = False
             else:
                 out.append(line)
+            continue
+
+        if stripped.startswith("<!--") and stripped.endswith("-->"):
+            if table_buffer:
+                flush_table()
             continue
 
         if table_buffer and (not stripped.startswith("|") or stripped == "|"):
@@ -614,9 +620,12 @@ def _render_latex_table(lines: list[str]) -> list[str]:
     for row in rows:
         while len(row) < col_count:
             row.append("")
-    col_width = max(0.12, min(0.34, 0.92 / max(1, col_count)))
+    col_width = max(0.11, min(0.32, 0.86 / max(1, col_count)))
     spec = " ".join([f">{{\\raggedright\\arraybackslash}}p{{{col_width:.2f}\\linewidth}}" for _ in range(col_count)])
     rendered = [
+        r"\begingroup",
+        r"\small",
+        r"\setlength{\tabcolsep}{3pt}",
         r"\begin{longtable}{" + spec + "}",
         r"\toprule",
         " & ".join(_latex_inline(cell) for cell in rows[0]) + r" \\",
@@ -629,7 +638,7 @@ def _render_latex_table(lines: list[str]) -> list[str]:
     ]
     for row in rows[1:]:
         rendered.append(" & ".join(_latex_inline(cell) for cell in row) + r" \\")
-    rendered.extend([r"\bottomrule", r"\end{longtable}", ""])
+    rendered.extend([r"\bottomrule", r"\end{longtable}", r"\endgroup", ""])
     return rendered
 
 
@@ -666,7 +675,7 @@ def _convert_markdown_citations(text: str) -> str:
 
 
 def _convert_inline_code(text: str) -> str:
-    return re.sub(r"`([^`]+)`", lambda match: r"\texttt{" + match.group(1) + "}", text)
+    return re.sub(r"`([^`]+)`", lambda match: r"\nolinkurl{" + match.group(1) + "}", text)
 
 
 def _convert_bold(text: str) -> str:
@@ -683,6 +692,7 @@ def _escape_latex(text: str) -> str:
 
     text = re.sub(r"\\cite\{[^}]+\}", lambda match: hold("cite", match.group(0)), text)
     text = re.sub(r"\\texttt\{[^}]*\}", lambda match: hold("texttt", match.group(0)), text)
+    text = re.sub(r"\\nolinkurl\{[^}]*\}", lambda match: hold("nolinkurl", match.group(0)), text)
     text = re.sub(r"\\textbf\{[^}]*\}", lambda match: hold("textbf", match.group(0)), text)
     replacements = {
         "\\": r"\textbackslash{}",
@@ -698,7 +708,10 @@ def _escape_latex(text: str) -> str:
     }
     escaped = "".join(replacements.get(char, char) for char in text)
     for key, value in placeholders.items():
-        if value.startswith(r"\texttt{") or value.startswith(r"\textbf{"):
+        if value.startswith(r"\nolinkurl{"):
+            inner = value[value.index("{") + 1 : -1]
+            value = r"\nolinkurl{" + inner.replace("{", "").replace("}", "") + "}"
+        elif value.startswith(r"\texttt{") or value.startswith(r"\textbf{"):
             inner = value[value.index("{") + 1 : -1]
             value = value[: value.index("{") + 1] + _escape_latex(inner) + "}"
         escaped = escaped.replace(key, value)
@@ -1084,7 +1097,7 @@ def _render_release_candidate_checklist(*, manifest: dict[str, Any], package_aud
             "",
             "## Claim boundary",
             "",
-            "The source package remains an evaluation-environment release candidate. It still must not claim hard AML superiority, SOTA or leaderboard-winning performance, RevClassify parity, graph-neural superiority, production readiness, or hard business value.",
+            "The source package remains an evaluation-environment release candidate. It still must not claim hard AML superiority, SOTA or leaderboard-winning performance, claimed equivalence to RevClassify, graph-neural superiority, production readiness, or hard business value.",
             "",
         ]
     )

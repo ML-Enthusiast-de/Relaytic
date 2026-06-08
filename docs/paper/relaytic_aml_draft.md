@@ -40,13 +40,13 @@ The method has four claim-control rules:
 3. Numeric paper cells must cite machine-readable provenance rather than handwritten notes.
 4. Blocked tracks stay visible as limitations instead of being replaced by easier evidence.
 
-![Relaytic-AML claim-gated evidence flow](figures/figure_1_claim_gate_flow.svg)
+![Local-first Relaytic agent architecture](figures/figure_1_claim_gate_flow.svg)
 
 ![Supporting PR-AUC rows with claim posture](figures/figure_2_supporting_pr_auc.svg)
 
 ![Review-budget precision and recall](figures/figure_3_review_budget.svg)
 
-![Publishability gate posture by track](figures/figure_4_publishability_matrix.svg)
+![Claim boundaries and future unlocks](figures/figure_4_publishability_matrix.svg)
 
 ## Benchmarks
 
@@ -81,8 +81,8 @@ The PaySim competitive result improved over the PaySim baseline under the record
 ## Limitations
 
 - **LIM-01-paysim-proxy**: PaySim is synthetic mobile-money fraud evidence. It is useful for a temporal proxy workflow, but it is not real-bank AML superiority evidence. Required repair: Add a real financial-crime holdout or partner-approved private evaluation before making hard AML claims.
-- **LIM-02-elliptic-supporting-graph**: The Elliptic row is a supporting temporal graph-feature result. It does not prove graph-neural or graph-SOTA superiority. Required repair: Run repeated-seed graph baselines and promote a graph-native candidate only if it beats strong feature baselines under the same split.
-- **LIM-03-elliptic2-context-only**: Elliptic2 is retained as modern context and limitation evidence only; it is not a Relaytic performance contribution in this paper. Required repair: Reproduce a faithful RevClassify parity run or define a new leakage-resistant subgraph protocol with viable cohort proof.
+- **LIM-02-elliptic-supporting-graph**: The Elliptic row is a supporting temporal graph-feature result. It does not prove graph-neural or graph benchmark superiority. Required repair: Run repeated-seed graph baselines and promote a graph-native candidate only if it beats strong feature baselines under the same split.
+- **LIM-03-elliptic2-context-only**: Elliptic2 is retained as modern context and limitation evidence only; it is not a Relaytic performance contribution in this paper. Required repair: Reproduce the RevClassify reference setup faithfully or define a new leakage-resistant subgraph protocol with viable cohort proof.
 - **LIM-04-operational-assumptions**: Operational review-budget rows are supporting estimates because aggregate case packets, same-queue incumbent comparisons, and analyst-hour assumptions are not fully frozen. Required repair: Freeze case-packet completeness and compare against the same review queue or an approved incumbent baseline.
 - **LIM-05-clean-clone-pending**: The first draft is generated from committed evidence, but P12 must still prove clean-clone install, paper-smoke reproduction, leak scan, and claim lint. Required repair: Run Paper Track P12 from a clean clone and record the external dry-run report before arXiv release.
 

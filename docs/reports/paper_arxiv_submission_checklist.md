@@ -22,7 +22,7 @@ P13 permits only a claim-safe evaluation-environment release.
 ## Public Claim Discipline
 
 - [ ] Public posts use `docs/reports/paper_attention_pack.md` wording only.
-- [ ] Do not add hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, or hard business-value claims.
+- [ ] Do not add hard AML, headline, SOTA, claimed-equivalence-to-RevClassify, graph-neural superiority, or hard business-value claims.
 - [ ] Confirm public wording status is `claim_safe_public_wording_allowed`.
 
 ## Suggested arXiv Metadata
@@ -35,7 +35,7 @@ P13 permits only a claim-safe evaluation-environment release.
 ## Tag And Release
 
 - [ ] Confirm `git status --short` is empty at the final tag target.
-- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `470e726d5e9bfe74b298e661f16212dac8599eab`; rerun the manifest after final edits if the source evidence changes.
+- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `21c7229cb53a2a6dd1ae2ea6c234802362984503`; rerun the manifest after final edits if the source evidence changes.
 - [ ] Create tag after the final PDF/source matches the manifest: `git tag -a relaytic-aml-paper-p13-claim-safe -m "Relaytic-AML claim-safe paper release"`.
 - [ ] Attach or link the paper PDF, release manifest, public claims JSON, and benchmark artifacts.
 
