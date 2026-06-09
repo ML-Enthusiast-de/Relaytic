@@ -300,19 +300,19 @@ def _render_paper_draft(
         [
             f"# {title}",
             "",
-            "Draft status: Paper Track P11 claim-linted draft generated from P10 artifacts.",
+            "Source-draft status: generated evidence draft used by the release pipeline. For reader-facing review, use `docs/paper/relaytic_aml_arxiv_draft.md`.",
             "",
             "## Abstract",
             "",
             "Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC "
             f"{_metric_value(key, 'paysim_p6a_competitive_selected.test_pr_auc')} and the Elliptic graph-feature row reports test PR-AUC "
-            f"{_metric_value(key, 'elliptic_p7_selected_graph_feature_baseline.test_pr_auc')}; both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates remain unresolved. The contribution is an auditable environment for claim-safe AML evaluation, not a SOTA detector claim.",
+            f"{_metric_value(key, 'elliptic_p7_selected_graph_feature_baseline.test_pr_auc')}; both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates remain unresolved. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.",
             "",
             "## Introduction",
             "",
             "AML and fraud detection systems are rare-event decision systems, not only classifiers. A model can look strong under a single metric while still being unusable if the split leaks future information, if graph evidence is flattened into an overbroad claim, if review capacity is ignored, or if paper text drifts beyond what the benchmark actually proves. Relaytic-AML treats those failure modes as first-class evaluation objects.",
             "",
-            "This draft argues for a claim-gated evaluation environment. Each numeric cell in the result table is tied to a command, dataset, split, run-directory reference, artifact field, budget tier, leakage posture, and claim state. Public claims are allowed only when the evidence pack and publishability gates agree. The current package allows supporting evidence claims and blocks hard AML, headline performance, SOTA, and hard business-value claims.",
+            "This source draft argues for a claim-gated evaluation environment. Each numeric cell in the result table is tied to a command, dataset, split, run-directory reference, artifact field, budget tier, leakage posture, and claim state. Public claims are allowed only when the evidence pack and publishability gates agree. The current package allows supporting evidence claims and blocks hard AML, headline performance, and hard business-value claims.",
             "",
             "The paper therefore asks whether a local artifact system can make AML evaluation more credible by keeping model score, temporal correctness, graph provenance, operational review utility, and public claim boundaries inspectable together.",
             "",
@@ -345,7 +345,7 @@ def _render_paper_draft(
             "",
             results_table,
             "",
-            "The PaySim competitive result improved over the PaySim baseline under the recorded temporal proxy contract, but PaySim remains synthetic. The Elliptic graph-feature result is credible supporting graph evidence, but it does not promote a graph-neural claim. The Elliptic2 context row shows a strong reproduced local candidate relative to many ordinary baselines, yet it remains below the recorded RevClassifyDS reference and cannot support a parity or SOTA claim in this draft.",
+            "The PaySim competitive result improved over the PaySim baseline under the recorded temporal proxy contract, but PaySim remains synthetic. The Elliptic graph-feature result is credible supporting graph evidence, but it does not promote a graph-neural claim. The Elliptic2 context row shows a strong reproduced local candidate relative to many ordinary baselines, yet it remains below the recorded RevClassifyDS reference and cannot support a parity or headline detector claim in this source draft.",
             "",
             "## Limitations",
             "",
@@ -596,48 +596,48 @@ def _render_limitations_section(limitations: dict[str, Any]) -> str:
 
 def _claim_gate_flow_svg() -> str:
     agent_boxes = [
-        ("Operator /\nmandate", 60, "#edf6f9"),
-        ("Guide +\nassist", 230, "#edf6f9"),
-        ("Scout +\ntask contracts", 400, "#f7f4ea"),
-        ("Scientist +\nchallengers", 570, "#f7f4ea"),
-        ("Builder +\nsearch", 740, "#eef4ff"),
-        ("Claim/release\ngovernors", 910, "#fdeeee"),
+        ("Operator", 55, "#edf6f9"),
+        ("Guide", 205, "#edf6f9"),
+        ("Scout", 355, "#f7f4ea"),
+        ("Scientist", 505, "#f7f4ea"),
+        ("Builder", 655, "#eef4ff"),
+        ("Claim Gate", 805, "#fdeeee"),
     ]
     artifact_boxes = [
-        ("Policy +\npermissions", 60, "#ffffff"),
-        ("Status +\ncontext packs", 230, "#ffffff"),
-        ("Source/split\ncontracts", 400, "#ffffff"),
-        ("Scorecards +\nablations", 570, "#ffffff"),
-        ("Run/model\nartifacts", 740, "#ffffff"),
-        ("Claim boundary\n+ source audit", 910, "#ffffff"),
+        ("Mandate", 55, "#ffffff"),
+        ("Run status", 205, "#ffffff"),
+        ("Split contract", 355, "#ffffff"),
+        ("Ablations", 505, "#ffffff"),
+        ("Model artifact", 655, "#ffffff"),
+        ("Public claims", 805, "#ffffff"),
     ]
     parts = [
-        _svg_header(1120, 420),
-        '<text x="30" y="30" font-size="18" font-weight="700">Local-first Relaytic agent architecture</text>',
-        '<text x="30" y="52" font-size="12" fill="#5b6472">The workspace is the authority: specialist roles produce local artifacts, optional LLM help is redacted, and claim gates fail closed.</text>',
-        '<rect x="30" y="76" width="1060" height="294" rx="8" fill="#fbfcfe" stroke="#8d99ae" stroke-width="1.2"/>',
-        '<text x="50" y="102" font-size="13" font-weight="700" fill="#293241">Controlled local workspace: files, traces, models, policies, evidence, and release state stay under the user boundary.</text>',
-        '<line x1="50" y1="118" x2="1070" y2="118" stroke="#d7dde8" stroke-width="1"/>',
+        _svg_header(980, 520),
+        '<text x="30" y="38" font-size="31" font-weight="700">Local-first Relaytic agent architecture</text>',
+        '<rect x="30" y="65" width="920" height="400" rx="10" fill="#fbfcfe" stroke="#8d99ae" stroke-width="1.7"/>',
+        '<text x="55" y="102" font-size="21" font-weight="700" fill="#293241">Workspace is the authority</text>',
+        '<text x="55" y="132" font-size="19" fill="#5b6472">Specialist roles create local artifacts. LLM help is optional, redacted, and never the source of truth.</text>',
+        '<line x1="55" y1="154" x2="925" y2="154" stroke="#d7dde8" stroke-width="1.4"/>',
     ]
     for label, x, fill in agent_boxes:
-        parts.append(f'<rect x="{x}" y="142" width="145" height="70" rx="6" fill="{fill}" stroke="#293241" stroke-width="1.1"/>')
-        parts.extend(_svg_text_lines(label, x + 72, 171, font_size=12, anchor="middle", line_height=15))
+        parts.append(f'<rect x="{x}" y="180" width="120" height="78" rx="8" fill="{fill}" stroke="#293241" stroke-width="1.5"/>')
+        parts.extend(_svg_text_lines(label, x + 60, 227, font_size=22, anchor="middle", line_height=24))
     for label, x, fill in artifact_boxes:
-        parts.append(f'<rect x="{x}" y="258" width="145" height="66" rx="6" fill="{fill}" stroke="#8d99ae" stroke-width="1.0"/>')
-        parts.extend(_svg_text_lines(label, x + 72, 284, font_size=11, anchor="middle", line_height=14))
-    for x in [132, 302, 472, 642, 812, 982]:
-        parts.append(f'<line x1="{x}" y1="212" x2="{x}" y2="258" stroke="#293241" stroke-width="1.2"/>')
-        parts.append(f'<polygon points="{x},258 {x - 5},250 {x + 5},250" fill="#293241"/>')
-    for x1, x2 in [(205, 230), (375, 400), (545, 570), (715, 740), (885, 910)]:
-        parts.append(f'<line x1="{x1}" y1="177" x2="{x2}" y2="177" stroke="#293241" stroke-width="1.2"/>')
-        parts.append(f'<polygon points="{x2},177 {x2 - 8},172 {x2 - 8},182" fill="#293241"/>')
-    parts.append('<rect x="60" y="342" width="380" height="18" rx="4" fill="#eef4ff" stroke="#8d99ae" stroke-width="0.8"/>')
-    parts.append('<text x="250" y="355" text-anchor="middle" font-size="10" fill="#293241">Artifact graph is canonical: JSON, Markdown, TeX, figures, model files, traces</text>')
-    parts.append('<rect x="484" y="342" width="280" height="18" rx="4" fill="#edf6f9" stroke="#8d99ae" stroke-width="0.8"/>')
-    parts.append('<text x="624" y="355" text-anchor="middle" font-size="10" fill="#293241">External handoff is rowless/redacted by default</text>')
-    parts.append('<rect x="808" y="342" width="232" height="18" rx="4" fill="#fdeeee" stroke="#8d99ae" stroke-width="0.8"/>')
-    parts.append('<text x="924" y="355" text-anchor="middle" font-size="10" fill="#293241">Public claims fail closed until gates pass</text>')
-    parts.append('<text x="30" y="398" font-size="12" fill="#5b6472">Benchmarks exercise this architecture; they do not replace the local-first role, artifact, and claim-control thesis.</text>')
+        parts.append(f'<rect x="{x}" y="298" width="120" height="68" rx="8" fill="{fill}" stroke="#8d99ae" stroke-width="1.25"/>')
+        parts.extend(_svg_text_lines(label, x + 60, 339, font_size=18, anchor="middle", line_height=20))
+    for x in [115, 265, 415, 565, 715, 865]:
+        parts.append(f'<line x1="{x}" y1="258" x2="{x}" y2="298" stroke="#293241" stroke-width="1.5"/>')
+        parts.append(f'<polygon points="{x},298 {x - 7},287 {x + 7},287" fill="#293241"/>')
+    for x1, x2 in [(175, 205), (325, 355), (475, 505), (625, 655), (775, 805)]:
+        parts.append(f'<line x1="{x1}" y1="219" x2="{x2}" y2="219" stroke="#293241" stroke-width="1.5"/>')
+        parts.append(f'<polygon points="{x2},219 {x2 - 10},212 {x2 - 10},226" fill="#293241"/>')
+    parts.append('<rect x="55" y="398" width="280" height="36" rx="6" fill="#eef4ff" stroke="#8d99ae" stroke-width="1.0"/>')
+    parts.append('<text x="195" y="422" text-anchor="middle" font-size="17" fill="#293241">Canonical artifact graph</text>')
+    parts.append('<rect x="350" y="398" width="280" height="36" rx="6" fill="#edf6f9" stroke="#8d99ae" stroke-width="1.0"/>')
+    parts.append('<text x="490" y="422" text-anchor="middle" font-size="17" fill="#293241">Rowless external handoff</text>')
+    parts.append('<rect x="645" y="398" width="280" height="36" rx="6" fill="#fdeeee" stroke="#8d99ae" stroke-width="1.0"/>')
+    parts.append('<text x="785" y="422" text-anchor="middle" font-size="17" fill="#293241">Claim gates fail closed</text>')
+    parts.append('<text x="30" y="498" font-size="18" fill="#5b6472">Benchmarks exercise this architecture; they do not replace the local-first artifact and claim-control thesis.</text>')
     parts.append("</svg>")
     return "\n".join(parts)
 
@@ -655,7 +655,7 @@ def _supporting_pr_auc_svg(cells: list[dict[str, Any]]) -> str:
         ylabel="PR-AUC",
         values=values,
         width=940,
-        height=390,
+        height=430,
     )
 
 
@@ -671,7 +671,7 @@ def _review_budget_svg(cells: list[dict[str, Any]]) -> str:
         ylabel="score",
         values=values,
         width=880,
-        height=370,
+        height=410,
     )
 
 
@@ -684,28 +684,28 @@ def _publishability_matrix_svg(publishability: dict[str, Any]) -> str:
         ("Operational", "review-budget\nsupport", "hard business\nvalue", "same-queue\nincumbent", "supporting"),
     ]
     width = 1040
-    row_h = 62
-    height = 128 + row_h * len(rows)
+    row_h = 82
+    height = 150 + row_h * len(rows)
     parts = [
         _svg_header(width, height),
-        '<text x="30" y="30" font-size="18" font-weight="700">Claim boundaries and future unlocks</text>',
-        '<text x="30" y="54" font-size="12" fill="#5b6472">Every track remains useful, but stronger claims require specific evidence upgrades.</text>',
-        '<text x="40" y="94" font-size="12" font-weight="700">Track</text>',
-        '<text x="210" y="94" font-size="12" font-weight="700">Current role</text>',
-        '<text x="430" y="94" font-size="12" font-weight="700">Blocked claim</text>',
-        '<text x="650" y="94" font-size="12" font-weight="700">Future unlock</text>',
-        '<text x="860" y="94" font-size="12" font-weight="700">Current posture</text>',
+        '<text x="30" y="36" font-size="26" font-weight="700">Claim boundaries and future unlocks</text>',
+        '<text x="30" y="66" font-size="17" fill="#5b6472">Every track remains useful, but stronger claims require specific evidence upgrades.</text>',
+        '<text x="40" y="112" font-size="16" font-weight="700">Track</text>',
+        '<text x="210" y="112" font-size="16" font-weight="700">Current role</text>',
+        '<text x="430" y="112" font-size="16" font-weight="700">Blocked claim</text>',
+        '<text x="650" y="112" font-size="16" font-weight="700">Future unlock</text>',
+        '<text x="860" y="112" font-size="16" font-weight="700">Current posture</text>',
     ]
     for index, (track, role, blocked, unlock, posture) in enumerate(rows):
-        y = 112 + index * row_h
+        y = 136 + index * row_h
         fill = "#fbfcfe" if index % 2 == 0 else "#f4f7fb"
         parts.append(f'<rect x="30" y="{y - 20}" width="980" height="{row_h - 8}" rx="4" fill="{fill}" stroke="#d7dde8" stroke-width="0.8"/>')
-        parts.append(f'<text x="42" y="{y + 14}" font-size="13" font-weight="700">{_xml_escape(track)}</text>')
-        parts.extend(_svg_text_lines(role, 210, y + 2, font_size=12, anchor="start", line_height=15))
-        parts.extend(_svg_text_lines(blocked, 430, y + 2, font_size=12, anchor="start", line_height=15, fill="#9b2226"))
-        parts.extend(_svg_text_lines(unlock, 650, y + 2, font_size=12, anchor="start", line_height=15))
-        parts.append(f'<rect x="855" y="{y - 5}" width="124" height="28" rx="4" fill="#2a9d8f"/>')
-        parts.append(f'<text x="917" y="{y + 13}" text-anchor="middle" font-size="11" fill="#ffffff">{_xml_escape(posture)}</text>')
+        parts.append(f'<text x="42" y="{y + 24}" font-size="17" font-weight="700">{_xml_escape(track)}</text>')
+        parts.extend(_svg_text_lines(role, 210, y + 8, font_size=16, anchor="start", line_height=20))
+        parts.extend(_svg_text_lines(blocked, 430, y + 8, font_size=16, anchor="start", line_height=20, fill="#9b2226"))
+        parts.extend(_svg_text_lines(unlock, 650, y + 8, font_size=16, anchor="start", line_height=20))
+        parts.append(f'<rect x="850" y="{y + 3}" width="140" height="36" rx="5" fill="#2a9d8f"/>')
+        parts.append(f'<text x="920" y="{y + 26}" text-anchor="middle" font-size="14" fill="#ffffff">{_xml_escape(posture)}</text>')
     parts.append("</svg>")
     return "\n".join(parts)
 
@@ -719,19 +719,19 @@ def _bar_chart_svg(
     height: int,
 ) -> str:
     plot_x = 76
-    plot_y = 62
+    plot_y = 74
     plot_w = width - 122
-    plot_h = height - 155
+    plot_h = height - 178
     clean_values = [(label, float(value) if isinstance(value, (int, float)) else 0.0, color) for label, value, color in values]
     max_value = max([1.0] + [value for _, value, _ in clean_values])
     bar_w = max(38, int(plot_w / max(1, len(clean_values)) * 0.58))
     gap = (plot_w - bar_w * len(clean_values)) / max(1, len(clean_values))
     parts = [
         _svg_header(width, height),
-        f'<text x="30" y="28" font-size="18" font-weight="700">{_xml_escape(title)}</text>',
+        f'<text x="30" y="34" font-size="24" font-weight="700">{_xml_escape(title)}</text>',
         f'<line x1="{plot_x}" y1="{plot_y + plot_h}" x2="{plot_x + plot_w}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
         f'<line x1="{plot_x}" y1="{plot_y}" x2="{plot_x}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
-        f'<text x="20" y="{plot_y + 18}" font-size="12">{_xml_escape(ylabel)}</text>',
+        f'<text x="20" y="{plot_y + 20}" font-size="16">{_xml_escape(ylabel)}</text>',
         f'<line x1="{plot_x}" y1="{plot_y}" x2="{plot_x + plot_w}" y2="{plot_y}" stroke="#d7dde8" stroke-width="0.8"/>',
         f'<line x1="{plot_x}" y1="{plot_y + plot_h / 2:.1f}" x2="{plot_x + plot_w}" y2="{plot_y + plot_h / 2:.1f}" stroke="#e4e8f0" stroke-width="0.8"/>',
     ]
@@ -740,9 +740,9 @@ def _bar_chart_svg(
         bar_h = 0 if max_value == 0 else (value / max_value) * plot_h
         y = plot_y + plot_h - bar_h
         parts.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{bar_w}" height="{bar_h:.1f}" fill="{color}"/>')
-        parts.append(f'<text x="{x + bar_w / 2:.1f}" y="{y - 6:.1f}" text-anchor="middle" font-size="11">{_format_metric(value)}</text>')
-        parts.extend(_svg_text_lines(label.replace(" ", "\n", 1), x + bar_w / 2, plot_y + plot_h + 25, font_size=10, anchor="middle", line_height=12))
-    parts.append('<text x="30" y="{0}" font-size="11" fill="#5b6472">Values come from fixed local evidence cells; the rows are supporting evidence, not headline claims.</text>'.format(height - 20))
+        parts.append(f'<text x="{x + bar_w / 2:.1f}" y="{y - 8:.1f}" text-anchor="middle" font-size="16">{_format_metric(value)}</text>')
+        parts.extend(_svg_text_lines(label.replace(" ", "\n", 1), x + bar_w / 2, plot_y + plot_h + 32, font_size=14, anchor="middle", line_height=17))
+    parts.append('<text x="30" y="{0}" font-size="17" fill="#5b6472">Values come from fixed local evidence cells; rows are supporting evidence, not headline claims.</text>'.format(height - 24))
     parts.append("</svg>")
     return "\n".join(parts)
 

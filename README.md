@@ -1,12 +1,12 @@
-# Relaytic - The Relay Inference Lab
+# Relaytic - Local-First AML Evaluation Lab
 
-**Flagship frontier edition:** `Relaytic-AML`
+**Flagship research edition:** `Relaytic-AML`
 
-Relaytic is now being positioned around a sharper wedge: a local-first AML and financial-crime investigation system that turns datasets, operator intent, and optional local semantic help into auditable modeling decisions, structured case evidence, and reusable local tooling.
+Relaytic is a local-first inference lab. The current public story is Relaytic-AML: an AML and financial-crime evaluation environment that turns datasets, operator intent, modeling work, review assumptions, and optional local semantic help into auditable artifacts.
 
 The public product name, package, and CLI stay `Relaytic` / `relaytic` / `relaytic`. `Relaytic-AML` is the flagship product story and roadmap direction, not a package rename.
 
-Relaytic is designed around a deterministic floor, specialist-agent reasoning, explicit policy and mandate handling, and artifact-first execution. The system should be able to continue autonomously when non-critical ambiguity remains, while still making its assumptions inspectable.
+Relaytic-AML is not presented as a production AML detector or a leaderboard-winning model. It is an evidence environment: local data custody, specialist-agent roles, reproducible artifacts, review-queue context, redacted handoff, and claim gates before public or paper-facing statements.
 
 ## Start Here: Relaytic-AML Demo Path
 
@@ -98,7 +98,7 @@ Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard
 
 ## Current Product Baseline
 
-The repository already supports a working early product baseline:
+The repository already supports a working early product baseline. Treat the list below as a capability inventory for reviewers and contributors, not as a paper claim ladder or proof of deployment readiness:
 
 - installable `relaytic` package and CLI
 - one-shot `relaytic run` orchestration for a first usable MVP surface
@@ -169,7 +169,7 @@ The repository already supports a working early product baseline:
 
 Relaytic has a longer internal build history, but the public story is now simpler: Relaytic is the local-first inference lab, and Relaytic-AML is the flagship edition used to prove the architecture in a demanding domain. Detailed build history lives in `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`. The next product work is capability-card and academy-style hardening, while the paper work is human-facing: replace author metadata, inspect the compiled PDF, confirm a clean tag target, and submit only claim-safe wording.
 
-That ordering is deliberate. Relaytic is more interesting as a world-class AML evaluation lab than as a generic capability-evolution project with no sharp domain wedge.
+That ordering is deliberate. Relaytic is more useful when judged as a serious AML evaluation lab than as a generic capability-evolution project with no sharp domain wedge.
 
 The normative product-contract pack that now governs the shipped workspace layer and its future follow-ons lives in [workspace_lifecycle.md](docs/specs/workspace_lifecycle.md), [result_contract_schema.md](docs/specs/result_contract_schema.md), [governed_learnings_schema.md](docs/specs/governed_learnings_schema.md), [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [temporal_benchmark_pack.md](docs/specs/temporal_benchmark_pack.md), [aml_frontier_contract.md](docs/specs/aml_frontier_contract.md), [aml_benchmark_pack.md](docs/specs/aml_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md), [mission_control_flows.md](docs/specs/mission_control_flows.md), [test_and_proof_matrix.md](docs/specs/test_and_proof_matrix.md), and [flagship_demo_pack.md](docs/specs/flagship_demo_pack.md).
 

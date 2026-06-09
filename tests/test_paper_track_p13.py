@@ -51,7 +51,8 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "[@song2024revtrack]" in draft
     assert "[@chen2026transxion]" in draft
     assert "[@ye2026blazingaml]" in draft
-    assert "test PR-AUC 0.638773" in draft
+    assert "PaySim synthetic temporal-fraud PR-AUC 0.638773" in draft
+    assert "[@yang2026skillopt]" in draft
     assert "hard AML superiority" in draft
     assert "SOTA" in "\n".join(public_claims["blocked_public_claims"])
     assert set(tables) == set(PAPER_RELEASE_TABLE_FILENAMES)
@@ -59,6 +60,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "@misc{weber2019elliptic" in references
     assert "@misc{chen2026transxion" in references
     assert "@misc{deprez2025continualaml" in references
+    assert "@misc{yang2026skillopt" in references
     assert any(item["citation_key"] == "song2024revtrack" for item in manifest["source_verification"])
     assert not manifest["failed_checks"]
 

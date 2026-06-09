@@ -54,7 +54,7 @@ def test_paper_track_p14_builds_arxiv_source_release_candidate() -> None:
     assert "Author Name" in main_tex
     assert "\\documentclass" in main_tex
     assert "\\bibliography{references}" in main_tex
-    assert "\\includegraphics[width=0.94\\linewidth]{figures/figure_1_claim_gate_flow.pdf}" in main_tex
+    assert "\\includegraphics[width=\\linewidth]{figures/figure_1_claim_gate_flow.pdf}" in main_tex
     assert ".svg" not in main_tex
     assert "This draft" not in main_tex
     assert "claim-safe Markdown draft" not in main_tex

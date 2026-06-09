@@ -423,6 +423,7 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\usepackage{array}",
         r"\usepackage{booktabs}",
         r"\usepackage{graphicx}",
+        r"\usepackage[font=normalsize,labelfont=bf]{caption}",
         r"\usepackage{longtable}",
         r"\usepackage{natbib}",
         r"\usepackage{xurl}",
@@ -520,7 +521,7 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
                 [
                     r"\begin{figure}[htbp]",
                     r"\centering",
-                    f"\\includegraphics[width=0.94\\linewidth]{{{target}}}",
+                    f"\\includegraphics[width=\\linewidth]{{{target}}}",
                     f"\\caption{{{_latex_inline(caption)}}}",
                     r"\end{figure}",
                     "",

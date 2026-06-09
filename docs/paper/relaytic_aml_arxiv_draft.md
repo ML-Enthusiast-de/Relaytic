@@ -2,7 +2,9 @@
 
 ## Abstract
 
-Financial-crime machine learning is often described through model scores, but real AML work is shaped by data access, temporal validity, graph context, review capacity, and the language people use when they explain a result. Relaytic-AML is a local-first evaluation lab for that setting. The system keeps the workspace as the source of truth, records data posture and modeling decisions as inspectable artifacts, and lets specialist agents help without taking authority away from the local record. Relaytic began as a general local inference-engineering system. In this work it is sharpened into an AML-focused environment where humans and external agents can see what is known, what is blocked, and what should happen next. The benchmark rows are evidence for the environment, not the whole story. The current public pack includes supporting PaySim synthetic temporal-fraud evidence with test PR-AUC 0.638773, supporting Elliptic temporal graph-feature evidence with test PR-AUC 0.668756, and Elliptic2 modern-context evidence at PR-AUC 0.94324 +/- 0.000882, below the recorded RevClassifyDS reference of 0.974. The main contribution is an auditable local architecture that keeps experiments, review assumptions, limitations, and public claims from drifting apart.
+Financial-crime machine learning is usually judged by detector scores, but operational AML work depends on evidence a team can trust: data posture, temporal validity, graph provenance, review capacity, and claim discipline. Relaytic-AML is a local-first evaluation lab for that setting. It keeps the workspace as the source of truth, records data and modeling decisions as inspectable artifacts, and lets specialist agents help without making their prose the authority.
+
+Relaytic began as a general local inference-engineering system. In this work it is sharpened into an AML-focused environment where a human or external agent can ask what is known, what is blocked, and what should happen next. The public evidence includes supporting PaySim synthetic temporal-fraud PR-AUC 0.638773, supporting Elliptic temporal graph-feature PR-AUC 0.668756, and Elliptic2 modern-context PR-AUC 0.94324 +/- 0.000882, below the recorded RevClassifyDS reference of 0.974. The contribution is not a detector-superiority claim. It is a reproducible architecture for keeping experiments, review assumptions, limitations, and public wording aligned.
 
 ## 1. Introduction
 
@@ -20,9 +22,23 @@ This paper is a systems paper about local-first AML evaluation. Its first contri
 
 This scope matters. Relaytic-AML does not claim hard AML superiority, production readiness, graph-neural superiority, or equivalence to RevClassify. It shows a working local evaluation environment that can run meaningful public evidence, expose where stronger claims remain blocked, and give both humans and agents a stable way to continue the work.
 
+| Paper claim | Relaytic mechanism | Current evidence posture |
+|---|---|---|
+| Local state is auditable | Run directories, manifests, traces, metric cells, tables, and release reports live in the workspace | Demonstrated by the generated paper and source package |
+| Agent help is bounded | Guide, scout, scientist, builder, and claim governor roles have separate jobs and artifacts | Architecture evidence; not yet a formal autonomy benchmark |
+| Scores are traceable | Evidence cells bind every number to dataset, split, command, artifact field, budget, and claim state | Supporting PaySim, Elliptic, and Elliptic2-context rows |
+| Public wording is governed | Claim linting, release manifests, and source-package audits fail closed | Hard and headline AML claims remain blocked |
+
 ## 3. Questions
 
 The central question is whether an AML evaluation system can stay useful without becoming opaque. A trained reader can understand PR-AUC, temporal splits, graph features, and review budgets. That reader cannot know Relaytic's internal state unless the system makes it legible. The paper therefore asks whether Relaytic can keep the state of a run visible, whether external agents can receive enough structured context to help safely, and whether claim boundaries can stop a local result from being overstated.
+
+| Question | What to inspect | Current answer |
+|---|---|---|
+| Can local artifacts remain the authority? | Source manifests, run summaries, metric cells, tables, and source-bundle reports | Yes for the current paper path |
+| Can humans and agents avoid getting lost? | Guide, status, assist, mission-control, and redacted context-export surfaces | Supported by product surfaces; formal user/agent study remains future work |
+| Can benchmark evidence stay useful without becoming marketing language? | Claim-boundary reports, public wording lint, and release gates | Yes: supporting rows are visible while stronger claims stay blocked |
+| What would make the work stronger? | Future unlock conditions for holdout data, same-queue comparison, and faithful graph reference reproduction | Explicitly listed as future work rather than implied as solved |
 
 ## 4. Local-First Agent Architecture
 
@@ -47,6 +63,8 @@ Two design choices carry most of the system. First, important work produces a lo
 ## 5. Current Frontier Context
 
 The current AML frontier is not a single leaderboard. It is a set of pressure points: real graph scale, realistic entity behavior, temporal drift, operational throughput, and reliable agent-assisted research. Relaytic-AML is designed as infrastructure around those pressure points, not as a replacement for detector papers.
+
+Recent agentic-ML work also treats external state, benchmark environments, and research validity as first-class objects. SkillOpt, for example, frames agent skills as trainable external state with validation-gated edits [@yang2026skillopt], while MLR-Bench evaluates whether agents can produce valid open-ended ML research rather than only fluent reports [@chen2025mlrbench]. Relaytic-AML follows the same broader style of making the environment and its evidence inspectable, but applies it to AML-specific data custody, review queues, and public-claim gates.
 
 PaySim is a synthetic mobile-money simulator designed to address the scarcity of legitimate public mobile-transaction datasets for fraud research [@lopezrojas2016paysim]. It is useful for temporal transaction-fraud workflow evaluation, but synthetic evidence cannot by itself establish hard real-bank AML performance.
 
@@ -156,6 +174,8 @@ For research teams and agentic ML workflows, the same structure is a guard again
 
 The system is also valuable when results are not spectacular. A low or blocked row can still tell a team that a dataset is synthetic-only, that a split leaks future information, that a graph-native candidate failed to beat strong tabular features, that a review-queue claim lacks a same-queue incumbent, or that a paper sentence is stronger than the evidence permits. In high-risk financial-crime settings, those negative answers are productive outputs.
 
+A company would not use Relaytic-AML because it magically knows AML. It would use it because the difficult parts of a model evaluation are forced into the open: what data was allowed to move, what split was used, what budget was spent, whether the threshold was chosen on validation evidence, what a reviewer would see, and which sentence the evidence still refuses to support.
+
 ## 13. Limitations
 
 The current public evidence is not a deployment validation. PaySim is synthetic mobile-money evidence, so it cannot establish real-bank AML superiority. The Elliptic row is a temporal graph-feature result, not proof that a graph-neural model is better. Elliptic2 is modern context, not a Relaytic performance contribution, because faithful reference-protocol reproduction and cohort equivalence still need more work.
@@ -167,6 +187,8 @@ The paper therefore does not make a hard AML superiority claim. It argues that R
 ## 14. Future Work
 
 The next step is to make the architecture harder to fool and the evidence more operationally realistic. Some work should test Relaytic itself: whether the guide, scout, scientist, builder, and claim reviewer agree about the same local run state, and whether an external LLM can use a redacted context pack to propose a useful repair without inventing unsupported claims. Other work should push the AML evidence: a partner-approved holdout, faithful Elliptic2 reference reproduction, stronger graph-native candidates, continual-learning experiments, and same-queue business-value comparisons.
+
+The next strong paper version should evaluate the environment as directly as it evaluates detector rows. A first-time human, a local LLM, and an external coding agent should each be given the same run and asked to recover current state, identify the right artifacts, propose the next safe action, and avoid unsupported public claims. That would turn Relaytic's usability promise into a measurable benchmark rather than a narrative assertion.
 
 | Direction | What would make the claim stronger |
 |---|---|
@@ -202,6 +224,8 @@ This manuscript was written and revised by the human author with assistance from
 
 Relaytic-AML should be read as a local-first AML evaluation-lab paper. The current work is valuable because it makes the operating idea concrete. Data stays locally governed. Specialist roles create inspectable artifacts. External agents receive structured context instead of hidden state. Claim boundaries prevent stronger wording than the evidence has earned. The same evidence does not support hard AML superiority, a headline benchmark claim, graph-neural superiority, claimed equivalence to RevClassify, or hard business value. That restraint is not a footnote. It is part of the contribution.
 
+The right test for this version is therefore not whether it ends the AML detector race. It does not. The right test is whether the repository makes the current evidence easier to inspect, easier to challenge, and harder to oversell. That is the claim this paper is prepared to make.
+
 ## References
 
 - Lopez-Rojas, E. A., Elmir, A., and Axelsson, S. (2016). PaySim: A Financial Mobile Money Simulator for Fraud Detection. European Modeling and Simulation Symposium.
@@ -217,3 +241,4 @@ Relaytic-AML should be read as a local-first AML evaluation-lab paper. The curre
 - Mitchell, M. et al. (2019). Model Cards for Model Reporting. FAT* 2019.
 - Pineau, J. et al. (2021). Improving Reproducibility in Machine Learning Research. JMLR.
 - Chen, H. et al. (2025). MLR-Bench: Evaluating AI Agents on Open-Ended Machine Learning Research. arXiv:2505.19955.
+- Yang, Y. et al. (2026). SkillOpt: Executive Strategy for Self-Evolving Agent Skills. arXiv:2605.23904.
