@@ -621,7 +621,7 @@ def _render_latex_table(lines: list[str]) -> list[str]:
     for row in rows:
         while len(row) < col_count:
             row.append("")
-    col_width = max(0.11, min(0.32, 0.86 / max(1, col_count)))
+    col_width = max(0.11, min(0.45, 0.90 / max(1, col_count)))
     spec = " ".join([f">{{\\raggedright\\arraybackslash}}p{{{col_width:.2f}\\linewidth}}" for _ in range(col_count)])
     rendered = [
         r"\begin{center}",

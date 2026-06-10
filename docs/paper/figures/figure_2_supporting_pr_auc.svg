@@ -2,7 +2,7 @@
 <text x="30" y="34" font-size="24" font-weight="700">Supporting PR-AUC rows and frontier reference context</text>
 <line x1="76" y1="326" x2="894" y2="326" stroke="#293241" stroke-width="1.2"/>
 <line x1="76" y1="74" x2="76" y2="326" stroke="#293241" stroke-width="1.2"/>
-<text x="20" y="94" font-size="16">PR-AUC</text>
+<text x="76" y="62" font-size="16" fill="#293241">PR-AUC</text>
 <line x1="76" y1="74" x2="894" y2="74" stroke="#d7dde8" stroke-width="0.8"/>
 <line x1="76" y1="200.0" x2="894" y2="200.0" stroke="#e4e8f0" stroke-width="0.8"/>
 <rect x="110.8" y="242.5" width="94" height="83.5" fill="#8d99ae"/>

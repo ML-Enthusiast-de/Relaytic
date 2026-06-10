@@ -79,7 +79,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "9f4c7305caa4dd8386546597612340d17f0e7a42",
+  "git_commit": "5daf5c7cc5ce16745f5f188c7c1e549bf02e3a4f",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -214,8 +214,8 @@
     {
       "accessed_date": "2026-06-09",
       "citation_key": "gebru2021datasheets",
-      "source_url": "https://cacm.acm.org/research/datasheets-for-datasets/",
-      "verified_role": "Dataset documentation and transparency context."
+      "source_url": "https://arxiv.org/abs/1803.09010",
+      "verified_role": "Dataset documentation and transparency context; arXiv source retained because the CACM article page blocks automated access."
     },
     {
       "accessed_date": "2026-06-09",
@@ -228,6 +228,12 @@
       "citation_key": "chen2025mlrbench",
       "source_url": "https://arxiv.org/abs/2505.19955",
       "verified_role": "Agent-generated ML research reliability and invalidated-experiment risk context."
+    },
+    {
+      "accessed_date": "2026-06-09",
+      "citation_key": "starace2025paperbench",
+      "source_url": "https://arxiv.org/abs/2504.01848",
+      "verified_role": "AI-agent paper replication benchmark context and gap between fluent research artifacts and validated experimental reproduction."
     },
     {
       "accessed_date": "2026-06-09",

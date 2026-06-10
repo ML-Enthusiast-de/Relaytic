@@ -599,17 +599,17 @@ def _claim_gate_flow_svg() -> str:
         ("Operator", 55, "#edf6f9"),
         ("Guide", 205, "#edf6f9"),
         ("Scout", 355, "#f7f4ea"),
-        ("Scientist", 505, "#f7f4ea"),
+        ("Science", 505, "#f7f4ea"),
         ("Builder", 655, "#eef4ff"),
-        ("Claim Gate", 805, "#fdeeee"),
+        ("Review", 805, "#fdeeee"),
     ]
     artifact_boxes = [
         ("Mandate", 55, "#ffffff"),
-        ("Run status", 205, "#ffffff"),
-        ("Split contract", 355, "#ffffff"),
+        ("Status", 205, "#ffffff"),
+        ("Split", 355, "#ffffff"),
         ("Ablations", 505, "#ffffff"),
-        ("Model artifact", 655, "#ffffff"),
-        ("Public claims", 805, "#ffffff"),
+        ("Model", 655, "#ffffff"),
+        ("Claims", 805, "#ffffff"),
     ]
     parts = [
         _svg_header(980, 520),
@@ -620,15 +620,15 @@ def _claim_gate_flow_svg() -> str:
         '<line x1="55" y1="154" x2="925" y2="154" stroke="#d7dde8" stroke-width="1.4"/>',
     ]
     for label, x, fill in agent_boxes:
-        parts.append(f'<rect x="{x}" y="180" width="120" height="78" rx="8" fill="{fill}" stroke="#293241" stroke-width="1.5"/>')
-        parts.extend(_svg_text_lines(label, x + 60, 227, font_size=22, anchor="middle", line_height=24))
+        parts.append(f'<rect x="{x}" y="180" width="132" height="78" rx="8" fill="{fill}" stroke="#293241" stroke-width="1.5"/>')
+        parts.extend(_svg_text_lines(label, x + 66, 227, font_size=21, anchor="middle", line_height=23))
     for label, x, fill in artifact_boxes:
-        parts.append(f'<rect x="{x}" y="298" width="120" height="68" rx="8" fill="{fill}" stroke="#8d99ae" stroke-width="1.25"/>')
-        parts.extend(_svg_text_lines(label, x + 60, 339, font_size=18, anchor="middle", line_height=20))
-    for x in [115, 265, 415, 565, 715, 865]:
+        parts.append(f'<rect x="{x}" y="298" width="132" height="68" rx="8" fill="{fill}" stroke="#8d99ae" stroke-width="1.25"/>')
+        parts.extend(_svg_text_lines(label, x + 66, 339, font_size=18, anchor="middle", line_height=20))
+    for x in [121, 271, 421, 571, 721, 871]:
         parts.append(f'<line x1="{x}" y1="258" x2="{x}" y2="298" stroke="#293241" stroke-width="1.5"/>')
         parts.append(f'<polygon points="{x},298 {x - 7},287 {x + 7},287" fill="#293241"/>')
-    for x1, x2 in [(175, 205), (325, 355), (475, 505), (625, 655), (775, 805)]:
+    for x1, x2 in [(187, 205), (337, 355), (487, 505), (637, 655), (787, 805)]:
         parts.append(f'<line x1="{x1}" y1="219" x2="{x2}" y2="219" stroke="#293241" stroke-width="1.5"/>')
         parts.append(f'<polygon points="{x2},219 {x2 - 10},212 {x2 - 10},226" fill="#293241"/>')
     parts.append('<rect x="55" y="398" width="280" height="36" rx="6" fill="#eef4ff" stroke="#8d99ae" stroke-width="1.0"/>')
@@ -731,7 +731,7 @@ def _bar_chart_svg(
         f'<text x="30" y="34" font-size="24" font-weight="700">{_xml_escape(title)}</text>',
         f'<line x1="{plot_x}" y1="{plot_y + plot_h}" x2="{plot_x + plot_w}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
         f'<line x1="{plot_x}" y1="{plot_y}" x2="{plot_x}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
-        f'<text x="20" y="{plot_y + 20}" font-size="16">{_xml_escape(ylabel)}</text>',
+        f'<text x="{plot_x}" y="{plot_y - 12}" font-size="16" fill="#293241">{_xml_escape(ylabel)}</text>',
         f'<line x1="{plot_x}" y1="{plot_y}" x2="{plot_x + plot_w}" y2="{plot_y}" stroke="#d7dde8" stroke-width="0.8"/>',
         f'<line x1="{plot_x}" y1="{plot_y + plot_h / 2:.1f}" x2="{plot_x + plot_w}" y2="{plot_y + plot_h / 2:.1f}" stroke="#e4e8f0" stroke-width="0.8"/>',
     ]

@@ -79,7 +79,7 @@
     }
   ],
   "citation_audit": {
-    "bib_key_count": 14,
+    "bib_key_count": 15,
     "bib_keys": [
       "bellei2024elliptic2",
       "chen2025mlrbench",
@@ -91,12 +91,13 @@
       "pineau2021reproducibility",
       "poon2026linemvgnn",
       "song2024revtrack",
+      "starace2025paperbench",
       "tariq2026extraqt",
       "weber2019elliptic",
       "yang2026skillopt",
       "ye2026blazingaml"
     ],
-    "cited_key_count": 14,
+    "cited_key_count": 15,
     "cited_keys": [
       "bellei2024elliptic2",
       "chen2025mlrbench",
@@ -108,6 +109,7 @@
       "pineau2021reproducibility",
       "poon2026linemvgnn",
       "song2024revtrack",
+      "starace2025paperbench",
       "tariq2026extraqt",
       "weber2019elliptic",
       "yang2026skillopt",
@@ -166,14 +168,14 @@
   "schema_version": "relaytic.paper_arxiv_source.v1",
   "slice": "Paper Track P14",
   "source_hashes": {
-    "main_tex_sha256": "b1c73d5f6e5ef915849857b2f1dace3b1ae67bfad9b809b7516b69fe165d71fb",
+    "main_tex_sha256": "2ab57bbc7c20df4c9a641111f4519293eb3445620143e324635ee578c1715fbd",
     "pdf_figure_sha256": {
-      "figure_1_claim_gate_flow.pdf": "284bd6263623b4fc4cbd1b040876abe0fcd4841dffca1f898ee94ad57faf1354",
-      "figure_2_supporting_pr_auc.pdf": "041788827de9f582f9bd8d680c97728e6b1fb7d748e00343b85bfa1fe868050b",
-      "figure_3_review_budget.pdf": "c7250551718acf8489b102c7ef1d787c40cba434a1d0162a54d04ebba075a29e",
+      "figure_1_claim_gate_flow.pdf": "86acf1d27ac3ed6207fa5cf58e5f2deac41323a2edf245f2566715eeda9c7350",
+      "figure_2_supporting_pr_auc.pdf": "1bc777236ac8574d12b83c1e98008ceb32b7a26367204e5761f95e5e9d9da0ca",
+      "figure_3_review_budget.pdf": "eef7634ce2d8400278dc989abe9ea79e844de09930080be70d301cf027a94200",
       "figure_4_publishability_matrix.pdf": "c4c79b80f72db78de67261cf0e67f04af393815f6ba764db3cea249d76dd1f44"
     },
-    "references_bib_sha256": "630c628ff2e2768e12ffed8a6ac983e356e5d9d1b0fdf1795df4031b0f8e83ac"
+    "references_bib_sha256": "5e8545c469bb8c9e5e1c00e997a4670d3346fd8ac9b172288778fac7b816e3e7"
   },
   "source_release_candidate_ready": true,
   "source_tree": {

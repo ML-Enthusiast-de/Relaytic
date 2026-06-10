@@ -2,7 +2,7 @@
 <text x="30" y="34" font-size="24" font-weight="700">Review-budget precision and recall under supporting-only posture</text>
 <line x1="76" y1="306" x2="834" y2="306" stroke="#293241" stroke-width="1.2"/>
 <line x1="76" y1="74" x2="76" y2="306" stroke="#293241" stroke-width="1.2"/>
-<text x="20" y="94" font-size="16">score</text>
+<text x="76" y="62" font-size="16" fill="#293241">score</text>
 <line x1="76" y1="74" x2="834" y2="74" stroke="#d7dde8" stroke-width="0.8"/>
 <line x1="76" y1="190.0" x2="834" y2="190.0" stroke="#e4e8f0" stroke-width="0.8"/>
 <rect x="116.2" y="142.8" width="109" height="163.2" fill="#2a9d8f"/>
