@@ -79,7 +79,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "5daf5c7cc5ce16745f5f188c7c1e549bf02e3a4f",
+  "git_commit": "2f8f56cfe60643a71ee554b3e2ed540e94d8b534",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -234,6 +234,12 @@
       "citation_key": "starace2025paperbench",
       "source_url": "https://arxiv.org/abs/2504.01848",
       "verified_role": "AI-agent paper replication benchmark context and gap between fluent research artifacts and validated experimental reproduction."
+    },
+    {
+      "accessed_date": "2026-06-09",
+      "citation_key": "wijk2025rebench",
+      "source_url": "https://proceedings.mlr.press/v267/wijk25a.html",
+      "verified_role": "Recent research-engineering benchmark context comparing language-model agents with human experts."
     },
     {
       "accessed_date": "2026-06-09",
