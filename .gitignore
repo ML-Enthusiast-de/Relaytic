@@ -193,6 +193,15 @@ reports/*
 models/
 *.gguf
 
+# Relaytic paper local TeX compile outputs
+docs/paper/arxiv_src/main.aux
+docs/paper/arxiv_src/main.bbl
+docs/paper/arxiv_src/main.blg
+docs/paper/arxiv_src/main.log
+docs/paper/arxiv_src/main.out
+docs/paper/arxiv_src/main.pdf
+docs/paper/arxiv_src/paper_preview-*.png
+
 # OS/editor local files
 .DS_Store
 Thumbs.db

@@ -170,11 +170,11 @@
   "schema_version": "relaytic.paper_arxiv_source.v1",
   "slice": "Paper Track P14",
   "source_hashes": {
-    "main_tex_sha256": "41528836e25de8c1d77ad9af53fdb736c67a4df05d64cb9c06a835bf4d677ee8",
+    "main_tex_sha256": "e264c6b298dfda3c849c11158e3ddd47f750c94c001aff7a91776719fec37353",
     "pdf_figure_sha256": {
       "figure_1_claim_gate_flow.pdf": "86acf1d27ac3ed6207fa5cf58e5f2deac41323a2edf245f2566715eeda9c7350",
-      "figure_2_supporting_pr_auc.pdf": "1bc777236ac8574d12b83c1e98008ceb32b7a26367204e5761f95e5e9d9da0ca",
-      "figure_3_review_budget.pdf": "eef7634ce2d8400278dc989abe9ea79e844de09930080be70d301cf027a94200",
+      "figure_2_supporting_pr_auc.pdf": "a1949acb1a8fcb06cbf991ee31f734cce029214c05c48df59b5b9b64c8230ce3",
+      "figure_3_review_budget.pdf": "2e319914cec4ca47f07a0dba58c713fae0473d4b59b6e018165f06312786d1b6",
       "figure_4_publishability_matrix.pdf": "c4c79b80f72db78de67261cf0e67f04af393815f6ba764db3cea249d76dd1f44"
     },
     "references_bib_sha256": "50e3b34010e993d98b36b6f7bba6e7243daecfb13798d0b6981251f9f7e11cdf"

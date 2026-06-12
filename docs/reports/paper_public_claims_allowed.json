@@ -1,7 +1,7 @@
 {
   "allowed_public_claims": [
-    "Relaytic-AML is a local-first, claim-gated evaluation environment for temporal, graph, and operational financial-crime ML.",
-    "The current paper pack presents Relaytic as a local-first AML evaluation lab with local artifacts, specialist roles, redacted context export, and explicit claim boundaries.",
+    "Relaytic-AML is a local-first, claim-gated evaluation environment for temporal, graph, and operational financial-crime machine learning.",
+    "The current paper pack presents Relaytic as a local-first anti-money-laundering evaluation lab with local artifacts, specialist roles, redacted context export, and explicit claim boundaries.",
     "PaySim and Elliptic rows may be described as supporting evidence only under their documented proxy and graph-feature boundaries.",
     "Elliptic2 may be described as modern context and limitation evidence only, not as a Relaytic performance contribution.",
     "The public source package and paper assets may be regenerated from the repository commands documented in the paper."

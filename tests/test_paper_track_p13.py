@@ -51,9 +51,10 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "[@song2024revtrack]" in draft
     assert "[@chen2026transxion]" in draft
     assert "[@ye2026blazingaml]" in draft
-    assert "PaySim synthetic temporal-fraud PR-AUC 0.638773" in draft
+    assert "operational anti-money laundering (AML)" in draft
+    assert "PaySim synthetic temporal-fraud precision-recall area under the curve (PR-AUC) 0.638773" in draft
     assert "[@yang2026skillopt]" in draft
-    assert "hard AML superiority" in draft
+    assert "broad deployment superiority" in draft
     assert "SOTA" in "\n".join(public_claims["blocked_public_claims"])
     assert set(tables) == set(PAPER_RELEASE_TABLE_FILENAMES)
     assert "paper-cell:paysim_p6a_competitive_selected.test_pr_auc" in tables["evidence_summary"]

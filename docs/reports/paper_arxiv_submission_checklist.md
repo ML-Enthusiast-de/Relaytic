@@ -23,20 +23,20 @@ P13 permits only a claim-safe evaluation-environment release.
 ## Public Claim Discipline
 
 - [ ] Public posts use `docs/reports/paper_attention_pack.md` wording only.
-- [ ] Do not add hard AML, headline, SOTA, claimed-equivalence-to-RevClassify, graph-neural superiority, or hard business-value claims.
+- [ ] Do not add hard anti-money-laundering, headline, SOTA, claimed-equivalence-to-RevClassify, graph-neural superiority, or hard business-value claims.
 - [ ] Confirm public wording status is `claim_safe_public_wording_allowed`.
 
 ## Suggested arXiv Metadata
 
-- Title: `Relaytic-AML: Claim-Gated Evaluation Environments for Temporal Graph Financial-Crime ML`
+- Title: `Relaytic-AML: Claim-Gated Evaluation Environments for Temporal Graph Financial-Crime Machine Learning`
 - Primary category: `cs.LG`
 - Secondary categories: `q-fin.GN`, `cs.SI`, `cs.CY`
-- Keywords: AML, financial crime, graph ML, reproducibility, evaluation environments, claim gating
+- Keywords: anti-money laundering, financial crime, graph machine learning, reproducibility, evaluation environments, claim gating
 
 ## Tag And Release
 
 - [ ] Confirm `git status --short` is empty at the final tag target.
-- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `2f8f56cfe60643a71ee554b3e2ed540e94d8b534`; rerun the manifest after final edits if the source evidence changes.
+- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `feda0bdff718e32bec555e103613136c174d7d0d`; rerun the manifest after final edits if the source evidence changes.
 - [ ] Create tag after the final PDF/source matches the manifest: `git tag -a relaytic-aml-paper-p13-claim-safe -m "Relaytic-AML claim-safe paper release"`.
 - [ ] Attach or link the paper PDF, release manifest, public claims JSON, and benchmark artifacts.
 

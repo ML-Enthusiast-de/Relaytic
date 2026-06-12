@@ -10,15 +10,15 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 940.000 430.000] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 2271 >>
+<< /Length 2238 >>
 stream
 1.0000 1.0000 1.0000 rg
 0.000 330.000 100.000 100.000 re f
 BT
-/F1 24.000 Tf
-0.0000 0.0000 0.0000 rg
+/F1 21.000 Tf
+0.0941 0.1294 0.1843 rg
 1 0 0 1 30.000 396.000 Tm
-(Supporting PR-AUC rows and frontier reference context) Tj
+(PR-AUC evidence rows) Tj
 ET
 0.1608 0.1961 0.2549 RG
 1.200 w
@@ -156,9 +156,9 @@ xref
 0000000064 00000 n 
 0000000121 00000 n 
 0000000255 00000 n 
-0000002577 00000 n 
+0000002544 00000 n 
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-2647
+2614
 %%EOF

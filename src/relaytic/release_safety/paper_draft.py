@@ -222,7 +222,7 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
         {
             "figure_id": "supporting_pr_auc",
             "filename": PAPER_FIGURE_FILENAMES["supporting_pr_auc"],
-            "title": "Supporting PR-AUC rows with claim posture",
+            "title": "PR-AUC evidence rows",
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_metric_cell_audit.json", "docs/reports/paper_result_table_final.json"],
             "paper_claim_role": "supporting_numeric_evidence_only",
@@ -230,7 +230,7 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
         {
             "figure_id": "review_budget",
             "filename": PAPER_FIGURE_FILENAMES["review_budget"],
-            "title": "Review-budget precision and recall",
+            "title": "Review-budget operating points",
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_operational_metric_table.json", "docs/reports/paper_metric_cell_audit.json"],
             "paper_claim_role": "supporting_operational_evidence_only",
@@ -651,7 +651,7 @@ def _supporting_pr_auc_svg(cells: list[dict[str, Any]]) -> str:
         ("RevClassifyDS ref", _cell_value(cells, "elliptic2_p8b_modern_context.published_reference_pr_auc"), "#e76f51"),
     ]
     return _bar_chart_svg(
-        title="Supporting PR-AUC rows and frontier reference context",
+        title="PR-AUC evidence rows",
         ylabel="PR-AUC",
         values=values,
         width=940,
@@ -667,7 +667,7 @@ def _review_budget_svg(cells: list[dict[str, Any]]) -> str:
         ("Elliptic recall", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.recall_at_review_budget"), "#f4a261"),
     ]
     return _bar_chart_svg(
-        title="Review-budget precision and recall under supporting-only posture",
+        title="Review-budget operating points",
         ylabel="score",
         values=values,
         width=880,
@@ -728,7 +728,7 @@ def _bar_chart_svg(
     gap = (plot_w - bar_w * len(clean_values)) / max(1, len(clean_values))
     parts = [
         _svg_header(width, height),
-        f'<text x="30" y="34" font-size="24" font-weight="700">{_xml_escape(title)}</text>',
+        f'<text x="30" y="34" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="600" fill="#18212f">{_xml_escape(title)}</text>',
         f'<line x1="{plot_x}" y1="{plot_y + plot_h}" x2="{plot_x + plot_w}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
         f'<line x1="{plot_x}" y1="{plot_y}" x2="{plot_x}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
         f'<text x="{plot_x}" y="{plot_y - 12}" font-size="16" fill="#293241">{_xml_escape(ylabel)}</text>',

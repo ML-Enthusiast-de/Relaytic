@@ -22,7 +22,7 @@
         "docs/reports/paper_result_table_final.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Supporting PR-AUC rows with claim posture"
+      "title": "PR-AUC evidence rows"
     },
     {
       "figure_id": "review_budget",
@@ -33,7 +33,7 @@
         "docs/reports/paper_metric_cell_audit.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Review-budget precision and recall"
+      "title": "Review-budget operating points"
     },
     {
       "figure_id": "publishability_matrix",

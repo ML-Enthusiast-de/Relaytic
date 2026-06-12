@@ -42,9 +42,9 @@ The method has four claim-control rules:
 
 ![Local-first Relaytic agent architecture](figures/figure_1_claim_gate_flow.svg)
 
-![Supporting PR-AUC rows with claim posture](figures/figure_2_supporting_pr_auc.svg)
+![PR-AUC evidence rows](figures/figure_2_supporting_pr_auc.svg)
 
-![Review-budget precision and recall](figures/figure_3_review_budget.svg)
+![Review-budget operating points](figures/figure_3_review_budget.svg)
 
 ![Claim boundaries and future unlocks](figures/figure_4_publishability_matrix.svg)
 
