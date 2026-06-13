@@ -1,49 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="478" viewBox="0 0 1040 478" role="img"><rect width="100%" height="100%" fill="#ffffff"/>
-<text x="30" y="36" font-size="26" font-weight="700">Claim boundaries and future unlocks</text>
-<text x="30" y="66" font-size="17" fill="#5b6472">Every track remains useful, but stronger claims require specific evidence upgrades.</text>
-<text x="40" y="112" font-size="16" font-weight="700">Track</text>
-<text x="210" y="112" font-size="16" font-weight="700">Current role</text>
-<text x="430" y="112" font-size="16" font-weight="700">Blocked claim</text>
-<text x="650" y="112" font-size="16" font-weight="700">Future unlock</text>
-<text x="860" y="112" font-size="16" font-weight="700">Current posture</text>
-<rect x="30" y="116" width="980" height="74" rx="4" fill="#fbfcfe" stroke="#d7dde8" stroke-width="0.8"/>
-<text x="42" y="160" font-size="17" font-weight="700">PaySim</text>
-<text x="210.0" y="144.0" text-anchor="start" font-size="16" fill="#293241">synthetic temporal</text>
-<text x="210.0" y="164.0" text-anchor="start" font-size="16" fill="#293241">proxy</text>
-<text x="430.0" y="144.0" text-anchor="start" font-size="16" fill="#9b2226">real-bank</text>
-<text x="430.0" y="164.0" text-anchor="start" font-size="16" fill="#9b2226">superiority</text>
-<text x="650.0" y="144.0" text-anchor="start" font-size="16" fill="#293241">real/partner</text>
-<text x="650.0" y="164.0" text-anchor="start" font-size="16" fill="#293241">holdout</text>
-<rect x="850" y="139" width="140" height="36" rx="5" fill="#2a9d8f"/>
-<text x="920" y="162" text-anchor="middle" font-size="14" fill="#ffffff">supporting</text>
-<rect x="30" y="198" width="980" height="74" rx="4" fill="#f4f7fb" stroke="#d7dde8" stroke-width="0.8"/>
-<text x="42" y="242" font-size="17" font-weight="700">Elliptic</text>
-<text x="210.0" y="226.0" text-anchor="start" font-size="16" fill="#293241">graph-feature</text>
-<text x="210.0" y="246.0" text-anchor="start" font-size="16" fill="#293241">support</text>
-<text x="430.0" y="226.0" text-anchor="start" font-size="16" fill="#9b2226">graph-neural</text>
-<text x="430.0" y="246.0" text-anchor="start" font-size="16" fill="#9b2226">superiority</text>
-<text x="650.0" y="226.0" text-anchor="start" font-size="16" fill="#293241">repeated graph</text>
-<text x="650.0" y="246.0" text-anchor="start" font-size="16" fill="#293241">release budget</text>
-<rect x="850" y="221" width="140" height="36" rx="5" fill="#2a9d8f"/>
-<text x="920" y="244" text-anchor="middle" font-size="14" fill="#ffffff">supporting</text>
-<rect x="30" y="280" width="980" height="74" rx="4" fill="#fbfcfe" stroke="#d7dde8" stroke-width="0.8"/>
-<text x="42" y="324" font-size="17" font-weight="700">Elliptic2</text>
-<text x="210.0" y="308.0" text-anchor="start" font-size="16" fill="#293241">modern subgraph</text>
-<text x="210.0" y="328.0" text-anchor="start" font-size="16" fill="#293241">context</text>
-<text x="430.0" y="308.0" text-anchor="start" font-size="16" fill="#9b2226">RevClassify</text>
-<text x="430.0" y="328.0" text-anchor="start" font-size="16" fill="#9b2226">parity</text>
-<text x="650.0" y="308.0" text-anchor="start" font-size="16" fill="#293241">faithful parity</text>
-<text x="650.0" y="328.0" text-anchor="start" font-size="16" fill="#293241">+ cohort proof</text>
-<rect x="850" y="303" width="140" height="36" rx="5" fill="#2a9d8f"/>
-<text x="920" y="326" text-anchor="middle" font-size="14" fill="#ffffff">context only</text>
-<rect x="30" y="362" width="980" height="74" rx="4" fill="#f4f7fb" stroke="#d7dde8" stroke-width="0.8"/>
-<text x="42" y="406" font-size="17" font-weight="700">Operational</text>
-<text x="210.0" y="390.0" text-anchor="start" font-size="16" fill="#293241">review-budget</text>
-<text x="210.0" y="410.0" text-anchor="start" font-size="16" fill="#293241">support</text>
-<text x="430.0" y="390.0" text-anchor="start" font-size="16" fill="#9b2226">hard business</text>
-<text x="430.0" y="410.0" text-anchor="start" font-size="16" fill="#9b2226">value</text>
-<text x="650.0" y="390.0" text-anchor="start" font-size="16" fill="#293241">same-queue</text>
-<text x="650.0" y="410.0" text-anchor="start" font-size="16" fill="#293241">incumbent</text>
-<rect x="850" y="385" width="140" height="36" rx="5" fill="#2a9d8f"/>
-<text x="920" y="408" text-anchor="middle" font-size="14" fill="#ffffff">supporting</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="440" viewBox="0 0 1040 440" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
+<text x="30" y="38" font-size="17" fill="#5b6472">Rows can be useful evidence while still failing stronger claim gates.</text>
+<line x1="185" y1="92" x2="905" y2="92" stroke="#d7dde8" stroke-width="2"/>
+<text x="185" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">current evidence</text>
+<text x="545" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">blocked claim</text>
+<text x="905" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">evidence needed</text>
+<text x="50" y="126" font-size="18" font-weight="700" fill="#293241">PaySim</text>
+<circle cx="185" cy="120" r="10" fill="#2a9d8f"/>
+<circle cx="545" cy="120" r="10" fill="#c94c4c"/>
+<circle cx="905" cy="120" r="10" fill="#457b9d"/>
+<line x1="195" y1="120" x2="535" y2="120" stroke="#d7dde8" stroke-width="2"/>
+<line x1="555" y1="120" x2="895" y2="120" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>
+<text x="185.0" y="149.0" text-anchor="middle" font-size="14" fill="#293241">current: synthetic temporal proxy</text>
+<text x="545.0" y="149.0" text-anchor="middle" font-size="14" fill="#8a3434">blocked: real-bank superiority</text>
+<text x="905.0" y="149.0" text-anchor="middle" font-size="14" fill="#293241">unlock: partner/real holdout</text>
+<text x="50" y="196" font-size="18" font-weight="700" fill="#293241">Elliptic</text>
+<circle cx="185" cy="190" r="10" fill="#2a9d8f"/>
+<circle cx="545" cy="190" r="10" fill="#c94c4c"/>
+<circle cx="905" cy="190" r="10" fill="#457b9d"/>
+<line x1="195" y1="190" x2="535" y2="190" stroke="#d7dde8" stroke-width="2"/>
+<line x1="555" y1="190" x2="895" y2="190" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>
+<text x="185.0" y="219.0" text-anchor="middle" font-size="14" fill="#293241">current: temporal graph features</text>
+<text x="545.0" y="219.0" text-anchor="middle" font-size="14" fill="#8a3434">blocked: graph-neural superiority</text>
+<text x="905.0" y="219.0" text-anchor="middle" font-size="14" fill="#293241">unlock: repeated graph release budget</text>
+<text x="50" y="266" font-size="18" font-weight="700" fill="#293241">Elliptic2</text>
+<circle cx="185" cy="260" r="10" fill="#2a9d8f"/>
+<circle cx="545" cy="260" r="10" fill="#c94c4c"/>
+<circle cx="905" cy="260" r="10" fill="#457b9d"/>
+<line x1="195" y1="260" x2="535" y2="260" stroke="#d7dde8" stroke-width="2"/>
+<line x1="555" y1="260" x2="895" y2="260" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>
+<text x="185.0" y="289.0" text-anchor="middle" font-size="14" fill="#293241">current: modern subgraph context</text>
+<text x="545.0" y="289.0" text-anchor="middle" font-size="14" fill="#8a3434">blocked: RevClassify parity</text>
+<text x="905.0" y="289.0" text-anchor="middle" font-size="14" fill="#293241">unlock: faithful parity + cohort proof</text>
+<text x="50" y="336" font-size="18" font-weight="700" fill="#293241">Operational</text>
+<circle cx="185" cy="330" r="10" fill="#2a9d8f"/>
+<circle cx="545" cy="330" r="10" fill="#c94c4c"/>
+<circle cx="905" cy="330" r="10" fill="#457b9d"/>
+<line x1="195" y1="330" x2="535" y2="330" stroke="#d7dde8" stroke-width="2"/>
+<line x1="555" y1="330" x2="895" y2="330" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>
+<text x="185.0" y="359.0" text-anchor="middle" font-size="14" fill="#293241">current: review-budget support</text>
+<text x="545.0" y="359.0" text-anchor="middle" font-size="14" fill="#8a3434">blocked: hard business value</text>
+<text x="905.0" y="359.0" text-anchor="middle" font-size="14" fill="#293241">unlock: same-queue incumbent</text>
+<rect x="44" y="394" width="952" height="28" rx="6" fill="#fbfcfe" stroke="#d7dde8" stroke-width="1"/>
+<text x="520" y="413" text-anchor="middle" font-size="15" fill="#5b6472">The gate preserves useful evidence while preventing unsupported promotion.</text>
 </svg>

@@ -135,7 +135,7 @@ def test_paper_track_p14_committed_source_bundle_is_ready() -> None:
     assert "Author Name" in main_tex
 
     cited_keys = set()
-    for citation in re.findall(r"\\cite\{([^}]+)\}", main_tex):
+    for citation in re.findall(r"\\citep?\{([^}]+)\}", main_tex):
         cited_keys.update(part.strip() for part in citation.split(","))
     bib_keys = set(re.findall(r"@\w+\{([^,\s]+)", references))
     assert cited_keys <= bib_keys

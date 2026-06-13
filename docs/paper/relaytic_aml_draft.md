@@ -40,13 +40,13 @@ The method has four claim-control rules:
 3. Numeric paper cells must cite machine-readable provenance rather than handwritten notes.
 4. Blocked tracks stay visible as limitations instead of being replaced by easier evidence.
 
-![Local-first Relaytic agent architecture](figures/figure_1_claim_gate_flow.svg)
+![Relaytic-AML local evidence loop. Specialist roles write local artifacts; external handoff is rowless by default and claim gates fail closed.](figures/figure_1_claim_gate_flow.svg)
 
-![PR-AUC evidence rows](figures/figure_2_supporting_pr_auc.svg)
+![PR-AUC evidence rows. PaySim improves under the synthetic temporal proxy, while Elliptic2 remains below the RevClassifyDS reference and is not a parity claim.](figures/figure_2_supporting_pr_auc.svg)
 
-![Review-budget operating points](figures/figure_3_review_budget.svg)
+![Review-budget operating points. High top-queue precision with lower recall shows useful but incomplete analyst coverage under a bounded review budget.](figures/figure_3_review_budget.svg)
 
-![Claim boundaries and future unlocks](figures/figure_4_publishability_matrix.svg)
+![Claim boundary ladder. Current evidence is preserved while stronger AML, graph-neural, RevClassify-parity, and business-value claims remain blocked.](figures/figure_4_publishability_matrix.svg)
 
 ## Benchmarks
 

@@ -1,60 +1,59 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520" role="img"><rect width="100%" height="100%" fill="#ffffff"/>
-<text x="30" y="38" font-size="31" font-weight="700">Local-first Relaytic agent architecture</text>
-<rect x="30" y="65" width="920" height="400" rx="10" fill="#fbfcfe" stroke="#8d99ae" stroke-width="1.7"/>
-<text x="55" y="102" font-size="21" font-weight="700" fill="#293241">Workspace is the authority</text>
-<text x="55" y="132" font-size="19" fill="#5b6472">Specialist roles create local artifacts. LLM help is optional, redacted, and never the source of truth.</text>
-<line x1="55" y1="154" x2="925" y2="154" stroke="#d7dde8" stroke-width="1.4"/>
-<rect x="55" y="180" width="132" height="78" rx="8" fill="#edf6f9" stroke="#293241" stroke-width="1.5"/>
-<text x="121.0" y="227.0" text-anchor="middle" font-size="21" fill="#293241">Operator</text>
-<rect x="205" y="180" width="132" height="78" rx="8" fill="#edf6f9" stroke="#293241" stroke-width="1.5"/>
-<text x="271.0" y="227.0" text-anchor="middle" font-size="21" fill="#293241">Guide</text>
-<rect x="355" y="180" width="132" height="78" rx="8" fill="#f7f4ea" stroke="#293241" stroke-width="1.5"/>
-<text x="421.0" y="227.0" text-anchor="middle" font-size="21" fill="#293241">Scout</text>
-<rect x="505" y="180" width="132" height="78" rx="8" fill="#f7f4ea" stroke="#293241" stroke-width="1.5"/>
-<text x="571.0" y="227.0" text-anchor="middle" font-size="21" fill="#293241">Science</text>
-<rect x="655" y="180" width="132" height="78" rx="8" fill="#eef4ff" stroke="#293241" stroke-width="1.5"/>
-<text x="721.0" y="227.0" text-anchor="middle" font-size="21" fill="#293241">Builder</text>
-<rect x="805" y="180" width="132" height="78" rx="8" fill="#fdeeee" stroke="#293241" stroke-width="1.5"/>
-<text x="871.0" y="227.0" text-anchor="middle" font-size="21" fill="#293241">Review</text>
-<rect x="55" y="298" width="132" height="68" rx="8" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
-<text x="121.0" y="339.0" text-anchor="middle" font-size="18" fill="#293241">Mandate</text>
-<rect x="205" y="298" width="132" height="68" rx="8" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
-<text x="271.0" y="339.0" text-anchor="middle" font-size="18" fill="#293241">Status</text>
-<rect x="355" y="298" width="132" height="68" rx="8" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
-<text x="421.0" y="339.0" text-anchor="middle" font-size="18" fill="#293241">Split</text>
-<rect x="505" y="298" width="132" height="68" rx="8" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
-<text x="571.0" y="339.0" text-anchor="middle" font-size="18" fill="#293241">Ablations</text>
-<rect x="655" y="298" width="132" height="68" rx="8" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
-<text x="721.0" y="339.0" text-anchor="middle" font-size="18" fill="#293241">Model</text>
-<rect x="805" y="298" width="132" height="68" rx="8" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
-<text x="871.0" y="339.0" text-anchor="middle" font-size="18" fill="#293241">Claims</text>
-<line x1="121" y1="258" x2="121" y2="298" stroke="#293241" stroke-width="1.5"/>
-<polygon points="121,298 114,287 128,287" fill="#293241"/>
-<line x1="271" y1="258" x2="271" y2="298" stroke="#293241" stroke-width="1.5"/>
-<polygon points="271,298 264,287 278,287" fill="#293241"/>
-<line x1="421" y1="258" x2="421" y2="298" stroke="#293241" stroke-width="1.5"/>
-<polygon points="421,298 414,287 428,287" fill="#293241"/>
-<line x1="571" y1="258" x2="571" y2="298" stroke="#293241" stroke-width="1.5"/>
-<polygon points="571,298 564,287 578,287" fill="#293241"/>
-<line x1="721" y1="258" x2="721" y2="298" stroke="#293241" stroke-width="1.5"/>
-<polygon points="721,298 714,287 728,287" fill="#293241"/>
-<line x1="871" y1="258" x2="871" y2="298" stroke="#293241" stroke-width="1.5"/>
-<polygon points="871,298 864,287 878,287" fill="#293241"/>
-<line x1="187" y1="219" x2="205" y2="219" stroke="#293241" stroke-width="1.5"/>
-<polygon points="205,219 195,212 195,226" fill="#293241"/>
-<line x1="337" y1="219" x2="355" y2="219" stroke="#293241" stroke-width="1.5"/>
-<polygon points="355,219 345,212 345,226" fill="#293241"/>
-<line x1="487" y1="219" x2="505" y2="219" stroke="#293241" stroke-width="1.5"/>
-<polygon points="505,219 495,212 495,226" fill="#293241"/>
-<line x1="637" y1="219" x2="655" y2="219" stroke="#293241" stroke-width="1.5"/>
-<polygon points="655,219 645,212 645,226" fill="#293241"/>
-<line x1="787" y1="219" x2="805" y2="219" stroke="#293241" stroke-width="1.5"/>
-<polygon points="805,219 795,212 795,226" fill="#293241"/>
-<rect x="55" y="398" width="280" height="36" rx="6" fill="#eef4ff" stroke="#8d99ae" stroke-width="1.0"/>
-<text x="195" y="422" text-anchor="middle" font-size="17" fill="#293241">Canonical artifact graph</text>
-<rect x="350" y="398" width="280" height="36" rx="6" fill="#edf6f9" stroke="#8d99ae" stroke-width="1.0"/>
-<text x="490" y="422" text-anchor="middle" font-size="17" fill="#293241">Rowless external handoff</text>
-<rect x="645" y="398" width="280" height="36" rx="6" fill="#fdeeee" stroke="#8d99ae" stroke-width="1.0"/>
-<text x="785" y="422" text-anchor="middle" font-size="17" fill="#293241">Claim gates fail closed</text>
-<text x="30" y="498" font-size="18" fill="#5b6472">Benchmarks exercise this architecture; they do not replace the local-first artifact and claim-control thesis.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="480" viewBox="0 0 980 480" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="30" y="28" width="920" height="394" rx="8" fill="#fbfcfe" stroke="#8d99ae" stroke-width="1.7"/>
+<text x="55" y="66" font-size="21" font-weight="700" fill="#293241">Workspace authority and evidence flow</text>
+<text x="55" y="96" font-size="18" fill="#5b6472">Specialist roles create local artifacts. Optional LLM help is redacted advice, not truth.</text>
+<line x1="55" y1="119" x2="925" y2="119" stroke="#d7dde8" stroke-width="1.4"/>
+<rect x="55" y="145" width="132" height="76" rx="7" fill="#edf6f9" stroke="#293241" stroke-width="1.5"/>
+<text x="121.0" y="191.0" text-anchor="middle" font-size="20" fill="#293241">Operator</text>
+<rect x="205" y="145" width="132" height="76" rx="7" fill="#edf6f9" stroke="#293241" stroke-width="1.5"/>
+<text x="271.0" y="191.0" text-anchor="middle" font-size="20" fill="#293241">Guide</text>
+<rect x="355" y="145" width="132" height="76" rx="7" fill="#f7f4ea" stroke="#293241" stroke-width="1.5"/>
+<text x="421.0" y="191.0" text-anchor="middle" font-size="20" fill="#293241">Scout</text>
+<rect x="505" y="145" width="132" height="76" rx="7" fill="#f7f4ea" stroke="#293241" stroke-width="1.5"/>
+<text x="571.0" y="191.0" text-anchor="middle" font-size="20" fill="#293241">Science</text>
+<rect x="655" y="145" width="132" height="76" rx="7" fill="#eef4ff" stroke="#293241" stroke-width="1.5"/>
+<text x="721.0" y="191.0" text-anchor="middle" font-size="20" fill="#293241">Builder</text>
+<rect x="805" y="145" width="132" height="76" rx="7" fill="#fdeeee" stroke="#293241" stroke-width="1.5"/>
+<text x="871.0" y="191.0" text-anchor="middle" font-size="20" fill="#293241">Review</text>
+<rect x="55" y="260" width="132" height="66" rx="7" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
+<text x="121.0" y="300.0" text-anchor="middle" font-size="18" fill="#293241">Mandate</text>
+<rect x="205" y="260" width="132" height="66" rx="7" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
+<text x="271.0" y="300.0" text-anchor="middle" font-size="18" fill="#293241">Status</text>
+<rect x="355" y="260" width="132" height="66" rx="7" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
+<text x="421.0" y="300.0" text-anchor="middle" font-size="18" fill="#293241">Split</text>
+<rect x="505" y="260" width="132" height="66" rx="7" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
+<text x="571.0" y="300.0" text-anchor="middle" font-size="18" fill="#293241">Ablations</text>
+<rect x="655" y="260" width="132" height="66" rx="7" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
+<text x="721.0" y="300.0" text-anchor="middle" font-size="18" fill="#293241">Model</text>
+<rect x="805" y="260" width="132" height="66" rx="7" fill="#ffffff" stroke="#8d99ae" stroke-width="1.25"/>
+<text x="871.0" y="300.0" text-anchor="middle" font-size="18" fill="#293241">Claims</text>
+<line x1="121" y1="221" x2="121" y2="260" stroke="#293241" stroke-width="1.5"/>
+<polygon points="121,260 114,249 128,249" fill="#293241"/>
+<line x1="271" y1="221" x2="271" y2="260" stroke="#293241" stroke-width="1.5"/>
+<polygon points="271,260 264,249 278,249" fill="#293241"/>
+<line x1="421" y1="221" x2="421" y2="260" stroke="#293241" stroke-width="1.5"/>
+<polygon points="421,260 414,249 428,249" fill="#293241"/>
+<line x1="571" y1="221" x2="571" y2="260" stroke="#293241" stroke-width="1.5"/>
+<polygon points="571,260 564,249 578,249" fill="#293241"/>
+<line x1="721" y1="221" x2="721" y2="260" stroke="#293241" stroke-width="1.5"/>
+<polygon points="721,260 714,249 728,249" fill="#293241"/>
+<line x1="871" y1="221" x2="871" y2="260" stroke="#293241" stroke-width="1.5"/>
+<polygon points="871,260 864,249 878,249" fill="#293241"/>
+<line x1="187" y1="183" x2="205" y2="183" stroke="#293241" stroke-width="1.5"/>
+<polygon points="205,183 195,176 195,190" fill="#293241"/>
+<line x1="337" y1="183" x2="355" y2="183" stroke="#293241" stroke-width="1.5"/>
+<polygon points="355,183 345,176 345,190" fill="#293241"/>
+<line x1="487" y1="183" x2="505" y2="183" stroke="#293241" stroke-width="1.5"/>
+<polygon points="505,183 495,176 495,190" fill="#293241"/>
+<line x1="637" y1="183" x2="655" y2="183" stroke="#293241" stroke-width="1.5"/>
+<polygon points="655,183 645,176 645,190" fill="#293241"/>
+<line x1="787" y1="183" x2="805" y2="183" stroke="#293241" stroke-width="1.5"/>
+<polygon points="805,183 795,176 795,190" fill="#293241"/>
+<rect x="55" y="354" width="280" height="36" rx="6" fill="#eef4ff" stroke="#8d99ae" stroke-width="1.0"/>
+<text x="195" y="378" text-anchor="middle" font-size="17" fill="#293241">Canonical artifact graph</text>
+<rect x="350" y="354" width="280" height="36" rx="6" fill="#edf6f9" stroke="#8d99ae" stroke-width="1.0"/>
+<text x="490" y="378" text-anchor="middle" font-size="17" fill="#293241">Rowless external handoff</text>
+<rect x="645" y="354" width="280" height="36" rx="6" fill="#fdeeee" stroke="#8d99ae" stroke-width="1.0"/>
+<text x="785" y="378" text-anchor="middle" font-size="17" fill="#293241">Claim gates fail closed</text>
+<text x="30" y="454" font-size="17" fill="#5b6472">Benchmarks exercise this architecture; they do not replace the local-first artifact and claim-control thesis.</text>
 </svg>

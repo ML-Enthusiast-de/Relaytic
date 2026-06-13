@@ -210,7 +210,10 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
         {
             "figure_id": "claim_gate_flow",
             "filename": PAPER_FIGURE_FILENAMES["claim_gate_flow"],
-            "title": "Local-first Relaytic agent architecture",
+            "title": (
+                "Relaytic-AML local evidence loop. Specialist roles write local artifacts; "
+                "external handoff is rowless by default and claim gates fail closed."
+            ),
             "source_type": "schematic_explicit",
             "source_refs": [
                 "docs/reports/paper_thesis_contract.json",
@@ -222,7 +225,10 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
         {
             "figure_id": "supporting_pr_auc",
             "filename": PAPER_FIGURE_FILENAMES["supporting_pr_auc"],
-            "title": "PR-AUC evidence rows",
+            "title": (
+                "PR-AUC evidence rows. PaySim improves under the synthetic temporal proxy, "
+                "while Elliptic2 remains below the RevClassifyDS reference and is not a parity claim."
+            ),
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_metric_cell_audit.json", "docs/reports/paper_result_table_final.json"],
             "paper_claim_role": "supporting_numeric_evidence_only",
@@ -230,7 +236,10 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
         {
             "figure_id": "review_budget",
             "filename": PAPER_FIGURE_FILENAMES["review_budget"],
-            "title": "Review-budget operating points",
+            "title": (
+                "Review-budget operating points. High top-queue precision with lower recall shows useful "
+                "but incomplete analyst coverage under a bounded review budget."
+            ),
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_operational_metric_table.json", "docs/reports/paper_metric_cell_audit.json"],
             "paper_claim_role": "supporting_operational_evidence_only",
@@ -238,7 +247,10 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
         {
             "figure_id": "publishability_matrix",
             "filename": PAPER_FIGURE_FILENAMES["publishability_matrix"],
-            "title": "Claim boundaries and future unlocks",
+            "title": (
+                "Claim boundary ladder. Current evidence is preserved while stronger AML, graph-neural, "
+                "RevClassify-parity, and business-value claims remain blocked."
+            ),
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_publishability_matrix.json"],
             "paper_claim_role": "claim_gate_evidence",
@@ -612,32 +624,31 @@ def _claim_gate_flow_svg() -> str:
         ("Claims", 805, "#ffffff"),
     ]
     parts = [
-        _svg_header(980, 520),
-        '<text x="30" y="38" font-size="31" font-weight="700">Local-first Relaytic agent architecture</text>',
-        '<rect x="30" y="65" width="920" height="400" rx="10" fill="#fbfcfe" stroke="#8d99ae" stroke-width="1.7"/>',
-        '<text x="55" y="102" font-size="21" font-weight="700" fill="#293241">Workspace is the authority</text>',
-        '<text x="55" y="132" font-size="19" fill="#5b6472">Specialist roles create local artifacts. LLM help is optional, redacted, and never the source of truth.</text>',
-        '<line x1="55" y1="154" x2="925" y2="154" stroke="#d7dde8" stroke-width="1.4"/>',
+        _svg_header(980, 480),
+        '<rect x="30" y="28" width="920" height="394" rx="8" fill="#fbfcfe" stroke="#8d99ae" stroke-width="1.7"/>',
+        '<text x="55" y="66" font-size="21" font-weight="700" fill="#293241">Workspace authority and evidence flow</text>',
+        '<text x="55" y="96" font-size="18" fill="#5b6472">Specialist roles create local artifacts. Optional LLM help is redacted advice, not truth.</text>',
+        '<line x1="55" y1="119" x2="925" y2="119" stroke="#d7dde8" stroke-width="1.4"/>',
     ]
     for label, x, fill in agent_boxes:
-        parts.append(f'<rect x="{x}" y="180" width="132" height="78" rx="8" fill="{fill}" stroke="#293241" stroke-width="1.5"/>')
-        parts.extend(_svg_text_lines(label, x + 66, 227, font_size=21, anchor="middle", line_height=23))
+        parts.append(f'<rect x="{x}" y="145" width="132" height="76" rx="7" fill="{fill}" stroke="#293241" stroke-width="1.5"/>')
+        parts.extend(_svg_text_lines(label, x + 66, 191, font_size=20, anchor="middle", line_height=22))
     for label, x, fill in artifact_boxes:
-        parts.append(f'<rect x="{x}" y="298" width="132" height="68" rx="8" fill="{fill}" stroke="#8d99ae" stroke-width="1.25"/>')
-        parts.extend(_svg_text_lines(label, x + 66, 339, font_size=18, anchor="middle", line_height=20))
+        parts.append(f'<rect x="{x}" y="260" width="132" height="66" rx="7" fill="{fill}" stroke="#8d99ae" stroke-width="1.25"/>')
+        parts.extend(_svg_text_lines(label, x + 66, 300, font_size=18, anchor="middle", line_height=20))
     for x in [121, 271, 421, 571, 721, 871]:
-        parts.append(f'<line x1="{x}" y1="258" x2="{x}" y2="298" stroke="#293241" stroke-width="1.5"/>')
-        parts.append(f'<polygon points="{x},298 {x - 7},287 {x + 7},287" fill="#293241"/>')
+        parts.append(f'<line x1="{x}" y1="221" x2="{x}" y2="260" stroke="#293241" stroke-width="1.5"/>')
+        parts.append(f'<polygon points="{x},260 {x - 7},249 {x + 7},249" fill="#293241"/>')
     for x1, x2 in [(187, 205), (337, 355), (487, 505), (637, 655), (787, 805)]:
-        parts.append(f'<line x1="{x1}" y1="219" x2="{x2}" y2="219" stroke="#293241" stroke-width="1.5"/>')
-        parts.append(f'<polygon points="{x2},219 {x2 - 10},212 {x2 - 10},226" fill="#293241"/>')
-    parts.append('<rect x="55" y="398" width="280" height="36" rx="6" fill="#eef4ff" stroke="#8d99ae" stroke-width="1.0"/>')
-    parts.append('<text x="195" y="422" text-anchor="middle" font-size="17" fill="#293241">Canonical artifact graph</text>')
-    parts.append('<rect x="350" y="398" width="280" height="36" rx="6" fill="#edf6f9" stroke="#8d99ae" stroke-width="1.0"/>')
-    parts.append('<text x="490" y="422" text-anchor="middle" font-size="17" fill="#293241">Rowless external handoff</text>')
-    parts.append('<rect x="645" y="398" width="280" height="36" rx="6" fill="#fdeeee" stroke="#8d99ae" stroke-width="1.0"/>')
-    parts.append('<text x="785" y="422" text-anchor="middle" font-size="17" fill="#293241">Claim gates fail closed</text>')
-    parts.append('<text x="30" y="498" font-size="18" fill="#5b6472">Benchmarks exercise this architecture; they do not replace the local-first artifact and claim-control thesis.</text>')
+        parts.append(f'<line x1="{x1}" y1="183" x2="{x2}" y2="183" stroke="#293241" stroke-width="1.5"/>')
+        parts.append(f'<polygon points="{x2},183 {x2 - 10},176 {x2 - 10},190" fill="#293241"/>')
+    parts.append('<rect x="55" y="354" width="280" height="36" rx="6" fill="#eef4ff" stroke="#8d99ae" stroke-width="1.0"/>')
+    parts.append('<text x="195" y="378" text-anchor="middle" font-size="17" fill="#293241">Canonical artifact graph</text>')
+    parts.append('<rect x="350" y="354" width="280" height="36" rx="6" fill="#edf6f9" stroke="#8d99ae" stroke-width="1.0"/>')
+    parts.append('<text x="490" y="378" text-anchor="middle" font-size="17" fill="#293241">Rowless external handoff</text>')
+    parts.append('<rect x="645" y="354" width="280" height="36" rx="6" fill="#fdeeee" stroke="#8d99ae" stroke-width="1.0"/>')
+    parts.append('<text x="785" y="378" text-anchor="middle" font-size="17" fill="#293241">Claim gates fail closed</text>')
+    parts.append('<text x="30" y="454" font-size="17" fill="#5b6472">Benchmarks exercise this architecture; they do not replace the local-first artifact and claim-control thesis.</text>')
     parts.append("</svg>")
     return "\n".join(parts)
 
@@ -678,34 +689,34 @@ def _review_budget_svg(cells: list[dict[str, Any]]) -> str:
 def _publishability_matrix_svg(publishability: dict[str, Any]) -> str:
     _ = publishability
     rows = [
-        ("PaySim", "synthetic temporal\nproxy", "real-bank\nsuperiority", "real/partner\nholdout", "supporting"),
-        ("Elliptic", "graph-feature\nsupport", "graph-neural\nsuperiority", "repeated graph\nrelease budget", "supporting"),
-        ("Elliptic2", "modern subgraph\ncontext", "RevClassify\nparity", "faithful parity\n+ cohort proof", "context only"),
-        ("Operational", "review-budget\nsupport", "hard business\nvalue", "same-queue\nincumbent", "supporting"),
+        ("PaySim", "current: synthetic temporal proxy", "blocked: real-bank superiority", "unlock: partner/real holdout"),
+        ("Elliptic", "current: temporal graph features", "blocked: graph-neural superiority", "unlock: repeated graph release budget"),
+        ("Elliptic2", "current: modern subgraph context", "blocked: RevClassify parity", "unlock: faithful parity + cohort proof"),
+        ("Operational", "current: review-budget support", "blocked: hard business value", "unlock: same-queue incumbent"),
     ]
     width = 1040
-    row_h = 82
-    height = 150 + row_h * len(rows)
+    height = 440
     parts = [
         _svg_header(width, height),
-        '<text x="30" y="36" font-size="26" font-weight="700">Claim boundaries and future unlocks</text>',
-        '<text x="30" y="66" font-size="17" fill="#5b6472">Every track remains useful, but stronger claims require specific evidence upgrades.</text>',
-        '<text x="40" y="112" font-size="16" font-weight="700">Track</text>',
-        '<text x="210" y="112" font-size="16" font-weight="700">Current role</text>',
-        '<text x="430" y="112" font-size="16" font-weight="700">Blocked claim</text>',
-        '<text x="650" y="112" font-size="16" font-weight="700">Future unlock</text>',
-        '<text x="860" y="112" font-size="16" font-weight="700">Current posture</text>',
+        '<text x="30" y="38" font-size="17" fill="#5b6472">Rows can be useful evidence while still failing stronger claim gates.</text>',
+        '<line x1="185" y1="92" x2="905" y2="92" stroke="#d7dde8" stroke-width="2"/>',
+        '<text x="185" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">current evidence</text>',
+        '<text x="545" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">blocked claim</text>',
+        '<text x="905" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">evidence needed</text>',
     ]
-    for index, (track, role, blocked, unlock, posture) in enumerate(rows):
-        y = 136 + index * row_h
-        fill = "#fbfcfe" if index % 2 == 0 else "#f4f7fb"
-        parts.append(f'<rect x="30" y="{y - 20}" width="980" height="{row_h - 8}" rx="4" fill="{fill}" stroke="#d7dde8" stroke-width="0.8"/>')
-        parts.append(f'<text x="42" y="{y + 24}" font-size="17" font-weight="700">{_xml_escape(track)}</text>')
-        parts.extend(_svg_text_lines(role, 210, y + 8, font_size=16, anchor="start", line_height=20))
-        parts.extend(_svg_text_lines(blocked, 430, y + 8, font_size=16, anchor="start", line_height=20, fill="#9b2226"))
-        parts.extend(_svg_text_lines(unlock, 650, y + 8, font_size=16, anchor="start", line_height=20))
-        parts.append(f'<rect x="850" y="{y + 3}" width="140" height="36" rx="5" fill="#2a9d8f"/>')
-        parts.append(f'<text x="920" y="{y + 26}" text-anchor="middle" font-size="14" fill="#ffffff">{_xml_escape(posture)}</text>')
+    for index, (track, current, blocked, unlock) in enumerate(rows):
+        y = 120 + index * 70
+        parts.append(f'<text x="50" y="{y + 6}" font-size="18" font-weight="700" fill="#293241">{_xml_escape(track)}</text>')
+        parts.append(f'<circle cx="185" cy="{y}" r="10" fill="#2a9d8f"/>')
+        parts.append(f'<circle cx="545" cy="{y}" r="10" fill="#c94c4c"/>')
+        parts.append(f'<circle cx="905" cy="{y}" r="10" fill="#457b9d"/>')
+        parts.append(f'<line x1="195" y1="{y}" x2="535" y2="{y}" stroke="#d7dde8" stroke-width="2"/>')
+        parts.append(f'<line x1="555" y1="{y}" x2="895" y2="{y}" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>')
+        parts.extend(_svg_text_lines(current, 185, y + 29, font_size=14, anchor="middle", line_height=16))
+        parts.extend(_svg_text_lines(blocked, 545, y + 29, font_size=14, anchor="middle", line_height=16, fill="#8a3434"))
+        parts.extend(_svg_text_lines(unlock, 905, y + 29, font_size=14, anchor="middle", line_height=16))
+    parts.append('<rect x="44" y="394" width="952" height="28" rx="6" fill="#fbfcfe" stroke="#d7dde8" stroke-width="1"/>')
+    parts.append('<text x="520" y="413" text-anchor="middle" font-size="15" fill="#5b6472">The gate preserves useful evidence while preventing unsupported promotion.</text>')
     parts.append("</svg>")
     return "\n".join(parts)
 
@@ -719,19 +730,18 @@ def _bar_chart_svg(
     height: int,
 ) -> str:
     plot_x = 76
-    plot_y = 74
+    plot_y = 58
     plot_w = width - 122
-    plot_h = height - 178
+    plot_h = height - 162
     clean_values = [(label, float(value) if isinstance(value, (int, float)) else 0.0, color) for label, value, color in values]
     max_value = max([1.0] + [value for _, value, _ in clean_values])
     bar_w = max(38, int(plot_w / max(1, len(clean_values)) * 0.58))
     gap = (plot_w - bar_w * len(clean_values)) / max(1, len(clean_values))
     parts = [
         _svg_header(width, height),
-        f'<text x="30" y="34" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="600" fill="#18212f">{_xml_escape(title)}</text>',
         f'<line x1="{plot_x}" y1="{plot_y + plot_h}" x2="{plot_x + plot_w}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
         f'<line x1="{plot_x}" y1="{plot_y}" x2="{plot_x}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
-        f'<text x="{plot_x}" y="{plot_y - 12}" font-size="16" fill="#293241">{_xml_escape(ylabel)}</text>',
+        f'<text x="{plot_x}" y="{plot_y - 16}" font-size="16" fill="#293241">{_xml_escape(ylabel)}</text>',
         f'<line x1="{plot_x}" y1="{plot_y}" x2="{plot_x + plot_w}" y2="{plot_y}" stroke="#d7dde8" stroke-width="0.8"/>',
         f'<line x1="{plot_x}" y1="{plot_y + plot_h / 2:.1f}" x2="{plot_x + plot_w}" y2="{plot_y + plot_h / 2:.1f}" stroke="#e4e8f0" stroke-width="0.8"/>',
     ]
@@ -956,6 +966,7 @@ def _svg_header(width: int, height: int) -> str:
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
         f'viewBox="0 0 {width} {height}" role="img">'
+        '<style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style>'
         '<rect width="100%" height="100%" fill="#ffffff"/>'
     )
 

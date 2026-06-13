@@ -79,7 +79,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "feda0bdff718e32bec555e103613136c174d7d0d",
+  "git_commit": "a9b210670a82f8d7364f8938d1034933b293430a",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -162,6 +162,24 @@
       "citation_key": "lopezrojas2016paysim",
       "source_url": "https://www.msc-les.org/proceedings/emss/2016/EMSS2016_249.pdf",
       "verified_role": "PaySim synthetic mobile-money simulator source and caveat."
+    },
+    {
+      "accessed_date": "2026-06-09",
+      "citation_key": "fatf2020virtualassets",
+      "source_url": "https://www.fatf-gafi.org/en/publications/Methodsandtrends/Virtual-assets-red-flag-indicators.html",
+      "verified_role": "Official virtual-asset red-flag categories for transaction pattern, anonymity, geography, sender/recipient, and source-of-funds context."
+    },
+    {
+      "accessed_date": "2026-06-09",
+      "citation_key": "fincenAdvisories",
+      "source_url": "https://www.fincen.gov/resources/advisoriesbulletinsfact-sheets",
+      "verified_role": "Official FinCEN description of advisories, typologies, red flags, and AML monitoring use."
+    },
+    {
+      "accessed_date": "2026-06-09",
+      "citation_key": "ffiecRedFlags",
+      "source_url": "https://bsaaml.ffiec.gov/manual/Appendices/07",
+      "verified_role": "Official BSA/AML examination red-flag examples for funds transfers, inconsistent activity, cross-border flows, and unusual transactions."
     },
     {
       "accessed_date": "2026-06-09",

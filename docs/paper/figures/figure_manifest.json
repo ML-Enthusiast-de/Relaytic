@@ -11,7 +11,7 @@
         "docs/reports/paper_publishability_matrix.json"
       ],
       "source_type": "schematic_explicit",
-      "title": "Local-first Relaytic agent architecture"
+      "title": "Relaytic-AML local evidence loop. Specialist roles write local artifacts; external handoff is rowless by default and claim gates fail closed."
     },
     {
       "figure_id": "supporting_pr_auc",
@@ -22,7 +22,7 @@
         "docs/reports/paper_result_table_final.json"
       ],
       "source_type": "artifact_generated",
-      "title": "PR-AUC evidence rows"
+      "title": "PR-AUC evidence rows. PaySim improves under the synthetic temporal proxy, while Elliptic2 remains below the RevClassifyDS reference and is not a parity claim."
     },
     {
       "figure_id": "review_budget",
@@ -33,7 +33,7 @@
         "docs/reports/paper_metric_cell_audit.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Review-budget operating points"
+      "title": "Review-budget operating points. High top-queue precision with lower recall shows useful but incomplete analyst coverage under a bounded review budget."
     },
     {
       "figure_id": "publishability_matrix",
@@ -43,7 +43,7 @@
         "docs/reports/paper_publishability_matrix.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Claim boundaries and future unlocks"
+      "title": "Claim boundary ladder. Current evidence is preserved while stronger AML, graph-neural, RevClassify-parity, and business-value claims remain blocked."
     }
   ],
   "schema_version": "relaytic.paper_draft.v1",

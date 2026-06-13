@@ -1,28 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="940" height="430" viewBox="0 0 940 430" role="img"><rect width="100%" height="100%" fill="#ffffff"/>
-<text x="30" y="34" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="600" fill="#18212f">PR-AUC evidence rows</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="430" viewBox="0 0 940 430" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
 <line x1="76" y1="326" x2="894" y2="326" stroke="#293241" stroke-width="1.2"/>
-<line x1="76" y1="74" x2="76" y2="326" stroke="#293241" stroke-width="1.2"/>
-<text x="76" y="62" font-size="16" fill="#293241">PR-AUC</text>
-<line x1="76" y1="74" x2="894" y2="74" stroke="#d7dde8" stroke-width="0.8"/>
-<line x1="76" y1="200.0" x2="894" y2="200.0" stroke="#e4e8f0" stroke-width="0.8"/>
-<rect x="110.8" y="242.5" width="94" height="83.5" fill="#8d99ae"/>
-<text x="157.8" y="234.5" text-anchor="middle" font-size="16">0.331345</text>
+<line x1="76" y1="58" x2="76" y2="326" stroke="#293241" stroke-width="1.2"/>
+<text x="76" y="42" font-size="16" fill="#293241">PR-AUC</text>
+<line x1="76" y1="58" x2="894" y2="58" stroke="#d7dde8" stroke-width="0.8"/>
+<line x1="76" y1="192.0" x2="894" y2="192.0" stroke="#e4e8f0" stroke-width="0.8"/>
+<rect x="110.8" y="237.2" width="94" height="88.8" fill="#8d99ae"/>
+<text x="157.8" y="229.2" text-anchor="middle" font-size="16">0.331345</text>
 <text x="157.8" y="358.0" text-anchor="middle" font-size="14" fill="#293241">PaySim</text>
 <text x="157.8" y="375.0" text-anchor="middle" font-size="14" fill="#293241">baseline</text>
-<rect x="274.4" y="165.0" width="94" height="161.0" fill="#2a9d8f"/>
-<text x="321.4" y="157.0" text-anchor="middle" font-size="16">0.638773</text>
+<rect x="274.4" y="154.8" width="94" height="171.2" fill="#2a9d8f"/>
+<text x="321.4" y="146.8" text-anchor="middle" font-size="16">0.638773</text>
 <text x="321.4" y="358.0" text-anchor="middle" font-size="14" fill="#293241">PaySim</text>
 <text x="321.4" y="375.0" text-anchor="middle" font-size="14" fill="#293241">competitive</text>
-<rect x="438.0" y="157.5" width="94" height="168.5" fill="#457b9d"/>
-<text x="485.0" y="149.5" text-anchor="middle" font-size="16">0.668756</text>
+<rect x="438.0" y="146.8" width="94" height="179.2" fill="#457b9d"/>
+<text x="485.0" y="138.8" text-anchor="middle" font-size="16">0.668756</text>
 <text x="485.0" y="358.0" text-anchor="middle" font-size="14" fill="#293241">Elliptic</text>
 <text x="485.0" y="375.0" text-anchor="middle" font-size="14" fill="#293241">graph</text>
-<rect x="601.6" y="88.3" width="94" height="237.7" fill="#e9c46a"/>
-<text x="648.6" y="80.3" text-anchor="middle" font-size="16">0.94324</text>
+<rect x="601.6" y="73.2" width="94" height="252.8" fill="#e9c46a"/>
+<text x="648.6" y="65.2" text-anchor="middle" font-size="16">0.94324</text>
 <text x="648.6" y="358.0" text-anchor="middle" font-size="14" fill="#293241">Elliptic2</text>
 <text x="648.6" y="375.0" text-anchor="middle" font-size="14" fill="#293241">context</text>
-<rect x="765.2" y="80.6" width="94" height="245.4" fill="#e76f51"/>
-<text x="812.2" y="72.6" text-anchor="middle" font-size="16">0.974</text>
+<rect x="765.2" y="65.0" width="94" height="261.0" fill="#e76f51"/>
+<text x="812.2" y="57.0" text-anchor="middle" font-size="16">0.974</text>
 <text x="812.2" y="358.0" text-anchor="middle" font-size="14" fill="#293241">RevClassifyDS</text>
 <text x="812.2" y="375.0" text-anchor="middle" font-size="14" fill="#293241">ref</text>
 <text x="30" y="406" font-size="17" fill="#5b6472">Values come from fixed local evidence cells; rows are supporting evidence, not headline claims.</text>

@@ -24,15 +24,30 @@ This paper is a systems paper about local-first AML evaluation. Its first contri
 
 The scope is deliberate. Relaytic-AML is presented as an evaluation environment and evidence system. Its current public benchmark rows support that systems claim; they are not offered as broad deployment superiority, graph-neural dominance, or equivalence to RevClassify. That boundary is part of the design rather than an afterthought.
 
-| Paper contribution | Relaytic mechanism | Evidence in this release |
-|---|---|---|
-| Local state is auditable | Run directories, manifests, traces, metric cells, tables, and release reports live in the workspace | Demonstrated by the generated paper and source package |
-| Agent help is legible | Guide, scout, scientist, strategist, builder, trace reviewer, and claim governor roles have separate jobs and artifacts | Role boundaries and artifacts are documented in the paper and repository |
-| Scores are traceable | Evidence cells bind every number to dataset, split, command, artifact field, budget, and claim state | Supporting PaySim, Elliptic, and Elliptic2-context rows |
-| External handoff is governed | Redacted context packs, JSON command surfaces, skills, and Model Context Protocol adapters expose state without exposing private rows by default | OpenClaw, Claude/Codex project-skill, CLI, and Model Context Protocol use cases share the same artifact graph |
-| Public claims stay evidence-bounded | Metric cells, limitation records, and release audits prevent unsupported promotion | Tables, figures, and source package are regenerated from the governed evidence layer |
+The release therefore contributes five concrete mechanisms:
 
-## 3. Problem Setting and Design Thesis
+- A local artifact graph for run state, model outputs, traces, metric cells, tables, figures, and source packages.
+- A role-scoped agent runtime in which guide, scout, strategist, scientist, builder, trace reviewer, and release governor work through typed artifacts rather than ambient memory.
+- Evidence cells that bind each reported number to dataset, split, command, artifact field, budget, leakage posture, operating point, and claim state.
+- Governed handoff surfaces for local models, external coding agents, OpenClaw-style skills, Claude/Codex project skills, JSON CLI calls, and Model Context Protocol adapters.
+- A release harness that can regenerate the manuscript assets while refusing stronger claims than the evidence has earned.
+
+## 3. AML Problem Setting
+
+Money laundering and financial crime are not usually visible as one obviously illegal row. They appear as transaction patterns, entity relationships, and changes in behavior. A transfer can be ordinary in isolation and suspicious in context: many small incoming transfers followed by rapid outward movement, round-number wires without a business explanation, flows to higher-risk locations, repeated transfers among related accounts, weak originator or beneficiary information, or cryptocurrency flows that use anonymity-enhancing services. FinCEN describes advisories as a way to publish typologies and red flags that improve monitoring, while the FFIEC manual lists funds-transfer, activity-inconsistent, cross-border, and unusual-transaction indicators used by banks and examiners [@fincenAdvisories; @ffiecRedFlags]. FATF makes the same point for virtual assets: red flags can involve anonymity technology, geography, transaction patterns, transaction size, sender/recipient profiles, and source-of-funds signals [@fatf2020virtualassets].
+
+In data terms, AML work starts with events. A transaction record may contain a timestamp, sender, receiver, amount, channel, geography, account or wallet identifiers, device or network context, customer segment, and sometimes balances or counterparties. Fraud can enter through account takeover, mule accounts, front companies, shell-company transfers, trade or invoice activity, digital-asset movement, or a cash-out endpoint. A useful system therefore has to reason over both rows and relationships: what happened before, which entities are connected, whether the flow is unusual for the customer, whether a new counterparty receives many small transfers, and what a human reviewer would need to see.
+
+Relaytic-AML operationalizes that setting in four steps:
+
+- It first freezes the source and task contract: what data is local, which columns are allowed, what target is being modeled, and which split rule prevents future information from leaking backward.
+- It then builds time-aware and graph-aware evidence: prior-step history for destination entities, structural counterparty features, suspicious-subgraph context, typology posture, and delayed-label or review-budget artifacts where available.
+- It runs baseline and competitive candidate models under explicit budgets, chooses thresholds only on validation evidence, and reports fixed test metrics with leakage posture attached.
+- It connects scores to operations by asking which transactions or entities would enter a review queue, what precision and recall look like under a bounded analyst budget, and whether the result can support a paper, product, or compliance claim.
+
+A simple example makes the point. In a mobile-money style dataset, a fraud pattern may look like a transfer into a destination account followed quickly by cash-out. A naive model can accidentally learn from balance columns that reveal the simulator's internal bookkeeping after the event. Relaytic therefore records those fields as forbidden for the paper row and instead uses features that would be available at decision time, such as prior-step destination behavior. In a blockchain graph, the row is less like a bank transfer table and more like a directed transaction network over time. Relaytic therefore keeps graph provenance and subgraph boundaries visible before treating a score as evidence.
+
+## 4. Relaytic Design Thesis
 
 The central problem is legibility under constraint. A trained reader can understand PR-AUC, temporal splits, graph features, and review budgets, but that reader cannot know the state of a local experiment unless the system makes it legible. Relaytic-AML is built around the view that an evaluation environment should expose its state in the same way a model exposes its metrics: through stable artifacts, not through informal memory.
 
@@ -40,7 +55,7 @@ The design thesis is that local-first evidence can make agent-assisted AML resea
 
 This paper evaluates whether the current Relaytic-AML implementation makes those invariants concrete. The benchmark rows are useful because they exercise the architecture, not because they settle AML detection. The more important question is whether a human, a local model, or an external coding agent can enter the workspace, understand what is known, see what remains blocked, and choose a safe next action without private rows leaving the local boundary.
 
-## 4. Local-First Agent Architecture
+## 5. Local-First Agent Architecture
 
 Relaytic is designed around one control rule: the user's workspace is the authority. Raw and licensed data stay local by default. Run directories, manifests, traces, metric cells, model files, and paper assets form the durable record. Semantic caches, memory indexes, and LLM summaries are derived views. This is different from a remote-first agent that sends private rows to a hosted planner and later reconstructs provenance from a conversation.
 
@@ -48,21 +63,21 @@ The system is agentic, but the roles are concrete. They are small jobs with boun
 
 This makes Relaytic host-neutral. OpenClaw can consume the checked-in Relaytic skill notes. Claude Code can use the project-local agent and Model Context Protocol (MCP) configuration. Codex-style skill environments can use the same skill contract. Any host can also use the command-line interface (CLI) JSON surfaces. The important privacy rule is the same across all of them: external agents should receive artifact references, aggregate metadata, commands, and redacted context packs by default, while raw rows and licensed files stay inside the governed workspace unless the operator explicitly changes policy.
 
-| Role | What it owns | Local-first boundary | Main artifacts |
-|---|---|---|---|
-| Operator and mandate owner | Sets goals, constraints, privacy posture, and stop/continue preferences. | Can keep all data on a controlled local machine, server, or cluster. | Mandate, policy, permission, and next-action artifacts. |
-| Guide and assist layer | Answers where the run is, what artifacts matter, and which action is safe next. | Uses local artifacts first. Optional LLM help is advisory and redacted by default. | Guide payloads, assist turns, status, and context packs. |
-| Scout and task-contract agents | Inspect source posture, target semantics, split validity, and leakage risk. | Work from staged local snapshots rather than mutating the original data source. | Dataset registry, source manifests, split contracts, and task reports. |
-| Scientist and challenger agents | Propose baselines, ablations, shadow candidates, and failure explanations. | Candidate work is bounded by explicit budgets and local artifact permissions. | Experiment registry, scorecards, ablations, and shadow-trial reports. |
-| Builder and search controller | Execute reproducible model/search plans and select thresholds on validation evidence. | Optional adapters are versioned and never become hidden sources of truth. | Run directories, model artifacts, search traces, and operating-point records. |
-| Evidence and release governors | Decide how evidence may be described and which claims stay blocked. | Fail closed on leakage, missing provenance, unsupported interpretation, or dirty release state. | Metric cells, claim boundaries, release notes, and source-bundle audits. |
-| External agents or LLMs | Consume exported context, propose repairs, or continue work through stable surfaces. | Receive rowless/redacted context unless policy explicitly grants richer access. | External context packs, handoff reports, and reproducible commands. |
+| Role | Responsibility | Boundary and outputs |
+| --- | --- | --- |
+| Operator and mandate owner | Sets goals, constraints, privacy posture, and stop/continue preferences. | Mandate, policy, permission, and next-action artifacts. Data can stay on a controlled local machine, server, or cluster. |
+| Guide and assist layer | Answers where the run is, what artifacts matter, and which action is safe next. | Guide payloads, assist turns, status, and context packs. Optional LLM help is advisory and redacted by default. |
+| Scout and task-contract agents | Inspect source posture, target semantics, split validity, and leakage risk. | Dataset registry, source manifests, split contracts, and task reports. Work from staged local snapshots. |
+| Scientist and challenger agents | Propose baselines, ablations, shadow candidates, and failure explanations. | Experiment registry, scorecards, ablations, and shadow-trial reports. Candidate work is budgeted and permission-bound. |
+| Builder and search controller | Execute reproducible model/search plans and select thresholds on validation evidence. | Run directories, model artifacts, search traces, and operating-point records. Optional adapters are versioned. |
+| Evidence and release governors | Decide how evidence may be described and which claims stay blocked. | Metric cells, claim boundaries, release notes, and source-bundle audits. Gates fail closed on unsupported interpretation. |
+| External agents or LLMs | Consume exported context, propose repairs, or continue work through stable surfaces. | External context packs, handoff reports, and reproducible commands. Rowless/redacted by default unless policy grants more. |
 
 Two design choices carry most of the system. First, important work produces a local artifact that another human or agent can inspect. Second, optional intelligence is subordinate to the artifact graph. A local LLM may help phrase guidance, and a frontier model may suggest repairs, but neither becomes the source of truth unless its proposal is converted into a reproducible local artifact.
 
-![Local-first Relaytic agent architecture](figures/figure_1_claim_gate_flow.svg)
+![Relaytic-AML local evidence loop. Specialist roles write local artifacts; external handoff is rowless by default and claim gates fail closed.](figures/figure_1_claim_gate_flow.svg)
 
-### Agent Runtime, Loops, and Harness
+## 6. Agent Runtime, Loops, and Harness
 
 Relaytic's technical core is an artifact-first agent loop. Each specialist observes the local run state, reads the contracts it is allowed to read, decides a bounded next action, executes deterministic or advisory logic, writes a typed artifact, and records enough trace information for another process to audit the step. The loop is intentionally less glamorous than an open-ended chat agent. It is engineered so that progress survives process restarts, model changes, and external review.
 
@@ -70,73 +85,68 @@ The scout loop is deterministic-first. It converts ingestion metadata, quality c
 
 The modeling harness follows the same pattern. Dataset registry artifacts describe what source is being used and what cannot be claimed from it. Split contracts define the temporal or graph partition before model selection. Candidate runners write search traces, validation decisions, calibration records, selected operating points, and test metrics. The release layer reads those outputs as evidence cells. It does not trust a score unless the score can be tied back to the split, command, budget, artifact field, and claim boundary that produced it.
 
-| Runtime surface | What the implementation builds | Failure mode it controls |
-|---|---|---|
-| Investigation loop | Source manifests, quality checks, target-risk notes, leakage warnings, and task-contract evidence | Starting model work before the task is well defined |
-| Planning loop | Builder handoffs with task type, route, metric family, candidate steps, and open assumptions | Vague objectives, wrong metrics, or hidden modeling choices |
-| Model/search harness | Baseline and competitive candidate runs, budget tiers, calibration, threshold selection, and operating-point artifacts | Anecdotal model development or test-set tuning |
-| Trace and adjudication loop | Runtime spans, specialist traces, branch graphs, claim packets, replay reports, and scorecards | Uninspectable agent decisions and unsupported branch choices |
-| Guide and assist loop | Run-state summaries, action menus, artifact shortlists, status answers, and redacted context packs | Humans or external agents getting lost in the workspace |
-| Release harness | Evidence cells, paper tables, figures, source bundles, citations, and claim-gate reports | Release claims exceeding the evidence record |
+The implementation has six load-bearing loops. The investigation loop prevents model work from starting before the task is coherent. The planning loop turns investigation state into an executable builder contract. The model/search harness separates quick checks, baselines, competitive search, calibration, threshold selection, and fixed test reporting. The trace loop materializes branch choices, tool calls, claim packets, and replay reports. The guide/assist loop makes local state navigable for humans and external agents. The release harness converts evidence cells into paper assets and blocks manuscript claims that exceed the evidence record.
 
 This is the part of Relaytic that matters technically. The agents are not only prompt roles. They are state machines around a governed artifact graph. The architecture favors typed files, schemas, replayable commands, and conservative gates because those are the objects a reviewer, engineer, or future agent can actually inspect. In AML, that matters more than a fluent explanation. A fluent explanation is useful only after the evidence state is already coherent.
 
 ### Execution Contract and System Evidence
 
-A full Relaytic run follows a fixed execution contract. The mandate records the user's goal, constraints, and data-movement posture. Intake and scouting materialize source posture, task semantics, candidate target fields, leakage warnings, and split recommendations. Planning converts those findings into a builder handoff. Execution writes candidate results and operating-point artifacts. Trace review records decisions, branches, tool use, and claim packets. The release harness then decides what can appear in a table, figure, paper sentence, or external handoff.
+A full Relaytic run follows a fixed execution contract. The mandate records the user's goal, constraints, and data-movement posture. Intake and scouting materialize source posture, task semantics, candidate target fields, leakage warnings, and split recommendations. Planning converts those findings into a builder handoff. Execution writes candidate results and operating-point artifacts. Trace review records decisions, branches, tool use, and claim packets. The release harness then decides what can appear in a table, figure, manuscript claim, or external handoff.
 
 The practical effect is that an agent cannot simply assert that a result is valid. It has to leave behind a path that other surfaces can read. A guide response, an assist turn, a mission-control view, a paper table, and a redacted context pack all read from the same artifact graph. This is why Relaytic is local-first in more than a privacy sense: the local state is also the arbitration layer for meaning.
 
-| Run stage | Primary agent surface | Artifact contract | Evidence control |
-|---|---|---|---|
-| Mandate and policy | Operator plus guide | Goal, data boundary, allowed actions, stop/continue preference | Defines the authorized work envelope before analysis starts |
-| Source and task scouting | Scout | Source manifest, quality checks, target-risk notes, split-risk notes | Freezes data posture and task validity before model search |
-| Planning handoff | Strategist | Task profile, metric family, route, candidate steps, unresolved assumptions | Converts investigation state into an executable builder contract |
-| Search and execution | Builder/search controller | Candidate traces, validation decisions, calibration, thresholds, selected run | Separates validation-selected development from fixed test reporting |
-| Trace and adjudication | Trace reviewer | Runtime spans, branch graph, claim packets, replay report, scorecard | Makes agent choices replayable as artifacts rather than remembered prose |
-| Release and handoff | Evidence governor plus guide | Evidence cells, claim boundaries, paper tables, context pack | Promotes only interpretations supported by the local evidence record |
+The run path is deliberately simple: mandate and policy define the authorized work envelope; source and task scouting freeze data posture before model search; planning turns that state into a builder contract; search writes candidate traces and validation decisions; trace review makes the choices replayable; release and handoff promote only interpretations supported by local evidence.
 
-Algorithm 1 shows the loop in implementation terms. The important feature is not that every specialist uses the same model, but that every specialist is forced through the same artifact, gate, and trace discipline.
+Algorithm 1 shows the specialist loop in implementation terms. The important feature is not that every specialist uses the same model. The important feature is that every specialist must pass through the same artifact, gate, and trace discipline.
 
 ```text
 Algorithm 1: Artifact-first specialist loop
 
-input: run_dir, specialist_contract, policy
-repeat until stop_condition(run_dir, policy):
-  state <- read_allowed_artifacts(run_dir, specialist_contract)
-  obs <- inspect(state)
-  proposal <- deterministic_step(obs)
+input: local run directory, role contract, privacy policy
+while the run still needs work:
+  read only the artifacts allowed for this role
+  summarize the current evidence state
+  propose one bounded next step
 
-  if advisory_model_enabled(policy):
-    note <- advisory_note(obs, redacted_context(state))
-    proposal <- attach_note(proposal, note)
+  if advisory model help is enabled:
+    send a redacted, rowless context pack
+    attach the returned note as advice, not authority
 
-  decision <- gate(proposal, policy, budget, claim_contract)
-  if decision.accept:
-    artifact <- write_typed_artifact(run_dir, decision.payload)
-    trace(role, inputs=state.refs, outputs=artifact.refs)
+  check the proposal against policy, budget, and claim contracts
+  if the proposal is allowed:
+    write the typed artifact
+    append a trace span linking inputs to outputs
   else:
-    blocker <- write_blocker(run_dir, decision.reason)
-    trace(role, inputs=state.refs, outputs=blocker.refs)
+    write a blocker artifact with the rejected reason
+    append a trace span linking inputs to the blocker
 
-  refresh_run_summary(run_dir)
+  refresh the run summary so humans and agents see the same state
 ```
 
-A simplified evidence cell shows the same contract at metric level:
+Algorithm 2 is the corresponding gate for a reported metric. This is the part that stops a good-looking result from becoming a stronger paper claim than it deserves.
 
-| Evidence-cell field | Example from the PaySim row | Why a reviewer needs it |
-|---|---|---|
-| Dataset identity | `paysim_temporal_transaction_fraud` | Separates synthetic proxy evidence from real-bank evidence |
-| Split contract | Chronological step split | Prevents random-split leakage from masquerading as temporal validity |
-| Metric and value | Test PR-AUC 0.638773 | Names the exact reported quantity |
-| Budget tier | Competitive | Shows that stronger search was used rather than a smoke run |
-| Leakage posture | Prior-step destination history only | Explains why engineered history features are allowed |
-| Claim state | Supporting only | Prevents the result from being promoted beyond its dataset boundary |
-| Source artifacts | Benchmark manifest, budget contract, and claim gate | Gives the reader concrete files to inspect or regenerate |
+```text
+Algorithm 2: Evidence-cell claim gate
+
+input: candidate metric, dataset contract, split contract, release policy
+require dataset identity, split rule, command, artifact field, metric value
+require budget tier, leakage posture, operating-point rule, and source refs
+
+if any required field is missing:
+  mark the row blocked and name the missing evidence
+elif split or leakage checks fail:
+  mark the row blocked and prevent table promotion
+else:
+  assign the narrowest valid claim state
+  attach limitation notes and future unlock conditions
+  emit the metric cell, allowed claim, blocked claims, and paper refs
+```
+
+A simplified PaySim evidence cell contains the dataset identity (`paysim_temporal_transaction_fraud`), a chronological split contract, test PR-AUC 0.638773, a competitive budget tier, the leakage posture `prior_step_destination_history_only`, a supporting-only claim state, and source artifacts for the benchmark manifest, budget contract, and claim gate.
 
 This schema-like record is the difference between a result and an anecdote. A serious reader can challenge the dataset, the split, the metric, the budget, the leakage posture, or the claim state without needing to reconstruct the run from memory.
 
-## 5. Current Frontier Context
+## 7. Current Frontier Context
 
 The current AML frontier is not a single leaderboard. It is a set of pressure points: real graph scale, realistic entity behavior, temporal drift, operational throughput, and reliable agent-assisted research. Relaytic-AML is designed as infrastructure around those pressure points, not as a replacement for detector papers.
 
@@ -148,11 +158,11 @@ The Elliptic Bitcoin dataset introduced a public transaction graph with more tha
 
 Elliptic2 shifts the public AML benchmark center toward subgraph learning, with 121,810 labeled subgraphs inside a background graph of roughly 49M node clusters and 196M edge transactions [@bellei2024elliptic2]. RevTrack and RevClassify further argue that sender and receiver context around a subgraph can be a powerful and scalable signal [@song2024revtrack]. These works motivate Relaytic-AML's modern-context and limitation track, but they do not make the current Relaytic Elliptic2 row a performance contribution.
 
-Recent AML graph work raises the bar beyond the current Relaytic evidence rows. TransXion frames benchmark realism around profile-aware simulation, richer entity attributes, non-template illicit synthesis, and out-of-character behavior [@chen2026transxion]. LineMVGNN and ExSTraQt focus on directed money flow, edge-aware graph views, and quasi-temporal transaction representations [@poon2026linemvgnn] [@tariq2026extraqt]. BlazingAML treats throughput and multi-stage graph mining as a systems problem [@ye2026blazingaml]. Continual graph-learning reviews emphasize drift, adaptation, class imbalance, and changing laundering behavior [@deprez2025continualaml]. These papers point to a frontier where realism, scale, graph structure, time, and operations are inseparable. Relaytic-AML is complementary to those efforts: it does not claim detector parity with them, but tries to make dataset posture, split validity, budget, limitations, and release claims auditable.
+Recent AML graph work raises the bar beyond the current Relaytic evidence rows. TransXion frames benchmark realism around profile-aware simulation, richer entity attributes, non-template illicit synthesis, and out-of-character behavior [@chen2026transxion]. LineMVGNN and ExSTraQt focus on directed money flow, edge-aware graph views, and quasi-temporal transaction representations [@poon2026linemvgnn; @tariq2026extraqt]. BlazingAML treats throughput and multi-stage graph mining as a systems problem [@ye2026blazingaml]. Continual graph-learning reviews emphasize drift, adaptation, class imbalance, and changing laundering behavior [@deprez2025continualaml]. These papers point to a frontier where realism, scale, graph structure, time, and operations are inseparable. Relaytic-AML is complementary to those efforts: it does not claim detector parity with them, but tries to make dataset posture, split validity, budget, limitations, and release claims auditable.
 
-The paper also follows broader machine-learning documentation and reproducibility practice. Datasheets for Datasets and Model Cards argue for explicit dataset and model reporting [@gebru2021datasheets] [@mitchell2019modelcards]. The NeurIPS reproducibility program highlights the need for code, data, and checklist discipline in machine-learning research [@pineau2021reproducibility]. Recent work on machine-learning research agents warns that coherent papers can still contain invalidated experiments, which reinforces the need for executable artifacts, reproducible commands, and explicit claim boundaries [@chen2025mlrbench] [@starace2025paperbench].
+The paper also follows broader machine-learning documentation and reproducibility practice. Datasheets for Datasets and Model Cards argue for explicit dataset and model reporting [@gebru2021datasheets; @mitchell2019modelcards]. The NeurIPS reproducibility program highlights the need for code, data, and checklist discipline in machine-learning research [@pineau2021reproducibility]. Recent work on machine-learning research agents warns that coherent papers can still contain invalidated experiments, which reinforces the need for executable artifacts, reproducible commands, and explicit claim boundaries [@chen2025mlrbench; @starace2025paperbench].
 
-## 6. Methodology: Evidence Cells, Gates, and Budgets
+## 8. Methodology: Evidence Cells, Gates, and Budgets
 
 Relaytic-AML treats a metric as an evidence cell, not as a free-standing score. An evidence cell records the dataset identity, split contract, execution command, run or artifact reference, metric value, budget tier, leakage posture, operating-point rule, claim state, and limitation notes. A reported row is accepted only when those fields are present and internally consistent.
 
@@ -164,42 +174,37 @@ The budget ladder separates quick engineering checks from serious evidence. Smok
 
 For an external reader, the important idea is simple: every number has a trail, and every claim has a boundary. The trail helps another person reproduce or challenge the result. The boundary says whether the result is a benchmark observation, an operational estimate, a limitation, or a claim that should not be made yet.
 
-## 7. Evidence Operating Layer
+## 9. Evidence Operating Layer
 
 The local-first architecture becomes concrete through an evidence operating layer. Relaytic-AML is not only a model runner. It coordinates source posture, task semantics, split discipline, model search, decision thresholds, review queues, artifacts, trace review, and claim boundaries.
 
-| Layer | What Relaytic records | Why it matters |
-|---|---|---|
-| Source and task contracts | Dataset access, target semantics, benchmark posture, and split rules | A reader can see whether the task is valid before judging the score |
-| Execution and search | Candidate families, budgets, calibration, thresholds, selected runs, and search traces | Model development becomes inspectable instead of anecdotal |
-| AML domain layer | Entity graphs, typology posture, review queues, delayed labels, and case evidence | The model is tied to the analyst workflow it is supposed to support |
-| Evidence ledger | Metric cells, tables, figures, limitations, and commands | Numbers are connected to the artifacts that produced them |
-| Claim boundaries | Allowed claims, blocked claims, and future unlock conditions | The same result cannot quietly become a stronger interpretation |
-| Trace and replay | Runtime spans, branch graphs, tool logs, claim packets, and adjudication scorecards | Agentic decisions can be reviewed rather than trusted from prose |
-| Handoff surfaces | Guide, status, assist, mission control, and redacted context export | Humans and external agents can continue work without guessing hidden state |
+The table below is deliberately more useful than another list of agent names. It shows the evidence substrate a reader should expect to find behind any serious Relaytic result.
+
+| Layer | What It Records | Why It Matters |
+| --- | --- | --- |
+| Source and task contracts | Dataset access, target semantics, benchmark posture, and split rules. | Lets a reader judge task validity before judging a score. |
+| Execution and search artifacts | Candidate families, budgets, calibration, thresholds, selected runs, and search traces. | Makes model development inspectable rather than anecdotal. |
+| AML domain artifacts | Entity graphs, typology posture, review queues, delayed labels, and case evidence. | Connects model output to analyst workflow instead of treating rows in isolation. |
+| Evidence ledgers | Metric cells, tables, figures, limitations, and commands. | Keeps every public number tied to local source artifacts. |
+| Claim boundaries | Allowed claims, blocked claims, limitation notes, and future unlock conditions. | Stops attractive numbers from becoming unsupported claims. |
+| Trace and replay artifacts | Runtime spans, branch graphs, tool logs, claim packets, and adjudication scorecards. | Lets another reviewer reconstruct how Relaytic reached the state. |
+| Handoff surfaces | Guide, status, assist, mission control, and redacted context export. | Lets humans and external agents continue without guessing hidden state. |
 
 This operating layer is useful even when a result cannot support a stronger interpretation. The row is not thrown away. It becomes a structured research state with a reason, an artifact reference, and a repair path.
 
-## 8. What Relaytic-AML Is For
+## 10. What Relaytic-AML Is For
 
 The intended user is a person or team that has data, a risky modeling question, and a need to know whether the evidence is strong enough to act on. That includes a bank team comparing a new model against an incumbent queue, a fraud group exploring a new dataset, a researcher testing a benchmark protocol, or an external agent trying to continue a run without seeing private rows.
 
-| Capability | Operational role |
-|---|---|
-| Local-first privacy posture | Private or licensed data can stay outside the public repo while hashes, access posture, and evidence artifacts remain inspectable |
-| Artifact-first reproducibility | Tables and figures are tied to local JSON and model artifacts rather than loose notes |
-| Role-scoped agent help | A guide, scout, scientist, builder, and claim reviewer have different responsibilities |
-| Budget-aware modeling | Quick checks, baseline evidence, competitive runs, and frozen reporting are kept separate |
-| Operational evaluation | Review-budget precision, recall, false-positive burden, and case-packet completeness sit next to model metrics |
-| External context export | Another LLM or coding agent can receive redacted state, artifact references, and reproducible commands |
+The practical capabilities are deliberately operational. Private or licensed data can stay outside the public repo while hashes, access posture, and evidence artifacts remain inspectable. Tables and figures are tied to local JSON and model artifacts rather than loose notes. The guide, scout, scientist, builder, trace reviewer, and claim reviewer have different responsibilities. Quick checks, baseline evidence, competitive runs, and frozen reporting are kept separate. Review-budget precision, recall, false-positive burden, and case-packet completeness sit next to model metrics. External agents receive redacted state, artifact references, limitations, and reproducible commands rather than private rows by default.
 
 For other agents, Relaytic behaves like a local evidence service rather than a private-data proxy. An OpenClaw workflow can read the Relaytic skill and call the same command surfaces. A Claude Code session can use the project-local agent notes and MCP configuration. A Codex or similar project-skill host can follow the checked-in skill contract. In all cases the safe handoff is artifact-first: the agent sees the run summary, selected artifact references, aggregate metrics, limitations, and reproduction commands. It does not need raw private rows to decide whether the next action is a rerun, a leakage repair, a stronger baseline, a data-acquisition step, or a claim edit.
 
-This is why the project moved from a broad Relaytic system toward Relaytic-AML as the flagship story. The general architecture still matters, but AML gives it a sharper test. It forces the system to handle rare events, temporal splits, graph context, human review limits, privacy, and public-claim discipline at the same time.
+This is why the project moved from a broad Relaytic system toward Relaytic-AML as the flagship story. The general architecture still matters, but AML gives it a sharper test. It forces the system to handle rare events, temporal splits, graph context, human review limits, privacy, and interpretation boundaries at the same time.
 
 Companies could use this kind of lab to challenge incumbent rules or models on the same review queue, evaluate whether a new dataset is worth deeper investment, audit whether a vendor comparison is fair, and prepare evidence packs for compliance or model-risk review. Engineering leaders could use it to test whether an agent-assisted machine-learning workflow is actually governable: whether the system knows its state, exposes its assumptions, records its choices, and refuses claims it has not earned. Researchers could use it to ask whether an AML result is supported, blocked, or mainly useful as a limitation.
 
-## 9. Evaluation Environment
+## 11. Evaluation Environment
 
 The current evaluation environment combines public benchmark evidence with local artifact discipline. Dataset registry artifacts define source and access posture. Split contracts define chronological, graph-snapshot, or subgraph partition rules. Benchmark runners produce model and operating-point artifacts. Tables and figures then read from those artifacts.
 
@@ -211,17 +216,11 @@ The environment follows three design rules. Local artifacts are the source of tr
 
 The benchmark rows are not the only evaluation target. Relaytic itself has to behave like a usable research instrument. The current paper therefore treats system behavior as part of the evidence: whether a user or another agent can recover state, find the right artifacts, understand what is blocked, and continue without private rows leaving the workspace.
 
-| Evaluation dimension | Relaytic surface | Evidence emitted |
-|---|---|---|
-| State recovery | Guide, status fallback, assist turns, mission-control summaries, and run-summary artifacts | Current state, artifact shortlist, starter actions, and next-step options generated from local artifacts |
-| External-agent handoff | Rowless/redacted context packs, OpenClaw notes, Claude/Codex skill contracts, JSON CLI, and MCP surfaces | Commands, artifact references, limitations, and claim posture without raw rows by default |
-| Metric auditability | Evidence cells, metric-cell audit, command ledger, budget contracts, and release manifests | Each public row binds value, dataset, split, budget, leakage posture, and claim state |
-| Agent traceability | Runtime spans, specialist traces, branch graph, claim packets, replay report, and adjudication scorecard | Agent decisions materialized as artifacts rather than only remembered in conversation |
-| Claim governance | Public-claim lint, claim gate matrix, limitation records, and release checklist | Tables, figures, and paper text regenerated from the same governed evidence layer |
+The current implementation emits five kinds of system evidence. State recovery is covered by guide payloads, status fallback, assist turns, mission-control summaries, run summaries, artifact shortlists, and next-step options generated from local artifacts. External-agent handoff is covered by rowless context packs, OpenClaw notes, Claude/Codex skill contracts, JSON CLI surfaces, and MCP surfaces. Metric auditability is covered by evidence cells, metric-cell audits, command ledgers, budget contracts, and release manifests. Agent traceability is covered by runtime spans, specialist traces, branch graphs, claim packets, replay reports, and adjudication scorecards. Claim boundaries are covered by release-gate records, limitation notes, and evidence-backed allowed or blocked claim lists.
 
-The PaySim competitive row illustrates the contract. The run uses a chronological split, excludes forbidden balance fields, builds prior-step destination history, selects candidates on validation evidence, and freezes the test operating point. The resulting PR-AUC is reported because the evidence cell is complete. It is not promoted to a real-bank AML claim because the data is synthetic. That refusal is a system result: Relaytic preserved the useful score while preventing the more attractive but unsupported sentence.
+The PaySim competitive row illustrates the contract. The run uses a chronological split, excludes forbidden balance fields, builds prior-step destination history, selects candidates on validation evidence, and freezes the test operating point. The resulting PR-AUC is reported because the evidence cell is complete. It is not promoted to a real-bank AML claim because the data is synthetic. That refusal is a system result: Relaytic preserved the useful score while preventing a stronger but unsupported interpretation.
 
-## 10. Benchmark Protocol
+## 12. Benchmark Protocol
 
 The benchmark protocol is deliberately subordinate to the architecture. Its purpose is to check whether Relaytic can produce traceable evidence, respect split and leakage contracts, expose operational assumptions, and block unsupported claims. A single score does not define the value of the system.
 
@@ -242,26 +241,33 @@ The evidence summary below should be read as a claim-boundary table as much as a
 | Elliptic2 context | official-partition PR-AUC std | 0.000882 | modern context only |
 | RevClassifyDS reference | published PR-AUC | 0.974 | reference context, not parity |
 
-![PR-AUC evidence rows](figures/figure_2_supporting_pr_auc.svg)
+The first thing to notice is the PaySim change from the baseline row (0.331345) to the competitive row (0.638773). That is a substantial improvement inside the synthetic temporal-fraud contract, and it is the clearest current sign that Relaytic's workflow is doing useful modeling work rather than only wrapping reports around a weak baseline. The likely driver is the combination of leakage exclusion, prior-step destination-history features, validation-selected model choice, and explicit competitive search. The same row still cannot become a real-bank AML claim because the source is synthetic.
 
-![Review-budget operating points](figures/figure_3_review_budget.svg)
+The Elliptic row (0.668756) is different. It is useful because it keeps graph-source and structural-feature evidence under a chronological snapshot protocol, but the graph-feature lift over source-only evidence is small. A serious reader should treat it as support for Relaytic's provenance and split discipline, not as evidence that Relaytic has solved graph-native AML detection.
 
-![Claim boundaries and future unlocks](figures/figure_4_publishability_matrix.svg)
+The Elliptic2 context row (0.94324 +/- 0.000882) is high in absolute terms, but the recorded RevClassifyDS reference is 0.974. That makes it valuable as modern-context pressure, not as a parity or superiority result. The system's behavior here matters: Relaytic preserves the evidence and also blocks the stronger interpretation.
 
-## 11. Results
+![PR-AUC evidence rows. PaySim improves under the synthetic temporal proxy, while Elliptic2 remains below the RevClassifyDS reference and is not a parity claim.](figures/figure_2_supporting_pr_auc.svg)
 
-The PaySim competitive row improves over the PaySim baseline inside the synthetic temporal-fraud contract. The Elliptic graph-feature row is useful supporting graph evidence, but it is not a graph-neural superiority claim. The Elliptic2 context row is strong enough to justify more work, but not enough to claim parity with the RevClassifyDS reference or to make an Elliptic2 performance contribution.
+Figure 2 visualizes the same distinction. PaySim is the cleanest improvement story because the competitive row materially improves on the baseline under the same synthetic task. Elliptic and Elliptic2 are not failures, but they answer narrower questions: whether the environment can carry graph evidence and whether it can keep a strong modern-context row separate from a blocked state-of-the-art claim.
 
-The more important result is the behavior of the environment. Relaytic can carry a useful score and still refuse the stronger sentence. In financial-crime machine learning, that refusal is not cosmetic. It is part of scientific and operational honesty.
+![Review-budget operating points. High top-queue precision with lower recall shows useful but incomplete analyst coverage under a bounded review budget.](figures/figure_3_review_budget.svg)
 
-| Track | Current paper use | Blocked stronger claim | Evidence needed before promotion | Gate status |
-|---|---|---|---|---|
-| PaySim temporal proxy | supporting synthetic temporal-fraud evidence | real-bank AML superiority | partner or real holdout with frozen evaluation budget | supporting only |
-| Elliptic graph-feature | supporting temporal graph-feature evidence | graph-neural or graph benchmark superiority | repeated graph evaluation budget against strong feature baselines | supporting only |
-| Elliptic2 subgraph | modern subgraph context and limitation evidence | Elliptic2 performance contribution or reference-method match | faithful RevClassify reproduction or leakage-resistant subgraph protocol | context only |
-| Operational review layer | supporting review-budget estimates | hard analyst-hour or business-value claim | complete case packets and same-queue incumbent comparison | supporting only |
+Figure 3 translates scores into review-queue behavior. PaySim has high review-budget precision (0.703336) with much lower recall (0.471584), which is typical when only a small top-ranked queue is inspected. Elliptic shows a similar asymmetry: precision 1, recall 0.056604. This is operationally important because an AML team would not read PR-AUC alone. They would ask whether the top of the queue is useful, how much fraud remains outside the reviewed set, and whether the threshold was chosen without touching the test set.
 
-## 12. Discussion
+![Claim boundary ladder. Current evidence is preserved while stronger AML, graph-neural, RevClassify-parity, and business-value claims remain blocked.](figures/figure_4_publishability_matrix.svg)
+
+## 13. Results
+
+The strongest current empirical result is PaySim. It is not a headline AML result, but it is a good systems result: Relaytic starts from a modest baseline, expands the feature/search budget, excludes leakage-prone fields, selects on validation evidence, and produces a much stronger fixed-test PR-AUC under the same public synthetic task. That is exactly the kind of improvement an evaluation lab should surface before it becomes more ambitious.
+
+The Elliptic result is more cautious. It shows that Relaytic can ingest and evaluate temporal graph-feature evidence with provenance attached, but the current public row does not prove that Relaytic has a superior graph learner. That is an honest limitation and also a useful next target: future work should test stronger graph-native families, repeated budgets, and stricter graph protocols.
+
+The Elliptic2 result is a warning against overclaiming. The number is high enough to show that current subgraph context is fertile ground, but it remains below the recorded RevClassifyDS reference and the local reproduction path does not yet prove reference-protocol parity. A weaker paper would hide that nuance. Relaytic makes it part of the evidence record.
+
+The broader result is the behavior of the environment. Relaytic can carry a useful score and still refuse the stronger sentence. In financial-crime machine learning, that refusal is not cosmetic. It is part of scientific and operational honesty. The gate decisions are concise: PaySim is supporting synthetic temporal-fraud evidence, Elliptic is supporting graph-feature evidence, Elliptic2 is modern context and limitation evidence, and the operational layer is review-budget support rather than proven analyst-hour savings.
+
+## 14. Discussion
 
 The practical value of Relaytic-AML is not that it replaces a compliance platform or wins one benchmark table. Its value is that it gives risk, fraud, or AML teams a local evidence lab for unknown datasets, incumbent challenges, review-budget tradeoffs, leakage checks, and claim discipline. A team evaluating a new dataset can inspect whether the result is a model win, an environment win, a proxy-only result, or a blocked claim.
 
@@ -271,7 +277,7 @@ The same structure also helps when an experiment changes direction. A row can te
 
 An organization would use Relaytic-AML not as a replacement for domain expertise, but as an evaluation layer that makes difficult assumptions explicit: what data was allowed to move, what split was used, what budget was spent, whether the threshold was chosen on validation evidence, what a reviewer would see, and which interpretation the evidence can support.
 
-## 13. Limitations
+## 15. Limitations
 
 The current public evidence is not a deployment validation. PaySim is synthetic mobile-money evidence, so it cannot establish real-bank AML superiority. The Elliptic row is a temporal graph-feature result, not proof that a graph-neural model is better. Elliptic2 is modern context, not a Relaytic performance contribution, because faithful reference-protocol reproduction and cohort equivalence still need more work.
 
@@ -279,7 +285,7 @@ The operational evidence also remains early. The review-budget rows are useful f
 
 The paper therefore argues for Relaytic-AML as a useful local evaluation environment. The current benchmark rows demonstrate the architecture and evidence discipline. They do not close the broader detector question, which should be tested with stronger holdouts, larger search budgets, and partner-grade operational comparisons.
 
-## 14. Future Work
+## 16. Future Work
 
 The next step is to make the architecture more robust against misinterpretation and the evidence more operationally realistic. Relaytic itself should be evaluated as an object of study: whether the guide, scout, scientist, builder, and evidence reviewer agree about the same local run state; whether a first-time user can recover the right artifacts without knowing the repository; and whether an external model can use a redacted context pack to propose a useful repair without inventing unsupported claims.
 
@@ -289,7 +295,7 @@ A useful next paper would therefore have two coupled evaluations. The detector e
 
 The longer-term goal is still broader than AML. Relaytic should become a general local evaluation laboratory for structured, temporal, and graph machine learning. AML is the current flagship because it forces the system to handle privacy, time, graph context, human review, and claim discipline together.
 
-## 15. Reproducibility
+## 17. Reproducibility
 
 The code, paper source, figures, tables, and public evidence artifacts are in the Relaytic repository. The public repo keeps raw private or licensed data out of version control. Where a benchmark requires local data, the command ledger describes the expected local paths and access posture.
 
@@ -315,11 +321,11 @@ python3 -m relaytic.ui.cli scan-git-safety
 
 For readers, the README and this paper are the intended entry points. The README explains the current project shape: Relaytic remains the general package and command-line interface, while Relaytic-AML is the flagship AML edition used for this paper. Lower-level JSON reports, tables, figure sources, and TeX files are reproducibility machinery, not documents a first reader should have to discover manually.
 
-## 16. Author Use of AI Assistance
+## 18. Author Use of AI Assistance
 
 Large-language-model tools assisted with drafting, editing, repository inspection, and consistency checks. The scientific framing, claim boundaries, experimental interpretation, and final manuscript remain the author's work. The tools are not listed as authors.
 
-## 17. Conclusion
+## 19. Conclusion
 
 Relaytic-AML should be read as a local-first AML evaluation-lab paper. The current work is valuable because it makes the operating idea concrete. Data stays locally governed. Specialist roles create inspectable artifacts. External agents receive structured context instead of hidden state. Claim boundaries keep manuscript claims aligned with evidence. The result is a system where model development, privacy, agent assistance, and paper claims are connected by one artifact graph.
 
@@ -328,6 +334,9 @@ The right test for this version is therefore whether the repository makes the cu
 ## References
 
 - Lopez-Rojas, E. A., Elmir, A., and Axelsson, S. (2016). PaySim: A Financial Mobile Money Simulator for Fraud Detection. European Modeling and Simulation Symposium.
+- Financial Action Task Force. (2020). Virtual Assets Red Flag Indicators of Money Laundering and Terrorist Financing.
+- Financial Crimes Enforcement Network. (2026). Alerts, Advisories, Notices, Bulletins, and Fact Sheets.
+- Federal Financial Institutions Examination Council. (2026). BSA/AML Examination Manual: Appendix F, Money Laundering and Terrorist Financing Red Flags.
 - Weber, M., Domeniconi, G., Chen, J., Weidele, D. K. I., Bellei, C., Robinson, T., and Leiserson, C. E. (2019). Anti-Money Laundering in Bitcoin. arXiv:1908.02591.
 - Bellei, C., Xu, M., Phillips, R., Robinson, T., Weber, M., Kaler, T., Leiserson, C. E., Arvind, and Chen, J. (2024). The Shape of Money Laundering. arXiv:2404.19109.
 - Song, K., Dhraief, M. A., Xu, M., Cai, L., Chen, X., Arvind, and Chen, J. (2024). Identifying Money Laundering Subgraphs on the Blockchain. ICAIF 2024.

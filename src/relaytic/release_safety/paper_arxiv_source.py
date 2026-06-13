@@ -668,7 +668,7 @@ def _convert_markdown_citations(text: str) -> str:
             for part in re.split(r"[;,]", match.group(1))
             if part.strip()
         ]
-        return r"\cite{" + ",".join(keys) + "}"
+        return r"\citep{" + ",".join(keys) + "}"
 
     return re.sub(r"\[@([^\]]+)\]", repl, text)
 
@@ -689,7 +689,7 @@ def _escape_latex(text: str) -> str:
         placeholders[key] = value
         return key
 
-    text = re.sub(r"\\cite\{[^}]+\}", lambda match: hold("cite", match.group(0)), text)
+    text = re.sub(r"\\citep?\{[^}]+\}", lambda match: hold("cite", match.group(0)), text)
     text = re.sub(r"\\texttt\{[^}]*\}", lambda match: hold("texttt", match.group(0)), text)
     text = re.sub(r"\\nolinkurl\{[^}]*\}", lambda match: hold("nolinkurl", match.group(0)), text)
     text = re.sub(r"\\textbf\{[^}]*\}", lambda match: hold("textbf", match.group(0)), text)
@@ -923,7 +923,7 @@ def _pdf_escape_text(text: str) -> str:
 
 def _audit_citations(*, tex_source: str, bibliography: str) -> dict[str, Any]:
     cited = []
-    for raw in re.findall(r"\\cite\{([^}]+)\}", tex_source):
+    for raw in re.findall(r"\\citep?\{([^}]+)\}", tex_source):
         cited.extend(part.strip() for part in raw.split(",") if part.strip())
     cited_keys = sorted(set(cited))
     bib_keys = sorted(set(re.findall(r"@\w+\{([^,\s]+)", bibliography)))
