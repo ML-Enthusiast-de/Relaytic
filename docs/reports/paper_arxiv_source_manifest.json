@@ -176,7 +176,7 @@
   "schema_version": "relaytic.paper_arxiv_source.v1",
   "slice": "Paper Track P14",
   "source_hashes": {
-    "main_tex_sha256": "26f637f497ab6e96fb870c2b86033224b5306c3a2ccb1f29c58f91206142432a",
+    "main_tex_sha256": "75f27d0262fefc9a42abc79c8c650cdec0338d270b5fb6c3f584c500c28e0e43",
     "pdf_figure_sha256": {
       "figure_1_claim_gate_flow.pdf": "b4583b78dd75edf9ecdd20f8a1de124b57035ee640a5c92672e8150b8915c048",
       "figure_2_supporting_pr_auc.pdf": "8ec94209cdb1b38dbd5d71c3e79d3062467694b1204cb160b957977b3cb0c30b",

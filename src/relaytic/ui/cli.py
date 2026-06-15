@@ -1530,6 +1530,26 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p15 = release_safety_sub.add_parser(
+        "paper-system-eval",
+        help="Build Paper Track P15 measured system-evaluation reports for guide, handoff, and claim-gate behavior.",
+    )
+    release_safety_p15.add_argument(
+        "--state-dir",
+        default=None,
+        help="Optional temporary state directory for deterministic P15 proof fixtures. Defaults to artifacts/release_safety/paper_p15_system_eval/.",
+    )
+    release_safety_p15.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P15 report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p15.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3580,6 +3600,11 @@ def main(argv: list[str] | None = None) -> int:
             elif args.release_safety_command == "paper-arxiv-source":
                 payload = _run_paper_arxiv_source_surface(
                     source_dir=args.source_dir,
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-system-eval":
+                payload = _run_paper_system_eval_surface(
+                    state_dir=args.state_dir,
                     output_dir=args.output_dir,
                 )
             else:
@@ -7783,6 +7808,47 @@ def _run_paper_arxiv_source_surface(
                 "paper_submission_package_audit": audit,
             }
         ),
+    }
+
+
+def _run_paper_system_eval_surface(
+    *,
+    state_dir: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_system_eval_markdown,
+        sync_paper_system_eval_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_system_eval_pack(
+        root,
+        state_dir=state_dir,
+        output_dir=output_dir,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    manifest = dict(pack["paper_system_eval_manifest"])
+    behavior = dict(pack["paper_system_behavior_eval"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "state_dir": str(Path(state_dir) if state_dir else root / "artifacts" / "release_safety" / "paper_p15_system_eval"),
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_system_eval_manifest": manifest,
+            "paper_system_behavior_eval": behavior,
+            "paper_agent_handoff_eval": pack["paper_agent_handoff_eval"],
+            "paper_no_lost_user_eval": pack["paper_no_lost_user_eval"],
+            "paper_claim_gate_case_studies": pack["paper_claim_gate_case_studies"],
+            "bundle": pack,
+        },
+        "human_output": render_paper_system_eval_markdown(pack),
     }
 
 

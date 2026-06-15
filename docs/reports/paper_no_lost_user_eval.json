@@ -1,0 +1,44 @@
+{
+  "passed_task_count": 3,
+  "schema_version": "relaytic.paper_system_eval.v1",
+  "slice": "Paper Track P15",
+  "state_tree": {
+    "committed": false,
+    "onboarding": "artifacts/release_safety/paper_p15_system_eval/onboarding",
+    "partial_run": "artifacts/release_safety/paper_p15_system_eval/partial_run",
+    "purpose": "temporary deterministic proof fixtures; committed reports contain only rowless summaries",
+    "state_root": "artifacts/release_safety/paper_p15_system_eval"
+  },
+  "status": "pass",
+  "summary": "Relaytic guide surfaces were evaluated for onboarding, partial-run recovery, and artifact shortlisting.",
+  "task_count": 3,
+  "tasks": [
+    {
+      "expected_behavior": "A new user should see onboarding state, safe commands, starter questions, and human/agent handbooks.",
+      "measured_signal": "state=onboarding; commands=4; questions=4",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/onboarding/guide_state.json",
+      "task_id": "onboarding_guide_available",
+      "track": "no_lost_user"
+    },
+    {
+      "expected_behavior": "A partial run should explain where it is, what evidence is missing, and how to export safe context.",
+      "measured_signal": "state=partial_run; missing=8; actions=6",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/guide_state.json",
+      "task_id": "partial_run_state_recovery",
+      "track": "no_lost_user"
+    },
+    {
+      "expected_behavior": "The handoff should name canonical state artifacts without exposing raw rows.",
+      "measured_signal": "artifact_count=1; includes_run_summary=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/external_llm_artifact_index.json",
+      "task_id": "artifact_shortlist_points_to_canonical_state",
+      "track": "no_lost_user"
+    }
+  ]
+}

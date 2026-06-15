@@ -1,0 +1,142 @@
+{
+  "deterministic": true,
+  "evaluation_rows": [
+    {
+      "expected_behavior": "A new user should see onboarding state, safe commands, starter questions, and human/agent handbooks.",
+      "measured_signal": "state=onboarding; commands=4; questions=4",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/onboarding/guide_state.json",
+      "task": "onboarding_guide_available",
+      "track": "no_lost_user"
+    },
+    {
+      "expected_behavior": "A partial run should explain where it is, what evidence is missing, and how to export safe context.",
+      "measured_signal": "state=partial_run; missing=8; actions=6",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/guide_state.json",
+      "task": "partial_run_state_recovery",
+      "track": "no_lost_user"
+    },
+    {
+      "expected_behavior": "The handoff should name canonical state artifacts without exposing raw rows.",
+      "measured_signal": "artifact_count=1; includes_run_summary=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/external_llm_artifact_index.json",
+      "task": "artifact_shortlist_points_to_canonical_state",
+      "track": "no_lost_user"
+    },
+    {
+      "expected_behavior": "External agents should be able to discover inspection, workflow, trace, and permission tools.",
+      "measured_signal": "tool_count=57; required_present=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "relaytic.interoperability.relaytic_server_info",
+      "task": "server_tool_contract_available",
+      "track": "agent_handoff"
+    },
+    {
+      "expected_behavior": "External context should carry artifact-derived state, not raw rows or private paths.",
+      "measured_signal": "raw_rows=False; redactions=8; blocked_fields=6",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/external_llm_context_pack.json",
+      "task": "external_context_rowless_and_redacted",
+      "track": "agent_handoff"
+    },
+    {
+      "expected_behavior": "Another model should receive next-action options and starter questions without guessing artifact names.",
+      "measured_signal": "actions=6; starter_questions=6",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/external_llm_context_pack.json",
+      "task": "safe_next_action_exported",
+      "track": "agent_handoff"
+    },
+    {
+      "expected_behavior": "The local-LLM path should be optional phrasing help over deterministic artifact guidance.",
+      "measured_signal": "llm_status=not_requested; llm_used=False",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/guide_local_llm_summary.json",
+      "task": "local_llm_option_is_advisory",
+      "track": "agent_handoff"
+    },
+    {
+      "expected_behavior": "P11 should keep blocked claim language out of the generated draft.",
+      "measured_signal": "status=pass; hard=False; headline=False",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_claim_lint_report.json",
+      "task": "p11_claim_lint_passed",
+      "track": "claim_gate"
+    },
+    {
+      "expected_behavior": "P12 should allow only a claim-safe paper release mode.",
+      "measured_signal": "status=go_for_p13_claim_safe_release_pack; blocked=5",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_release_go_no_go.json",
+      "task": "p12_go_no_go_blocks_hard_and_headline_claims",
+      "track": "claim_gate"
+    },
+    {
+      "expected_behavior": "P12 should disclose which heavy benchmark reruns remain outside the paper-smoke proof.",
+      "measured_signal": "fallback=True; withheld_commands=8",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_external_dry_run_report.json",
+      "task": "p12_full_benchmark_rerun_scope_disclosed",
+      "track": "claim_gate"
+    },
+    {
+      "expected_behavior": "P12 should have no unresolved paper-smoke reproduction failures.",
+      "measured_signal": "status=no_failures; unresolved=0",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_reproduction_failure_report.json",
+      "task": "p12_reproduction_failures_clear",
+      "track": "claim_gate"
+    },
+    {
+      "expected_behavior": "P13 public wording should remain claim-safe if present.",
+      "measured_signal": "status=claim_safe_public_wording_allowed; lint=pass",
+      "passed": true,
+      "required": false,
+      "source_artifact": "docs/reports/paper_public_claims_allowed.json",
+      "task": "p13_public_wording_lint_passed",
+      "track": "claim_gate"
+    },
+    {
+      "expected_behavior": "P14 source packaging should stay release-candidate only until human metadata and PDF checks are complete.",
+      "measured_signal": "source_ready=True; upload_ready=False",
+      "passed": true,
+      "required": false,
+      "source_artifact": "docs/reports/paper_arxiv_source_manifest.json",
+      "task": "p14_source_bundle_requires_human_upload_gate",
+      "track": "claim_gate"
+    },
+    {
+      "expected_behavior": "P13 release manifest should authorize only claim-safe public release if present.",
+      "measured_signal": "status=ready_for_claim_safe_arxiv_release; release_allowed=True",
+      "passed": true,
+      "required": false,
+      "source_artifact": "docs/reports/paper_release_manifest.json",
+      "task": "p13_release_manifest_claim_safe",
+      "track": "claim_gate"
+    }
+  ],
+  "interpretation": "These checks are deterministic system-behavior evidence. They support the paper's usability and agent-handoff claims, but they are not a controlled human-subject study.",
+  "pass_rate": 1.0,
+  "passed_required_task_count": 11,
+  "private_paths_exposed": false,
+  "raw_rows_exposed": false,
+  "required_task_count": 11,
+  "schema_version": "relaytic.paper_system_eval.v1",
+  "slice": "Paper Track P15",
+  "status": "pass",
+  "surface_count": 5,
+  "task_count": 14
+}

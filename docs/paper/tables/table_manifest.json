@@ -15,7 +15,13 @@
         "docs/reports/paper_claim_lint_report.json",
         "docs/reports/paper_external_dry_run_report.json",
         "docs/reports/paper_reproduction_failure_report.json",
-        "docs/reports/paper_release_go_no_go.json"
+        "docs/reports/paper_release_go_no_go.json",
+        "docs/reports/paper_system_behavior_eval.json",
+        "docs/reports/paper_agent_handoff_eval.json",
+        "docs/reports/paper_no_lost_user_eval.json",
+        "docs/reports/paper_claim_gate_case_studies.json",
+        "docs/reports/paper_system_eval_manifest.json",
+        "docs/reports/paper_system_eval_summary.md"
       ],
       "table_id": "evidence_summary"
     },
@@ -30,13 +36,19 @@
         "docs/reports/paper_claim_lint_report.json",
         "docs/reports/paper_external_dry_run_report.json",
         "docs/reports/paper_reproduction_failure_report.json",
-        "docs/reports/paper_release_go_no_go.json"
+        "docs/reports/paper_release_go_no_go.json",
+        "docs/reports/paper_system_behavior_eval.json",
+        "docs/reports/paper_agent_handoff_eval.json",
+        "docs/reports/paper_no_lost_user_eval.json",
+        "docs/reports/paper_claim_gate_case_studies.json",
+        "docs/reports/paper_system_eval_manifest.json",
+        "docs/reports/paper_system_eval_summary.md"
       ],
       "table_id": "claim_gate_matrix"
     },
     {
       "artifact_ref": "docs/paper/tables/table_3_release_artifact_set.md",
-      "byte_count": 1239,
+      "byte_count": 1738,
       "paper_claim_role": "claim_safe_supporting_evidence_only",
       "source_refs": [
         "docs/reports/paper_result_table_final.json",
@@ -45,7 +57,13 @@
         "docs/reports/paper_claim_lint_report.json",
         "docs/reports/paper_external_dry_run_report.json",
         "docs/reports/paper_reproduction_failure_report.json",
-        "docs/reports/paper_release_go_no_go.json"
+        "docs/reports/paper_release_go_no_go.json",
+        "docs/reports/paper_system_behavior_eval.json",
+        "docs/reports/paper_agent_handoff_eval.json",
+        "docs/reports/paper_no_lost_user_eval.json",
+        "docs/reports/paper_claim_gate_case_studies.json",
+        "docs/reports/paper_system_eval_manifest.json",
+        "docs/reports/paper_system_eval_summary.md"
       ],
       "table_id": "release_artifact_set"
     }

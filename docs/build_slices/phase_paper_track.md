@@ -1,14 +1,14 @@
-# Paper Track P0-P14 - Relaytic-AML arXiv benchmark path
+# Paper Track P0-P15 - Relaytic-AML arXiv benchmark path
 
 ## Status
 
-P0 through P14 implemented. Slice 16A is the next execution target before Academy work resumes.
+P0 through P15 implemented. Slice 16A is the next execution target before Academy work resumes.
 
 ## Intent
 
-Paper Track P0 through P14 is the mandatory path between Slice 15Z-R and Slice 16A.
+Paper Track P0 through P15 is the mandatory path between Slice 15Z-R and Slice 16A.
 
-Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, and final arXiv source release candidate. The final upload still requires author metadata replacement, a local TeX/PDF compile, and human PDF inspection.
+Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, final arXiv source release candidate, and measured system-evaluation proof pack. The final upload still requires author metadata replacement, local PDF review, and clean tag-target proof.
 
 ## Paper Thesis
 
@@ -66,6 +66,8 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
 20. **P14 - final arXiv source bundle and clean release candidate** - implemented
     Convert the claim-safe Markdown paper pack into a LaTeX source tree, convert figures into accepted arXiv graphic formats, audit citations and package hygiene, and leave upload blocked until human metadata and TeX/PDF inspection gates are complete.
+21. **P15 - measured system-evaluation proof pack** - implemented
+    Exercise guide onboarding, partial-run recovery, redacted external-agent handoff, local-LLM advisory boundaries, interoperability discovery, and paper claim gates before regenerating release artifacts.
 
 ## Non-Negotiable Gates
 
@@ -344,7 +346,7 @@ P13 added:
 
 P13 produces the claim-safe Markdown draft, citable references, generated paper tables, release manifest, public attention pack, submission checklist, and allowed-public-claims report from the P10-P12 gated artifact set. It writes a release tag plan but does not create or push tags automatically. Public wording is allowed only in evaluation-environment mode; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked.
 
-## Completed Final Source Bundle
+## Completed Source and System Evidence
 
 ### Paper Track P14 - final arXiv source bundle and clean release candidate
 
@@ -367,3 +369,27 @@ Implemented acceptance:
 3. The submission package audit confirms no local machine paths, external private data paths, secrets, `.env` files, or virtual environments are referenced.
 4. The final checklist records that `git status --short` is empty at the release-candidate tag target.
 5. `paper_arxiv_source_manifest.json` marks source release-candidate status ready, keeps hard/headline claims blocked, and keeps `arxiv_upload_ready` false until author metadata and human TeX/PDF inspection gates pass.
+
+### Paper Track P15 - measured system-evaluation proof pack
+
+P15 converts the paper's system-behavior claims into deterministic protocol evidence. It checks whether a new user or external agent can discover the current state through the guide surface, recover from a partial run, receive a rowless and redacted context pack, inspect available interoperability tools, understand optional local-LLM boundaries, and see which paper claims are allowed or blocked. The result strengthens the architecture and methodology sections without pretending that the project has run a human-subject study or production deployment.
+
+P15 added:
+
+- `src/relaytic/release_safety/paper_system_eval.py`
+- `relaytic release-safety paper-system-eval --format json`
+- `docs/reports/paper_system_behavior_eval.json`
+- `docs/reports/paper_agent_handoff_eval.json`
+- `docs/reports/paper_no_lost_user_eval.json`
+- `docs/reports/paper_claim_gate_case_studies.json`
+- `docs/reports/paper_system_eval_manifest.json`
+- `docs/reports/paper_system_eval_summary.md`
+- `tests/test_paper_track_p15.py`
+
+Implemented acceptance:
+
+1. All 11 required deterministic protocol checks pass in the committed report set.
+2. The pack fails closed when required P11/P12/P13 claim-gate inputs are absent.
+3. The handoff evidence is rowless and redacted, and committed P15 reports avoid raw rows, secrets, and private local paths.
+4. P13 consumes the P15 report before rendering reader-facing measured-system-evaluation text.
+5. The current evidence remains protocol-level only; human-study, analyst-hour, production, hard AML, headline, and SOTA claims remain blocked.

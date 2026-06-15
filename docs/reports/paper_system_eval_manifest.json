@@ -1,0 +1,97 @@
+{
+  "artifact_hashes": {
+    "docs/reports/paper_claim_lint_report.json": "9123d9521638cfb866171a4ebeee931b556f6b8a9d65735d0aa24ebb2ed25322",
+    "docs/reports/paper_external_dry_run_report.json": "ba3b1a75ef7b5d5e045e89ea3cead280643e8a4ef7d4b86512e64ac340bf252d",
+    "docs/reports/paper_release_go_no_go.json": "51aa6561f57abaa2794e2e26f213ed8a21ca8378bd7a2b27896fe106bf796710",
+    "docs/reports/paper_reproduction_failure_report.json": "d3a72c7448abd993743f3f2542e3031364240247dca2d59d6cb2829bf3b7db3a"
+  },
+  "artifact_refs": [
+    "docs/reports/paper_system_behavior_eval.json",
+    "docs/reports/paper_agent_handoff_eval.json",
+    "docs/reports/paper_no_lost_user_eval.json",
+    "docs/reports/paper_claim_gate_case_studies.json",
+    "docs/reports/paper_system_eval_manifest.json",
+    "docs/reports/paper_system_eval_summary.md"
+  ],
+  "checks": [
+    {
+      "check_id": "required_claim_gate_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [],
+        "present_artifact_refs": [
+          "docs/reports/paper_claim_lint_report.json",
+          "docs/reports/paper_external_dry_run_report.json",
+          "docs/reports/paper_reproduction_failure_report.json",
+          "docs/reports/paper_release_go_no_go.json"
+        ]
+      },
+      "message": "P15 requires P11/P12 claim lint, dry-run, failure, and go/no-go artifacts.",
+      "passed": true,
+      "source_artifact": "docs/reports"
+    },
+    {
+      "check_id": "no_lost_user_eval_passed",
+      "message": "Guide and status-like surfaces must prove onboarding and partial-run recovery.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_no_lost_user_eval.json"
+    },
+    {
+      "check_id": "agent_handoff_eval_passed",
+      "message": "External-agent handoff must be rowless, redacted, discoverable, and action-oriented.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_agent_handoff_eval.json"
+    },
+    {
+      "check_id": "claim_gate_case_studies_passed",
+      "message": "Required claim-gate case studies must pass.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_claim_gate_case_studies.json"
+    },
+    {
+      "check_id": "system_behavior_eval_passed",
+      "message": "Aggregate system-behavior evaluation must pass.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_system_behavior_eval.json"
+    },
+    {
+      "check_id": "no_raw_rows_or_private_paths_exposed",
+      "message": "Committed P15 reports must not expose raw rows or private machine paths.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_system_behavior_eval.json"
+    }
+  ],
+  "failed_checks": [],
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "human_study_claim_allowed": false,
+  "next_slice": "Slice 16A - capability registry and capability cards",
+  "release_mode": "claim_safe_evaluation_environment_only",
+  "schema_version": "relaytic.paper_system_eval.v1",
+  "slice": "Paper Track P15",
+  "source_input_refs": [
+    "docs/reports/paper_claim_lint_report.json",
+    "docs/reports/paper_external_dry_run_report.json",
+    "docs/reports/paper_reproduction_failure_report.json",
+    "docs/reports/paper_release_go_no_go.json",
+    "docs/reports/paper_public_claims_allowed.json",
+    "docs/reports/paper_release_manifest.json",
+    "docs/reports/paper_arxiv_source_manifest.json"
+  ],
+  "state_tree": {
+    "committed": false,
+    "onboarding": "artifacts/release_safety/paper_p15_system_eval/onboarding",
+    "partial_run": "artifacts/release_safety/paper_p15_system_eval/partial_run",
+    "purpose": "temporary deterministic proof fixtures; committed reports contain only rowless summaries",
+    "state_root": "artifacts/release_safety/paper_p15_system_eval"
+  },
+  "status": "ready_for_system_evaluation_evidence",
+  "summary": "P15 turns Relaytic's guide, redacted handoff, interoperability, and claim-gate surfaces into measured paper evidence.",
+  "surface_refs": [
+    "relaytic guide --format json",
+    "relaytic guide --run-dir <run_dir> --format json",
+    "relaytic guide export-context --run-dir <run_dir> --format json",
+    "relaytic status --run-dir <run_dir> --format json",
+    "relaytic interoperability relaytic_server_info"
+  ],
+  "system_evaluation_claim_allowed": true
+}

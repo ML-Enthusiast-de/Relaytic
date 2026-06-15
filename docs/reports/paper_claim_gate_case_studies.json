@@ -1,0 +1,81 @@
+{
+  "case_count": 7,
+  "cases": [
+    {
+      "case_id": "p11_claim_lint_passed",
+      "expected_behavior": "P11 should keep blocked claim language out of the generated draft.",
+      "measured_signal": "status=pass; hard=False; headline=False",
+      "observed": true,
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_claim_lint_report.json",
+      "track": "claim_gate"
+    },
+    {
+      "case_id": "p12_go_no_go_blocks_hard_and_headline_claims",
+      "expected_behavior": "P12 should allow only a claim-safe paper release mode.",
+      "measured_signal": "status=go_for_p13_claim_safe_release_pack; blocked=5",
+      "observed": true,
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_release_go_no_go.json",
+      "track": "claim_gate"
+    },
+    {
+      "case_id": "p12_full_benchmark_rerun_scope_disclosed",
+      "expected_behavior": "P12 should disclose which heavy benchmark reruns remain outside the paper-smoke proof.",
+      "measured_signal": "fallback=True; withheld_commands=8",
+      "observed": true,
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_external_dry_run_report.json",
+      "track": "claim_gate"
+    },
+    {
+      "case_id": "p12_reproduction_failures_clear",
+      "expected_behavior": "P12 should have no unresolved paper-smoke reproduction failures.",
+      "measured_signal": "status=no_failures; unresolved=0",
+      "observed": true,
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_reproduction_failure_report.json",
+      "track": "claim_gate"
+    },
+    {
+      "case_id": "p13_public_wording_lint_passed",
+      "expected_behavior": "P13 public wording should remain claim-safe if present.",
+      "measured_signal": "status=claim_safe_public_wording_allowed; lint=pass",
+      "observed": true,
+      "passed": true,
+      "required": false,
+      "source_artifact": "docs/reports/paper_public_claims_allowed.json",
+      "track": "claim_gate"
+    },
+    {
+      "case_id": "p14_source_bundle_requires_human_upload_gate",
+      "expected_behavior": "P14 source packaging should stay release-candidate only until human metadata and PDF checks are complete.",
+      "measured_signal": "source_ready=True; upload_ready=False",
+      "observed": true,
+      "passed": true,
+      "required": false,
+      "source_artifact": "docs/reports/paper_arxiv_source_manifest.json",
+      "track": "claim_gate"
+    },
+    {
+      "case_id": "p13_release_manifest_claim_safe",
+      "expected_behavior": "P13 release manifest should authorize only claim-safe public release if present.",
+      "measured_signal": "status=ready_for_claim_safe_arxiv_release; release_allowed=True",
+      "observed": true,
+      "passed": true,
+      "required": false,
+      "source_artifact": "docs/reports/paper_release_manifest.json",
+      "track": "claim_gate"
+    }
+  ],
+  "passed_required_case_count": 4,
+  "required_case_count": 4,
+  "schema_version": "relaytic.paper_system_eval.v1",
+  "slice": "Paper Track P15",
+  "status": "pass",
+  "summary": "Claim-gate cases verify that public paper claims remain bounded by P11/P12 evidence, with P13/P14 observed when present."
+}

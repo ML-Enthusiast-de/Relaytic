@@ -391,6 +391,13 @@ Avoid introducing new references to:
 - introduced paper-track release-candidate artifacts under `docs/reports/`: `paper_arxiv_source_manifest.json`, `paper_submission_package_audit.json`, and `paper_release_candidate_checklist.md`
 - produced a source release candidate with passing citation, figure, and package audits while keeping `arxiv_upload_ready` false until author metadata, local TeX/PDF inspection, and clean tag-target proof are completed
 
+### Paper Track P15
+
+- introduced `src/relaytic/release_safety/paper_system_eval.py` under the existing release-safety boundary for deterministic system-behavior evaluation of guide, status recovery, external-agent handoff, local-LLM advisory boundaries, interoperability discovery, and paper claim gates
+- introduced the public command `relaytic release-safety paper-system-eval` for regenerating the P15 system-evaluation artifacts before P13/P14 release regeneration
+- introduced paper-track system-evaluation artifacts under `docs/reports/`: `paper_system_behavior_eval.json`, `paper_agent_handoff_eval.json`, `paper_no_lost_user_eval.json`, `paper_claim_gate_case_studies.json`, `paper_system_eval_manifest.json`, and `paper_system_eval_summary.md`
+- wired P15 into the P13 release gate so reader-facing claims about user and agent handoff are backed by measured protocol evidence; the evidence remains bounded to deterministic system behavior and does not claim human-study, analyst-hour, or production deployment results
+
 ### AML Pivot Track
 
 - the public product name remains `Relaytic`, but the flagship frontier story now becomes `Relaytic-AML`
@@ -840,6 +847,12 @@ Implemented release-safety artifact names:
 - `paper_clean_clone_install_report.json`
 - `paper_reproduction_failure_report.json`
 - `paper_release_go_no_go.json`
+- `paper_system_behavior_eval.json`
+- `paper_agent_handoff_eval.json`
+- `paper_no_lost_user_eval.json`
+- `paper_claim_gate_case_studies.json`
+- `paper_system_eval_manifest.json`
+- `paper_system_eval_summary.md`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`

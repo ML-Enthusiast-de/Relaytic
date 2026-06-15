@@ -15,6 +15,7 @@ from relaytic.release_safety import (
     PAPER_RELEASE_TABLE_MANIFEST_FILENAME,
     build_paper_release_pack,
 )
+from relaytic.release_safety.paper_release import FORBIDDEN_READER_TONE_PHRASES
 from relaytic.ui.cli import main
 
 
@@ -55,6 +56,8 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "PaySim synthetic temporal-fraud precision-recall area under the curve (PR-AUC) 0.638773" in draft
     assert "[@yang2026skillopt]" in draft
     assert "broad deployment superiority" in draft
+    for phrase in FORBIDDEN_READER_TONE_PHRASES:
+        assert phrase.lower() not in draft.lower()
     assert "SOTA" in "\n".join(public_claims["blocked_public_claims"])
     assert set(tables) == set(PAPER_RELEASE_TABLE_FILENAMES)
     assert "paper-cell:paysim_p6a_competitive_selected.test_pr_auc" in tables["evidence_summary"]
@@ -142,6 +145,8 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert "Relaytic-AML: A Local-First Evaluation Lab" in draft
     assert "arXiv-ready draft" not in draft
     assert "## References" in draft
+    for phrase in FORBIDDEN_READER_TONE_PHRASES:
+        assert phrase.lower() not in draft.lower()
     assert "No SOTA or leaderboard-winner claim." in attention
 
     references = (PAPER_DIR / PAPER_REFERENCES_FILENAME).read_text(encoding="utf-8")

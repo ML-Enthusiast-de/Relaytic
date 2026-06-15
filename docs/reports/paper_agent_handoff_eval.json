@@ -1,0 +1,60 @@
+{
+  "passed_task_count": 4,
+  "schema_version": "relaytic.paper_system_eval.v1",
+  "slice": "Paper Track P15",
+  "status": "pass",
+  "summary": "Relaytic external-agent handoff was evaluated for discoverability, redaction, next actions, and local-LLM boundaries.",
+  "task_count": 4,
+  "tasks": [
+    {
+      "expected_behavior": "External agents should be able to discover inspection, workflow, trace, and permission tools.",
+      "measured_signal": "tool_count=57; required_present=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "relaytic.interoperability.relaytic_server_info",
+      "task_id": "server_tool_contract_available",
+      "track": "agent_handoff"
+    },
+    {
+      "expected_behavior": "External context should carry artifact-derived state, not raw rows or private paths.",
+      "measured_signal": "raw_rows=False; redactions=8; blocked_fields=6",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/external_llm_context_pack.json",
+      "task_id": "external_context_rowless_and_redacted",
+      "track": "agent_handoff"
+    },
+    {
+      "expected_behavior": "Another model should receive next-action options and starter questions without guessing artifact names.",
+      "measured_signal": "actions=6; starter_questions=6",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/external_llm_context_pack.json",
+      "task_id": "safe_next_action_exported",
+      "track": "agent_handoff"
+    },
+    {
+      "expected_behavior": "The local-LLM path should be optional phrasing help over deterministic artifact guidance.",
+      "measured_signal": "llm_status=not_requested; llm_used=False",
+      "passed": true,
+      "required": true,
+      "source_artifact": "artifacts/release_safety/paper_p15_system_eval/partial_run/guide_local_llm_summary.json",
+      "task_id": "local_llm_option_is_advisory",
+      "track": "agent_handoff"
+    }
+  ],
+  "tool_contract": {
+    "missing_required_tools": [],
+    "required_tools": [
+      "relaytic_assist_turn",
+      "relaytic_check_permission",
+      "relaytic_run_agent_evals",
+      "relaytic_server_info",
+      "relaytic_show_handoff",
+      "relaytic_show_mission_control",
+      "relaytic_show_trace",
+      "relaytic_show_workspace"
+    ],
+    "tool_count": 57
+  }
+}
