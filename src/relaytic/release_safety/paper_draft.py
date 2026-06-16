@@ -655,106 +655,194 @@ def _claim_gate_flow_svg() -> str:
 
 def _supporting_pr_auc_svg(cells: list[dict[str, Any]]) -> str:
     values = [
-        ("PaySim baseline", _cell_value(cells, "paysim_p6_validation_selected_baseline.test_pr_auc"), "#8d99ae"),
-        ("PaySim competitive", _cell_value(cells, "paysim_p6a_competitive_selected.test_pr_auc"), "#2a9d8f"),
-        ("Elliptic graph", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.test_pr_auc"), "#457b9d"),
-        ("Elliptic2 context", _cell_value(cells, "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean"), "#e9c46a"),
-        ("RevClassifyDS ref", _cell_value(cells, "elliptic2_p8b_modern_context.published_reference_pr_auc"), "#e76f51"),
+        (
+            "PaySim baseline",
+            "synthetic temporal proxy",
+            _cell_value(cells, "paysim_p6_validation_selected_baseline.test_pr_auc"),
+            "baseline only",
+            "#8d99ae",
+            "#f3f5f8",
+        ),
+        (
+            "PaySim competitive",
+            "same split, stronger budget",
+            _cell_value(cells, "paysim_p6a_competitive_selected.test_pr_auc"),
+            "supporting",
+            "#2a9d8f",
+            "#eaf7f3",
+        ),
+        (
+            "Elliptic graph",
+            "temporal graph features",
+            _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.test_pr_auc"),
+            "supporting",
+            "#457b9d",
+            "#edf4f8",
+        ),
+        (
+            "Elliptic2 context",
+            "modern subgraph pressure",
+            _cell_value(cells, "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean"),
+            "context only",
+            "#d6a83a",
+            "#fbf5df",
+        ),
+        (
+            "RevClassifyDS ref",
+            "external reference",
+            _cell_value(cells, "elliptic2_p8b_modern_context.published_reference_pr_auc"),
+            "not Relaytic",
+            "#e76f51",
+            "#fff0ec",
+        ),
     ]
-    return _bar_chart_svg(
-        title="PR-AUC evidence rows",
-        ylabel="PR-AUC",
+    return _horizontal_evidence_panel_svg(
+        title="PR-AUC evidence, with claim posture",
+        subtitle="Scores are useful only with source, split, budget, leakage, and interpretation boundaries attached.",
+        metric_label="PR-AUC",
         values=values,
-        width=940,
-        height=430,
+        width=1080,
+        height=500,
+        footer="PaySim improves materially under the synthetic task; Elliptic2 remains context, not a parity claim.",
     )
 
 
 def _review_budget_svg(cells: list[dict[str, Any]]) -> str:
     values = [
-        ("PaySim precision", _cell_value(cells, "paysim_p6a_competitive_selected.precision_at_review_budget"), "#2a9d8f"),
-        ("PaySim recall", _cell_value(cells, "paysim_p6a_competitive_selected.recall_at_review_budget"), "#80b918"),
-        ("Elliptic precision", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget"), "#457b9d"),
-        ("Elliptic recall", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.recall_at_review_budget"), "#f4a261"),
+        (
+            "PaySim precision",
+            "top review queue",
+            _cell_value(cells, "paysim_p6a_competitive_selected.precision_at_review_budget"),
+            "queue quality",
+            "#2a9d8f",
+            "#eaf7f3",
+        ),
+        (
+            "PaySim recall",
+            "fraud coverage",
+            _cell_value(cells, "paysim_p6a_competitive_selected.recall_at_review_budget"),
+            "incomplete",
+            "#6f9f18",
+            "#f1f8e6",
+        ),
+        (
+            "Elliptic precision",
+            "top review queue",
+            _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget"),
+            "queue quality",
+            "#457b9d",
+            "#edf4f8",
+        ),
+        (
+            "Elliptic recall",
+            "fraud coverage",
+            _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.recall_at_review_budget"),
+            "very narrow",
+            "#f4a261",
+            "#fff4e8",
+        ),
     ]
-    return _bar_chart_svg(
+    return _horizontal_evidence_panel_svg(
         title="Review-budget operating points",
-        ylabel="score",
+        subtitle="Operational evidence separates top-queue precision from total fraud coverage.",
+        metric_label="score",
         values=values,
-        width=880,
-        height=410,
+        width=1080,
+        height=440,
+        footer="High precision can still leave substantial recall outside the reviewed queue.",
     )
 
 
 def _publishability_matrix_svg(publishability: dict[str, Any]) -> str:
     _ = publishability
     rows = [
-        ("PaySim", "current: synthetic temporal proxy", "blocked: real-bank superiority", "unlock: partner/real holdout"),
-        ("Elliptic", "current: temporal graph features", "blocked: graph-neural superiority", "unlock: repeated graph release budget"),
-        ("Elliptic2", "current: modern subgraph context", "blocked: RevClassify parity", "unlock: faithful parity + cohort proof"),
-        ("Operational", "current: review-budget support", "blocked: hard business value", "unlock: same-queue incumbent"),
+        ("PaySim", "synthetic temporal\nproxy", "real-bank\nsuperiority", "partner or real\nholdout"),
+        ("Elliptic", "temporal graph\nfeatures", "graph-neural\nsuperiority", "repeated graph\nrelease budget"),
+        ("Elliptic2", "modern subgraph\ncontext", "RevClassify\nparity", "faithful parity\nand cohort proof"),
+        ("Operational", "review-budget\nsupport", "hard business\nvalue", "same-queue\nincumbent"),
     ]
-    width = 1040
-    height = 440
+    width = 1080
+    height = 500
     parts = [
         _svg_header(width, height),
-        '<text x="30" y="38" font-size="17" fill="#5b6472">Rows can be useful evidence while still failing stronger claim gates.</text>',
-        '<line x1="185" y1="92" x2="905" y2="92" stroke="#d7dde8" stroke-width="2"/>',
-        '<text x="185" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">current evidence</text>',
-        '<text x="545" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">blocked claim</text>',
-        '<text x="905" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">evidence needed</text>',
+        '<rect x="28" y="24" width="1024" height="440" rx="8" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.4"/>',
+        '<text x="54" y="58" font-size="22" font-weight="700" fill="#293241">Claim boundary ladder</text>',
+        '<text x="54" y="86" font-size="15" fill="#5b6472">A row can be useful and still fail a stronger publication claim.</text>',
+        '<text x="252" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#293241">current evidence</text>',
+        '<text x="532" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#293241">blocked promotion</text>',
+        '<text x="842" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#293241">evidence needed</text>',
     ]
     for index, (track, current, blocked, unlock) in enumerate(rows):
-        y = 120 + index * 70
-        parts.append(f'<text x="50" y="{y + 6}" font-size="18" font-weight="700" fill="#293241">{_xml_escape(track)}</text>')
-        parts.append(f'<circle cx="185" cy="{y}" r="10" fill="#2a9d8f"/>')
-        parts.append(f'<circle cx="545" cy="{y}" r="10" fill="#c94c4c"/>')
-        parts.append(f'<circle cx="905" cy="{y}" r="10" fill="#457b9d"/>')
-        parts.append(f'<line x1="195" y1="{y}" x2="535" y2="{y}" stroke="#d7dde8" stroke-width="2"/>')
-        parts.append(f'<line x1="555" y1="{y}" x2="895" y2="{y}" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>')
-        parts.extend(_svg_text_lines(current, 185, y + 29, font_size=14, anchor="middle", line_height=16))
-        parts.extend(_svg_text_lines(blocked, 545, y + 29, font_size=14, anchor="middle", line_height=16, fill="#8a3434"))
-        parts.extend(_svg_text_lines(unlock, 905, y + 29, font_size=14, anchor="middle", line_height=16))
-    parts.append('<rect x="44" y="394" width="952" height="28" rx="6" fill="#fbfcfe" stroke="#d7dde8" stroke-width="1"/>')
-    parts.append('<text x="520" y="413" text-anchor="middle" font-size="15" fill="#5b6472">The gate preserves useful evidence while preventing unsupported promotion.</text>')
+        y = 148 + index * 72
+        parts.append(f'<rect x="54" y="{y - 20}" width="972" height="58" rx="8" fill="#ffffff" stroke="#e1e6ef" stroke-width="1"/>')
+        parts.append(f'<text x="72" y="{y + 4}" font-size="14" font-weight="700" fill="#293241">{_xml_escape(track)}</text>')
+        parts.append(f'<rect x="180" y="{y - 13}" width="144" height="42" rx="6" fill="#eaf7f3" stroke="#b8dfd1" stroke-width="1"/>')
+        parts.append(f'<rect x="460" y="{y - 13}" width="144" height="42" rx="6" fill="#fff0f0" stroke="#efc6c6" stroke-width="1"/>')
+        parts.append(f'<rect x="770" y="{y - 13}" width="144" height="42" rx="6" fill="#eef4ff" stroke="#c9d8f1" stroke-width="1"/>')
+        parts.extend(_svg_text_lines(current, 252, y + 1, font_size=12, anchor="middle", line_height=14))
+        parts.extend(_svg_text_lines(blocked, 532, y + 1, font_size=12, anchor="middle", line_height=14, fill="#8a3434"))
+        parts.extend(_svg_text_lines(unlock, 842, y + 1, font_size=12, anchor="middle", line_height=14))
+        parts.append(f'<line x1="340" y1="{y + 7}" x2="440" y2="{y + 7}" stroke="#cfd7e3" stroke-width="1.6"/>')
+        parts.append(f'<polygon points="440,{y + 7} 429,{y} 429,{y + 14}" fill="#cfd7e3"/>')
+        parts.append(f'<line x1="620" y1="{y + 7}" x2="750" y2="{y + 7}" stroke="#cfd7e3" stroke-width="1.6" stroke-dasharray="6 6"/>')
+        parts.append(f'<polygon points="750,{y + 7} 739,{y} 739,{y + 14}" fill="#cfd7e3"/>')
+    parts.append('<rect x="54" y="432" width="972" height="22" rx="5" fill="#f7f9fc" stroke="#d7dde8" stroke-width="1"/>')
+    parts.append('<text x="540" y="448" text-anchor="middle" font-size="13" fill="#5b6472">The gate keeps useful evidence visible while blocking unsupported promotion.</text>')
     parts.append("</svg>")
     return "\n".join(parts)
 
 
-def _bar_chart_svg(
+def _horizontal_evidence_panel_svg(
     *,
     title: str,
-    ylabel: str,
-    values: list[tuple[str, Any, str]],
+    subtitle: str,
+    metric_label: str,
+    values: list[tuple[str, str, Any, str, str, str]],
     width: int,
     height: int,
+    footer: str,
 ) -> str:
-    plot_x = 76
-    plot_y = 58
-    plot_w = width - 122
-    plot_h = height - 162
-    clean_values = [(label, float(value) if isinstance(value, (int, float)) else 0.0, color) for label, value, color in values]
-    max_value = max([1.0] + [value for _, value, _ in clean_values])
-    bar_w = max(38, int(plot_w / max(1, len(clean_values)) * 0.58))
-    gap = (plot_w - bar_w * len(clean_values)) / max(1, len(clean_values))
+    plot_x = 292
+    plot_y = 120
+    plot_w = 470
+    row_h = 58
+    clean_values = [
+        (label, subtitle_text, float(value) if isinstance(value, (int, float)) else 0.0, posture, color, fill)
+        for label, subtitle_text, value, posture, color, fill in values
+    ]
+    plot_bottom = plot_y + row_h * len(clean_values)
     parts = [
         _svg_header(width, height),
-        f'<line x1="{plot_x}" y1="{plot_y + plot_h}" x2="{plot_x + plot_w}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
-        f'<line x1="{plot_x}" y1="{plot_y}" x2="{plot_x}" y2="{plot_y + plot_h}" stroke="#293241" stroke-width="1.2"/>',
-        f'<text x="{plot_x}" y="{plot_y - 16}" font-size="16" fill="#293241">{_xml_escape(ylabel)}</text>',
-        f'<line x1="{plot_x}" y1="{plot_y}" x2="{plot_x + plot_w}" y2="{plot_y}" stroke="#d7dde8" stroke-width="0.8"/>',
-        f'<line x1="{plot_x}" y1="{plot_y + plot_h / 2:.1f}" x2="{plot_x + plot_w}" y2="{plot_y + plot_h / 2:.1f}" stroke="#e4e8f0" stroke-width="0.8"/>',
+        f'<rect x="28" y="24" width="{width - 56}" height="{height - 64}" rx="8" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.4"/>',
+        f'<text x="54" y="58" font-size="22" font-weight="700" fill="#293241">{_xml_escape(title)}</text>',
+        f'<text x="54" y="86" font-size="15" fill="#5b6472">{_xml_escape(subtitle)}</text>',
+        f'<text x="{plot_x}" y="108" font-size="13" font-weight="700" fill="#293241">{_xml_escape(metric_label)}</text>',
+        '<text x="854" y="108" font-size="13" font-weight="700" fill="#293241">claim posture</text>',
     ]
-    for index, (label, value, color) in enumerate(clean_values):
-        x = plot_x + gap / 2 + index * (bar_w + gap)
-        bar_h = 0 if max_value == 0 else (value / max_value) * plot_h
-        y = plot_y + plot_h - bar_h
-        parts.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{bar_w}" height="{bar_h:.1f}" fill="{color}"/>')
-        parts.append(f'<text x="{x + bar_w / 2:.1f}" y="{y - 8:.1f}" text-anchor="middle" font-size="16">{_format_metric(value)}</text>')
-        parts.extend(_svg_text_lines(label.replace(" ", "\n", 1), x + bar_w / 2, plot_y + plot_h + 32, font_size=14, anchor="middle", line_height=17))
-    parts.append('<text x="30" y="{0}" font-size="17" fill="#5b6472">Values come from fixed local evidence cells; rows are supporting evidence, not headline claims.</text>'.format(height - 24))
+    for tick in [0.0, 0.25, 0.5, 0.75, 1.0]:
+        x = plot_x + tick * plot_w
+        parts.append(f'<line x1="{x:.1f}" y1="{plot_y - 8}" x2="{x:.1f}" y2="{plot_bottom - 16}" stroke="#e3e8f0" stroke-width="0.9"/>')
+        parts.append(f'<text x="{x:.1f}" y="{plot_bottom + 14}" text-anchor="middle" font-size="11" fill="#5b6472">{_format_tick(tick)}</text>')
+    for index, (label, subtitle_text, value, posture, color, fill) in enumerate(clean_values):
+        y = plot_y + index * row_h
+        value = max(0.0, min(1.0, value))
+        bar_w = value * plot_w
+        parts.append(f'<text x="54" y="{y + 17}" font-size="15" font-weight="700" fill="#293241">{_xml_escape(label)}</text>')
+        parts.append(f'<text x="54" y="{y + 36}" font-size="12" fill="#5b6472">{_xml_escape(subtitle_text)}</text>')
+        parts.append(f'<rect x="{plot_x}" y="{y + 8}" width="{plot_w}" height="20" rx="5" fill="#edf1f6" stroke="#d8dee8" stroke-width="0.8"/>')
+        parts.append(f'<rect x="{plot_x}" y="{y + 8}" width="{bar_w:.1f}" height="20" rx="5" fill="{color}"/>')
+        parts.append(f'<text x="{plot_x + plot_w + 18}" y="{y + 23}" font-size="13" fill="#293241">{_format_metric(value)}</text>')
+        parts.append(f'<rect x="838" y="{y + 4}" width="190" height="28" rx="7" fill="{fill}" stroke="#d7dde8" stroke-width="0.9"/>')
+        parts.append(f'<text x="933" y="{y + 23}" text-anchor="middle" font-size="12" fill="#293241">{_xml_escape(posture)}</text>')
+    parts.append(f'<text x="54" y="{height - 46}" font-size="13" fill="#5b6472">{_xml_escape(footer)}</text>')
     parts.append("</svg>")
     return "\n".join(parts)
+
+
+def _format_tick(value: float) -> str:
+    if value in {0.0, 1.0}:
+        return str(int(value))
+    return f"{value:.2f}".rstrip("0")
 
 
 def _limitation(

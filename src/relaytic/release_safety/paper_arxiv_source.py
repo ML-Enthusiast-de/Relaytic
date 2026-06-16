@@ -424,6 +424,8 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\usepackage{booktabs}",
         r"\usepackage{graphicx}",
         r"\usepackage[font=normalsize,labelfont=bf]{caption}",
+        r"\usepackage{fancyvrb}",
+        r"\usepackage{needspace}",
         r"\usepackage{longtable}",
         r"\usepackage{natbib}",
         r"\usepackage{xurl}",
@@ -496,7 +498,8 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
 
         if in_code:
             if stripped.startswith("```"):
-                out.append(r"\end{verbatim}")
+                out.append(r"\end{Verbatim}")
+                out.append(r"\end{samepage}")
                 out.append("")
                 in_code = False
             else:
@@ -541,7 +544,8 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
         if stripped.startswith("```"):
             close_list()
             flush_table()
-            out.append(r"\begin{verbatim}")
+            out.append(r"\begin{samepage}")
+            out.append(r"\begin{Verbatim}[frame=single,framesep=6pt,fontsize=\small]")
             in_code = True
             previous_blank = False
             continue
@@ -598,6 +602,8 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
 
         close_list()
         flush_table()
+        if re.match(r"^Algorithm \d+\b", stripped):
+            out.append(r"\Needspace{18\baselineskip}")
         out.append(_latex_inline(stripped))
         previous_blank = False
 

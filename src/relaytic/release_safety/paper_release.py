@@ -77,6 +77,7 @@ P13_GATE_REFS = [
     "docs/reports/paper_reproduction_failure_report.json",
     "docs/reports/paper_release_go_no_go.json",
     "docs/reports/paper_system_behavior_eval.json",
+    "docs/reports/paper_system_task_eval.json",
     "docs/reports/paper_agent_handoff_eval.json",
     "docs/reports/paper_no_lost_user_eval.json",
     "docs/reports/paper_claim_gate_case_studies.json",
@@ -273,6 +274,7 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "reproduction_failures": _read_artifact(reports / "paper_reproduction_failure_report.json"),
         "release_go_no_go": _read_artifact(reports / "paper_release_go_no_go.json"),
         "system_behavior_eval": _read_artifact(reports / "paper_system_behavior_eval.json"),
+        "system_task_eval": _read_artifact(reports / "paper_system_task_eval.json"),
         "agent_handoff_eval": _read_artifact(reports / "paper_agent_handoff_eval.json"),
         "no_lost_user_eval": _read_artifact(reports / "paper_no_lost_user_eval.json"),
         "claim_gate_case_studies": _read_artifact(reports / "paper_claim_gate_case_studies.json"),
@@ -441,6 +443,7 @@ def _release_checks(
     go_no_go = _payload(inputs["release_go_no_go"])
     system_manifest = _payload(inputs["system_eval_manifest"])
     system_behavior = _payload(inputs["system_behavior_eval"])
+    system_tasks = _payload(inputs["system_task_eval"])
     required = _required_artifact_presence(inputs)
     paper_artifact_set = set(FINAL_PAPER_REFS)
     table_artifact_set = {item.get("artifact_ref") for item in table_manifest.get("tables", []) if isinstance(item, dict)}
@@ -487,9 +490,18 @@ def _release_checks(
         _check(
             "p15_system_eval_passed",
             system_manifest.get("status") == "ready_for_system_evaluation_evidence"
-            and system_behavior.get("status") == "pass",
+            and system_behavior.get("status") == "pass"
+            and system_tasks.get("status") == "pass",
             "Measured system-evaluation proof must pass before the paper describes Relaytic's user and agent handoff behavior.",
             source_artifact="docs/reports/paper_system_eval_manifest.json",
+        ),
+        _check(
+            "p15_reader_task_eval_passed",
+            system_tasks.get("status") == "pass"
+            and int(system_tasks.get("task_count") or 0) >= 10
+            and not system_tasks.get("failed_tasks"),
+            "Reader and external-agent task evaluation must prove navigation, provenance, recovery, privacy, and claim-boundary tasks.",
+            source_artifact="docs/reports/paper_system_task_eval.json",
         ),
         _check(
             "required_p13_inputs_present",
@@ -837,63 +849,104 @@ def _render_evidence_layer_table() -> str:
     return "\n".join(lines)
 
 
-def _render_measured_system_eval_section(inputs: dict[str, Any]) -> str:
-    manifest = _payload(inputs["system_eval_manifest"])
-    behavior = _payload(inputs["system_behavior_eval"])
-    if (
-        manifest.get("status") != "ready_for_system_evaluation_evidence"
-        or behavior.get("status") != "pass"
-        or not behavior.get("evaluation_rows")
-    ):
-        return ""
-    rows_by_task = {
-        str(row.get("task")): row
-        for row in list(behavior.get("evaluation_rows", []))
-        if isinstance(row, dict)
-    }
-    selected = [
+def _render_adjacent_systems_table() -> str:
+    rows = [
         (
-            "New-user orientation",
-            "onboarding_guide_available",
-            "Onboarding state, four safe commands, starter questions, and human/agent handbooks.",
+            "Experiment tracking",
+            "Runs, metrics, artifacts, lineage, and model versions.",
+            "A metric can still be separated from task validity, privacy posture, review capacity, and public interpretation.",
         ),
         (
-            "Partial-run recovery",
-            "partial_run_state_recovery",
-            "Partial-run state, missing-evidence count, and a safe context-export action.",
+            "Data validation and monitoring",
+            "Schema checks, drift, quality rules, and production signals.",
+            "Validation often stops before model-search budgets, operating-point choices, and manuscript claims are tied together.",
         ),
         (
-            "Rowless agent handoff",
-            "external_context_rowless_and_redacted",
-            "Local-only context, raw rows false, redaction count, and blocked private-path fields.",
+            "Workflow orchestration",
+            "DAG execution, retries, scheduling, and dependency management.",
+            "Execution graphs usually do not decide whether evidence is strong enough for a claim or a safe next action.",
         ),
         (
-            "Tool discovery",
-            "server_tool_contract_available",
-            "Fifty-seven tools discovered, including required inspection, trace, permission, and workflow tools.",
+            "AutoML and benchmark suites",
+            "Model-family search, hyperparameter optimization, and leaderboard comparison.",
+            "Score search can obscure leakage posture, budget spent, review-queue utility, and whether a result may be generalized.",
         ),
         (
-            "Claim-gate behavior",
-            "p12_go_no_go_blocks_hard_and_headline_claims",
-            "Hard and headline claims blocked; only claim-safe release mode allowed.",
+            "General agent frameworks",
+            "Tool use, planning, memory, and host integration.",
+            "Agent fluency can outpace evidence unless state, permissions, redaction, traces, and claim gates are explicit.",
         ),
     ]
     lines = [
-        "The release pack now measures part of the system behavior directly. These checks are not a substitute for a controlled user study. They are deterministic protocol checks over the actual command surfaces a human or external agent would use when entering the workspace.",
-        "",
-        "| System behavior | What is measured | Result |",
-        "| --- | --- | ---: |",
+        "| Adjacent practice | What it handles well | Gap for AML evaluation |",
+        "| --- | --- | --- |",
     ]
-    for label, task_id, explanation in selected:
-        row = dict(rows_by_task.get(task_id, {}))
-        result = "pass" if row.get("passed") else "fail"
-        lines.append(f"| {_escape_md(label)} | {_escape_md(explanation)} | `{result}` |")
-    lines.extend(
+    for system, strength, gap in rows:
+        lines.append(f"| {_escape_md(system)} | {_escape_md(strength)} | {_escape_md(gap)} |")
+    return "\n".join(lines)
+
+
+def _render_paysim_evidence_walkthrough(
+    *,
+    pay_base_pr: str,
+    pay_pr: str,
+    pay_precision: str,
+    pay_recall: str,
+) -> str:
+    return "\n".join(
         [
+            "The PaySim row is the clearest example of the evidence-cell path. The source contract identifies a synthetic mobile-money transaction-fraud task. The split contract orders records by simulator step. The leakage contract excludes simulator balance fields that can reveal after-event information, then allows prior-step destination-history features. The model-search contract separates a baseline budget from a competitive budget. The threshold contract chooses operating points on validation evidence and applies them unchanged to the test partition.",
             "",
-            f"All {behavior.get('required_task_count')} required protocol checks pass in the current artifact pack. The interpretation is deliberately narrow: Relaytic demonstrates state recovery, rowless handoff, tool discovery, and claim gating under deterministic fixtures. It does not claim that first-time users are faster, that analysts save hours, or that external agents produce better models without a separate study.",
+            f"That path changes the fixed-test PR-AUC from {pay_base_pr} in the baseline run to {pay_pr} in the competitive run. At the selected review budget, the same evidence cell records precision {pay_precision} and recall {pay_recall}. The result is meaningful because the improvement is tied to a documented modeling change under the same split and metric contract. It remains bounded because PaySim is synthetic, so the claim state is supporting temporal-fraud evidence rather than real-bank AML performance.",
+            "",
+            "This is the pattern Relaytic is meant to enforce: useful evidence is preserved, the modeling work that created it is inspectable, and the stronger interpretation is blocked until the data and protocol justify it.",
         ]
     )
+
+
+def _render_measured_system_eval_section(inputs: dict[str, Any]) -> str:
+    manifest = _payload(inputs["system_eval_manifest"])
+    behavior = _payload(inputs["system_behavior_eval"])
+    task_eval = _payload(inputs["system_task_eval"])
+    if (
+        manifest.get("status") != "ready_for_system_evaluation_evidence"
+        or behavior.get("status") != "pass"
+        or task_eval.get("status") != "pass"
+        or not behavior.get("evaluation_rows")
+    ):
+        return ""
+    task_count = int(task_eval.get("task_count") or 0)
+    required_count = int(behavior.get("required_task_count") or 0)
+    task_ids = {
+        str(item.get("task_id"))
+        for item in list(task_eval.get("tasks", []))
+        if isinstance(item, dict) and item.get("task_id")
+    }
+    task_scope = ", ".join(
+        item
+        for item, task_id in [
+            ("repository navigation", "repo_navigation_separates_relaytic_from_aml_paper"),
+            ("cross-platform reproduction", "cross_platform_reproduction_path_visible"),
+            ("metric provenance", "metric_cell_provenance_available"),
+            ("baseline-versus-competitive comparison", "paysim_baseline_and_competitive_budget_comparable"),
+            ("claim-boundary recovery", "claim_gate_fails_closed_for_public_interpretation"),
+            ("rowless handoff", "rowless_external_agent_handoff_recoverable"),
+        ]
+        if task_id in task_ids
+    )
+    lines = [
+        "The release pack measures part of the system behavior directly. The target is not user satisfaction. The target is a more basic property that an evaluation lab should have: a reader or external agent should be able to enter the repository, find the paper evidence, recover the current state, trace a number back to its source, and see why a stronger claim remains blocked.",
+        "",
+        f"The current pack contains {required_count} required deterministic checks. Within it, {task_count} reader and external-agent tasks cover {task_scope}. These tasks are intentionally concrete. They ask whether the README separates the general Relaytic platform from the Relaytic-AML paper path, whether Windows and macOS/Linux reproduction commands are visible, whether the PaySim PR-AUC cell carries dataset/split/command/artifact/budget/leakage/claim provenance, whether PaySim baseline and competitive budgets are comparable, whether Elliptic2 is recoverable as modern context rather than a performance contribution, and whether an interrupted run can be exported to another model without raw rows or private paths.",
+        "",
+        "This matters because the paper's central claim is about controlled evidence, not only detector performance. A strong PR-AUC with no recoverable provenance would be weak evidence for this paper. Conversely, a blocked Elliptic2 row is still useful when the system can explain exactly why it is blocked and which future evidence would change that state.",
+        "",
+        "The evaluation also checks the local-first handoff contract. Relaytic exports a rowless external-agent context pack from local artifacts, verifies that raw rows are absent, records redactions, and exposes safe next actions plus tool discovery. Optional local large-language-model phrasing remains advisory in the evaluated fixture; the truth-bearing state is the artifact graph.",
+        "",
+        "All required checks currently pass. The result should be read narrowly but seriously: Relaytic demonstrates deterministic navigation, provenance recovery, partial-run recovery, rowless handoff, optional-LLM containment, and fail-closed claim gating. It does not claim a controlled human-subject result, analyst-hour savings, production deployment, or autonomous external-agent performance improvement.",
+        "",
+        "The repository publishes the task-level system evaluation, aggregate behavior evaluation, partial-run recovery check, rowless handoff check, claim-gate case studies, and fail-closed manifest as machine-readable evidence. The README maps those generated reports to concrete filenames for readers who want to audit the JSON.",
+    ]
     return "\n".join(lines)
 
 
@@ -926,6 +979,13 @@ def _render_final_paper(
     claim_ladder_figure = _render_figure_list(figure_manifest, figure_ids={"publishability_matrix"})
     agent_roles = _render_agent_role_table()
     evidence_layers = _render_evidence_layer_table()
+    adjacent_systems = _render_adjacent_systems_table()
+    paysim_walkthrough = _render_paysim_evidence_walkthrough(
+        pay_base_pr=pay_base_pr,
+        pay_pr=pay_pr,
+        pay_precision=pay_precision,
+        pay_recall=pay_recall,
+    )
     measured_system_eval = _render_measured_system_eval_section(inputs)
     references = _render_reference_section()
     return "\n".join(
@@ -1067,9 +1127,11 @@ def _render_final_paper(
             "  emit the metric cell, allowed claim, blocked claims, and paper refs",
             "```",
             "",
-            "A simplified PaySim evidence cell contains the dataset identity (`paysim_temporal_transaction_fraud`), a chronological split contract, test PR-AUC 0.638773, a competitive budget tier, the leakage posture `prior_step_destination_history_only`, a supporting-only claim state, and source artifacts for the benchmark manifest, budget contract, and claim gate.",
+            f"A simplified PaySim evidence cell contains the dataset identity (`paysim_temporal_transaction_fraud`), a chronological split contract, test PR-AUC {pay_pr}, a competitive budget tier, the leakage posture `prior_step_destination_history_only`, a supporting-only claim state, and source artifacts for the benchmark manifest, budget contract, and claim gate.",
             "",
             "This schema-like record is the difference between a result and an anecdote. It lets a reviewer challenge the dataset, the split, the metric, the budget, the leakage posture, or the claim state without reconstructing the run from memory.",
+            "",
+            paysim_walkthrough,
             "",
             "## 7. Current Frontier Context",
             "",
@@ -1086,6 +1148,10 @@ def _render_final_paper(
             "Recent AML graph work raises the bar beyond the current Relaytic evidence rows. TransXion frames benchmark realism around profile-aware simulation, richer entity attributes, non-template illicit synthesis, and out-of-character behavior [@chen2026transxion]. LineMVGNN and ExSTraQt focus on directed money flow, edge-aware graph views, and quasi-temporal transaction representations [@poon2026linemvgnn; @tariq2026extraqt]. BlazingAML treats throughput and multi-stage graph mining as a systems problem [@ye2026blazingaml]. Continual graph-learning reviews emphasize drift, adaptation, class imbalance, and changing laundering behavior [@deprez2025continualaml]. These papers point to a frontier where realism, scale, graph structure, time, and operations are inseparable. Relaytic-AML is complementary to those efforts: it does not claim detector parity with them, but tries to make dataset posture, split validity, budget, limitations, and release claims auditable.",
             "",
             "The paper also follows broader machine-learning documentation and reproducibility practice. Datasheets for Datasets and Model Cards argue for explicit dataset and model reporting [@gebru2021datasheets; @mitchell2019modelcards]. The NeurIPS reproducibility program highlights the need for code, data, and checklist discipline in machine-learning research [@pineau2021reproducibility]. Recent work on machine-learning research agents warns that coherent papers can still contain invalidated experiments, which reinforces the need for executable artifacts, reproducible commands, and explicit claim boundaries [@chen2025mlrbench; @starace2025paperbench].",
+            "",
+            adjacent_systems,
+            "",
+            "The contribution sits in the gap between these categories. Relaytic-AML does not replace experiment tracking, validation, orchestration, AutoML, or agent frameworks. It binds them into a local evidence loop where a result, its budget, its review context, its privacy posture, and its allowed interpretation stay connected.",
             "",
             "## 8. Methodology: Evidence Cells, Gates, and Budgets",
             "",
@@ -1205,7 +1271,9 @@ def _render_final_paper(
             "",
             "## 17. Reproducibility",
             "",
-            "The code, paper source, figures, tables, and public evidence artifacts are in the Relaytic repository. The public repo keeps raw private or licensed data out of version control. Where a benchmark requires local data, the command ledger describes the expected local paths and access posture.",
+            "The code, paper source, figures, tables, and public evidence artifacts are in the Relaytic repository. The repository is larger than the AML paper: Relaytic is the general local-first inference lab, while Relaytic-AML is the flagship edition used here to evaluate financial-crime workflows. A reader who wants to review the paper should start with this manuscript and the README. The broader architecture, interoperability, runtime, build-history, and academy-planning documents are useful context, but they are not all part of the AML benchmark contribution.",
+            "",
+            "The public repo keeps raw private or licensed data out of version control. Where a benchmark requires local data, the command ledger describes the expected local paths and access posture.",
             "",
             "A compact Windows PowerShell reproduction path for the public paper assets is:",
             "```powershell",
@@ -1231,7 +1299,15 @@ def _render_final_paper(
             "python3 -m relaytic.ui.cli scan-git-safety",
             "```",
             "",
-            "For readers, the README and this paper are the intended entry points. The README explains the current project shape: Relaytic remains the general package and command-line interface, while Relaytic-AML is the flagship AML edition used for this paper. Lower-level JSON reports, tables, figure sources, and TeX files are reproducibility machinery, not documents a first reader should have to discover manually.",
+            "To recheck the system-evaluation claim without rebuilding every table, run only the system-evaluation command and the focused test:",
+            "```powershell",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json",
+            "py -3.11 -m pytest tests/test_paper_track_p15.py -q",
+            "```",
+            "",
+            "On macOS or Linux, replace `py -3.11` with `python3`. The system-evaluation command writes task-level evidence, aggregate behavior evidence, rowless handoff evidence, partial-run recovery evidence, claim-gate case studies, and a fail-closed manifest. The README names the generated JSON files for readers who want to inspect them directly.",
+            "",
+            "For navigation, use the README as the repo map. The repository is larger than the manuscript: the AML paper assets and generated evidence reports are the paper path, while broader architecture, interoperability, runtime, build-history, and planning documents are product context rather than required paper reading.",
             "",
             "## 18. Author Use of AI Assistance",
             "",

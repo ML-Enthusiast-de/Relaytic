@@ -10,6 +10,7 @@
 | `docs/reports/paper_reproduction_failure_report.json` | yes | internal evidence record |
 | `docs/reports/paper_release_go_no_go.json` | yes | internal evidence record |
 | `docs/reports/paper_system_behavior_eval.json` | yes | internal evidence record |
+| `docs/reports/paper_system_task_eval.json` | yes | internal evidence record |
 | `docs/reports/paper_agent_handoff_eval.json` | yes | internal evidence record |
 | `docs/reports/paper_no_lost_user_eval.json` | yes | internal evidence record |
 | `docs/reports/paper_claim_gate_case_studies.json` | yes | internal evidence record |

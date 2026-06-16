@@ -7843,6 +7843,7 @@ def _run_paper_system_eval_surface(
             "paths": {key: str(path) for key, path in written.items()},
             "paper_system_eval_manifest": manifest,
             "paper_system_behavior_eval": behavior,
+            "paper_system_task_eval": pack["paper_system_task_eval"],
             "paper_agent_handoff_eval": pack["paper_agent_handoff_eval"],
             "paper_no_lost_user_eval": pack["paper_no_lost_user_eval"],
             "paper_claim_gate_case_studies": pack["paper_claim_gate_case_studies"],

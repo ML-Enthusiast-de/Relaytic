@@ -46,6 +46,12 @@
       "source_artifact": "docs/reports/paper_system_eval_manifest.json"
     },
     {
+      "check_id": "p15_reader_task_eval_passed",
+      "message": "Reader and external-agent task evaluation must prove navigation, provenance, recovery, privacy, and claim-boundary tasks.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_system_task_eval.json"
+    },
+    {
       "check_id": "required_p13_inputs_present",
       "detail": {
         "missing_artifact_refs": [],
@@ -58,6 +64,7 @@
           "docs/reports/paper_reproduction_failure_report.json",
           "docs/reports/paper_release_go_no_go.json",
           "docs/reports/paper_system_behavior_eval.json",
+          "docs/reports/paper_system_task_eval.json",
           "docs/reports/paper_agent_handoff_eval.json",
           "docs/reports/paper_no_lost_user_eval.json",
           "docs/reports/paper_claim_gate_case_studies.json",
@@ -91,7 +98,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "80cafec76cc43925129c92914bc3ac0f7cb051c9",
+  "git_commit": "cdfaee7afabd739b11768e8bf8776d514b88df25",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -118,6 +125,7 @@
       "docs/reports/paper_reproduction_failure_report.json",
       "docs/reports/paper_release_go_no_go.json",
       "docs/reports/paper_system_behavior_eval.json",
+      "docs/reports/paper_system_task_eval.json",
       "docs/reports/paper_agent_handoff_eval.json",
       "docs/reports/paper_no_lost_user_eval.json",
       "docs/reports/paper_claim_gate_case_studies.json",
@@ -159,6 +167,7 @@
       "docs/reports/paper_system_behavior_eval.json",
       "docs/reports/paper_system_eval_manifest.json",
       "docs/reports/paper_system_eval_summary.md",
+      "docs/reports/paper_system_task_eval.json",
       "paper_arxiv_submission_checklist.md",
       "paper_attention_pack.md",
       "paper_public_claims_allowed.json",
@@ -178,6 +187,7 @@
     "docs/reports/paper_reproduction_failure_report.json",
     "docs/reports/paper_release_go_no_go.json",
     "docs/reports/paper_system_behavior_eval.json",
+    "docs/reports/paper_system_task_eval.json",
     "docs/reports/paper_agent_handoff_eval.json",
     "docs/reports/paper_no_lost_user_eval.json",
     "docs/reports/paper_claim_gate_case_studies.json",

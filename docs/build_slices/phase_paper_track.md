@@ -379,6 +379,7 @@ P15 added:
 - `src/relaytic/release_safety/paper_system_eval.py`
 - `relaytic release-safety paper-system-eval --format json`
 - `docs/reports/paper_system_behavior_eval.json`
+- `docs/reports/paper_system_task_eval.json`
 - `docs/reports/paper_agent_handoff_eval.json`
 - `docs/reports/paper_no_lost_user_eval.json`
 - `docs/reports/paper_claim_gate_case_studies.json`
@@ -388,7 +389,7 @@ P15 added:
 
 Implemented acceptance:
 
-1. All 11 required deterministic protocol checks pass in the committed report set.
+1. All required deterministic protocol checks pass in the committed report set, including the reader/agent task suite for repository navigation, metric provenance, claim-boundary recovery, partial-run recovery, and rowless handoff.
 2. The pack fails closed when required P11/P12/P13 claim-gate inputs are absent.
 3. The handoff evidence is rowless and redacted, and committed P15 reports avoid raw rows, secrets, and private local paths.
 4. P13 consumes the P15 report before rendering reader-facing measured-system-evaluation text.

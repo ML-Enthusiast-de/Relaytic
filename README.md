@@ -8,6 +8,20 @@ The public product name, package, and CLI stay `Relaytic` / `relaytic` / `relayt
 
 Relaytic-AML is not presented as a production AML detector or a leaderboard-winning model. It is an evidence environment: local data custody, specialist-agent roles, reproducible artifacts, review-queue context, redacted handoff, and claim gates before public or paper-facing statements.
 
+## How To Read This Repository
+
+This repository is larger than the AML paper. Relaytic is the general local-first inference lab and command-line interface. Relaytic-AML is the current flagship edition, chosen because anti-money-laundering work forces privacy, temporal validity, graph context, human review, and public-claim discipline into one demanding setting.
+
+For a paper review, use this path:
+
+- Start with this README for navigation and claim boundaries.
+- Read `docs/paper/relaytic_aml_arxiv_draft.pdf` or `docs/paper/relaytic_aml_arxiv_draft.md` for the manuscript.
+- Inspect `docs/reports/paper_system_task_eval.json`, `docs/reports/paper_system_behavior_eval.json`, `docs/reports/paper_agent_handoff_eval.json`, `docs/reports/paper_no_lost_user_eval.json`, and `docs/reports/paper_claim_gate_case_studies.json` for the system-evaluation proof behind the reader navigation, provenance, and user/agent handoff claims.
+- Inspect `docs/reports/paper_result_table_final.json`, `docs/reports/paper_metric_cell_audit.json`, and `docs/reports/paper_publishability_matrix.json` for metric provenance and claim posture.
+- Use `ARCHITECTURE.md`, `INTEROPERABILITY.md`, `RUNTIME.md`, and `PROJECT_LAYOUT.md` when you want the general Relaytic platform context.
+
+The long build-control files, especially `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`, are development provenance. They explain how the repo got here, but they are not required reading for the paper.
+
 ## Start Here: Relaytic-AML Demo Path
 
 For a first technical review, start with the public-safe AML review-queue demo instead of reading the roadmap first.
@@ -90,8 +104,10 @@ Inspect:
 Regenerate:
 
 ```bash
+relaytic release-safety paper-system-eval --format json
 relaytic release-safety paper-release --format json
 relaytic release-safety paper-arxiv-source --format json
+python -m pytest tests/test_paper_track_p15.py -q
 ```
 
 Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked until later gates explicitly allow them.

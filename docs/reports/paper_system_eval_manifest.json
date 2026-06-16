@@ -1,12 +1,17 @@
 {
   "artifact_hashes": {
+    "README.md": "00392ff9ed75cfdc615aadf9830c8bc5d0d9633006fc0c88e92f2591d6cb0bad",
     "docs/reports/paper_claim_lint_report.json": "9123d9521638cfb866171a4ebeee931b556f6b8a9d65735d0aa24ebb2ed25322",
     "docs/reports/paper_external_dry_run_report.json": "ba3b1a75ef7b5d5e045e89ea3cead280643e8a4ef7d4b86512e64ac340bf252d",
+    "docs/reports/paper_metric_cell_audit.json": "e22ab8c753c45aa2f79d9b148731e7ba2dc1ebb0837abf5e2c9f2167a31d9a5c",
+    "docs/reports/paper_publishability_matrix.json": "74ad1e835b8ef994f2ea26ebebef43757ec362e596194e298d5289f52f2efc80",
     "docs/reports/paper_release_go_no_go.json": "51aa6561f57abaa2794e2e26f213ed8a21ca8378bd7a2b27896fe106bf796710",
-    "docs/reports/paper_reproduction_failure_report.json": "d3a72c7448abd993743f3f2542e3031364240247dca2d59d6cb2829bf3b7db3a"
+    "docs/reports/paper_reproduction_failure_report.json": "d3a72c7448abd993743f3f2542e3031364240247dca2d59d6cb2829bf3b7db3a",
+    "docs/reports/paper_result_table_final.json": "c9c80a51b0f1c3756c146e3a886cf3061172c3d79896951d7d7b7112097f2e01"
   },
   "artifact_refs": [
     "docs/reports/paper_system_behavior_eval.json",
+    "docs/reports/paper_system_task_eval.json",
     "docs/reports/paper_agent_handoff_eval.json",
     "docs/reports/paper_no_lost_user_eval.json",
     "docs/reports/paper_claim_gate_case_studies.json",
@@ -22,10 +27,14 @@
           "docs/reports/paper_claim_lint_report.json",
           "docs/reports/paper_external_dry_run_report.json",
           "docs/reports/paper_reproduction_failure_report.json",
-          "docs/reports/paper_release_go_no_go.json"
+          "docs/reports/paper_release_go_no_go.json",
+          "README.md",
+          "docs/reports/paper_result_table_final.json",
+          "docs/reports/paper_metric_cell_audit.json",
+          "docs/reports/paper_publishability_matrix.json"
         ]
       },
-      "message": "P15 requires P11/P12 claim lint, dry-run, failure, and go/no-go artifacts.",
+      "message": "P15 requires claim-gate artifacts plus README, table, metric-provenance, and publishability inputs.",
       "passed": true,
       "source_artifact": "docs/reports"
     },
@@ -46,6 +55,12 @@
       "message": "Required claim-gate case studies must pass.",
       "passed": true,
       "source_artifact": "docs/reports/paper_claim_gate_case_studies.json"
+    },
+    {
+      "check_id": "reader_task_eval_passed",
+      "message": "Reader and external-agent task evaluation must prove navigation, provenance, handoff, and claim-boundary tasks.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_system_task_eval.json"
     },
     {
       "check_id": "system_behavior_eval_passed",
@@ -73,6 +88,10 @@
     "docs/reports/paper_external_dry_run_report.json",
     "docs/reports/paper_reproduction_failure_report.json",
     "docs/reports/paper_release_go_no_go.json",
+    "README.md",
+    "docs/reports/paper_result_table_final.json",
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_publishability_matrix.json",
     "docs/reports/paper_public_claims_allowed.json",
     "docs/reports/paper_release_manifest.json",
     "docs/reports/paper_arxiv_source_manifest.json"
@@ -85,7 +104,7 @@
     "state_root": "artifacts/release_safety/paper_p15_system_eval"
   },
   "status": "ready_for_system_evaluation_evidence",
-  "summary": "P15 turns Relaytic's guide, redacted handoff, interoperability, and claim-gate surfaces into measured paper evidence.",
+  "summary": "P15 turns Relaytic's guide, reader navigation, redacted handoff, interoperability, and claim-gate surfaces into measured paper evidence.",
   "surface_refs": [
     "relaytic guide --format json",
     "relaytic guide --run-dir <run_dir> --format json",

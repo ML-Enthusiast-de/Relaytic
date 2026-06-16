@@ -1,0 +1,112 @@
+{
+  "deterministic": true,
+  "failed_tasks": [],
+  "interpretation": "This is a deterministic reader/agent task suite. It verifies that the current repo surfaces let a reviewer navigate the AML paper, trace numeric evidence, understand blocked claims, recover run state, and export rowless context. It is not a substitute for a controlled human-subject study.",
+  "passed_task_count": 11,
+  "required_task_count": 11,
+  "schema_version": "relaytic.paper_system_eval.v1",
+  "slice": "Paper Track P15",
+  "status": "pass",
+  "task_count": 11,
+  "tasks": [
+    {
+      "expected_behavior": "A reviewer should learn from the README that Relaytic is the general lab and Relaytic-AML is the current paper focus.",
+      "measured_signal": "readme_present=True; mentions_pdf=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "README.md",
+      "task_id": "repo_navigation_separates_relaytic_from_aml_paper",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "A reviewer should see compact Windows and macOS/Linux commands for the paper and system-evaluation artifacts.",
+      "measured_signal": "windows_path=True; unix_path=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "README.md",
+      "task_id": "cross_platform_reproduction_path_visible",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "A reviewer should be able to trace the PaySim competitive PR-AUC cell to dataset, split, command, artifact field, budget, leakage posture, and claim state.",
+      "measured_signal": "audit_status=pass; required_fields_present=13/13",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_metric_cell_audit.json",
+      "task_id": "metric_cell_provenance_available",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "A reviewer should be able to compare the PaySim baseline and competitive budgets under the same metric and dataset contract.",
+      "measured_signal": "baseline=0.331345; competitive=0.638773; improved=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_metric_cell_audit.json",
+      "task_id": "paysim_baseline_and_competitive_budget_comparable",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "The PaySim row should be usable as supporting evidence while staying blocked from real-bank or headline claims.",
+      "measured_signal": "supporting=True; hard=False; reasons=2",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_publishability_matrix.json",
+      "task_id": "paysim_claim_boundary_machine_readable",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "Elliptic2 should be visible as modern context plus a claim firewall, not as a Relaytic performance contribution.",
+      "measured_signal": "context_role=modern_context_only; firewall_status=blocked_supporting_only_thesis_narrowing_required",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_publishability_matrix.json",
+      "task_id": "elliptic2_supporting_context_and_firewall_visible",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "An external model or agent should receive redacted state, action choices, and tool discovery without raw rows.",
+      "measured_signal": "rowless=True; next_action=True; tools=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_agent_handoff_eval.json",
+      "task_id": "rowless_external_agent_handoff_recoverable",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "A new or interrupted user should see onboarding, partial-run state, and a canonical artifact shortlist.",
+      "measured_signal": "onboarding=True; partial=True; shortlist=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_no_lost_user_eval.json",
+      "task_id": "partial_run_recovery_without_artifact_literacy",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "Public paper interpretation should stay below the claim lint and go/no-go gates.",
+      "measured_signal": "claim_cases_status=pass; go_no_go=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_claim_gate_case_studies.json",
+      "task_id": "claim_gate_fails_closed_for_public_interpretation",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "Every current paper row should keep hard and headline claims blocked until stronger evidence gates pass.",
+      "measured_signal": "rows=5; all_blocked=True",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_publishability_matrix.json",
+      "task_id": "all_publishability_rows_block_hard_and_headline_claims",
+      "track": "reader_task"
+    },
+    {
+      "expected_behavior": "The result table should connect the reader-facing row to metric cells and source artifacts.",
+      "measured_signal": "row_present=True; artifact_refs=4",
+      "passed": true,
+      "required": true,
+      "source_artifact": "docs/reports/paper_result_table_final.json",
+      "task_id": "result_row_links_metric_cells_and_source_artifacts",
+      "track": "reader_task"
+    }
+  ]
+}

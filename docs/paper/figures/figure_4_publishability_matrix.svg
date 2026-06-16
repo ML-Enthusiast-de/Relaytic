@@ -1,45 +1,70 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="440" viewBox="0 0 1040 440" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
-<text x="30" y="38" font-size="17" fill="#5b6472">Rows can be useful evidence while still failing stronger claim gates.</text>
-<line x1="185" y1="92" x2="905" y2="92" stroke="#d7dde8" stroke-width="2"/>
-<text x="185" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">current evidence</text>
-<text x="545" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">blocked claim</text>
-<text x="905" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">evidence needed</text>
-<text x="50" y="126" font-size="18" font-weight="700" fill="#293241">PaySim</text>
-<circle cx="185" cy="120" r="10" fill="#2a9d8f"/>
-<circle cx="545" cy="120" r="10" fill="#c94c4c"/>
-<circle cx="905" cy="120" r="10" fill="#457b9d"/>
-<line x1="195" y1="120" x2="535" y2="120" stroke="#d7dde8" stroke-width="2"/>
-<line x1="555" y1="120" x2="895" y2="120" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>
-<text x="185.0" y="149.0" text-anchor="middle" font-size="14" fill="#293241">current: synthetic temporal proxy</text>
-<text x="545.0" y="149.0" text-anchor="middle" font-size="14" fill="#8a3434">blocked: real-bank superiority</text>
-<text x="905.0" y="149.0" text-anchor="middle" font-size="14" fill="#293241">unlock: partner/real holdout</text>
-<text x="50" y="196" font-size="18" font-weight="700" fill="#293241">Elliptic</text>
-<circle cx="185" cy="190" r="10" fill="#2a9d8f"/>
-<circle cx="545" cy="190" r="10" fill="#c94c4c"/>
-<circle cx="905" cy="190" r="10" fill="#457b9d"/>
-<line x1="195" y1="190" x2="535" y2="190" stroke="#d7dde8" stroke-width="2"/>
-<line x1="555" y1="190" x2="895" y2="190" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>
-<text x="185.0" y="219.0" text-anchor="middle" font-size="14" fill="#293241">current: temporal graph features</text>
-<text x="545.0" y="219.0" text-anchor="middle" font-size="14" fill="#8a3434">blocked: graph-neural superiority</text>
-<text x="905.0" y="219.0" text-anchor="middle" font-size="14" fill="#293241">unlock: repeated graph release budget</text>
-<text x="50" y="266" font-size="18" font-weight="700" fill="#293241">Elliptic2</text>
-<circle cx="185" cy="260" r="10" fill="#2a9d8f"/>
-<circle cx="545" cy="260" r="10" fill="#c94c4c"/>
-<circle cx="905" cy="260" r="10" fill="#457b9d"/>
-<line x1="195" y1="260" x2="535" y2="260" stroke="#d7dde8" stroke-width="2"/>
-<line x1="555" y1="260" x2="895" y2="260" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>
-<text x="185.0" y="289.0" text-anchor="middle" font-size="14" fill="#293241">current: modern subgraph context</text>
-<text x="545.0" y="289.0" text-anchor="middle" font-size="14" fill="#8a3434">blocked: RevClassify parity</text>
-<text x="905.0" y="289.0" text-anchor="middle" font-size="14" fill="#293241">unlock: faithful parity + cohort proof</text>
-<text x="50" y="336" font-size="18" font-weight="700" fill="#293241">Operational</text>
-<circle cx="185" cy="330" r="10" fill="#2a9d8f"/>
-<circle cx="545" cy="330" r="10" fill="#c94c4c"/>
-<circle cx="905" cy="330" r="10" fill="#457b9d"/>
-<line x1="195" y1="330" x2="535" y2="330" stroke="#d7dde8" stroke-width="2"/>
-<line x1="555" y1="330" x2="895" y2="330" stroke="#d7dde8" stroke-width="2" stroke-dasharray="6 6"/>
-<text x="185.0" y="359.0" text-anchor="middle" font-size="14" fill="#293241">current: review-budget support</text>
-<text x="545.0" y="359.0" text-anchor="middle" font-size="14" fill="#8a3434">blocked: hard business value</text>
-<text x="905.0" y="359.0" text-anchor="middle" font-size="14" fill="#293241">unlock: same-queue incumbent</text>
-<rect x="44" y="394" width="952" height="28" rx="6" fill="#fbfcfe" stroke="#d7dde8" stroke-width="1"/>
-<text x="520" y="413" text-anchor="middle" font-size="15" fill="#5b6472">The gate preserves useful evidence while preventing unsupported promotion.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="500" viewBox="0 0 1080 500" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="28" y="24" width="1024" height="440" rx="8" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.4"/>
+<text x="54" y="58" font-size="22" font-weight="700" fill="#293241">Claim boundary ladder</text>
+<text x="54" y="86" font-size="15" fill="#5b6472">A row can be useful and still fail a stronger publication claim.</text>
+<text x="252" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#293241">current evidence</text>
+<text x="532" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#293241">blocked promotion</text>
+<text x="842" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#293241">evidence needed</text>
+<rect x="54" y="128" width="972" height="58" rx="8" fill="#ffffff" stroke="#e1e6ef" stroke-width="1"/>
+<text x="72" y="152" font-size="14" font-weight="700" fill="#293241">PaySim</text>
+<rect x="180" y="135" width="144" height="42" rx="6" fill="#eaf7f3" stroke="#b8dfd1" stroke-width="1"/>
+<rect x="460" y="135" width="144" height="42" rx="6" fill="#fff0f0" stroke="#efc6c6" stroke-width="1"/>
+<rect x="770" y="135" width="144" height="42" rx="6" fill="#eef4ff" stroke="#c9d8f1" stroke-width="1"/>
+<text x="252.0" y="149.0" text-anchor="middle" font-size="12" fill="#293241">synthetic temporal</text>
+<text x="252.0" y="163.0" text-anchor="middle" font-size="12" fill="#293241">proxy</text>
+<text x="532.0" y="149.0" text-anchor="middle" font-size="12" fill="#8a3434">real-bank</text>
+<text x="532.0" y="163.0" text-anchor="middle" font-size="12" fill="#8a3434">superiority</text>
+<text x="842.0" y="149.0" text-anchor="middle" font-size="12" fill="#293241">partner or real</text>
+<text x="842.0" y="163.0" text-anchor="middle" font-size="12" fill="#293241">holdout</text>
+<line x1="340" y1="155" x2="440" y2="155" stroke="#cfd7e3" stroke-width="1.6"/>
+<polygon points="440,155 429,148 429,162" fill="#cfd7e3"/>
+<line x1="620" y1="155" x2="750" y2="155" stroke="#cfd7e3" stroke-width="1.6" stroke-dasharray="6 6"/>
+<polygon points="750,155 739,148 739,162" fill="#cfd7e3"/>
+<rect x="54" y="200" width="972" height="58" rx="8" fill="#ffffff" stroke="#e1e6ef" stroke-width="1"/>
+<text x="72" y="224" font-size="14" font-weight="700" fill="#293241">Elliptic</text>
+<rect x="180" y="207" width="144" height="42" rx="6" fill="#eaf7f3" stroke="#b8dfd1" stroke-width="1"/>
+<rect x="460" y="207" width="144" height="42" rx="6" fill="#fff0f0" stroke="#efc6c6" stroke-width="1"/>
+<rect x="770" y="207" width="144" height="42" rx="6" fill="#eef4ff" stroke="#c9d8f1" stroke-width="1"/>
+<text x="252.0" y="221.0" text-anchor="middle" font-size="12" fill="#293241">temporal graph</text>
+<text x="252.0" y="235.0" text-anchor="middle" font-size="12" fill="#293241">features</text>
+<text x="532.0" y="221.0" text-anchor="middle" font-size="12" fill="#8a3434">graph-neural</text>
+<text x="532.0" y="235.0" text-anchor="middle" font-size="12" fill="#8a3434">superiority</text>
+<text x="842.0" y="221.0" text-anchor="middle" font-size="12" fill="#293241">repeated graph</text>
+<text x="842.0" y="235.0" text-anchor="middle" font-size="12" fill="#293241">release budget</text>
+<line x1="340" y1="227" x2="440" y2="227" stroke="#cfd7e3" stroke-width="1.6"/>
+<polygon points="440,227 429,220 429,234" fill="#cfd7e3"/>
+<line x1="620" y1="227" x2="750" y2="227" stroke="#cfd7e3" stroke-width="1.6" stroke-dasharray="6 6"/>
+<polygon points="750,227 739,220 739,234" fill="#cfd7e3"/>
+<rect x="54" y="272" width="972" height="58" rx="8" fill="#ffffff" stroke="#e1e6ef" stroke-width="1"/>
+<text x="72" y="296" font-size="14" font-weight="700" fill="#293241">Elliptic2</text>
+<rect x="180" y="279" width="144" height="42" rx="6" fill="#eaf7f3" stroke="#b8dfd1" stroke-width="1"/>
+<rect x="460" y="279" width="144" height="42" rx="6" fill="#fff0f0" stroke="#efc6c6" stroke-width="1"/>
+<rect x="770" y="279" width="144" height="42" rx="6" fill="#eef4ff" stroke="#c9d8f1" stroke-width="1"/>
+<text x="252.0" y="293.0" text-anchor="middle" font-size="12" fill="#293241">modern subgraph</text>
+<text x="252.0" y="307.0" text-anchor="middle" font-size="12" fill="#293241">context</text>
+<text x="532.0" y="293.0" text-anchor="middle" font-size="12" fill="#8a3434">RevClassify</text>
+<text x="532.0" y="307.0" text-anchor="middle" font-size="12" fill="#8a3434">parity</text>
+<text x="842.0" y="293.0" text-anchor="middle" font-size="12" fill="#293241">faithful parity</text>
+<text x="842.0" y="307.0" text-anchor="middle" font-size="12" fill="#293241">and cohort proof</text>
+<line x1="340" y1="299" x2="440" y2="299" stroke="#cfd7e3" stroke-width="1.6"/>
+<polygon points="440,299 429,292 429,306" fill="#cfd7e3"/>
+<line x1="620" y1="299" x2="750" y2="299" stroke="#cfd7e3" stroke-width="1.6" stroke-dasharray="6 6"/>
+<polygon points="750,299 739,292 739,306" fill="#cfd7e3"/>
+<rect x="54" y="344" width="972" height="58" rx="8" fill="#ffffff" stroke="#e1e6ef" stroke-width="1"/>
+<text x="72" y="368" font-size="14" font-weight="700" fill="#293241">Operational</text>
+<rect x="180" y="351" width="144" height="42" rx="6" fill="#eaf7f3" stroke="#b8dfd1" stroke-width="1"/>
+<rect x="460" y="351" width="144" height="42" rx="6" fill="#fff0f0" stroke="#efc6c6" stroke-width="1"/>
+<rect x="770" y="351" width="144" height="42" rx="6" fill="#eef4ff" stroke="#c9d8f1" stroke-width="1"/>
+<text x="252.0" y="365.0" text-anchor="middle" font-size="12" fill="#293241">review-budget</text>
+<text x="252.0" y="379.0" text-anchor="middle" font-size="12" fill="#293241">support</text>
+<text x="532.0" y="365.0" text-anchor="middle" font-size="12" fill="#8a3434">hard business</text>
+<text x="532.0" y="379.0" text-anchor="middle" font-size="12" fill="#8a3434">value</text>
+<text x="842.0" y="365.0" text-anchor="middle" font-size="12" fill="#293241">same-queue</text>
+<text x="842.0" y="379.0" text-anchor="middle" font-size="12" fill="#293241">incumbent</text>
+<line x1="340" y1="371" x2="440" y2="371" stroke="#cfd7e3" stroke-width="1.6"/>
+<polygon points="440,371 429,364 429,378" fill="#cfd7e3"/>
+<line x1="620" y1="371" x2="750" y2="371" stroke="#cfd7e3" stroke-width="1.6" stroke-dasharray="6 6"/>
+<polygon points="750,371 739,364 739,378" fill="#cfd7e3"/>
+<rect x="54" y="432" width="972" height="22" rx="5" fill="#f7f9fc" stroke="#d7dde8" stroke-width="1"/>
+<text x="540" y="448" text-anchor="middle" font-size="13" fill="#5b6472">The gate keeps useful evidence visible while blocking unsupported promotion.</text>
 </svg>

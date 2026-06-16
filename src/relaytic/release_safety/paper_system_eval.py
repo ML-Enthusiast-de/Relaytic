@@ -18,6 +18,7 @@ NEXT_PAPER_SYSTEM_EVAL_SLICE = "Slice 16A - capability registry and capability c
 
 PAPER_SYSTEM_EVAL_FILENAMES = {
     "paper_system_behavior_eval": "paper_system_behavior_eval.json",
+    "paper_system_task_eval": "paper_system_task_eval.json",
     "paper_agent_handoff_eval": "paper_agent_handoff_eval.json",
     "paper_no_lost_user_eval": "paper_no_lost_user_eval.json",
     "paper_claim_gate_case_studies": "paper_claim_gate_case_studies.json",
@@ -30,6 +31,12 @@ REQUIRED_CLAIM_INPUT_REFS = [
     "docs/reports/paper_external_dry_run_report.json",
     "docs/reports/paper_reproduction_failure_report.json",
     "docs/reports/paper_release_go_no_go.json",
+]
+REQUIRED_READER_TASK_INPUT_REFS = [
+    "README.md",
+    "docs/reports/paper_result_table_final.json",
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_publishability_matrix.json",
 ]
 OPTIONAL_CLAIM_INPUT_REFS = [
     "docs/reports/paper_public_claims_allowed.json",
@@ -73,10 +80,17 @@ def build_paper_system_eval_pack(
     no_lost = _build_no_lost_user_eval(root=root, surfaces=surfaces)
     agent_handoff = _build_agent_handoff_eval(root=root, surfaces=surfaces)
     claim_cases = _build_claim_gate_case_studies(inputs=inputs)
+    reader_tasks = _build_reader_task_eval(
+        inputs=inputs,
+        no_lost_user_eval=no_lost,
+        agent_handoff_eval=agent_handoff,
+        claim_gate_case_studies=claim_cases,
+    )
     behavior = _build_system_behavior_eval(
         no_lost_user_eval=no_lost,
         agent_handoff_eval=agent_handoff,
         claim_gate_case_studies=claim_cases,
+        reader_task_eval=reader_tasks,
     )
     manifest = _build_manifest(
         root=root,
@@ -86,10 +100,12 @@ def build_paper_system_eval_pack(
         no_lost_user_eval=no_lost,
         agent_handoff_eval=agent_handoff,
         claim_gate_case_studies=claim_cases,
+        reader_task_eval=reader_tasks,
         system_behavior_eval=behavior,
     )
     pack = {
         "paper_system_behavior_eval": behavior,
+        "paper_system_task_eval": reader_tasks,
         "paper_agent_handoff_eval": agent_handoff,
         "paper_no_lost_user_eval": no_lost,
         "paper_claim_gate_case_studies": claim_cases,
@@ -124,7 +140,9 @@ def sync_paper_system_eval_pack(
 def render_paper_system_eval_markdown(pack: dict[str, Any]) -> str:
     manifest = dict(pack.get("paper_system_eval_manifest", {}))
     behavior = dict(pack.get("paper_system_behavior_eval", {}))
+    reader_tasks = dict(pack.get("paper_system_task_eval", {}))
     rows = list(behavior.get("evaluation_rows", []))
+    task_rows = list(reader_tasks.get("tasks", []))
     lines = [
         "# Paper P15 System-Evaluation Proof Pack",
         "",
@@ -135,9 +153,39 @@ def render_paper_system_eval_markdown(pack: dict[str, Any]) -> str:
         f"- Private paths exposed: `{behavior.get('private_paths_exposed')}`",
         f"- Next slice: `{manifest.get('next_slice') or 'unknown'}`",
         "",
-        "| Track | Task | Measured Signal | Result |",
+        "## Reader And Agent Task Evaluation",
+        "",
+        (
+            f"The reader-task suite checks `{reader_tasks.get('passed_task_count')}`/"
+            f"`{reader_tasks.get('task_count')}` concrete navigation, provenance, privacy, and claim-boundary tasks."
+        ),
+        "",
+        "| Task | Measured Signal | Source | Result |",
         "| --- | --- | --- | --- |",
     ]
+    for row in task_rows:
+        result = "pass" if row.get("passed") else "fail"
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    _escape_md(str(row.get("task_id") or "unknown")),
+                    _escape_md(str(row.get("measured_signal") or "")),
+                    _escape_md(str(row.get("source_artifact") or "")),
+                    f"`{result}`",
+                ]
+            )
+            + " |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Aggregate Protocol Checks",
+            "",
+        "| Track | Task | Measured Signal | Result |",
+        "| --- | --- | --- | --- |",
+        ]
+    )
     for row in rows:
         required = bool(row.get("required", True))
         passed = bool(row.get("passed"))
@@ -165,6 +213,10 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "paper_external_dry_run_report": _read_artifact(reports / "paper_external_dry_run_report.json", root=root),
         "paper_reproduction_failure_report": _read_artifact(reports / "paper_reproduction_failure_report.json", root=root),
         "paper_release_go_no_go": _read_artifact(reports / "paper_release_go_no_go.json", root=root),
+        "readme": _read_text_artifact(root / "README.md", root=root),
+        "paper_result_table_final": _read_artifact(reports / "paper_result_table_final.json", root=root),
+        "paper_metric_cell_audit": _read_artifact(reports / "paper_metric_cell_audit.json", root=root),
+        "paper_publishability_matrix": _read_artifact(reports / "paper_publishability_matrix.json", root=root),
         "paper_public_claims_allowed": _read_artifact(reports / "paper_public_claims_allowed.json", root=root),
         "paper_release_manifest": _read_artifact(reports / "paper_release_manifest.json", root=root),
         "paper_arxiv_source_manifest": _read_artifact(reports / "paper_arxiv_source_manifest.json", root=root),
@@ -463,16 +515,230 @@ def _build_claim_gate_case_studies(*, inputs: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _build_reader_task_eval(
+    *,
+    inputs: dict[str, Any],
+    no_lost_user_eval: dict[str, Any],
+    agent_handoff_eval: dict[str, Any],
+    claim_gate_case_studies: dict[str, Any],
+) -> dict[str, Any]:
+    readme_text = _text_payload(inputs["readme"])
+    readme_lower = readme_text.lower()
+    result_table = _payload(inputs["paper_result_table_final"])
+    metric_audit = _payload(inputs["paper_metric_cell_audit"])
+    publishability = _payload(inputs["paper_publishability_matrix"])
+    pay_base_cell = _find_metric_cell(metric_audit, "paysim_p6_validation_selected_baseline.test_pr_auc")
+    pay_comp_cell = _find_metric_cell(metric_audit, "paysim_p6a_competitive_selected.test_pr_auc")
+    pay_row = _find_publishability_row(publishability, dataset_id="paysim_temporal_transaction_fraud")
+    elliptic2_context = _find_publishability_row(
+        publishability,
+        dataset_id="elliptic2_subgraph_aml",
+        role="modern_context_only",
+    )
+    elliptic2_firewall = _find_publishability_row(
+        publishability,
+        dataset_id="elliptic2_subgraph_aml",
+        role="claim_firewall",
+    )
+    paysim_result_row = _find_result_row(result_table, "paysim_p6a_competitive_selected")
+    required_metric_fields = {
+        "artifact_ref",
+        "artifact_field",
+        "budget_tier",
+        "claim_state",
+        "command",
+        "dataset_id",
+        "leakage_posture",
+        "metric_id",
+        "publishability_gate_ref",
+        "publishability_gate_status",
+        "row_id",
+        "split",
+        "value",
+    }
+    no_lost_tasks = _task_pass_map(no_lost_user_eval.get("tasks", []))
+    handoff_tasks = _task_pass_map(agent_handoff_eval.get("tasks", []))
+    claim_cases = _case_pass_map(claim_gate_case_studies.get("cases", []))
+    publishability_rows = [
+        item
+        for item in list(publishability.get("rows", []))
+        if isinstance(item, dict)
+    ]
+    all_rows_block_hard = bool(publishability_rows) and all(
+        item.get("hard_claim_allowed") is False and item.get("headline_claim_allowed") is False
+        for item in publishability_rows
+    )
+    pay_base_value = pay_base_cell.get("value")
+    pay_comp_value = pay_comp_cell.get("value")
+    try:
+        pay_improved = float(pay_comp_value) > float(pay_base_value)
+    except (TypeError, ValueError):
+        pay_improved = False
+    tasks = [
+        _task(
+            "reader_task",
+            "repo_navigation_separates_relaytic_from_aml_paper",
+            inputs["readme"].get("exists") is True
+            and "this repository is larger than the aml paper" in readme_lower
+            and "relaytic is the general local-first inference lab" in readme_lower
+            and "relaytic-aml is the current flagship edition" in readme_lower
+            and "docs/paper/relaytic_aml_arxiv_draft.pdf" in readme_lower,
+            "A reviewer should learn from the README that Relaytic is the general lab and Relaytic-AML is the current paper focus.",
+            "readme_present="
+            f"{inputs['readme'].get('exists')}; mentions_pdf={'docs/paper/relaytic_aml_arxiv_draft.pdf' in readme_lower}",
+            "README.md",
+        ),
+        _task(
+            "reader_task",
+            "cross_platform_reproduction_path_visible",
+            "windows powershell" in readme_lower
+            and "macos/linux" in readme_lower
+            and "release-safety paper-system-eval" in readme_lower
+            and "release-safety paper-release" in readme_lower
+            and "release-safety paper-arxiv-source" in readme_lower,
+            "A reviewer should see compact Windows and macOS/Linux commands for the paper and system-evaluation artifacts.",
+            "windows_path="
+            f"{'windows powershell' in readme_lower}; unix_path={'macos/linux' in readme_lower}",
+            "README.md",
+        ),
+        _task(
+            "reader_task",
+            "metric_cell_provenance_available",
+            metric_audit.get("status") == "pass"
+            and required_metric_fields.issubset(set(pay_comp_cell.keys())),
+            "A reviewer should be able to trace the PaySim competitive PR-AUC cell to dataset, split, command, artifact field, budget, leakage posture, and claim state.",
+            "audit_status="
+            f"{metric_audit.get('status')}; required_fields_present={len(required_metric_fields & set(pay_comp_cell.keys()))}/{len(required_metric_fields)}",
+            "docs/reports/paper_metric_cell_audit.json",
+        ),
+        _task(
+            "reader_task",
+            "paysim_baseline_and_competitive_budget_comparable",
+            pay_improved
+            and pay_base_cell.get("dataset_id") == pay_comp_cell.get("dataset_id")
+            and pay_base_cell.get("metric_id") == pay_comp_cell.get("metric_id") == "test_pr_auc"
+            and pay_base_cell.get("budget_tier") == "baseline"
+            and pay_comp_cell.get("budget_tier") == "competitive",
+            "A reviewer should be able to compare the PaySim baseline and competitive budgets under the same metric and dataset contract.",
+            f"baseline={pay_base_value}; competitive={pay_comp_value}; improved={pay_improved}",
+            "docs/reports/paper_metric_cell_audit.json",
+        ),
+        _task(
+            "reader_task",
+            "paysim_claim_boundary_machine_readable",
+            pay_row.get("supporting_table_allowed") is True
+            and pay_row.get("hard_claim_allowed") is False
+            and pay_row.get("headline_claim_allowed") is False
+            and pay_row.get("performance_contribution_allowed") is False
+            and bool(pay_row.get("blocked_reason_codes")),
+            "The PaySim row should be usable as supporting evidence while staying blocked from real-bank or headline claims.",
+            "supporting="
+            f"{pay_row.get('supporting_table_allowed')}; hard={pay_row.get('hard_claim_allowed')}; "
+            f"reasons={len(pay_row.get('blocked_reason_codes', []) or [])}",
+            "docs/reports/paper_publishability_matrix.json",
+        ),
+        _task(
+            "reader_task",
+            "elliptic2_supporting_context_and_firewall_visible",
+            elliptic2_context.get("supporting_table_allowed") is True
+            and elliptic2_context.get("performance_contribution_allowed") is False
+            and elliptic2_firewall.get("gate_status") == "blocked_supporting_only_thesis_narrowing_required",
+            "Elliptic2 should be visible as modern context plus a claim firewall, not as a Relaytic performance contribution.",
+            "context_role="
+            f"{elliptic2_context.get('role')}; firewall_status={elliptic2_firewall.get('gate_status')}",
+            "docs/reports/paper_publishability_matrix.json",
+        ),
+        _task(
+            "reader_task",
+            "rowless_external_agent_handoff_recoverable",
+            handoff_tasks.get("external_context_rowless_and_redacted") is True
+            and handoff_tasks.get("safe_next_action_exported") is True
+            and handoff_tasks.get("server_tool_contract_available") is True,
+            "An external model or agent should receive redacted state, action choices, and tool discovery without raw rows.",
+            "rowless="
+            f"{handoff_tasks.get('external_context_rowless_and_redacted')}; next_action={handoff_tasks.get('safe_next_action_exported')}; "
+            f"tools={handoff_tasks.get('server_tool_contract_available')}",
+            "docs/reports/paper_agent_handoff_eval.json",
+        ),
+        _task(
+            "reader_task",
+            "partial_run_recovery_without_artifact_literacy",
+            no_lost_tasks.get("onboarding_guide_available") is True
+            and no_lost_tasks.get("partial_run_state_recovery") is True
+            and no_lost_tasks.get("artifact_shortlist_points_to_canonical_state") is True,
+            "A new or interrupted user should see onboarding, partial-run state, and a canonical artifact shortlist.",
+            "onboarding="
+            f"{no_lost_tasks.get('onboarding_guide_available')}; partial={no_lost_tasks.get('partial_run_state_recovery')}; "
+            f"shortlist={no_lost_tasks.get('artifact_shortlist_points_to_canonical_state')}",
+            "docs/reports/paper_no_lost_user_eval.json",
+        ),
+        _task(
+            "reader_task",
+            "claim_gate_fails_closed_for_public_interpretation",
+            claim_gate_case_studies.get("status") == "pass"
+            and claim_cases.get("p12_go_no_go_blocks_hard_and_headline_claims") is True
+            and claim_cases.get("p11_claim_lint_passed") is True,
+            "Public paper interpretation should stay below the claim lint and go/no-go gates.",
+            "claim_cases_status="
+            f"{claim_gate_case_studies.get('status')}; go_no_go={claim_cases.get('p12_go_no_go_blocks_hard_and_headline_claims')}",
+            "docs/reports/paper_claim_gate_case_studies.json",
+        ),
+        _task(
+            "reader_task",
+            "all_publishability_rows_block_hard_and_headline_claims",
+            all_rows_block_hard and len(publishability_rows) >= 5,
+            "Every current paper row should keep hard and headline claims blocked until stronger evidence gates pass.",
+            f"rows={len(publishability_rows)}; all_blocked={all_rows_block_hard}",
+            "docs/reports/paper_publishability_matrix.json",
+        ),
+        _task(
+            "reader_task",
+            "result_row_links_metric_cells_and_source_artifacts",
+            bool(paysim_result_row)
+            and any(
+                item.get("cell_id") == "paysim_p6a_competitive_selected.test_pr_auc"
+                for item in list(paysim_result_row.get("metrics", []))
+                if isinstance(item, dict)
+            )
+            and "docs/reports/paysim_competitive_benchmark_manifest.json"
+            in set(paysim_result_row.get("artifact_refs", []) or []),
+            "The result table should connect the reader-facing row to metric cells and source artifacts.",
+            "row_present="
+            f"{bool(paysim_result_row)}; artifact_refs={len(paysim_result_row.get('artifact_refs', []) or [])}",
+            "docs/reports/paper_result_table_final.json",
+        ),
+    ]
+    passed = sum(1 for item in tasks if item["passed"])
+    return {
+        "schema_version": PAPER_SYSTEM_EVAL_SCHEMA_VERSION,
+        "slice": "Paper Track P15",
+        "status": "pass" if passed == len(tasks) else "fail",
+        "deterministic": True,
+        "task_count": len(tasks),
+        "passed_task_count": passed,
+        "required_task_count": len(tasks),
+        "failed_tasks": [item for item in tasks if not item["passed"]],
+        "tasks": tasks,
+        "interpretation": (
+            "This is a deterministic reader/agent task suite. It verifies that the current repo surfaces let a reviewer "
+            "navigate the AML paper, trace numeric evidence, understand blocked claims, recover run state, and export "
+            "rowless context. It is not a substitute for a controlled human-subject study."
+        ),
+    }
+
+
 def _build_system_behavior_eval(
     *,
     no_lost_user_eval: dict[str, Any],
     agent_handoff_eval: dict[str, Any],
     claim_gate_case_studies: dict[str, Any],
+    reader_task_eval: dict[str, Any],
 ) -> dict[str, Any]:
     tasks = [
         *list(no_lost_user_eval.get("tasks", [])),
         *list(agent_handoff_eval.get("tasks", [])),
         *list(claim_gate_case_studies.get("cases", [])),
+        *list(reader_task_eval.get("tasks", [])),
     ]
     required_tasks = [item for item in tasks if item.get("required", True)]
     passed_required = [item for item in required_tasks if item.get("passed")]
@@ -510,11 +776,12 @@ def _build_system_behavior_eval(
         "pass_rate": round(len(passed_required) / len(required_tasks), 4) if required_tasks else 0.0,
         "raw_rows_exposed": raw_rows_exposed,
         "private_paths_exposed": private_paths_exposed,
-        "surface_count": 5,
+        "surface_count": 6,
         "evaluation_rows": evaluation_rows,
         "interpretation": (
-            "These checks are deterministic system-behavior evidence. They support the paper's usability and "
-            "agent-handoff claims, but they are not a controlled human-subject study."
+            "These checks are deterministic system-behavior and reader-task evidence. They support the paper's "
+            "navigation, provenance, recovery, privacy, agent-handoff, and claim-boundary claims, but they are "
+            "not a controlled human-subject study."
         ),
     }
 
@@ -528,6 +795,7 @@ def _build_manifest(
     no_lost_user_eval: dict[str, Any],
     agent_handoff_eval: dict[str, Any],
     claim_gate_case_studies: dict[str, Any],
+    reader_task_eval: dict[str, Any],
     system_behavior_eval: dict[str, Any],
 ) -> dict[str, Any]:
     required_presence = _required_input_presence(inputs)
@@ -539,7 +807,7 @@ def _build_manifest(
         _check(
             "required_claim_gate_inputs_present",
             not required_presence["missing_artifact_refs"],
-            "P15 requires P11/P12 claim lint, dry-run, failure, and go/no-go artifacts.",
+            "P15 requires claim-gate artifacts plus README, table, metric-provenance, and publishability inputs.",
             source_artifact="docs/reports",
             detail=required_presence,
         ),
@@ -560,6 +828,12 @@ def _build_manifest(
             claim_gate_case_studies.get("status") == "pass",
             "Required claim-gate case studies must pass.",
             source_artifact="docs/reports/paper_claim_gate_case_studies.json",
+        ),
+        _check(
+            "reader_task_eval_passed",
+            reader_task_eval.get("status") == "pass",
+            "Reader and external-agent task evaluation must prove navigation, provenance, handoff, and claim-boundary tasks.",
+            source_artifact="docs/reports/paper_system_task_eval.json",
         ),
         _check(
             "system_behavior_eval_passed",
@@ -599,12 +873,12 @@ def _build_manifest(
             "relaytic interoperability relaytic_server_info",
         ],
         "artifact_refs": artifact_refs,
-        "source_input_refs": REQUIRED_CLAIM_INPUT_REFS + OPTIONAL_CLAIM_INPUT_REFS,
+        "source_input_refs": REQUIRED_CLAIM_INPUT_REFS + REQUIRED_READER_TASK_INPUT_REFS + OPTIONAL_CLAIM_INPUT_REFS,
         "artifact_hashes": _artifact_hashes(inputs),
         "checks": checks,
         "failed_checks": [check for check in checks if not check["passed"]],
         "next_slice": NEXT_PAPER_SYSTEM_EVAL_SLICE if ready else "Paper Track P15 repair",
-        "summary": "P15 turns Relaytic's guide, redacted handoff, interoperability, and claim-gate surfaces into measured paper evidence.",
+        "summary": "P15 turns Relaytic's guide, reader navigation, redacted handoff, interoperability, and claim-gate surfaces into measured paper evidence.",
     }
 
 
@@ -768,6 +1042,54 @@ def _case(
     }
 
 
+def _task_pass_map(tasks: Any) -> dict[str, bool]:
+    return {
+        str(item.get("task_id")): bool(item.get("passed"))
+        for item in list(tasks or [])
+        if isinstance(item, dict) and item.get("task_id")
+    }
+
+
+def _case_pass_map(cases: Any) -> dict[str, bool]:
+    return {
+        str(item.get("case_id")): bool(item.get("passed"))
+        for item in list(cases or [])
+        if isinstance(item, dict) and item.get("case_id")
+    }
+
+
+def _find_metric_cell(metric_audit: dict[str, Any], cell_id: str) -> dict[str, Any]:
+    for cell in list(metric_audit.get("numeric_cells", [])) + list(metric_audit.get("blocked_or_empty_cells", [])):
+        if isinstance(cell, dict) and cell.get("cell_id") == cell_id:
+            return dict(cell)
+    return {}
+
+
+def _find_result_row(result_table: dict[str, Any], row_id: str) -> dict[str, Any]:
+    for group in list(result_table.get("table_groups", [])):
+        if not isinstance(group, dict):
+            continue
+        for row in list(group.get("rows", [])):
+            if isinstance(row, dict) and row.get("row_id") == row_id:
+                return dict(row)
+    return {}
+
+
+def _find_publishability_row(
+    publishability: dict[str, Any],
+    *,
+    dataset_id: str,
+    role: str | None = None,
+) -> dict[str, Any]:
+    for row in list(publishability.get("rows", [])):
+        if not isinstance(row, dict) or row.get("dataset_id") != dataset_id:
+            continue
+        if role is not None and row.get("role") != role:
+            continue
+        return dict(row)
+    return {}
+
+
 def _required_input_presence(inputs: dict[str, Any]) -> dict[str, Any]:
     artifacts_by_ref = {
         str(value.get("artifact_ref")): value
@@ -776,7 +1098,7 @@ def _required_input_presence(inputs: dict[str, Any]) -> dict[str, Any]:
     }
     present = []
     missing = []
-    for ref in REQUIRED_CLAIM_INPUT_REFS:
+    for ref in REQUIRED_CLAIM_INPUT_REFS + REQUIRED_READER_TASK_INPUT_REFS:
         artifact = artifacts_by_ref.get(ref)
         if artifact and artifact.get("exists"):
             present.append(ref)
@@ -790,7 +1112,7 @@ def _artifact_hashes(inputs: dict[str, Any]) -> dict[str, str]:
     for value in inputs.values():
         if not isinstance(value, dict) or not value.get("exists") or not value.get("sha256"):
             continue
-        if value.get("artifact_ref") not in REQUIRED_CLAIM_INPUT_REFS:
+        if value.get("artifact_ref") not in REQUIRED_CLAIM_INPUT_REFS + REQUIRED_READER_TASK_INPUT_REFS:
             continue
         hashes[str(value["artifact_ref"])] = str(value["sha256"])
     return hashes
@@ -813,9 +1135,27 @@ def _read_artifact(path: Path, *, root: Path) -> dict[str, Any]:
     }
 
 
+def _read_text_artifact(path: Path, *, root: Path) -> dict[str, Any]:
+    artifact_ref = _repo_relative(path, root=root)
+    if not path.is_file():
+        return {"artifact_ref": artifact_ref, "exists": False, "payload": ""}
+    text = path.read_text(encoding="utf-8")
+    return {
+        "artifact_ref": artifact_ref,
+        "exists": True,
+        "sha256": _sha256_text(text),
+        "payload": text,
+    }
+
+
 def _payload(artifact: dict[str, Any]) -> dict[str, Any]:
     payload = artifact.get("payload", {})
     return dict(payload) if isinstance(payload, dict) else {}
+
+
+def _text_payload(artifact: dict[str, Any]) -> str:
+    payload = artifact.get("payload", "")
+    return str(payload) if isinstance(payload, str) else ""
 
 
 def _check(

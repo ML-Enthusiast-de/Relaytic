@@ -17,6 +17,7 @@
         "docs/reports/paper_reproduction_failure_report.json",
         "docs/reports/paper_release_go_no_go.json",
         "docs/reports/paper_system_behavior_eval.json",
+        "docs/reports/paper_system_task_eval.json",
         "docs/reports/paper_agent_handoff_eval.json",
         "docs/reports/paper_no_lost_user_eval.json",
         "docs/reports/paper_claim_gate_case_studies.json",
@@ -38,6 +39,7 @@
         "docs/reports/paper_reproduction_failure_report.json",
         "docs/reports/paper_release_go_no_go.json",
         "docs/reports/paper_system_behavior_eval.json",
+        "docs/reports/paper_system_task_eval.json",
         "docs/reports/paper_agent_handoff_eval.json",
         "docs/reports/paper_no_lost_user_eval.json",
         "docs/reports/paper_claim_gate_case_studies.json",
@@ -48,7 +50,7 @@
     },
     {
       "artifact_ref": "docs/paper/tables/table_3_release_artifact_set.md",
-      "byte_count": 1738,
+      "byte_count": 1818,
       "paper_claim_role": "claim_safe_supporting_evidence_only",
       "source_refs": [
         "docs/reports/paper_result_table_final.json",
@@ -59,6 +61,7 @@
         "docs/reports/paper_reproduction_failure_report.json",
         "docs/reports/paper_release_go_no_go.json",
         "docs/reports/paper_system_behavior_eval.json",
+        "docs/reports/paper_system_task_eval.json",
         "docs/reports/paper_agent_handoff_eval.json",
         "docs/reports/paper_no_lost_user_eval.json",
         "docs/reports/paper_claim_gate_case_studies.json",

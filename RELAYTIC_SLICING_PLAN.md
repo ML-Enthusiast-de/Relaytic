@@ -4302,6 +4302,7 @@ Deliverables:
 - `src/relaytic/release_safety/paper_system_eval.py`
 - `relaytic release-safety paper-system-eval`
 - `docs/reports/paper_system_behavior_eval.json`
+- `docs/reports/paper_system_task_eval.json`
 - `docs/reports/paper_agent_handoff_eval.json`
 - `docs/reports/paper_no_lost_user_eval.json`
 - `docs/reports/paper_claim_gate_case_studies.json`
@@ -4320,8 +4321,8 @@ Acceptance:
 Implemented status:
 
 - implemented by `src/relaytic/release_safety/paper_system_eval.py`
-- generated reports: `paper_system_behavior_eval.json`, `paper_agent_handoff_eval.json`, `paper_no_lost_user_eval.json`, `paper_claim_gate_case_studies.json`, `paper_system_eval_manifest.json`, and `paper_system_eval_summary.md`
-- the current pack passes all 11 required deterministic protocol checks and remains explicitly bounded to protocol evidence, not human-study or production-deployment evidence
+- generated reports: `paper_system_behavior_eval.json`, `paper_system_task_eval.json`, `paper_agent_handoff_eval.json`, `paper_no_lost_user_eval.json`, `paper_claim_gate_case_studies.json`, `paper_system_eval_manifest.json`, and `paper_system_eval_summary.md`
+- the current pack passes the required deterministic protocol and reader/agent task checks, covering navigation, metric provenance, partial-run recovery, rowless handoff, local-LLM advisory boundaries, and claim gates while remaining explicitly bounded to protocol evidence, not human-study or production-deployment evidence
 - Slice 16A remains the next execution target
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth

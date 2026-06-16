@@ -146,6 +146,12 @@ A simplified PaySim evidence cell contains the dataset identity (`paysim_tempora
 
 This schema-like record is the difference between a result and an anecdote. It lets a reviewer challenge the dataset, the split, the metric, the budget, the leakage posture, or the claim state without reconstructing the run from memory.
 
+The PaySim row is the clearest example of the evidence-cell path. The source contract identifies a synthetic mobile-money transaction-fraud task. The split contract orders records by simulator step. The leakage contract excludes simulator balance fields that can reveal after-event information, then allows prior-step destination-history features. The model-search contract separates a baseline budget from a competitive budget. The threshold contract chooses operating points on validation evidence and applies them unchanged to the test partition.
+
+That path changes the fixed-test PR-AUC from 0.331345 in the baseline run to 0.638773 in the competitive run. At the selected review budget, the same evidence cell records precision 0.703336 and recall 0.471584. The result is meaningful because the improvement is tied to a documented modeling change under the same split and metric contract. It remains bounded because PaySim is synthetic, so the claim state is supporting temporal-fraud evidence rather than real-bank AML performance.
+
+This is the pattern Relaytic is meant to enforce: useful evidence is preserved, the modeling work that created it is inspectable, and the stronger interpretation is blocked until the data and protocol justify it.
+
 ## 7. Current Frontier Context
 
 The current AML frontier is not a single leaderboard. It is a set of pressure points: real graph scale, realistic entity behavior, temporal drift, operational throughput, and reliable agent-assisted research. Relaytic-AML is designed as infrastructure around those pressure points, not as a replacement for detector papers.
@@ -161,6 +167,16 @@ Elliptic2 shifts the public AML benchmark center toward subgraph learning, with 
 Recent AML graph work raises the bar beyond the current Relaytic evidence rows. TransXion frames benchmark realism around profile-aware simulation, richer entity attributes, non-template illicit synthesis, and out-of-character behavior [@chen2026transxion]. LineMVGNN and ExSTraQt focus on directed money flow, edge-aware graph views, and quasi-temporal transaction representations [@poon2026linemvgnn; @tariq2026extraqt]. BlazingAML treats throughput and multi-stage graph mining as a systems problem [@ye2026blazingaml]. Continual graph-learning reviews emphasize drift, adaptation, class imbalance, and changing laundering behavior [@deprez2025continualaml]. These papers point to a frontier where realism, scale, graph structure, time, and operations are inseparable. Relaytic-AML is complementary to those efforts: it does not claim detector parity with them, but tries to make dataset posture, split validity, budget, limitations, and release claims auditable.
 
 The paper also follows broader machine-learning documentation and reproducibility practice. Datasheets for Datasets and Model Cards argue for explicit dataset and model reporting [@gebru2021datasheets; @mitchell2019modelcards]. The NeurIPS reproducibility program highlights the need for code, data, and checklist discipline in machine-learning research [@pineau2021reproducibility]. Recent work on machine-learning research agents warns that coherent papers can still contain invalidated experiments, which reinforces the need for executable artifacts, reproducible commands, and explicit claim boundaries [@chen2025mlrbench; @starace2025paperbench].
+
+| Adjacent practice | What it handles well | Gap for AML evaluation |
+| --- | --- | --- |
+| Experiment tracking | Runs, metrics, artifacts, lineage, and model versions. | A metric can still be separated from task validity, privacy posture, review capacity, and public interpretation. |
+| Data validation and monitoring | Schema checks, drift, quality rules, and production signals. | Validation often stops before model-search budgets, operating-point choices, and manuscript claims are tied together. |
+| Workflow orchestration | DAG execution, retries, scheduling, and dependency management. | Execution graphs usually do not decide whether evidence is strong enough for a claim or a safe next action. |
+| AutoML and benchmark suites | Model-family search, hyperparameter optimization, and leaderboard comparison. | Score search can obscure leakage posture, budget spent, review-queue utility, and whether a result may be generalized. |
+| General agent frameworks | Tool use, planning, memory, and host integration. | Agent fluency can outpace evidence unless state, permissions, redaction, traces, and claim gates are explicit. |
+
+The contribution sits in the gap between these categories. Relaytic-AML does not replace experiment tracking, validation, orchestration, AutoML, or agent frameworks. It binds them into a local evidence loop where a result, its budget, its review context, its privacy posture, and its allowed interpretation stay connected.
 
 ## 8. Methodology: Evidence Cells, Gates, and Budgets
 
@@ -218,17 +234,17 @@ The benchmark rows are not the only evaluation target. Relaytic itself has to be
 
 The current implementation emits five kinds of system evidence. State recovery is covered by guide payloads, status fallback, assist turns, mission-control summaries, run summaries, artifact shortlists, and next-step options generated from local artifacts. External-agent handoff is covered by rowless context packs, OpenClaw notes, Claude/Codex skill contracts, JSON CLI surfaces, and MCP surfaces. Metric auditability is covered by evidence cells, metric-cell audits, command ledgers, budget contracts, and release manifests. Agent traceability is covered by runtime spans, specialist traces, branch graphs, claim packets, replay reports, and adjudication scorecards. Claim boundaries are covered by release-gate records, limitation notes, and evidence-backed allowed or blocked claim lists.
 
-The release pack now measures part of the system behavior directly. These checks are not a substitute for a controlled user study. They are deterministic protocol checks over the actual command surfaces a human or external agent would use when entering the workspace.
+The release pack measures part of the system behavior directly. The target is not user satisfaction. The target is a more basic property that an evaluation lab should have: a reader or external agent should be able to enter the repository, find the paper evidence, recover the current state, trace a number back to its source, and see why a stronger claim remains blocked.
 
-| System behavior | What is measured | Result |
-| --- | --- | ---: |
-| New-user orientation | Onboarding state, four safe commands, starter questions, and human/agent handbooks. | `pass` |
-| Partial-run recovery | Partial-run state, missing-evidence count, and a safe context-export action. | `pass` |
-| Rowless agent handoff | Local-only context, raw rows false, redaction count, and blocked private-path fields. | `pass` |
-| Tool discovery | Fifty-seven tools discovered, including required inspection, trace, permission, and workflow tools. | `pass` |
-| Claim-gate behavior | Hard and headline claims blocked; only claim-safe release mode allowed. | `pass` |
+The current pack contains 22 required deterministic checks. Within it, 11 reader and external-agent tasks cover repository navigation, cross-platform reproduction, metric provenance, baseline-versus-competitive comparison, claim-boundary recovery, rowless handoff. These tasks are intentionally concrete. They ask whether the README separates the general Relaytic platform from the Relaytic-AML paper path, whether Windows and macOS/Linux reproduction commands are visible, whether the PaySim PR-AUC cell carries dataset/split/command/artifact/budget/leakage/claim provenance, whether PaySim baseline and competitive budgets are comparable, whether Elliptic2 is recoverable as modern context rather than a performance contribution, and whether an interrupted run can be exported to another model without raw rows or private paths.
 
-All 11 required protocol checks pass in the current artifact pack. The interpretation is deliberately narrow: Relaytic demonstrates state recovery, rowless handoff, tool discovery, and claim gating under deterministic fixtures. It does not claim that first-time users are faster, that analysts save hours, or that external agents produce better models without a separate study.
+This matters because the paper's central claim is about controlled evidence, not only detector performance. A strong PR-AUC with no recoverable provenance would be weak evidence for this paper. Conversely, a blocked Elliptic2 row is still useful when the system can explain exactly why it is blocked and which future evidence would change that state.
+
+The evaluation also checks the local-first handoff contract. Relaytic exports a rowless external-agent context pack from local artifacts, verifies that raw rows are absent, records redactions, and exposes safe next actions plus tool discovery. Optional local large-language-model phrasing remains advisory in the evaluated fixture; the truth-bearing state is the artifact graph.
+
+All required checks currently pass. The result should be read narrowly but seriously: Relaytic demonstrates deterministic navigation, provenance recovery, partial-run recovery, rowless handoff, optional-LLM containment, and fail-closed claim gating. It does not claim a controlled human-subject result, analyst-hour savings, production deployment, or autonomous external-agent performance improvement.
+
+The repository publishes the task-level system evaluation, aggregate behavior evaluation, partial-run recovery check, rowless handoff check, claim-gate case studies, and fail-closed manifest as machine-readable evidence. The README maps those generated reports to concrete filenames for readers who want to audit the JSON.
 
 The PaySim competitive row illustrates the contract. The run uses a chronological split, excludes forbidden balance fields, builds prior-step destination history, selects candidates on validation evidence, and freezes the test operating point. The resulting PR-AUC is reported because the evidence cell is complete. It is not promoted to a real-bank AML claim because the data is synthetic. That refusal is a system result: Relaytic preserved the useful score while preventing a stronger but unsupported interpretation.
 
@@ -309,7 +325,9 @@ The longer-term goal is still broader than AML. Relaytic should become a general
 
 ## 17. Reproducibility
 
-The code, paper source, figures, tables, and public evidence artifacts are in the Relaytic repository. The public repo keeps raw private or licensed data out of version control. Where a benchmark requires local data, the command ledger describes the expected local paths and access posture.
+The code, paper source, figures, tables, and public evidence artifacts are in the Relaytic repository. The repository is larger than the AML paper: Relaytic is the general local-first inference lab, while Relaytic-AML is the flagship edition used here to evaluate financial-crime workflows. A reader who wants to review the paper should start with this manuscript and the README. The broader architecture, interoperability, runtime, build-history, and academy-planning documents are useful context, but they are not all part of the AML benchmark contribution.
+
+The public repo keeps raw private or licensed data out of version control. Where a benchmark requires local data, the command ledger describes the expected local paths and access posture.
 
 A compact Windows PowerShell reproduction path for the public paper assets is:
 ```powershell
@@ -335,7 +353,15 @@ python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 python3 -m relaytic.ui.cli scan-git-safety
 ```
 
-For readers, the README and this paper are the intended entry points. The README explains the current project shape: Relaytic remains the general package and command-line interface, while Relaytic-AML is the flagship AML edition used for this paper. Lower-level JSON reports, tables, figure sources, and TeX files are reproducibility machinery, not documents a first reader should have to discover manually.
+To recheck the system-evaluation claim without rebuilding every table, run only the system-evaluation command and the focused test:
+```powershell
+py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
+py -3.11 -m pytest tests/test_paper_track_p15.py -q
+```
+
+On macOS or Linux, replace `py -3.11` with `python3`. The system-evaluation command writes task-level evidence, aggregate behavior evidence, rowless handoff evidence, partial-run recovery evidence, claim-gate case studies, and a fail-closed manifest. The README names the generated JSON files for readers who want to inspect them directly.
+
+For navigation, use the README as the repo map. The repository is larger than the manuscript: the AML paper assets and generated evidence reports are the paper path, while broader architecture, interoperability, runtime, build-history, and planning documents are product context rather than required paper reading.
 
 ## 18. Author Use of AI Assistance
 
