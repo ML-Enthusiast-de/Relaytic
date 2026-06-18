@@ -51,7 +51,7 @@ def test_paper_track_p14_builds_arxiv_source_release_candidate() -> None:
     assert audit["status"] == "pass"
     assert audit["violation_count"] == 0
     assert audit["upload_blockers_remaining"]
-    assert "Author Name" in main_tex
+    assert r"TODO\_EVIDENCE[author\_metadata]" in main_tex
     assert "\\documentclass" in main_tex
     assert "\\bibliography{references}" in main_tex
     assert "\\includegraphics[width=\\linewidth]{figures/figure_1_claim_gate_flow.pdf}" in main_tex
@@ -132,7 +132,7 @@ def test_paper_track_p14_committed_source_bundle_is_ready() -> None:
     assert audit["status"] == "pass"
     assert audit["violation_count"] == 0
     assert ".svg" not in main_tex
-    assert "Author Name" in main_tex
+    assert r"TODO\_EVIDENCE[author\_metadata]" in main_tex
 
     cited_keys = set()
     for citation in re.findall(r"\\citep?\{([^}]+)\}", main_tex):

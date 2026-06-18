@@ -11,7 +11,7 @@
         "docs/reports/paper_publishability_matrix.json"
       ],
       "source_type": "schematic_explicit",
-      "title": "Relaytic-AML local evidence loop. Specialist roles write local artifacts; external handoff is rowless by default and claim gates fail closed."
+      "title": "Relaytic-AML local-first architecture: local data and artifacts flow through role-scoped agents into evidence cells, claim gates, and paper/release/handoff surfaces."
     },
     {
       "figure_id": "supporting_pr_auc",
@@ -22,7 +22,7 @@
         "docs/reports/paper_result_table_final.json"
       ],
       "source_type": "artifact_generated",
-      "title": "PR-AUC evidence rows. PaySim improves under the synthetic temporal proxy, while Elliptic2 remains below the RevClassifyDS reference and is not a parity claim."
+      "title": "Evidence-cell schema: every reported number carries dataset, split, command, artifact, budget, leakage posture, operating point, metric, and claim state."
     },
     {
       "figure_id": "review_budget",
@@ -33,7 +33,7 @@
         "docs/reports/paper_metric_cell_audit.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Review-budget operating points. High top-queue precision with lower recall shows useful but incomplete analyst coverage under a bounded review budget."
+      "title": "Benchmark and review-budget evidence: PR-AUC is shown beside precision and recall at the bounded review queue instead of being interpreted alone."
     },
     {
       "figure_id": "publishability_matrix",
@@ -43,7 +43,7 @@
         "docs/reports/paper_publishability_matrix.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Claim boundary ladder. Current evidence is preserved while stronger AML, graph-neural, RevClassify-parity, and business-value claims remain blocked."
+      "title": "Claim-gate examples: allowed claims, blocked promotions, and evidence needed before stronger public interpretations."
     }
   ],
   "schema_version": "relaytic.paper_draft.v1",

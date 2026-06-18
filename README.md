@@ -95,6 +95,7 @@ The repo includes the Markdown draft, a compiled PDF draft, an arXiv source cand
 Inspect:
 
 - `docs/paper/relaytic_aml_arxiv_draft.md` for the claim-safe paper draft.
+- `TODO_EVIDENCE.md` for the explicit evidence items that remain before upload or before stronger claims.
 - `docs/paper/arxiv_src/` for the arXiv source bundle.
 - `docs/paper/references.bib` for citable sources.
 - `docs/paper/figures/` and `docs/paper/tables/` for generated visual/table assets.

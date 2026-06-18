@@ -272,7 +272,12 @@ def _build_source_manifest(
         package_audit=package_audit,
     )
     source_ready = all(check["passed"] for check in checks)
-    author_placeholder = "Author Name" in tex_source or "contact@example.com" in tex_source
+    author_placeholder = (
+        "Author Name" in tex_source
+        or "contact@example.com" in tex_source
+        or "TODO_EVIDENCE[author_metadata]" in tex_source
+        or r"TODO\_EVIDENCE[author\_metadata]" in tex_source
+    )
     source_refs = [
         f"{_repo_relative(source_dir)}/{PAPER_ARXIV_MAIN_TEX_FILENAME}",
         f"{_repo_relative(source_dir)}/{PAPER_ARXIV_REFERENCES_FILENAME}",
@@ -435,7 +440,7 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\emergencystretch=3em",
         "",
         f"\\title{{{_latex_inline(title)}}}",
-        r"\author{Author Name\\Affiliation\\\texttt{contact@example.com}}",
+        r"\author{TODO\_EVIDENCE[author\_metadata]\\Independent research draft}",
         r"\date{June 2026}",
         "",
         r"\begin{document}",
@@ -604,6 +609,10 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
         flush_table()
         if re.match(r"^Algorithm \d+\b", stripped):
             out.append(r"\Needspace{18\baselineskip}")
+        if re.match(r"^\*\*Table \d+\.", stripped):
+            out.append(r"\Needspace{20\baselineskip}")
+        if stripped in {"Windows PowerShell:", "macOS/Linux:"}:
+            out.append(r"\Needspace{12\baselineskip}")
         out.append(_latex_inline(stripped))
         previous_blank = False
 
@@ -627,8 +636,28 @@ def _render_latex_table(lines: list[str]) -> list[str]:
     for row in rows:
         while len(row) < col_count:
             row.append("")
-    col_width = max(0.11, min(0.45, 0.90 / max(1, col_count)))
+    col_width = max(0.10, min(0.42, 0.84 / max(1, col_count)))
     spec = " ".join([f">{{\\raggedright\\arraybackslash}}p{{{col_width:.2f}\\linewidth}}" for _ in range(col_count)])
+    if len(rows) > 9:
+        rendered = [
+            r"\begin{center}",
+            r"\small",
+            r"\setlength{\tabcolsep}{3pt}",
+            r"\renewcommand{\arraystretch}{1.12}",
+            r"\begin{longtable}{" + spec + "}",
+            r"\toprule",
+            " & ".join(_latex_inline(cell) for cell in rows[0]) + r" \\",
+            r"\midrule",
+            r"\endfirsthead",
+            r"\toprule",
+            " & ".join(_latex_inline(cell) for cell in rows[0]) + r" \\",
+            r"\midrule",
+            r"\endhead",
+        ]
+        for row in rows[1:]:
+            rendered.append(" & ".join(_latex_inline(cell) for cell in row) + r" \\")
+        rendered.extend([r"\bottomrule", r"\end{longtable}", r"\end{center}", ""])
+        return rendered
     rendered = [
         r"\begin{center}",
         r"\setlength{\fboxsep}{8pt}",

@@ -40,13 +40,13 @@ The method has four claim-control rules:
 3. Numeric paper cells must cite machine-readable provenance rather than handwritten notes.
 4. Blocked tracks stay visible as limitations instead of being replaced by easier evidence.
 
-![Relaytic-AML local evidence loop. Specialist roles write local artifacts; external handoff is rowless by default and claim gates fail closed.](figures/figure_1_claim_gate_flow.svg)
+![Relaytic-AML local-first architecture: local data and artifacts flow through role-scoped agents into evidence cells, claim gates, and paper/release/handoff surfaces.](figures/figure_1_claim_gate_flow.svg)
 
-![PR-AUC evidence rows. PaySim improves under the synthetic temporal proxy, while Elliptic2 remains below the RevClassifyDS reference and is not a parity claim.](figures/figure_2_supporting_pr_auc.svg)
+![Evidence-cell schema: every reported number carries dataset, split, command, artifact, budget, leakage posture, operating point, metric, and claim state.](figures/figure_2_supporting_pr_auc.svg)
 
-![Review-budget operating points. High top-queue precision with lower recall shows useful but incomplete analyst coverage under a bounded review budget.](figures/figure_3_review_budget.svg)
+![Benchmark and review-budget evidence: PR-AUC is shown beside precision and recall at the bounded review queue instead of being interpreted alone.](figures/figure_3_review_budget.svg)
 
-![Claim boundary ladder. Current evidence is preserved while stronger AML, graph-neural, RevClassify-parity, and business-value claims remain blocked.](figures/figure_4_publishability_matrix.svg)
+![Claim-gate examples: allowed claims, blocked promotions, and evidence needed before stronger public interpretations.](figures/figure_4_publishability_matrix.svg)
 
 ## Benchmarks
 
