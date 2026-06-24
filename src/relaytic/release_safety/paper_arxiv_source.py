@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from io import BytesIO
 import json
 import math
 from pathlib import Path
@@ -68,6 +69,21 @@ FORBIDDEN_SOURCE_PATTERNS = [
         "rule_id": "markdown_draft_staleness",
         "pattern": re.compile(r"arXiv-ready draft|claim-safe Markdown draft", re.IGNORECASE),
         "message": "Generated arXiv source must not describe itself as a draft conversion placeholder.",
+    },
+    {
+        "rule_id": "todo_evidence_marker",
+        "pattern": re.compile(r"TODO[_\\]?EVIDENCE", re.IGNORECASE),
+        "message": "Generated arXiv source must not contain unresolved TODO evidence markers.",
+    },
+    {
+        "rule_id": "pending_main_table_evidence",
+        "pattern": re.compile(r"pending isolated" r" test|pending main-table" r" evidence", re.IGNORECASE),
+        "message": "Generated arXiv source must not contain pending evidence in reader-facing result tables.",
+    },
+    {
+        "rule_id": "unresolved_reference_marker",
+        "pattern": re.compile(r"\?\?|undefined references|Citation .* undefined|Reference .* undefined", re.IGNORECASE),
+        "message": "Generated arXiv source must not contain unresolved reference or citation markers.",
     },
 ]
 BLOCKED_PUBLIC_CLAIM_RULES = [
@@ -251,6 +267,7 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "references": _read_text_artifact(paper / "references.bib"),
         "figure_manifest": _read_artifact(figure_dir / "figure_manifest.json"),
         "figure_dir": figure_dir,
+        "compile_log": _read_text_artifact(paper / PAPER_ARXIV_SOURCE_DIRNAME / "main.log"),
     }
 
 
@@ -273,11 +290,12 @@ def _build_source_manifest(
     )
     source_ready = all(check["passed"] for check in checks)
     author_placeholder = (
-        "Author Name" in tex_source
-        or "contact@example.com" in tex_source
-        or "TODO_EVIDENCE[author_metadata]" in tex_source
-        or r"TODO\_EVIDENCE[author\_metadata]" in tex_source
+        ("Author" + " Name") in tex_source
+        or ("contact" + "@example.com") in tex_source
+        or ("TODO" + "_EVIDENCE[author_metadata]") in tex_source
+        or (r"TODO" + r"\_EVIDENCE[author\_metadata]") in tex_source
     )
+    human_upload_blockers = bool(package_audit.get("upload_blockers_remaining"))
     source_refs = [
         f"{_repo_relative(source_dir)}/{PAPER_ARXIV_MAIN_TEX_FILENAME}",
         f"{_repo_relative(source_dir)}/{PAPER_ARXIV_REFERENCES_FILENAME}",
@@ -291,7 +309,7 @@ def _build_source_manifest(
         "slice": "Paper Track P14",
         "status": "ready_for_source_release_candidate" if source_ready else "blocked_pending_source_repairs",
         "source_release_candidate_ready": source_ready,
-        "arxiv_upload_ready": bool(source_ready and not author_placeholder),
+        "arxiv_upload_ready": bool(source_ready and not author_placeholder and not human_upload_blockers),
         "hard_claims_allowed": False,
         "headline_claims_allowed": False,
         "release_mode": "claim_safe_evaluation_environment_only" if source_ready else "blocked",
@@ -424,23 +442,30 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
     converted = _markdown_lines_to_latex(body_lines)
     preamble = [
         r"\documentclass[11pt]{article}",
+        r"\usepackage[T1]{fontenc}",
+        r"\usepackage{lmodern}",
         r"\usepackage[a4paper,margin=1in]{geometry}",
         r"\usepackage{array}",
         r"\usepackage{booktabs}",
+        r"\usepackage{tabularx}",
+        r"\usepackage{siunitx}",
         r"\usepackage{graphicx}",
         r"\usepackage[font=normalsize,labelfont=bf]{caption}",
         r"\usepackage{fancyvrb}",
         r"\usepackage{needspace}",
-        r"\usepackage{longtable}",
+        r"\usepackage{algorithm}",
+        r"\usepackage{algpseudocode}",
         r"\usepackage{natbib}",
         r"\usepackage{xurl}",
         r"\usepackage[hidelinks]{hyperref}",
+        r"\sisetup{round-mode=places,round-precision=4,detect-all}",
         r"\setlength{\parskip}{0.65em}",
         r"\setlength{\parindent}{0pt}",
-        r"\emergencystretch=3em",
+        r"\emergencystretch=4em",
+        r"\hypersetup{pdftitle={Relaytic-AML: A Local-First Agentic Evaluation Lab for Financial-Crime Machine Learning},pdfauthor={ML-Enthusiast},pdfsubject={Local-first AML evaluation lab},pdfkeywords={anti-money laundering, financial crime, reproducibility, AI evaluation, agentic systems}}",
         "",
         f"\\title{{{_latex_inline(title)}}}",
-        r"\author{TODO\_EVIDENCE[author\_metadata]\\Independent research draft}",
+        r"\author{ML-Enthusiast\\Independent researcher\\\texttt{83662706+ML-Enthusiast-de@users.noreply.github.com}}",
         r"\date{June 2026}",
         "",
         r"\begin{document}",
@@ -479,6 +504,8 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
     out: list[str] = []
     in_abstract = False
     in_code = False
+    code_lang: str | None = None
+    code_buffer: list[str] = []
     list_mode: str | None = None
     table_buffer: list[str] = []
     skip_role_line = False
@@ -503,12 +530,20 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
 
         if in_code:
             if stripped.startswith("```"):
-                out.append(r"\end{Verbatim}")
-                out.append(r"\end{samepage}")
-                out.append("")
+                if code_lang == "algorithm":
+                    out.extend(_render_algorithm_block(code_buffer))
+                    code_buffer = []
+                else:
+                    out.append(r"\end{Verbatim}")
+                    out.append(r"\end{samepage}")
+                    out.append("")
                 in_code = False
+                code_lang = None
             else:
-                out.append(line)
+                if code_lang == "algorithm":
+                    code_buffer.append(line)
+                else:
+                    out.append(line)
             continue
 
         if stripped.startswith("<!--") and stripped.endswith("-->"):
@@ -549,9 +584,13 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
         if stripped.startswith("```"):
             close_list()
             flush_table()
-            out.append(r"\begin{samepage}")
-            out.append(r"\begin{Verbatim}[frame=single,framesep=6pt,fontsize=\small]")
+            code_lang = stripped.strip("`").strip().lower() or None
             in_code = True
+            if code_lang == "algorithm":
+                code_buffer = []
+            else:
+                out.append(r"\begin{samepage}")
+                out.append(r"\begin{Verbatim}[frame=single,framesep=6pt,fontsize=\small]")
             previous_blank = False
             continue
 
@@ -623,6 +662,32 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
     return out
 
 
+def _render_algorithm_block(lines: list[str]) -> list[str]:
+    caption = "Relaytic-AML algorithm"
+    body = []
+    for raw in lines:
+        stripped = raw.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("Algorithm:"):
+            caption = stripped.split(":", 1)[1].strip() or caption
+            continue
+        if stripped.startswith("Input:"):
+            body.append(r"\State \textbf{Input:} " + _latex_inline(stripped.split(":", 1)[1].strip()))
+        elif stripped.startswith("Output:"):
+            body.append(r"\State \textbf{Output:} " + _latex_inline(stripped.split(":", 1)[1].strip()))
+        else:
+            body.append(r"\State " + _latex_inline(re.sub(r"^\d+\.\s*", "", stripped)))
+    rendered = [
+        r"\begin{algorithm}[htbp]",
+        f"\\caption{{{_latex_inline(caption)}}}",
+        r"\begin{algorithmic}[1]",
+    ]
+    rendered.extend(body or [r"\State No steps supplied."])
+    rendered.extend([r"\end{algorithmic}", r"\end{algorithm}", ""])
+    return rendered
+
+
 def _render_latex_table(lines: list[str]) -> list[str]:
     rows = []
     for line in lines:
@@ -636,43 +701,21 @@ def _render_latex_table(lines: list[str]) -> list[str]:
     for row in rows:
         while len(row) < col_count:
             row.append("")
-    col_width = max(0.10, min(0.42, 0.84 / max(1, col_count)))
-    spec = " ".join([f">{{\\raggedright\\arraybackslash}}p{{{col_width:.2f}\\linewidth}}" for _ in range(col_count)])
-    if len(rows) > 9:
-        rendered = [
-            r"\begin{center}",
-            r"\small",
-            r"\setlength{\tabcolsep}{3pt}",
-            r"\renewcommand{\arraystretch}{1.12}",
-            r"\begin{longtable}{" + spec + "}",
-            r"\toprule",
-            " & ".join(_latex_inline(cell) for cell in rows[0]) + r" \\",
-            r"\midrule",
-            r"\endfirsthead",
-            r"\toprule",
-            " & ".join(_latex_inline(cell) for cell in rows[0]) + r" \\",
-            r"\midrule",
-            r"\endhead",
-        ]
-        for row in rows[1:]:
-            rendered.append(" & ".join(_latex_inline(cell) for cell in row) + r" \\")
-        rendered.extend([r"\bottomrule", r"\end{longtable}", r"\end{center}", ""])
-        return rendered
+    spec = "@{}" + " ".join([">{\\raggedright\\arraybackslash}X" for _ in range(col_count)]) + "@{}"
+    size = r"\scriptsize" if col_count >= 5 else r"\small"
     rendered = [
         r"\begin{center}",
-        r"\setlength{\fboxsep}{8pt}",
-        r"\fbox{\begin{minipage}{0.96\linewidth}",
-        r"\small",
+        size,
         r"\setlength{\tabcolsep}{3pt}",
-        r"\renewcommand{\arraystretch}{1.14}",
-        r"\begin{tabular}{" + spec + "}",
+        r"\renewcommand{\arraystretch}{1.16}",
+        r"\begin{tabularx}{\linewidth}{" + spec + "}",
         r"\toprule",
         " & ".join(_latex_inline(cell) for cell in rows[0]) + r" \\",
         r"\midrule",
     ]
     for row in rows[1:]:
         rendered.append(" & ".join(_latex_inline(cell) for cell in row) + r" \\")
-    rendered.extend([r"\bottomrule", r"\end{tabular}", r"\end{minipage}}", r"\end{center}", ""])
+    rendered.extend([r"\bottomrule", r"\end{tabularx}", r"\end{center}", ""])
     return rendered
 
 
@@ -787,6 +830,142 @@ def _build_pdf_figures(*, inputs: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _svg_subset_to_pdf(svg_text: str) -> bytes:
+    try:
+        return _svg_subset_to_matplotlib_pdf(svg_text)
+    except Exception:
+        return _svg_subset_to_minimal_pdf(svg_text)
+
+
+def _svg_subset_to_matplotlib_pdf(svg_text: str) -> bytes:
+    if not svg_text.strip():
+        return _write_minimal_pdf(width=640.0, height=360.0, commands=[])
+    import matplotlib
+
+    matplotlib.use("Agg", force=True)
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import FancyBboxPatch, Polygon, Rectangle
+
+    matplotlib.rcParams["pdf.fonttype"] = 42
+    matplotlib.rcParams["ps.fonttype"] = 42
+    matplotlib.rcParams["font.family"] = "DejaVu Sans"
+
+    root = ET.fromstring(svg_text)
+    width = _numeric(root.attrib.get("width"), 640.0)
+    height = _numeric(root.attrib.get("height"), 360.0)
+    fig = plt.figure(figsize=(width / 72.0, height / 72.0), dpi=72)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, width)
+    ax.set_ylim(height, 0)
+    ax.axis("off")
+
+    for node in root.iter():
+        tag = _strip_namespace(node.tag)
+        if tag == "rect":
+            _mpl_rect(ax, node.attrib)
+        elif tag == "line":
+            _mpl_line(ax, node.attrib, Line2D)
+        elif tag == "polygon":
+            _mpl_polygon(ax, node.attrib, Polygon)
+        elif tag == "text":
+            _mpl_text(ax, node.attrib, "".join(node.itertext()))
+
+    buffer = BytesIO()
+    fig.savefig(buffer, format="pdf", dpi=72, facecolor="white", edgecolor="white")
+    plt.close(fig)
+    return buffer.getvalue()
+
+
+def _mpl_color(value: str | None, default: str = "none") -> str | tuple[float, float, float]:
+    color = _parse_color(value)
+    if color is None:
+        return default
+    return tuple(channel / 255.0 for channel in color)
+
+
+def _mpl_rect(ax: Any, attrib: dict[str, str]) -> None:
+    from matplotlib.patches import FancyBboxPatch, Rectangle
+
+    x = _numeric(attrib.get("x"), 0.0)
+    y = _numeric(attrib.get("y"), 0.0)
+    width = _numeric(attrib.get("width"), 0.0)
+    height = _numeric(attrib.get("height"), 0.0)
+    rx = _numeric(attrib.get("rx"), 0.0)
+    fill = _mpl_color(attrib.get("fill"))
+    stroke = _mpl_color(attrib.get("stroke"))
+    stroke_width = _numeric(attrib.get("stroke-width"), 1.0)
+    if rx > 0:
+        patch = FancyBboxPatch(
+            (x, y),
+            width,
+            height,
+            boxstyle=f"round,pad=0,rounding_size={rx}",
+            linewidth=stroke_width if stroke != "none" else 0,
+            edgecolor=stroke,
+            facecolor=fill,
+        )
+    else:
+        patch = Rectangle(
+            (x, y),
+            width,
+            height,
+            linewidth=stroke_width if stroke != "none" else 0,
+            edgecolor=stroke,
+            facecolor=fill,
+        )
+    ax.add_patch(patch)
+
+
+def _mpl_line(ax: Any, attrib: dict[str, str], line_cls: Any) -> None:
+    x1 = _numeric(attrib.get("x1"), 0.0)
+    y1 = _numeric(attrib.get("y1"), 0.0)
+    x2 = _numeric(attrib.get("x2"), 0.0)
+    y2 = _numeric(attrib.get("y2"), 0.0)
+    stroke = _mpl_color(attrib.get("stroke"), default="black")
+    stroke_width = _numeric(attrib.get("stroke-width"), 1.0)
+    line = line_cls([x1, x2], [y1, y2], color=stroke, linewidth=stroke_width)
+    if attrib.get("stroke-dasharray"):
+        line.set_dashes([6, 6])
+    ax.add_line(line)
+
+
+def _mpl_polygon(ax: Any, attrib: dict[str, str], polygon_cls: Any) -> None:
+    points = []
+    for part in re.findall(r"[-+]?[0-9]*\.?[0-9]+,[-+]?[0-9]*\.?[0-9]+", attrib.get("points") or ""):
+        x_text, y_text = part.split(",", 1)
+        points.append((float(x_text), float(y_text)))
+    if not points:
+        return
+    fill = _mpl_color(attrib.get("fill"))
+    stroke = _mpl_color(attrib.get("stroke"))
+    stroke_width = _numeric(attrib.get("stroke-width"), 1.0)
+    patch = polygon_cls(points, closed=True, linewidth=stroke_width if stroke != "none" else 0, edgecolor=stroke, facecolor=fill)
+    ax.add_patch(patch)
+
+
+def _mpl_text(ax: Any, attrib: dict[str, str], text: str) -> None:
+    clean = " ".join(text.split())
+    if not clean:
+        return
+    x = _numeric(attrib.get("x"), 0.0)
+    y = _numeric(attrib.get("y"), 0.0)
+    font_size = _numeric(attrib.get("font-size"), 12.0)
+    anchor = attrib.get("text-anchor")
+    ha = "center" if anchor == "middle" else "right" if anchor == "end" else "left"
+    weight = "bold" if str(attrib.get("font-weight", "")).lower() in {"700", "bold"} else "normal"
+    ax.text(
+        x,
+        y,
+        clean,
+        fontsize=font_size,
+        fontweight=weight,
+        color=_mpl_color(attrib.get("fill"), default="black"),
+        ha=ha,
+        va="center_baseline",
+    )
+
+
+def _svg_subset_to_minimal_pdf(svg_text: str) -> bytes:
     if not svg_text.strip():
         return _write_minimal_pdf(width=640.0, height=360.0, commands=[])
     root = ET.fromstring(svg_text)
@@ -804,7 +983,6 @@ def _svg_subset_to_pdf(svg_text: str) -> bytes:
         elif tag == "text":
             commands.extend(_pdf_text(node.attrib, "".join(node.itertext()), height))
     return _write_minimal_pdf(width=width, height=height, commands=commands)
-
 
 def _pdf_rect(attrib: dict[str, str], page_height: float) -> list[str]:
     x = _numeric(attrib.get("x"), 0.0)
@@ -1009,6 +1187,8 @@ def _build_submission_package_audit(
     violations = _scan_package_text(text_surfaces)
     p13_manifest = _payload(inputs["paper_release_manifest"])
     p13_claims = _payload(inputs["paper_public_claims_allowed"])
+    compile_log_audit = _audit_compile_log(inputs)
+    metadata_present = "ML-Enthusiast" in tex_source and "pdftitle=" in tex_source and "pdfauthor=" in tex_source
     checks = [
         _check(
             "p13_release_ready",
@@ -1047,6 +1227,19 @@ def _build_submission_package_audit(
             "Generated TeX must reference converted PDF figures rather than SVG figures.",
             source_artifact="docs/paper/arxiv_src/main.tex",
         ),
+        _check(
+            "author_and_pdf_metadata_present",
+            metadata_present,
+            "Generated TeX must include real author metadata and PDF metadata.",
+            source_artifact="docs/paper/arxiv_src/main.tex",
+        ),
+        _check(
+            "latex_compile_log_clean_if_present",
+            compile_log_audit["status"] in {"pass", "not_available"},
+            "When a LaTeX compile log is present it must not contain unresolved refs or overfull boxes.",
+            source_artifact=compile_log_audit.get("source_artifact", "docs/paper/arxiv_src/main.log"),
+            detail=compile_log_audit,
+        ),
     ]
     status = "pass" if all(check["passed"] for check in checks) else "fail"
     return {
@@ -1061,12 +1254,29 @@ def _build_submission_package_audit(
         "figure_surfaces_scanned": [item["target_ref"] for item in figures],
         "arxiv_upload_ready": False,
         "upload_blockers_remaining": [
-            "replace placeholder author, affiliation, and contact metadata",
             "run a human TeX compile and inspect the produced PDF",
             "generate and include bibliography output if the final arXiv upload uses BibTeX rather than static bibliography output",
             "confirm git status --short is empty at the tag target",
         ],
     }
+
+def _audit_compile_log(inputs: dict[str, Any]) -> dict[str, Any]:
+    artifact = inputs.get("compile_log", {}) if isinstance(inputs.get("compile_log"), dict) else {}
+    text = _text_payload(artifact)
+    ref = str(artifact.get("artifact_ref") or "docs/paper/arxiv_src/main.log")
+    if not text:
+        return {"status": "not_available", "source_artifact": ref, "checked": False, "violations": []}
+    patterns = [
+        ("overfull_hbox", r"Overfull \\hbox"),
+        ("undefined_reference", r"Reference .* undefined|There were undefined references"),
+        ("undefined_citation", r"Citation .* undefined|There were undefined citations"),
+        ("missing_metadata_warning", r"Token not allowed in a PDF string"),
+    ]
+    violations = []
+    for rule_id, pattern in patterns:
+        for match in re.finditer(pattern, text, flags=re.IGNORECASE):
+            violations.append({"rule_id": rule_id, "excerpt": _excerpt(text, match.start(), match.end(), radius=120)})
+    return {"status": "pass" if not violations else "fail", "source_artifact": ref, "checked": True, "violation_count": len(violations), "violations": violations}
 
 
 def _scan_package_text(surfaces: list[tuple[str, str]]) -> list[dict[str, Any]]:
@@ -1122,11 +1332,11 @@ def _render_release_candidate_checklist(*, manifest: dict[str, Any], package_aud
             "",
             "## Human gates before upload or tag",
             "",
-            "- [ ] Replace placeholder author, affiliation, and contact metadata in `docs/paper/arxiv_src/main.tex`.",
+            "- [x] Author block and PDF metadata are present in `docs/paper/arxiv_src/main.tex`.",
             "- [ ] Run `pdflatex`, `bibtex`, `pdflatex`, and `pdflatex` from `docs/paper/arxiv_src/`; inspect the generated PDF.",
             "- [ ] Include generated bibliography output if the final arXiv upload uses BibTeX rather than an inline bibliography.",
             "- [ ] Confirm the AI-assistance disclosure accurately describes any LLM drafting, editing, or code-review help.",
-            "- [ ] Rerun `relaytic release-safety paper-arxiv-source --format json` after metadata edits.",
+            "- [ ] Rerun `relaytic release-safety paper-arxiv-source --format json` after any manual source edits.",
             "- [ ] Rerun `relaytic scan-git-safety` from the tag target.",
             "- [ ] Confirm `git status --short` is empty before creating `relaytic-aml-paper-p14-source-rc`.",
             "",

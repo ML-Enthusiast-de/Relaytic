@@ -7,7 +7,7 @@
       ".pdf",
       ".png"
     ],
-    "author_metadata_placeholder_present": true,
+    "author_metadata_placeholder_present": false,
     "bibtex_bundle_state": "references.bib included; final upload checklist requires generating and inspecting bibliography output before upload",
     "graphic_formats_used": [
       ".pdf"
@@ -176,12 +176,12 @@
   "schema_version": "relaytic.paper_arxiv_source.v1",
   "slice": "Paper Track P14",
   "source_hashes": {
-    "main_tex_sha256": "362dfc00b67673cfff87b5558602c3c5462bef3a5a0428cc2603a4490808669c",
+    "main_tex_sha256": "44a3daf2e6a075b6b1823d77b87066095e9ec13360f1249b6737ab4e58a5ecf4",
     "pdf_figure_sha256": {
-      "figure_1_claim_gate_flow.pdf": "56b65626829951a0836117a658ecc92e7559838d769f872e12950b9cb60013c1",
-      "figure_2_supporting_pr_auc.pdf": "20d051bf94e6b096c9782df5432db4384c1b4d0cdfbb64f9b8dee597f901c2d6",
-      "figure_3_review_budget.pdf": "65fba776889c9351ab49d8201d623dd9c8218f72d268c8f733e7c4cdad9547db",
-      "figure_4_publishability_matrix.pdf": "5b45c90cb02bf4580618f5d1079283d546c5478a7227086c033e4e6e08824b76"
+      "figure_1_claim_gate_flow.pdf": "69aaca55074bc5eb28eaf89ac5ba29f56cccd7915c0e45ae4b91d49f8a32c18a",
+      "figure_2_supporting_pr_auc.pdf": "a7c34360cf6252f5a087f16bcc5f0fb90faf97da326628f5080bf60e7c1b36fa",
+      "figure_3_review_budget.pdf": "1169321199acd21b50fd29cb1817f5508e6561f1a4a4625c962d0ad1f86f0b3b",
+      "figure_4_publishability_matrix.pdf": "e2d01cf05b192c3743b589cc13b9cb2a0d0cdb82654731c35ebf79cfe8b59de6"
     },
     "references_bib_sha256": "eb3ff711c6e09fe5b138c44dafe701b93b00beae6a24dfca1042623f01cd130c"
   },

@@ -1,50 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="500" viewBox="0 0 1160 500" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
-<rect x="34" y="32" width="1092" height="398" rx="8" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>
-<text x="580" y="72" text-anchor="middle" font-size="22" font-weight="700" fill="#293241">Local-first Relaytic-AML evidence architecture</text>
-<text x="580" y="104" text-anchor="middle" font-size="16" fill="#5b6472">Artifacts are the source of truth; agent help and public wording are downstream.</text>
-<rect x="66" y="148" width="185" height="152" rx="7" fill="#eef4ff" stroke="#293241" stroke-width="1.4"/>
-<text x="158.5" y="184.0" text-anchor="middle" font-size="20" fill="#293241">Local data</text>
-<text x="158.5" y="207.0" text-anchor="middle" font-size="20" fill="#293241">and artifacts</text>
-<line x1="88" y1="225" x2="229" y2="225" stroke="#c4ccd8" stroke-width="1"/>
-<text x="158.5" y="255.0" text-anchor="middle" font-size="14" fill="#394452">raw files stay local</text>
-<text x="158.5" y="273.0" text-anchor="middle" font-size="14" fill="#394452">manifests, hashes, run state</text>
-<line x1="257" y1="224" x2="273" y2="224" stroke="#293241" stroke-width="1.8"/>
-<polygon points="273,224 264,217 264,231" fill="#293241"/>
-<rect x="279" y="148" width="185" height="152" rx="7" fill="#eaf7f3" stroke="#293241" stroke-width="1.4"/>
-<text x="371.5" y="184.0" text-anchor="middle" font-size="20" fill="#293241">Role-scoped</text>
-<text x="371.5" y="207.0" text-anchor="middle" font-size="20" fill="#293241">agents</text>
-<line x1="301" y1="225" x2="442" y2="225" stroke="#c4ccd8" stroke-width="1"/>
-<text x="371.5" y="255.0" text-anchor="middle" font-size="14" fill="#394452">guide, scout, scientist</text>
-<text x="371.5" y="273.0" text-anchor="middle" font-size="14" fill="#394452">builder, reviewers, governors</text>
-<line x1="470" y1="224" x2="486" y2="224" stroke="#293241" stroke-width="1.8"/>
-<polygon points="486,224 477,217 477,231" fill="#293241"/>
-<rect x="492" y="148" width="185" height="152" rx="7" fill="#fff7df" stroke="#293241" stroke-width="1.4"/>
-<text x="584.5" y="184.0" text-anchor="middle" font-size="20" fill="#293241">Evidence</text>
-<text x="584.5" y="207.0" text-anchor="middle" font-size="20" fill="#293241">cells</text>
-<line x1="514" y1="225" x2="655" y2="225" stroke="#c4ccd8" stroke-width="1"/>
-<text x="584.5" y="255.0" text-anchor="middle" font-size="14" fill="#394452">dataset, split, command</text>
-<text x="584.5" y="273.0" text-anchor="middle" font-size="14" fill="#394452">metric, budget, leakage</text>
-<line x1="683" y1="224" x2="699" y2="224" stroke="#293241" stroke-width="1.8"/>
-<polygon points="699,224 690,217 690,231" fill="#293241"/>
-<rect x="705" y="148" width="185" height="152" rx="7" fill="#fdeeee" stroke="#293241" stroke-width="1.4"/>
-<text x="797.5" y="184.0" text-anchor="middle" font-size="20" fill="#293241">Claim</text>
-<text x="797.5" y="207.0" text-anchor="middle" font-size="20" fill="#293241">gates</text>
-<line x1="727" y1="225" x2="868" y2="225" stroke="#c4ccd8" stroke-width="1"/>
-<text x="797.5" y="255.0" text-anchor="middle" font-size="14" fill="#394452">allow exact claims</text>
-<text x="797.5" y="273.0" text-anchor="middle" font-size="14" fill="#394452">block unsupported promotion</text>
-<line x1="896" y1="224" x2="912" y2="224" stroke="#293241" stroke-width="1.8"/>
-<polygon points="912,224 903,217 903,231" fill="#293241"/>
-<rect x="918" y="148" width="185" height="152" rx="7" fill="#f4f0ff" stroke="#293241" stroke-width="1.4"/>
-<text x="1010.5" y="184.0" text-anchor="middle" font-size="20" fill="#293241">Paper, release</text>
-<text x="1010.5" y="207.0" text-anchor="middle" font-size="20" fill="#293241">and handoff</text>
-<line x1="940" y1="225" x2="1081" y2="225" stroke="#c4ccd8" stroke-width="1"/>
-<text x="1010.5" y="255.0" text-anchor="middle" font-size="14" fill="#394452">figures, tables, TeX</text>
-<text x="1010.5" y="273.0" text-anchor="middle" font-size="14" fill="#394452">rowless context export</text>
-<rect x="96" y="338" width="258" height="42" rx="6" fill="#ffffff" stroke="#d7dde8" stroke-width="1"/>
-<text x="225" y="365" text-anchor="middle" font-size="14" fill="#293241">Private rows stay inside the workspace</text>
-<rect x="392" y="338" width="258" height="42" rx="6" fill="#ffffff" stroke="#d7dde8" stroke-width="1"/>
-<text x="521" y="365" text-anchor="middle" font-size="14" fill="#293241">Validation-only selection before test scoring</text>
-<rect x="690" y="338" width="258" height="42" rx="6" fill="#ffffff" stroke="#d7dde8" stroke-width="1"/>
-<text x="819" y="365" text-anchor="middle" font-size="14" fill="#293241">External agents receive redacted state</text>
-<text x="580" y="420" text-anchor="middle" font-size="14" fill="#5b6472">The same artifact graph feeds CLI, skills, MCP adapters, paper tables, and release gates.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="640" viewBox="0 0 1220 640" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>
+<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Relaytic-AML evidence loop</text>
+<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Local artifacts are authoritative; agents propose, execute, review, and gate claims through files.</text>
+<rect x="64" y="148" width="205" height="214" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.3"/>
+<text x="166.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Local inputs</text>
+<line x1="86" y1="214" x2="247" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="166.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">dataset_registry.json</text>
+<text x="166.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">split_contracts.json</text>
+<text x="166.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">source hashes</text>
+<line x1="273" y1="255" x2="287" y2="255" stroke="#1f2937" stroke-width="1.8"/>
+<polygon points="287,255 278,248 278,262" fill="#1f2937"/>
+<rect x="291" y="148" width="205" height="214" rx="6" fill="#eef6f3" stroke="#1f2937" stroke-width="1.3"/>
+<text x="393.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Role loops</text>
+<line x1="313" y1="214" x2="474" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="393.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">guide -&gt; scout</text>
+<text x="393.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">strategist -&gt; scientist</text>
+<text x="393.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">builder -&gt; reviewers</text>
+<line x1="500" y1="255" x2="514" y2="255" stroke="#1f2937" stroke-width="1.8"/>
+<polygon points="514,255 505,248 505,262" fill="#1f2937"/>
+<rect x="518" y="148" width="205" height="214" rx="6" fill="#fff8e5" stroke="#1f2937" stroke-width="1.3"/>
+<text x="620.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Run artifacts</text>
+<line x1="540" y1="214" x2="701" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="620.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">benchmark_manifest.json</text>
+<text x="620.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">feature_report.json</text>
+<text x="620.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">search_trace.json</text>
+<line x1="727" y1="255" x2="741" y2="255" stroke="#1f2937" stroke-width="1.8"/>
+<polygon points="741,255 732,248 732,262" fill="#1f2937"/>
+<rect x="745" y="148" width="205" height="214" rx="6" fill="#f3f0fb" stroke="#1f2937" stroke-width="1.3"/>
+<text x="847.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Evidence cells</text>
+<line x1="767" y1="214" x2="928" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="847.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">cell_id</text>
+<text x="847.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">metric + artifact field</text>
+<text x="847.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">claim_state</text>
+<line x1="954" y1="255" x2="968" y2="255" stroke="#1f2937" stroke-width="1.8"/>
+<polygon points="968,255 959,248 959,262" fill="#1f2937"/>
+<rect x="972" y="148" width="205" height="214" rx="6" fill="#fdeeee" stroke="#1f2937" stroke-width="1.3"/>
+<text x="1074.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Release gates</text>
+<line x1="994" y1="214" x2="1155" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="1074.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">public_claims_allowed</text>
+<text x="1074.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">source package audit</text>
+<text x="1074.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">rowless handoff</text>
+<rect x="104" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
+<text x="249.0" y="442.0" text-anchor="middle" font-size="16" fill="#293241">private rows stay local</text>
+<rect x="394" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
+<text x="539.0" y="442.0" text-anchor="middle" font-size="16" fill="#293241">validation choices precede test scoring</text>
+<rect x="728" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
+<text x="873.0" y="442.0" text-anchor="middle" font-size="16" fill="#293241">external agents receive redacted state</text>
+<rect x="96" y="506" width="1028" height="44" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>
+<text x="610" y="534" text-anchor="middle" font-size="15" fill="#4b5563">The same artifact graph feeds CLI, skills, MCP adapters, paper tables, vector figures, and release checks.</text>
 </svg>

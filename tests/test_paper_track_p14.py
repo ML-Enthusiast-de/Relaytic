@@ -50,12 +50,19 @@ def test_paper_track_p14_builds_arxiv_source_release_candidate() -> None:
 
     assert audit["status"] == "pass"
     assert audit["violation_count"] == 0
+    assert any(check["check_id"] == "author_and_pdf_metadata_present" and check["passed"] for check in audit["checks"])
     assert audit["upload_blockers_remaining"]
-    assert r"TODO\_EVIDENCE[author\_metadata]" in main_tex
+    assert "replace placeholder author" not in "\n".join(audit["upload_blockers_remaining"])
+    assert "ML-Enthusiast" in main_tex
+    assert "pdftitle=" in main_tex and "pdfauthor=" in main_tex
+    assert r"\begin{algorithm}" in main_tex
+    assert ("TODO" + "_EVIDENCE") not in main_tex
+    assert r"TODO\_EVIDENCE" not in main_tex
     assert "\\documentclass" in main_tex
     assert "\\bibliography{references}" in main_tex
     assert "\\includegraphics[width=\\linewidth]{figures/figure_1_claim_gate_flow.pdf}" in main_tex
     assert ".svg" not in main_tex
+    assert "pending isolated" + " test" not in main_tex
     assert "This draft" not in main_tex
     assert "claim-safe Markdown draft" not in main_tex
     assert "@misc{weber2019elliptic" in references
@@ -131,8 +138,12 @@ def test_paper_track_p14_committed_source_bundle_is_ready() -> None:
     assert manifest["figure_audit"]["status"] == "pass"
     assert audit["status"] == "pass"
     assert audit["violation_count"] == 0
+    assert any(check["check_id"] == "author_and_pdf_metadata_present" and check["passed"] for check in audit["checks"])
     assert ".svg" not in main_tex
-    assert r"TODO\_EVIDENCE[author\_metadata]" in main_tex
+    assert "pending isolated" + " test" not in main_tex
+    assert "ML-Enthusiast" in main_tex
+    assert ("TODO" + "_EVIDENCE") not in main_tex
+    assert r"TODO\_EVIDENCE" not in main_tex
 
     cited_keys = set()
     for citation in re.findall(r"\\citep?\{([^}]+)\}", main_tex):

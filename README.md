@@ -90,12 +90,11 @@ More context:
 
 The current paper draft presents Relaytic-AML as a local-first evaluation lab for financial-crime ML. It is an architecture and evidence-discipline paper, not a hard AML superiority result. Relaytic remains the general package and CLI. Relaytic-AML is the current flagship edition and the focus of the draft because AML makes privacy, temporal validity, graph context, human review, and claim discipline visible in one domain.
 
-The repo includes the Markdown draft, a compiled PDF draft, an arXiv source candidate, references, figures, tables, and the underlying public evidence artifacts. The final upload still needs author metadata, local TeX/PDF inspection, and a clean tag-target confirmation.
+The repo includes the Markdown draft, a compiled PDF draft, an arXiv source candidate, references, figures, tables, and the underlying public evidence artifacts. The final upload still needs local TeX/PDF inspection and a clean tag-target confirmation.
 
 Inspect:
 
 - `docs/paper/relaytic_aml_arxiv_draft.md` for the claim-safe paper draft.
-- `TODO_EVIDENCE.md` for the explicit evidence items that remain before upload or before stronger claims.
 - `docs/paper/arxiv_src/` for the arXiv source bundle.
 - `docs/paper/references.bib` for citable sources.
 - `docs/paper/figures/` and `docs/paper/tables/` for generated visual/table assets.
@@ -184,7 +183,7 @@ The repository already supports a working early product baseline. Treat the list
 - a final paper-source surface through `relaytic release-safety paper-arxiv-source`, with deterministic LaTeX source, converted PDF figures, citation/figure audits, source-package scanning, and a release-candidate checklist
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Relaytic has a longer internal build history, but the public story is now simpler: Relaytic is the local-first inference lab, and Relaytic-AML is the flagship edition used to prove the architecture in a demanding domain. Detailed build history lives in `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`. The next product work is capability-card and academy-style hardening, while the paper work is human-facing: replace author metadata, inspect the compiled PDF, confirm a clean tag target, and submit only claim-safe wording.
+Relaytic has a longer internal build history, but the public story is now simpler: Relaytic is the local-first inference lab, and Relaytic-AML is the flagship edition used to prove the architecture in a demanding domain. Detailed build history lives in `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`. The next product work is capability-card and academy-style hardening, while the paper work is human-facing: inspect the compiled PDF, confirm a clean tag target, and submit only claim-safe wording.
 
 That ordering is deliberate. Relaytic is more useful when judged as a serious AML evaluation lab than as a generic capability-evolution project with no sharp domain wedge.
 

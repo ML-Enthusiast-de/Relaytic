@@ -8,7 +8,7 @@ P0 through P15 implemented. Slice 16A is the next execution target before Academ
 
 Paper Track P0 through P15 is the mandatory path between Slice 15Z-R and Slice 16A.
 
-Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, final arXiv source release candidate, and measured system-evaluation proof pack. The final upload still requires author metadata replacement, local PDF review, and clean tag-target proof.
+Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, final arXiv source release candidate, and measured system-evaluation proof pack. The final upload still requires local PDF review, bibliography/source-policy confirmation, and clean tag-target proof.
 
 ## Paper Thesis
 
@@ -65,7 +65,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
 19. **P13 - arXiv release and attention pack** - implemented
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
 20. **P14 - final arXiv source bundle and clean release candidate** - implemented
-    Convert the claim-safe Markdown paper pack into a LaTeX source tree, convert figures into accepted arXiv graphic formats, audit citations and package hygiene, and leave upload blocked until human metadata and TeX/PDF inspection gates are complete.
+    Convert the claim-safe Markdown paper pack into a LaTeX source tree, convert figures into accepted arXiv graphic formats, audit citations and package hygiene, and leave upload blocked until human TeX/PDF inspection and clean release gates are complete.
 21. **P15 - measured system-evaluation proof pack** - implemented
     Exercise guide onboarding, partial-run recovery, redacted external-agent handoff, local-LLM advisory boundaries, interoperability discovery, and paper claim gates before regenerating release artifacts.
 
@@ -368,7 +368,7 @@ Implemented acceptance:
 2. A deterministic citation audit confirms every in-text citation has a BibTeX entry and no BibTeX entry used by the paper is malformed.
 3. The submission package audit confirms no local machine paths, external private data paths, secrets, `.env` files, or virtual environments are referenced.
 4. The final checklist records that `git status --short` is empty at the release-candidate tag target.
-5. `paper_arxiv_source_manifest.json` marks source release-candidate status ready, keeps hard/headline claims blocked, and keeps `arxiv_upload_ready` false until author metadata and human TeX/PDF inspection gates pass.
+5. `paper_arxiv_source_manifest.json` marks source release-candidate status ready, keeps hard/headline claims blocked, and keeps `arxiv_upload_ready` false until human TeX/PDF inspection, source-policy, and clean release gates pass.
 
 ### Paper Track P15 - measured system-evaluation proof pack
 

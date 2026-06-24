@@ -8,7 +8,7 @@ Relaytic-AML is a local-first agentic evaluation environment for financial-crime
 
 ## Short Abstract
 
-The Relaytic-AML draft presents a local-first architecture for agent-assisted anti-money-laundering (AML) evaluation, not a detector superiority claim. The controlled workspace is the source of truth. Specialist roles inspect source posture, challenge modeling plans, execute bounded searches, explain current state, and govern public claims. Benchmarks exercise that architecture. The current draft includes supporting PaySim synthetic temporal-fraud test precision-recall area under the curve (PR-AUC) 0.638773 and supporting Elliptic temporal graph-feature test PR-AUC 0.668756, while blocking hard AML, headline, graph-neural, claimed-equivalence-to-RevClassify, and hard business-value claims.
+The Relaytic-AML draft presents a local-first architecture for agent-assisted anti-money-laundering (AML) evaluation, not a detector superiority claim. The controlled workspace is the source of truth. Specialist roles inspect source posture, challenge modeling plans, execute bounded searches, explain current state, and govern public claims. Benchmarks exercise that architecture. The current draft includes supporting PaySim synthetic temporal-fraud test precision-recall area under the curve (PR-AUC) 0.6388 and supporting Elliptic temporal graph-feature test PR-AUC 0.6688, while blocking hard AML, headline, graph-neural, claimed-equivalence-to-RevClassify, and hard business-value claims.
 
 ## Public Post
 

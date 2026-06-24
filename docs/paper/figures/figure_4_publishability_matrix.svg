@@ -1,51 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
-<rect x="34" y="30" width="1052" height="430" rx="8" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>
-<text x="560" y="70" text-anchor="middle" font-size="22" font-weight="700" fill="#293241">Claim gates preserve evidence and block promotion</text>
-<text x="246" y="122" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">allowed claim</text>
-<text x="558" y="122" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">blocked promotion</text>
-<text x="872" y="122" text-anchor="middle" font-size="15" font-weight="700" fill="#293241">evidence needed</text>
-<text x="76" y="189" font-size="17" font-weight="700" fill="#293241">PaySim</text>
-<rect x="160" y="156" width="184" height="66" rx="7" fill="#eaf7f3" stroke="#a8d8c9" stroke-width="1.2"/>
-<text x="252.0" y="183.0" text-anchor="middle" font-size="15" fill="#293241">supporting synthetic</text>
-<text x="252.0" y="201.0" text-anchor="middle" font-size="15" fill="#293241">temporal-fraud row</text>
-<rect x="472" y="156" width="184" height="66" rx="7" fill="#fdeeee" stroke="#efc6c6" stroke-width="1.2"/>
-<text x="564.0" y="183.0" text-anchor="middle" font-size="15" fill="#8a3434">real-bank AML</text>
-<text x="564.0" y="201.0" text-anchor="middle" font-size="15" fill="#8a3434">superiority</text>
-<rect x="786" y="156" width="184" height="66" rx="7" fill="#eef4ff" stroke="#c9d8f1" stroke-width="1.2"/>
-<text x="878.0" y="183.0" text-anchor="middle" font-size="15" fill="#293241">partner or real</text>
-<text x="878.0" y="201.0" text-anchor="middle" font-size="15" fill="#293241">holdout evidence</text>
-<line x1="356" y1="189" x2="456" y2="189" stroke="#8d99ae" stroke-width="1.6"/>
-<polygon points="456,189 446,182 446,196" fill="#8d99ae"/>
-<line x1="668" y1="189" x2="770" y2="189" stroke="#8d99ae" stroke-width="1.6" stroke-dasharray="6 6"/>
-<polygon points="770,189 760,182 760,196" fill="#8d99ae"/>
-<text x="76" y="285" font-size="17" font-weight="700" fill="#293241">Elliptic</text>
-<rect x="160" y="252" width="184" height="66" rx="7" fill="#eaf7f3" stroke="#a8d8c9" stroke-width="1.2"/>
-<text x="252.0" y="279.0" text-anchor="middle" font-size="15" fill="#293241">supporting temporal</text>
-<text x="252.0" y="297.0" text-anchor="middle" font-size="15" fill="#293241">graph-feature row</text>
-<rect x="472" y="252" width="184" height="66" rx="7" fill="#fdeeee" stroke="#efc6c6" stroke-width="1.2"/>
-<text x="564.0" y="279.0" text-anchor="middle" font-size="15" fill="#8a3434">graph-neural</text>
-<text x="564.0" y="297.0" text-anchor="middle" font-size="15" fill="#8a3434">superiority</text>
-<rect x="786" y="252" width="184" height="66" rx="7" fill="#eef4ff" stroke="#c9d8f1" stroke-width="1.2"/>
-<text x="878.0" y="279.0" text-anchor="middle" font-size="15" fill="#293241">graph-native release</text>
-<text x="878.0" y="297.0" text-anchor="middle" font-size="15" fill="#293241">budget and baselines</text>
-<line x1="356" y1="285" x2="456" y2="285" stroke="#8d99ae" stroke-width="1.6"/>
-<polygon points="456,285 446,278 446,292" fill="#8d99ae"/>
-<line x1="668" y1="285" x2="770" y2="285" stroke="#8d99ae" stroke-width="1.6" stroke-dasharray="6 6"/>
-<polygon points="770,285 760,278 760,292" fill="#8d99ae"/>
-<text x="76" y="381" font-size="17" font-weight="700" fill="#293241">Elliptic2</text>
-<rect x="160" y="348" width="184" height="66" rx="7" fill="#eaf7f3" stroke="#a8d8c9" stroke-width="1.2"/>
-<text x="252.0" y="375.0" text-anchor="middle" font-size="15" fill="#293241">modern subgraph</text>
-<text x="252.0" y="393.0" text-anchor="middle" font-size="15" fill="#293241">context row</text>
-<rect x="472" y="348" width="184" height="66" rx="7" fill="#fdeeee" stroke="#efc6c6" stroke-width="1.2"/>
-<text x="564.0" y="375.0" text-anchor="middle" font-size="15" fill="#8a3434">RevClassifyDS</text>
-<text x="564.0" y="393.0" text-anchor="middle" font-size="15" fill="#8a3434">parity</text>
-<rect x="786" y="348" width="184" height="66" rx="7" fill="#eef4ff" stroke="#c9d8f1" stroke-width="1.2"/>
-<text x="878.0" y="375.0" text-anchor="middle" font-size="15" fill="#293241">faithful reference</text>
-<text x="878.0" y="393.0" text-anchor="middle" font-size="15" fill="#293241">protocol proof</text>
-<line x1="356" y1="381" x2="456" y2="381" stroke="#8d99ae" stroke-width="1.6"/>
-<polygon points="456,381 446,374 446,388" fill="#8d99ae"/>
-<line x1="668" y1="381" x2="770" y2="381" stroke="#8d99ae" stroke-width="1.6" stroke-dasharray="6 6"/>
-<polygon points="770,381 760,374 760,388" fill="#8d99ae"/>
-<rect x="106" y="432" width="908" height="24" rx="5" fill="#ffffff" stroke="#d7dde8" stroke-width="1"/>
-<text x="560" y="449" text-anchor="middle" font-size="13" fill="#5b6472">The gate output becomes paper wording, release posture, and external-agent context.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="640" viewBox="0 0 1220 640" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>
+<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Claim-gate examples</text>
+<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">The gate keeps useful evidence visible while preventing unsupported public promotion.</text>
+<text x="255" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">supported evidence</text>
+<text x="610" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">blocked public claim</text>
+<text x="965" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence needed</text>
+<text x="78" y="222" font-size="18" font-weight="700" fill="#1f2937">PaySim</text>
+<rect x="150" y="178" width="210" height="84" rx="6" fill="#eef6f3" stroke="#91c7b1" stroke-width="1.2"/>
+<text x="255.0" y="212.0" text-anchor="middle" font-size="15" fill="#1f2937">synthetic temporal-fraud</text>
+<text x="255.0" y="231.0" text-anchor="middle" font-size="15" fill="#1f2937">PR-AUC cell</text>
+<rect x="505" y="178" width="210" height="84" rx="6" fill="#fdeeee" stroke="#df9b9b" stroke-width="1.2"/>
+<text x="610.0" y="212.0" text-anchor="middle" font-size="15" fill="#7f1d1d">real-bank AML</text>
+<text x="610.0" y="231.0" text-anchor="middle" font-size="15" fill="#7f1d1d">superiority</text>
+<rect x="860" y="178" width="210" height="84" rx="6" fill="#f5f7fa" stroke="#aab4c3" stroke-width="1.2"/>
+<text x="965.0" y="212.0" text-anchor="middle" font-size="15" fill="#1f2937">partner holdout +</text>
+<text x="965.0" y="231.0" text-anchor="middle" font-size="15" fill="#1f2937">incumbent queue study</text>
+<line x1="374" y1="220" x2="490" y2="220" stroke="#6b7280" stroke-width="1.6"/>
+<polygon points="490,220 480,213 480,227" fill="#6b7280"/>
+<line x1="730" y1="220" x2="846" y2="220" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="6 6"/>
+<polygon points="846,220 836,213 836,227" fill="#6b7280"/>
+<text x="78" y="340" font-size="18" font-weight="700" fill="#1f2937">Elliptic</text>
+<rect x="150" y="296" width="210" height="84" rx="6" fill="#eef6f3" stroke="#91c7b1" stroke-width="1.2"/>
+<text x="255.0" y="330.0" text-anchor="middle" font-size="15" fill="#1f2937">temporal graph-feature</text>
+<text x="255.0" y="349.0" text-anchor="middle" font-size="15" fill="#1f2937">provenance</text>
+<rect x="505" y="296" width="210" height="84" rx="6" fill="#fdeeee" stroke="#df9b9b" stroke-width="1.2"/>
+<text x="610.0" y="330.0" text-anchor="middle" font-size="15" fill="#7f1d1d">graph-neural</text>
+<text x="610.0" y="349.0" text-anchor="middle" font-size="15" fill="#7f1d1d">detector advance</text>
+<rect x="860" y="296" width="210" height="84" rx="6" fill="#f5f7fa" stroke="#aab4c3" stroke-width="1.2"/>
+<text x="965.0" y="330.0" text-anchor="middle" font-size="15" fill="#1f2937">graph-native budget +</text>
+<text x="965.0" y="349.0" text-anchor="middle" font-size="15" fill="#1f2937">neural baselines</text>
+<line x1="374" y1="338" x2="490" y2="338" stroke="#6b7280" stroke-width="1.6"/>
+<polygon points="490,338 480,331 480,345" fill="#6b7280"/>
+<line x1="730" y1="338" x2="846" y2="338" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="6 6"/>
+<polygon points="846,338 836,331 836,345" fill="#6b7280"/>
+<text x="78" y="458" font-size="18" font-weight="700" fill="#1f2937">Elliptic2</text>
+<rect x="150" y="414" width="210" height="84" rx="6" fill="#eef6f3" stroke="#91c7b1" stroke-width="1.2"/>
+<text x="255.0" y="448.0" text-anchor="middle" font-size="15" fill="#1f2937">modern subgraph</text>
+<text x="255.0" y="467.0" text-anchor="middle" font-size="15" fill="#1f2937">context row</text>
+<rect x="505" y="414" width="210" height="84" rx="6" fill="#fdeeee" stroke="#df9b9b" stroke-width="1.2"/>
+<text x="610.0" y="448.0" text-anchor="middle" font-size="15" fill="#7f1d1d">RevClassifyDS</text>
+<text x="610.0" y="467.0" text-anchor="middle" font-size="15" fill="#7f1d1d">parity</text>
+<rect x="860" y="414" width="210" height="84" rx="6" fill="#f5f7fa" stroke="#aab4c3" stroke-width="1.2"/>
+<text x="965.0" y="448.0" text-anchor="middle" font-size="15" fill="#1f2937">faithful reference run +</text>
+<text x="965.0" y="467.0" text-anchor="middle" font-size="15" fill="#1f2937">cohort reconciliation</text>
+<line x1="374" y1="456" x2="490" y2="456" stroke="#6b7280" stroke-width="1.6"/>
+<polygon points="490,456 480,449 480,463" fill="#6b7280"/>
+<line x1="730" y1="456" x2="846" y2="456" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="6 6"/>
+<polygon points="846,456 836,449 836,463" fill="#6b7280"/>
+<rect x="118" y="540" width="984" height="34" rx="5" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>
+<text x="610" y="562" text-anchor="middle" font-size="14" fill="#4b5563">Blocked claims are routed to missing evidence or limitations, not to headline wording.</text>
 </svg>

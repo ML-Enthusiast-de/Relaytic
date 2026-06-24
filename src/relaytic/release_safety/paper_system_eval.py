@@ -484,7 +484,7 @@ def _build_claim_gate_case_studies(*, inputs: dict[str, Any]) -> dict[str, Any]:
             "p14_source_bundle_requires_human_upload_gate",
             p14_source.get("source_release_candidate_ready") is True
             and p14_source.get("arxiv_upload_ready") is False,
-            "P14 source packaging should stay release-candidate only until human metadata and PDF checks are complete.",
+            "P14 source packaging should stay release-candidate only until human PDF inspection, bibliography/source policy, and clean tag checks are complete.",
             f"source_ready={p14_source.get('source_release_candidate_ready')}; upload_ready={p14_source.get('arxiv_upload_ready')}",
             "docs/reports/paper_arxiv_source_manifest.json",
             required=False,

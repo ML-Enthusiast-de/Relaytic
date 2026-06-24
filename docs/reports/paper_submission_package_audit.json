@@ -39,6 +39,25 @@
       "message": "Generated TeX must reference converted PDF figures rather than SVG figures.",
       "passed": true,
       "source_artifact": "docs/paper/arxiv_src/main.tex"
+    },
+    {
+      "check_id": "author_and_pdf_metadata_present",
+      "message": "Generated TeX must include real author metadata and PDF metadata.",
+      "passed": true,
+      "source_artifact": "docs/paper/arxiv_src/main.tex"
+    },
+    {
+      "check_id": "latex_compile_log_clean_if_present",
+      "detail": {
+        "checked": true,
+        "source_artifact": "docs/paper/arxiv_src/main.log",
+        "status": "pass",
+        "violation_count": 0,
+        "violations": []
+      },
+      "message": "When a LaTeX compile log is present it must not contain unresolved refs or overfull boxes.",
+      "passed": true,
+      "source_artifact": "docs/paper/arxiv_src/main.log"
     }
   ],
   "failed_checks": [],
@@ -56,7 +75,6 @@
   ],
   "status": "pass",
   "upload_blockers_remaining": [
-    "replace placeholder author, affiliation, and contact metadata",
     "run a human TeX compile and inspect the produced PDF",
     "generate and include bibliography output if the final arXiv upload uses BibTeX rather than static bibliography output",
     "confirm git status --short is empty at the tag target"

@@ -53,16 +53,20 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "@chen2026transxion" in draft
     assert "@ye2026blazingaml" in draft
     assert "Anti-money laundering (AML)" in draft
-    assert "PaySim reports supporting synthetic temporal-fraud PR-AUC 0.638773" in draft
+    assert "PaySim synthetic temporal-fraud PR-AUC 0.6388" in draft
     assert "@yang2026skillopt" in draft
     assert "not presented as a new best detector family" in draft
     assert "RQ1" in draft and "RQ4" in draft
     assert "Table 1. Representative evidence cells" in draft
-    assert "Table 2. Dataset and task contracts" in draft
+    assert "Table 2a. Dataset scale and split contracts" in draft
+    assert "Table 2b. Feature and metric policy" in draft
     assert "Table 3. Model families and search budgets" in draft
-    assert "Table 4. PaySim modeling path and ablation evidence" in draft
-    assert "Table 5. Deterministic system-evaluation protocol" in draft
-    assert "TODO_EVIDENCE[paysim_prior_history_isolated_test_pr_auc]" in draft
+    assert "Table 4. PaySim modeling path" in draft
+    assert "Table 5. System audit matrix" in draft
+    assert "Table 6. Blocked claim examples" in draft
+    assert "Table 7. Rowless handoff and interrupted-run recovery examples" in draft
+    assert ("TODO" + "_EVIDENCE") not in draft
+    assert "pending isolated" + " test" not in draft
     for phrase in FORBIDDEN_READER_TONE_PHRASES:
         assert phrase.lower() not in draft.lower()
     assert "SOTA" in "\n".join(public_claims["blocked_public_claims"])
@@ -151,6 +155,8 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert claims["headline_claims_allowed"] is False
     assert "Relaytic-AML: A Local-First Agentic Evaluation Lab" in draft
     assert "arXiv-ready draft" not in draft
+    assert ("TODO" + "_EVIDENCE") not in draft
+    assert "pending isolated" + " test" not in draft
     assert "## References" in draft
     for phrase in FORBIDDEN_READER_TONE_PHRASES:
         assert phrase.lower() not in draft.lower()
