@@ -98,7 +98,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "625be0733fef7f751d3826d24cbb0f03ac0fd677",
+  "git_commit": "4dcec84382a9e5c48c920630bfa96e528810c452",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -198,109 +198,115 @@
   "slice": "Paper Track P13",
   "source_verification": [
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "lopezrojas2016paysim",
       "source_url": "https://www.msc-les.org/proceedings/emss/2016/EMSS2016_249.pdf",
       "verified_role": "PaySim synthetic mobile-money simulator source and caveat."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "fatf2020virtualassets",
       "source_url": "https://www.fatf-gafi.org/en/publications/Methodsandtrends/Virtual-assets-red-flag-indicators.html",
       "verified_role": "Official virtual-asset red-flag categories for transaction pattern, anonymity, geography, sender/recipient, and source-of-funds context."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "fincenAdvisories",
       "source_url": "https://www.fincen.gov/resources/advisoriesbulletinsfact-sheets",
       "verified_role": "Official FinCEN description of advisories, typologies, red flags, and AML monitoring use."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "ffiecRedFlags",
       "source_url": "https://bsaaml.ffiec.gov/manual/Appendices/07",
       "verified_role": "Official BSA/AML examination red-flag examples for funds transfers, inconsistent activity, cross-border flows, and unusual transactions."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "weber2019elliptic",
       "source_url": "https://arxiv.org/abs/1908.02591",
       "verified_role": "Elliptic transaction graph size, features, and AML benchmark context."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "bellei2024elliptic2",
       "source_url": "https://arxiv.org/abs/2404.19109",
       "verified_role": "Elliptic2 subgraph benchmark scale and task framing."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "song2024revtrack",
       "source_url": "https://arxiv.org/abs/2410.08394",
       "verified_role": "RevTrack/RevClassify modern reference and subgraph-method context."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "chen2026transxion",
       "source_url": "https://arxiv.org/abs/2604.17420",
       "verified_role": "Recent AML benchmark-realism context."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "poon2026linemvgnn",
       "source_url": "https://arxiv.org/abs/2603.23584",
       "verified_role": "Recent directed transaction-graph detector context."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "tariq2026extraqt",
       "source_url": "https://arxiv.org/abs/2604.02899",
       "verified_role": "Recent quasi-temporal transaction-graph detector context."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "ye2026blazingaml",
       "source_url": "https://arxiv.org/abs/2604.12241",
       "verified_role": "Recent high-throughput AML graph-mining systems context."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "deprez2025continualaml",
       "source_url": "https://arxiv.org/abs/2503.24259",
       "verified_role": "Recent continual-learning and drift context for AML graph systems."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "gebru2021datasheets",
       "source_url": "https://arxiv.org/abs/1803.09010",
       "verified_role": "Dataset documentation and transparency context; arXiv source retained because the CACM article page blocks automated access."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
+      "citation_key": "mitchell2019modelcards",
+      "source_url": "https://arxiv.org/abs/1810.03993",
+      "verified_role": "Model reporting context for distinguishing model documentation from Relaytic-AML's evidence-cell and claim-gating workflow."
+    },
+    {
+      "accessed_date": "2026-06-25",
       "citation_key": "pineau2021reproducibility",
       "source_url": "https://www.jmlr.org/papers/v22/20-303.html",
       "verified_role": "ML reproducibility checklist and code/data discipline context."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "chen2025mlrbench",
       "source_url": "https://arxiv.org/abs/2505.19955",
       "verified_role": "Agent-generated ML research reliability and invalidated-experiment risk context."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "starace2025paperbench",
       "source_url": "https://arxiv.org/abs/2504.01848",
       "verified_role": "AI-agent paper replication benchmark context and gap between fluent research artifacts and validated experimental reproduction."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "wijk2025rebench",
       "source_url": "https://proceedings.mlr.press/v267/wijk25a.html",
       "verified_role": "Recent research-engineering benchmark context comparing language-model agents with human experts."
     },
     {
-      "accessed_date": "2026-06-09",
+      "accessed_date": "2026-06-25",
       "citation_key": "yang2026skillopt",
       "source_url": "https://arxiv.org/abs/2605.23904",
       "verified_role": "Recent agentic-ML context for treating external agent state and validation-gated updates as first-class research objects."

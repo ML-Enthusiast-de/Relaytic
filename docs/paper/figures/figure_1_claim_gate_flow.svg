@@ -40,12 +40,12 @@
 <text x="1074.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">public_claims_allowed</text>
 <text x="1074.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">source package audit</text>
 <text x="1074.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">rowless handoff</text>
-<rect x="104" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
-<text x="249.0" y="442.0" text-anchor="middle" font-size="16" fill="#293241">private rows stay local</text>
-<rect x="394" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
-<text x="539.0" y="442.0" text-anchor="middle" font-size="16" fill="#293241">validation choices precede test scoring</text>
-<rect x="728" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
-<text x="873.0" y="442.0" text-anchor="middle" font-size="16" fill="#293241">external agents receive redacted state</text>
+<rect x="90" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
+<text x="235.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">private rows stay local</text>
+<rect x="465" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
+<text x="610.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">validation choices precede test scoring</text>
+<rect x="840" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
+<text x="985.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">external agents receive redacted state</text>
 <rect x="96" y="506" width="1028" height="44" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>
 <text x="610" y="534" text-anchor="middle" font-size="15" fill="#4b5563">The same artifact graph feeds CLI, skills, MCP adapters, paper tables, vector figures, and release checks.</text>
 </svg>

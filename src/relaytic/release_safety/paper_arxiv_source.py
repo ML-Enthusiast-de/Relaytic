@@ -462,10 +462,10 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\setlength{\parskip}{0.65em}",
         r"\setlength{\parindent}{0pt}",
         r"\emergencystretch=4em",
-        r"\hypersetup{pdftitle={Relaytic-AML: A Local-First Agentic Evaluation Lab for Financial-Crime Machine Learning},pdfauthor={ML-Enthusiast},pdfsubject={Local-first AML evaluation lab},pdfkeywords={anti-money laundering, financial crime, reproducibility, AI evaluation, agentic systems}}",
+        r"\hypersetup{pdftitle={Relaytic-AML: A Local-First Agentic Evaluation Lab for Financial-Crime Machine Learning},pdfauthor={ML-Enthusiast-de},pdfsubject={Local-first AML evaluation lab},pdfkeywords={anti-money laundering, financial crime, reproducibility, AI evaluation, agentic systems}}",
         "",
         f"\\title{{{_latex_inline(title)}}}",
-        r"\author{ML-Enthusiast\\Independent researcher\\\texttt{83662706+ML-Enthusiast-de@users.noreply.github.com}}",
+        r"\author{ML-Enthusiast-de\\Independent Researcher\\GitHub: \texttt{ML-Enthusiast-de}\\\href{mailto:83662706+ML-Enthusiast-de@users.noreply.github.com}{\texttt{83662706+ML-Enthusiast-de@users.noreply.github.com}}}",
         r"\date{June 2026}",
         "",
         r"\begin{document}",
@@ -701,7 +701,7 @@ def _render_latex_table(lines: list[str]) -> list[str]:
     for row in rows:
         while len(row) < col_count:
             row.append("")
-    spec = "@{}" + " ".join([">{\\raggedright\\arraybackslash}X" for _ in range(col_count)]) + "@{}"
+    spec = _latex_table_spec(rows[0], col_count)
     size = r"\scriptsize" if col_count >= 5 else r"\small"
     rendered = [
         r"\begin{center}",
@@ -717,6 +717,41 @@ def _render_latex_table(lines: list[str]) -> list[str]:
         rendered.append(" & ".join(_latex_inline(cell) for cell in row) + r" \\")
     rendered.extend([r"\bottomrule", r"\end{tabularx}", r"\end{center}", ""])
     return rendered
+
+
+def _latex_table_spec(headers: list[str], col_count: int) -> str:
+    normalized = [header.strip().lower() for header in headers]
+    if normalized == ["id", "dataset", "metric", "value", "split", "artifact", "claim"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.075\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.115\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.125\linewidth} "
+            r">{\raggedleft\arraybackslash}p{0.075\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.115\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.145\linewidth}"
+            "@{}"
+        )
+    if normalized == ["track", "families", "features", "search budget", "gate"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.11\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.19\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.18\linewidth}"
+            "@{}"
+        )
+    columns = []
+    for header in normalized:
+        if header in {"value", "test pr-auc", "pr-auc"}:
+            columns.append(r">{\raggedleft\arraybackslash}X")
+        else:
+            columns.append(r">{\raggedright\arraybackslash}X")
+    while len(columns) < col_count:
+        columns.append(r">{\raggedright\arraybackslash}X")
+    return "@{}" + " ".join(columns[:col_count]) + "@{}"
 
 
 def _latex_inline(text: str) -> str:
@@ -1188,7 +1223,12 @@ def _build_submission_package_audit(
     p13_manifest = _payload(inputs["paper_release_manifest"])
     p13_claims = _payload(inputs["paper_public_claims_allowed"])
     compile_log_audit = _audit_compile_log(inputs)
-    metadata_present = "ML-Enthusiast" in tex_source and "pdftitle=" in tex_source and "pdfauthor=" in tex_source
+    metadata_present = (
+        "ML-Enthusiast-de" in tex_source
+        and "pdftitle=" in tex_source
+        and "pdfauthor={ML-Enthusiast-de}" in tex_source
+        and r"\date{June 2026}" in tex_source
+    )
     checks = [
         _check(
             "p13_release_ready",

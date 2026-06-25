@@ -318,7 +318,7 @@ def _render_paper_draft(
             "",
             "Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC "
             f"{_metric_value(key, 'paysim_p6a_competitive_selected.test_pr_auc')} and the Elliptic graph-feature row reports test PR-AUC "
-            f"{_metric_value(key, 'elliptic_p7_selected_graph_feature_baseline.test_pr_auc')}; both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates remain unresolved. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.",
+            f"{_metric_value(key, 'elliptic_p7_selected_graph_feature_baseline.test_pr_auc')}; both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates are not established. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.",
             "",
             "## Introduction",
             "",
@@ -879,13 +879,13 @@ def _architecture_flow_svg_v2() -> str:
             parts.append(f'<line x1="{x1}" y1="{y}" x2="{x2}" y2="{y}" stroke="#1f2937" stroke-width="1.8"/>')
             parts.append(f'<polygon points="{x2},{y} {x2 - 9},{y - 7} {x2 - 9},{y + 7}" fill="#1f2937"/>')
     lower = [
-        ("private rows stay local", 104),
-        ("validation choices precede test scoring", 394),
-        ("external agents receive redacted state", 728),
+        ("private rows stay local", 90),
+        ("validation choices precede test scoring", 465),
+        ("external agents receive redacted state", 840),
     ]
     for label, x in lower:
         parts.append(f'<rect x="{x}" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>')
-        parts.extend(_svg_text_lines(label, x + 145, 442, font_size=16, anchor="middle", line_height=18))
+        parts.extend(_svg_text_lines(label, x + 145, 442, font_size=14, anchor="middle", line_height=17))
     parts.append('<rect x="96" y="506" width="1028" height="44" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>')
     parts.append('<text x="610" y="534" text-anchor="middle" font-size="15" fill="#4b5563">The same artifact graph feeds CLI, skills, MCP adapters, paper tables, vector figures, and release checks.</text>')
     parts.append('</svg>')
@@ -944,36 +944,38 @@ def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
         ("Elliptic precision", "top queue", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget"), "#457b9d"),
         ("Elliptic recall", "reviewed illicit", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.recall_at_review_budget"), "#f4a261"),
     ]
-    width = 1220
-    height = 640
+    width = 1400
+    height = 700
     parts = [
         _svg_header(width, height),
-        '<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
-        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Benchmark evidence and review-budget context</text>',
-        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Ranking metrics and operating-point metrics are grouped separately because they answer different questions.</text>',
+        '<rect x="38" y="30" width="1324" height="606" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
+        '<text x="700" y="72" text-anchor="middle" font-size="26" font-weight="700" fill="#1f2937">Benchmark evidence and review-budget context</text>',
+        '<text x="700" y="106" text-anchor="middle" font-size="18" fill="#4b5563">Ranking metrics and operating-point metrics are grouped separately because they answer different questions.</text>',
     ]
     def panel(x0: int, y0: int, title: str, values: list[tuple[str, str, Any, str]]) -> None:
-        plot_x = x0 + 190
-        plot_w = 330
-        parts.append(f'<rect x="{x0}" y="{y0}" width="520" height="350" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
-        parts.append(f'<text x="{x0 + 24}" y="{y0 + 36}" font-size="18" font-weight="700" fill="#1f2937">{_xml_escape(title)}</text>')
+        panel_w = 610
+        plot_x = x0 + 230
+        plot_w = 300
+        value_x = plot_x + plot_w + 26
+        parts.append(f'<rect x="{x0}" y="{y0}" width="{panel_w}" height="390" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
+        parts.append(f'<text x="{x0 + 26}" y="{y0 + 40}" font-size="19" font-weight="700" fill="#1f2937">{_xml_escape(title)}</text>')
         for tick in [0.0, 0.5, 1.0]:
             tx = plot_x + tick * plot_w
-            parts.append(f'<line x1="{tx:.1f}" y1="{y0 + 58}" x2="{tx:.1f}" y2="{y0 + 300}" stroke="#e5e7eb" stroke-width="1"/>')
-            parts.append(f'<text x="{tx:.1f}" y="{y0 + 322}" text-anchor="middle" font-size="12" fill="#4b5563">{_format_tick(tick)}</text>')
+            parts.append(f'<line x1="{tx:.1f}" y1="{y0 + 66}" x2="{tx:.1f}" y2="{y0 + 326}" stroke="#e5e7eb" stroke-width="1"/>')
+            parts.append(f'<text x="{tx:.1f}" y="{y0 + 352}" text-anchor="middle" font-size="13" fill="#4b5563">{_format_tick(tick)}</text>')
         for index, (label, detail, raw_value, color) in enumerate(values):
-            y = y0 + 72 + index * 56
+            y = y0 + 86 + index * 62
             value = float(raw_value) if isinstance(raw_value, (int, float)) else 0.0
             value = max(0.0, min(1.0, value))
-            parts.append(f'<text x="{x0 + 24}" y="{y + 15}" font-size="14" font-weight="700" fill="#1f2937">{_xml_escape(label)}</text>')
-            parts.append(f'<text x="{x0 + 24}" y="{y + 33}" font-size="12" fill="#4b5563">{_xml_escape(detail)}</text>')
-            parts.append(f'<rect x="{plot_x}" y="{y + 4}" width="{plot_w}" height="20" rx="4" fill="#edf1f6" stroke="#d1d5db" stroke-width="0.8"/>')
-            parts.append(f'<rect x="{plot_x}" y="{y + 4}" width="{value * plot_w:.1f}" height="20" rx="4" fill="{color}"/>')
-            parts.append(f'<text x="{plot_x + plot_w + 14}" y="{y + 20}" font-size="13" fill="#1f2937">{_format_metric(raw_value)}</text>')
-    panel(78, 148, "Panel A: PR-AUC ranking evidence", ranking)
-    panel(622, 148, "Panel B: fixed review queue", operating)
-    parts.append('<rect x="132" y="532" width="956" height="38" rx="5" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>')
-    parts.append('<text x="610" y="556" text-anchor="middle" font-size="14" fill="#4b5563">Elliptic2 is shown as context only. Precision/recall rows use the validation-selected review-budget policy.</text>')
+            parts.append(f'<text x="{x0 + 26}" y="{y + 15}" font-size="15" font-weight="700" fill="#1f2937">{_xml_escape(label)}</text>')
+            parts.append(f'<text x="{x0 + 26}" y="{y + 36}" font-size="13" fill="#4b5563">{_xml_escape(detail)}</text>')
+            parts.append(f'<rect x="{plot_x}" y="{y + 5}" width="{plot_w}" height="24" rx="4" fill="#edf1f6" stroke="#d1d5db" stroke-width="0.8"/>')
+            parts.append(f'<rect x="{plot_x}" y="{y + 5}" width="{value * plot_w:.1f}" height="24" rx="4" fill="{color}"/>')
+            parts.append(f'<text x="{value_x}" y="{y + 24}" font-size="14" font-weight="700" fill="#1f2937">{_format_metric(raw_value)}</text>')
+    panel(70, 148, "Panel A: PR-AUC ranking evidence", ranking)
+    panel(720, 148, "Panel B: fixed review queue", operating)
+    parts.append('<rect x="122" y="574" width="1156" height="42" rx="5" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>')
+    parts.append('<text x="700" y="601" text-anchor="middle" font-size="15" fill="#4b5563">Elliptic2 is context only. Precision/recall rows use the validation-selected review-budget policy.</text>')
     parts.append('</svg>')
     return "\n".join(parts)
 
@@ -1092,7 +1094,7 @@ def _unguarded_phrase_hits(text: str, phrase: str) -> list[dict[str, Any]]:
                 "no ",
                 "without",
                 "does not",
-                "remain unresolved",
+                "are not established",
                 "separate from",
             ]
         )
@@ -1132,7 +1134,7 @@ def _format_metric(value: Any) -> str:
     if isinstance(value, float):
         if abs(value) >= 100:
             return f"{value:.0f}"
-        return f"{value:.4f}".rstrip("0").rstrip(".")
+        return f"{value:.4f}"
     return str(value)
 
 

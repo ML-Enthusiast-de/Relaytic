@@ -4,7 +4,7 @@ Source-draft status: generated evidence draft used by the release pipeline. For 
 
 ## Abstract
 
-Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC 0.6388 and the Elliptic graph-feature row reports test PR-AUC 0.6688; both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates remain unresolved. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.
+Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC 0.6388 and the Elliptic graph-feature row reports test PR-AUC 0.6688; both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates are not established. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.
 
 ## Introduction
 
@@ -72,9 +72,9 @@ The current result table is intentionally supporting-only. It is useful because 
 | PaySim competitive | precision at review budget | 0.7033 | supporting-only | `paper-cell:paysim_p6a_competitive_selected.precision_at_review_budget` |
 | PaySim competitive | recall at review budget | 0.4716 | supporting-only | `paper-cell:paysim_p6a_competitive_selected.recall_at_review_budget` |
 | Elliptic graph-feature | test PR-AUC | 0.6688 | supporting-only | `paper-cell:elliptic_p7_selected_graph_feature_baseline.test_pr_auc` |
-| Elliptic graph-feature | precision at review budget | 1 | supporting-only | `paper-cell:elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget` |
+| Elliptic graph-feature | precision at review budget | 1.0000 | supporting-only | `paper-cell:elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget` |
 | Elliptic2 context | official-partition PR-AUC mean | 0.9432 | modern context only | `paper-cell:elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean` |
-| Elliptic2 context | published RevClassifyDS PR-AUC | 0.974 | reference context | `paper-cell:elliptic2_p8b_modern_context.published_reference_pr_auc` |
+| Elliptic2 context | published RevClassifyDS PR-AUC | 0.9740 | reference context | `paper-cell:elliptic2_p8b_modern_context.published_reference_pr_auc` |
 
 The PaySim competitive result improved over the PaySim baseline under the recorded temporal proxy contract, but PaySim remains synthetic. The Elliptic graph-feature result is credible supporting graph evidence, but it does not promote a graph-neural claim. The Elliptic2 context row shows a strong reproduced local candidate relative to many ordinary baselines, yet it remains below the recorded RevClassifyDS reference and cannot support a parity or headline detector claim in this source draft.
 

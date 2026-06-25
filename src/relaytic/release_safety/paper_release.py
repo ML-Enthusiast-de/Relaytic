@@ -15,6 +15,7 @@ PAPER_RELEASE_REPORT_DIR = Path("docs") / "reports"
 PAPER_RELEASE_DOC_DIR = Path("docs") / "paper"
 PAPER_RELEASE_TABLE_DIRNAME = "tables"
 PAPER_RELEASE_DATE = "2026-06-09"
+SOURCE_VERIFICATION_DATE = "2026-06-25"
 DEFAULT_RELEASE_TAG = "relaytic-aml-paper-p13-claim-safe"
 NEXT_PAPER_RELEASE_SLICE = "Paper Track P14 - final arXiv source bundle and clean release candidate"
 PAPER_FINAL_DRAFT_FILENAME = "relaytic_aml_arxiv_draft.md"
@@ -998,6 +999,7 @@ def _render_final_paper_v2(
     claim_gate_figure = _render_figure_list(figure_manifest, figure_ids={"publishability_matrix"})
 
     evidence_cell_table = _render_evidence_cell_table_v2(metrics)
+    evidence_cell_snippet = _render_evidence_cell_snippet(metrics)
     dataset_split_table = _render_dataset_split_table(inputs)
     feature_metric_policy_table = _render_feature_metric_policy_table(inputs)
     model_search_table = _render_model_search_table(inputs)
@@ -1034,7 +1036,7 @@ def _render_final_paper_v2(
             "- **RQ3:** Can the local artifact record support rowless handoff to external agents while preserving provenance?",
             "- **RQ4:** Do the benchmark rows demonstrate useful, bounded detector evidence under explicit split and budget contracts?",
             "",
-            "This paper makes four contributions. First, it presents a local-first artifact graph and role-scoped agent runtime for AML evaluation. Second, it defines an evidence-cell schema tying each metric to dataset, split, command, artifact, budget, leakage posture, operating point, and claim state. Third, it contributes a release and claim-gating harness that turns local artifacts into tables, figures, source packages, and manuscript claims while blocking unsupported interpretations. Fourth, it gives public demonstrations on PaySim, Elliptic, and Elliptic2 context rows under strict claim boundaries.",
+            "This paper makes four contributions. First, it presents a workspace-backed, role-scoped agent runtime for AML evaluation. Second, it defines an evidence-cell schema tying each metric to dataset, split, command, artifact, budget, leakage posture, operating point, and claim state. Third, it contributes a release and claim-gating harness that turns local artifacts into tables, figures, source packages, and manuscript claims while blocking unsupported interpretations. Fourth, it gives public demonstrations on PaySim, Elliptic, and Elliptic2 context rows under strict claim boundaries.",
             "",
             "## 2. Related Work",
             "",
@@ -1066,6 +1068,10 @@ def _render_final_paper_v2(
             "",
             evidence_cell_table,
             "",
+            "A representative metric cell is compact enough to audit directly. The public table uses the alias `PS-PR`, while the underlying artifact keeps the longer machine identifier.",
+            "",
+            evidence_cell_snippet,
+            "",
             "```algorithm",
             "Algorithm: Evidence-cell creation",
             "Input: dataset registry D, split contract S, candidate budget B, run artifacts A",
@@ -1083,7 +1089,7 @@ def _render_final_paper_v2(
             "",
             "```algorithm",
             "Algorithm: Claim-gate validation",
-            "Input: proposed public claim q, evidence cells C, publishability gates G, limitation matrix L",
+            "Input: public claim q, evidence cells C, gates G, limitations L",
             "Output: allowed wording or blocked-claim record",
             "1. Resolve every evidence cell named by q and require dataset, split, command, artifact, budget, and leakage fields.",
             "2. Compare the strength of q with source posture, split validity, metric scope, and benchmark role.",
@@ -1109,7 +1115,7 @@ def _render_final_paper_v2(
             "",
             model_search_table,
             "",
-            "Table 3 records the modeling effort without presenting the paper as a hyperparameter leaderboard. PaySim uses a two-stage competitive budget: probes over a seeded train-only sample, five full-training finalists, validation-only calibration, and one fixed test evaluation for the selected finalist. Elliptic uses a graph-feature budget over source-provided anonymized features, same-snapshot structural features, and their combination. Elliptic2 uses repeated pooled-moment LightGBM context rows with seeds 11, 42, and 73, but this row is not a Relaytic performance contribution because reference-protocol parity is unresolved.",
+            "Table 3 records the modeling effort without presenting the paper as a hyperparameter leaderboard. PaySim uses a two-stage competitive budget: probes over a seeded train-only sample, five full-training finalists, validation-only calibration, and one fixed test evaluation for the selected finalist. Elliptic uses a graph-feature budget over source-provided anonymized features, same-snapshot structural features, and their combination. Elliptic2 uses repeated pooled-moment LightGBM context rows with seeds 11, 42, and 73, but this row is not a Relaytic performance contribution because reference-protocol parity is not established.",
             "",
             "The feature policy is strictest for PaySim because simulator balance columns can leak post-event state. Relaytic excludes those balance fields, raw origin and destination identifiers as model features, and simulator flags. It allows row-local amount, type, and time features, train-only thresholds, and destination history shifted before each step. The isolated contribution of destination-history features has not been measured as a separate test row, so it is not reported as a main result.",
             "",
@@ -1123,7 +1129,7 @@ def _render_final_paper_v2(
             "",
             f"Elliptic is a different kind of evidence. The validation-selected source-plus-structural LightGBM row reports test PR-AUC {ell_pr}, with review-budget precision {ell_precision} and recall {ell_recall}. The result supports temporal graph-feature provenance and operating-point reporting. It also reveals a limitation: the current graph-structure-only floor is weak, and the final row is heavily influenced by source-provided anonymized features. Relaytic can therefore claim graph-aware evidence handling, not a new graph-native detector.",
             "",
-            f"Elliptic2 is intentionally framed as context. The repeated official-partition context row reports PR-AUC {e2_pr} +/- {e2_std}, and the content-hash robustness partition reports mean PR-AUC {e2_hash}. Those are strong absolute values, but the recorded RevClassifyDS reference is {ref_pr}, and the local parity gate records unresolved cohort and reference-execution issues. The scientific result is that Relaytic keeps the context row available while blocking a parity or superiority interpretation.",
+            f"Elliptic2 is intentionally framed as context. The repeated official-partition context row reports PR-AUC {e2_pr} +/- {e2_std}, and the content-hash robustness partition reports mean PR-AUC {e2_hash}. Those are strong absolute values, but the recorded RevClassifyDS reference is {ref_pr}, and the local parity gate records cohort and reference-execution gaps. The scientific result is that Relaytic keeps the context row available while blocking a parity or superiority interpretation.",
             "",
             benchmark_figure,
             "",
@@ -1135,7 +1141,7 @@ def _render_final_paper_v2(
             "",
             system_eval_table,
             "",
-            "Table 5 reports the audit matrix behind the system claim. The important result is not that a script returned a generic pass flag. It is that each checked behavior has an observed signal: 13 of 13 provenance fields are present for the PaySim metric cell, baseline and competitive budgets are comparable under the same contract, Elliptic2 is firewalled as context, rowless handoff exposes no raw rows, and interrupted-run recovery surfaces state, missing evidence, and next actions.",
+            "Table 5 reports the audit matrix behind the system claim. Each row names a behavior, a deterministic check, a pass criterion, and an observed signal: 13 of 13 provenance fields are present for the PaySim metric cell, baseline and competitive budgets are comparable under the same contract, Elliptic2 is firewalled as context, rowless handoff exposes no raw rows, and interrupted-run recovery surfaces state, missing evidence, and next actions.",
             "",
             blocked_claim_table,
             "",
@@ -1191,7 +1197,9 @@ def _render_final_paper_v2(
             "",
             "Raw benchmark data is not committed. PaySim and Elliptic require local downloads and are referenced through registry artifacts, split reports, hashes, and command ledgers. Elliptic2 remains context-only in this paper because the stronger reference-parity conditions are not satisfied locally. Clean clones can reproduce the paper-generation checks and repo-local public fixtures; full benchmark regeneration requires the locally licensed datasets named in the README.",
             "",
-            "LLM tools assisted with drafting, editing, repository inspection, and consistency checks. They are not authors. The evidence cells, code, figures, tables, limitations, and final claims remain the author's responsibility.",
+            "## Use of AI Assistance",
+            "",
+            "Large language model tools assisted with drafting, editing, repository inspection, consistency checks, and implementation work around the paper artifacts. They are not authors. The evidence cells, benchmark outputs, source code, figures, tables, limitations, and final interpretation remain the author's responsibility.",
             "",
             "## Conclusion",
             "",
@@ -1270,11 +1278,29 @@ def _render_model_search_table(inputs: dict[str, Any]) -> str:
     graph_table = _payload(inputs["elliptic_graph_feature_table"])
     elliptic2 = _payload(inputs["elliptic2_repeated_seed_scorecard"])
     rows = [
-        ["PaySim", "tree ensembles and gradient boosting; fixed-rule baseline retained", "amount, type, time, train-only thresholds, shifted destination history", f"{paysim_budget.get('probe_trial_count', 'n/a')} probes; {paysim_budget.get('finalist_fit_count', 'n/a')} full finalists", _selection_summary(paysim_search, "validation_pr_auc_only", "validation-only calibration and threshold"), ", ".join(str(seed) for seed in paysim_budget.get("random_seeds", [])) or "not recorded"],
-        ["Elliptic", "tree ensembles and gradient boosting over frozen feature views", "source anonymized node features, same-snapshot graph features, combined view", f"{graph_budget.get('validation_search_trial_count', 'n/a')} validation trials; {_model_family_label(str(graph_table.get('validation_selected_competitive_baseline', {}).get('family_id', 'selected model')))} selected", "validation PR-AUC within declared feature views; validation-only calibration and threshold", ", ".join(str(seed) for seed in graph_budget.get("random_seeds", [])) or "not recorded"],
-        ["Elliptic2", "pooled-moment LightGBM context candidate", "348 pooled subgraph moment/count features", f"{elliptic2.get('official_partition', {}).get('seed_count', 'n/a')} repeated seeds; context row only", "official partition plus content-hash robustness; reference parity gate remains blocked", ", ".join(str(seed) for seed in elliptic2.get("seeds", [])) or "not recorded"],
+        [
+            "PaySim",
+            "tree and boosting candidates; Extra Trees selected",
+            "amount, type, time, shifted destination history",
+            f"{paysim_budget.get('probe_trial_count', 'n/a')} probes; {paysim_budget.get('finalist_fit_count', 'n/a')} finalists; seeds {', '.join(str(seed) for seed in paysim_budget.get('random_seeds', [])) or 'n/a'}",
+            "validation PR-AUC; one fixed test",
+        ],
+        [
+            "Elliptic",
+            "tree/boosting baselines; LightGBM selected",
+            "source node features plus same-step graph statistics",
+            f"{graph_budget.get('validation_search_trial_count', 'n/a')} trials; seeds {', '.join(str(seed) for seed in graph_budget.get('random_seeds', [])) or 'n/a'}",
+            "supporting graph-feature row",
+        ],
+        [
+            "Elliptic2",
+            "LightGBM context row",
+            "348 pooled subgraph moments/counts",
+            f"{elliptic2.get('official_partition', {}).get('seed_count', 'n/a')} repeated seeds: {', '.join(str(seed) for seed in elliptic2.get('seeds', [])) or 'n/a'}",
+            "context only; parity not established",
+        ],
     ]
-    return _markdown_table("Table 3. Model families and search budgets", ["Track", "Model family scope", "Feature family scope", "Budget", "Selection rule", "Seeds"], rows)
+    return _markdown_table("Table 3. Model families and search budgets", ["Track", "Families", "Features", "Search budget", "Gate"], rows)
 
 
 def _render_evidence_cell_table_v2(metrics: dict[str, dict[str, Any]]) -> str:
@@ -1294,12 +1320,30 @@ def _render_evidence_cell_table_v2(metrics: dict[str, dict[str, Any]]) -> str:
             _dataset_short_name(str(cell.get("dataset_id") or "")),
             _paper_metric_label(str(cell.get("metric_id") or cell_id)),
             _format_metric(cell.get("value")),
-            _humanize_gate_token(str(cell.get("split") or "not recorded")),
+            _compact_cell_split(cell_id, str(cell.get("split") or "not recorded")),
             _compact_command_artifact(cell),
-            _humanize_gate_token(str(cell.get("budget_tier") or "not recorded")),
             _compact_claim_state(str(cell.get("claim_state") or "not recorded")),
         ])
-    return _markdown_table("Table 1. Representative evidence cells", ["Evidence cell", "Dataset", "Metric", "Value", "Split", "Evidence", "Budget", "Claim state"], rows)
+    return _markdown_table("Table 1. Representative evidence cells", ["ID", "Dataset", "Metric", "Value", "Split", "Artifact", "Claim"], rows)
+
+
+def _render_evidence_cell_snippet(metrics: dict[str, dict[str, Any]]) -> str:
+    cell_id = "paysim_p6a_competitive_selected.test_pr_auc"
+    cell = metrics.get(cell_id, {})
+    snippet = [
+        "{",
+        '  "cell_id": "PS-PR",',
+        '  "dataset_id": "paysim_temporal_transaction_fraud",',
+        f'  "split": "{_compact_cell_split(cell_id, str(cell.get("split") or "temporal_fixed_test"))}",',
+        '  "artifact_ref": "paper_metric_cell_audit.json",',
+        '  "command": "release-safety paysim-competitive",',
+        '  "metric": "test_pr_auc",',
+        f'  "value": {_format_metric(cell.get("value"))},',
+        '  "leakage_posture": "balance/raw IDs excluded; history shifted",',
+        '  "claim_state": "supporting synthetic temporal-proxy only"',
+        "}",
+    ]
+    return "```json\n" + "\n".join(snippet) + "\n```"
 
 
 def _render_paysim_ablation_table(inputs: dict[str, Any], metrics: dict[str, dict[str, Any]]) -> str:
@@ -1338,7 +1382,7 @@ def _render_system_evaluation_table(inputs: dict[str, Any]) -> str:
 def _render_blocked_claim_examples_table() -> str:
     rows = [
         ["Relaytic-AML is superior for real-bank AML detection.", "PaySim is synthetic and the current evidence is a temporal proxy result.", "Partner or bank-approved holdout, incumbent comparison, analyst-review protocol, and legal release gate."],
-        ["Relaytic-AML reaches RevClassifyDS parity on Elliptic2.", "The context row is below the recorded reference and reference-protocol parity remains unresolved.", "Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report."],
+        ["Relaytic-AML reaches RevClassifyDS parity on Elliptic2.", "The context row is below the recorded reference and reference-protocol parity is not established.", "Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report."],
         ["Relaytic-AML is a graph-neural detector advance.", "Elliptic evidence uses graph-feature provenance and tree/boosting baselines, not a new graph-neural family.", "Graph-native release budget, neural baselines, repeated seeds, and graph-specific ablations."],
     ]
     return _markdown_table("Table 6. Blocked claim examples", ["Proposed invalid claim", "Gate reason", "Missing evidence"], rows)
@@ -1388,6 +1432,28 @@ def _audit_result(task_id: str, passed: Callable[[str], str], signal: Callable[[
         "claim_gate_fails_closed_for_public_interpretation": "case gates pass",
     }.get(task_id, signal(task_id))
     return f"{passed(task_id)}; {compact_signal}"
+
+
+def _compact_split_label(split: str) -> str:
+    mapping = {
+        "fixed_temporal_test": "temporal test",
+        "temporal_fixed_test": "temporal test",
+        "temporal_graph_test": "graph time test",
+        "official_partition_test": "official test",
+        "published_reference": "published ref.",
+        "not recorded": "not recorded",
+    }
+    return mapping.get(split, _humanize_gate_token(split).replace(" partition", "").replace(" reference", " ref."))
+
+
+def _compact_cell_split(cell_id: str, split: str) -> str:
+    if cell_id.startswith("paysim_") and split == "test":
+        return "temporal test"
+    if cell_id.startswith("elliptic_p7_") and split == "test":
+        return "graph-time test"
+    if cell_id.endswith("published_reference_pr_auc"):
+        return "reported ref."
+    return _compact_split_label(split)
 
 
 def _markdown_table(title: str, headers: list[str], rows: list[list[Any]]) -> str:
@@ -1766,7 +1832,7 @@ def _render_arxiv_checklist(
             "- [ ] Include `docs/paper/references.bib` and verify every in-text citation has a matching BibTeX key.",
             "- [ ] Verify the converted PDF figures in `docs/paper/arxiv_src/figures/` are accepted by the selected arXiv processor.",
             "- [ ] Keep the table values synchronized with `docs/paper/tables/table_manifest.json` and `docs/reports/paper_metric_cell_audit.json`.",
-            "- [ ] Fill in author name, affiliation, contact, and optional acknowledgements before upload.",
+            "- [ ] Verify the pseudonymous author block, affiliation, contact, and optional acknowledgements before upload.",
             "- [ ] Confirm the AI-assistance disclosure is accurate before upload.",
             "",
             "## Public Claim Discipline",
@@ -1777,7 +1843,7 @@ def _render_arxiv_checklist(
             "",
             "## Suggested arXiv Metadata",
             "",
-            "- Title: `Relaytic-AML: Claim-Gated Evaluation Environments for Temporal Graph Financial-Crime Machine Learning`",
+            "- Title: `Relaytic-AML: A Local-First Agentic Evaluation Lab for Financial-Crime Machine Learning`",
             "- Primary category: `cs.LG`",
             "- Secondary categories: `q-fin.GN`, `cs.SI`, `cs.CY`",
             "- Keywords: anti-money laundering, financial crime, graph machine learning, reproducibility, evaluation environments, claim gating",
@@ -2024,109 +2090,115 @@ def _source_verification_records() -> list[dict[str, str]]:
             "citation_key": "lopezrojas2016paysim",
             "source_url": "https://www.msc-les.org/proceedings/emss/2016/EMSS2016_249.pdf",
             "verified_role": "PaySim synthetic mobile-money simulator source and caveat.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "fatf2020virtualassets",
             "source_url": "https://www.fatf-gafi.org/en/publications/Methodsandtrends/Virtual-assets-red-flag-indicators.html",
             "verified_role": "Official virtual-asset red-flag categories for transaction pattern, anonymity, geography, sender/recipient, and source-of-funds context.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "fincenAdvisories",
             "source_url": "https://www.fincen.gov/resources/advisoriesbulletinsfact-sheets",
             "verified_role": "Official FinCEN description of advisories, typologies, red flags, and AML monitoring use.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "ffiecRedFlags",
             "source_url": "https://bsaaml.ffiec.gov/manual/Appendices/07",
             "verified_role": "Official BSA/AML examination red-flag examples for funds transfers, inconsistent activity, cross-border flows, and unusual transactions.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "weber2019elliptic",
             "source_url": "https://arxiv.org/abs/1908.02591",
             "verified_role": "Elliptic transaction graph size, features, and AML benchmark context.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "bellei2024elliptic2",
             "source_url": "https://arxiv.org/abs/2404.19109",
             "verified_role": "Elliptic2 subgraph benchmark scale and task framing.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "song2024revtrack",
             "source_url": "https://arxiv.org/abs/2410.08394",
             "verified_role": "RevTrack/RevClassify modern reference and subgraph-method context.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "chen2026transxion",
             "source_url": "https://arxiv.org/abs/2604.17420",
             "verified_role": "Recent AML benchmark-realism context.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "poon2026linemvgnn",
             "source_url": "https://arxiv.org/abs/2603.23584",
             "verified_role": "Recent directed transaction-graph detector context.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "tariq2026extraqt",
             "source_url": "https://arxiv.org/abs/2604.02899",
             "verified_role": "Recent quasi-temporal transaction-graph detector context.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "ye2026blazingaml",
             "source_url": "https://arxiv.org/abs/2604.12241",
             "verified_role": "Recent high-throughput AML graph-mining systems context.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "deprez2025continualaml",
             "source_url": "https://arxiv.org/abs/2503.24259",
             "verified_role": "Recent continual-learning and drift context for AML graph systems.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "gebru2021datasheets",
             "source_url": "https://arxiv.org/abs/1803.09010",
             "verified_role": "Dataset documentation and transparency context; arXiv source retained because the CACM article page blocks automated access.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
+        },
+        {
+            "citation_key": "mitchell2019modelcards",
+            "source_url": "https://arxiv.org/abs/1810.03993",
+            "verified_role": "Model reporting context for distinguishing model documentation from Relaytic-AML's evidence-cell and claim-gating workflow.",
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "pineau2021reproducibility",
             "source_url": "https://www.jmlr.org/papers/v22/20-303.html",
             "verified_role": "ML reproducibility checklist and code/data discipline context.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "chen2025mlrbench",
             "source_url": "https://arxiv.org/abs/2505.19955",
             "verified_role": "Agent-generated ML research reliability and invalidated-experiment risk context.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "starace2025paperbench",
             "source_url": "https://arxiv.org/abs/2504.01848",
             "verified_role": "AI-agent paper replication benchmark context and gap between fluent research artifacts and validated experimental reproduction.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "wijk2025rebench",
             "source_url": "https://proceedings.mlr.press/v267/wijk25a.html",
             "verified_role": "Recent research-engineering benchmark context comparing language-model agents with human experts.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {
             "citation_key": "yang2026skillopt",
             "source_url": "https://arxiv.org/abs/2605.23904",
             "verified_role": "Recent agentic-ML context for treating external agent state and validation-gated updates as first-class research objects.",
-            "accessed_date": PAPER_RELEASE_DATE,
+            "accessed_date": SOURCE_VERIFICATION_DATE,
         },
     ]
 
@@ -2348,7 +2420,7 @@ def _format_metric(value: Any) -> str:
     if isinstance(value, float):
         if abs(value) >= 100:
             return f"{value:.0f}"
-        return f"{value:.4f}".rstrip("0").rstrip(".")
+        return f"{value:.4f}"
     return str(value)
 
 

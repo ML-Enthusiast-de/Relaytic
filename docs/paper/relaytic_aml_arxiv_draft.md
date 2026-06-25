@@ -2,7 +2,7 @@
 
 ## Abstract
 
-Anti-money laundering (AML) machine-learning results are difficult to trust when privacy constraints, temporal validity, graph provenance, leakage controls, review capacity, and public claims are handled separately. Relaytic-AML is a local-first evaluation lab in which role-scoped agents create auditable evidence cells and conservative claim gates decide what those cells are allowed to support. The current evidence pack reports PaySim synthetic temporal-fraud PR-AUC 0.6388, Elliptic temporal graph-feature PR-AUC 0.6688, and Elliptic2 context PR-AUC 0.9432 +/- 0.0009, with the Elliptic2 row kept below the recorded RevClassifyDS reference of 0.974. The contribution is a reproducible AI evaluation-lab and governance architecture for financial-crime experimentation, not a claim of detector superiority.
+Anti-money laundering (AML) machine-learning results are difficult to trust when privacy constraints, temporal validity, graph provenance, leakage controls, review capacity, and public claims are handled separately. Relaytic-AML is a local-first evaluation lab in which role-scoped agents create auditable evidence cells and conservative claim gates decide what those cells are allowed to support. The current evidence pack reports PaySim synthetic temporal-fraud PR-AUC 0.6388, Elliptic temporal graph-feature PR-AUC 0.6688, and Elliptic2 context PR-AUC 0.9432 +/- 0.0009, with the Elliptic2 row kept below the recorded RevClassifyDS reference of 0.9740. The contribution is a reproducible AI evaluation-lab and governance architecture for financial-crime experimentation, not a claim of detector superiority.
 
 ## 1. Introduction
 
@@ -21,7 +21,7 @@ The work is organized around four research questions:
 - **RQ3:** Can the local artifact record support rowless handoff to external agents while preserving provenance?
 - **RQ4:** Do the benchmark rows demonstrate useful, bounded detector evidence under explicit split and budget contracts?
 
-This paper makes four contributions. First, it presents a local-first artifact graph and role-scoped agent runtime for AML evaluation. Second, it defines an evidence-cell schema tying each metric to dataset, split, command, artifact, budget, leakage posture, operating point, and claim state. Third, it contributes a release and claim-gating harness that turns local artifacts into tables, figures, source packages, and manuscript claims while blocking unsupported interpretations. Fourth, it gives public demonstrations on PaySim, Elliptic, and Elliptic2 context rows under strict claim boundaries.
+This paper makes four contributions. First, it presents a workspace-backed, role-scoped agent runtime for AML evaluation. Second, it defines an evidence-cell schema tying each metric to dataset, split, command, artifact, budget, leakage posture, operating point, and claim state. Third, it contributes a release and claim-gating harness that turns local artifacts into tables, figures, source packages, and manuscript claims while blocking unsupported interpretations. Fourth, it gives public demonstrations on PaySim, Elliptic, and Elliptic2 context rows under strict claim boundaries.
 
 ## 2. Related Work
 
@@ -53,14 +53,30 @@ Table 1 uses compact publication aliases for readability; the full machine metri
 
 **Table 1. Representative evidence cells.**
 
-| Evidence cell | Dataset | Metric | Value | Split | Evidence | Budget | Claim state |
-|---|---|---|---|---|---|---|---|
-| PS-PR | PaySim | test PR-AUC | 0.6388 | test | PaySim run; manifest | competitive | supporting only |
-| PS-P@B | PaySim | precision at review budget | 0.7033 | test | PaySim run; manifest | competitive | supporting only |
-| EL-PR | Elliptic | test PR-AUC | 0.6688 | test | graph run; feature table | competitive | supporting only |
-| EL-P@B | Elliptic | precision at review budget | 1 | test | graph run; feature table | competitive | supporting only |
-| E2-PRm | Elliptic2 | official test PR-AUC mean | 0.9432 | official test | E2 run; scorecard | competitive context | context only; no contribution |
-| E2-ref | Elliptic2 | published reference PR-AUC | 0.974 | reported reference | E2 run; scorecard | competitive context | context only; no contribution |
+| ID | Dataset | Metric | Value | Split | Artifact | Claim |
+|---|---|---|---|---|---|---|
+| PS-PR | PaySim | test PR-AUC | 0.6388 | temporal test | PaySim run; manifest | supporting only |
+| PS-P@B | PaySim | precision at review budget | 0.7033 | temporal test | PaySim run; manifest | supporting only |
+| EL-PR | Elliptic | test PR-AUC | 0.6688 | graph-time test | graph run; feature table | supporting only |
+| EL-P@B | Elliptic | precision at review budget | 1.0000 | graph-time test | graph run; feature table | supporting only |
+| E2-PRm | Elliptic2 | official test PR-AUC mean | 0.9432 | official test | E2 run; scorecard | context only; no contribution |
+| E2-ref | Elliptic2 | published reference PR-AUC | 0.9740 | reported ref. | E2 run; scorecard | context only; no contribution |
+
+A representative metric cell is compact enough to audit directly. The public table uses the alias `PS-PR`, while the underlying artifact keeps the longer machine identifier.
+
+```json
+{
+  "cell_id": "PS-PR",
+  "dataset_id": "paysim_temporal_transaction_fraud",
+  "split": "temporal test",
+  "artifact_ref": "paper_metric_cell_audit.json",
+  "command": "release-safety paysim-competitive",
+  "metric": "test_pr_auc",
+  "value": 0.6388,
+  "leakage_posture": "balance/raw IDs excluded; history shifted",
+  "claim_state": "supporting synthetic temporal-proxy only"
+}
+```
 
 ```algorithm
 Algorithm: Evidence-cell creation
@@ -79,7 +95,7 @@ The claim gate is the second half of the design. It is deliberately conservative
 
 ```algorithm
 Algorithm: Claim-gate validation
-Input: proposed public claim q, evidence cells C, publishability gates G, limitation matrix L
+Input: public claim q, evidence cells C, gates G, limitations L
 Output: allowed wording or blocked-claim record
 1. Resolve every evidence cell named by q and require dataset, split, command, artifact, budget, and leakage fields.
 2. Compare the strength of q with source posture, split validity, metric scope, and benchmark role.
@@ -117,13 +133,13 @@ Tables 2a and 2b record the context a reader needs before interpreting any metri
 
 **Table 3. Model families and search budgets.**
 
-| Track | Model family scope | Feature family scope | Budget | Selection rule | Seeds |
-|---|---|---|---|---|---|
-| PaySim | tree ensembles and gradient boosting; fixed-rule baseline retained | amount, type, time, train-only thresholds, shifted destination history | 14 probes; 5 full finalists | validation PR-AUC only; Platt calibration | 42 |
-| Elliptic | tree ensembles and gradient boosting over frozen feature views | source anonymized node features, same-snapshot graph features, combined view | 16 validation trials; LightGBM selected | validation PR-AUC within declared feature views; validation-only calibration and threshold | 42 |
-| Elliptic2 | pooled-moment LightGBM context candidate | 348 pooled subgraph moment/count features | 3 repeated seeds; context row only | official partition plus content-hash robustness; reference parity gate remains blocked | 11, 42, 73 |
+| Track | Families | Features | Search budget | Gate |
+|---|---|---|---|---|
+| PaySim | tree and boosting candidates; Extra Trees selected | amount, type, time, shifted destination history | 14 probes; 5 finalists; seeds 42 | validation PR-AUC; one fixed test |
+| Elliptic | tree/boosting baselines; LightGBM selected | source node features plus same-step graph statistics | 16 trials; seeds 42 | supporting graph-feature row |
+| Elliptic2 | LightGBM context row | 348 pooled subgraph moments/counts | 3 repeated seeds: 11, 42, 73 | context only; parity not established |
 
-Table 3 records the modeling effort without presenting the paper as a hyperparameter leaderboard. PaySim uses a two-stage competitive budget: probes over a seeded train-only sample, five full-training finalists, validation-only calibration, and one fixed test evaluation for the selected finalist. Elliptic uses a graph-feature budget over source-provided anonymized features, same-snapshot structural features, and their combination. Elliptic2 uses repeated pooled-moment LightGBM context rows with seeds 11, 42, and 73, but this row is not a Relaytic performance contribution because reference-protocol parity is unresolved.
+Table 3 records the modeling effort without presenting the paper as a hyperparameter leaderboard. PaySim uses a two-stage competitive budget: probes over a seeded train-only sample, five full-training finalists, validation-only calibration, and one fixed test evaluation for the selected finalist. Elliptic uses a graph-feature budget over source-provided anonymized features, same-snapshot structural features, and their combination. Elliptic2 uses repeated pooled-moment LightGBM context rows with seeds 11, 42, and 73, but this row is not a Relaytic performance contribution because reference-protocol parity is not established.
 
 The feature policy is strictest for PaySim because simulator balance columns can leak post-event state. Relaytic excludes those balance fields, raw origin and destination identifiers as model features, and simulator flags. It allows row-local amount, type, and time features, train-only thresholds, and destination history shifted before each step. The isolated contribution of destination-history features has not been measured as a separate test row, so it is not reported as a main result.
 
@@ -142,9 +158,9 @@ PaySim is the clearest modeling result in the current evidence pack. The earlies
 
 The review-budget metrics sharpen the interpretation. At the selected PaySim review budget, precision is 0.7033 and recall is 0.4716. The top of the queue is much richer than prevalence, but a large share of fraud remains outside the reviewed set. That is a useful operating result for an evaluation lab because it connects ranking quality to analyst capacity instead of treating PR-AUC as the whole story.
 
-Elliptic is a different kind of evidence. The validation-selected source-plus-structural LightGBM row reports test PR-AUC 0.6688, with review-budget precision 1 and recall 0.0566. The result supports temporal graph-feature provenance and operating-point reporting. It also reveals a limitation: the current graph-structure-only floor is weak, and the final row is heavily influenced by source-provided anonymized features. Relaytic can therefore claim graph-aware evidence handling, not a new graph-native detector.
+Elliptic is a different kind of evidence. The validation-selected source-plus-structural LightGBM row reports test PR-AUC 0.6688, with review-budget precision 1.0000 and recall 0.0566. The result supports temporal graph-feature provenance and operating-point reporting. It also reveals a limitation: the current graph-structure-only floor is weak, and the final row is heavily influenced by source-provided anonymized features. Relaytic can therefore claim graph-aware evidence handling, not a new graph-native detector.
 
-Elliptic2 is intentionally framed as context. The repeated official-partition context row reports PR-AUC 0.9432 +/- 0.0009, and the content-hash robustness partition reports mean PR-AUC 0.9297. Those are strong absolute values, but the recorded RevClassifyDS reference is 0.974, and the local parity gate records unresolved cohort and reference-execution issues. The scientific result is that Relaytic keeps the context row available while blocking a parity or superiority interpretation.
+Elliptic2 is intentionally framed as context. The repeated official-partition context row reports PR-AUC 0.9432 +/- 0.0009, and the content-hash robustness partition reports mean PR-AUC 0.9297. Those are strong absolute values, but the recorded RevClassifyDS reference is 0.9740, and the local parity gate records cohort and reference-execution gaps. The scientific result is that Relaytic keeps the context row available while blocking a parity or superiority interpretation.
 
 ![Benchmark and review-budget evidence: PR-AUC is shown beside precision and recall at the bounded review queue instead of being interpreted alone.](figures/figure_3_review_budget.svg)
 
@@ -166,14 +182,14 @@ The system claim is evaluated through deterministic reader and agent tasks. Thes
 | Interrupted recovery | no-lost-user recovery | guide recovery report | stage, shortlist, next action exposed | pass; partial recovery |
 | Claim fail-closed | claim-gate cases | blocked-claim case studies | unsupported wording blocked | pass; case gates pass |
 
-Table 5 reports the audit matrix behind the system claim. The important result is not that a script returned a generic pass flag. It is that each checked behavior has an observed signal: 13 of 13 provenance fields are present for the PaySim metric cell, baseline and competitive budgets are comparable under the same contract, Elliptic2 is firewalled as context, rowless handoff exposes no raw rows, and interrupted-run recovery surfaces state, missing evidence, and next actions.
+Table 5 reports the audit matrix behind the system claim. Each row names a behavior, a deterministic check, a pass criterion, and an observed signal: 13 of 13 provenance fields are present for the PaySim metric cell, baseline and competitive budgets are comparable under the same contract, Elliptic2 is firewalled as context, rowless handoff exposes no raw rows, and interrupted-run recovery surfaces state, missing evidence, and next actions.
 
 **Table 6. Blocked claim examples.**
 
 | Proposed invalid claim | Gate reason | Missing evidence |
 |---|---|---|
 | Relaytic-AML is superior for real-bank AML detection. | PaySim is synthetic and the current evidence is a temporal proxy result. | Partner or bank-approved holdout, incumbent comparison, analyst-review protocol, and legal release gate. |
-| Relaytic-AML reaches RevClassifyDS parity on Elliptic2. | The context row is below the recorded reference and reference-protocol parity remains unresolved. | Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report. |
+| Relaytic-AML reaches RevClassifyDS parity on Elliptic2. | The context row is below the recorded reference and reference-protocol parity is not established. | Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report. |
 | Relaytic-AML is a graph-neural detector advance. | Elliptic evidence uses graph-feature provenance and tree/boosting baselines, not a new graph-neural family. | Graph-native release budget, neural baselines, repeated seeds, and graph-specific ablations. |
 
 Table 6 shows how the gate behaves on concrete over-strong claims. The blocked claims are not hidden. They are converted into missing-evidence records, which makes future work actionable while keeping the current paper below its evidence boundary.
@@ -241,7 +257,9 @@ python3 -m pytest \
 
 Raw benchmark data is not committed. PaySim and Elliptic require local downloads and are referenced through registry artifacts, split reports, hashes, and command ledgers. Elliptic2 remains context-only in this paper because the stronger reference-parity conditions are not satisfied locally. Clean clones can reproduce the paper-generation checks and repo-local public fixtures; full benchmark regeneration requires the locally licensed datasets named in the README.
 
-LLM tools assisted with drafting, editing, repository inspection, and consistency checks. They are not authors. The evidence cells, code, figures, tables, limitations, and final claims remain the author's responsibility.
+## Use of AI Assistance
+
+Large language model tools assisted with drafting, editing, repository inspection, consistency checks, and implementation work around the paper artifacts. They are not authors. The evidence cells, benchmark outputs, source code, figures, tables, limitations, and final interpretation remain the author's responsibility.
 
 ## Conclusion
 
