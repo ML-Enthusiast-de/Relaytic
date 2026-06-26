@@ -55,7 +55,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Anti-money laundering (AML)" in draft
     assert "PaySim synthetic temporal-fraud PR-AUC 0.6388" in draft
     assert "@yang2026skillopt" in draft
-    assert "not presented as a new best detector family" in draft
+    assert "detector claims kept within the evidence boundary" in draft
     assert "RQ1" in draft and "RQ4" in draft
     assert "Table 1. Representative evidence cells" in draft
     assert "Table 2a. Dataset scale and split contracts" in draft
@@ -63,7 +63,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Table 3. Model families and search budgets" in draft
     assert "Table 4. PaySim modeling path" in draft
     assert "Table 5. System audit matrix" in draft
-    assert "Table 6. Blocked claim examples" in draft
+    assert "Table 6. Evidence routing examples" in draft
     assert "Table 7. Rowless handoff and interrupted-run recovery examples" in draft
     assert ("TODO" + "_EVIDENCE") not in draft
     assert "pending isolated" + " test" not in draft

@@ -279,6 +279,12 @@ Stable slice numbering stays the same, but the preferred execution order after S
 74. Paper Track P13 - claim-safe paper release and attention pack
 74A. Paper Track P14 - final arXiv source bundle and clean release candidate
 74B. Paper Track P15 - measured system-evaluation proof pack
+74C. Paper Track P16 - failure-case evaluation pack
+74D. Paper Track P17 - governance machinery ablation pack
+74E. Paper Track P18 - governance invariants and adjacent-systems positioning
+74F. Paper Track P19 - hosted detector workflow demonstration, if selected
+74G. Paper Track P20 - PaySim selection-story cleanup and paper visual/narrative polish
+74H. Paper Track P21 - final source/PDF preflight and release changelog
 75. Slice 16
 76. Slice 16A
 77. Slice 16B
@@ -349,6 +355,7 @@ Why:
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
 - Paper Track P0 through P15 now come before Academy work because the current freeze pack deliberately blocked hard AML and SOTA claims; Relaytic first cleaned public surfaces, ran relevant benchmark tracks, challenged weak first-pass rows with competitive leakage-safe budgets, generated real numeric evidence, drafted a claim-safe paper, proved a clean paper-smoke path, produced a claim-safe P13 paper release pack, produced a P14 arXiv-compatible source bundle, and then added P15 measured user/agent handoff evidence before expanding into capability evolution
+- Paper Track P16 through P21 are now registered as a triggerable paper-strengthening follow-on in `docs/build_slices/phase_paper_strengthening.md`: P16 adds concrete failure-case evaluation, P17 governance ablations, P18 formal invariants and adjacent-systems positioning, P19 an optional hosted-detector workflow demonstration, P20 PaySim/story/visual polish, and P21 final source/PDF preflight. These stages must run one at a time and preserve the evaluation-lab claim boundary.
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
 - Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, and adds Relaytic aliases for legacy API/tool names
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
@@ -357,6 +364,7 @@ Why:
 - Paper Track P5 is now implemented and inspects the raw Elliptic graph bundle, freezes graph provenance and temporal split artifacts, records unknown-label scope, allows only supporting loader/provenance wording, and keeps graph benchmark/SOTA claims blocked before numeric graph baselines run
 - Paper Track P6 is now implemented and runs the full PaySim tabular baseline suite under a train-only leakage-safe feature contract with explicit adapter versions, budget tiers, fallback states, and a publishability gate that blocks headline promotion until P6-A
 - Paper Track P6-A is now implemented and runs a competitive PaySim rerun with audited prior-step destination-history features, 14 recorded probe trials, five full-training finalists, validation-only calibration/threshold selection, and a supporting-only publishability pass for validation-selected Extra Trees (`test_pr_auc=0.638773`) while retaining hard-claim blockers before P7
+- Paper Track P16 should start when the user triggers Stage 1; until then it is a registered plan only and must not change paper artifacts, benchmark results, arXiv source, or PDF behavior.
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -370,7 +378,7 @@ Why:
 ## Current execution state
 
 - implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P15. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, Paper Track P11 claim-linted paper draft generation, Paper Track P12 external dry-run proof, Paper Track P13 claim-safe paper release pack, Paper Track P14 final arXiv source bundle, and Paper Track P15 measured system-evaluation proof pack.
-- next execution target: Slice 16A
+- next execution target: Paper Track P16 if the paper-strengthening path is triggered; otherwise Slice 16A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -379,7 +387,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned paper follow-on: none before Slice 16A; P15 leaves only human author metadata, final PDF review, and clean tag-target confirmation before upload
+- next planned paper follow-on: Paper Track P16 is registered as the next triggerable paper-strengthening slice; P15 still leaves only human author metadata, final PDF review, and clean tag-target confirmation before upload if no strengthening slice is pursued
 - next planned academy follow-on: Slice 16A, after P15 closed the upload-source, release-candidate, and measured system-evaluation gaps
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
@@ -4323,7 +4331,145 @@ Implemented status:
 - implemented by `src/relaytic/release_safety/paper_system_eval.py`
 - generated reports: `paper_system_behavior_eval.json`, `paper_system_task_eval.json`, `paper_agent_handoff_eval.json`, `paper_no_lost_user_eval.json`, `paper_claim_gate_case_studies.json`, `paper_system_eval_manifest.json`, and `paper_system_eval_summary.md`
 - the current pack passes the required deterministic protocol and reader/agent task checks, covering navigation, metric provenance, partial-run recovery, rowless handoff, local-LLM advisory boundaries, and claim gates while remaining explicitly bounded to protocol evidence, not human-study or production-deployment evidence
-- Slice 16A remains the next execution target
+- P16 is registered as the next paper-strengthening slice if the user triggers Stage 1; otherwise Slice 16A remains the academy target
+
+## Paper Track P16 - Failure-case evaluation pack
+
+Goal:
+- add concrete deterministic evidence that Relaytic-AML catches realistic paper/release failure modes before they become public claims
+
+Load-bearing improvement:
+- the paper can discuss measured failure prevention instead of only describing governance architecture
+
+Human surface:
+- a concise paper subsection and table explaining injected risks, expected behavior, observed result, and artifact references
+
+Agent surface:
+- machine-readable failure-case reports under `docs/reports/` that another agent can inspect without reading the manuscript
+
+Intelligence source:
+- deterministic fixtures and existing release-safety gates; no new model intelligence is introduced
+
+Proof obligation:
+- tests must cover leakage-column injection, test-set selection violation, over-strong claim attempts, rowless handoff redaction, and interrupted-run recovery
+
+Fallback rule:
+- if a failure case cannot be implemented against real benchmark artifacts without heavy reruns, use labeled deterministic fixtures and mark them as system-level safety/audit evidence rather than detector benchmark evidence
+
+## Paper Track P17 - Governance machinery ablation pack
+
+Goal:
+- show why the Relaytic-AML governance machinery matters by comparing the full path against disabled-gate fixtures
+
+Load-bearing improvement:
+- the paper can report system-level ablations for claim gates, leakage policy, rowless handoff redaction, and evidence-cell required fields
+
+Human surface:
+- a compact ablation table with direct interpretation near the table
+
+Agent surface:
+- a machine-readable governance ablation matrix with unsupported-claim, leakage, redaction, provenance, table-generation, and recovery-next-action metrics
+
+Intelligence source:
+- deterministic ablation fixtures over existing gate contracts
+
+Proof obligation:
+- tests must fail if the full path releases unsupported claims, allows leakage features, exports raw fields, misses provenance, fails to generate publishable tables, or loses recovery next actions
+
+Fallback rule:
+- if a disabled component cannot be represented by configuration, emulate the disabled behavior in a fixture and label the result as a governance ablation, not a live runtime mode
+
+## Paper Track P18 - Governance invariants and adjacent-systems positioning
+
+Goal:
+- make the paper more formal by defining release/governance invariants and positioning Relaytic-AML against adjacent systems
+
+Load-bearing improvement:
+- the paper ties the architecture to explicit invariants that P16/P17 test
+
+Human surface:
+- a short invariants subsection and a compact comparison table against model cards, datasheets, reproducibility checklists, MLflow/W&B/DVC-style tracking, agent benchmarks, and AML detector papers
+
+Agent surface:
+- the invariants should be discoverable from the generated manuscript and any supporting report without relying on prose-only memory
+
+Intelligence source:
+- deterministic synthesis from existing artifact contracts and cited related-work boundaries
+
+Proof obligation:
+- every invariant named in the paper must map to at least one evidence cell, audit check, failure case, ablation, or limitation
+
+Fallback rule:
+- if an invariant is aspirational rather than checked, move it to future work instead of presenting it as current behavior
+
+## Paper Track P19 - Hosted detector workflow demonstration
+
+Goal:
+- demonstrate that Relaytic-AML can host and govern stronger detector workflows without claiming detector novelty or superiority
+
+Load-bearing improvement:
+- the substrate story becomes more credible to ML readers because imported or graph-style detector outputs can be routed through evidence cells, operating points, and claim gates
+
+Human surface:
+- a small demonstration table or paragraph that says what was hosted, what evidence was generated, and what claims remain blocked
+
+Agent surface:
+- an adapter or fixture contract that accepts detector scores or graph-style outputs and emits evidence-cell/gate artifacts
+
+Intelligence source:
+- preferred default is a deterministic external-score adapter fixture; a lightweight graph-native fixture or RevClassifyDS-style scorecard adapter requires explicit user selection
+
+Proof obligation:
+- tests must prove that the hosted workflow produces evidence cells and operating-point metrics while blocking RevClassifyDS parity, graph-neural novelty, and SOTA claims unless stronger evidence exists
+
+Fallback rule:
+- if no safe hosted-detector path is selected, skip P19 and keep the paper focused on P16-P18 system-evaluation evidence
+
+## Paper Track P20 - PaySim selection-story cleanup and paper visual/narrative polish
+
+Goal:
+- remove confusing model-selection wording and polish figures/tables after the new evidence exists
+
+Load-bearing improvement:
+- the paper reads as a coherent systems/evaluation paper rather than a generated benchmark report
+
+Human surface:
+- clearer Table 4 interpretation, tighter evaluation narrative, and polished Figures 1-4 plus compact tables
+
+Agent surface:
+- generated paper artifacts remain traceable to evidence sources and do not require manual number copying
+
+Intelligence source:
+- deterministic artifact inspection plus manuscript generation; no new benchmark claims
+
+Proof obligation:
+- tests or scans must ensure no invented rationale is added for PaySim model selection, every result has nearby interpretation, and the detector-superiority boundary remains intact
+
+Fallback rule:
+- if evidence does not explain the XGBoost-probe versus Extra Trees-finalist story, rewrite the table to avoid implying inconsistency rather than guessing a reason
+
+## Paper Track P21 - Final source/PDF preflight and release changelog
+
+Goal:
+- produce the final strengthened arXiv source/PDF package and a short changelog
+
+Load-bearing improvement:
+- the strengthened paper can be reviewed from one clean PDF/source bundle with audit checks documented
+
+Human surface:
+- updated PDF, updated arXiv source, and a changelog listing new tests, new artifacts, table/figure changes, and claims intentionally not made
+
+Agent surface:
+- machine-readable source/package manifests stay clean and can be checked by another agent
+
+Intelligence source:
+- deterministic release-safety, LaTeX, citation, leak, and visual preflight checks
+
+Proof obligation:
+- run paper-track tests, source/package audits, TODO/FIXME/placeholder scans, LaTeX warning scans, font embedding checks, PDF metadata checks, leak scan, and rendered-page inspection
+
+Fallback rule:
+- if any preflight fails, do not mark the package upload-ready; record the blocker and schedule a repair slice
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

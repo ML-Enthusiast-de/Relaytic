@@ -19,7 +19,7 @@ Current strategic doctrine:
 
 - Relaytic remains the public product and package
 - Relaytic-AML is the flagship frontier direction for all pre-academy work from now on
-- the Paper Track P0 through P15 is now completed as the mandatory pre-Academy paper path; capability-academy slices may start from Slice 16A, while hard AML/headline performance claims remain blocked until future benchmark-extension gates earn them
+- the Paper Track P0 through P15 is now completed as the mandatory pre-Academy paper path; a triggerable Paper Track P16 through P21 strengthening path is registered in `docs/build_slices/phase_paper_strengthening.md`, and capability-academy slices may start from Slice 16A if the paper-strengthening path is not being pursued
 - paper benchmark work must separate smoke, baseline, competitive, and release budgets; weak first-pass numbers can be retained as honest baselines but must not become headline paper claims without leakage-safe competitive reruns, HPO/search-budget accounting, and publishability gates
 - the paper-track execution brief lives at `docs/build_slices/phase_paper_track.md` and the normative slice contract lives in `RELAYTIC_SLICING_PLAN.md`
 
@@ -161,6 +161,12 @@ Paper P12. external dry run and clean-clone proof
 Paper P13. arXiv release and attention pack
 Paper P14. final arXiv source bundle and clean release candidate
 Paper P15. measured system-evaluation proof pack
+Paper P16. failure-case evaluation pack
+Paper P17. governance machinery ablation pack
+Paper P18. governance invariants and adjacent-systems positioning
+Paper P19. hosted detector workflow demonstration, if selected
+Paper P20. PaySim selection-story cleanup and paper visual/narrative polish
+Paper P21. final source/PDF preflight and release changelog
 16. Relaytic Academy umbrella track, governed capability evolution, and shadow-tested growth
 16A. capability registry and capability cards
 16B. offline replay packs and shadow mode
@@ -258,6 +264,12 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 74. Paper Track P13
 75. Paper Track P14
 75A. Paper Track P15
+75B. Paper Track P16
+75C. Paper Track P17
+75D. Paper Track P18
+75E. Paper Track P19
+75F. Paper Track P20
+75G. Paper Track P21
 76. Slice 16
 77. Slice 16A
 78. Slice 16B
@@ -350,6 +362,7 @@ Reason:
 - Paper Track P13 is now implemented and produces the claim-safe arXiv release pack: final generated draft, citable references, paper tables, submission checklist, public attention pack, release manifest, and allowed-public-claims report. The release status is claim-safe evaluation-environment only; hard/headline performance claims stay blocked.
 - Paper Track P14 is now implemented and produces the final arXiv source release candidate: deterministic LaTeX source, bibliography copy, converted PDF figures, citation and package audits, and a release-candidate checklist. Upload stays blocked until real author metadata, local TeX/PDF inspection, and clean tag-target proof exist.
 - Paper Track P15 is now implemented and produces a measured system-evaluation proof pack: guide onboarding, partial-run recovery, rowless external-agent handoff, optional local-LLM advisory boundaries, MCP-style tool discovery, and paper claim gates are checked deterministically before P13/P14 release regeneration. The evidence is protocol-level only; it does not claim a human study, production deployment, or hard operational impact.
+- Paper Track P16 through P21 is now registered as a triggerable strengthening path, not yet implemented: P16 should add concrete failure-case evaluation, P17 governance ablations, P18 formal invariants and adjacent-systems positioning, P19 an optional hosted-detector workflow demonstration, P20 PaySim/story/visual polish, and P21 final PDF/source preflight. The track is evidence-first and preserves all hard/headline detector-claim blockers.
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so later post-AML capability-evolution work has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -363,7 +376,7 @@ Reason:
 Current repo state:
 
 - implemented through Slice 15Z-R plus Paper Track P0 through P15, with Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U AML baseline and ablation relevance proof, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 tabular baseline suite, Paper Track P6-A competitive PaySim gate, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard-track decisions, Paper Track P8-A Elliptic2 modern recovery, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible table generation, Paper Track P11 paper draft generation, Paper Track P12 external dry-run proof, Paper Track P13 claim-safe arXiv release pack, Paper Track P14 arXiv source release candidate, and Paper Track P15 measured system-evaluation proof pack now landed
-- next execution target: Slice 16A
+- next execution target: Paper Track P16 if the paper-strengthening path is triggered; otherwise Slice 16A
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
 - latest handoff-and-learnings slice: Slice 12D

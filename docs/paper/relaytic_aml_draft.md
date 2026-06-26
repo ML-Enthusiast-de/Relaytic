@@ -40,13 +40,13 @@ The method has four claim-control rules:
 3. Numeric paper cells must cite machine-readable provenance rather than handwritten notes.
 4. Blocked tracks stay visible as limitations instead of being replaced by easier evidence.
 
-![Relaytic-AML local-first architecture: local data and artifacts flow through role-scoped agents into evidence cells, claim gates, and paper/release/handoff surfaces.](figures/figure_1_claim_gate_flow.svg)
+![Relaytic-AML local-first architecture: local data and artifacts flow through role-scoped agents into evidence cells, interpretation gates, and paper/release/handoff surfaces.](figures/figure_1_claim_gate_flow.svg)
 
-![Evidence-cell schema: every reported number carries dataset, split, command, artifact, budget, leakage posture, operating point, metric, and claim state.](figures/figure_2_supporting_pr_auc.svg)
+![Evidence-cell schema: every reported number carries dataset, split, command, artifact, budget, leakage posture, operating point, metric, and value; interpretation is stored separately.](figures/figure_2_supporting_pr_auc.svg)
 
 ![Benchmark and review-budget evidence: PR-AUC is shown beside precision and recall at the bounded review queue instead of being interpreted alone.](figures/figure_3_review_budget.svg)
 
-![Claim-gate examples: allowed claims, blocked promotions, and evidence needed before stronger public interpretations.](figures/figure_4_publishability_matrix.svg)
+![Evidence routing examples: current cells map to admissible paper uses and to evidence needed for stronger future interpretations.](figures/figure_4_publishability_matrix.svg)
 
 ## Benchmarks
 

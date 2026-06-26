@@ -212,7 +212,7 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
             "filename": PAPER_FIGURE_FILENAMES["claim_gate_flow"],
             "title": (
                 "Relaytic-AML local-first architecture: local data and artifacts flow through "
-                "role-scoped agents into evidence cells, claim gates, and paper/release/handoff surfaces."
+                "role-scoped agents into evidence cells, interpretation gates, and paper/release/handoff surfaces."
             ),
             "source_type": "schematic_explicit",
             "source_refs": [
@@ -227,7 +227,7 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
             "filename": PAPER_FIGURE_FILENAMES["supporting_pr_auc"],
             "title": (
                 "Evidence-cell schema: every reported number carries dataset, split, command, artifact, "
-                "budget, leakage posture, operating point, metric, and claim state."
+                "budget, leakage posture, operating point, metric, and value; interpretation is stored separately."
             ),
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_metric_cell_audit.json", "docs/reports/paper_result_table_final.json"],
@@ -248,8 +248,8 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
             "figure_id": "publishability_matrix",
             "filename": PAPER_FIGURE_FILENAMES["publishability_matrix"],
             "title": (
-                "Claim-gate examples: allowed claims, blocked promotions, and evidence needed before "
-                "stronger public interpretations."
+                "Evidence routing examples: current cells map to admissible paper uses and to evidence "
+                "needed for stronger future interpretations."
             ),
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_publishability_matrix.json"],
@@ -854,8 +854,8 @@ def _architecture_flow_svg_v2() -> str:
         ("Local inputs", "dataset_registry.json\nsplit_contracts.json\nsource hashes", "#f5f7fa"),
         ("Role loops", "guide -> scout\nstrategist -> scientist\nbuilder -> reviewers", "#eef6f3"),
         ("Run artifacts", "benchmark_manifest.json\nfeature_report.json\nsearch_trace.json", "#fff8e5"),
-        ("Evidence cells", "cell_id\nmetric + artifact field\nclaim_state", "#f3f0fb"),
-        ("Release gates", "public_claims_allowed\nsource package audit\nrowless handoff", "#fdeeee"),
+        ("Evidence cells", "cell_id\nmetric + value\nartifact field", "#f3f0fb"),
+        ("Release gates", "admissible use\nmissing evidence\nrelease wording", "#fdeeee"),
     ]
     parts = [
         _svg_header(width, height),
@@ -903,13 +903,13 @@ def _evidence_cell_schema_svg_v2() -> str:
         ("budget_tier", "baseline, competitive, context"),
         ("leakage_posture", "forbidden fields excluded"),
         ("operating_point", "review budget and threshold"),
-        ("claim_state", "supporting, context, blocked"),
+        ("metric_value", "PR-AUC 0.6388"),
     ]
     parts = [
         _svg_header(width, height),
         '<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
-        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Evidence-cell schema</text>',
-        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">A reported number is publishable only when the metric and its claim boundary are bound to provenance.</text>',
+        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Evidence-cell facts</text>',
+        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Evidence cells store metric facts; claim gates store admissible use and missing evidence.</text>',
     ]
     box_w = 340
     box_h = 96
@@ -927,7 +927,7 @@ def _evidence_cell_schema_svg_v2() -> str:
         parts.append(f'<text x="{x + 22}" y="{y + 34}" font-size="18" font-weight="700" fill="#1f2937">{_xml_escape(field)}</text>')
         parts.extend(_svg_text_lines(example, x + 22, y + 66, font_size=14, anchor="start", line_height=18, fill="#374151"))
     parts.append('<rect x="90" y="540" width="1040" height="32" rx="5" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>')
-    parts.append('<text x="610" y="561" text-anchor="middle" font-size="14" fill="#4b5563">Tables and figures read these cells instead of copying benchmark numbers by hand.</text>')
+    parts.append('<text x="610" y="561" text-anchor="middle" font-size="14" fill="#4b5563">Gate outputs are separate records: evidence_cell_ids, admissible_use, stronger_claim_status, missing_evidence.</text>')
     parts.append('</svg>')
     return "\n".join(parts)
 
@@ -935,9 +935,9 @@ def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
     ranking = [
         ("PaySim", "synthetic temporal proxy", _cell_value(cells, "paysim_p6a_competitive_selected.test_pr_auc"), "#2a9d8f"),
         ("Elliptic", "temporal graph features", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.test_pr_auc"), "#457b9d"),
-        ("Elliptic2", "context only", _cell_value(cells, "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean"), "#d6a83a"),
-        ("RevClassifyDS", "external reference", _cell_value(cells, "elliptic2_p8b_modern_context.published_reference_pr_auc"), "#8d99ae"),
+        ("Elliptic2", "local context row", _cell_value(cells, "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean"), "#d6a83a"),
     ]
+    revclassify_ref = _cell_value(cells, "elliptic2_p8b_modern_context.published_reference_pr_auc")
     operating = [
         ("PaySim precision", "top queue", _cell_value(cells, "paysim_p6a_competitive_selected.precision_at_review_budget"), "#2a9d8f"),
         ("PaySim recall", "reviewed fraud", _cell_value(cells, "paysim_p6a_competitive_selected.recall_at_review_budget"), "#6f9f18"),
@@ -952,7 +952,14 @@ def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
         '<text x="700" y="72" text-anchor="middle" font-size="26" font-weight="700" fill="#1f2937">Benchmark evidence and review-budget context</text>',
         '<text x="700" y="106" text-anchor="middle" font-size="18" fill="#4b5563">Ranking metrics and operating-point metrics are grouped separately because they answer different questions.</text>',
     ]
-    def panel(x0: int, y0: int, title: str, values: list[tuple[str, str, Any, str]]) -> None:
+    def panel(
+        x0: int,
+        y0: int,
+        title: str,
+        values: list[tuple[str, str, Any, str]],
+        *,
+        marker: tuple[str, Any, str] | None = None,
+    ) -> None:
         panel_w = 610
         plot_x = x0 + 230
         plot_w = 300
@@ -963,6 +970,14 @@ def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
             tx = plot_x + tick * plot_w
             parts.append(f'<line x1="{tx:.1f}" y1="{y0 + 66}" x2="{tx:.1f}" y2="{y0 + 326}" stroke="#e5e7eb" stroke-width="1"/>')
             parts.append(f'<text x="{tx:.1f}" y="{y0 + 352}" text-anchor="middle" font-size="13" fill="#4b5563">{_format_tick(tick)}</text>')
+        if marker is not None:
+            marker_label, marker_value, marker_note = marker
+            marker_float = float(marker_value) if isinstance(marker_value, (int, float)) else 0.0
+            marker_float = max(0.0, min(1.0, marker_float))
+            mx = plot_x + marker_float * plot_w
+            parts.append(f'<line x1="{mx:.1f}" y1="{y0 + 68}" x2="{mx:.1f}" y2="{y0 + 296}" stroke="#374151" stroke-width="1.5" stroke-dasharray="5 5"/>')
+            parts.append(f'<text x="{x0 + panel_w - 26}" y="{y0 + 74}" text-anchor="end" font-size="12" font-weight="700" fill="#374151">{_xml_escape(marker_label)} {_format_metric(marker_value)}</text>')
+            parts.append(f'<text x="{x0 + panel_w - 26}" y="{y0 + 92}" text-anchor="end" font-size="11" fill="#4b5563">{_xml_escape(marker_note)}</text>')
         for index, (label, detail, raw_value, color) in enumerate(values):
             y = y0 + 86 + index * 62
             value = float(raw_value) if isinstance(raw_value, (int, float)) else 0.0
@@ -972,10 +987,16 @@ def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
             parts.append(f'<rect x="{plot_x}" y="{y + 5}" width="{plot_w}" height="24" rx="4" fill="#edf1f6" stroke="#d1d5db" stroke-width="0.8"/>')
             parts.append(f'<rect x="{plot_x}" y="{y + 5}" width="{value * plot_w:.1f}" height="24" rx="4" fill="{color}"/>')
             parts.append(f'<text x="{value_x}" y="{y + 24}" font-size="14" font-weight="700" fill="#1f2937">{_format_metric(raw_value)}</text>')
-    panel(70, 148, "Panel A: PR-AUC ranking evidence", ranking)
+    panel(
+        70,
+        148,
+        "Panel A: PR-AUC ranking evidence",
+        ranking,
+        marker=("RevClassifyDS ref.", revclassify_ref, "external paper marker"),
+    )
     panel(720, 148, "Panel B: fixed review queue", operating)
     parts.append('<rect x="122" y="574" width="1156" height="42" rx="5" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>')
-    parts.append('<text x="700" y="601" text-anchor="middle" font-size="15" fill="#4b5563">Elliptic2 is context only. Precision/recall rows use the validation-selected review-budget policy.</text>')
+    parts.append('<text x="700" y="601" text-anchor="middle" font-size="15" fill="#4b5563">RevClassifyDS is an external reference marker; precision/recall rows use the fixed review-budget policy.</text>')
     parts.append('</svg>')
     return "\n".join(parts)
 
@@ -983,25 +1004,25 @@ def _claim_gate_examples_svg_v2() -> str:
     width = 1220
     height = 640
     rows = [
-        ("PaySim", "synthetic temporal-fraud\nPR-AUC cell", "real-bank AML\nsuperiority", "partner holdout +\nincumbent queue study"),
-        ("Elliptic", "temporal graph-feature\nprovenance", "graph-neural\ndetector advance", "graph-native budget +\nneural baselines"),
-        ("Elliptic2", "modern subgraph\ncontext row", "RevClassifyDS\nparity", "faithful reference run +\ncohort reconciliation"),
+        ("PaySim", "PS-PR evidence\ncell", "bounded temporal-\nproxy result", "partner holdout +\nincumbent queue study"),
+        ("Elliptic", "EL-PR graph-\nfeature cell", "graph-aware\nevidence audit", "graph-native budget +\nneural baselines"),
+        ("Elliptic2", "E2 reference\nrow", "modern benchmark\ncontext", "faithful reference run +\ncohort reconciliation"),
     ]
     parts = [
         _svg_header(width, height),
         '<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
-        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Claim-gate examples</text>',
-        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">The gate keeps useful evidence visible while preventing unsupported public promotion.</text>',
-        '<text x="255" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">supported evidence</text>',
-        '<text x="610" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">blocked public claim</text>',
-        '<text x="965" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence needed</text>',
+        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Evidence routing examples</text>',
+        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">The release path promotes admissible interpretations and records evidence needed for stronger future use.</text>',
+        '<text x="255" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence cell</text>',
+        '<text x="610" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">admissible paper use</text>',
+        '<text x="965" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence for stronger use</text>',
     ]
-    for index, (track, supported, blocked, needed) in enumerate(rows):
+    for index, (track, evidence, admissible, needed) in enumerate(rows):
         y = 178 + index * 118
         parts.append(f'<text x="78" y="{y + 44}" font-size="18" font-weight="700" fill="#1f2937">{_xml_escape(track)}</text>')
         for x, label, fill, stroke, color in [
-            (150, supported, "#eef6f3", "#91c7b1", "#1f2937"),
-            (505, blocked, "#fdeeee", "#df9b9b", "#7f1d1d"),
+            (150, evidence, "#eef6f3", "#91c7b1", "#1f2937"),
+            (505, admissible, "#eef4ff", "#9db7e5", "#1f2937"),
             (860, needed, "#f5f7fa", "#aab4c3", "#1f2937"),
         ]:
             parts.append(f'<rect x="{x}" y="{y}" width="210" height="84" rx="6" fill="{fill}" stroke="{stroke}" stroke-width="1.2"/>')
@@ -1011,7 +1032,7 @@ def _claim_gate_examples_svg_v2() -> str:
         parts.append(f'<line x1="730" y1="{y + 42}" x2="846" y2="{y + 42}" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="6 6"/>')
         parts.append(f'<polygon points="846,{y + 42} 836,{y + 35} 836,{y + 49}" fill="#6b7280"/>')
     parts.append('<rect x="118" y="540" width="984" height="34" rx="5" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>')
-    parts.append('<text x="610" y="562" text-anchor="middle" font-size="14" fill="#4b5563">Blocked claims are routed to missing evidence or limitations, not to headline wording.</text>')
+    parts.append('<text x="610" y="562" text-anchor="middle" font-size="14" fill="#4b5563">The route keeps current evidence publishable while making stronger future work explicit.</text>')
     parts.append('</svg>')
     return "\n".join(parts)
 

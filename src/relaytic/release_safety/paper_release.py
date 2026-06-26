@@ -15,7 +15,7 @@ PAPER_RELEASE_REPORT_DIR = Path("docs") / "reports"
 PAPER_RELEASE_DOC_DIR = Path("docs") / "paper"
 PAPER_RELEASE_TABLE_DIRNAME = "tables"
 PAPER_RELEASE_DATE = "2026-06-09"
-SOURCE_VERIFICATION_DATE = "2026-06-25"
+SOURCE_VERIFICATION_DATE = "2026-06-26"
 DEFAULT_RELEASE_TAG = "relaytic-aml-paper-p13-claim-safe"
 NEXT_PAPER_RELEASE_SLICE = "Paper Track P14 - final arXiv source bundle and clean release candidate"
 PAPER_FINAL_DRAFT_FILENAME = "relaytic_aml_arxiv_draft.md"
@@ -1016,8 +1016,8 @@ def _render_final_paper_v2(
             "",
             "## Abstract",
             "",
-            "Anti-money laundering (AML) machine-learning results are difficult to trust when privacy constraints, temporal validity, graph provenance, leakage controls, review capacity, and public claims are handled separately. Relaytic-AML is a local-first evaluation lab in which role-scoped agents create auditable evidence cells and conservative claim gates decide what those cells are allowed to support. The current evidence pack reports PaySim synthetic temporal-fraud PR-AUC "
-            f"{pay_pr}, Elliptic temporal graph-feature PR-AUC {ell_pr}, and Elliptic2 context PR-AUC {e2_pr} +/- {e2_std}, with the Elliptic2 row kept below the recorded RevClassifyDS reference of {ref_pr}. The contribution is a reproducible AI evaluation-lab and governance architecture for financial-crime experimentation, not a claim of detector superiority.",
+            "Anti-money laundering (AML) machine-learning experiments are hard to audit when private data, temporal validity, graph provenance, leakage controls, review capacity, and public claims are managed in separate tools. Relaytic-AML is a local-first evaluation lab in which role-scoped agents produce auditable evidence cells and deterministic gates route those cells into admissible paper uses. The current evidence pack reports PaySim synthetic temporal-fraud PR-AUC "
+            f"{pay_pr}, Elliptic temporal graph-feature PR-AUC {ell_pr}, and Elliptic2 context PR-AUC {e2_pr} +/- {e2_std}, with a recorded RevClassifyDS reference of {ref_pr}. The paper contributes an evaluation and governance substrate for financial-crime ML, with detector claims kept within the evidence boundary.",
             "",
             "## 1. Introduction",
             "",
@@ -1027,7 +1027,7 @@ def _render_final_paper_v2(
             "",
             "Relaytic began as a general local-first inference-engineering lab. Relaytic-AML is the financial-crime edition used here to test whether that architecture can support governed AML experimentation. It is a set of cooperating agents and deterministic harnesses around a local artifact store. The guide helps a user or another agent understand where the run is. The scout checks source posture, schema, leakage risk, and split feasibility. The strategist turns the objective into a task contract. The scientist challenges baselines, ablations, and budget choices. The builder executes bounded runs. Reviewers reconstruct traces. Release governors lint claims, figures, tables, source packages, and public wording against the evidence record.",
             "",
-            "The paper is therefore a systems and methodology paper. The benchmark rows matter because they exercise the architecture under temporal, graph, operating-point, and claim-governance pressure. They are not presented as a new best detector family. The central question is whether a local evaluation lab can keep evidence, agent assistance, privacy boundaries, and publishable claims aligned.",
+            "The paper is therefore a systems and methodology paper. The benchmark rows matter because they exercise the architecture under temporal, graph, operating-point, and claim-governance pressure. The central question is whether a local evaluation lab can keep evidence, agent assistance, privacy boundaries, and publishable claims aligned without turning proxy evidence into detector-superiority claims.",
             "",
             "The work is organized around four research questions:",
             "",
@@ -1036,15 +1036,15 @@ def _render_final_paper_v2(
             "- **RQ3:** Can the local artifact record support rowless handoff to external agents while preserving provenance?",
             "- **RQ4:** Do the benchmark rows demonstrate useful, bounded detector evidence under explicit split and budget contracts?",
             "",
-            "This paper makes four contributions. First, it presents a workspace-backed, role-scoped agent runtime for AML evaluation. Second, it defines an evidence-cell schema tying each metric to dataset, split, command, artifact, budget, leakage posture, operating point, and claim state. Third, it contributes a release and claim-gating harness that turns local artifacts into tables, figures, source packages, and manuscript claims while blocking unsupported interpretations. Fourth, it gives public demonstrations on PaySim, Elliptic, and Elliptic2 context rows under strict claim boundaries.",
+            "This paper makes four contributions. First, it presents a workspace-backed, role-scoped agent runtime for AML evaluation. Second, it defines an evidence-cell schema tying each metric to dataset, split, command, artifact, budget, leakage posture, and operating point. Third, it contributes a release and interpretation-routing harness that turns local artifacts into tables, figures, source packages, and manuscript claims while recording the evidence needed for stronger future uses. Fourth, it gives public demonstrations on PaySim, Elliptic, and Elliptic2 reference rows under explicit evidence roles.",
             "",
             "## 2. Related Work",
             "",
             "The AML benchmark landscape is moving toward larger, more realistic, and more graph-native settings. PaySim remains useful as a synthetic mobile-money fraud simulator for temporal proxy experiments [@lopezrojas2016paysim]. Elliptic introduced a public Bitcoin transaction graph with anonymized node features and temporal labels [@weber2019elliptic]. Elliptic2 and RevTrack/RevClassify shifted attention to suspicious subgraphs and richer blockchain context [@bellei2024elliptic2; @song2024revtrack]. Recent work such as TransXion, LineMVGNN, quasi-temporal graph extraction, BlazingAML, and continual graph-learning studies shows that the research frontier increasingly treats AML as dynamic graph and systems work rather than static tabular classification [@chen2026transxion; @poon2026linemvgnn; @tariq2026extraqt; @ye2026blazingaml; @deprez2025continualaml].",
             "",
-            "Relaytic-AML does not compete with those papers as a new graph-neural detector. Its position is complementary. It asks how an experiment should be governed when data is local or licensed, the task may be temporal or graph-based, analyst review capacity matters, and an agent-assisted workflow must still produce evidence that a skeptical reviewer can audit. That places the system near dataset documentation, model reporting, reproducibility practice, experiment tracking, and governance work [@gebru2021datasheets; @mitchell2019modelcards; @pineau2021reproducibility].",
+            "Detector papers such as TransXion, BlazingAML, LineMVGNN, and RevClassifyDS push the model frontier. Relaytic-AML sits one layer around that work: it asks how experiments should be governed when data is local or licensed, the task may be temporal or graph-based, analyst review capacity matters, and an agent-assisted workflow must still produce evidence that a skeptical reviewer can audit. That places the system near dataset documentation, model reporting, reproducibility practice, experiment tracking, and governance work [@gebru2021datasheets; @mitchell2019modelcards; @pineau2021reproducibility].",
             "",
-            "The system also differs from adjacent evaluation artifacts. Model cards explain a trained model, but they do not usually bind every number to a command, split, artifact field, and blocked-claim state. Datasheets describe data, but they do not run the model-search and release gates. Reproducibility checklists improve reporting, but they are often static forms rather than executable evidence. MLOps experiment trackers preserve runs, but they are not designed to govern public scientific claims about local, licensed, or privacy-sensitive AML data. Agent benchmarks evaluate agents, while Relaytic-AML uses agents inside an evaluation lab and then tests whether the lab keeps the agents honest. This is the new systems contribution: evidence, agents, local privacy, and publishable wording are coupled in one deterministic release path.",
+            "The system also differs from adjacent evaluation artifacts. Model cards explain a trained model, but they do not usually bind every number to a command, split, artifact field, and admissible-use record. Datasheets describe data, but they do not run the model-search and release gates. Reproducibility checklists improve reporting, but they are often static forms rather than executable evidence. MLOps experiment trackers preserve runs, but they are not designed to govern public scientific claims about local, licensed, or privacy-sensitive AML data. Agent benchmarks evaluate agents, while Relaytic-AML uses agents inside an evaluation lab and then tests whether the lab keeps the agents attached to artifacts. This is the systems contribution: evidence, agents, local privacy, and publishable wording are coupled in one deterministic release path.",
             "",
             "Recent agent-evaluation work shows that language-model systems can produce persuasive research artifacts while still failing on reproduction, validation, or expert-level judgment [@chen2025mlrbench; @starace2025paperbench; @wijk2025rebench]. Skill- and tool-using agents make that opportunity larger and the governance problem sharper [@yang2026skillopt]. Relaytic-AML responds by making model scores, public claims, handoff packets, and paper assets downstream of local artifacts rather than downstream of a conversation transcript.",
             "",
@@ -1060,7 +1060,7 @@ def _render_final_paper_v2(
             "",
             "## 4. Evidence Cell and Claim-Gate Design",
             "",
-            "An evidence cell is the unit that makes a paper number auditable. It is not just a metric value. It records the dataset, split, command, artifact field, model or feature budget, leakage posture, operating point, and claim state. That structure gives a reviewer two kinds of visibility: how the number was produced, and what the number is allowed to mean.",
+            "An evidence cell is the unit that makes a paper number auditable. It is not just a metric value. It records the dataset, split, command, artifact field, model or feature budget, leakage posture, and operating point. Interpretation is deliberately stored in a separate gate output: the cell says what happened, and the gate says how that fact may be used.",
             "",
             evidence_schema_figure,
             "",
@@ -1068,44 +1068,44 @@ def _render_final_paper_v2(
             "",
             evidence_cell_table,
             "",
-            "A representative metric cell is compact enough to audit directly. The public table uses the alias `PS-PR`, while the underlying artifact keeps the longer machine identifier.",
+            "A representative record is compact enough to audit directly. The public table uses the alias `PS-PR`, while the underlying artifact keeps the longer machine identifier. The example separates the factual evidence cell from the gate output that names admissible use and evidence needed for a stronger interpretation.",
             "",
             evidence_cell_snippet,
             "",
             "```algorithm",
             "Algorithm: Evidence-cell creation",
             "Input: dataset registry D, split contract S, candidate budget B, run artifacts A",
-            "Output: evidence cell c with provenance and claim state",
+            "Output: evidence cell c with factual provenance",
             "1. Freeze source posture, license posture, task target, and split contract.",
             "2. Derive only features allowed by S and record excluded leakage fields.",
             "3. Run baseline candidates under the declared baseline budget.",
             "4. Run stronger candidates only within B and select on validation evidence.",
             "5. Evaluate the selected row once on the fixed test surface.",
-            "6. Write c = dataset, split, command, artifact field, metric, value, budget, leakage posture, operating point, claim state.",
-            "7. Publish c only through tables, figures, and release text that reference the cell identifier.",
+            "6. Write c = dataset, split, command, artifact field, metric, value, budget, leakage posture, and operating point.",
+            "7. Hand c to the claim gate before it appears in tables, figures, or release text.",
             "```",
             "",
-            "The claim gate is the second half of the design. It is deliberately conservative. If the evidence cell is incomplete, if a split is leakage-prone, if a metric is only a proxy, or if a stronger interpretation needs a different dataset or study, the gate preserves the evidence but blocks the stronger claim. This is a mechanism, not a disclaimer: it changes what the paper generator and public release surfaces are allowed to say.",
+            "The claim gate is the second half of the design. It is deliberately conservative. If the evidence cell is incomplete, if a split is leakage-prone, if a metric is only a proxy, or if a stronger interpretation needs a different dataset or study, the gate preserves the evidence and routes the stronger use to an evidence-needs record. This is a mechanism, not a disclaimer: it changes what the paper generator and public release surfaces are allowed to say.",
             "",
             "```algorithm",
             "Algorithm: Claim-gate validation",
             "Input: public claim q, evidence cells C, gates G, limitations L",
-            "Output: allowed wording or blocked-claim record",
+            "Output: admissible wording and evidence-needs record",
             "1. Resolve every evidence cell named by q and require dataset, split, command, artifact, budget, and leakage fields.",
             "2. Compare the strength of q with source posture, split validity, metric scope, and benchmark role.",
             "3. If q is exactly supported, emit the bounded wording and the evidence-cell identifiers.",
-            "4. If q is stronger than C and G permit, block q and write the gate reason.",
-            "5. Attach the missing evidence needed to move q from blocked to testable future work.",
-            "6. Keep blocked evidence visible, but route it to limitations or context rather than headline claims.",
+            "4. If q is stronger than C and G permit, record the stronger-claim status and gate reason.",
+            "5. Attach the missing evidence needed to make q testable in future work.",
+            "6. Route current evidence to its admissible paper use and keep stronger uses out of headline wording.",
             "```",
             "",
             claim_gate_figure,
             "",
-            "Figure 3 gives concrete gate behavior. A PaySim row can support a synthetic temporal-fraud result, but not a real-bank AML superiority statement. An Elliptic row can support temporal graph-feature provenance, but not graph-neural dominance. An Elliptic2 row can be modern benchmark context while the reference-parity claim remains blocked.",
+            "Figure 3 gives concrete routing behavior. A PaySim row becomes a bounded temporal-proxy demonstration, an Elliptic row becomes graph-feature evidence with temporal provenance, and an Elliptic2 row becomes external benchmark context. The same records also specify what evidence would be needed before stronger future uses could be made.",
             "",
             "## 5. Experimental Protocol",
             "",
-            "The experiments test Relaytic-AML as an evaluation lab. The datasets are separated by claim posture. PaySim is the main empirical demonstration because it is fully local and supports a controlled temporal proxy workflow. Elliptic tests temporal graph provenance and feature-view discipline. Elliptic2 tests whether the system can keep modern-context evidence visible without promoting it to a performance contribution.",
+            "The experiments test Relaytic-AML as an evaluation lab. The datasets are separated by evidence role. PaySim is the main empirical demonstration because it is fully local and supports a controlled temporal proxy workflow. Elliptic tests temporal graph provenance and feature-view discipline. Elliptic2 tests whether the system can keep a modern external reference row visible without overstating its role.",
             "",
             dataset_split_table,
             "",
@@ -1115,7 +1115,7 @@ def _render_final_paper_v2(
             "",
             model_search_table,
             "",
-            "Table 3 records the modeling effort without presenting the paper as a hyperparameter leaderboard. PaySim uses a two-stage competitive budget: probes over a seeded train-only sample, five full-training finalists, validation-only calibration, and one fixed test evaluation for the selected finalist. Elliptic uses a graph-feature budget over source-provided anonymized features, same-snapshot structural features, and their combination. Elliptic2 uses repeated pooled-moment LightGBM context rows with seeds 11, 42, and 73, but this row is not a Relaytic performance contribution because reference-protocol parity is not established.",
+            "Table 3 records the modeling effort without presenting the paper as a hyperparameter leaderboard. PaySim uses a two-stage competitive budget: probes over a seeded train-only sample, five full-training finalists, validation-only calibration, and one fixed test evaluation for the selected finalist. Elliptic uses a graph-feature budget over source-provided anonymized features, same-snapshot structural features, and their combination. Elliptic2 uses repeated pooled-moment LightGBM context rows with seeds 11, 42, and 73 as an external-reference stress test for the release machinery.",
             "",
             "The feature policy is strictest for PaySim because simulator balance columns can leak post-event state. Relaytic excludes those balance fields, raw origin and destination identifiers as model features, and simulator flags. It allows row-local amount, type, and time features, train-only thresholds, and destination history shifted before each step. The isolated contribution of destination-history features has not been measured as a separate test row, so it is not reported as a main result.",
             "",
@@ -1123,13 +1123,13 @@ def _render_final_paper_v2(
             "",
             paysim_ablation_table,
             "",
-            f"PaySim is the clearest modeling result in the current evidence pack. The earliest reference row was PR-AUC 0.2159. The later leakage-safe baseline improved to {pay_base_pr}, and the competitive selected Extra Trees model reached fixed-test PR-AUC {pay_pr} and ROC-AUC {pay_roc}. The improvement is meaningful inside the synthetic temporal-fraud contract because it follows a visible sequence: balance fields were excluded, prior-step destination history was added without raw account encoding, candidates were selected by validation PR-AUC, and calibration and thresholding used validation-only partitions. The allowed claim is precise: Relaytic-AML can produce a stronger, leakage-audited PaySim temporal-proxy row under a declared budget. It cannot turn that row into evidence of real-bank AML superiority.",
+            f"PaySim is the clearest modeling result in the current evidence pack. The earliest reference row was PR-AUC 0.2159. The later leakage-safe baseline improved to {pay_base_pr}, and the competitive selected Extra Trees model reached fixed-test PR-AUC {pay_pr} and ROC-AUC {pay_roc}. The improvement is meaningful inside the synthetic temporal-fraud contract because it follows a visible sequence: balance fields were excluded, prior-step destination history was added without raw account encoding, candidates were selected by validation evidence, and calibration and thresholding used validation-only partitions. The admissible interpretation is precise: Relaytic-AML produced a stronger, leakage-audited PaySim temporal-proxy row under a declared budget.",
             "",
             f"The review-budget metrics sharpen the interpretation. At the selected PaySim review budget, precision is {pay_precision} and recall is {pay_recall}. The top of the queue is much richer than prevalence, but a large share of fraud remains outside the reviewed set. That is a useful operating result for an evaluation lab because it connects ranking quality to analyst capacity instead of treating PR-AUC as the whole story.",
             "",
-            f"Elliptic is a different kind of evidence. The validation-selected source-plus-structural LightGBM row reports test PR-AUC {ell_pr}, with review-budget precision {ell_precision} and recall {ell_recall}. The result supports temporal graph-feature provenance and operating-point reporting. It also reveals a limitation: the current graph-structure-only floor is weak, and the final row is heavily influenced by source-provided anonymized features. Relaytic can therefore claim graph-aware evidence handling, not a new graph-native detector.",
+            f"Elliptic is a different kind of evidence. The validation-selected source-plus-structural LightGBM row reports test PR-AUC {ell_pr}, with review-budget precision {ell_precision} and recall {ell_recall}. The result supports temporal graph-feature provenance and operating-point reporting. It also reveals a limitation: the current graph-structure-only floor is weak, and the final row is heavily influenced by source-provided anonymized features. Relaytic's contribution here is the graph-aware evidence path: feature provenance, temporal splits, operating-point metrics, and interpretation routing are made auditable together.",
             "",
-            f"Elliptic2 is intentionally framed as context. The repeated official-partition context row reports PR-AUC {e2_pr} +/- {e2_std}, and the content-hash robustness partition reports mean PR-AUC {e2_hash}. Those are strong absolute values, but the recorded RevClassifyDS reference is {ref_pr}, and the local parity gate records cohort and reference-execution gaps. The scientific result is that Relaytic keeps the context row available while blocking a parity or superiority interpretation.",
+            f"Elliptic2 is intentionally framed as an external reference row. The repeated official-partition context row reports PR-AUC {e2_pr} +/- {e2_std}, and the content-hash robustness partition reports mean PR-AUC {e2_hash}. Those are strong absolute values, and the recorded RevClassifyDS reference of {ref_pr} gives the reader a useful frontier marker. Relaytic's evidence role is to keep that modern benchmark context visible while recording the cohort and reference-execution evidence needed for stronger future comparison.",
             "",
             benchmark_figure,
             "",
@@ -1141,11 +1141,11 @@ def _render_final_paper_v2(
             "",
             system_eval_table,
             "",
-            "Table 5 reports the audit matrix behind the system claim. Each row names a behavior, a deterministic check, a pass criterion, and an observed signal: 13 of 13 provenance fields are present for the PaySim metric cell, baseline and competitive budgets are comparable under the same contract, Elliptic2 is firewalled as context, rowless handoff exposes no raw rows, and interrupted-run recovery surfaces state, missing evidence, and next actions.",
+            "Table 5 reports the audit matrix behind the system claim. Each row names a behavior, a deterministic check, a pass criterion, and an observed signal: 13 of 13 provenance fields are present for the PaySim metric cell, baseline and competitive budgets are comparable under the same contract, Elliptic2 remains in its reference role, rowless handoff exposes no raw rows, and interrupted-run recovery surfaces state, missing evidence, and next actions.",
             "",
             blocked_claim_table,
             "",
-            "Table 6 shows how the gate behaves on concrete over-strong claims. The blocked claims are not hidden. They are converted into missing-evidence records, which makes future work actionable while keeping the current paper below its evidence boundary.",
+            "Table 6 shows how stronger future uses are handled. Rather than letting narrative claims drift beyond the artifacts, the gate records the current admissible use and the evidence that would be needed before the stronger interpretation could be made.",
             "",
             handoff_recovery_table,
             "",
@@ -1157,7 +1157,7 @@ def _render_final_paper_v2(
             "",
             "Public blockchain data is also not the same as bank AML. Elliptic provides a valuable temporal graph task, but unknown labels, anonymized features, and public-chain behavior limit direct operational interpretation. Elliptic2 is modern and highly relevant, but the current local evidence does not satisfy the stronger reference-parity conditions needed for a performance contribution against RevClassifyDS.",
             "",
-            "The deterministic system checks are not a substitute for a human usability study. They show that artifacts, redactions, claim gates, and recovery surfaces are present and internally consistent. They do not measure analyst time, production incident rates, organizational adoption, or real investigation quality. Future work should test stronger release budgets, repeated runs, private or partner-approved holdouts, same-queue incumbent comparisons, and graph-native families under the same evidence-cell discipline.",
+            "The deterministic system checks are not a substitute for a human usability study. They show that artifacts, redactions, interpretation gates, and recovery surfaces are present and internally consistent. They do not measure analyst time, production incident rates, organizational adoption, or real investigation quality. Future work should test stronger release budgets, repeated runs, private or partner-approved holdouts, same-queue incumbent comparisons, and graph-native families under the same evidence-cell discipline.",
             "",
             "The system is intentionally local-first, which creates a tradeoff. Privacy and provenance improve because raw rows stay local, but external reviewers cannot rerun licensed or private data without obtaining it themselves. The paper handles that by publishing commands, hashes where allowed, generated artifacts, and claim boundaries, but a fully independent reproduction of every heavy benchmark still depends on legal access to the source datasets.",
             "",
@@ -1176,10 +1176,7 @@ def _render_final_paper_v2(
             "py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-release --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "py -3.11 -m pytest `",
-            "  tests/test_paper_track_p13.py `",
-            "  tests/test_paper_track_p14.py `",
-            "  tests/test_paper_track_p15.py -q",
+            "py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py -q",
             "```",
             "",
             "macOS/Linux:",
@@ -1189,10 +1186,7 @@ def _render_final_paper_v2(
             "python3 -m relaytic.ui.cli release-safety paper-system-eval --format json",
             "python3 -m relaytic.ui.cli release-safety paper-release --format json",
             "python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "python3 -m pytest \\",
-            "  tests/test_paper_track_p13.py \\",
-            "  tests/test_paper_track_p14.py \\",
-            "  tests/test_paper_track_p15.py -q",
+            "python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py -q",
             "```",
             "",
             "Raw benchmark data is not committed. PaySim and Elliptic require local downloads and are referenced through registry artifacts, split reports, hashes, and command ledgers. Elliptic2 remains context-only in this paper because the stronger reference-parity conditions are not satisfied locally. Clean clones can reproduce the paper-generation checks and repo-local public fixtures; full benchmark regeneration requires the locally licensed datasets named in the README.",
@@ -1203,9 +1197,9 @@ def _render_final_paper_v2(
             "",
             "## Conclusion",
             "",
-            "Relaytic-AML shows how an agent-assisted AML evaluation lab can be built around local evidence rather than conversational memory. The system keeps data posture, temporal and graph split validity, leakage controls, model budgets, review-budget operating points, rowless handoff, and public claims inside one artifact record. The PaySim, Elliptic, and Elliptic2 rows are useful because they demonstrate that architecture under realistic forms of pressure, including rare events, graph provenance, modern benchmark context, and blocked claims.",
+            "Relaytic-AML shows how an agent-assisted AML evaluation lab can be built around local evidence rather than conversational memory. The system keeps data posture, temporal and graph split validity, leakage controls, model budgets, review-budget operating points, rowless handoff, and public claims inside one artifact record. The PaySim, Elliptic, and Elliptic2 rows are useful because they demonstrate that architecture under realistic forms of pressure, including rare events, graph provenance, modern benchmark context, and governed interpretation.",
             "",
-            "The strongest claim supported today is architectural: Relaytic-AML can make AML experiments easier to inspect, easier to challenge, safer to hand off to another agent, and harder to overstate. Stronger detector and business-value claims require stronger evidence. That is the boundary the system is designed to preserve.",
+            "The strongest claim supported today is architectural: Relaytic-AML can make AML experiments easier to inspect, easier to challenge, safer to hand off to another agent, and harder to overstate. That is the useful substrate on which stronger detector studies, private holdouts, incumbent comparisons, and graph-native budgets can be built.",
             "",
             "## References",
             "",
@@ -1261,12 +1255,12 @@ def _render_feature_metric_policy_table(inputs: dict[str, Any]) -> str:
                 _feature_policy_summary(inputs, dataset_id),
                 _forbidden_feature_summary(contract, dataset_id),
                 _metric_list(contract.get("primary_metrics") or []),
-                _humanize_gate_token(str(contract.get("claim_posture") or "context only")),
+                _evidence_role_from_dataset(dataset_id),
             ]
         )
     return _markdown_table(
         "Table 2b. Feature and metric policy",
-        ["Track", "Allowed feature policy", "Forbidden or gated inputs", "Primary metrics", "Claim posture"],
+        ["Track", "Allowed feature policy", "Forbidden or gated inputs", "Primary metrics", "Evidence role"],
         rows,
     )
 
@@ -1290,17 +1284,17 @@ def _render_model_search_table(inputs: dict[str, Any]) -> str:
             "tree/boosting baselines; LightGBM selected",
             "source node features plus same-step graph statistics",
             f"{graph_budget.get('validation_search_trial_count', 'n/a')} trials; seeds {', '.join(str(seed) for seed in graph_budget.get('random_seeds', [])) or 'n/a'}",
-            "supporting graph-feature row",
+            "graph-feature evidence row",
         ],
         [
             "Elliptic2",
             "LightGBM context row",
             "348 pooled subgraph moments/counts",
             f"{elliptic2.get('official_partition', {}).get('seed_count', 'n/a')} repeated seeds: {', '.join(str(seed) for seed in elliptic2.get('seeds', [])) or 'n/a'}",
-            "context only; parity not established",
+            "external reference row",
         ],
     ]
-    return _markdown_table("Table 3. Model families and search budgets", ["Track", "Families", "Features", "Search budget", "Gate"], rows)
+    return _markdown_table("Table 3. Model families and search budgets", ["Track", "Families", "Features", "Search budget", "Evidence role"], rows)
 
 
 def _render_evidence_cell_table_v2(metrics: dict[str, dict[str, Any]]) -> str:
@@ -1322,9 +1316,9 @@ def _render_evidence_cell_table_v2(metrics: dict[str, dict[str, Any]]) -> str:
             _format_metric(cell.get("value")),
             _compact_cell_split(cell_id, str(cell.get("split") or "not recorded")),
             _compact_command_artifact(cell),
-            _compact_claim_state(str(cell.get("claim_state") or "not recorded")),
+            _evidence_role_from_cell(cell_id),
         ])
-    return _markdown_table("Table 1. Representative evidence cells", ["ID", "Dataset", "Metric", "Value", "Split", "Artifact", "Claim"], rows)
+    return _markdown_table("Table 1. Representative evidence cells", ["ID", "Dataset", "Metric", "Value", "Split", "Artifact", "Evidence role"], rows)
 
 
 def _render_evidence_cell_snippet(metrics: dict[str, dict[str, Any]]) -> str:
@@ -1332,15 +1326,18 @@ def _render_evidence_cell_snippet(metrics: dict[str, dict[str, Any]]) -> str:
     cell = metrics.get(cell_id, {})
     snippet = [
         "{",
-        '  "cell_id": "PS-PR",',
-        '  "dataset_id": "paysim_temporal_transaction_fraud",',
-        f'  "split": "{_compact_cell_split(cell_id, str(cell.get("split") or "temporal_fixed_test"))}",',
-        '  "artifact_ref": "paper_metric_cell_audit.json",',
-        '  "command": "release-safety paysim-competitive",',
-        '  "metric": "test_pr_auc",',
-        f'  "value": {_format_metric(cell.get("value"))},',
-        '  "leakage_posture": "balance/raw IDs excluded; history shifted",',
-        '  "claim_state": "supporting synthetic temporal-proxy only"',
+        '  "evidence_cell": {',
+        '    "cell_id": "PS-PR", "dataset_id": "paysim_temporal_transaction_fraud",',
+        f'    "split": "{_compact_cell_split(cell_id, str(cell.get("split") or "temporal_fixed_test"))}", "metric": "test_pr_auc", "value": {_format_metric(cell.get("value"))},',
+        '    "artifact_ref": "paper_metric_cell_audit.json:test_pr_auc",',
+        '    "budget": "competitive", "leakage_posture": "balance/raw IDs excluded",',
+        '    "operating_point": "ranking metric"',
+        '  },',
+        '  "claim_gate_output": {',
+        '    "evidence_cell_ids": ["PS-PR"], "admissible_use": "bounded PaySim proxy",',
+        '    "stronger_claim_status": "requires external holdout",',
+        '    "missing_evidence": ["partner holdout", "incumbent queue study"]',
+        '  }',
         "}",
     ]
     return "```json\n" + "\n".join(snippet) + "\n```"
@@ -1353,12 +1350,12 @@ def _render_paysim_ablation_table(inputs: dict[str, Any], metrics: dict[str, dic
     best_probe = _best_validation_attempt(search_trace)
     feature_count = len(feature_report.get("feature_columns", []))
     rows = [
-        ["P4 reference", "SGD logistic baseline", "source-safe starting point", _format_metric(baseline_table.get("p4_reference_row", {}).get("test_pr_auc")), "not a paper claim"],
-        ["P6 baseline", "Extra Trees baseline", "leakage-safe feature set", _format_metric(_metric_value(metrics, "paysim_p6_validation_selected_baseline.test_pr_auc")), "baseline only"],
-        ["Competitive search", _model_family_label(str(best_probe.get("family_id") or "best validation probe")), f"{feature_count} allowed features; best validation PR-AUC {_format_metric(best_probe.get('validation_metrics', {}).get('pr_auc'))}", "test hidden until selected finalist", "search evidence only"],
-        ["Final model", "Extra Trees with Platt calibration", "validation-selected finalist evaluated once on test", _format_metric(_metric_value(metrics, "paysim_p6a_competitive_selected.test_pr_auc")), "supporting synthetic temporal-proxy claim"],
+        ["P4 reference", "SGD logistic baseline", "source-safe starting point", _format_metric(baseline_table.get("p4_reference_row", {}).get("test_pr_auc")), "reference row"],
+        ["P6 baseline", "Extra Trees baseline", "leakage-safe feature set", _format_metric(_metric_value(metrics, "paysim_p6_validation_selected_baseline.test_pr_auc")), "baseline row"],
+        ["Competitive search", _model_family_label(str(best_probe.get("family_id") or "best validation probe")), f"{feature_count} allowed features; best probe validation PR-AUC {_format_metric(best_probe.get('validation_metrics', {}).get('pr_auc'))}", "not evaluated on test", "candidate screening"],
+        ["Final model", "Extra Trees with Platt calibration", "validation-selected finalist; validation-only calibration", _format_metric(_metric_value(metrics, "paysim_p6a_competitive_selected.test_pr_auc")), "bounded demonstration"],
     ]
-    return _markdown_table("Table 4. PaySim modeling path", ["Stage", "Model or contract", "Change", "Test PR-AUC", "Claim use"], rows)
+    return _markdown_table("Table 4. PaySim modeling path", ["Stage", "Model/contract", "Selection evidence", "Final test evidence", "Role"], rows)
 
 
 def _render_system_evaluation_table(inputs: dict[str, Any]) -> str:
@@ -1370,22 +1367,22 @@ def _render_system_evaluation_table(inputs: dict[str, Any]) -> str:
     rows = [
         ["Metric provenance", "metric provenance", "PaySim selected PR-AUC cell", "required fields present", _audit_result("metric_cell_provenance_available", passed, signal)],
         ["Budget comparison", "budget comparability", "PaySim baseline and competitive cells", "same dataset, split doctrine, and metric", _audit_result("paysim_baseline_and_competitive_budget_comparable", passed, signal)],
-        ["PaySim claim boundary", "claim-boundary check", "PaySim publishability row", "supporting=true; hard/headline=false", _audit_result("paysim_claim_boundary_machine_readable", passed, signal)],
-        ["Elliptic2 firewall", "reference-parity firewall", "Elliptic2 publishability row", "context visible; parity blocked", _audit_result("elliptic2_supporting_context_and_firewall_visible", passed, signal)],
+        ["PaySim interpretation", "interpretation-route check", "PaySim publishability row", "admissible use present; headline=false", _audit_result("paysim_claim_boundary_machine_readable", passed, signal)],
+        ["Elliptic2 reference role", "reference role check", "Elliptic2 publishability row", "reference role visible; parity evidence required", _audit_result("elliptic2_supporting_context_and_firewall_visible", passed, signal)],
         ["Rowless handoff", "handoff recovery", "agent handoff report", "state, tools, next action; no rows", _audit_result("rowless_external_agent_handoff_recoverable", passed, signal)],
         ["Interrupted recovery", "no-lost-user recovery", "guide recovery report", "stage, shortlist, next action exposed", _audit_result("partial_run_recovery_without_artifact_literacy", passed, signal)],
-        ["Claim fail-closed", "claim-gate cases", "blocked-claim case studies", "unsupported wording blocked", _audit_result("claim_gate_fails_closed_for_public_interpretation", passed, signal)],
+        ["Stronger-use routing", "routing cases", "evidence-needs case studies", "missing evidence recorded", _audit_result("claim_gate_fails_closed_for_public_interpretation", passed, signal)],
     ]
     return _markdown_table("Table 5. System audit matrix", ["Check", "Command or test", "Evidence", "Pass criterion", "Observed result"], rows)
 
 
 def _render_blocked_claim_examples_table() -> str:
     rows = [
-        ["Relaytic-AML is superior for real-bank AML detection.", "PaySim is synthetic and the current evidence is a temporal proxy result.", "Partner or bank-approved holdout, incumbent comparison, analyst-review protocol, and legal release gate."],
-        ["Relaytic-AML reaches RevClassifyDS parity on Elliptic2.", "The context row is below the recorded reference and reference-protocol parity is not established.", "Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report."],
-        ["Relaytic-AML is a graph-neural detector advance.", "Elliptic evidence uses graph-feature provenance and tree/boosting baselines, not a new graph-neural family.", "Graph-native release budget, neural baselines, repeated seeds, and graph-specific ablations."],
+        ["Real-bank deployment study", "bounded PaySim temporal-proxy demonstration", "Partner or bank-approved holdout, incumbent comparison, analyst-review protocol, and legal release gate."],
+        ["Elliptic2 reference-method comparison", "external RevClassifyDS reference marker plus local context row", "Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report."],
+        ["Graph-native detector release", "Elliptic temporal graph-feature evidence path", "Graph-native release budget, neural baselines, repeated seeds, and graph-specific ablations."],
     ]
-    return _markdown_table("Table 6. Blocked claim examples", ["Proposed invalid claim", "Gate reason", "Missing evidence"], rows)
+    return _markdown_table("Table 6. Evidence routing examples", ["Stronger future use", "Current admissible use", "Evidence needed"], rows)
 
 
 def _render_handoff_recovery_table(inputs: dict[str, Any]) -> str:
@@ -1423,13 +1420,13 @@ def _evidence_cell_display_id(cell_id: str) -> str:
 
 def _audit_result(task_id: str, passed: Callable[[str], str], signal: Callable[[str], str]) -> str:
     compact_signal = {
-        "metric_cell_provenance_available": "fields 13/13",
-        "paysim_baseline_and_competitive_budget_comparable": "0.3313 to 0.6388",
-        "paysim_claim_boundary_machine_readable": "supporting only",
-        "elliptic2_supporting_context_and_firewall_visible": "context only",
-        "rowless_external_agent_handoff_recoverable": "rowless handoff",
-        "partial_run_recovery_without_artifact_literacy": "partial recovery",
-        "claim_gate_fails_closed_for_public_interpretation": "case gates pass",
+        "metric_cell_provenance_available": "fields 13/13 in metric-cell audit",
+        "paysim_baseline_and_competitive_budget_comparable": "same split/metric; PR-AUC 0.3313 -> 0.6388",
+        "paysim_claim_boundary_machine_readable": "admissible use present; hard/headline=false",
+        "elliptic2_supporting_context_and_firewall_visible": "reference role visible; parity evidence required",
+        "rowless_external_agent_handoff_recoverable": "raw rows=false; redactions=8; blocked fields=6",
+        "partial_run_recovery_without_artifact_literacy": "partial run; missing=8; actions=6",
+        "claim_gate_fails_closed_for_public_interpretation": "case studies record missing evidence",
     }.get(task_id, signal(task_id))
     return f"{passed(task_id)}; {compact_signal}"
 
@@ -1640,6 +1637,25 @@ def _compact_command_artifact(cell: dict[str, Any]) -> str:
         command_label = command.split()[0] if command else "command"
         artifact_label = _artifact_label(str(cell.get("artifact_ref") or "artifact unavailable"))
     return f"{command_label}; {artifact_label}"
+
+
+def _evidence_role_from_dataset(dataset_id: str) -> str:
+    roles = {
+        "paysim_temporal_transaction_fraud": "bounded demonstration",
+        "elliptic_bitcoin_flattened_graph_aml": "graph-feature evidence",
+        "elliptic2_subgraph_aml": "external reference/context",
+    }
+    return roles.get(dataset_id, "recorded evidence")
+
+
+def _evidence_role_from_cell(cell_id: str) -> str:
+    if cell_id.startswith("paysim_p6a_"):
+        return "bounded demonstration"
+    if cell_id.startswith("elliptic_p7_"):
+        return "graph-feature evidence"
+    if cell_id.startswith("elliptic2_"):
+        return "external reference/context"
+    return "recorded evidence"
 
 
 def _compact_claim_state(claim_state: str) -> str:

@@ -2,13 +2,15 @@
 
 ## Status
 
-P0 through P15 implemented. Slice 16A is the next execution target before Academy work resumes.
+P0 through P15 implemented. A triggerable paper-strengthening follow-on lives in `docs/build_slices/phase_paper_strengthening.md`; if the user triggers Stage 1, Paper Track P16 is next, otherwise Slice 16A is the next academy target.
 
 ## Intent
 
 Paper Track P0 through P15 is the mandatory path between Slice 15Z-R and Slice 16A.
 
 Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, final arXiv source release candidate, and measured system-evaluation proof pack. The final upload still requires local PDF review, bibliography/source-policy confirmation, and clean tag-target proof.
+
+The P16-P21 strengthening track is not part of the original mandatory bridge. It is a user-triggered follow-on for adding stronger failure-case evidence, governance ablations, formal invariants, optional hosted-detector workflow evidence, visual polish, and final preflight before a stronger arXiv or systems/evaluation submission.
 
 ## Paper Thesis
 
@@ -394,3 +396,7 @@ Implemented acceptance:
 3. The handoff evidence is rowless and redacted, and committed P15 reports avoid raw rows, secrets, and private local paths.
 4. P13 consumes the P15 report before rendering reader-facing measured-system-evaluation text.
 5. The current evidence remains protocol-level only; human-study, analyst-hour, production, hard AML, headline, and SOTA claims remain blocked.
+
+Follow-on:
+
+- `docs/build_slices/phase_paper_strengthening.md` registers P16-P21 as the optional paper-strengthening path. P16 should only start when the user triggers Stage 1.

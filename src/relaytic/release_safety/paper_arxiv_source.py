@@ -721,7 +721,7 @@ def _render_latex_table(lines: list[str]) -> list[str]:
 
 def _latex_table_spec(headers: list[str], col_count: int) -> str:
     normalized = [header.strip().lower() for header in headers]
-    if normalized == ["id", "dataset", "metric", "value", "split", "artifact", "claim"]:
+    if normalized == ["id", "dataset", "metric", "value", "split", "artifact", "evidence role"]:
         return (
             "@{}"
             r">{\raggedright\arraybackslash}p{0.075\linewidth} "
@@ -733,13 +733,33 @@ def _latex_table_spec(headers: list[str], col_count: int) -> str:
             r">{\raggedright\arraybackslash}p{0.145\linewidth}"
             "@{}"
         )
-    if normalized == ["track", "families", "features", "search budget", "gate"]:
+    if normalized == ["track", "allowed feature policy", "forbidden or gated inputs", "primary metrics", "evidence role"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.12\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.18\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.17\linewidth}"
+            "@{}"
+        )
+    if normalized == ["track", "families", "features", "search budget", "evidence role"]:
         return (
             "@{}"
             r">{\raggedright\arraybackslash}p{0.11\linewidth} "
             r">{\raggedright\arraybackslash}X "
             r">{\raggedright\arraybackslash}X "
             r">{\raggedright\arraybackslash}p{0.19\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.18\linewidth}"
+            "@{}"
+        )
+    if normalized == ["stage", "model/contract", "selection evidence", "final test evidence", "role"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.12\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.20\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.15\linewidth} "
             r">{\raggedright\arraybackslash}p{0.18\linewidth}"
             "@{}"
         )

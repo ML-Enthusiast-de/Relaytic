@@ -30,16 +30,16 @@
 <text x="847.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Evidence cells</text>
 <line x1="767" y1="214" x2="928" y2="214" stroke="#c8d0dc" stroke-width="1"/>
 <text x="847.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">cell_id</text>
-<text x="847.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">metric + artifact field</text>
-<text x="847.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">claim_state</text>
+<text x="847.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">metric + value</text>
+<text x="847.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">artifact field</text>
 <line x1="954" y1="255" x2="968" y2="255" stroke="#1f2937" stroke-width="1.8"/>
 <polygon points="968,255 959,248 959,262" fill="#1f2937"/>
 <rect x="972" y="148" width="205" height="214" rx="6" fill="#fdeeee" stroke="#1f2937" stroke-width="1.3"/>
 <text x="1074.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Release gates</text>
 <line x1="994" y1="214" x2="1155" y2="214" stroke="#c8d0dc" stroke-width="1"/>
-<text x="1074.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">public_claims_allowed</text>
-<text x="1074.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">source package audit</text>
-<text x="1074.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">rowless handoff</text>
+<text x="1074.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">admissible use</text>
+<text x="1074.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">missing evidence</text>
+<text x="1074.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">release wording</text>
 <rect x="90" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
 <text x="235.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">private rows stay local</text>
 <rect x="465" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
