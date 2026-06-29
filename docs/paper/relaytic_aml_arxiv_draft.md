@@ -187,7 +187,19 @@ The system claim is evaluated through deterministic reader and agent tasks. Thes
 
 Table 5 reports the audit matrix behind the system claim. Each row names a behavior, a deterministic check, a pass criterion, and an observed signal: 13 of 13 provenance fields are present for the PaySim metric cell, baseline and competitive budgets are comparable under the same contract, Elliptic2 remains in its reference role, rowless handoff exposes no raw rows, and interrupted-run recovery surfaces state, missing evidence, and next actions.
 
-**Table 6. Evidence routing examples.**
+**Table 6. Failure-case evaluation.**
+
+| Failure mode | Injected risk | Gate/check | Evidence | Expected behavior | Observed result |
+|---|---|---|---|---|---|
+| Leakage-column injection | PaySim balance fields are offered as candidate model inputs. | Leakage feature policy | PS-PR feature policy | Post-event balance fields stay out of allowed features. | 4 offered, 4 excluded, 0 used; labels=no |
+| Test-set selection violation | A model-selection path tries to use test evidence before the finalist is fixed. | Validation-only selection policy | PS-PR search contract | Only validation evidence may select, calibrate, or threshold the finalist. | validation-only probes; no test selection; one finalist test |
+| Over-strong claim attempt | Draft wording proposes real-bank superiority or RevClassifyDS parity. | Public claim gate | claim-gate report | Unsupported headline and hard-performance claims remain blocked. | 6 blocked claims; hard=no; headline=no |
+| Rowless handoff redaction | An external-agent packet requests raw rows, private paths, or sensitive fields. | Context export redaction | handoff redaction task | The export contains state and next actions, not raw rows or private paths. | raw rows=no; redactions=8; blocked fields=6 |
+| Interrupted-run recovery | A user or agent resumes a partial run without knowing which artifact to inspect. | No-lost-user guide | guide recovery task | The guide exposes current state, missing evidence, artifact shortlist, and next actions. | partial run; missing evidence=8; actions=6 |
+
+Table 6 adds injected failure cases. The point is not detector performance; the checks exercise whether the release path refuses leakage features, test-set model selection, over-strong claims, unsafe handoff, and lost-run states under deterministic system fixtures. These cases make the governance claim auditable without adding a new benchmark row.
+
+**Table 7. Evidence routing examples.**
 
 | Stronger future use | Current admissible use | Evidence needed |
 |---|---|---|
@@ -195,17 +207,17 @@ Table 5 reports the audit matrix behind the system claim. Each row names a behav
 | Elliptic2 reference-method comparison | external RevClassifyDS reference marker plus local context row | Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report. |
 | Graph-native detector release | Elliptic temporal graph-feature evidence path | Graph-native release budget, neural baselines, repeated seeds, and graph-specific ablations. |
 
-Table 6 shows how stronger future uses are handled. Rather than letting narrative claims drift beyond the artifacts, the gate records the current admissible use and the evidence that would be needed before the stronger interpretation could be made.
+Table 7 shows how stronger future uses are handled. Rather than letting narrative claims drift beyond the artifacts, the gate records the current admissible use and the evidence that would be needed before the stronger interpretation could be made.
 
-**Table 7. Rowless handoff and interrupted-run recovery examples.**
+**Table 8. Rowless handoff and interrupted-run recovery examples.**
 
 | Scenario | Input state | Exported fields | Redacted fields | Observed signal |
 |---|---|---|---|---|
-| External-agent handoff | partial run with available guide state | state summary, action options, starter questions, tool contract, artifact shortlist | raw transaction rows, credentials, private paths, raw source files | raw_rows=False; redactions=8; blocked_fields=6 |
-| Safe next action | external model asked what to do next | six next actions, six starter questions, command options | unredacted local paths and data rows | actions=6; starter_questions=6 |
-| Interrupted-run recovery | operator returns to partial run without artifact literacy | current state, missing evidence count, canonical artifact shortlist, context-export command | raw benchmark data and private machine paths | state=partial_run; missing=8; actions=6 |
+| External-agent handoff | partial run with available guide state | state summary, action options, starter questions, tool contract, artifact shortlist | raw transaction rows, credentials, private paths, raw source files | raw rows=no; redactions=8; blocked fields=6 |
+| Safe next action | external model asked what to do next | six next actions, six starter questions, command options | unredacted local paths and data rows | actions=6; starter questions=6 |
+| Interrupted-run recovery | operator returns to partial run without artifact literacy | current state, missing evidence count, canonical artifact shortlist, context-export command | raw benchmark data and private machine paths | partial run; missing evidence=8; actions=6 |
 
-Table 7 gives the practical external-agent story. A second model can receive state, commands, artifacts, and starter questions, while raw rows remain redacted together with private machine paths. The same mechanism helps an inexperienced or interrupted user recover the next action without knowing which internal artifact to inspect first.
+Table 8 gives the practical external-agent story. A second model can receive state, commands, artifacts, and starter questions, while raw rows remain redacted together with private machine paths. The same mechanism helps an inexperienced or interrupted user recover the next action without knowing which internal artifact to inspect first.
 
 ## 8. Limitations and Threats to Validity
 
@@ -221,7 +233,7 @@ The system is intentionally local-first, which creates a tradeoff. Privacy and p
 
 The repository is larger than this AML paper. Relaytic is the general local-first inference lab and public package; Relaytic-AML is the focused AML edition used here for the manuscript. A reader should start with the README and this paper. Development-control files record the build history, but they are not required to understand the paper claims.
 
-**Table 8. Reproducibility contract.**
+**Table 9. Reproducibility contract.**
 
 | Component | Command | Expected output | Environment or data dependency | Hash or seed record |
 |---|---|---|---|---|
@@ -229,6 +241,7 @@ The repository is larger than this AML paper. Relaytic is the general local-firs
 | PaySim benchmark | release-safety paysim-competitive --budget-tier competitive --run-optional --format json | PaySim selected PR-AUC cell | local Kaggle PaySim file required | sha256 prefix 16910f90577b |
 | Elliptic benchmark | release-safety graph-baselines --budget-tier competitive --run-optional --format json | Elliptic selected PR-AUC cell | local Kaggle Elliptic files required | sha256 prefix 93e2e7b2405c plus 2 files |
 | System evaluation | release-safety paper-system-eval --format json | task, handoff, recovery, and claim-gate reports | repo-local deterministic fixtures | all required system-evaluation tasks pass in current evidence pack |
+| Failure-case evaluation | release-safety paper-failure-eval --format json | injected-risk failure-case reports | repo-local deterministic fixtures | all required failure cases pass in current evidence pack |
 
 Minimal regeneration commands are shown below.
 
@@ -237,9 +250,10 @@ Windows PowerShell:
 ```powershell
 py -3.11 -m pip install -e ".[full]"
 py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-failure-eval --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py -q
+py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py -q
 ```
 
 macOS/Linux:
@@ -247,9 +261,10 @@ macOS/Linux:
 ```bash
 python3 -m pip install -e ".[full]"
 python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
+python3 -m relaytic.ui.cli release-safety paper-failure-eval --format json
 python3 -m relaytic.ui.cli release-safety paper-release --format json
 python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py -q
+python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py -q
 ```
 
 Raw benchmark data is not committed. PaySim and Elliptic require local downloads and are referenced through registry artifacts, split reports, hashes, and command ledgers. Elliptic2 remains context-only in this paper because the stronger reference-parity conditions are not satisfied locally. Clean clones can reproduce the paper-generation checks and repo-local public fixtures; full benchmark regeneration requires the locally licensed datasets named in the README.

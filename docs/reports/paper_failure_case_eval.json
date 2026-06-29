@@ -1,0 +1,95 @@
+{
+  "case_count": 5,
+  "cases": [
+    {
+      "artifact_label": "PS-PR feature policy",
+      "artifact_ref": "docs/reports/paysim_leakage_safe_feature_report.json",
+      "case_id": "leakage_column_injection",
+      "claim_boundary": "supports governance evidence only; not detector benchmark evidence",
+      "evidence_cell_id": "paysim_p6a_competitive_selected.test_pr_auc",
+      "expected_behavior": "Post-event balance fields stay out of allowed features.",
+      "failure_mode": "Leakage-column injection",
+      "fixture_scope": "system-level safety/audit fixture",
+      "gate_or_check": "Leakage feature policy",
+      "injected_risk": "PaySim balance fields are offered as candidate model inputs.",
+      "observed_result": "offered=4; excluded=4; used=0; labels_for_features=False",
+      "passed": true
+    },
+    {
+      "artifact_label": "PaySim search contract",
+      "artifact_ref": "docs/reports/paysim_competitive_search_trace.json",
+      "case_id": "test_set_selection_violation",
+      "claim_boundary": "supports governance evidence only; not detector benchmark evidence",
+      "evidence_cell_id": "paysim_p6a_competitive_selected.test_pr_auc",
+      "expected_behavior": "Only validation evidence may select, calibrate, or threshold the finalist.",
+      "failure_mode": "Test-set selection violation",
+      "fixture_scope": "system-level safety/audit fixture",
+      "gate_or_check": "Validation-only selection policy",
+      "injected_risk": "A model-selection path tries to use test evidence before the finalist is fixed.",
+      "observed_result": "probe_surfaces=1 validation-only; test_used_for_selection=False; final_policy=only_validation_selected_finalist_is_evaluated_on_test",
+      "passed": true
+    },
+    {
+      "artifact_label": "Claim routing report",
+      "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
+      "case_id": "overstrong_claim_attempt",
+      "claim_boundary": "supports governance evidence only; not detector benchmark evidence",
+      "evidence_cell_id": "claim-gate:hard_and_headline_claims_blocked",
+      "expected_behavior": "Unsupported headline and hard-performance claims remain blocked.",
+      "failure_mode": "Over-strong claim attempt",
+      "fixture_scope": "system-level safety/audit fixture",
+      "gate_or_check": "Public claim gate",
+      "injected_risk": "Draft wording proposes real-bank superiority or RevClassifyDS parity.",
+      "observed_result": "blocked_claims=6; hard_allowed=False; headline_allowed=False",
+      "passed": true
+    },
+    {
+      "artifact_label": "Agent handoff report",
+      "artifact_ref": "docs/reports/paper_agent_handoff_eval.json",
+      "case_id": "rowless_handoff_redaction",
+      "claim_boundary": "supports governance evidence only; not detector benchmark evidence",
+      "evidence_cell_id": "agent-handoff:external_context_rowless_and_redacted",
+      "expected_behavior": "The export contains state and next actions, not raw rows or private paths.",
+      "failure_mode": "Rowless handoff redaction",
+      "fixture_scope": "system-level safety/audit fixture",
+      "gate_or_check": "Context export redaction",
+      "injected_risk": "An external-agent packet requests raw rows, private paths, or sensitive fields.",
+      "observed_result": "raw_rows=False; redactions=8; blocked_fields=6",
+      "passed": true
+    },
+    {
+      "artifact_label": "Recovery guide report",
+      "artifact_ref": "docs/reports/paper_no_lost_user_eval.json",
+      "case_id": "interrupted_run_recovery",
+      "claim_boundary": "supports governance evidence only; not detector benchmark evidence",
+      "evidence_cell_id": "guide:partial_run_state_recovery",
+      "expected_behavior": "The guide exposes current state, missing evidence, artifact shortlist, and next actions.",
+      "failure_mode": "Interrupted-run recovery",
+      "fixture_scope": "system-level safety/audit fixture",
+      "gate_or_check": "No-lost-user guide",
+      "injected_risk": "A user or agent resumes a partial run without knowing which artifact to inspect.",
+      "observed_result": "state=partial_run; missing=8; actions=6",
+      "passed": true
+    }
+  ],
+  "fixture_scope": "deterministic injected-risk audit over current paper evidence artifacts",
+  "interpretation": "These cases test release-governance behavior. They are not detector benchmarks and do not add real-bank AML superiority, RevClassifyDS parity, production deployment, or graph-neural novelty claims.",
+  "passed_case_count": 5,
+  "private_paths_exposed": false,
+  "raw_rows_exposed": false,
+  "required_inputs": {
+    "missing_artifact_refs": [],
+    "present_artifact_refs": [
+      "docs/reports/paysim_leakage_safe_feature_report.json",
+      "docs/reports/paysim_competitive_search_trace.json",
+      "docs/reports/paysim_competitive_budget_contract.json",
+      "docs/reports/paper_public_claims_allowed.json",
+      "docs/reports/paper_claim_gate_case_studies.json",
+      "docs/reports/paper_agent_handoff_eval.json",
+      "docs/reports/paper_no_lost_user_eval.json"
+    ]
+  },
+  "schema_version": "relaytic.paper_failure_eval.v1",
+  "slice": "Paper Track P16",
+  "status": "pass"
+}

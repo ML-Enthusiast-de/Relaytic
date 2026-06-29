@@ -13,7 +13,7 @@ def _read(relative_path: str) -> str:
     return (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def test_paper_strengthening_track_is_registered_without_implementation_claims() -> None:
+def test_paper_strengthening_track_records_stage_1_and_remaining_followons() -> None:
     plan = _read("docs/build_slices/phase_paper_strengthening.md")
     slicing = _read("RELAYTIC_SLICING_PLAN.md")
     build = _read("RELAYTIC_BUILD_MASTER.md")
@@ -24,10 +24,12 @@ def test_paper_strengthening_track_is_registered_without_implementation_claims()
         assert f"Paper Track {slice_id}" in plan
         assert f"Paper Track {slice_id}" in slicing
 
-    assert "Registered by Stage 0. No P16-P21 implementation has landed yet." in plan
+    assert "Stage 1 is implemented." in plan
+    assert "P17 is the next triggerable stage." in plan
+    assert "Paper Track P16 - failure-case evaluation pack** - implemented" in plan
     assert "phase_paper_strengthening.md" in build
     assert "phase_paper_strengthening.md" in paper_track
-    assert "latest paper-strengthening plan slice" in status
+    assert "latest paper-strengthening slice" in status
 
 
 def test_paper_strengthening_plan_preserves_evidence_first_scope() -> None:

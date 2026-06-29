@@ -84,6 +84,10 @@ P13_GATE_REFS = [
     "docs/reports/paper_claim_gate_case_studies.json",
     "docs/reports/paper_system_eval_manifest.json",
     "docs/reports/paper_system_eval_summary.md",
+    "docs/reports/paper_failure_case_eval.json",
+    "docs/reports/paper_failure_case_table.json",
+    "docs/reports/paper_failure_case_manifest.json",
+    "docs/reports/paper_failure_case_summary.md",
 ]
 
 FORBIDDEN_PUBLIC_RULES = [
@@ -281,6 +285,10 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "claim_gate_case_studies": _read_artifact(reports / "paper_claim_gate_case_studies.json"),
         "system_eval_manifest": _read_artifact(reports / "paper_system_eval_manifest.json"),
         "system_eval_summary": _read_text_artifact(reports / "paper_system_eval_summary.md"),
+        "failure_case_eval": _read_artifact(reports / "paper_failure_case_eval.json"),
+        "failure_case_table": _read_artifact(reports / "paper_failure_case_table.json"),
+        "failure_case_manifest": _read_artifact(reports / "paper_failure_case_manifest.json"),
+        "failure_case_summary": _read_text_artifact(reports / "paper_failure_case_summary.md"),
         "table_provenance": _read_artifact(reports / "paper_table_provenance.json"),
         "paper_reproduction_commands": _read_text_artifact(reports / "paper_reproduction_commands.md"),
         "dataset_registry": _read_artifact(reports / "paper_dataset_registry.json"),
@@ -458,6 +466,9 @@ def _release_checks(
     system_manifest = _payload(inputs["system_eval_manifest"])
     system_behavior = _payload(inputs["system_behavior_eval"])
     system_tasks = _payload(inputs["system_task_eval"])
+    failure_manifest = _payload(inputs["failure_case_manifest"])
+    failure_eval = _payload(inputs["failure_case_eval"])
+    failure_table = _payload(inputs["failure_case_table"])
     required = _required_artifact_presence(inputs)
     paper_artifact_set = set(FINAL_PAPER_REFS)
     table_artifact_set = {item.get("artifact_ref") for item in table_manifest.get("tables", []) if isinstance(item, dict)}
@@ -516,6 +527,15 @@ def _release_checks(
             and not system_tasks.get("failed_tasks"),
             "Reader and external-agent task evaluation must prove navigation, provenance, recovery, privacy, and claim-boundary tasks.",
             source_artifact="docs/reports/paper_system_task_eval.json",
+        ),
+        _check(
+            "p16_failure_case_eval_passed",
+            failure_manifest.get("status") == "ready_for_failure_case_evidence"
+            and failure_eval.get("status") == "pass"
+            and failure_table.get("status") == "pass"
+            and int(failure_eval.get("passed_case_count") or 0) == int(failure_eval.get("case_count") or -1),
+            "Failure-case evaluation must verify leakage, test-selection, over-claim, redaction, and recovery guardrails before the paper describes measured failure prevention.",
+            source_artifact="docs/reports/paper_failure_case_manifest.json",
         ),
         _check(
             "required_p13_inputs_present",
@@ -1005,6 +1025,7 @@ def _render_final_paper_v2(
     model_search_table = _render_model_search_table(inputs)
     paysim_ablation_table = _render_paysim_ablation_table(inputs, metrics)
     system_eval_table = _render_system_evaluation_table(inputs)
+    failure_case_table = _render_failure_case_table(inputs)
     blocked_claim_table = _render_blocked_claim_examples_table()
     handoff_recovery_table = _render_handoff_recovery_table(inputs)
     reproducibility_table = _render_reproducibility_table(inputs)
@@ -1143,13 +1164,17 @@ def _render_final_paper_v2(
             "",
             "Table 5 reports the audit matrix behind the system claim. Each row names a behavior, a deterministic check, a pass criterion, and an observed signal: 13 of 13 provenance fields are present for the PaySim metric cell, baseline and competitive budgets are comparable under the same contract, Elliptic2 remains in its reference role, rowless handoff exposes no raw rows, and interrupted-run recovery surfaces state, missing evidence, and next actions.",
             "",
+            failure_case_table,
+            "",
+            "Table 6 adds injected failure cases. The point is not detector performance; the checks exercise whether the release path refuses leakage features, test-set model selection, over-strong claims, unsafe handoff, and lost-run states under deterministic system fixtures. These cases make the governance claim auditable without adding a new benchmark row.",
+            "",
             blocked_claim_table,
             "",
-            "Table 6 shows how stronger future uses are handled. Rather than letting narrative claims drift beyond the artifacts, the gate records the current admissible use and the evidence that would be needed before the stronger interpretation could be made.",
+            "Table 7 shows how stronger future uses are handled. Rather than letting narrative claims drift beyond the artifacts, the gate records the current admissible use and the evidence that would be needed before the stronger interpretation could be made.",
             "",
             handoff_recovery_table,
             "",
-            "Table 7 gives the practical external-agent story. A second model can receive state, commands, artifacts, and starter questions, while raw rows remain redacted together with private machine paths. The same mechanism helps an inexperienced or interrupted user recover the next action without knowing which internal artifact to inspect first.",
+            "Table 8 gives the practical external-agent story. A second model can receive state, commands, artifacts, and starter questions, while raw rows remain redacted together with private machine paths. The same mechanism helps an inexperienced or interrupted user recover the next action without knowing which internal artifact to inspect first.",
             "",
             "## 8. Limitations and Threats to Validity",
             "",
@@ -1174,9 +1199,10 @@ def _render_final_paper_v2(
             "```powershell",
             "py -3.11 -m pip install -e \".[full]\"",
             "py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-failure-eval --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-release --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py -q",
+            "py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py -q",
             "```",
             "",
             "macOS/Linux:",
@@ -1184,9 +1210,10 @@ def _render_final_paper_v2(
             "```bash",
             "python3 -m pip install -e \".[full]\"",
             "python3 -m relaytic.ui.cli release-safety paper-system-eval --format json",
+            "python3 -m relaytic.ui.cli release-safety paper-failure-eval --format json",
             "python3 -m relaytic.ui.cli release-safety paper-release --format json",
             "python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py -q",
+            "python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py -q",
             "```",
             "",
             "Raw benchmark data is not committed. PaySim and Elliptic require local downloads and are referenced through registry artifacts, split reports, hashes, and command ledgers. Elliptic2 remains context-only in this paper because the stronger reference-parity conditions are not satisfied locally. Clean clones can reproduce the paper-generation checks and repo-local public fixtures; full benchmark regeneration requires the locally licensed datasets named in the README.",
@@ -1376,24 +1403,58 @@ def _render_system_evaluation_table(inputs: dict[str, Any]) -> str:
     return _markdown_table("Table 5. System audit matrix", ["Check", "Command or test", "Evidence", "Pass criterion", "Observed result"], rows)
 
 
+def _render_failure_case_table(inputs: dict[str, Any]) -> str:
+    table = _payload(inputs["failure_case_table"])
+    rows = []
+    for row in table.get("rows", []):
+        if not isinstance(row, dict):
+            continue
+        rows.append(
+            [
+                str(row.get("failure_mode") or ""),
+                str(row.get("injected_risk") or ""),
+                str(row.get("gate_or_check") or ""),
+                str(row.get("evidence") or ""),
+                str(row.get("expected_behavior") or ""),
+                str(row.get("observed_result") or ""),
+            ]
+        )
+    if not rows:
+        rows.append(
+            [
+                "Failure-case pack",
+                "Required P16 report is absent.",
+                "release gate",
+                "paper_failure_case_manifest",
+                "Paper release blocks until the failure-case report is generated.",
+                "not available",
+            ]
+        )
+    return _markdown_table(
+        "Table 6. Failure-case evaluation",
+        ["Failure mode", "Injected risk", "Gate/check", "Evidence", "Expected behavior", "Observed result"],
+        rows,
+    )
+
+
 def _render_blocked_claim_examples_table() -> str:
     rows = [
         ["Real-bank deployment study", "bounded PaySim temporal-proxy demonstration", "Partner or bank-approved holdout, incumbent comparison, analyst-review protocol, and legal release gate."],
         ["Elliptic2 reference-method comparison", "external RevClassifyDS reference marker plus local context row", "Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report."],
         ["Graph-native detector release", "Elliptic temporal graph-feature evidence path", "Graph-native release budget, neural baselines, repeated seeds, and graph-specific ablations."],
     ]
-    return _markdown_table("Table 6. Evidence routing examples", ["Stronger future use", "Current admissible use", "Evidence needed"], rows)
+    return _markdown_table("Table 7. Evidence routing examples", ["Stronger future use", "Current admissible use", "Evidence needed"], rows)
 
 
 def _render_handoff_recovery_table(inputs: dict[str, Any]) -> str:
     handoff_tasks = _task_by_id(_payload(inputs["agent_handoff_eval"]))
     recovery_tasks = _task_by_id(_payload(inputs["no_lost_user_eval"]))
     rows = [
-        ["External-agent handoff", "partial run with available guide state", "state summary, action options, starter questions, tool contract, artifact shortlist", "raw transaction rows, credentials, private paths, raw source files", str(handoff_tasks.get("external_context_rowless_and_redacted", {}).get("measured_signal") or "not observed")],
-        ["Safe next action", "external model asked what to do next", "six next actions, six starter questions, command options", "unredacted local paths and data rows", str(handoff_tasks.get("safe_next_action_exported", {}).get("measured_signal") or "not observed")],
-        ["Interrupted-run recovery", "operator returns to partial run without artifact literacy", "current state, missing evidence count, canonical artifact shortlist, context-export command", "raw benchmark data and private machine paths", str(recovery_tasks.get("partial_run_state_recovery", {}).get("measured_signal") or "not observed")],
+        ["External-agent handoff", "partial run with available guide state", "state summary, action options, starter questions, tool contract, artifact shortlist", "raw transaction rows, credentials, private paths, raw source files", _paper_signal("handoff_redaction", handoff_tasks.get("external_context_rowless_and_redacted", {}).get("measured_signal"))],
+        ["Safe next action", "external model asked what to do next", "six next actions, six starter questions, command options", "unredacted local paths and data rows", _paper_signal("safe_next_action", handoff_tasks.get("safe_next_action_exported", {}).get("measured_signal"))],
+        ["Interrupted-run recovery", "operator returns to partial run without artifact literacy", "current state, missing evidence count, canonical artifact shortlist, context-export command", "raw benchmark data and private machine paths", _paper_signal("interrupted_recovery", recovery_tasks.get("partial_run_state_recovery", {}).get("measured_signal"))],
     ]
-    return _markdown_table("Table 7. Rowless handoff and interrupted-run recovery examples", ["Scenario", "Input state", "Exported fields", "Redacted fields", "Observed signal"], rows)
+    return _markdown_table("Table 8. Rowless handoff and interrupted-run recovery examples", ["Scenario", "Input state", "Exported fields", "Redacted fields", "Observed signal"], rows)
 
 
 def _render_reproducibility_table(inputs: dict[str, Any]) -> str:
@@ -1402,8 +1463,9 @@ def _render_reproducibility_table(inputs: dict[str, Any]) -> str:
         ["PaySim benchmark", "release-safety paysim-competitive --budget-tier competitive --run-optional --format json", "PaySim selected PR-AUC cell", "local Kaggle PaySim file required", _repro_hash_summary(inputs, "paysim_temporal_transaction_fraud")],
         ["Elliptic benchmark", "release-safety graph-baselines --budget-tier competitive --run-optional --format json", "Elliptic selected PR-AUC cell", "local Kaggle Elliptic files required", _repro_hash_summary(inputs, "elliptic_bitcoin_flattened_graph_aml")],
         ["System evaluation", "release-safety paper-system-eval --format json", "task, handoff, recovery, and claim-gate reports", "repo-local deterministic fixtures", "all required system-evaluation tasks pass in current evidence pack"],
+        ["Failure-case evaluation", "release-safety paper-failure-eval --format json", "injected-risk failure-case reports", "repo-local deterministic fixtures", "all required failure cases pass in current evidence pack"],
     ]
-    return _markdown_table("Table 8. Reproducibility contract", ["Component", "Command", "Expected output", "Environment or data dependency", "Hash or seed record"], rows)
+    return _markdown_table("Table 9. Reproducibility contract", ["Component", "Command", "Expected output", "Environment or data dependency", "Hash or seed record"], rows)
 
 
 def _evidence_cell_display_id(cell_id: str) -> str:
@@ -1429,6 +1491,17 @@ def _audit_result(task_id: str, passed: Callable[[str], str], signal: Callable[[
         "claim_gate_fails_closed_for_public_interpretation": "case studies record missing evidence",
     }.get(task_id, signal(task_id))
     return f"{passed(task_id)}; {compact_signal}"
+
+
+def _paper_signal(signal_id: str, measured_signal: Any) -> str:
+    display = {
+        "handoff_redaction": "raw rows=no; redactions=8; blocked fields=6",
+        "safe_next_action": "actions=6; starter questions=6",
+        "interrupted_recovery": "partial run; missing evidence=8; actions=6",
+    }
+    if signal_id in display:
+        return display[signal_id]
+    return str(measured_signal or "not observed").replace("_", " ")
 
 
 def _compact_split_label(split: str) -> str:

@@ -1,0 +1,81 @@
+{
+  "columns": [
+    "Failure mode",
+    "Injected risk",
+    "Gate/check",
+    "Evidence",
+    "Expected behavior",
+    "Observed result"
+  ],
+  "rows": [
+    {
+      "artifact_ref": "docs/reports/paysim_leakage_safe_feature_report.json",
+      "case_id": "leakage_column_injection",
+      "evidence": "PS-PR feature policy",
+      "evidence_cell_id": "paysim_p6a_competitive_selected.test_pr_auc",
+      "expected_behavior": "Post-event balance fields stay out of allowed features.",
+      "failure_mode": "Leakage-column injection",
+      "full_observed_result": "offered=4; excluded=4; used=0; labels_for_features=False",
+      "gate_or_check": "Leakage feature policy",
+      "injected_risk": "PaySim balance fields are offered as candidate model inputs.",
+      "observed_result": "4 offered, 4 excluded, 0 used; labels=no",
+      "passed": true
+    },
+    {
+      "artifact_ref": "docs/reports/paysim_competitive_search_trace.json",
+      "case_id": "test_set_selection_violation",
+      "evidence": "PS-PR search contract",
+      "evidence_cell_id": "paysim_p6a_competitive_selected.test_pr_auc",
+      "expected_behavior": "Only validation evidence may select, calibrate, or threshold the finalist.",
+      "failure_mode": "Test-set selection violation",
+      "full_observed_result": "probe_surfaces=1 validation-only; test_used_for_selection=False; final_policy=only_validation_selected_finalist_is_evaluated_on_test",
+      "gate_or_check": "Validation-only selection policy",
+      "injected_risk": "A model-selection path tries to use test evidence before the finalist is fixed.",
+      "observed_result": "validation-only probes; no test selection; one finalist test",
+      "passed": true
+    },
+    {
+      "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
+      "case_id": "overstrong_claim_attempt",
+      "evidence": "claim-gate report",
+      "evidence_cell_id": "claim-gate:hard_and_headline_claims_blocked",
+      "expected_behavior": "Unsupported headline and hard-performance claims remain blocked.",
+      "failure_mode": "Over-strong claim attempt",
+      "full_observed_result": "blocked_claims=6; hard_allowed=False; headline_allowed=False",
+      "gate_or_check": "Public claim gate",
+      "injected_risk": "Draft wording proposes real-bank superiority or RevClassifyDS parity.",
+      "observed_result": "6 blocked claims; hard=no; headline=no",
+      "passed": true
+    },
+    {
+      "artifact_ref": "docs/reports/paper_agent_handoff_eval.json",
+      "case_id": "rowless_handoff_redaction",
+      "evidence": "handoff redaction task",
+      "evidence_cell_id": "agent-handoff:external_context_rowless_and_redacted",
+      "expected_behavior": "The export contains state and next actions, not raw rows or private paths.",
+      "failure_mode": "Rowless handoff redaction",
+      "full_observed_result": "raw_rows=False; redactions=8; blocked_fields=6",
+      "gate_or_check": "Context export redaction",
+      "injected_risk": "An external-agent packet requests raw rows, private paths, or sensitive fields.",
+      "observed_result": "raw rows=no; redactions=8; blocked fields=6",
+      "passed": true
+    },
+    {
+      "artifact_ref": "docs/reports/paper_no_lost_user_eval.json",
+      "case_id": "interrupted_run_recovery",
+      "evidence": "guide recovery task",
+      "evidence_cell_id": "guide:partial_run_state_recovery",
+      "expected_behavior": "The guide exposes current state, missing evidence, artifact shortlist, and next actions.",
+      "failure_mode": "Interrupted-run recovery",
+      "full_observed_result": "state=partial_run; missing=8; actions=6",
+      "gate_or_check": "No-lost-user guide",
+      "injected_risk": "A user or agent resumes a partial run without knowing which artifact to inspect.",
+      "observed_result": "partial run; missing evidence=8; actions=6",
+      "passed": true
+    }
+  ],
+  "schema_version": "relaytic.paper_failure_eval.v1",
+  "slice": "Paper Track P16",
+  "status": "pass",
+  "table_id": "failure_case_evaluation"
+}

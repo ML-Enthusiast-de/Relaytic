@@ -1,0 +1,89 @@
+{
+  "artifact_hashes": {
+    "docs/reports/paper_agent_handoff_eval.json": "3b228b1d99b4f2a6d0ae22a3fdfe6451fc8f2383d88066edecee93fa4bd2d290",
+    "docs/reports/paper_claim_gate_case_studies.json": "e67a9a0f3d340bbc3d96d16b4e96f0ccfa6dd2a09cb1d813d87dd4d215cd72e2",
+    "docs/reports/paper_no_lost_user_eval.json": "6a68a1c96069a3b39524f281352ad72c60db344e501a432804693923411477d0",
+    "docs/reports/paper_public_claims_allowed.json": "4318a61dcd778affd5b7d9fb85ecb090dcf8d061846ee3558877f3768e226568",
+    "docs/reports/paysim_competitive_budget_contract.json": "a987738376a7eb702269a649009b3f8a949a47fcc78f2fc8f82f935ced6a2feb",
+    "docs/reports/paysim_competitive_search_trace.json": "f37673ff705233e9b82d45ebf3f1551fdc687023c1470160718e9be104152a4a",
+    "docs/reports/paysim_leakage_safe_feature_report.json": "5929bba645118009267ea68cfd6ad806377589ba933fed4f44500c7a1c405d12"
+  },
+  "checks": [
+    {
+      "check_id": "required_failure_case_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [],
+        "present_artifact_refs": [
+          "docs/reports/paysim_leakage_safe_feature_report.json",
+          "docs/reports/paysim_competitive_search_trace.json",
+          "docs/reports/paysim_competitive_budget_contract.json",
+          "docs/reports/paper_public_claims_allowed.json",
+          "docs/reports/paper_claim_gate_case_studies.json",
+          "docs/reports/paper_agent_handoff_eval.json",
+          "docs/reports/paper_no_lost_user_eval.json"
+        ]
+      },
+      "message": "All P16 source evidence artifacts must be present.",
+      "passed": true,
+      "source_artifact": "docs/reports"
+    },
+    {
+      "check_id": "all_failure_cases_pass",
+      "detail": {
+        "case_ids": [
+          "leakage_column_injection",
+          "test_set_selection_violation",
+          "overstrong_claim_attempt",
+          "rowless_handoff_redaction",
+          "interrupted_run_recovery"
+        ]
+      },
+      "message": "Every required injected failure case must pass.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_failure_case_eval.json"
+    },
+    {
+      "check_id": "failure_table_materialized",
+      "message": "The paper-ready failure-case table must be generated from the case report.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_failure_case_table.json"
+    },
+    {
+      "check_id": "rowless_and_path_safe",
+      "message": "The P16 reports must not expose raw rows or private machine paths.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_failure_case_eval.json"
+    },
+    {
+      "check_id": "claim_boundary_preserved",
+      "message": "P16 may support governance claims only, not detector-superiority claims.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_failure_case_eval.json"
+    }
+  ],
+  "detector_superiority_claim_allowed": false,
+  "failed_checks": [],
+  "failure_case_evidence_allowed": true,
+  "fixture_scope": "deterministic injected-risk audit over current paper evidence artifacts",
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "next_slice": "Paper Track P17 - governance machinery ablation pack",
+  "report_refs": {
+    "paper_failure_case_eval": "docs/reports/paper_failure_case_eval.json",
+    "paper_failure_case_manifest": "docs/reports/paper_failure_case_manifest.json",
+    "paper_failure_case_summary": "docs/reports/paper_failure_case_summary.md",
+    "paper_failure_case_table": "docs/reports/paper_failure_case_table.json"
+  },
+  "required_source_artifacts": [
+    "docs/reports/paysim_leakage_safe_feature_report.json",
+    "docs/reports/paysim_competitive_search_trace.json",
+    "docs/reports/paysim_competitive_budget_contract.json",
+    "docs/reports/paper_public_claims_allowed.json",
+    "docs/reports/paper_claim_gate_case_studies.json",
+    "docs/reports/paper_agent_handoff_eval.json",
+    "docs/reports/paper_no_lost_user_eval.json"
+  ],
+  "schema_version": "relaytic.paper_failure_eval.v1",
+  "slice": "Paper Track P16",
+  "status": "ready_for_failure_case_evidence"
+}

@@ -1550,6 +1550,21 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p16 = release_safety_sub.add_parser(
+        "paper-failure-eval",
+        help="Build Paper Track P16 deterministic failure-case evaluation reports.",
+    )
+    release_safety_p16.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P16 report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p16.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3605,6 +3620,10 @@ def main(argv: list[str] | None = None) -> int:
             elif args.release_safety_command == "paper-system-eval":
                 payload = _run_paper_system_eval_surface(
                     state_dir=args.state_dir,
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-failure-eval":
+                payload = _run_paper_failure_eval_surface(
                     output_dir=args.output_dir,
                 )
             else:
@@ -7850,6 +7869,43 @@ def _run_paper_system_eval_surface(
             "bundle": pack,
         },
         "human_output": render_paper_system_eval_markdown(pack),
+    }
+
+
+def _run_paper_failure_eval_surface(
+    *,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_failure_eval_markdown,
+        sync_paper_failure_eval_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_failure_eval_pack(
+        root,
+        output_dir=output_dir,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    manifest = dict(pack["paper_failure_case_manifest"])
+    evaluation = dict(pack["paper_failure_case_eval"])
+    table = dict(pack["paper_failure_case_table"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_failure_case_manifest": manifest,
+            "paper_failure_case_eval": evaluation,
+            "paper_failure_case_table": table,
+            "bundle": pack,
+        },
+        "human_output": render_paper_failure_eval_markdown(pack),
     }
 
 

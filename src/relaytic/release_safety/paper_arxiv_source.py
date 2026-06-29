@@ -763,6 +763,17 @@ def _latex_table_spec(headers: list[str], col_count: int) -> str:
             r">{\raggedright\arraybackslash}p{0.18\linewidth}"
             "@{}"
         )
+    if normalized == ["failure mode", "injected risk", "gate/check", "evidence", "expected behavior", "observed result"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.13\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.17\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.13\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.16\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.16\linewidth}"
+            "@{}"
+        )
     columns = []
     for header in normalized:
         if header in {"value", "test pr-auc", "pr-auc"}:

@@ -16,6 +16,10 @@
 | `docs/reports/paper_claim_gate_case_studies.json` | yes | internal evidence record |
 | `docs/reports/paper_system_eval_manifest.json` | yes | internal evidence record |
 | `docs/reports/paper_system_eval_summary.md` | yes | internal evidence record |
+| `docs/reports/paper_failure_case_eval.json` | yes | internal evidence record |
+| `docs/reports/paper_failure_case_table.json` | yes | internal evidence record |
+| `docs/reports/paper_failure_case_manifest.json` | yes | internal evidence record |
+| `docs/reports/paper_failure_case_summary.md` | yes | internal evidence record |
 | `docs/paper/relaytic_aml_arxiv_draft.md` | yes | paper manuscript |
 | `docs/paper/relaytic_aml_draft.md` | yes | draft-generation support artifact |
 | `docs/paper/figures/figure_manifest.json` | yes | figure source artifact |
