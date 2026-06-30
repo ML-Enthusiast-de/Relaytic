@@ -139,4 +139,4 @@ def test_paper_track_p15_committed_system_eval_artifacts_are_ready() -> None:
     assert "rowless handoff exposes no raw rows" in draft
     assert "Table 5 reports the audit matrix" in draft
     assert "raw rows remain redacted" in draft
-    assert "Table 8 gives the practical external-agent story" in draft
+    assert "Table 10 gives the practical external-agent story" in draft

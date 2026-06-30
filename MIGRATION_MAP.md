@@ -403,7 +403,15 @@ Avoid introducing new references to:
 - introduced the public command `relaytic release-safety paper-failure-eval` for regenerating P16 failure-case artifacts before P13/P14 release regeneration
 - introduced paper-track failure-case artifacts under `docs/reports/`: `paper_failure_case_eval.json`, `paper_failure_case_table.json`, `paper_failure_case_manifest.json`, and `paper_failure_case_summary.md`
 - P16 records system-level safety/audit fixtures for leakage-column injection, test-set selection violation, over-strong claim attempts, rowless handoff redaction, and interrupted-run recovery while preserving all hard/headline detector-claim blockers
-- wired P15 into the P13 release gate so reader-facing claims about user and agent handoff are backed by measured protocol evidence; the evidence remains bounded to deterministic system behavior and does not claim human-study, analyst-hour, or production deployment results
+- wired P16 into the P13 release gate so reader-facing claims about failure prevention are backed by deterministic injected-risk evidence; the evidence remains bounded to system behavior and does not claim detector superiority, human-study, analyst-hour, or production deployment results
+
+### Paper Track P17
+
+- introduced `src/relaytic/release_safety/paper_governance_ablation.py` under the existing release-safety boundary for deterministic governance-ablation evidence
+- introduced the public command `relaytic release-safety paper-governance-ablation` for regenerating P17 governance-ablation artifacts before P13/P14 release regeneration
+- introduced paper-track governance-ablation artifacts under `docs/reports/`: `paper_governance_ablation_eval.json`, `paper_governance_ablation_matrix.json`, `paper_governance_ablation_manifest.json`, and `paper_governance_ablation_summary.md`
+- P17 records full-path versus disabled-component fixtures for public-claim gates, PaySim leakage policy, rowless handoff redaction, metric-cell required fields, and interrupted-run recovery while preserving all hard/headline detector-claim blockers
+- the disabled-component rows are deterministic governance fixtures, not live unsafe runtime modes and not detector benchmark claims
 
 ### AML Pivot Track
 
@@ -1014,6 +1022,22 @@ Implemented daemon, feasibility, remote-supervision, and mission-control proof a
 - `representation_transfer_report.json`
 - `representation_ood_report.json`
 - `jepa_pretraining_report.json`
+
+## Paper Track P18 Governance Invariants
+
+P18 adds a release-safety/governance surface, not a detector boundary expansion.
+
+- introduced `src/relaytic/release_safety/paper_invariants.py`
+- introduced the public command `relaytic release-safety paper-invariants`
+- added generated artifacts:
+  - `docs/reports/paper_governance_invariants.json`
+  - `docs/reports/paper_adjacent_systems_comparison.json`
+  - `docs/reports/paper_invariant_manifest.json`
+  - `docs/reports/paper_invariant_summary.md`
+- gated `paper-release` on the P18 invariant proof obligation
+- extended the generated paper with an adjacent-systems comparison and a governance-invariant evidence map
+
+Compatibility boundary: P18 does not promote any hard AML, detector-SOTA, graph-neural novelty, production-ready, RevClassifyDS parity, or real-bank superiority claim. It only makes the current governance contracts explicit and machine-auditable.
 
 ## Removal Criteria
 

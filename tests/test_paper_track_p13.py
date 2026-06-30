@@ -64,9 +64,12 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Table 4. PaySim modeling path" in draft
     assert "Table 5. System audit matrix" in draft
     assert "Table 6. Failure-case evaluation" in draft
-    assert "Table 7. Evidence routing examples" in draft
-    assert "Table 8. Rowless handoff and interrupted-run recovery examples" in draft
-    assert "Table 9. Reproducibility contract" in draft
+    assert "Table 7. Governance machinery ablation" in draft
+    assert "Adjacent systems comparison" in draft
+    assert "Table 8. Governance invariants and evidence map" in draft
+    assert "Table 9. Evidence routing examples" in draft
+    assert "Table 10. Rowless handoff and interrupted-run recovery examples" in draft
+    assert "Table 11. Reproducibility contract" in draft
     assert ("TODO" + "_EVIDENCE") not in draft
     assert "pending isolated" + " test" not in draft
     for phrase in FORBIDDEN_READER_TONE_PHRASES:

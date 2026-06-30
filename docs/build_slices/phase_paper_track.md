@@ -1,16 +1,16 @@
-# Paper Track P0-P15 - Relaytic-AML arXiv benchmark path
+# Paper Track P0-P17 - Relaytic-AML arXiv benchmark path
 
 ## Status
 
-P0 through P16 implemented. A triggerable paper-strengthening follow-on lives in `docs/build_slices/phase_paper_strengthening.md`; if the user triggers Stage 2, Paper Track P17 is next, otherwise Slice 16A is the next academy target.
+P0 through P18 implemented. A triggerable paper-strengthening follow-on lives in `docs/build_slices/phase_paper_strengthening.md`; if the user triggers Stage 4 and selects the hosted-detector demonstration route, Paper Track P19 is next, otherwise Paper Track P20 or Slice 16A is the next target.
 
 ## Intent
 
-Paper Track P0 through P16 is the mandatory path plus first strengthening stage between Slice 15Z-R and Slice 16A.
+Paper Track P0 through P18 is the mandatory path plus the first three strengthening stages between Slice 15Z-R and Slice 16A.
 
 Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, final arXiv source release candidate, and measured system-evaluation proof pack. The final upload still requires local PDF review, bibliography/source-policy confirmation, and clean tag-target proof.
 
-The P17-P21 strengthening track is not part of the original mandatory bridge. It is a user-triggered follow-on for adding governance ablations, formal invariants, optional hosted-detector workflow evidence, visual polish, and final preflight before a stronger arXiv or systems/evaluation submission.
+The P18-P21 strengthening track is not part of the original mandatory bridge. It is a user-triggered follow-on for adding formal invariants, optional hosted-detector workflow evidence, visual polish, and final preflight before a stronger arXiv or systems/evaluation submission.
 
 ## Paper Thesis
 
@@ -70,6 +70,10 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
     Convert the claim-safe Markdown paper pack into a LaTeX source tree, convert figures into accepted arXiv graphic formats, audit citations and package hygiene, and leave upload blocked until human TeX/PDF inspection and clean release gates are complete.
 21. **P15 - measured system-evaluation proof pack** - implemented
     Exercise guide onboarding, partial-run recovery, redacted external-agent handoff, local-LLM advisory boundaries, interoperability discovery, and paper claim gates before regenerating release artifacts.
+22. **P16 - failure-case evaluation pack** - implemented
+    Add deterministic injected-risk cases for leakage columns, test-set selection, over-strong claims, unsafe handoff, and interrupted-run recovery.
+23. **P17 - governance machinery ablation pack** - implemented
+    Compare the full governance path with disabled-component fixtures for claim gates, leakage policy, rowless handoff redaction, metric-cell required fields, and recovery guidance.
 
 ## Non-Negotiable Gates
 
@@ -399,4 +403,4 @@ Implemented acceptance:
 
 Follow-on:
 
-- `docs/build_slices/phase_paper_strengthening.md` records P16 as implemented and P17-P21 as the remaining optional paper-strengthening path. P17 should only start when the user triggers Stage 2.
+- `docs/build_slices/phase_paper_strengthening.md` records P16 through P18 as implemented and P19-P21 as the remaining optional paper-strengthening path. P19 should only start when the user triggers Stage 4 and selects a hosted-detector demonstration route.

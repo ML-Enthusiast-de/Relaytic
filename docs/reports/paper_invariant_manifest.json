@@ -1,0 +1,158 @@
+{
+  "checks": [
+    {
+      "check_id": "required_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [],
+        "present_artifact_refs": [
+          "docs/reports/paper_metric_cell_audit.json",
+          "docs/reports/paper_public_claims_allowed.json",
+          "docs/reports/paper_publishability_matrix.json",
+          "docs/reports/paper_claim_lint_report.json",
+          "docs/reports/paper_release_go_no_go.json",
+          "docs/reports/paper_system_task_eval.json",
+          "docs/reports/paper_agent_handoff_eval.json",
+          "docs/reports/paper_no_lost_user_eval.json",
+          "docs/reports/paper_failure_case_eval.json",
+          "docs/reports/paper_governance_ablation_eval.json",
+          "docs/reports/paper_governance_ablation_manifest.json",
+          "docs/reports/paysim_leakage_safe_feature_report.json",
+          "docs/paper/references.bib"
+        ]
+      },
+      "message": "P18 requires the P10-P17 governance, failure, and metric-cell evidence artifacts.",
+      "passed": true
+    },
+    {
+      "check_id": "invariant_proof_obligation_passed",
+      "message": "Every named current invariant must map to evidence refs, a failure or ablation signal, or a limitation boundary.",
+      "passed": true
+    },
+    {
+      "check_id": "adjacent_systems_comparison_passed",
+      "message": "Adjacent systems comparison must cover the required families with resolved citations where sources are named.",
+      "passed": true
+    },
+    {
+      "check_id": "detector_claim_boundary_preserved",
+      "message": "P18 must not strengthen detector claims.",
+      "passed": true
+    },
+    {
+      "check_id": "generated_reports_redacted",
+      "detail": {
+        "private_path_patterns": [],
+        "raw_row_markers": []
+      },
+      "message": "P18 reports must not expose local machine paths or raw-row markers.",
+      "passed": true
+    }
+  ],
+  "claim_boundary": "governance architecture only; detector superiority, production AML readiness, graph-neural novelty, and RevClassifyDS parity remain blocked",
+  "failed_checks": [],
+  "input_artifacts": [
+    {
+      "artifact_ref": "docs/reports/paper_metric_cell_audit.json",
+      "exists": true,
+      "input_id": "metric_cell_audit",
+      "sha256_prefix": "e22ab8c753c4"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
+      "exists": true,
+      "input_id": "public_claims_allowed",
+      "sha256_prefix": "4318a61dcd77"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_publishability_matrix.json",
+      "exists": true,
+      "input_id": "publishability_matrix",
+      "sha256_prefix": "74ad1e835b8e"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_claim_lint_report.json",
+      "exists": true,
+      "input_id": "claim_lint",
+      "sha256_prefix": "9123d9521638"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_release_go_no_go.json",
+      "exists": true,
+      "input_id": "release_go_no_go",
+      "sha256_prefix": "51aa6561f57a"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_system_task_eval.json",
+      "exists": true,
+      "input_id": "system_task_eval",
+      "sha256_prefix": "8b40f361fec4"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_agent_handoff_eval.json",
+      "exists": true,
+      "input_id": "agent_handoff_eval",
+      "sha256_prefix": "3b228b1d99b4"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_no_lost_user_eval.json",
+      "exists": true,
+      "input_id": "no_lost_user_eval",
+      "sha256_prefix": "6a68a1c96069"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_failure_case_eval.json",
+      "exists": true,
+      "input_id": "failure_case_eval",
+      "sha256_prefix": "a7abf9da24a1"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
+      "exists": true,
+      "input_id": "governance_ablation_eval",
+      "sha256_prefix": "013a946b7f1f"
+    },
+    {
+      "artifact_ref": "docs/reports/paper_governance_ablation_manifest.json",
+      "exists": true,
+      "input_id": "governance_ablation_manifest",
+      "sha256_prefix": "befaa3a39f76"
+    },
+    {
+      "artifact_ref": "docs/reports/paysim_leakage_safe_feature_report.json",
+      "exists": true,
+      "input_id": "paysim_feature_report",
+      "sha256_prefix": "5929bba64511"
+    },
+    {
+      "artifact_ref": "docs/paper/references.bib",
+      "exists": true,
+      "input_id": "references",
+      "sha256_prefix": "eb3ff711c6e0"
+    }
+  ],
+  "next_slice": "Paper Track P19 - hosted detector workflow demonstration, if selected",
+  "report_refs": [
+    "docs/reports/paper_governance_invariants.json",
+    "docs/reports/paper_adjacent_systems_comparison.json",
+    "docs/reports/paper_invariant_manifest.json",
+    "docs/reports/paper_invariant_summary.md"
+  ],
+  "required_input_artifact_refs": [
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_public_claims_allowed.json",
+    "docs/reports/paper_publishability_matrix.json",
+    "docs/reports/paper_claim_lint_report.json",
+    "docs/reports/paper_release_go_no_go.json",
+    "docs/reports/paper_system_task_eval.json",
+    "docs/reports/paper_agent_handoff_eval.json",
+    "docs/reports/paper_no_lost_user_eval.json",
+    "docs/reports/paper_failure_case_eval.json",
+    "docs/reports/paper_governance_ablation_eval.json",
+    "docs/reports/paper_governance_ablation_manifest.json",
+    "docs/reports/paysim_leakage_safe_feature_report.json",
+    "docs/paper/references.bib"
+  ],
+  "schema_version": "relaytic.paper_invariants.v1",
+  "slice": "Paper Track P18",
+  "status": "ready_for_governance_invariant_evidence"
+}

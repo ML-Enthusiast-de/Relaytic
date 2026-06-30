@@ -45,7 +45,7 @@ def test_paper_track_p14_builds_arxiv_source_release_candidate() -> None:
     assert manifest["citation_audit"]["status"] == "pass"
     assert manifest["figure_audit"]["status"] == "pass"
     assert manifest["figure_audit"]["svg_references_remaining"] == []
-    assert manifest["next_slice"].startswith("Slice 16A")
+    assert manifest["next_slice"].startswith("Paper Track P19")
     assert not manifest["failed_checks"]
 
     assert audit["status"] == "pass"

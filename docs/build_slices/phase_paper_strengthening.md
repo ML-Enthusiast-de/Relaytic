@@ -2,7 +2,7 @@
 
 ## Status
 
-Stage 1 is implemented. P16 now produces deterministic failure-case evidence and the generated paper consumes it as a publication table. P17 is the next triggerable stage.
+Stage 3 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, and P18 produces formal governance-invariant plus adjacent-systems positioning evidence; the generated paper consumes all three as publication-ready system-evaluation material. P19 is the next triggerable stage and requires a short decision before implementation.
 
 ## Intent
 
@@ -36,11 +36,11 @@ Stage 4 requires a short decision before implementation: prefer an external-scor
 1. **Paper Track P16 - failure-case evaluation pack** - implemented
    Added deterministic failure fixtures and artifacts for leakage-column injection, test-set selection violation, over-strong claim attempts, rowless handoff redaction, and interrupted-run recovery. Generated a machine-readable report and a paper-ready failure-case table.
 
-2. **Paper Track P17 - governance machinery ablation pack**
-   Compare the full Relaytic-AML path against disabled-gate fixtures: no claim gate, no leakage policy, no rowless handoff redaction, and no evidence-cell required fields. Report unsupported claims released, leakage features allowed, raw fields exported, missing provenance fields, publishable tables generated, and recovery next actions available.
+2. **Paper Track P17 - governance machinery ablation pack** - implemented
+   Compares the full Relaytic-AML path against deterministic disabled-component fixtures: no claim gate, no leakage policy, no rowless handoff redaction, no evidence-cell required fields, and no interrupted-run recovery guide. Reports unsupported claims released, leakage features allowed, raw fields exported, missing provenance fields, publishable tables generated, and recovery next actions available.
 
-3. **Paper Track P18 - governance invariants and adjacent-systems positioning**
-   Add formal release/governance invariants and connect them to P16/P17 checks. Add a compact related-work comparison against model cards, datasheets, reproducibility checklists, MLflow/W&B/DVC-style tracking, agent benchmarks, and AML detector papers.
+3. **Paper Track P18 - governance invariants and adjacent-systems positioning** - implemented
+   Adds formal release/governance invariants and connects them to P16/P17 checks. Adds a compact related-work comparison against model cards, datasheets, reproducibility checklists, MLOps experiment tracking, agent benchmarks, and AML detector papers.
 
 4. **Paper Track P19 - hosted detector workflow demonstration**
    If feasible, demonstrate that Relaytic-AML can host a stronger detector workflow through an external score-file adapter, a lightweight graph-native fixture, or a RevClassifyDS-style external scorecard adapter. The claim is substrate hosting and evidence routing, not detector superiority.
@@ -64,7 +64,7 @@ Stage 4 requires a short decision before implementation: prefer an external-scor
 
 ## Expected Evidence Artifacts
 
-P16 and P17 introduce committed, machine-readable reports under `docs/reports/`. P16 writes `paper_failure_case_eval.json`, `paper_failure_case_table.json`, `paper_failure_case_manifest.json`, and `paper_failure_case_summary.md`. P17 should add the governance-ablation family.
+P16 through P18 introduce committed, machine-readable reports under `docs/reports/`. P16 writes `paper_failure_case_eval.json`, `paper_failure_case_table.json`, `paper_failure_case_manifest.json`, and `paper_failure_case_summary.md`. P17 writes `paper_governance_ablation_eval.json`, `paper_governance_ablation_matrix.json`, `paper_governance_ablation_manifest.json`, and `paper_governance_ablation_summary.md`. P18 writes `paper_governance_invariants.json`, `paper_adjacent_systems_comparison.json`, `paper_invariant_manifest.json`, and `paper_invariant_summary.md`.
 
 - failure-case evaluation manifest and per-case reports
 - governance ablation matrix
@@ -74,6 +74,8 @@ P16 and P17 introduce committed, machine-readable reports under `docs/reports/`.
 - over-strong-claim routing report
 - rowless handoff redaction report
 - interrupted-run recovery report
+- governance-invariant proof map
+- adjacent-systems positioning comparison
 
 ## Stage 1 Acceptance
 
@@ -84,6 +86,26 @@ Stage 1 is complete when:
 3. P13 release generation fails closed if P16 evidence is missing.
 4. The generated manuscript includes a publication-clean failure-case table and preserves the evaluation-lab claim boundary.
 5. Focused P13-P16 tests and LaTeX/source audits pass without overfull table warnings.
+
+## Stage 2 Acceptance
+
+Stage 2 is complete when:
+
+1. `relaytic release-safety paper-governance-ablation` writes the P17 report family under `docs/reports/`.
+2. The report compares the full governance path with disabled fixtures for public-claim gating, leakage policy, rowless handoff redaction, metric-cell required fields, and interrupted-run recovery.
+3. P13 release generation fails closed if P17 evidence is missing.
+4. The generated manuscript includes a publication-clean governance-ablation table and states that the ablation is system/governance evidence, not detector performance evidence.
+5. Focused P13-P17 tests and LaTeX/source audits pass without overfull table warnings.
+
+## Stage 3 Acceptance
+
+Stage 3 is complete when:
+
+1. `relaytic release-safety paper-invariants` writes the P18 report family under `docs/reports/`.
+2. The report records current invariants for metric-cell provenance, claim-strength monotonicity, leakage and selection firewalls, rowless handoff, interrupted-run recovery, benchmark role separation, and local-first release safety.
+3. Every current invariant maps to at least one evidence artifact plus a failure, ablation, or limitation boundary.
+4. The generated manuscript includes an adjacent-systems comparison and a governance-invariant evidence table without promoting detector-superiority claims.
+5. Focused P13-P18 tests and LaTeX/source audits pass without overfull table warnings.
 
 ## Stage 0 Acceptance (completed)
 

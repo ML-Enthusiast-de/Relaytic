@@ -26,7 +26,15 @@
         "docs/reports/paper_failure_case_eval.json",
         "docs/reports/paper_failure_case_table.json",
         "docs/reports/paper_failure_case_manifest.json",
-        "docs/reports/paper_failure_case_summary.md"
+        "docs/reports/paper_failure_case_summary.md",
+        "docs/reports/paper_governance_ablation_eval.json",
+        "docs/reports/paper_governance_ablation_matrix.json",
+        "docs/reports/paper_governance_ablation_manifest.json",
+        "docs/reports/paper_governance_ablation_summary.md",
+        "docs/reports/paper_governance_invariants.json",
+        "docs/reports/paper_adjacent_systems_comparison.json",
+        "docs/reports/paper_invariant_manifest.json",
+        "docs/reports/paper_invariant_summary.md"
       ],
       "table_id": "evidence_summary"
     },
@@ -52,13 +60,21 @@
         "docs/reports/paper_failure_case_eval.json",
         "docs/reports/paper_failure_case_table.json",
         "docs/reports/paper_failure_case_manifest.json",
-        "docs/reports/paper_failure_case_summary.md"
+        "docs/reports/paper_failure_case_summary.md",
+        "docs/reports/paper_governance_ablation_eval.json",
+        "docs/reports/paper_governance_ablation_matrix.json",
+        "docs/reports/paper_governance_ablation_manifest.json",
+        "docs/reports/paper_governance_ablation_summary.md",
+        "docs/reports/paper_governance_invariants.json",
+        "docs/reports/paper_adjacent_systems_comparison.json",
+        "docs/reports/paper_invariant_manifest.json",
+        "docs/reports/paper_invariant_summary.md"
       ],
       "table_id": "claim_gate_matrix"
     },
     {
       "artifact_ref": "docs/paper/tables/table_3_release_artifact_set.md",
-      "byte_count": 2148,
+      "byte_count": 2844,
       "paper_claim_role": "claim_safe_supporting_evidence_only",
       "source_refs": [
         "docs/reports/paper_result_table_final.json",
@@ -78,7 +94,15 @@
         "docs/reports/paper_failure_case_eval.json",
         "docs/reports/paper_failure_case_table.json",
         "docs/reports/paper_failure_case_manifest.json",
-        "docs/reports/paper_failure_case_summary.md"
+        "docs/reports/paper_failure_case_summary.md",
+        "docs/reports/paper_governance_ablation_eval.json",
+        "docs/reports/paper_governance_ablation_matrix.json",
+        "docs/reports/paper_governance_ablation_manifest.json",
+        "docs/reports/paper_governance_ablation_summary.md",
+        "docs/reports/paper_governance_invariants.json",
+        "docs/reports/paper_adjacent_systems_comparison.json",
+        "docs/reports/paper_invariant_manifest.json",
+        "docs/reports/paper_invariant_summary.md"
       ],
       "table_id": "release_artifact_set"
     }

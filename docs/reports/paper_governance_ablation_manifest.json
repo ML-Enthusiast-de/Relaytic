@@ -1,0 +1,125 @@
+{
+  "artifact_hashes": {
+    "docs/reports/paper_agent_handoff_eval.json": "3b228b1d99b4f2a6d0ae22a3fdfe6451fc8f2383d88066edecee93fa4bd2d290",
+    "docs/reports/paper_failure_case_eval.json": "a7abf9da24a1d9421a0a3b10c505716964b6b54ca3092d9cb5e6b2046e412d00",
+    "docs/reports/paper_failure_case_manifest.json": "2deea3bb119d556d58f5496463ed4e0ae21195f8f2aa6b466deff7beb59825cf",
+    "docs/reports/paper_metric_cell_audit.json": "e22ab8c753c45aa2f79d9b148731e7ba2dc1ebb0837abf5e2c9f2167a31d9a5c",
+    "docs/reports/paper_no_lost_user_eval.json": "6a68a1c96069a3b39524f281352ad72c60db344e501a432804693923411477d0",
+    "docs/reports/paper_public_claims_allowed.json": "4318a61dcd778affd5b7d9fb85ecb090dcf8d061846ee3558877f3768e226568",
+    "docs/reports/paper_publishability_matrix.json": "74ad1e835b8ef994f2ea26ebebef43757ec362e596194e298d5289f52f2efc80",
+    "docs/reports/paper_result_table_final.json": "c9c80a51b0f1c3756c146e3a886cf3061172c3d79896951d7d7b7112097f2e01",
+    "docs/reports/paysim_leakage_safe_feature_report.json": "5929bba645118009267ea68cfd6ad806377589ba933fed4f44500c7a1c405d12"
+  },
+  "checks": [
+    {
+      "check_id": "required_governance_ablation_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [],
+        "present_artifact_refs": [
+          "docs/reports/paper_public_claims_allowed.json",
+          "docs/reports/paysim_leakage_safe_feature_report.json",
+          "docs/reports/paper_agent_handoff_eval.json",
+          "docs/reports/paper_no_lost_user_eval.json",
+          "docs/reports/paper_metric_cell_audit.json",
+          "docs/reports/paper_publishability_matrix.json",
+          "docs/reports/paper_result_table_final.json",
+          "docs/reports/paper_failure_case_manifest.json",
+          "docs/reports/paper_failure_case_eval.json"
+        ]
+      },
+      "message": "All P17 source evidence artifacts must be present.",
+      "passed": true,
+      "source_artifact": "docs/reports"
+    },
+    {
+      "check_id": "full_path_blocks_unsafe_claims",
+      "message": "The full path must release zero unsupported public claims.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_public_claims_allowed.json"
+    },
+    {
+      "check_id": "full_path_blocks_leakage_features",
+      "message": "The full path must allow zero forbidden PaySim leakage inputs.",
+      "passed": true,
+      "source_artifact": "docs/reports/paysim_leakage_safe_feature_report.json"
+    },
+    {
+      "check_id": "full_path_redacts_handoff",
+      "message": "The full path must export no raw fields in the external-agent handoff.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_agent_handoff_eval.json"
+    },
+    {
+      "check_id": "full_path_metric_provenance_complete",
+      "message": "The full path must retain required metric-cell provenance fields.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_metric_cell_audit.json"
+    },
+    {
+      "check_id": "full_path_generates_publishable_tables",
+      "message": "The full path must generate the claim-safe paper tables.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_result_table_final.json"
+    },
+    {
+      "check_id": "full_path_recovery_actions_available",
+      "message": "The full path must expose next actions for interrupted-run recovery.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_no_lost_user_eval.json"
+    },
+    {
+      "check_id": "disabled_fixtures_expose_expected_failures",
+      "detail": {
+        "condition_ids": [
+          "no_claim_gate",
+          "no_leakage_policy",
+          "no_rowless_redaction",
+          "no_evidence_cell_required_fields",
+          "no_recovery_guide"
+        ]
+      },
+      "message": "Each disabled-component fixture must expose the expected governance failure.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_governance_ablation_eval.json"
+    },
+    {
+      "check_id": "rowless_and_path_safe",
+      "message": "The P17 reports must not expose raw rows or private machine paths.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_governance_ablation_eval.json"
+    },
+    {
+      "check_id": "claim_boundary_preserved",
+      "message": "P17 may support governance-ablation claims only, not detector-superiority claims.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_governance_ablation_eval.json"
+    }
+  ],
+  "detector_superiority_claim_allowed": false,
+  "failed_checks": [],
+  "fixture_scope": "deterministic system-level governance ablation over current paper evidence artifacts",
+  "governance_ablation_evidence_allowed": true,
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "next_slice": "Paper Track P18 - governance invariants and adjacent-systems positioning",
+  "report_refs": {
+    "paper_governance_ablation_eval": "docs/reports/paper_governance_ablation_eval.json",
+    "paper_governance_ablation_manifest": "docs/reports/paper_governance_ablation_manifest.json",
+    "paper_governance_ablation_matrix": "docs/reports/paper_governance_ablation_matrix.json",
+    "paper_governance_ablation_summary": "docs/reports/paper_governance_ablation_summary.md"
+  },
+  "required_source_artifacts": [
+    "docs/reports/paper_public_claims_allowed.json",
+    "docs/reports/paysim_leakage_safe_feature_report.json",
+    "docs/reports/paper_agent_handoff_eval.json",
+    "docs/reports/paper_no_lost_user_eval.json",
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_publishability_matrix.json",
+    "docs/reports/paper_result_table_final.json",
+    "docs/reports/paper_failure_case_manifest.json",
+    "docs/reports/paper_failure_case_eval.json"
+  ],
+  "schema_version": "relaytic.paper_governance_ablation.v1",
+  "slice": "Paper Track P17",
+  "status": "ready_for_governance_ablation_evidence"
+}

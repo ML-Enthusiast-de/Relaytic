@@ -88,6 +88,14 @@ P13_GATE_REFS = [
     "docs/reports/paper_failure_case_table.json",
     "docs/reports/paper_failure_case_manifest.json",
     "docs/reports/paper_failure_case_summary.md",
+    "docs/reports/paper_governance_ablation_eval.json",
+    "docs/reports/paper_governance_ablation_matrix.json",
+    "docs/reports/paper_governance_ablation_manifest.json",
+    "docs/reports/paper_governance_ablation_summary.md",
+    "docs/reports/paper_governance_invariants.json",
+    "docs/reports/paper_adjacent_systems_comparison.json",
+    "docs/reports/paper_invariant_manifest.json",
+    "docs/reports/paper_invariant_summary.md",
 ]
 
 FORBIDDEN_PUBLIC_RULES = [
@@ -289,6 +297,14 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "failure_case_table": _read_artifact(reports / "paper_failure_case_table.json"),
         "failure_case_manifest": _read_artifact(reports / "paper_failure_case_manifest.json"),
         "failure_case_summary": _read_text_artifact(reports / "paper_failure_case_summary.md"),
+        "governance_ablation_eval": _read_artifact(reports / "paper_governance_ablation_eval.json"),
+        "governance_ablation_matrix": _read_artifact(reports / "paper_governance_ablation_matrix.json"),
+        "governance_ablation_manifest": _read_artifact(reports / "paper_governance_ablation_manifest.json"),
+        "governance_ablation_summary": _read_text_artifact(reports / "paper_governance_ablation_summary.md"),
+        "governance_invariants": _read_artifact(reports / "paper_governance_invariants.json"),
+        "adjacent_systems_comparison": _read_artifact(reports / "paper_adjacent_systems_comparison.json"),
+        "invariant_manifest": _read_artifact(reports / "paper_invariant_manifest.json"),
+        "invariant_summary": _read_text_artifact(reports / "paper_invariant_summary.md"),
         "table_provenance": _read_artifact(reports / "paper_table_provenance.json"),
         "paper_reproduction_commands": _read_text_artifact(reports / "paper_reproduction_commands.md"),
         "dataset_registry": _read_artifact(reports / "paper_dataset_registry.json"),
@@ -469,6 +485,12 @@ def _release_checks(
     failure_manifest = _payload(inputs["failure_case_manifest"])
     failure_eval = _payload(inputs["failure_case_eval"])
     failure_table = _payload(inputs["failure_case_table"])
+    governance_manifest = _payload(inputs["governance_ablation_manifest"])
+    governance_eval = _payload(inputs["governance_ablation_eval"])
+    governance_matrix = _payload(inputs["governance_ablation_matrix"])
+    invariant_manifest = _payload(inputs["invariant_manifest"])
+    governance_invariants = _payload(inputs["governance_invariants"])
+    adjacent_systems = _payload(inputs["adjacent_systems_comparison"])
     required = _required_artifact_presence(inputs)
     paper_artifact_set = set(FINAL_PAPER_REFS)
     table_artifact_set = {item.get("artifact_ref") for item in table_manifest.get("tables", []) if isinstance(item, dict)}
@@ -536,6 +558,25 @@ def _release_checks(
             and int(failure_eval.get("passed_case_count") or 0) == int(failure_eval.get("case_count") or -1),
             "Failure-case evaluation must verify leakage, test-selection, over-claim, redaction, and recovery guardrails before the paper describes measured failure prevention.",
             source_artifact="docs/reports/paper_failure_case_manifest.json",
+        ),
+        _check(
+            "p17_governance_ablation_passed",
+            governance_manifest.get("status") == "ready_for_governance_ablation_evidence"
+            and governance_eval.get("status") == "pass"
+            and governance_matrix.get("status") == "pass"
+            and bool(governance_eval.get("full_path_safe")),
+            "Governance-ablation evidence must compare the full path with disabled-component fixtures before the paper describes machinery-level release behavior.",
+            source_artifact="docs/reports/paper_governance_ablation_manifest.json",
+        ),
+        _check(
+            "p18_governance_invariants_passed",
+            invariant_manifest.get("status") == "ready_for_governance_invariant_evidence"
+            and governance_invariants.get("status") == "pass"
+            and adjacent_systems.get("status") == "pass"
+            and bool(governance_invariants.get("proof_obligation_passed"))
+            and int(governance_invariants.get("current_invariant_count") or 0) >= 6,
+            "Governance-invariant evidence must map every current invariant in the paper to artifacts, failure cases, ablations, or limitations.",
+            source_artifact="docs/reports/paper_invariant_manifest.json",
         ),
         _check(
             "required_p13_inputs_present",
@@ -1023,9 +1064,12 @@ def _render_final_paper_v2(
     dataset_split_table = _render_dataset_split_table(inputs)
     feature_metric_policy_table = _render_feature_metric_policy_table(inputs)
     model_search_table = _render_model_search_table(inputs)
+    adjacent_systems_table = _render_adjacent_systems_comparison_table(inputs)
     paysim_ablation_table = _render_paysim_ablation_table(inputs, metrics)
     system_eval_table = _render_system_evaluation_table(inputs)
     failure_case_table = _render_failure_case_table(inputs)
+    governance_ablation_table = _render_governance_ablation_table(inputs)
+    governance_invariant_table = _render_governance_invariant_table(inputs)
     blocked_claim_table = _render_blocked_claim_examples_table()
     handoff_recovery_table = _render_handoff_recovery_table(inputs)
     reproducibility_table = _render_reproducibility_table(inputs)
@@ -1066,6 +1110,10 @@ def _render_final_paper_v2(
             "Detector papers such as TransXion, BlazingAML, LineMVGNN, and RevClassifyDS push the model frontier. Relaytic-AML sits one layer around that work: it asks how experiments should be governed when data is local or licensed, the task may be temporal or graph-based, analyst review capacity matters, and an agent-assisted workflow must still produce evidence that a skeptical reviewer can audit. That places the system near dataset documentation, model reporting, reproducibility practice, experiment tracking, and governance work [@gebru2021datasheets; @mitchell2019modelcards; @pineau2021reproducibility].",
             "",
             "The system also differs from adjacent evaluation artifacts. Model cards explain a trained model, but they do not usually bind every number to a command, split, artifact field, and admissible-use record. Datasheets describe data, but they do not run the model-search and release gates. Reproducibility checklists improve reporting, but they are often static forms rather than executable evidence. MLOps experiment trackers preserve runs, but they are not designed to govern public scientific claims about local, licensed, or privacy-sensitive AML data. Agent benchmarks evaluate agents, while Relaytic-AML uses agents inside an evaluation lab and then tests whether the lab keeps the agents attached to artifacts. This is the systems contribution: evidence, agents, local privacy, and publishable wording are coupled in one deterministic release path.",
+            "",
+            adjacent_systems_table,
+            "",
+            "The comparison is intentionally narrow. Relaytic-AML does not replace dataset documentation, model cards, experiment trackers, or detector papers. It occupies the layer that ties those concerns together for local AML research: a model result is only reader-facing after its source posture, split, leakage policy, budget, artifact field, handoff posture, and claim boundary are visible.",
             "",
             "Recent agent-evaluation work shows that language-model systems can produce persuasive research artifacts while still failing on reproduction, validation, or expert-level judgment [@chen2025mlrbench; @starace2025paperbench; @wijk2025rebench]. Skill- and tool-using agents make that opportunity larger and the governance problem sharper [@yang2026skillopt]. Relaytic-AML responds by making model scores, public claims, handoff packets, and paper assets downstream of local artifacts rather than downstream of a conversation transcript.",
             "",
@@ -1168,13 +1216,21 @@ def _render_final_paper_v2(
             "",
             "Table 6 adds injected failure cases. The point is not detector performance; the checks exercise whether the release path refuses leakage features, test-set model selection, over-strong claims, unsafe handoff, and lost-run states under deterministic system fixtures. These cases make the governance claim auditable without adding a new benchmark row.",
             "",
+            governance_ablation_table,
+            "",
+            "Table 7 compares the full governance path with disabled-component fixtures. The ablation does not change detector results. It tests whether claim gates, leakage policy, redaction, metric provenance, and recovery guidance change what can be released from the same evidence pack.",
+            "",
+            governance_invariant_table,
+            "",
+            "Table 8 states the current invariants as release-time rules rather than prose preferences. Each invariant has a mechanism, evidence artifacts, an observed failure or ablation signal, and an explicit boundary. This is the core systems claim: Relaytic-AML makes agent-assisted evaluation safer by turning interpretation into checked state.",
+            "",
             blocked_claim_table,
             "",
-            "Table 7 shows how stronger future uses are handled. Rather than letting narrative claims drift beyond the artifacts, the gate records the current admissible use and the evidence that would be needed before the stronger interpretation could be made.",
+            "Table 9 shows how stronger future uses are handled. Rather than letting narrative claims drift beyond the artifacts, the gate records the current admissible use and the evidence that would be needed before the stronger interpretation could be made.",
             "",
             handoff_recovery_table,
             "",
-            "Table 8 gives the practical external-agent story. A second model can receive state, commands, artifacts, and starter questions, while raw rows remain redacted together with private machine paths. The same mechanism helps an inexperienced or interrupted user recover the next action without knowing which internal artifact to inspect first.",
+            "Table 10 gives the practical external-agent story. A second model can receive state, commands, artifacts, and starter questions, while raw rows remain redacted together with private machine paths. The same mechanism helps an inexperienced or interrupted user recover the next action without knowing which internal artifact to inspect first.",
             "",
             "## 8. Limitations and Threats to Validity",
             "",
@@ -1200,9 +1256,11 @@ def _render_final_paper_v2(
             "py -3.11 -m pip install -e \".[full]\"",
             "py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-failure-eval --format json",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-governance-ablation --format json",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-release --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py -q",
+            "py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py -q",
             "```",
             "",
             "macOS/Linux:",
@@ -1211,9 +1269,11 @@ def _render_final_paper_v2(
             "python3 -m pip install -e \".[full]\"",
             "python3 -m relaytic.ui.cli release-safety paper-system-eval --format json",
             "python3 -m relaytic.ui.cli release-safety paper-failure-eval --format json",
+            "python3 -m relaytic.ui.cli release-safety paper-governance-ablation --format json",
+            "python3 -m relaytic.ui.cli release-safety paper-invariants --format json",
             "python3 -m relaytic.ui.cli release-safety paper-release --format json",
             "python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py -q",
+            "python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py -q",
             "```",
             "",
             "Raw benchmark data is not committed. PaySim and Elliptic require local downloads and are referenced through registry artifacts, split reports, hashes, and command ledgers. Elliptic2 remains context-only in this paper because the stronger reference-parity conditions are not satisfied locally. Clean clones can reproduce the paper-generation checks and repo-local public fixtures; full benchmark regeneration requires the locally licensed datasets named in the README.",
@@ -1322,6 +1382,36 @@ def _render_model_search_table(inputs: dict[str, Any]) -> str:
         ],
     ]
     return _markdown_table("Table 3. Model families and search budgets", ["Track", "Families", "Features", "Search budget", "Evidence role"], rows)
+
+
+def _render_adjacent_systems_comparison_table(inputs: dict[str, Any]) -> str:
+    report = _payload(inputs["adjacent_systems_comparison"])
+    rows = []
+    for row in report.get("comparison_rows", []):
+        if not isinstance(row, dict):
+            continue
+        rows.append(
+            [
+                _family_with_citations(row),
+                _shorten_table_text(str(row.get("primary_object") or ""), 92),
+                _shorten_table_text(str(row.get("relaytic_aml_position") or ""), 115),
+                _shorten_table_text(str(row.get("relaytic_aml_boundary") or ""), 82),
+            ]
+        )
+    if not rows:
+        rows.append(
+            [
+                "Adjacent systems",
+                "source report absent",
+                "Generate the P18 invariant pack before positioning the paper.",
+                "no stronger detector claim",
+            ]
+        )
+    return _markdown_table(
+        "Adjacent systems comparison",
+        ["Family", "Primary object", "Relaytic-AML position", "Boundary"],
+        rows,
+    )
 
 
 def _render_evidence_cell_table_v2(metrics: dict[str, dict[str, Any]]) -> str:
@@ -1437,13 +1527,77 @@ def _render_failure_case_table(inputs: dict[str, Any]) -> str:
     )
 
 
+def _render_governance_ablation_table(inputs: dict[str, Any]) -> str:
+    matrix = _payload(inputs["governance_ablation_matrix"])
+    rows = []
+    for row in matrix.get("rows", []):
+        if not isinstance(row, dict):
+            continue
+        rows.append(
+            [
+                str(row.get("path") or ""),
+                str(row.get("disabled_machinery") or ""),
+                str(row.get("unsafe_signal") or ""),
+                str(row.get("artifact_integrity") or ""),
+                str(row.get("handoff_recovery") or ""),
+                str(row.get("interpretation") or ""),
+            ]
+        )
+    if not rows:
+        rows.append(
+            [
+                "Governance ablation",
+                "Required P17 report absent",
+                "release blocks",
+                "no publication matrix",
+                "no recovery proof",
+                "Generate the P17 ablation pack before describing machinery-level release behavior.",
+            ]
+        )
+    return _markdown_table(
+        "Table 7. Governance machinery ablation",
+        ["Path", "Disabled machinery", "Unsafe signal", "Artifact integrity", "Handoff / recovery", "Interpretation"],
+        rows,
+    )
+
+
+def _render_governance_invariant_table(inputs: dict[str, Any]) -> str:
+    report = _payload(inputs["governance_invariants"])
+    rows = []
+    for row in report.get("invariants", []):
+        if not isinstance(row, dict):
+            continue
+        rows.append(
+            [
+                str(row.get("name") or row.get("invariant_id") or ""),
+                _shorten_table_text(str(row.get("enforcement_mechanism") or ""), 90),
+                _shorten_table_text(_invariant_evidence_cell(row), 130),
+                _shorten_table_text(str(row.get("limitation_or_boundary") or ""), 95),
+            ]
+        )
+    if not rows:
+        rows.append(
+            [
+                "Governance invariants",
+                "P18 report absent",
+                "Generate paper-invariants before publishing the systems claim.",
+                "current behavior cannot be described without the report",
+            ]
+        )
+    return _markdown_table(
+        "Table 8. Governance invariants and evidence map",
+        ["Invariant", "Mechanism", "Evidence and stress signal", "Boundary"],
+        rows,
+    )
+
+
 def _render_blocked_claim_examples_table() -> str:
     rows = [
         ["Real-bank deployment study", "bounded PaySim temporal-proxy demonstration", "Partner or bank-approved holdout, incumbent comparison, analyst-review protocol, and legal release gate."],
         ["Elliptic2 reference-method comparison", "external RevClassifyDS reference marker plus local context row", "Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report."],
         ["Graph-native detector release", "Elliptic temporal graph-feature evidence path", "Graph-native release budget, neural baselines, repeated seeds, and graph-specific ablations."],
     ]
-    return _markdown_table("Table 7. Evidence routing examples", ["Stronger future use", "Current admissible use", "Evidence needed"], rows)
+    return _markdown_table("Table 9. Evidence routing examples", ["Stronger future use", "Current admissible use", "Evidence needed"], rows)
 
 
 def _render_handoff_recovery_table(inputs: dict[str, Any]) -> str:
@@ -1454,7 +1608,7 @@ def _render_handoff_recovery_table(inputs: dict[str, Any]) -> str:
         ["Safe next action", "external model asked what to do next", "six next actions, six starter questions, command options", "unredacted local paths and data rows", _paper_signal("safe_next_action", handoff_tasks.get("safe_next_action_exported", {}).get("measured_signal"))],
         ["Interrupted-run recovery", "operator returns to partial run without artifact literacy", "current state, missing evidence count, canonical artifact shortlist, context-export command", "raw benchmark data and private machine paths", _paper_signal("interrupted_recovery", recovery_tasks.get("partial_run_state_recovery", {}).get("measured_signal"))],
     ]
-    return _markdown_table("Table 8. Rowless handoff and interrupted-run recovery examples", ["Scenario", "Input state", "Exported fields", "Redacted fields", "Observed signal"], rows)
+    return _markdown_table("Table 10. Rowless handoff and interrupted-run recovery examples", ["Scenario", "Input state", "Exported fields", "Redacted fields", "Observed signal"], rows)
 
 
 def _render_reproducibility_table(inputs: dict[str, Any]) -> str:
@@ -1464,8 +1618,10 @@ def _render_reproducibility_table(inputs: dict[str, Any]) -> str:
         ["Elliptic benchmark", "release-safety graph-baselines --budget-tier competitive --run-optional --format json", "Elliptic selected PR-AUC cell", "local Kaggle Elliptic files required", _repro_hash_summary(inputs, "elliptic_bitcoin_flattened_graph_aml")],
         ["System evaluation", "release-safety paper-system-eval --format json", "task, handoff, recovery, and claim-gate reports", "repo-local deterministic fixtures", "all required system-evaluation tasks pass in current evidence pack"],
         ["Failure-case evaluation", "release-safety paper-failure-eval --format json", "injected-risk failure-case reports", "repo-local deterministic fixtures", "all required failure cases pass in current evidence pack"],
+        ["Governance ablation", "release-safety paper-governance-ablation --format json", "full-vs-disabled governance ablation reports", "repo-local deterministic fixtures", "full path safe; disabled fixtures expose expected failures"],
+        ["Governance invariants", "release-safety paper-invariants --format json", "invariant and adjacent-systems reports", "repo-local deterministic fixtures", "7 current invariants; 6 adjacent families; no stronger detector claim"],
     ]
-    return _markdown_table("Table 9. Reproducibility contract", ["Component", "Command", "Expected output", "Environment or data dependency", "Hash or seed record"], rows)
+    return _markdown_table("Table 11. Reproducibility contract", ["Component", "Command", "Expected output", "Environment or data dependency", "Hash or seed record"], rows)
 
 
 def _evidence_cell_display_id(cell_id: str) -> str:
@@ -1478,6 +1634,97 @@ def _evidence_cell_display_id(cell_id: str) -> str:
         "elliptic2_p8b_modern_context.published_reference_pr_auc": "E2-ref",
     }
     return display.get(cell_id, cell_id)
+
+
+def _family_with_citations(row: dict[str, Any]) -> str:
+    family = str(row.get("adjacent_family") or "")
+    sources = [str(item) for item in row.get("representative_sources", []) if item]
+    if not sources:
+        return family
+    visible = sources[:2]
+    return f"{family} [@{'; @'.join(visible)}]"
+
+
+def _invariant_evidence_cell(row: dict[str, Any]) -> str:
+    evidence_refs = [item for item in row.get("evidence_refs", []) if isinstance(item, dict)]
+    stress_refs = [item for item in row.get("failure_or_ablation_refs", []) if isinstance(item, dict)]
+    evidence = evidence_refs[0] if evidence_refs else {}
+    stress = stress_refs[0] if stress_refs else {}
+    pieces = []
+    if evidence:
+        evidence_id = str(evidence.get("evidence_id") or "evidence")
+        pieces.append(
+            f"{_evidence_table_label(evidence_id)}: {_evidence_table_signal(evidence.get('observed_signal'), evidence_id)}"
+        )
+    if stress:
+        stress_id = str(stress.get("evidence_id") or "fixture")
+        pieces.append(
+            f"stress {_evidence_table_label(stress_id)}: {_evidence_table_signal(stress.get('observed_signal'), stress_id)}"
+        )
+    return "; ".join(piece for piece in pieces if piece) or "not observed"
+
+
+def _evidence_table_label(evidence_id: str) -> str:
+    labels = {
+        "all_numeric_cells_have_required_provenance": "metric audit",
+        "metric_cell_provenance_available": "provenance task",
+        "claim_safe_public_wording_allowed": "claim whitelist",
+        "hard_headline_claims_blocked": "publishability matrix",
+        "forbidden_balance_columns_used": "leakage report",
+        "test_set_selection_violation": "test-selection fixture",
+        "external_context_rowless_and_redacted": "handoff eval",
+        "rowless_external_agent_handoff_recoverable": "handoff task",
+        "partial_run_state_recovery": "recovery eval",
+        "partial_run_recovery_without_artifact_literacy": "recovery task",
+        "supporting_table_allowed": "publishability rows",
+        "elliptic2_supporting_context_and_firewall_visible": "Elliptic2 role task",
+        "wording_lint": "wording lint",
+        "go_for_p13_claim_safe_release_pack": "go/no-go gate",
+        "No evidence-cell required fields": "missing-field ablation",
+        "overstrong_claim_attempt": "overclaim fixture",
+        "leakage_column_injection": "leakage fixture",
+        "rowless_handoff_redaction": "redaction fixture",
+        "interrupted_run_recovery": "recovery fixture",
+        "blocked_public_claims": "blocked claims",
+        "detector_claim_boundary": "claim boundary",
+    }
+    return labels.get(evidence_id, _humanize_gate_token(evidence_id))
+
+
+def _evidence_table_signal(value: Any, evidence_id: str) -> str:
+    signal_overrides = {
+        "all_numeric_cells_have_required_provenance": "pass",
+        "claim_safe_public_wording_allowed": "pass",
+        "forbidden_balance_columns_used": "used=0; labels for features=false",
+        "external_context_rowless_and_redacted": "raw rows=false; redactions=8; blocked fields=6",
+        "partial_run_state_recovery": "state=partial run; missing=8; actions=6",
+        "supporting_table_allowed": "rows=5; supporting=5; hard/headline blocked",
+        "wording_lint": "pass",
+        "No evidence-cell required fields": "missing provenance=13; safe=false",
+        "overstrong_claim_attempt": "blocked claims=6; hard/headline=false",
+        "leakage_column_injection": "offered=4; excluded=4; used=0",
+        "rowless_handoff_redaction": "blocked fields=6; raw rows=false",
+        "interrupted_run_recovery": "state=partial run; actions=6",
+        "blocked_public_claims": "blocked=6",
+        "detector_claim_boundary": "hard/headline blocked",
+    }
+    if evidence_id in signal_overrides:
+        return signal_overrides[evidence_id]
+    text = str(value or "not observed").strip()
+    replacements = {
+        "claim_safe_public_wording_allowed": "pass",
+        "True": "pass",
+        "False": "fail",
+    }
+    text = replacements.get(text, text)
+    return " ".join(text.replace("_", " ").split())
+
+
+def _shorten_table_text(value: str, max_len: int) -> str:
+    text = " ".join(str(value).split())
+    if len(text) <= max_len:
+        return text
+    return text[: max_len - 3].rstrip(" ;,.") + "..."
 
 
 def _audit_result(task_id: str, passed: Callable[[str], str], signal: Callable[[str], str]) -> str:

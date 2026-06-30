@@ -22,7 +22,7 @@ PAPER_ARXIV_FIGURE_DIRNAME = "figures"
 PAPER_ARXIV_MAIN_TEX_FILENAME = "main.tex"
 PAPER_ARXIV_REFERENCES_FILENAME = "references.bib"
 PAPER_ARXIV_RELEASE_TAG = "relaytic-aml-paper-p14-source-rc"
-NEXT_PAPER_ARXIV_SOURCE_SLICE = "Slice 16A - capability registry and capability cards"
+NEXT_PAPER_ARXIV_SOURCE_SLICE = "Paper Track P19 - hosted detector workflow demonstration, if selected"
 
 PAPER_ARXIV_SOURCE_FILENAMES = {
     "paper_arxiv_source_manifest": "paper_arxiv_source_manifest.json",
@@ -753,6 +753,15 @@ def _latex_table_spec(headers: list[str], col_count: int) -> str:
             r">{\raggedright\arraybackslash}p{0.18\linewidth}"
             "@{}"
         )
+    if normalized == ["family", "primary object", "relaytic-aml position", "boundary"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.23\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.21\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.18\linewidth}"
+            "@{}"
+        )
     if normalized == ["stage", "model/contract", "selection evidence", "final test evidence", "role"]:
         return (
             "@{}"
@@ -772,6 +781,26 @@ def _latex_table_spec(headers: list[str], col_count: int) -> str:
             r">{\raggedright\arraybackslash}p{0.16\linewidth} "
             r">{\raggedright\arraybackslash}X "
             r">{\raggedright\arraybackslash}p{0.16\linewidth}"
+            "@{}"
+        )
+    if normalized == ["path", "disabled machinery", "unsafe signal", "artifact integrity", "handoff / recovery", "interpretation"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.13\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.15\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.15\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.16\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.13\linewidth} "
+            r">{\raggedright\arraybackslash}X"
+            "@{}"
+        )
+    if normalized == ["invariant", "mechanism", "evidence and stress signal", "boundary"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.18\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.20\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.22\linewidth}"
             "@{}"
         )
     columns = []

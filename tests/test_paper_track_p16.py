@@ -123,4 +123,4 @@ def test_paper_track_p16_committed_failure_case_artifacts_are_ready() -> None:
     assert "Paper P16 Failure-Case Evaluation Pack" in summary
     assert "Table 6. Failure-case evaluation" in draft
     assert "Leakage-column injection" in draft
-    assert "Table 8 gives the practical external-agent story" in draft
+    assert "Table 10 gives the practical external-agent story" in draft

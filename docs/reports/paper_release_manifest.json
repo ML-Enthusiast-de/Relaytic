@@ -58,6 +58,18 @@
       "source_artifact": "docs/reports/paper_failure_case_manifest.json"
     },
     {
+      "check_id": "p17_governance_ablation_passed",
+      "message": "Governance-ablation evidence must compare the full path with disabled-component fixtures before the paper describes machinery-level release behavior.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_governance_ablation_manifest.json"
+    },
+    {
+      "check_id": "p18_governance_invariants_passed",
+      "message": "Governance-invariant evidence must map every current invariant in the paper to artifacts, failure cases, ablations, or limitations.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_invariant_manifest.json"
+    },
+    {
       "check_id": "required_p13_inputs_present",
       "detail": {
         "missing_artifact_refs": [],
@@ -79,7 +91,15 @@
           "docs/reports/paper_failure_case_eval.json",
           "docs/reports/paper_failure_case_table.json",
           "docs/reports/paper_failure_case_manifest.json",
-          "docs/reports/paper_failure_case_summary.md"
+          "docs/reports/paper_failure_case_summary.md",
+          "docs/reports/paper_governance_ablation_eval.json",
+          "docs/reports/paper_governance_ablation_matrix.json",
+          "docs/reports/paper_governance_ablation_manifest.json",
+          "docs/reports/paper_governance_ablation_summary.md",
+          "docs/reports/paper_governance_invariants.json",
+          "docs/reports/paper_adjacent_systems_comparison.json",
+          "docs/reports/paper_invariant_manifest.json",
+          "docs/reports/paper_invariant_summary.md"
         ]
       },
       "message": "All P10-P12 source artifacts required by P13 must be present.",
@@ -108,7 +128,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "3d2d5174c1ec88eba3d5af5720fe7b1ed4087edc",
+  "git_commit": "b32ce8fca5837d52c3f05ffcc7969e2a22fb0ab1",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -144,7 +164,15 @@
       "docs/reports/paper_failure_case_eval.json",
       "docs/reports/paper_failure_case_table.json",
       "docs/reports/paper_failure_case_manifest.json",
-      "docs/reports/paper_failure_case_summary.md"
+      "docs/reports/paper_failure_case_summary.md",
+      "docs/reports/paper_governance_ablation_eval.json",
+      "docs/reports/paper_governance_ablation_matrix.json",
+      "docs/reports/paper_governance_ablation_manifest.json",
+      "docs/reports/paper_governance_ablation_summary.md",
+      "docs/reports/paper_governance_invariants.json",
+      "docs/reports/paper_adjacent_systems_comparison.json",
+      "docs/reports/paper_invariant_manifest.json",
+      "docs/reports/paper_invariant_summary.md"
     ],
     "bib_ref": "docs/paper/references.bib",
     "draft_ref": "docs/paper/relaytic_aml_arxiv_draft.md",
@@ -168,6 +196,7 @@
       "docs/paper/tables/table_2_claim_gate_matrix.md",
       "docs/paper/tables/table_3_release_artifact_set.md",
       "docs/paper/tables/table_manifest.json",
+      "docs/reports/paper_adjacent_systems_comparison.json",
       "docs/reports/paper_agent_handoff_eval.json",
       "docs/reports/paper_claim_gate_case_studies.json",
       "docs/reports/paper_claim_lint_report.json",
@@ -176,6 +205,13 @@
       "docs/reports/paper_failure_case_manifest.json",
       "docs/reports/paper_failure_case_summary.md",
       "docs/reports/paper_failure_case_table.json",
+      "docs/reports/paper_governance_ablation_eval.json",
+      "docs/reports/paper_governance_ablation_manifest.json",
+      "docs/reports/paper_governance_ablation_matrix.json",
+      "docs/reports/paper_governance_ablation_summary.md",
+      "docs/reports/paper_governance_invariants.json",
+      "docs/reports/paper_invariant_manifest.json",
+      "docs/reports/paper_invariant_summary.md",
       "docs/reports/paper_metric_cell_audit.json",
       "docs/reports/paper_no_lost_user_eval.json",
       "docs/reports/paper_publishability_matrix.json",
@@ -214,7 +250,15 @@
     "docs/reports/paper_failure_case_eval.json",
     "docs/reports/paper_failure_case_table.json",
     "docs/reports/paper_failure_case_manifest.json",
-    "docs/reports/paper_failure_case_summary.md"
+    "docs/reports/paper_failure_case_summary.md",
+    "docs/reports/paper_governance_ablation_eval.json",
+    "docs/reports/paper_governance_ablation_matrix.json",
+    "docs/reports/paper_governance_ablation_manifest.json",
+    "docs/reports/paper_governance_ablation_summary.md",
+    "docs/reports/paper_governance_invariants.json",
+    "docs/reports/paper_adjacent_systems_comparison.json",
+    "docs/reports/paper_invariant_manifest.json",
+    "docs/reports/paper_invariant_summary.md"
   ],
   "schema_version": "relaytic.paper_release.v1",
   "slice": "Paper Track P13",

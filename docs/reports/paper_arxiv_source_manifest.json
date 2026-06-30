@@ -146,7 +146,7 @@
   },
   "hard_claims_allowed": false,
   "headline_claims_allowed": false,
-  "next_slice": "Slice 16A - capability registry and capability cards",
+  "next_slice": "Paper Track P19 - hosted detector workflow demonstration, if selected",
   "p13_gate_refs": [
     "docs/reports/paper_release_manifest.json",
     "docs/reports/paper_public_claims_allowed.json",
@@ -176,12 +176,12 @@
   "schema_version": "relaytic.paper_arxiv_source.v1",
   "slice": "Paper Track P14",
   "source_hashes": {
-    "main_tex_sha256": "0928d4f462cd9808717e2ea5f1861b21f81b44c3518fadb8ca46b814d3fe2269",
+    "main_tex_sha256": "32cd2d60be8400d6f27a1baa67190784b97ad543322314e3aba15826eeff9489",
     "pdf_figure_sha256": {
-      "figure_1_claim_gate_flow.pdf": "3dd8da4d5b3dd6f39bc7bd83f965d3a9caddde21272c4e62faed1ff6be24aa8c",
-      "figure_2_supporting_pr_auc.pdf": "5e3d12514167e1623163c2c13ca18a752e248893dafa03371b761f5fa56c5cb9",
-      "figure_3_review_budget.pdf": "b8b1d774215647edb4599e6b4814dae343e737412e46c1b47e67b978ca76adac",
-      "figure_4_publishability_matrix.pdf": "86f84c656c48789ddab2b07705afbbeb7566c133a771fe9987dbc1a030485ff7"
+      "figure_1_claim_gate_flow.pdf": "9aa645534f892be3dbfc044725bbd38698e670c3fca55d1e6adc504eed1787cd",
+      "figure_2_supporting_pr_auc.pdf": "592f05f227336ab65356eb3618c468ac52e5df839d598898af35ffa5b21c5fc4",
+      "figure_3_review_budget.pdf": "6c4f80e03faddeb464682804af94d77018f48bd4f6f29ba12b87234b835e4f80",
+      "figure_4_publishability_matrix.pdf": "63a81aead428a7f6c0f3670d389710ad6be2abe4948a71b7d660f150670b70c1"
     },
     "references_bib_sha256": "eb3ff711c6e09fe5b138c44dafe701b93b00beae6a24dfca1042623f01cd130c"
   },

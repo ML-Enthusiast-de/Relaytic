@@ -1,0 +1,130 @@
+{
+  "columns": [
+    "Path",
+    "Disabled machinery",
+    "Unsafe signal",
+    "Artifact integrity",
+    "Handoff / recovery",
+    "Interpretation"
+  ],
+  "rows": [
+    {
+      "artifact_integrity": "0 missing fields; 3 table groups",
+      "condition_id": "full_governance_path",
+      "disabled_machinery": "none",
+      "handoff_recovery": "actions=6",
+      "interpretation": "Claim gate, leakage policy, redaction, provenance, and recovery guide are all active.",
+      "metrics": {
+        "leakage_features_allowed": 0,
+        "missing_provenance_fields": 0,
+        "publishable_tables_generated": 3,
+        "raw_fields_exported": 0,
+        "recovery_next_actions_available": 6,
+        "unsafe_publishable_tables_generated": 0,
+        "unsupported_claims_released": 0
+      },
+      "path": "Full governance path",
+      "safe_to_publish": true,
+      "unsafe_signal": "0 unsupported claims, leakage inputs, or raw fields"
+    },
+    {
+      "artifact_integrity": "3 table groups unchanged",
+      "condition_id": "no_claim_gate",
+      "disabled_machinery": "public claim gate",
+      "handoff_recovery": "actions=6",
+      "interpretation": "The claim gate is what keeps proxy evidence below hard AML, SOTA, RevClassifyDS parity, production, and business-value claims.",
+      "metrics": {
+        "leakage_features_allowed": 0,
+        "missing_provenance_fields": 0,
+        "publishable_tables_generated": 3,
+        "raw_fields_exported": 0,
+        "recovery_next_actions_available": 6,
+        "unsafe_publishable_tables_generated": 0,
+        "unsupported_claims_released": 6
+      },
+      "path": "No claim gate",
+      "safe_to_publish": false,
+      "unsafe_signal": "6 unsupported claims"
+    },
+    {
+      "artifact_integrity": "0 missing fields; 1 unsafe table path",
+      "condition_id": "no_leakage_policy",
+      "disabled_machinery": "PaySim feature leakage policy",
+      "handoff_recovery": "actions=6",
+      "interpretation": "The leakage policy prevents post-event simulator fields from becoming apparently strong evidence.",
+      "metrics": {
+        "leakage_features_allowed": 4,
+        "missing_provenance_fields": 0,
+        "publishable_tables_generated": 3,
+        "raw_fields_exported": 0,
+        "recovery_next_actions_available": 6,
+        "unsafe_publishable_tables_generated": 1,
+        "unsupported_claims_released": 0
+      },
+      "path": "No leakage policy",
+      "safe_to_publish": false,
+      "unsafe_signal": "4 leakage inputs"
+    },
+    {
+      "artifact_integrity": "3 table groups unchanged",
+      "condition_id": "no_rowless_redaction",
+      "disabled_machinery": "external-agent redaction",
+      "handoff_recovery": "6 raw fields; actions=6",
+      "interpretation": "Rowless handoff is the privacy boundary that lets outside agents help without receiving raw data or local paths.",
+      "metrics": {
+        "leakage_features_allowed": 0,
+        "missing_provenance_fields": 0,
+        "publishable_tables_generated": 3,
+        "raw_fields_exported": 6,
+        "recovery_next_actions_available": 6,
+        "unsafe_publishable_tables_generated": 0,
+        "unsupported_claims_released": 0
+      },
+      "path": "No rowless handoff redaction",
+      "safe_to_publish": false,
+      "unsafe_signal": "6 raw fields"
+    },
+    {
+      "artifact_integrity": "13 missing fields; 1 unsafe table path",
+      "condition_id": "no_evidence_cell_required_fields",
+      "disabled_machinery": "metric-cell required-field gate",
+      "handoff_recovery": "actions=6",
+      "interpretation": "Required fields are what connect a reader-facing number back to dataset, split, command, artifact, leakage, budget, and claim state.",
+      "metrics": {
+        "leakage_features_allowed": 0,
+        "missing_provenance_fields": 13,
+        "publishable_tables_generated": 3,
+        "raw_fields_exported": 0,
+        "recovery_next_actions_available": 6,
+        "unsafe_publishable_tables_generated": 1,
+        "unsupported_claims_released": 0
+      },
+      "path": "No evidence-cell required fields",
+      "safe_to_publish": false,
+      "unsafe_signal": "13 missing provenance fields"
+    },
+    {
+      "artifact_integrity": "3 table groups unchanged",
+      "condition_id": "no_recovery_guide",
+      "disabled_machinery": "no-lost-user guide",
+      "handoff_recovery": "actions=0",
+      "interpretation": "The recovery guide is what keeps state navigation from depending on repo literacy.",
+      "metrics": {
+        "leakage_features_allowed": 0,
+        "missing_provenance_fields": 0,
+        "publishable_tables_generated": 3,
+        "raw_fields_exported": 0,
+        "recovery_next_actions_available": 0,
+        "unsafe_publishable_tables_generated": 0,
+        "unsupported_claims_released": 0
+      },
+      "path": "No interrupted-run recovery guide",
+      "safe_to_publish": false,
+      "unsafe_signal": "0 recovery actions"
+    }
+  ],
+  "schema_version": "relaytic.paper_governance_ablation.v1",
+  "slice": "Paper Track P17",
+  "status": "pass",
+  "table_id": "governance_machinery_ablation"
+}

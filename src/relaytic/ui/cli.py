@@ -1565,6 +1565,36 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p17 = release_safety_sub.add_parser(
+        "paper-governance-ablation",
+        help="Build Paper Track P17 deterministic governance-ablation reports.",
+    )
+    release_safety_p17.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P17 report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p17.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+    release_safety_p18 = release_safety_sub.add_parser(
+        "paper-invariants",
+        help="Build Paper Track P18 governance-invariant and adjacent-systems reports.",
+    )
+    release_safety_p18.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P18 report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p18.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3624,6 +3654,14 @@ def main(argv: list[str] | None = None) -> int:
                 )
             elif args.release_safety_command == "paper-failure-eval":
                 payload = _run_paper_failure_eval_surface(
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-governance-ablation":
+                payload = _run_paper_governance_ablation_surface(
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-invariants":
+                payload = _run_paper_invariants_surface(
                     output_dir=args.output_dir,
                 )
             else:
@@ -7906,6 +7944,80 @@ def _run_paper_failure_eval_surface(
             "bundle": pack,
         },
         "human_output": render_paper_failure_eval_markdown(pack),
+    }
+
+
+def _run_paper_governance_ablation_surface(
+    *,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_governance_ablation_markdown,
+        sync_paper_governance_ablation_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_governance_ablation_pack(
+        root,
+        output_dir=output_dir,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    manifest = dict(pack["paper_governance_ablation_manifest"])
+    evaluation = dict(pack["paper_governance_ablation_eval"])
+    matrix = dict(pack["paper_governance_ablation_matrix"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_governance_ablation_manifest": manifest,
+            "paper_governance_ablation_eval": evaluation,
+            "paper_governance_ablation_matrix": matrix,
+            "bundle": pack,
+        },
+        "human_output": render_paper_governance_ablation_markdown(pack),
+    }
+
+
+def _run_paper_invariants_surface(
+    *,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_invariant_markdown,
+        sync_paper_invariant_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_invariant_pack(
+        root,
+        output_dir=output_dir,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    manifest = dict(pack["paper_invariant_manifest"])
+    invariants = dict(pack["paper_governance_invariants"])
+    adjacent = dict(pack["paper_adjacent_systems_comparison"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_invariant_manifest": manifest,
+            "paper_governance_invariants": invariants,
+            "paper_adjacent_systems_comparison": adjacent,
+            "bundle": pack,
+        },
+        "human_output": render_paper_invariant_markdown(pack),
     }
 
 

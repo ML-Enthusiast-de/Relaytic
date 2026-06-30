@@ -20,6 +20,14 @@
 | `docs/reports/paper_failure_case_table.json` | yes | internal evidence record |
 | `docs/reports/paper_failure_case_manifest.json` | yes | internal evidence record |
 | `docs/reports/paper_failure_case_summary.md` | yes | internal evidence record |
+| `docs/reports/paper_governance_ablation_eval.json` | yes | internal evidence record |
+| `docs/reports/paper_governance_ablation_matrix.json` | yes | internal evidence record |
+| `docs/reports/paper_governance_ablation_manifest.json` | yes | internal evidence record |
+| `docs/reports/paper_governance_ablation_summary.md` | yes | internal evidence record |
+| `docs/reports/paper_governance_invariants.json` | yes | internal evidence record |
+| `docs/reports/paper_adjacent_systems_comparison.json` | yes | internal evidence record |
+| `docs/reports/paper_invariant_manifest.json` | yes | internal evidence record |
+| `docs/reports/paper_invariant_summary.md` | yes | internal evidence record |
 | `docs/paper/relaytic_aml_arxiv_draft.md` | yes | paper manuscript |
 | `docs/paper/relaytic_aml_draft.md` | yes | draft-generation support artifact |
 | `docs/paper/figures/figure_manifest.json` | yes | figure source artifact |
