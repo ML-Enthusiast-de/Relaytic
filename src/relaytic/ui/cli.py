@@ -1595,6 +1595,31 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p19a = release_safety_sub.add_parser(
+        "paper-external-score-proof",
+        help="Build Paper Track P19-A external score-file governance proof reports.",
+    )
+    release_safety_p19a.add_argument(
+        "--score-artifact",
+        default=None,
+        help="Optional local JSON score artifact. Defaults to a deterministic rowless fixture.",
+    )
+    release_safety_p19a.add_argument(
+        "--metadata-file",
+        default=None,
+        help="Optional local JSON metadata file merged with the score artifact without recording private paths.",
+    )
+    release_safety_p19a.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P19-A report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p19a.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3662,6 +3687,12 @@ def main(argv: list[str] | None = None) -> int:
                 )
             elif args.release_safety_command == "paper-invariants":
                 payload = _run_paper_invariants_surface(
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-external-score-proof":
+                payload = _run_paper_external_score_surface(
+                    score_artifact=args.score_artifact,
+                    metadata_file=args.metadata_file,
                     output_dir=args.output_dir,
                 )
             else:
@@ -8018,6 +8049,53 @@ def _run_paper_invariants_surface(
             "bundle": pack,
         },
         "human_output": render_paper_invariant_markdown(pack),
+    }
+
+
+def _run_paper_external_score_surface(
+    *,
+    score_artifact: str | None,
+    metadata_file: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_external_score_markdown,
+        sync_paper_external_score_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_external_score_pack(
+        root,
+        score_artifact_path=score_artifact,
+        metadata_path=metadata_file,
+        output_dir=output_dir,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    manifest = dict(pack["paper_external_score_manifest"])
+    schema = dict(pack["paper_external_score_schema"])
+    route = dict(pack["paper_external_score_route_decision"])
+    cells = dict(pack["paper_external_score_evidence_cells"])
+    gate = dict(pack["paper_external_score_claim_gate"])
+    handoff = dict(pack["paper_external_score_handoff_eval"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_external_score_manifest": manifest,
+            "paper_external_score_schema": schema,
+            "paper_external_score_route_decision": route,
+            "paper_external_score_evidence_cells": cells,
+            "paper_external_score_claim_gate": gate,
+            "paper_external_score_handoff_eval": handoff,
+            "bundle": pack,
+        },
+        "human_output": render_paper_external_score_markdown(pack),
     }
 
 

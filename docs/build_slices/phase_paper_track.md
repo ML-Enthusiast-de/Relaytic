@@ -2,15 +2,15 @@
 
 ## Status
 
-P0 through P18 implemented. A triggerable paper-strengthening follow-on lives in `docs/build_slices/phase_paper_strengthening.md`; if the user triggers Stage 4 and selects the hosted-detector demonstration route, Paper Track P19 is next, otherwise Paper Track P20 or Slice 16A is the next target.
+P0 through P19-A implemented. A triggerable paper-strengthening follow-on lives in `docs/build_slices/phase_paper_strengthening.md`; P19-B is the next implementation target if the hosted-score case study should enter the paper. Otherwise Paper Track P20 or Slice 16A is the next target.
 
 ## Intent
 
-Paper Track P0 through P18 is the mandatory path plus the first three strengthening stages between Slice 15Z-R and Slice 16A.
+Paper Track P0 through P19-A is the mandatory path plus the implemented strengthening stages between Slice 15Z-R and Slice 16A.
 
 Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, final arXiv source release candidate, and measured system-evaluation proof pack. The final upload still requires local PDF review, bibliography/source-policy confirmation, and clean tag-target proof.
 
-The P18-P21 strengthening track is not part of the original mandatory bridge. It is a user-triggered follow-on for adding formal invariants, optional hosted-detector workflow evidence, visual polish, and final preflight before a stronger arXiv or systems/evaluation submission.
+The P18-P21 strengthening track is not part of the original mandatory bridge. It is a user-triggered follow-on for adding formal invariants, optional external score-file governance evidence, optional hosted-score paper integration, visual polish, and final preflight before a stronger arXiv or systems/evaluation submission.
 
 ## Paper Thesis
 
@@ -403,4 +403,4 @@ Implemented acceptance:
 
 Follow-on:
 
-- `docs/build_slices/phase_paper_strengthening.md` records P16 through P18 as implemented and P19-P21 as the remaining optional paper-strengthening path. P19 should only start when the user triggers Stage 4 and selects a hosted-detector demonstration route.
+- `docs/build_slices/phase_paper_strengthening.md` records P16 through P19-A as implemented and P19-B, P20, and P21 as the remaining optional paper-strengthening path. P19-B should only start after P19-A evidence exists.

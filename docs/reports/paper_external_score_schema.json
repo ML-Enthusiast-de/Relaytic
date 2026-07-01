@@ -1,0 +1,60 @@
+{
+  "accepted": true,
+  "artifact_ref": "fixture:p19a_external_score_rowless_v1",
+  "claim_state": "hosted_detector_output_governance_only",
+  "claim_state_allowed": true,
+  "content_hash_prefix": "dac68c3801f5",
+  "forbidden_fields_detected": [],
+  "input_exists": true,
+  "input_filename": "p19a_external_score_rowless_fixture.json",
+  "leakage_posture": "rowless_no_training_or_label_data_exported",
+  "metric": {
+    "detector_performance_metric": false,
+    "name": "hosted_score_metadata_completeness",
+    "role": "governance_metric",
+    "value": 1.0
+  },
+  "parse_error": null,
+  "required_fields": [
+    "artifact_id",
+    "dataset_id",
+    "dataset_role",
+    "split",
+    "split_role",
+    "score_artifact_type",
+    "schema_fields",
+    "metric",
+    "metric_policy",
+    "leakage_posture",
+    "claim_state"
+  ],
+  "required_metadata_completeness": 1.0,
+  "required_missing": [],
+  "required_present_count": 11,
+  "rowless_input": true,
+  "schema_fields": [
+    {
+      "dtype": "float",
+      "name": "risk_score",
+      "role": "score_summary",
+      "rowless": true
+    },
+    {
+      "dtype": "integer",
+      "name": "score_count",
+      "role": "aggregate_count",
+      "rowless": true
+    },
+    {
+      "dtype": "string",
+      "name": "split_role",
+      "role": "evaluation_metadata",
+      "rowless": true
+    }
+  ],
+  "schema_hash": "4b2b70a58b0ce8716fdae619eb77599d953cc939e2b5fea026427055e0acd93e",
+  "schema_hash_prefix": "4b2b70a58b0c",
+  "schema_version": "relaytic.paper_external_score.v1",
+  "source_kind": "deterministic_rowless_fixture",
+  "status": "pass"
+}

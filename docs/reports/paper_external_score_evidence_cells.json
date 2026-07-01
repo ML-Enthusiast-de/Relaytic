@@ -1,0 +1,38 @@
+{
+  "blocked_cell": null,
+  "evidence_cell_count": 1,
+  "evidence_cells": [
+    {
+      "artifact_hash_prefix": "dac68c3801f5",
+      "artifact_ref": "fixture:p19a_external_score_rowless_v1",
+      "cell_id": "p19a.external_score.hosted_metadata_completeness",
+      "claim_state": "hosted_detector_output_governance_only",
+      "command": "relaytic release-safety paper-external-score-proof",
+      "dataset_id": "p19a_hosted_score_fixture",
+      "dataset_role": "deterministic_system_fixture",
+      "leakage_posture": "rowless_no_training_or_label_data_exported",
+      "metric": "hosted_score_metadata_completeness",
+      "metric_role": "governance_metric",
+      "paper_role": "hosted_detector_output_governance_evidence",
+      "publishable": true,
+      "rowless": true,
+      "schema_hash_prefix": "4b2b70a58b0c",
+      "split": "fixture_holdout",
+      "split_role": "fixed_evaluation_surface",
+      "value": 1.0
+    }
+  ],
+  "required_cell_fields": [
+    "cell_id",
+    "dataset_id",
+    "split",
+    "command",
+    "artifact_ref",
+    "metric",
+    "value",
+    "leakage_posture",
+    "claim_state"
+  ],
+  "schema_version": "relaytic.paper_external_score.v1",
+  "status": "pass"
+}

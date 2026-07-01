@@ -1,0 +1,81 @@
+{
+  "allowed_claim_scope": "hosted_detector_output_governance_only",
+  "allowed_public_claims": [
+    "Relaytic-AML can convert a rowless external detector-score artifact into evidence cells with schema, hash, leakage-posture, and claim-state metadata.",
+    "Relaytic-AML can produce a rowless handoff summary for hosted detector-output governance."
+  ],
+  "blocked_claims": [
+    {
+      "claim": "The imported detector is superior to current AML detectors.",
+      "missing_evidence": "independent benchmark comparison under a validated detector budget",
+      "reason": "P19-A validates governance of an external score artifact, not detector performance."
+    },
+    {
+      "claim": "Relaytic-AML is production-ready for bank AML monitoring.",
+      "missing_evidence": "production controls, live data validation, and human analyst outcome study",
+      "reason": "No production deployment, analyst study, or bank validation exists."
+    },
+    {
+      "claim": "Relaytic-AML introduces graph-neural detector novelty.",
+      "missing_evidence": "new detector architecture plus benchmark and ablation evidence",
+      "reason": "The route hosts external detector outputs and does not implement a new graph-neural model."
+    },
+    {
+      "claim": "Relaytic-AML reaches RevClassifyDS parity.",
+      "missing_evidence": "faithful reference replay or accepted parity protocol",
+      "reason": "No faithful RevClassifyDS parity run is executed in P19-A."
+    },
+    {
+      "claim": "Relaytic-AML proves real-bank AML superiority.",
+      "missing_evidence": "licensed real-bank data, approved evaluation protocol, and independent validation",
+      "reason": "The artifact is rowless governance evidence, not real-bank detector validation."
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "score_artifact_exists",
+      "observed": "exists=True",
+      "passed": true,
+      "requirement": "score artifact or deterministic fixture is available"
+    },
+    {
+      "check_id": "score_artifact_parseable",
+      "observed": "parse_error=None",
+      "passed": true,
+      "requirement": "score artifact parses as JSON object"
+    },
+    {
+      "check_id": "required_metadata_complete",
+      "observed": "missing=0",
+      "passed": true,
+      "requirement": "artifact carries dataset, split, schema, metric, leakage, and claim-state metadata"
+    },
+    {
+      "check_id": "rowless_input_contract",
+      "observed": "forbidden_fields=0",
+      "passed": true,
+      "requirement": "artifact does not expose raw rows, identifiers, local paths, secrets, or raw score payloads"
+    },
+    {
+      "check_id": "claim_state_bounded",
+      "observed": "claim_state=hosted_detector_output_governance_only",
+      "passed": true,
+      "requirement": "claim state is hosted detector-output governance only"
+    },
+    {
+      "check_id": "detector_performance_not_promoted",
+      "observed": "detector_performance_metric=False",
+      "passed": true,
+      "requirement": "P19-A does not promote detector-performance metrics"
+    }
+  ],
+  "detector_superiority_claimed": false,
+  "failed_checks": [],
+  "graph_neural_detector_novelty_claimed": false,
+  "hard_real_bank_aml_superiority_claimed": false,
+  "production_aml_readiness_claimed": false,
+  "publishable": true,
+  "revclassify_parity_claimed": false,
+  "schema_version": "relaytic.paper_external_score.v1",
+  "status": "pass"
+}

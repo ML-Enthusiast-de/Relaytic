@@ -282,7 +282,9 @@ Stable slice numbering stays the same, but the preferred execution order after S
 74C. Paper Track P16 - failure-case evaluation pack
 74D. Paper Track P17 - governance machinery ablation pack
 74E. Paper Track P18 - governance invariants and adjacent-systems positioning
-74F. Paper Track P19 - hosted detector workflow demonstration, if selected
+74F. Paper Track P19 - CTO/arXiv quality gate and hosted detector workflow demonstration, if selected
+74F-A. Paper Track P19-A - external score-file adapter proof pack, if selected
+74F-B. Paper Track P19-B - external score case-study and paper integration, if selected
 74G. Paper Track P20 - PaySim selection-story cleanup and paper visual/narrative polish
 74H. Paper Track P21 - final source/PDF preflight and release changelog
 75. Slice 16
@@ -354,8 +356,8 @@ Why:
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
-- Paper Track P0 through P18 now come before Academy work because the current freeze pack deliberately blocked hard AML and SOTA claims; Relaytic first cleaned public surfaces, ran relevant benchmark tracks, challenged weak first-pass rows with competitive leakage-safe budgets, generated real numeric evidence, drafted a claim-safe paper, proved a clean paper-smoke path, produced a claim-safe P13 paper release pack, produced a P14 arXiv-compatible source bundle, added P15 measured user/agent handoff evidence, added P16 deterministic failure-case evidence, added P17 governance-ablation evidence, and added P18 governance-invariant positioning before expanding into capability evolution
-- Paper Track P19 through P21 remain as triggerable paper-strengthening follow-ons in `docs/build_slices/phase_paper_strengthening.md`: P19 is an optional hosted-detector workflow demonstration, P20 PaySim/story/visual polish, and P21 final source/PDF preflight. P18 has added formal invariants and adjacent-systems positioning. These stages must run one at a time and preserve the evaluation-lab claim boundary.
+- Paper Track P0 through P19-A now come before Academy work because the current freeze pack deliberately blocked hard AML and SOTA claims; Relaytic first cleaned public surfaces, ran relevant benchmark tracks, challenged weak first-pass rows with competitive leakage-safe budgets, generated real numeric evidence, drafted a claim-safe paper, proved a clean paper-smoke path, produced a claim-safe P13 paper release pack, produced a P14 arXiv-compatible source bundle, added P15 measured user/agent handoff evidence, added P16 deterministic failure-case evidence, added P17 governance-ablation evidence, added P18 governance-invariant positioning, and added P19-A hosted-score governance proof before expanding into capability evolution
+- Paper Track P19-B through P21 remain as triggerable paper-strengthening follow-ons in `docs/build_slices/phase_paper_strengthening.md`: P19-B is the paper-facing hosted-score case-study integration now that P19-A has landed, P20 is PaySim/story/visual polish, and P21 is final source/PDF preflight. These stages must run one at a time and preserve the evaluation-lab claim boundary.
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
 - Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, and adds Relaytic aliases for legacy API/tool names
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
@@ -364,7 +366,7 @@ Why:
 - Paper Track P5 is now implemented and inspects the raw Elliptic graph bundle, freezes graph provenance and temporal split artifacts, records unknown-label scope, allows only supporting loader/provenance wording, and keeps graph benchmark/SOTA claims blocked before numeric graph baselines run
 - Paper Track P6 is now implemented and runs the full PaySim tabular baseline suite under a train-only leakage-safe feature contract with explicit adapter versions, budget tiers, fallback states, and a publishability gate that blocks headline promotion until P6-A
 - Paper Track P6-A is now implemented and runs a competitive PaySim rerun with audited prior-step destination-history features, 14 recorded probe trials, five full-training finalists, validation-only calibration/threshold selection, and a supporting-only publishability pass for validation-selected Extra Trees (`test_pr_auc=0.638773`) while retaining hard-claim blockers before P7
-- Paper Track P18 is implemented; Paper Track P19 should start only when the user triggers Stage 4 and chooses a hosted-detector demonstration route.
+- Paper Track P19-A is implemented; Paper Track P19-B should start next if the paper-strengthening path continues so the hosted-score evidence becomes a reader-facing case study.
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -377,8 +379,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P18. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, Paper Track P11 claim-linted paper draft generation, Paper Track P12 external dry-run proof, Paper Track P13 claim-safe paper release pack, Paper Track P14 final arXiv source bundle, Paper Track P15 measured system-evaluation proof pack, Paper Track P16 failure-case evaluation pack, Paper Track P17 governance machinery ablation pack, and Paper Track P18 governance invariants and adjacent-systems positioning.
-- next execution target: Paper Track P19 if the hosted-detector workflow demonstration is selected; otherwise Paper Track P20 or Slice 16A
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P19-A. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, Paper Track P11 claim-linted paper draft generation, Paper Track P12 external dry-run proof, Paper Track P13 claim-safe paper release pack, Paper Track P14 final arXiv source bundle, Paper Track P15 measured system-evaluation proof pack, Paper Track P16 failure-case evaluation pack, Paper Track P17 governance machinery ablation pack, Paper Track P18 governance invariants and adjacent-systems positioning, and Paper Track P19-A external score-file adapter proof pack.
+- next execution target: Paper Track P19-B hosted-score case-study integration; otherwise Paper Track P20 or Slice 16A
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -387,7 +389,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned paper follow-on: Paper Track P19 hosted detector workflow demonstration is the next triggerable paper-strengthening slice if selected; final human upload work remains human PDF review, arXiv upload-package confirmation, and clean tag-target confirmation if no further strengthening slice is pursued
+- next planned paper follow-on: Paper Track P19-B hosted-score case-study integration is the next triggerable paper-strengthening slice; final human upload work remains human PDF review, arXiv upload-package confirmation, and clean tag-target confirmation if no further strengthening slice is pursued
 - next planned academy follow-on: Slice 16A, after P15 closed the upload-source, release-candidate, and measured system-evaluation gaps
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
@@ -4331,7 +4333,7 @@ Implemented status:
 - implemented by `src/relaytic/release_safety/paper_system_eval.py`
 - generated reports: `paper_system_behavior_eval.json`, `paper_system_task_eval.json`, `paper_agent_handoff_eval.json`, `paper_no_lost_user_eval.json`, `paper_claim_gate_case_studies.json`, `paper_system_eval_manifest.json`, and `paper_system_eval_summary.md`
 - the current pack passes the required deterministic protocol and reader/agent task checks, covering navigation, metric provenance, partial-run recovery, rowless handoff, local-LLM advisory boundaries, and claim gates while remaining explicitly bounded to protocol evidence, not human-study or production-deployment evidence
-- P18 is implemented. P19 is the next paper-strengthening slice if the user triggers Stage 4 and selects a hosted-detector workflow demonstration route; otherwise P20 or Slice 16A remains the next target.
+- P19-A is implemented. P19-B is the next paper-strengthening slice if the hosted-score case study should enter the paper; otherwise P20 or Slice 16A remains the next target.
 
 ## Paper Track P16 - Failure-case evaluation pack
 
@@ -4363,7 +4365,7 @@ Implemented status:
 - implemented by `src/relaytic/release_safety/paper_governance_ablation.py`
 - generated reports: `paper_governance_ablation_eval.json`, `paper_governance_ablation_matrix.json`, `paper_governance_ablation_manifest.json`, and `paper_governance_ablation_summary.md`
 - the current pack compares the full governance path with deterministic disabled-component fixtures for public-claim gating, leakage policy, rowless handoff redaction, metric-cell required fields, and interrupted-run recovery
-- P19 is the next paper-strengthening slice if the user triggers Stage 4 and selects a hosted-detector workflow demonstration route; otherwise P20 or Slice 16A remains the next target.
+- P19-A is implemented. P19-B is the next paper-strengthening slice if the hosted-score case study should enter the paper; otherwise P20 or Slice 16A remains the next target.
 
 Goal:
 - show why the Relaytic-AML governance machinery matters by comparing the full path against disabled-gate fixtures
@@ -4409,7 +4411,7 @@ Proof obligation:
 Fallback rule:
 - if an invariant is aspirational rather than checked, move it to future work instead of presenting it as current behavior
 
-## Paper Track P19 - Hosted detector workflow demonstration
+## Paper Track P19 - CTO/arXiv quality gate and hosted detector workflow demonstration
 
 Goal:
 - demonstrate that Relaytic-AML can host and govern stronger detector workflows without claiming detector novelty or superiority
@@ -4430,7 +4432,62 @@ Proof obligation:
 - tests must prove that the hosted workflow produces evidence cells and operating-point metrics while blocking RevClassifyDS parity, graph-neural novelty, and SOTA claims unless stronger evidence exists
 
 Fallback rule:
-- if no safe hosted-detector path is selected, skip P19 and keep the paper focused on P16-P18 system-evaluation evidence
+- first consume `docs/reports/paper_cto_quality_gap_review.md` and select one route: external score-file adapter, lightweight graph-native fixture, RevClassifyDS-style scorecard adapter, or skip P19 and move to P20
+- if no safe hosted-detector or score-workflow path is selected, skip P19 and keep the paper focused on P16-P18 system-evaluation evidence
+
+## Paper Track P19-A - External score-file adapter proof pack
+
+Implemented status:
+
+- implemented by `src/relaytic/release_safety/paper_external_score.py`
+- exposed through `relaytic release-safety paper-external-score-proof`
+- generated reports: `paper_external_score_route_decision.json`, `paper_external_score_schema.json`, `paper_external_score_manifest.json`, `paper_external_score_evidence_cells.json`, `paper_external_score_claim_gate.json`, `paper_external_score_handoff_eval.json`, and `paper_external_score_summary.md`
+- the current pack passes the required deterministic rowless fixture, required-metadata, claim-gate, evidence-cell, and handoff-redaction checks while remaining explicitly bounded to hosted detector-output governance, not detector superiority
+- P19-B is the next paper-strengthening slice if the user continues this track
+
+Goal:
+- implement the preferred P19 route by proving Relaytic-AML can host a detector-output score artifact while preserving rowless local-first governance and claim gates
+
+Load-bearing improvement:
+- gives CTO and reviewer readers concrete evidence that Relaytic can wrap a realistic detector workflow without claiming model novelty
+
+Human surface:
+- a compact paper-safe summary or table with artifact type, schema hash, metric policy, redaction posture, claim state, and blocked stronger claims
+
+Agent surface:
+- CLI and report artifacts for route decision, score schema, score manifest, evidence cells, claim gate, handoff redaction evaluation, and paper-safe summary
+
+Intelligence source:
+- deterministic score artifact fixture or local user-provided score file; no auto-download and no private data exposure; external-score route is the default
+
+Proof obligation:
+- tests must show that missing metadata blocks publication, a valid score artifact creates evidence cells and a bounded governance claim, rowless export redacts raw rows, entity identifiers, private paths, and unapproved score payload fields, and hard detector claims remain blocked
+
+Fallback rule:
+- if no safe score artifact can be created, record P19-A as blocked and move to P20 with the limitation explicit
+
+## Paper Track P19-B - External score case-study and paper integration
+
+Goal:
+- turn the P19-A external-score proof into a reader-facing systems case study that makes the hosted detector-output governance contribution concrete
+
+Load-bearing improvement:
+- prevents the strongest evidence from living only in JSON by giving reviewers a compact view of the adapter input, Relaytic checks, generated evidence, redactions, claim state, and blocked stronger claims
+
+Human surface:
+- one compact table or figure panel in the paper plus nearby interpretation explaining what can and cannot be concluded
+
+Agent surface:
+- generated paper-integration artifacts for case-study rows, paper-panel data, claim mapping, and a reproduction card
+
+Intelligence source:
+- deterministic synthesis from P19-A artifacts and existing paper claim gates; no new detector run, benchmark number, or model claim
+
+Proof obligation:
+- tests must show that the generated case study consumes P19-A artifacts, cites evidence-cell IDs, includes reproduction commands for Windows and macOS/Linux, and blocks raw rows, private paths, secrets, licensed data, detector-superiority claims, and RevClassifyDS parity wording
+
+Fallback rule:
+- if P19-A is skipped or blocked, P19-B must also be skipped and P20 must state that no hosted-score case study is available
 
 ## Paper Track P20 - PaySim selection-story cleanup and paper visual/narrative polish
 

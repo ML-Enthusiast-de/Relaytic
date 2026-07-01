@@ -1,0 +1,31 @@
+{
+  "alternatives": [
+    {
+      "decision": "not_selected",
+      "reason": "Would shift attention toward detector mechanics rather than hosted-output governance.",
+      "route": "lightweight_graph_native_fixture"
+    },
+    {
+      "decision": "not_selected",
+      "reason": "Would invite parity interpretation without faithful reference replay evidence.",
+      "route": "revclassifyds_style_scorecard_adapter"
+    },
+    {
+      "decision": "not_selected",
+      "reason": "Use only if no safe score artifact can be governed.",
+      "route": "skip_hosted_score_workflow"
+    }
+  ],
+  "artifact_id": "p19a_external_score_rowless_fixture_v1",
+  "claim_state": "hosted_detector_output_governance_only",
+  "dataset_id": "p19a_hosted_score_fixture",
+  "input_artifact_ref": "fixture:p19a_external_score_rowless_v1",
+  "next_slice": "Paper Track P19-B - external score case-study and paper integration",
+  "paper_claim_boundary": "hosted detector-output governance, not detector superiority",
+  "preferred_route": "external_score_file_adapter",
+  "route_reason": "The external score route proves Relaytic-AML can host detector-output evidence without claiming detector novelty.",
+  "schema_version": "relaytic.paper_external_score.v1",
+  "selected_route": "external_score_file_adapter",
+  "split": "fixture_holdout",
+  "status": "selected"
+}

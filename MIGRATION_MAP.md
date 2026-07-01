@@ -1039,6 +1039,25 @@ P18 adds a release-safety/governance surface, not a detector boundary expansion.
 
 Compatibility boundary: P18 does not promote any hard AML, detector-SOTA, graph-neural novelty, production-ready, RevClassifyDS parity, or real-bank superiority claim. It only makes the current governance contracts explicit and machine-auditable.
 
+## Paper Track P19-A External Score-File Proof
+
+P19-A extends the existing release-safety paper-track boundary with a hosted detector-output governance proof, not a detector implementation boundary.
+
+- introduced `src/relaytic/release_safety/paper_external_score.py`
+- introduced the public command `relaytic release-safety paper-external-score-proof`
+- added generated artifacts:
+  - `docs/reports/paper_external_score_route_decision.json`
+  - `docs/reports/paper_external_score_schema.json`
+  - `docs/reports/paper_external_score_manifest.json`
+  - `docs/reports/paper_external_score_evidence_cells.json`
+  - `docs/reports/paper_external_score_claim_gate.json`
+  - `docs/reports/paper_external_score_handoff_eval.json`
+  - `docs/reports/paper_external_score_summary.md`
+- supports a deterministic rowless fixture by default and optional local JSON score artifacts without committing raw rows, entity identifiers, secrets, licensed data, or absolute local paths
+- keeps the allowed public claim bounded to hosted detector-output governance and continues blocking detector superiority, graph-neural novelty, production AML readiness, RevClassifyDS parity, and real-bank superiority claims
+
+Compatibility boundary: P19-A does not expand the public detector API, does not add a graph-neural model, and does not create a benchmark-performance claim. It only proves that external score artifacts can be converted into claim-gated, rowless, auditable evidence cells.
+
 ## Removal Criteria
 
 The remaining compatibility layer can be removed when all of the following are true:

@@ -1,0 +1,74 @@
+{
+  "checks": [
+    {
+      "check_id": "route_selected",
+      "observed": "status=selected",
+      "passed": true,
+      "requirement": "external score-file adapter route is selected"
+    },
+    {
+      "check_id": "score_schema_accepted",
+      "observed": "accepted=True",
+      "passed": true,
+      "requirement": "score artifact has required schema, metadata, rowless posture, and bounded claim state"
+    },
+    {
+      "check_id": "evidence_cells_created",
+      "observed": "count=1",
+      "passed": true,
+      "requirement": "at least one evidence cell is emitted"
+    },
+    {
+      "check_id": "claim_gate_publishable",
+      "observed": "publishable=True",
+      "passed": true,
+      "requirement": "claim gate allows only hosted-detector-output governance wording"
+    },
+    {
+      "check_id": "rowless_handoff_redaction_passed",
+      "observed": "redacted=16; exported=11",
+      "passed": true,
+      "requirement": "handoff redacts rows, identifiers, private paths, raw scores, and secrets"
+    }
+  ],
+  "claim_boundary": {
+    "allowed": "hosted_detector_output_governance_only",
+    "detector_superiority_claimed": false,
+    "graph_neural_detector_novelty_claimed": false,
+    "hard_real_bank_aml_superiority_claimed": false,
+    "production_aml_readiness_claimed": false,
+    "revclassify_parity_claimed": false
+  },
+  "command": "relaytic release-safety paper-external-score-proof",
+  "failed_checks": [],
+  "input_summary": {
+    "artifact_ref": "fixture:p19a_external_score_rowless_v1",
+    "content_hash_prefix": "dac68c3801f5",
+    "input_exists": true,
+    "input_filename": "p19a_external_score_rowless_fixture.json",
+    "metadata_exists": true,
+    "metadata_source": "embedded_fixture",
+    "schema_hash_prefix": "4b2b70a58b0c",
+    "source_kind": "deterministic_rowless_fixture"
+  },
+  "next_slice": "Paper Track P19-B - external score case-study and paper integration",
+  "no_private_data_posture": {
+    "absolute_paths_written": false,
+    "entity_identifiers_written": false,
+    "licensed_data_written": false,
+    "raw_rows_written": false,
+    "secrets_written": false
+  },
+  "reports": {
+    "paper_external_score_claim_gate": "paper_external_score_claim_gate.json",
+    "paper_external_score_evidence_cells": "paper_external_score_evidence_cells.json",
+    "paper_external_score_handoff_eval": "paper_external_score_handoff_eval.json",
+    "paper_external_score_manifest": "paper_external_score_manifest.json",
+    "paper_external_score_route_decision": "paper_external_score_route_decision.json",
+    "paper_external_score_schema": "paper_external_score_schema.json",
+    "paper_external_score_summary": "paper_external_score_summary.md"
+  },
+  "schema_version": "relaytic.paper_external_score.v1",
+  "slice": "Paper Track P19-A",
+  "status": "ready_for_hosted_score_governance"
+}

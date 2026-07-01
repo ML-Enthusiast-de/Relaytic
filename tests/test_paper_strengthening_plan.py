@@ -13,7 +13,7 @@ def _read(relative_path: str) -> str:
     return (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def test_paper_strengthening_track_records_stage_3_and_remaining_followons() -> None:
+def test_paper_strengthening_track_records_stage_4a_and_remaining_followons() -> None:
     plan = _read("docs/build_slices/phase_paper_strengthening.md")
     slicing = _read("RELAYTIC_SLICING_PLAN.md")
     build = _read("RELAYTIC_BUILD_MASTER.md")
@@ -24,15 +24,28 @@ def test_paper_strengthening_track_records_stage_3_and_remaining_followons() -> 
         assert f"Paper Track {slice_id}" in plan
         assert f"Paper Track {slice_id}" in slicing
 
-    assert "Stage 3 is implemented." in plan
-    assert "P19 is the next triggerable stage" in plan
+    assert "Paper Track P19-A" in plan
+    assert "Paper Track P19-A" in slicing
+    assert "Paper Track P19-B" in plan
+    assert "Paper Track P19-B" in slicing
+    assert "Paper P19-A" in build
+    assert "Paper P19-B" in build
+    assert "Stage 4A is implemented." in plan
+    assert "P19-B is now the next triggerable paper-facing integration stage" in plan
+    assert "P19-A produces the external score-file governance proof pack" in plan
     assert "Paper Track P16 - failure-case evaluation pack** - implemented" in plan
     assert "Paper Track P17 - governance machinery ablation pack** - implemented" in plan
     assert "Paper Track P18 - governance invariants and adjacent-systems positioning** - implemented" in plan
+    assert "Paper Track P19-A - external score-file adapter proof pack** - implemented" in plan
+    assert "Paper Track P19-B - external score case-study and paper integration" in plan
     assert "Stage 3 Acceptance" in plan
+    assert "Stage 4A Acceptance (completed)" in plan
+    assert "Stage 4B Acceptance" in plan
     assert "phase_paper_strengthening.md" in build
     assert "phase_paper_strengthening.md" in paper_track
     assert "latest paper-strengthening slice" in status
+    assert "Paper Track P19-A external score-file adapter proof pack" in status
+    assert "Paper Track P19-B hosted-score case-study integration" in status
 
 
 def test_paper_strengthening_plan_preserves_evidence_first_scope() -> None:
@@ -79,3 +92,37 @@ def test_paper_strengthening_plan_preserves_evidence_first_scope() -> None:
 
     assert "No invented benchmark result" in plan
     assert "Stage work stops at the requested trigger" in plan
+    assert "CTO/arXiv quality gate" in plan
+    assert "paper_cto_quality_gap_review.md" in plan
+    assert "external score-file adapter" in plan
+    assert "paper-external-score-proof" in plan
+    assert "paper-external-score-integration" in plan
+    assert "paper_external_score_manifest.json" in plan
+    assert "paper_external_score_evidence_cells.json" in plan
+    assert "paper_external_score_case_study.json" in plan
+    assert "paper_external_score_paper_panel.json" in plan
+    assert "paper_external_score_repro_card.md" in plan
+    assert "rowless handoff report redacts raw rows" in plan
+    assert "hosted-score case study" in plan
+    assert "hosted detector or score-workflow" in plan
+
+
+def test_paper_strengthening_plan_records_cto_quality_review() -> None:
+    review = _read("docs/reports/paper_cto_quality_gap_review.md")
+
+    for source_marker in (
+        "PaperBench",
+        "MLR-Bench",
+        "TransXion",
+        "BlazingAML",
+        "LineMVGNN",
+        "Elliptic2",
+    ):
+        assert source_marker in review
+
+    assert "Good independent arXiv systems/evaluation paper: yes." in review
+    assert "Top visible arXiv paper" in review
+    assert "not yet" in review
+    assert "Hosted detector or score-stream demonstration" in review
+    assert "Preferred route: external score-file adapter." in review
+    assert "The paper should not try to compete" in review
