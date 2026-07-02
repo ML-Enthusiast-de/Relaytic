@@ -1,0 +1,33 @@
+{
+  "interpretation": "This case study shows that Relaytic-AML can host a rowless detector-score artifact as governed evidence: the adapter records schema and content hashes, creates evidence cells, redacts unsafe handoff fields, and blocks stronger detector or production claims. It is not a detector-performance result.",
+  "panel_id": "p19b_hosted_score_panel",
+  "rows": [
+    {
+      "component": "Adapter input",
+      "evidence_ref": "docs/reports/paper_external_score_schema.json",
+      "observed": "external-score adapter over a rowless fixture; schema hash 4b2b70a58b0c; content hash dac68c3801f5",
+      "reader_takeaway": "The score artifact is described by schema and hash posture, not by raw rows."
+    },
+    {
+      "component": "Evidence emitted",
+      "evidence_ref": "docs/reports/paper_external_score_evidence_cells.json",
+      "observed": "1 evidence cell; metadata-completeness metric; value 1.0000",
+      "reader_takeaway": "Relaytic records the governance metric as auditable evidence, not as detector novelty."
+    },
+    {
+      "component": "Rowless handoff",
+      "evidence_ref": "docs/reports/paper_external_score_handoff_eval.json",
+      "observed": "11 exported fields; 16 blocked fields; no raw rows exported",
+      "reader_takeaway": "A downstream agent can inspect state without receiving rows, identifiers, paths, or secrets."
+    },
+    {
+      "component": "Claim state",
+      "evidence_ref": "docs/reports/paper_external_score_claim_gate.json",
+      "observed": "hosted detector-output governance only; 5 stronger claims blocked",
+      "reader_takeaway": "The public use is hosted detector-output governance only."
+    }
+  ],
+  "schema_version": "relaytic.paper_external_score_integration.v1",
+  "status": "pass",
+  "title": "Hosted external-score case study"
+}

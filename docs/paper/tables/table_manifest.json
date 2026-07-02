@@ -34,7 +34,12 @@
         "docs/reports/paper_governance_invariants.json",
         "docs/reports/paper_adjacent_systems_comparison.json",
         "docs/reports/paper_invariant_manifest.json",
-        "docs/reports/paper_invariant_summary.md"
+        "docs/reports/paper_invariant_summary.md",
+        "docs/reports/paper_external_score_case_study.json",
+        "docs/reports/paper_external_score_paper_panel.json",
+        "docs/reports/paper_external_score_claim_map.json",
+        "docs/reports/paper_external_score_repro_card.md",
+        "docs/reports/paper_external_score_integration_manifest.json"
       ],
       "table_id": "evidence_summary"
     },
@@ -68,13 +73,18 @@
         "docs/reports/paper_governance_invariants.json",
         "docs/reports/paper_adjacent_systems_comparison.json",
         "docs/reports/paper_invariant_manifest.json",
-        "docs/reports/paper_invariant_summary.md"
+        "docs/reports/paper_invariant_summary.md",
+        "docs/reports/paper_external_score_case_study.json",
+        "docs/reports/paper_external_score_paper_panel.json",
+        "docs/reports/paper_external_score_claim_map.json",
+        "docs/reports/paper_external_score_repro_card.md",
+        "docs/reports/paper_external_score_integration_manifest.json"
       ],
       "table_id": "claim_gate_matrix"
     },
     {
       "artifact_ref": "docs/paper/tables/table_3_release_artifact_set.md",
-      "byte_count": 2844,
+      "byte_count": 3297,
       "paper_claim_role": "claim_safe_supporting_evidence_only",
       "source_refs": [
         "docs/reports/paper_result_table_final.json",
@@ -102,7 +112,12 @@
         "docs/reports/paper_governance_invariants.json",
         "docs/reports/paper_adjacent_systems_comparison.json",
         "docs/reports/paper_invariant_manifest.json",
-        "docs/reports/paper_invariant_summary.md"
+        "docs/reports/paper_invariant_summary.md",
+        "docs/reports/paper_external_score_case_study.json",
+        "docs/reports/paper_external_score_paper_panel.json",
+        "docs/reports/paper_external_score_claim_map.json",
+        "docs/reports/paper_external_score_repro_card.md",
+        "docs/reports/paper_external_score_integration_manifest.json"
       ],
       "table_id": "release_artifact_set"
     }

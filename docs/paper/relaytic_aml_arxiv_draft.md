@@ -167,16 +167,17 @@ The feature policy is strictest for PaySim because simulator balance columns can
 |---|---|---|---|---|
 | P4 reference | SGD logistic baseline | source-safe starting point | 0.2159 | reference row |
 | P6 baseline | Extra Trees baseline | leakage-safe feature set | 0.3313 | baseline row |
-| Competitive search | XGBoost probe | 26 allowed features; best probe validation PR-AUC 0.5944 | not evaluated on test | candidate screening |
-| Final model | Extra Trees with Platt calibration | validation-selected finalist; validation-only calibration | 0.6388 | bounded demonstration |
+| Probe screen | best small-sample probe: XGBoost | 26 allowed features; probe validation PR-AUC 0.5944 | no test evaluation | candidate screening |
+| Full finalist selection | Extra Trees finalist | full-training validation PR-AUC 0.5687; selected before test | test still hidden | model selection |
+| Final fixed test | Extra Trees with Platt calibration | validation-only calibration and threshold | 0.6388 | bounded demonstration |
 
-PaySim is the clearest modeling result in the current evidence pack. The earliest reference row was PR-AUC 0.2159. The later leakage-safe baseline improved to 0.3313, and the competitive selected Extra Trees model reached fixed-test PR-AUC 0.6388 and ROC-AUC 0.9683. The improvement is meaningful inside the synthetic temporal-fraud contract because it follows a visible sequence: balance fields were excluded, prior-step destination history was added without raw account encoding, candidates were selected by validation evidence, and calibration and thresholding used validation-only partitions. The admissible interpretation is precise: Relaytic-AML produced a stronger, leakage-audited PaySim temporal-proxy row under a declared budget.
+PaySim is the most complete local modeling path in the current evidence pack. It should be read as an audited sequence rather than as a leaderboard claim. The earliest reference row was PR-AUC 0.2159. The later leakage-safe baseline improved to 0.3313. The small-sample probe screen then identified a strong XGBoost probe, but fixed-test eligibility was decided later among full-training finalists; Extra Trees had the best full-training validation PR-AUC and was the only competitive finalist evaluated on the fixed test. It reached fixed-test PR-AUC 0.6388 and ROC-AUC 0.9683. The improvement is meaningful inside the synthetic temporal-fraud contract because balance fields were excluded, prior-step destination history was added without raw account encoding, candidates were selected by validation evidence, and calibration and thresholding used validation-only partitions. The admissible interpretation is precise: Relaytic-AML produced a stronger, leakage-audited PaySim temporal-proxy row under a declared budget. It is supporting temporal-fraud evidence rather than real-bank AML performance.
 
 The review-budget metrics sharpen the interpretation. At the selected PaySim review budget, precision is 0.7033 and recall is 0.4716. The top of the queue is much richer than prevalence, but a large share of fraud remains outside the reviewed set. That is a useful operating result for an evaluation lab because it connects ranking quality to analyst capacity instead of treating PR-AUC as the whole story.
 
 Elliptic is a different kind of evidence. The validation-selected source-plus-structural LightGBM row reports test PR-AUC 0.6688, with review-budget precision 1.0000 and recall 0.0566. The result supports temporal graph-feature provenance and operating-point reporting. It also reveals a limitation: the current graph-structure-only floor is weak, and the final row is heavily influenced by source-provided anonymized features. Relaytic's contribution here is the graph-aware evidence path: feature provenance, temporal splits, operating-point metrics, and interpretation routing are made auditable together.
 
-Elliptic2 is intentionally framed as an external reference row. The repeated official-partition context row reports PR-AUC 0.9432 +/- 0.0009, and the content-hash robustness partition reports mean PR-AUC 0.9297. Those are strong absolute values, and the recorded RevClassifyDS reference of 0.9740 gives the reader a useful frontier marker. Relaytic's evidence role is to keep that modern benchmark context visible while recording the cohort and reference-execution evidence needed for stronger future comparison.
+Elliptic2 is intentionally framed as an external reference row. The repeated official-partition context row reports PR-AUC 0.9432 +/- 0.0009, and the content-hash robustness partition reports mean PR-AUC 0.9297. Those are strong absolute values, and the recorded RevClassifyDS reference of 0.9740 gives the reader a useful frontier marker. This is not a contribution of a new Elliptic2 detector. Relaytic's evidence role is to keep that modern benchmark context visible while recording the cohort and reference-execution evidence needed for stronger future comparison.
 
 ![Benchmark and review-budget evidence: PR-AUC is shown beside precision and recall at the bounded review queue instead of being interpreted alone.](figures/figure_3_review_budget.svg)
 
@@ -239,6 +240,31 @@ Table 7 compares the full governance path with disabled-component fixtures. The 
 
 Table 8 states the current invariants as release-time rules rather than prose preferences. Each invariant has a mechanism, evidence artifacts, an observed failure or ablation signal, and an explicit boundary. This is the core systems claim: Relaytic-AML makes agent-assisted evaluation safer by turning interpretation into checked state.
 
+**Hosted external-score case study.**
+
+| Component | Observed evidence | Evidence | Admissible interpretation |
+|---|---|---|---|
+| Adapter input | external-score adapter over a rowless fixture; schema hash 4b2b70a58b0c; content hash dac68c3801f5 | schema/hash report | The score artifact is described by schema and hash posture, not by raw rows. |
+| Evidence emitted | 1 evidence cell; metadata-completeness metric; value 1.0000 | evidence-cell report | Relaytic records the governance metric as auditable evidence, not as detector novelty. |
+| Rowless handoff | 11 exported fields; 16 blocked fields; no raw rows exported | handoff-redaction report | A downstream agent can inspect state without receiving rows, identifiers, paths, or secrets. |
+| Claim state | hosted detector-output governance only; 5 stronger claims blocked | claim-gate report | The public use is hosted detector-output governance only. |
+
+The hosted external-score case study makes the integration point concrete. A rowless detector-score artifact enters Relaytic with schema and content hashes, not raw rows. Relaytic emits one governance evidence cell, redacts unsafe handoff fields, and allows only hosted detector-output governance wording. This is not a detector-performance result; it shows how a stronger or third-party detector output can be wrapped by the same local evidence and claim boundary.
+
+```json
+{
+  "cell_id": "p19a.external_score.hosted_metadata_completeness",
+  "dataset_id": "p19a_hosted_score_fixture",
+  "split": "fixture_holdout",
+  "command": "relaytic release-safety paper-external-score-proof",
+  "artifact_ref": "fixture:p19a_external_score_rowless_v1",
+  "metric": "hosted_score_metadata_completeness",
+  "value": 1.0,
+  "leakage_posture": "rowless_no_training_or_label_data_exported",
+  "claim_state": "hosted_detector_output_governance_only"
+}
+```
+
 **Table 9. Evidence routing examples.**
 
 | Stronger future use | Current admissible use | Evidence needed |
@@ -284,6 +310,7 @@ The repository is larger than this AML paper. Relaytic is the general local-firs
 | Failure-case evaluation | release-safety paper-failure-eval --format json | injected-risk failure-case reports | repo-local deterministic fixtures | all required failure cases pass in current evidence pack |
 | Governance ablation | release-safety paper-governance-ablation --format json | full-vs-disabled governance ablation reports | repo-local deterministic fixtures | full path safe; disabled fixtures expose expected failures |
 | Governance invariants | release-safety paper-invariants --format json | invariant and adjacent-systems reports | repo-local deterministic fixtures | 7 current invariants; 6 adjacent families; no stronger detector claim |
+| Hosted-score case study | release-safety paper-external-score-proof; paper-external-score-integration | external-score schema, evidence-cell, redaction, claim-map, and case-study reports | repo-local rowless fixture by default; optional local score files stay local | schema/content hash prefixes plus evidence-cell ID recorded |
 
 Minimal regeneration commands are shown below.
 
@@ -295,9 +322,12 @@ py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-failure-eval --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-governance-ablation --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-external-score-proof --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-external-score-integration --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py -q
+py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py tests/test_paper_track_p19a.py tests/test_paper_track_p19b.py tests/test_paper_track_p20.py -q
 ```
 
 macOS/Linux:
@@ -308,9 +338,12 @@ python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
 python3 -m relaytic.ui.cli release-safety paper-failure-eval --format json
 python3 -m relaytic.ui.cli release-safety paper-governance-ablation --format json
 python3 -m relaytic.ui.cli release-safety paper-invariants --format json
+python3 -m relaytic.ui.cli release-safety paper-external-score-proof --format json
+python3 -m relaytic.ui.cli release-safety paper-external-score-integration --format json
 python3 -m relaytic.ui.cli release-safety paper-release --format json
+python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py -q
+python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py tests/test_paper_track_p19a.py tests/test_paper_track_p19b.py tests/test_paper_track_p20.py -q
 ```
 
 Raw benchmark data is not committed. PaySim and Elliptic require local downloads and are referenced through registry artifacts, split reports, hashes, and command ledgers. Elliptic2 remains context-only in this paper because the stronger reference-parity conditions are not satisfied locally. Clean clones can reproduce the paper-generation checks and repo-local public fixtures; full benchmark regeneration requires the locally licensed datasets named in the README.

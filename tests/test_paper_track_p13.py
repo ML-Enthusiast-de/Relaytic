@@ -62,11 +62,18 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Table 2b. Feature and metric policy" in draft
     assert "Table 3. Model families and search budgets" in draft
     assert "Table 4. PaySim modeling path" in draft
+    assert "Probe screen" in draft
+    assert "Full finalist selection" in draft
+    assert "small-sample probe screen" in draft
+    assert "Competitive search | XGBoost probe" not in draft
     assert "Table 5. System audit matrix" in draft
     assert "Table 6. Failure-case evaluation" in draft
     assert "Table 7. Governance machinery ablation" in draft
     assert "Adjacent systems comparison" in draft
     assert "Table 8. Governance invariants and evidence map" in draft
+    assert "Hosted external-score case study" in draft
+    assert "not a detector-performance result" in draft
+    assert "paper-narrative-polish --format json" in draft
     assert "Table 9. Evidence routing examples" in draft
     assert "Table 10. Rowless handoff and interrupted-run recovery examples" in draft
     assert "Table 11. Reproducibility contract" in draft
@@ -82,6 +89,10 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "@misc{deprez2025continualaml" in references
     assert "@misc{yang2026skillopt" in references
     assert any(item["citation_key"] == "song2024revtrack" for item in manifest["source_verification"])
+    assert any(
+        check["check_id"] == "p19b_hosted_score_case_study_passed" and check["passed"]
+        for check in manifest["checks"]
+    )
     assert not manifest["failed_checks"]
 
 
@@ -159,6 +170,11 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert claims["hard_claims_allowed"] is False
     assert claims["headline_claims_allowed"] is False
     assert "Relaytic-AML: A Local-First Agentic Evaluation Lab" in draft
+    assert "Hosted external-score case study" in draft
+    assert "not a detector-performance result" in draft
+    assert "Probe screen" in draft
+    assert "Full finalist selection" in draft
+    assert "paper-narrative-polish --format json" in draft
     assert "arXiv-ready draft" not in draft
     assert ("TODO" + "_EVIDENCE") not in draft
     assert "pending isolated" + " test" not in draft
@@ -166,6 +182,10 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     for phrase in FORBIDDEN_READER_TONE_PHRASES:
         assert phrase.lower() not in draft.lower()
     assert "No SOTA or leaderboard-winner claim." in attention
+    assert any(
+        check["check_id"] == "p19b_hosted_score_case_study_passed" and check["passed"]
+        for check in manifest["checks"]
+    )
 
     references = (PAPER_DIR / PAPER_REFERENCES_FILENAME).read_text(encoding="utf-8")
     cited_keys = set()

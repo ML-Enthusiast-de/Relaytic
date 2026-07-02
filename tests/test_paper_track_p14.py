@@ -45,7 +45,8 @@ def test_paper_track_p14_builds_arxiv_source_release_candidate() -> None:
     assert manifest["citation_audit"]["status"] == "pass"
     assert manifest["figure_audit"]["status"] == "pass"
     assert manifest["figure_audit"]["svg_references_remaining"] == []
-    assert manifest["next_slice"].startswith("Paper Track P19")
+    assert manifest["next_slice"].startswith("Paper Track P21")
+    assert any(check["check_id"] == "p20_narrative_polish_passed" and check["passed"] for check in manifest["checks"])
     assert not manifest["failed_checks"]
 
     assert audit["status"] == "pass"
@@ -136,6 +137,7 @@ def test_paper_track_p14_committed_source_bundle_is_ready() -> None:
     assert manifest["arxiv_upload_ready"] is False
     assert manifest["citation_audit"]["status"] == "pass"
     assert manifest["figure_audit"]["status"] == "pass"
+    assert any(check["check_id"] == "p20_narrative_polish_passed" and check["passed"] for check in manifest["checks"])
     assert audit["status"] == "pass"
     assert audit["violation_count"] == 0
     assert any(check["check_id"] == "author_and_pdf_metadata_present" and check["passed"] for check in audit["checks"])

@@ -70,6 +70,12 @@
       "source_artifact": "docs/reports/paper_invariant_manifest.json"
     },
     {
+      "check_id": "p19b_hosted_score_case_study_passed",
+      "message": "Hosted-score case-study integration must pass before the paper describes external detector-output governance.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_external_score_integration_manifest.json"
+    },
+    {
       "check_id": "required_p13_inputs_present",
       "detail": {
         "missing_artifact_refs": [],
@@ -99,7 +105,12 @@
           "docs/reports/paper_governance_invariants.json",
           "docs/reports/paper_adjacent_systems_comparison.json",
           "docs/reports/paper_invariant_manifest.json",
-          "docs/reports/paper_invariant_summary.md"
+          "docs/reports/paper_invariant_summary.md",
+          "docs/reports/paper_external_score_case_study.json",
+          "docs/reports/paper_external_score_paper_panel.json",
+          "docs/reports/paper_external_score_claim_map.json",
+          "docs/reports/paper_external_score_repro_card.md",
+          "docs/reports/paper_external_score_integration_manifest.json"
         ]
       },
       "message": "All P10-P12 source artifacts required by P13 must be present.",
@@ -128,7 +139,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "b32ce8fca5837d52c3f05ffcc7969e2a22fb0ab1",
+  "git_commit": "a3ac8d290f5e3c6a0ded25cf66b0c39647eacbf0",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -172,7 +183,12 @@
       "docs/reports/paper_governance_invariants.json",
       "docs/reports/paper_adjacent_systems_comparison.json",
       "docs/reports/paper_invariant_manifest.json",
-      "docs/reports/paper_invariant_summary.md"
+      "docs/reports/paper_invariant_summary.md",
+      "docs/reports/paper_external_score_case_study.json",
+      "docs/reports/paper_external_score_paper_panel.json",
+      "docs/reports/paper_external_score_claim_map.json",
+      "docs/reports/paper_external_score_repro_card.md",
+      "docs/reports/paper_external_score_integration_manifest.json"
     ],
     "bib_ref": "docs/paper/references.bib",
     "draft_ref": "docs/paper/relaytic_aml_arxiv_draft.md",
@@ -201,6 +217,11 @@
       "docs/reports/paper_claim_gate_case_studies.json",
       "docs/reports/paper_claim_lint_report.json",
       "docs/reports/paper_external_dry_run_report.json",
+      "docs/reports/paper_external_score_case_study.json",
+      "docs/reports/paper_external_score_claim_map.json",
+      "docs/reports/paper_external_score_integration_manifest.json",
+      "docs/reports/paper_external_score_paper_panel.json",
+      "docs/reports/paper_external_score_repro_card.md",
       "docs/reports/paper_failure_case_eval.json",
       "docs/reports/paper_failure_case_manifest.json",
       "docs/reports/paper_failure_case_summary.md",
@@ -258,7 +279,12 @@
     "docs/reports/paper_governance_invariants.json",
     "docs/reports/paper_adjacent_systems_comparison.json",
     "docs/reports/paper_invariant_manifest.json",
-    "docs/reports/paper_invariant_summary.md"
+    "docs/reports/paper_invariant_summary.md",
+    "docs/reports/paper_external_score_case_study.json",
+    "docs/reports/paper_external_score_paper_panel.json",
+    "docs/reports/paper_external_score_claim_map.json",
+    "docs/reports/paper_external_score_repro_card.md",
+    "docs/reports/paper_external_score_integration_manifest.json"
   ],
   "schema_version": "relaytic.paper_release.v1",
   "slice": "Paper Track P13",

@@ -43,12 +43,23 @@
           "docs/reports/paper_public_claims_allowed.json",
           "docs/paper/relaytic_aml_arxiv_draft.md",
           "docs/paper/references.bib",
-          "docs/paper/figures/figure_manifest.json"
+          "docs/paper/figures/figure_manifest.json",
+          "docs/reports/paper_paysim_selection_story_review.json",
+          "docs/reports/paper_reader_guidance_audit.json",
+          "docs/reports/paper_visual_table_polish_audit.json",
+          "docs/reports/paper_narrative_polish_manifest.json",
+          "docs/reports/paper_polish_readiness.md"
         ]
       },
-      "message": "P14 requires the P13 manifest, public claims, Markdown draft, bibliography, and figure manifest.",
+      "message": "P14 requires the P13 source refs plus the P20 narrative/guidance polish refs.",
       "passed": true,
       "source_artifact": "docs/reports"
+    },
+    {
+      "check_id": "p20_narrative_polish_passed",
+      "message": "P20 story, reader guidance, and visual/table polish audits must pass before the final source/PDF preflight.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_narrative_polish_manifest.json"
     },
     {
       "check_id": "citation_audit_passed",
@@ -146,13 +157,20 @@
   },
   "hard_claims_allowed": false,
   "headline_claims_allowed": false,
-  "next_slice": "Paper Track P19 - hosted detector workflow demonstration, if selected",
+  "next_slice": "Paper Track P21 - final source/PDF preflight and release changelog",
   "p13_gate_refs": [
     "docs/reports/paper_release_manifest.json",
     "docs/reports/paper_public_claims_allowed.json",
     "docs/paper/relaytic_aml_arxiv_draft.md",
     "docs/paper/references.bib",
     "docs/paper/figures/figure_manifest.json"
+  ],
+  "p20_polish_refs": [
+    "docs/reports/paper_paysim_selection_story_review.json",
+    "docs/reports/paper_reader_guidance_audit.json",
+    "docs/reports/paper_visual_table_polish_audit.json",
+    "docs/reports/paper_narrative_polish_manifest.json",
+    "docs/reports/paper_polish_readiness.md"
   ],
   "release_candidate_checklist_ref": "docs/reports/paper_release_candidate_checklist.md",
   "release_mode": "claim_safe_evaluation_environment_only",
@@ -166,7 +184,12 @@
       "docs/paper/arxiv_src/figures/figure_4_publishability_matrix.pdf",
       "docs/reports/paper_arxiv_source_manifest.json",
       "docs/reports/paper_submission_package_audit.json",
-      "docs/reports/paper_release_candidate_checklist.md"
+      "docs/reports/paper_release_candidate_checklist.md",
+      "docs/reports/paper_paysim_selection_story_review.json",
+      "docs/reports/paper_reader_guidance_audit.json",
+      "docs/reports/paper_visual_table_polish_audit.json",
+      "docs/reports/paper_narrative_polish_manifest.json",
+      "docs/reports/paper_polish_readiness.md"
     ],
     "creation_command": "git tag -a relaytic-aml-paper-p14-source-rc -m \"Relaytic-AML arXiv source release candidate\"",
     "requires_clean_status_command": "git status --short",
@@ -176,12 +199,12 @@
   "schema_version": "relaytic.paper_arxiv_source.v1",
   "slice": "Paper Track P14",
   "source_hashes": {
-    "main_tex_sha256": "32cd2d60be8400d6f27a1baa67190784b97ad543322314e3aba15826eeff9489",
+    "main_tex_sha256": "dd9fc58fe3ec022f8767f2450dcbeb367d568f675a269ebdbc0e8f85d662a5a8",
     "pdf_figure_sha256": {
-      "figure_1_claim_gate_flow.pdf": "9aa645534f892be3dbfc044725bbd38698e670c3fca55d1e6adc504eed1787cd",
-      "figure_2_supporting_pr_auc.pdf": "592f05f227336ab65356eb3618c468ac52e5df839d598898af35ffa5b21c5fc4",
-      "figure_3_review_budget.pdf": "6c4f80e03faddeb464682804af94d77018f48bd4f6f29ba12b87234b835e4f80",
-      "figure_4_publishability_matrix.pdf": "63a81aead428a7f6c0f3670d389710ad6be2abe4948a71b7d660f150670b70c1"
+      "figure_1_claim_gate_flow.pdf": "0ef1d1eb687e78c10667e3f52941ce5698373556b767d4442df4354895f3956e",
+      "figure_2_supporting_pr_auc.pdf": "45f8bd02f125e1f8b06fcd2118a9769535fe4d283527faa7da21056f3bb0cbc5",
+      "figure_3_review_budget.pdf": "93d35c4b080618ea6341f300fca3ee688e9c71905a4b7b4acf746b8ce9f4b020",
+      "figure_4_publishability_matrix.pdf": "65894cff38c301692b43605a020aa73313f7b59723c62badea4fd267f68f69d3"
     },
     "references_bib_sha256": "eb3ff711c6e09fe5b138c44dafe701b93b00beae6a24dfca1042623f01cd130c"
   },

@@ -68,7 +68,7 @@ Current canonical boundaries:
 Reserved future boundaries:
 
 - `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15M task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, replay/shadow-tested imported-model, objective/split/metric-truth, first-class family-stack, staged portfolio-search, temporal-engine, operating-point, benchmark-truth-gate, competitive-specialization, and benchmark-generalization responsibilities; later work may introduce focused subpackages such as `src/relaytic/modeling/families/`, `src/relaytic/modeling/portfolio/`, or `src/relaytic/temporal/` only if they sharpen responsibility instead of forking a disconnected parallel stack
-- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, focused UI helpers such as `src/relaytic/ui/aml_environment.py`, and `src/relaytic/release_safety/paper_freeze.py` plus paper-track release-safety helpers now absorb the shipped AML productization, paper-freeze, PaySim temporal benchmark, Elliptic graph provenance, tabular baseline-suite, competitive PaySim gate, Elliptic graph-baseline work, thesis narrowing, operational paper metrics, reproducible paper-table generation, claim-linted paper drafting, external dry-run proof, claim-safe paper release packaging, and arXiv source-bundle release-candidate packaging before Academy expansion resumes
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, focused UI helpers such as `src/relaytic/ui/aml_environment.py`, and `src/relaytic/release_safety/paper_freeze.py` plus paper-track release-safety helpers now absorb the shipped AML productization, paper-freeze, PaySim temporal benchmark, Elliptic graph provenance, tabular baseline-suite, competitive PaySim gate, Elliptic graph-baseline work, thesis narrowing, operational paper metrics, reproducible paper-table generation, claim-linted paper drafting, external dry-run proof, claim-safe paper release packaging, arXiv source-bundle release-candidate packaging, measured system-evaluation packs, governance-invariant packs, hosted-score governance/case-study integration, and P20 paper narrative/guidance polish before Academy expansion resumes
 - `src/relaytic/graph_fabric/` may still absorb richer graph and subgraph reasoning where it sharpens responsibility beyond the shipped `src/relaytic/aml/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` slices
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
@@ -683,6 +683,33 @@ Current paper-track arXiv source artifact names from Paper Track P14:
 
 Paper Track P14 extends `src/relaytic/release_safety/` with a deterministic arXiv source-bundle generator. It consumes the P13 claim-safe paper pack, renders a top-level LaTeX source file, copies the bibliography, converts the generated SVG figure pack into PDF figures for the selected pdfLaTeX processor, audits citation resolution and figure references, scans the generated package for local paths, secrets, stale prototype wording, and unguarded hard claims, and records a release-candidate checklist. P14 keeps `arxiv_upload_ready` false until real author metadata, local TeX/PDF inspection, and clean tag-target proof are completed.
 
+Current paper-track hosted-score artifact names from Paper Track P19-A/P19-B:
+
+- `paper_external_score_route_decision.json`
+- `paper_external_score_schema.json`
+- `paper_external_score_manifest.json`
+- `paper_external_score_evidence_cells.json`
+- `paper_external_score_claim_gate.json`
+- `paper_external_score_handoff_eval.json`
+- `paper_external_score_summary.md`
+- `paper_external_score_case_study.json`
+- `paper_external_score_paper_panel.json`
+- `paper_external_score_claim_map.json`
+- `paper_external_score_repro_card.md`
+- `paper_external_score_integration_manifest.json`
+
+Paper Track P19-A/P19-B extend `src/relaytic/release_safety/` with deterministic hosted-score governance and paper-integration helpers. P19-A accepts rowless external score metadata or a safe fixture and emits schema/hash, evidence-cell, claim-gate, and handoff-redaction artifacts. P19-B consumes those artifacts and renders a compact hosted-score case study, claim map, and reproduction card into the paper release path. These slices do not expand the public detector API, do not add a graph-neural model, and do not create detector-superiority, production-readiness, RevClassify parity, or real-bank AML claims.
+
+Current paper-track narrative/guidance polish artifact names from Paper Track P20:
+
+- `paper_paysim_selection_story_review.json`
+- `paper_reader_guidance_audit.json`
+- `paper_visual_table_polish_audit.json`
+- `paper_narrative_polish_manifest.json`
+- `paper_polish_readiness.md`
+
+Paper Track P20 extends `src/relaytic/release_safety/` with deterministic paper-polish checks. It separates PaySim probe screening from full-finalist validation, verifies that results have nearby interpretation, audits the paper-to-README guidance path, and requires the P20 manifest before P14 emits a source candidate for final P21 preflight. P20 does not add benchmark rows and does not relax detector-superiority, production-readiness, RevClassify parity, or real-bank AML blockers.
+
 Current trace and eval artifact names:
 
 - `trace_model.json`
@@ -896,6 +923,9 @@ Minimum guaranteed surfaces at this stage:
 - `relaytic release-safety paper-dry-run`
 - `relaytic release-safety paper-release`
 - `relaytic release-safety paper-arxiv-source`
+- `relaytic release-safety paper-external-score-proof`
+- `relaytic release-safety paper-external-score-integration`
+- `relaytic release-safety paper-narrative-polish`
 - `relaytic scan-git-safety`
 
 ## Slice 05 Planning Contract

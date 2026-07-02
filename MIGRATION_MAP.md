@@ -869,6 +869,18 @@ Implemented release-safety artifact names:
 - `paper_claim_gate_case_studies.json`
 - `paper_system_eval_manifest.json`
 - `paper_system_eval_summary.md`
+- `paper_external_score_route_decision.json`
+- `paper_external_score_schema.json`
+- `paper_external_score_manifest.json`
+- `paper_external_score_evidence_cells.json`
+- `paper_external_score_claim_gate.json`
+- `paper_external_score_handoff_eval.json`
+- `paper_external_score_summary.md`
+- `paper_external_score_case_study.json`
+- `paper_external_score_paper_panel.json`
+- `paper_external_score_claim_map.json`
+- `paper_external_score_repro_card.md`
+- `paper_external_score_integration_manifest.json`
 
 Implemented event-bus and permission artifact names:
 - `event_schema.json`
@@ -1057,6 +1069,41 @@ P19-A extends the existing release-safety paper-track boundary with a hosted det
 - keeps the allowed public claim bounded to hosted detector-output governance and continues blocking detector superiority, graph-neural novelty, production AML readiness, RevClassifyDS parity, and real-bank superiority claims
 
 Compatibility boundary: P19-A does not expand the public detector API, does not add a graph-neural model, and does not create a benchmark-performance claim. It only proves that external score artifacts can be converted into claim-gated, rowless, auditable evidence cells.
+
+## Paper Track P19-B External Score Case-Study Integration
+
+P19-B extends the existing release-safety paper-track boundary with hosted detector-output paper integration, not detector implementation or benchmark expansion.
+
+- introduced `src/relaytic/release_safety/paper_external_score_integration.py`
+- introduced the public command `relaytic release-safety paper-external-score-integration`
+- added generated artifacts:
+  - `docs/reports/paper_external_score_case_study.json`
+  - `docs/reports/paper_external_score_paper_panel.json`
+  - `docs/reports/paper_external_score_claim_map.json`
+  - `docs/reports/paper_external_score_repro_card.md`
+  - `docs/reports/paper_external_score_integration_manifest.json`
+- wired `paper-release` and `paper-arxiv-source` regeneration to consume the hosted-score case study, compact paper-panel rows, blocked-claim map, and copy-paste-safe reproduction card
+- keeps reader-facing wording bounded to hosted detector-output governance while continuing to block detector superiority, graph-neural novelty, production AML readiness, RevClassifyDS parity, and real-bank superiority claims
+
+Compatibility boundary: P19-B does not create a new detector, does not introduce a new benchmark number, and does not promote P19-A fixture evidence into model-performance evidence. It only makes the existing rowless external-score governance proof auditable in the manuscript and release artifacts.
+
+## Paper Track P20 Narrative And Guidance Polish
+
+P20 extends the existing release-safety paper-track boundary with paper-polish and reader-guidance audits, not new benchmark or detector functionality.
+
+- introduced `src/relaytic/release_safety/paper_narrative_polish.py`
+- introduced the public command `relaytic release-safety paper-narrative-polish`
+- added generated artifacts:
+  - `docs/reports/paper_paysim_selection_story_review.json`
+  - `docs/reports/paper_reader_guidance_audit.json`
+  - `docs/reports/paper_visual_table_polish_audit.json`
+  - `docs/reports/paper_narrative_polish_manifest.json`
+  - `docs/reports/paper_polish_readiness.md`
+- updated the generated paper so the PaySim path separates small-sample probe screening from full-training finalist selection instead of implying an inconsistent model-selection story
+- updated the README and paper reproducibility path so readers can enter through README plus manuscript first, with deeper JSON artifacts available only after the first read
+- wired `paper-arxiv-source` to require the P20 polish manifest before the final P21 source/PDF preflight
+
+Compatibility boundary: P20 does not add a benchmark result, does not claim detector superiority, and does not expand the public detector API. It only makes the current paper and repo guidance easier to audit before final preflight.
 
 ## Removal Criteria
 

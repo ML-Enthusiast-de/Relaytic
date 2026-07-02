@@ -1,0 +1,99 @@
+{
+  "checks": [
+    {
+      "check_id": "p19a_inputs_present",
+      "observed": "missing=0",
+      "passed": true,
+      "requirement": "P19-B consumes the complete P19-A report family"
+    },
+    {
+      "check_id": "p19a_manifest_ready",
+      "observed": "status=ready_for_hosted_score_governance",
+      "passed": true,
+      "requirement": "P19-A manifest is ready for hosted-score governance"
+    },
+    {
+      "check_id": "adapter_contract_hashes_available",
+      "observed": "schema_hash=4b2b70a58b0c; content_hash=dac68c3801f5",
+      "passed": true,
+      "requirement": "adapter input has schema and content hash prefixes"
+    },
+    {
+      "check_id": "evidence_cell_ids_present",
+      "observed": "cell_ids=p19a.external_score.hosted_metadata_completeness",
+      "passed": true,
+      "requirement": "case study cites evidence-cell IDs"
+    },
+    {
+      "check_id": "rowless_handoff_passed",
+      "observed": "passed=True; redacted=16",
+      "passed": true,
+      "requirement": "handoff report redacts rows, identifiers, paths, raw scores, and secrets"
+    },
+    {
+      "check_id": "claim_gate_bounded",
+      "observed": "publishable=True; blocked=5",
+      "passed": true,
+      "requirement": "claim gate permits hosted-score governance only and blocks stronger claims"
+    },
+    {
+      "check_id": "paper_panel_ready",
+      "observed": "rows=4; status=pass",
+      "passed": true,
+      "requirement": "paper panel has compact reader-facing rows"
+    },
+    {
+      "check_id": "claim_map_bounded",
+      "observed": "detector_superiority_allowed=False; revclassifyds_parity_allowed=False",
+      "passed": true,
+      "requirement": "hosted-score integration does not permit stronger detector or production claims"
+    },
+    {
+      "check_id": "repro_card_cross_platform",
+      "observed": "windows=py -3.11; posix=python3; p19b_command=paper-external-score-integration",
+      "passed": true,
+      "requirement": "repro card includes Windows and macOS/Linux commands for P19-A and P19-B"
+    }
+  ],
+  "claim_boundary": {
+    "allowed": "hosted_detector_output_governance_only",
+    "detector_superiority_claimed": false,
+    "graph_neural_detector_novelty_claimed": false,
+    "production_aml_readiness_claimed": false,
+    "real_bank_validation_claimed": false,
+    "revclassify_parity_claimed": false
+  },
+  "command": "relaytic release-safety paper-external-score-integration",
+  "failed_checks": [],
+  "missing_p19a_artifacts": [],
+  "next_slice": "Paper Track P20 - PaySim selection-story cleanup and paper visual/narrative polish",
+  "no_private_data_posture": {
+    "entity_identifiers_written": false,
+    "licensed_data_written": false,
+    "private_paths_written": false,
+    "raw_rows_written": false,
+    "secrets_written": false
+  },
+  "paper_integration_allowed": true,
+  "reports": {
+    "paper_external_score_case_study": "paper_external_score_case_study.json",
+    "paper_external_score_claim_map": "paper_external_score_claim_map.json",
+    "paper_external_score_integration_manifest": "paper_external_score_integration_manifest.json",
+    "paper_external_score_paper_panel": "paper_external_score_paper_panel.json",
+    "paper_external_score_repro_card": "paper_external_score_repro_card.md"
+  },
+  "required_p19a_artifacts": [
+    "docs/reports/paper_external_score_route_decision.json",
+    "docs/reports/paper_external_score_schema.json",
+    "docs/reports/paper_external_score_manifest.json",
+    "docs/reports/paper_external_score_evidence_cells.json",
+    "docs/reports/paper_external_score_claim_gate.json",
+    "docs/reports/paper_external_score_handoff_eval.json"
+  ],
+  "schema_version": "relaytic.paper_external_score_integration.v1",
+  "slice": "Paper Track P19-B",
+  "source_evidence_cell_ids": [
+    "p19a.external_score.hosted_metadata_completeness"
+  ],
+  "status": "ready_for_hosted_score_case_study"
+}

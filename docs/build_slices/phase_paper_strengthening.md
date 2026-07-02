@@ -2,7 +2,7 @@
 
 ## Status
 
-Stage 4A is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, and P19-A produces the external score-file governance proof pack. The P19 CTO/arXiv quality-gate review is present, and P19-B is now the next triggerable paper-facing integration stage after P19-A.
+Stage 5/6 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, P19-A produces the external score-file governance proof pack, P19-B turns that proof into a reader-facing hosted-score case study, and P20 cleans the PaySim selection story plus reader-facing polish. P21 is now the next triggerable final paper-preflight stage.
 
 ## Intent
 
@@ -50,10 +50,10 @@ Stage 4 requires a short decision before implementation: prefer an external-scor
 5. **Paper Track P19-A - external score-file adapter proof pack** - implemented
    Implements the preferred P19 route. Ingests a rowless external detector-score artifact with schema, hash, dataset, split, metric, leakage, and claim-state metadata; emits evidence cells, a score manifest, a publishability gate, a handoff redaction report, a route decision, and a paper-safe summary. The claim remains hosted detector-output governance, not detector superiority.
 
-6. **Paper Track P19-B - external score case-study and paper integration**
-   Consume the P19-A artifact family and turn it into a reviewer-facing case study: what score artifact entered, what Relaytic checked, what it emitted, what was redacted, which claims were allowed, and which stronger claims stayed blocked. The paper should gain a compact case-study table or figure panel plus nearby interpretation, not a new detector-performance headline.
+6. **Paper Track P19-B - external score case-study and paper integration** - implemented
+   Consumes the P19-A artifact family and turns it into a reviewer-facing case study: what score artifact entered, what Relaytic checked, what it emitted, what was redacted, which claims were allowed, and which stronger claims stayed blocked. The paper gains a compact hosted-score case-study table plus nearby interpretation, not a new detector-performance headline.
 
-7. **Paper Track P20 - paper narrative and visual polish**
+7. **Paper Track P20 - paper narrative and visual polish** - implemented
    Clarify the PaySim model-selection story without inventing rationale, tighten evaluation wording around system behavior rather than detector PR-AUC, and polish Figures 1-4 plus dense tables after P16-P19 evidence is available.
 
 8. **Paper Track P21 - final source/PDF preflight and changelog**
@@ -72,7 +72,7 @@ Stage 4 requires a short decision before implementation: prefer an external-scor
 
 ## Expected Evidence Artifacts
 
-P16 through P19-A introduce committed, machine-readable reports under `docs/reports/`. P16 writes `paper_failure_case_eval.json`, `paper_failure_case_table.json`, `paper_failure_case_manifest.json`, and `paper_failure_case_summary.md`. P17 writes `paper_governance_ablation_eval.json`, `paper_governance_ablation_matrix.json`, `paper_governance_ablation_manifest.json`, and `paper_governance_ablation_summary.md`. P18 writes `paper_governance_invariants.json`, `paper_adjacent_systems_comparison.json`, `paper_invariant_manifest.json`, and `paper_invariant_summary.md`. P19-A writes `paper_external_score_route_decision.json`, `paper_external_score_schema.json`, `paper_external_score_manifest.json`, `paper_external_score_evidence_cells.json`, `paper_external_score_claim_gate.json`, `paper_external_score_handoff_eval.json`, and `paper_external_score_summary.md`.
+P16 through P20 introduce committed, machine-readable reports under `docs/reports/`. P16 writes `paper_failure_case_eval.json`, `paper_failure_case_table.json`, `paper_failure_case_manifest.json`, and `paper_failure_case_summary.md`. P17 writes `paper_governance_ablation_eval.json`, `paper_governance_ablation_matrix.json`, `paper_governance_ablation_manifest.json`, and `paper_governance_ablation_summary.md`. P18 writes `paper_governance_invariants.json`, `paper_adjacent_systems_comparison.json`, `paper_invariant_manifest.json`, and `paper_invariant_summary.md`. P19-A writes `paper_external_score_route_decision.json`, `paper_external_score_schema.json`, `paper_external_score_manifest.json`, `paper_external_score_evidence_cells.json`, `paper_external_score_claim_gate.json`, `paper_external_score_handoff_eval.json`, and `paper_external_score_summary.md`. P19-B writes `paper_external_score_case_study.json`, `paper_external_score_paper_panel.json`, `paper_external_score_claim_map.json`, `paper_external_score_repro_card.md`, and `paper_external_score_integration_manifest.json`. P20 writes `paper_paysim_selection_story_review.json`, `paper_reader_guidance_audit.json`, `paper_visual_table_polish_audit.json`, `paper_narrative_polish_manifest.json`, and `paper_polish_readiness.md`.
 
 - failure-case evaluation manifest and per-case reports
 - governance ablation matrix
@@ -97,6 +97,12 @@ P16 through P19-A introduce committed, machine-readable reports under `docs/repo
 - `paper_external_score_paper_panel.json`
 - `paper_external_score_claim_map.json`
 - `paper_external_score_repro_card.md`
+- `paper_external_score_integration_manifest.json`
+- `paper_paysim_selection_story_review.json`
+- `paper_reader_guidance_audit.json`
+- `paper_visual_table_polish_audit.json`
+- `paper_narrative_polish_manifest.json`
+- `paper_polish_readiness.md`
 
 ## Stage 1 Acceptance
 
@@ -149,7 +155,7 @@ Stage 4A is complete when:
 5. P13/P14 generation can only use bounded hosted-detector-output governance wording; detector superiority, production AML readiness, graph-neural novelty, and RevClassifyDS parity remain blocked.
 6. Focused P13-P19A tests, source scans, and leak scans pass.
 
-## Stage 4B Acceptance
+## Stage 4B Acceptance (completed)
 
 Stage 4B is complete when:
 
@@ -159,6 +165,17 @@ Stage 4B is complete when:
 4. The reproducibility card gives copy-paste-safe Windows and macOS/Linux commands for regenerating the P19-A/P19-B evidence without exposing raw rows, private paths, secrets, or licensed data.
 5. The paper wording stays inside the hosted-detector-output governance boundary and does not promote detector superiority, graph-neural novelty, production AML readiness, RevClassifyDS parity, or real-bank validation.
 6. Focused P13-P19B tests, source scans, paper static scans, and leak scans pass.
+
+## Stage 5/6 Acceptance (completed)
+
+Stage 5/6 is complete when:
+
+1. `relaytic release-safety paper-narrative-polish` writes the P20 polish reports under `docs/reports/`.
+2. The PaySim story separates small-sample probe screening from full-training finalist selection and does not invent a rationale for XGBoost versus Extra Trees beyond recorded validation evidence.
+3. Every main result has nearby interpretation and the detector-superiority boundary remains intact.
+4. The README and paper guide readers through the README, manuscript, and copy-paste-safe Windows plus macOS/Linux commands before optional deep JSON audit artifacts.
+5. P14 source generation requires the P20 polish manifest before final PDF/source preflight.
+6. Focused P13-P20 tests, source scans, paper static scans, and leak scans pass.
 
 ## Stage 0 Acceptance (completed)
 

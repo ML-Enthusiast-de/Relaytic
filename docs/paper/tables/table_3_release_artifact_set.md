@@ -28,6 +28,11 @@
 | `docs/reports/paper_adjacent_systems_comparison.json` | yes | internal evidence record |
 | `docs/reports/paper_invariant_manifest.json` | yes | internal evidence record |
 | `docs/reports/paper_invariant_summary.md` | yes | internal evidence record |
+| `docs/reports/paper_external_score_case_study.json` | yes | internal evidence record |
+| `docs/reports/paper_external_score_paper_panel.json` | yes | internal evidence record |
+| `docs/reports/paper_external_score_claim_map.json` | yes | internal evidence record |
+| `docs/reports/paper_external_score_repro_card.md` | yes | internal evidence record |
+| `docs/reports/paper_external_score_integration_manifest.json` | yes | internal evidence record |
 | `docs/paper/relaytic_aml_arxiv_draft.md` | yes | paper manuscript |
 | `docs/paper/relaytic_aml_draft.md` | yes | draft-generation support artifact |
 | `docs/paper/figures/figure_manifest.json` | yes | figure source artifact |

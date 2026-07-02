@@ -1620,6 +1620,46 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p19b = release_safety_sub.add_parser(
+        "paper-external-score-integration",
+        help="Build Paper Track P19-B hosted external-score case-study integration reports.",
+    )
+    release_safety_p19b.add_argument(
+        "--source-report-dir",
+        default=None,
+        help="Optional directory containing P19-A source reports. Defaults to docs/reports/.",
+    )
+    release_safety_p19b.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P19-B report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p19b.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
+    release_safety_p20 = release_safety_sub.add_parser(
+        "paper-narrative-polish",
+        help="Build Paper Track P20 PaySim story, reader guidance, and visual/table polish audits.",
+    )
+    release_safety_p20.add_argument(
+        "--source-report-dir",
+        default=None,
+        help="Optional directory containing paper and benchmark source reports. Defaults to docs/reports/.",
+    )
+    release_safety_p20.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P20 report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p20.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3693,6 +3733,16 @@ def main(argv: list[str] | None = None) -> int:
                 payload = _run_paper_external_score_surface(
                     score_artifact=args.score_artifact,
                     metadata_file=args.metadata_file,
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-external-score-integration":
+                payload = _run_paper_external_score_integration_surface(
+                    source_report_dir=args.source_report_dir,
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-narrative-polish":
+                payload = _run_paper_narrative_polish_surface(
+                    source_report_dir=args.source_report_dir,
                     output_dir=args.output_dir,
                 )
             else:
@@ -8096,6 +8146,90 @@ def _run_paper_external_score_surface(
             "bundle": pack,
         },
         "human_output": render_paper_external_score_markdown(pack),
+    }
+
+
+def _run_paper_external_score_integration_surface(
+    *,
+    source_report_dir: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_external_score_integration_markdown,
+        sync_paper_external_score_integration_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_external_score_integration_pack(
+        root,
+        source_report_dir=source_report_dir,
+        output_dir=output_dir,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    manifest = dict(pack["paper_external_score_integration_manifest"])
+    case_study = dict(pack["paper_external_score_case_study"])
+    paper_panel = dict(pack["paper_external_score_paper_panel"])
+    claim_map = dict(pack["paper_external_score_claim_map"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_external_score_integration_manifest": manifest,
+            "paper_external_score_case_study": case_study,
+            "paper_external_score_paper_panel": paper_panel,
+            "paper_external_score_claim_map": claim_map,
+            "paper_external_score_repro_card": pack["paper_external_score_repro_card"],
+            "bundle": pack,
+        },
+        "human_output": render_paper_external_score_integration_markdown(pack),
+    }
+
+
+def _run_paper_narrative_polish_surface(
+    *,
+    source_report_dir: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_narrative_polish_markdown,
+        sync_paper_narrative_polish_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_narrative_polish_pack(
+        root,
+        source_report_dir=source_report_dir,
+        output_dir=output_dir,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    manifest = dict(pack["paper_narrative_polish_manifest"])
+    paysim = dict(pack["paper_paysim_selection_story_review"])
+    guidance = dict(pack["paper_reader_guidance_audit"])
+    polish = dict(pack["paper_visual_table_polish_audit"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_narrative_polish_manifest": manifest,
+            "paper_paysim_selection_story_review": paysim,
+            "paper_reader_guidance_audit": guidance,
+            "paper_visual_table_polish_audit": polish,
+            "paper_polish_readiness": pack["paper_polish_readiness"],
+            "bundle": pack,
+        },
+        "human_output": render_paper_narrative_polish_markdown(pack),
     }
 
 

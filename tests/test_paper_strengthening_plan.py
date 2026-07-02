@@ -13,7 +13,7 @@ def _read(relative_path: str) -> str:
     return (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def test_paper_strengthening_track_records_stage_4a_and_remaining_followons() -> None:
+def test_paper_strengthening_track_records_stage_5_6_and_remaining_preflight() -> None:
     plan = _read("docs/build_slices/phase_paper_strengthening.md")
     slicing = _read("RELAYTIC_SLICING_PLAN.md")
     build = _read("RELAYTIC_BUILD_MASTER.md")
@@ -30,22 +30,25 @@ def test_paper_strengthening_track_records_stage_4a_and_remaining_followons() ->
     assert "Paper Track P19-B" in slicing
     assert "Paper P19-A" in build
     assert "Paper P19-B" in build
-    assert "Stage 4A is implemented." in plan
-    assert "P19-B is now the next triggerable paper-facing integration stage" in plan
+    assert "Stage 5/6 is implemented." in plan
+    assert "P21 is now the next triggerable final paper-preflight stage" in plan
     assert "P19-A produces the external score-file governance proof pack" in plan
+    assert "P19-B turns that proof into a reader-facing hosted-score case study" in plan
     assert "Paper Track P16 - failure-case evaluation pack** - implemented" in plan
     assert "Paper Track P17 - governance machinery ablation pack** - implemented" in plan
     assert "Paper Track P18 - governance invariants and adjacent-systems positioning** - implemented" in plan
     assert "Paper Track P19-A - external score-file adapter proof pack** - implemented" in plan
-    assert "Paper Track P19-B - external score case-study and paper integration" in plan
+    assert "Paper Track P19-B - external score case-study and paper integration** - implemented" in plan
+    assert "Paper Track P20 - paper narrative and visual polish** - implemented" in plan
     assert "Stage 3 Acceptance" in plan
     assert "Stage 4A Acceptance (completed)" in plan
-    assert "Stage 4B Acceptance" in plan
+    assert "Stage 4B Acceptance (completed)" in plan
+    assert "Stage 5/6 Acceptance (completed)" in plan
     assert "phase_paper_strengthening.md" in build
     assert "phase_paper_strengthening.md" in paper_track
     assert "latest paper-strengthening slice" in status
-    assert "Paper Track P19-A external score-file adapter proof pack" in status
-    assert "Paper Track P19-B hosted-score case-study integration" in status
+    assert "Paper Track P20 PaySim selection-story and visual/narrative polish" in status
+    assert "Paper Track P21 final source/PDF preflight" in status
 
 
 def test_paper_strengthening_plan_preserves_evidence_first_scope() -> None:
@@ -102,6 +105,10 @@ def test_paper_strengthening_plan_preserves_evidence_first_scope() -> None:
     assert "paper_external_score_case_study.json" in plan
     assert "paper_external_score_paper_panel.json" in plan
     assert "paper_external_score_repro_card.md" in plan
+    assert "paper_paysim_selection_story_review.json" in plan
+    assert "paper_reader_guidance_audit.json" in plan
+    assert "paper_visual_table_polish_audit.json" in plan
+    assert "paper_narrative_polish_manifest.json" in plan
     assert "rowless handoff report redacts raw rows" in plan
     assert "hosted-score case study" in plan
     assert "hosted detector or score-workflow" in plan

@@ -22,7 +22,7 @@ PAPER_ARXIV_FIGURE_DIRNAME = "figures"
 PAPER_ARXIV_MAIN_TEX_FILENAME = "main.tex"
 PAPER_ARXIV_REFERENCES_FILENAME = "references.bib"
 PAPER_ARXIV_RELEASE_TAG = "relaytic-aml-paper-p14-source-rc"
-NEXT_PAPER_ARXIV_SOURCE_SLICE = "Paper Track P19 - hosted detector workflow demonstration, if selected"
+NEXT_PAPER_ARXIV_SOURCE_SLICE = "Paper Track P21 - final source/PDF preflight and release changelog"
 
 PAPER_ARXIV_SOURCE_FILENAMES = {
     "paper_arxiv_source_manifest": "paper_arxiv_source_manifest.json",
@@ -36,6 +36,13 @@ P13_REQUIRED_REFS = [
     "docs/paper/relaytic_aml_arxiv_draft.md",
     "docs/paper/references.bib",
     "docs/paper/figures/figure_manifest.json",
+]
+P20_REQUIRED_REFS = [
+    "docs/reports/paper_paysim_selection_story_review.json",
+    "docs/reports/paper_reader_guidance_audit.json",
+    "docs/reports/paper_visual_table_polish_audit.json",
+    "docs/reports/paper_narrative_polish_manifest.json",
+    "docs/reports/paper_polish_readiness.md",
 ]
 
 ARXIV_ALLOWED_GRAPHIC_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".eps"}
@@ -263,6 +270,17 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "root": root,
         "paper_release_manifest": _read_artifact(reports / "paper_release_manifest.json"),
         "paper_public_claims_allowed": _read_artifact(reports / "paper_public_claims_allowed.json"),
+        "paper_paysim_selection_story_review": _read_artifact(
+            reports / "paper_paysim_selection_story_review.json"
+        ),
+        "paper_reader_guidance_audit": _read_artifact(reports / "paper_reader_guidance_audit.json"),
+        "paper_visual_table_polish_audit": _read_artifact(
+            reports / "paper_visual_table_polish_audit.json"
+        ),
+        "paper_narrative_polish_manifest": _read_artifact(
+            reports / "paper_narrative_polish_manifest.json"
+        ),
+        "paper_polish_readiness": _read_text_artifact(reports / "paper_polish_readiness.md"),
         "draft": _read_text_artifact(paper / "relaytic_aml_arxiv_draft.md"),
         "references": _read_text_artifact(paper / "references.bib"),
         "figure_manifest": _read_artifact(figure_dir / "figure_manifest.json"),
@@ -336,6 +354,7 @@ def _build_source_manifest(
             "author_metadata_placeholder_present": author_placeholder,
         },
         "p13_gate_refs": P13_REQUIRED_REFS,
+        "p20_polish_refs": P20_REQUIRED_REFS,
         "citation_audit": citation_audit,
         "figure_audit": figure_audit,
         "submission_package_audit_ref": "docs/reports/paper_submission_package_audit.json",
@@ -352,6 +371,7 @@ def _build_source_manifest(
                 "docs/reports/paper_arxiv_source_manifest.json",
                 "docs/reports/paper_submission_package_audit.json",
                 "docs/reports/paper_release_candidate_checklist.md",
+                *P20_REQUIRED_REFS,
             ],
         },
         "next_slice": NEXT_PAPER_ARXIV_SOURCE_SLICE if source_ready else "Paper Track P14 repair",
@@ -367,6 +387,10 @@ def _source_checks(
 ) -> list[dict[str, Any]]:
     release_manifest = _payload(inputs["paper_release_manifest"])
     public_claims = _payload(inputs["paper_public_claims_allowed"])
+    p20_manifest = _payload(inputs["paper_narrative_polish_manifest"])
+    paysim_story = _payload(inputs["paper_paysim_selection_story_review"])
+    guidance = _payload(inputs["paper_reader_guidance_audit"])
+    polish = _payload(inputs["paper_visual_table_polish_audit"])
     required = _required_artifact_presence(inputs)
     return [
         _check(
@@ -391,9 +415,19 @@ def _source_checks(
         _check(
             "required_p14_inputs_present",
             not required["missing_artifact_refs"],
-            "P14 requires the P13 manifest, public claims, Markdown draft, bibliography, and figure manifest.",
+            "P14 requires the P13 source refs plus the P20 narrative/guidance polish refs.",
             source_artifact="docs/reports",
             detail=required,
+        ),
+        _check(
+            "p20_narrative_polish_passed",
+            p20_manifest.get("status") == "ready_for_final_pdf_preflight"
+            and bool(p20_manifest.get("paper_content_ready_for_p21_preflight"))
+            and paysim_story.get("status") == "pass"
+            and guidance.get("status") == "pass"
+            and polish.get("status") == "pass",
+            "P20 story, reader guidance, and visual/table polish audits must pass before the final source/PDF preflight.",
+            source_artifact="docs/reports/paper_narrative_polish_manifest.json",
         ),
         _check(
             "citation_audit_passed",
@@ -427,7 +461,7 @@ def _required_artifact_presence(inputs: dict[str, Any]) -> dict[str, Any]:
     }
     present = []
     missing = []
-    for ref in P13_REQUIRED_REFS:
+    for ref in [*P13_REQUIRED_REFS, *P20_REQUIRED_REFS]:
         artifact = by_ref.get(ref)
         if artifact and artifact.get("exists"):
             present.append(ref)

@@ -16,9 +16,14 @@ For a paper review, use this path:
 
 - Start with this README for navigation and claim boundaries.
 - Read `docs/paper/relaytic_aml_arxiv_draft.pdf` or `docs/paper/relaytic_aml_arxiv_draft.md` for the manuscript.
-- Inspect `docs/reports/paper_system_task_eval.json`, `docs/reports/paper_system_behavior_eval.json`, `docs/reports/paper_agent_handoff_eval.json`, `docs/reports/paper_no_lost_user_eval.json`, and `docs/reports/paper_claim_gate_case_studies.json` for the system-evaluation proof behind the reader navigation, provenance, and user/agent handoff claims.
-- Inspect `docs/reports/paper_result_table_final.json`, `docs/reports/paper_metric_cell_audit.json`, and `docs/reports/paper_publishability_matrix.json` for metric provenance and claim posture.
-- Use `ARCHITECTURE.md`, `INTEROPERABILITY.md`, `RUNTIME.md`, and `PROJECT_LAYOUT.md` when you want the general Relaytic platform context.
+- Run the paper regeneration commands in the paper section below if you want to reproduce the reader-facing artifacts.
+- Use `ARCHITECTURE.md`, `INTEROPERABILITY.md`, `RUNTIME.md`, and `PROJECT_LAYOUT.md` only when you want the broader Relaytic platform context.
+
+Deep audit, after the first read:
+
+- System-evaluation proof: `docs/reports/paper_system_task_eval.json`, `docs/reports/paper_system_behavior_eval.json`, `docs/reports/paper_agent_handoff_eval.json`, `docs/reports/paper_no_lost_user_eval.json`, and `docs/reports/paper_claim_gate_case_studies.json`.
+- Metric provenance and claim posture: `docs/reports/paper_result_table_final.json`, `docs/reports/paper_metric_cell_audit.json`, and `docs/reports/paper_publishability_matrix.json`.
+- Final polish/readiness checks: `docs/reports/paper_narrative_polish_manifest.json`, `docs/reports/paper_paysim_selection_story_review.json`, `docs/reports/paper_reader_guidance_audit.json`, and `docs/reports/paper_visual_table_polish_audit.json`.
 
 The long build-control files, especially `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`, are development provenance. They explain how the repo got here, but they are not required reading for the paper.
 
@@ -103,11 +108,24 @@ Inspect:
 
 Regenerate:
 
+Windows PowerShell:
+
+```powershell
+py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
+py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py -q
+```
+
+macOS/Linux:
+
 ```bash
-relaytic release-safety paper-system-eval --format json
-relaytic release-safety paper-release --format json
-relaytic release-safety paper-arxiv-source --format json
-python -m pytest tests/test_paper_track_p15.py -q
+python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
+python3 -m relaytic.ui.cli release-safety paper-release --format json
+python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
+python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
+python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py -q
 ```
 
 Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked until later gates explicitly allow them.

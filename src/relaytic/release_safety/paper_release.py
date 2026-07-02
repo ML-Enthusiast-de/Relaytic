@@ -96,6 +96,11 @@ P13_GATE_REFS = [
     "docs/reports/paper_adjacent_systems_comparison.json",
     "docs/reports/paper_invariant_manifest.json",
     "docs/reports/paper_invariant_summary.md",
+    "docs/reports/paper_external_score_case_study.json",
+    "docs/reports/paper_external_score_paper_panel.json",
+    "docs/reports/paper_external_score_claim_map.json",
+    "docs/reports/paper_external_score_repro_card.md",
+    "docs/reports/paper_external_score_integration_manifest.json",
 ]
 
 FORBIDDEN_PUBLIC_RULES = [
@@ -305,6 +310,13 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "adjacent_systems_comparison": _read_artifact(reports / "paper_adjacent_systems_comparison.json"),
         "invariant_manifest": _read_artifact(reports / "paper_invariant_manifest.json"),
         "invariant_summary": _read_text_artifact(reports / "paper_invariant_summary.md"),
+        "external_score_case_study": _read_artifact(reports / "paper_external_score_case_study.json"),
+        "external_score_paper_panel": _read_artifact(reports / "paper_external_score_paper_panel.json"),
+        "external_score_claim_map": _read_artifact(reports / "paper_external_score_claim_map.json"),
+        "external_score_repro_card": _read_text_artifact(reports / "paper_external_score_repro_card.md"),
+        "external_score_integration_manifest": _read_artifact(
+            reports / "paper_external_score_integration_manifest.json"
+        ),
         "table_provenance": _read_artifact(reports / "paper_table_provenance.json"),
         "paper_reproduction_commands": _read_text_artifact(reports / "paper_reproduction_commands.md"),
         "dataset_registry": _read_artifact(reports / "paper_dataset_registry.json"),
@@ -491,6 +503,10 @@ def _release_checks(
     invariant_manifest = _payload(inputs["invariant_manifest"])
     governance_invariants = _payload(inputs["governance_invariants"])
     adjacent_systems = _payload(inputs["adjacent_systems_comparison"])
+    external_score_manifest = _payload(inputs["external_score_integration_manifest"])
+    external_score_case_study = _payload(inputs["external_score_case_study"])
+    external_score_panel = _payload(inputs["external_score_paper_panel"])
+    external_score_claim_map = _payload(inputs["external_score_claim_map"])
     required = _required_artifact_presence(inputs)
     paper_artifact_set = set(FINAL_PAPER_REFS)
     table_artifact_set = {item.get("artifact_ref") for item in table_manifest.get("tables", []) if isinstance(item, dict)}
@@ -577,6 +593,20 @@ def _release_checks(
             and int(governance_invariants.get("current_invariant_count") or 0) >= 6,
             "Governance-invariant evidence must map every current invariant in the paper to artifacts, failure cases, ablations, or limitations.",
             source_artifact="docs/reports/paper_invariant_manifest.json",
+        ),
+        _check(
+            "p19b_hosted_score_case_study_passed",
+            external_score_manifest.get("status") == "ready_for_hosted_score_case_study"
+            and bool(external_score_manifest.get("paper_integration_allowed"))
+            and external_score_case_study.get("status") == "pass"
+            and external_score_panel.get("status") == "pass"
+            and external_score_claim_map.get("status") == "pass"
+            and external_score_claim_map.get("allowed_claim_scope") == "hosted_detector_output_governance_only"
+            and not bool(external_score_claim_map.get("detector_superiority_allowed"))
+            and not bool(external_score_claim_map.get("production_aml_readiness_allowed"))
+            and not bool(external_score_claim_map.get("revclassifyds_parity_allowed")),
+            "Hosted-score case-study integration must pass before the paper describes external detector-output governance.",
+            source_artifact="docs/reports/paper_external_score_integration_manifest.json",
         ),
         _check(
             "required_p13_inputs_present",
@@ -1070,6 +1100,8 @@ def _render_final_paper_v2(
     failure_case_table = _render_failure_case_table(inputs)
     governance_ablation_table = _render_governance_ablation_table(inputs)
     governance_invariant_table = _render_governance_invariant_table(inputs)
+    hosted_score_case_study_table = _render_hosted_score_case_study_table(inputs)
+    hosted_score_record_snippet = _render_hosted_score_record_snippet(inputs)
     blocked_claim_table = _render_blocked_claim_examples_table()
     handoff_recovery_table = _render_handoff_recovery_table(inputs)
     reproducibility_table = _render_reproducibility_table(inputs)
@@ -1192,13 +1224,13 @@ def _render_final_paper_v2(
             "",
             paysim_ablation_table,
             "",
-            f"PaySim is the clearest modeling result in the current evidence pack. The earliest reference row was PR-AUC 0.2159. The later leakage-safe baseline improved to {pay_base_pr}, and the competitive selected Extra Trees model reached fixed-test PR-AUC {pay_pr} and ROC-AUC {pay_roc}. The improvement is meaningful inside the synthetic temporal-fraud contract because it follows a visible sequence: balance fields were excluded, prior-step destination history was added without raw account encoding, candidates were selected by validation evidence, and calibration and thresholding used validation-only partitions. The admissible interpretation is precise: Relaytic-AML produced a stronger, leakage-audited PaySim temporal-proxy row under a declared budget.",
+            f"PaySim is the most complete local modeling path in the current evidence pack. It should be read as an audited sequence rather than as a leaderboard claim. The earliest reference row was PR-AUC 0.2159. The later leakage-safe baseline improved to {pay_base_pr}. The small-sample probe screen then identified a strong XGBoost probe, but fixed-test eligibility was decided later among full-training finalists; Extra Trees had the best full-training validation PR-AUC and was the only competitive finalist evaluated on the fixed test. It reached fixed-test PR-AUC {pay_pr} and ROC-AUC {pay_roc}. The improvement is meaningful inside the synthetic temporal-fraud contract because balance fields were excluded, prior-step destination history was added without raw account encoding, candidates were selected by validation evidence, and calibration and thresholding used validation-only partitions. The admissible interpretation is precise: Relaytic-AML produced a stronger, leakage-audited PaySim temporal-proxy row under a declared budget. It is supporting temporal-fraud evidence rather than real-bank AML performance.",
             "",
             f"The review-budget metrics sharpen the interpretation. At the selected PaySim review budget, precision is {pay_precision} and recall is {pay_recall}. The top of the queue is much richer than prevalence, but a large share of fraud remains outside the reviewed set. That is a useful operating result for an evaluation lab because it connects ranking quality to analyst capacity instead of treating PR-AUC as the whole story.",
             "",
             f"Elliptic is a different kind of evidence. The validation-selected source-plus-structural LightGBM row reports test PR-AUC {ell_pr}, with review-budget precision {ell_precision} and recall {ell_recall}. The result supports temporal graph-feature provenance and operating-point reporting. It also reveals a limitation: the current graph-structure-only floor is weak, and the final row is heavily influenced by source-provided anonymized features. Relaytic's contribution here is the graph-aware evidence path: feature provenance, temporal splits, operating-point metrics, and interpretation routing are made auditable together.",
             "",
-            f"Elliptic2 is intentionally framed as an external reference row. The repeated official-partition context row reports PR-AUC {e2_pr} +/- {e2_std}, and the content-hash robustness partition reports mean PR-AUC {e2_hash}. Those are strong absolute values, and the recorded RevClassifyDS reference of {ref_pr} gives the reader a useful frontier marker. Relaytic's evidence role is to keep that modern benchmark context visible while recording the cohort and reference-execution evidence needed for stronger future comparison.",
+            f"Elliptic2 is intentionally framed as an external reference row. The repeated official-partition context row reports PR-AUC {e2_pr} +/- {e2_std}, and the content-hash robustness partition reports mean PR-AUC {e2_hash}. Those are strong absolute values, and the recorded RevClassifyDS reference of {ref_pr} gives the reader a useful frontier marker. This is not a contribution of a new Elliptic2 detector. Relaytic's evidence role is to keep that modern benchmark context visible while recording the cohort and reference-execution evidence needed for stronger future comparison.",
             "",
             benchmark_figure,
             "",
@@ -1223,6 +1255,12 @@ def _render_final_paper_v2(
             governance_invariant_table,
             "",
             "Table 8 states the current invariants as release-time rules rather than prose preferences. Each invariant has a mechanism, evidence artifacts, an observed failure or ablation signal, and an explicit boundary. This is the core systems claim: Relaytic-AML makes agent-assisted evaluation safer by turning interpretation into checked state.",
+            "",
+            hosted_score_case_study_table,
+            "",
+            "The hosted external-score case study makes the integration point concrete. A rowless detector-score artifact enters Relaytic with schema and content hashes, not raw rows. Relaytic emits one governance evidence cell, redacts unsafe handoff fields, and allows only hosted detector-output governance wording. This is not a detector-performance result; it shows how a stronger or third-party detector output can be wrapped by the same local evidence and claim boundary.",
+            "",
+            hosted_score_record_snippet,
             "",
             blocked_claim_table,
             "",
@@ -1258,9 +1296,12 @@ def _render_final_paper_v2(
             "py -3.11 -m relaytic.ui.cli release-safety paper-failure-eval --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-governance-ablation --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-external-score-proof --format json",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-external-score-integration --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-release --format json",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py -q",
+            "py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py tests/test_paper_track_p19a.py tests/test_paper_track_p19b.py tests/test_paper_track_p20.py -q",
             "```",
             "",
             "macOS/Linux:",
@@ -1271,9 +1312,12 @@ def _render_final_paper_v2(
             "python3 -m relaytic.ui.cli release-safety paper-failure-eval --format json",
             "python3 -m relaytic.ui.cli release-safety paper-governance-ablation --format json",
             "python3 -m relaytic.ui.cli release-safety paper-invariants --format json",
+            "python3 -m relaytic.ui.cli release-safety paper-external-score-proof --format json",
+            "python3 -m relaytic.ui.cli release-safety paper-external-score-integration --format json",
             "python3 -m relaytic.ui.cli release-safety paper-release --format json",
+            "python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json",
             "python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py -q",
+            "python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py tests/test_paper_track_p19a.py tests/test_paper_track_p19b.py tests/test_paper_track_p20.py -q",
             "```",
             "",
             "Raw benchmark data is not committed. PaySim and Elliptic require local downloads and are referenced through registry artifacts, split reports, hashes, and command ledgers. Elliptic2 remains context-only in this paper because the stronger reference-parity conditions are not satisfied locally. Clean clones can reproduce the paper-generation checks and repo-local public fixtures; full benchmark regeneration requires the locally licensed datasets named in the README.",
@@ -1464,13 +1508,21 @@ def _render_paysim_ablation_table(inputs: dict[str, Any], metrics: dict[str, dic
     baseline_table = _payload(inputs["paysim_competitive_baseline_table"])
     feature_report = _payload(inputs["paysim_competitive_feature_report"])
     search_trace = _payload(inputs["paysim_competitive_search_trace"])
-    best_probe = _best_validation_attempt(search_trace)
+    attempts = [row for row in search_trace.get("attempts", []) if isinstance(row, dict)]
+    probe_rows = [row for row in attempts if row.get("stage") == "probe"]
+    full_rows = [row for row in attempts if row.get("stage") == "full_train_finalist"]
+    best_probe = _best_validation_attempt({"attempts": probe_rows})
+    best_full = _best_validation_attempt({"attempts": full_rows})
+    selected = dict(baseline_table.get("validation_selected_competitive_model") or {})
+    selected_family = _model_family_label(str(selected.get("family_id") or best_full.get("family_id") or "sklearn_extra_trees"))
+    selected_val = selected.get("validation_pr_auc") or best_full.get("validation_metrics", {}).get("pr_auc")
     feature_count = len(feature_report.get("feature_columns", []))
     rows = [
         ["P4 reference", "SGD logistic baseline", "source-safe starting point", _format_metric(baseline_table.get("p4_reference_row", {}).get("test_pr_auc")), "reference row"],
         ["P6 baseline", "Extra Trees baseline", "leakage-safe feature set", _format_metric(_metric_value(metrics, "paysim_p6_validation_selected_baseline.test_pr_auc")), "baseline row"],
-        ["Competitive search", _model_family_label(str(best_probe.get("family_id") or "best validation probe")), f"{feature_count} allowed features; best probe validation PR-AUC {_format_metric(best_probe.get('validation_metrics', {}).get('pr_auc'))}", "not evaluated on test", "candidate screening"],
-        ["Final model", "Extra Trees with Platt calibration", "validation-selected finalist; validation-only calibration", _format_metric(_metric_value(metrics, "paysim_p6a_competitive_selected.test_pr_auc")), "bounded demonstration"],
+        ["Probe screen", f"best small-sample probe: {_model_family_label(str(best_probe.get('family_id') or 'best validation probe'))}", f"{feature_count} allowed features; probe validation PR-AUC {_format_metric(best_probe.get('validation_metrics', {}).get('pr_auc'))}", "no test evaluation", "candidate screening"],
+        ["Full finalist selection", f"{selected_family} finalist", f"full-training validation PR-AUC {_format_metric(selected_val)}; selected before test", "test still hidden", "model selection"],
+        ["Final fixed test", "Extra Trees with Platt calibration", "validation-only calibration and threshold", _format_metric(_metric_value(metrics, "paysim_p6a_competitive_selected.test_pr_auc")), "bounded demonstration"],
     ]
     return _markdown_table("Table 4. PaySim modeling path", ["Stage", "Model/contract", "Selection evidence", "Final test evidence", "Role"], rows)
 
@@ -1591,6 +1643,53 @@ def _render_governance_invariant_table(inputs: dict[str, Any]) -> str:
     )
 
 
+def _render_hosted_score_case_study_table(inputs: dict[str, Any]) -> str:
+    panel = _payload(inputs["external_score_paper_panel"])
+    rows = []
+    for row in panel.get("rows", []):
+        if not isinstance(row, dict):
+            continue
+        rows.append(
+            [
+                row.get("component") or "",
+                row.get("observed") or "",
+                _short_report_ref(str(row.get("evidence_ref") or "")),
+                row.get("reader_takeaway") or "",
+            ]
+        )
+    if not rows:
+        rows.append(
+            [
+                "Hosted score integration",
+                "P19-B report absent",
+                "paper_external_score_integration_manifest",
+                "Paper release blocks until the hosted-score case-study pack is generated.",
+            ]
+        )
+    return _markdown_table(
+        "Hosted external-score case study",
+        ["Component", "Observed evidence", "Evidence", "Admissible interpretation"],
+        rows,
+    )
+
+
+def _render_hosted_score_record_snippet(inputs: dict[str, Any]) -> str:
+    case_study = _payload(inputs["external_score_case_study"])
+    snippet = dict(case_study.get("auditable_record_snippet", {}))
+    ordered = {
+        "cell_id": snippet.get("cell_id") or "not_available",
+        "dataset_id": snippet.get("dataset_id") or "not_available",
+        "split": snippet.get("split") or "not_available",
+        "command": snippet.get("command") or "not_available",
+        "artifact_ref": snippet.get("artifact_ref") or "not_available",
+        "metric": snippet.get("metric") or "not_available",
+        "value": snippet.get("value") if "value" in snippet else "not_available",
+        "leakage_posture": snippet.get("leakage_posture") or "not_available",
+        "claim_state": snippet.get("claim_state") or "not_available",
+    }
+    return "```json\n" + json.dumps(ordered, indent=2) + "\n```"
+
+
 def _render_blocked_claim_examples_table() -> str:
     rows = [
         ["Real-bank deployment study", "bounded PaySim temporal-proxy demonstration", "Partner or bank-approved holdout, incumbent comparison, analyst-review protocol, and legal release gate."],
@@ -1620,6 +1719,7 @@ def _render_reproducibility_table(inputs: dict[str, Any]) -> str:
         ["Failure-case evaluation", "release-safety paper-failure-eval --format json", "injected-risk failure-case reports", "repo-local deterministic fixtures", "all required failure cases pass in current evidence pack"],
         ["Governance ablation", "release-safety paper-governance-ablation --format json", "full-vs-disabled governance ablation reports", "repo-local deterministic fixtures", "full path safe; disabled fixtures expose expected failures"],
         ["Governance invariants", "release-safety paper-invariants --format json", "invariant and adjacent-systems reports", "repo-local deterministic fixtures", "7 current invariants; 6 adjacent families; no stronger detector claim"],
+        ["Hosted-score case study", "release-safety paper-external-score-proof; paper-external-score-integration", "external-score schema, evidence-cell, redaction, claim-map, and case-study reports", "repo-local rowless fixture by default; optional local score files stay local", "schema/content hash prefixes plus evidence-cell ID recorded"],
     ]
     return _markdown_table("Table 11. Reproducibility contract", ["Component", "Command", "Expected output", "Environment or data dependency", "Hash or seed record"], rows)
 
@@ -1782,6 +1882,19 @@ def _markdown_table(title: str, headers: list[str], rows: list[list[Any]]) -> st
             cells.append("")
         lines.append("| " + " | ".join(_escape_md(str(cell)) for cell in cells) + " |")
     return "\n".join(lines)
+
+
+def _short_report_ref(ref: str) -> str:
+    if not ref:
+        return "not available"
+    stem = Path(ref).stem
+    labels = {
+        "paper_external_score_schema": "schema/hash report",
+        "paper_external_score_evidence_cells": "evidence-cell report",
+        "paper_external_score_handoff_eval": "handoff-redaction report",
+        "paper_external_score_claim_gate": "claim-gate report",
+    }
+    return labels.get(stem, stem)
 
 
 def _dataset_lookup(registry: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -2038,11 +2151,14 @@ def _short_split_rule(split_type: str) -> str:
 
 def _model_family_label(family_id: str) -> str:
     labels = {
-        "xgboost_classifier": "XGBoost probe",
+        "xgboost_classifier": "XGBoost",
         "lightgbm_classifier": "LightGBM",
         "extra_trees": "Extra Trees",
+        "sklearn_extra_trees": "Extra Trees",
         "random_forest": "Random Forest",
+        "sklearn_random_forest": "Random Forest",
         "hist_gradient_boosting": "HistGradientBoosting",
+        "sklearn_hist_gradient_boosting": "HistGradientBoosting",
     }
     return labels.get(family_id, _humanize_gate_token(family_id))
 

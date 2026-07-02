@@ -1,0 +1,76 @@
+{
+  "checks": [
+    {
+      "check_id": "probe_and_full_finalist_surfaces_separated",
+      "detail": {
+        "best_full_source_probe_trial_id": "sklearn_extra_trees_probe_1",
+        "best_probe_trial_id": "xgboost_classifier_probe_3"
+      },
+      "message": "The audit must distinguish small-sample probe screening from full-training finalist selection.",
+      "passed": true,
+      "source_artifact": "docs/reports/paysim_competitive_search_trace.json"
+    },
+    {
+      "check_id": "selected_finalist_is_full_validation_winner",
+      "detail": {
+        "best_full_finalist_family": "Extra Trees",
+        "selected_finalist_family": "Extra Trees"
+      },
+      "message": "The selected fixed-test finalist must match the full-training validation winner.",
+      "passed": true,
+      "source_artifact": "docs/reports/paysim_competitive_baseline_table.json"
+    },
+    {
+      "check_id": "nonselected_finalists_keep_test_metrics_hidden",
+      "message": "Only the validation-selected finalist may have fixed-test metrics.",
+      "passed": true,
+      "source_artifact": "docs/reports/paysim_competitive_baseline_table.json"
+    },
+    {
+      "check_id": "paper_explains_probe_screen_not_final_selection",
+      "message": "Table 4 and the nearby text must explain why a probe winner can differ from the final fixed-test model.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "no_invented_xgboost_rationale",
+      "message": "The paper must not invent a causal rationale beyond the recorded validation surfaces.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "results_have_nearby_interpretation",
+      "message": "Every main result needs nearby interpretation rather than a bare number.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "detector_superiority_boundary_intact",
+      "message": "The detector-superiority boundary must remain visible in the paper and README.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    }
+  ],
+  "claim_boundary": "supporting synthetic temporal-fraud evidence only; no real-bank AML superiority",
+  "failed_checks": [],
+  "schema_version": "relaytic.paper_narrative_polish.v1",
+  "selection_story": {
+    "baseline_pr_auc": 0.3313,
+    "best_full_finalist_family": "Extra Trees",
+    "best_full_finalist_validation_pr_auc": 0.5687,
+    "best_probe_family": "XGBoost",
+    "best_probe_validation_pr_auc": 0.5944,
+    "feature_count": 26,
+    "p4_reference_pr_auc": 0.2159,
+    "selected_finalist_family": "Extra Trees",
+    "selected_finalist_test_pr_auc": 0.6388,
+    "selected_finalist_test_roc_auc": 0.9683,
+    "selected_finalist_validation_pr_auc": 0.5687,
+    "selection_rule": "rank_full_train_finalists_on_validation_pr_auc_then_evaluate_only_the_selected_finalist_on_test",
+    "selection_surface": "validation_pr_auc_only_before_test_evaluation",
+    "test_visibility_policy": "nonselected_competitive_finalists_have_no_test_metrics",
+    "threshold_selection_surface": "validation_operating_partition_only"
+  },
+  "slice": "Paper Track P20",
+  "status": "pass"
+}

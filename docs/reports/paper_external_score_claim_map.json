@@ -1,0 +1,43 @@
+{
+  "allowed_claim_scope": "hosted_detector_output_governance_only",
+  "allowed_claims": [
+    "Relaytic-AML can convert a rowless external detector-score artifact into evidence cells with schema, hash, leakage-posture, and claim-state metadata.",
+    "Relaytic-AML can produce a rowless handoff summary for hosted detector-output governance."
+  ],
+  "blocked_claims": [
+    {
+      "claim": "The imported detector is superior to current AML detectors.",
+      "gate_reason": "P19-A validates governance of an external score artifact, not detector performance.",
+      "missing_evidence": "independent benchmark comparison under a validated detector budget"
+    },
+    {
+      "claim": "Relaytic-AML is production-ready for bank AML monitoring.",
+      "gate_reason": "No production deployment, analyst study, or bank validation exists.",
+      "missing_evidence": "production controls, live data validation, and human analyst outcome study"
+    },
+    {
+      "claim": "Relaytic-AML introduces graph-neural detector novelty.",
+      "gate_reason": "The route hosts external detector outputs and does not implement a new graph-neural model.",
+      "missing_evidence": "new detector architecture plus benchmark and ablation evidence"
+    },
+    {
+      "claim": "Relaytic-AML reaches RevClassifyDS parity.",
+      "gate_reason": "No faithful RevClassifyDS parity run is executed in P19-A.",
+      "missing_evidence": "faithful reference replay or accepted parity protocol"
+    },
+    {
+      "claim": "Relaytic-AML proves real-bank AML superiority.",
+      "gate_reason": "The artifact is rowless governance evidence, not real-bank detector validation.",
+      "missing_evidence": "licensed real-bank data, approved evaluation protocol, and independent validation"
+    }
+  ],
+  "detector_superiority_allowed": false,
+  "graph_neural_detector_novelty_allowed": false,
+  "headline_performance_claim_allowed": false,
+  "paper_safe_sentence": "Relaytic-AML can wrap a rowless external detector-score artifact in schema, hash, redaction, evidence-cell, and claim-state controls.",
+  "production_aml_readiness_allowed": false,
+  "real_bank_validation_allowed": false,
+  "revclassifyds_parity_allowed": false,
+  "schema_version": "relaytic.paper_external_score_integration.v1",
+  "status": "pass"
+}
