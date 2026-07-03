@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "check_id": "reader_public_markers_clean",
+      "detail": {
+        "status": "pass",
+        "violations": []
+      },
+      "message": "Reader-facing paper/source surfaces must be free of unresolved markers except the explicit release-tag placeholder.",
+      "passed": true
+    },
+    {
+      "check_id": "long_reproduction_commands_wrapped",
+      "detail": {
+        "status": "pass",
+        "violations": []
+      },
+      "message": "Reproduction command blocks should not contain margin-breaking command lines.",
+      "passed": true
+    },
+    {
+      "check_id": "hosted_score_case_study_numbered",
+      "message": "Hosted external-score material should be a numbered table rather than a floating internal panel.",
+      "passed": true
+    },
+    {
+      "check_id": "ai_disclosure_named_professionally",
+      "message": "AI assistance disclosure should be short, professional, and consistently named.",
+      "passed": true
+    },
+    {
+      "check_id": "release_identifier_visible",
+      "message": "Reproducibility section must identify the repository and the remaining public release-tag action.",
+      "passed": true
+    },
+    {
+      "check_id": "source_manifest_ready",
+      "message": "P21 requires a ready P14 source release candidate.",
+      "passed": true
+    },
+    {
+      "check_id": "p20_polish_ready",
+      "message": "P21 requires the P20 paper-polish gate to pass.",
+      "passed": true
+    },
+    {
+      "check_id": "source_package_audit_passed",
+      "message": "P21 requires the source/package audit to pass.",
+      "passed": true
+    }
+  ],
+  "failed_checks": [],
+  "schema_version": "relaytic.paper_final_preflight.v1",
+  "slice": "Paper Track P21",
+  "status": "pass"
+}

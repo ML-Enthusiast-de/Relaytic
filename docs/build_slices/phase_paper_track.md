@@ -2,11 +2,11 @@
 
 ## Status
 
-P0 through P20 implemented. A triggerable paper-strengthening follow-on lives in `docs/build_slices/phase_paper_strengthening.md`; P21 is the next implementation target if the final source/PDF preflight should be completed before release. Otherwise Slice 16A is the next target, with final upload still unchecked.
+P0 through P21 implemented. The paper-strengthening follow-on in `docs/build_slices/phase_paper_strengthening.md` now includes the final source/PDF preflight and release changelog. Slice 16A is the next implementation target; final arXiv upload remains a human release action with tag selection, page review, and clean tag-target confirmation.
 
 ## Intent
 
-Paper Track P0 through P20 is the mandatory path plus the implemented strengthening stages between Slice 15Z-R and Slice 16A.
+Paper Track P0 through P21 is the mandatory path plus the implemented strengthening stages between Slice 15Z-R and Slice 16A.
 
 Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, final arXiv source release candidate, and measured system-evaluation proof pack. The final upload still requires local PDF review, bibliography/source-policy confirmation, and clean tag-target proof.
 
@@ -403,4 +403,4 @@ Implemented acceptance:
 
 Follow-on:
 
-- `docs/build_slices/phase_paper_strengthening.md` records P16 through P20 as implemented and P21 as the remaining optional paper-strengthening path. P21 should only start after the P20 narrative/guidance polish evidence exists or is explicitly skipped.
+- `docs/build_slices/phase_paper_strengthening.md` records P16 through P21 as implemented. Slice 16A should start after the P21 final source/PDF preflight artifacts exist and any public upload action is handled as a separate human release step.

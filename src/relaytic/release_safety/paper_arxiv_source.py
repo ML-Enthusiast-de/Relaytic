@@ -485,7 +485,7 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\usepackage{siunitx}",
         r"\usepackage{graphicx}",
         r"\usepackage[font=normalsize,labelfont=bf]{caption}",
-        r"\usepackage{fancyvrb}",
+        r"\usepackage{fvextra}",
         r"\usepackage{needspace}",
         r"\usepackage{algorithm}",
         r"\usepackage{algpseudocode}",
@@ -569,7 +569,6 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
                     code_buffer = []
                 else:
                     out.append(r"\end{Verbatim}")
-                    out.append(r"\end{samepage}")
                     out.append("")
                 in_code = False
                 code_lang = None
@@ -623,8 +622,7 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
             if code_lang == "algorithm":
                 code_buffer = []
             else:
-                out.append(r"\begin{samepage}")
-                out.append(r"\begin{Verbatim}[frame=single,framesep=6pt,fontsize=\small]")
+                out.append(r"\begin{Verbatim}[frame=single,framesep=6pt,fontsize=\footnotesize,breaklines=true,breakanywhere=true]")
             previous_blank = False
             continue
 

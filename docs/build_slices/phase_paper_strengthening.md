@@ -2,7 +2,7 @@
 
 ## Status
 
-Stage 5/6 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, P19-A produces the external score-file governance proof pack, P19-B turns that proof into a reader-facing hosted-score case study, and P20 cleans the PaySim selection story plus reader-facing polish. P21 is now the next triggerable final paper-preflight stage.
+Stage 7/7 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, P19-A produces the external score-file governance proof pack, P19-B turns that proof into a reader-facing hosted-score case study, P20 cleans the PaySim selection story plus reader-facing polish, and P21 produces the final source/PDF preflight reports plus release changelog. Slice 16A is now the next implementation slice; final arXiv upload still requires author tag selection, human page review, and a clean tag target.
 
 ## Intent
 
@@ -56,7 +56,7 @@ Stage 4 requires a short decision before implementation: prefer an external-scor
 7. **Paper Track P20 - paper narrative and visual polish** - implemented
    Clarify the PaySim model-selection story without inventing rationale, tighten evaluation wording around system behavior rather than detector PR-AUC, and polish Figures 1-4 plus dense tables after P16-P19 evidence is available.
 
-8. **Paper Track P21 - final source/PDF preflight and changelog**
+8. **Paper Track P21 - final source/PDF preflight and changelog** - implemented
    Regenerate the paper PDF and arXiv source, run paper/source/static checks, inspect rendered pages, and produce a short changelog listing new tests, new artifacts, changed tables/figures, and claims intentionally not made.
 
 ## Non-Negotiable Gates
@@ -72,7 +72,7 @@ Stage 4 requires a short decision before implementation: prefer an external-scor
 
 ## Expected Evidence Artifacts
 
-P16 through P20 introduce committed, machine-readable reports under `docs/reports/`. P16 writes `paper_failure_case_eval.json`, `paper_failure_case_table.json`, `paper_failure_case_manifest.json`, and `paper_failure_case_summary.md`. P17 writes `paper_governance_ablation_eval.json`, `paper_governance_ablation_matrix.json`, `paper_governance_ablation_manifest.json`, and `paper_governance_ablation_summary.md`. P18 writes `paper_governance_invariants.json`, `paper_adjacent_systems_comparison.json`, `paper_invariant_manifest.json`, and `paper_invariant_summary.md`. P19-A writes `paper_external_score_route_decision.json`, `paper_external_score_schema.json`, `paper_external_score_manifest.json`, `paper_external_score_evidence_cells.json`, `paper_external_score_claim_gate.json`, `paper_external_score_handoff_eval.json`, and `paper_external_score_summary.md`. P19-B writes `paper_external_score_case_study.json`, `paper_external_score_paper_panel.json`, `paper_external_score_claim_map.json`, `paper_external_score_repro_card.md`, and `paper_external_score_integration_manifest.json`. P20 writes `paper_paysim_selection_story_review.json`, `paper_reader_guidance_audit.json`, `paper_visual_table_polish_audit.json`, `paper_narrative_polish_manifest.json`, and `paper_polish_readiness.md`.
+P16 through P21 introduce committed, machine-readable reports under `docs/reports/`. P16 writes `paper_failure_case_eval.json`, `paper_failure_case_table.json`, `paper_failure_case_manifest.json`, and `paper_failure_case_summary.md`. P17 writes `paper_governance_ablation_eval.json`, `paper_governance_ablation_matrix.json`, `paper_governance_ablation_manifest.json`, and `paper_governance_ablation_summary.md`. P18 writes `paper_governance_invariants.json`, `paper_adjacent_systems_comparison.json`, `paper_invariant_manifest.json`, and `paper_invariant_summary.md`. P19-A writes `paper_external_score_route_decision.json`, `paper_external_score_schema.json`, `paper_external_score_manifest.json`, `paper_external_score_evidence_cells.json`, `paper_external_score_claim_gate.json`, `paper_external_score_handoff_eval.json`, and `paper_external_score_summary.md`. P19-B writes `paper_external_score_case_study.json`, `paper_external_score_paper_panel.json`, `paper_external_score_claim_map.json`, `paper_external_score_repro_card.md`, and `paper_external_score_integration_manifest.json`. P20 writes `paper_paysim_selection_story_review.json`, `paper_reader_guidance_audit.json`, `paper_visual_table_polish_audit.json`, `paper_narrative_polish_manifest.json`, and `paper_polish_readiness.md`. P21 writes `paper_final_pdf_preflight.json`, `paper_final_source_preflight.json`, `paper_final_preflight_manifest.json`, and `paper_final_release_changelog.md`.
 
 - failure-case evaluation manifest and per-case reports
 - governance ablation matrix
@@ -103,6 +103,10 @@ P16 through P20 introduce committed, machine-readable reports under `docs/report
 - `paper_visual_table_polish_audit.json`
 - `paper_narrative_polish_manifest.json`
 - `paper_polish_readiness.md`
+- `paper_final_pdf_preflight.json`
+- `paper_final_source_preflight.json`
+- `paper_final_preflight_manifest.json`
+- `paper_final_release_changelog.md`
 
 ## Stage 1 Acceptance
 
@@ -176,6 +180,16 @@ Stage 5/6 is complete when:
 4. The README and paper guide readers through the README, manuscript, and copy-paste-safe Windows plus macOS/Linux commands before optional deep JSON audit artifacts.
 5. P14 source generation requires the P20 polish manifest before final PDF/source preflight.
 6. Focused P13-P20 tests, source scans, paper static scans, and leak scans pass.
+
+## Stage 7 Acceptance (completed)
+
+Stage 7 is complete when:
+
+1. `relaytic release-safety paper-final-preflight` writes the P21 final preflight reports and release changelog under `docs/reports/`.
+2. Source preflight checks the public-marker scan, wrapped reproduction commands, numbered hosted-score case study, AI assistance disclosure naming, release identifier, P20 polish manifest, P14 source manifest, and source-package audit.
+3. PDF preflight checks the compiled PDF, source/review PDF synchronization, LaTeX log, embedded fonts, and PDF metadata.
+4. The final manifest reports `ready_for_author_review_not_tagged`, keeps `arxiv_upload_ready` false, and records the remaining human upload blockers.
+5. Focused P13-P21 tests, LaTeX compile, font scan, static marker scan, and leak scan pass.
 
 ## Stage 0 Acceptance (completed)
 

@@ -1,0 +1,74 @@
+{
+  "arxiv_upload_ready": false,
+  "checks": [
+    {
+      "check_id": "required_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [],
+        "present_artifact_refs": [
+          "README.md",
+          "docs/paper/relaytic_aml_arxiv_draft.md",
+          "docs/paper/relaytic_aml_arxiv_draft.pdf",
+          "docs/paper/arxiv_src/main.tex",
+          "docs/paper/arxiv_src/references.bib",
+          "docs/reports/paper_release_manifest.json",
+          "docs/reports/paper_narrative_polish_manifest.json",
+          "docs/reports/paper_arxiv_source_manifest.json",
+          "docs/reports/paper_submission_package_audit.json"
+        ]
+      },
+      "message": "P21 requires the tracked paper/source artifacts plus P13/P14/P20 manifests; local build outputs are checked by the PDF preflight.",
+      "passed": true
+    },
+    {
+      "check_id": "p13_release_ready",
+      "message": "P21 requires the P13 claim-safe release manifest to remain ready.",
+      "passed": true
+    },
+    {
+      "check_id": "source_preflight_passed",
+      "message": "Source/text preflight must pass.",
+      "passed": true
+    },
+    {
+      "check_id": "pdf_preflight_passed",
+      "message": "PDF/log/font preflight must pass.",
+      "passed": true
+    }
+  ],
+  "failed_checks": [],
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "local_build_artifact_refs": [
+    "docs/paper/arxiv_src/main.pdf",
+    "docs/paper/arxiv_src/main.log"
+  ],
+  "next_slice": "Slice 16A - capability registry and capability cards",
+  "release_mode": "claim_safe_evaluation_environment_only",
+  "report_artifact_refs": [
+    "docs/reports/paper_final_pdf_preflight.json",
+    "docs/reports/paper_final_source_preflight.json",
+    "docs/reports/paper_final_preflight_manifest.json",
+    "docs/reports/paper_final_release_changelog.md"
+  ],
+  "required_source_artifacts": [
+    "README.md",
+    "docs/paper/relaytic_aml_arxiv_draft.md",
+    "docs/paper/relaytic_aml_arxiv_draft.pdf",
+    "docs/paper/arxiv_src/main.tex",
+    "docs/paper/arxiv_src/references.bib",
+    "docs/reports/paper_release_manifest.json",
+    "docs/reports/paper_narrative_polish_manifest.json",
+    "docs/reports/paper_arxiv_source_manifest.json",
+    "docs/reports/paper_submission_package_audit.json"
+  ],
+  "schema_version": "relaytic.paper_final_preflight.v1",
+  "slice": "Paper Track P21",
+  "source_pdf_review_ready": true,
+  "status": "ready_for_author_review_not_tagged",
+  "upload_blockers_remaining": [
+    "replace `Public release tag: TODO before arXiv submission` with the final public tag",
+    "perform final human page-by-page PDF inspection immediately before upload",
+    "confirm `git status --short` is empty at the tag target"
+  ]
+}

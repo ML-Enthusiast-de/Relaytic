@@ -2,7 +2,7 @@
 
 ## Abstract
 
-Anti-money laundering (AML) machine-learning experiments are hard to audit when private data, temporal validity, graph provenance, leakage controls, review capacity, and public claims are managed in separate tools. Relaytic-AML is a local-first evaluation lab in which role-scoped agents produce auditable evidence cells and deterministic gates route those cells into admissible paper uses. The current evidence pack reports PaySim synthetic temporal-fraud PR-AUC 0.6388, Elliptic temporal graph-feature PR-AUC 0.6688, and Elliptic2 context PR-AUC 0.9432 +/- 0.0009, with a recorded RevClassifyDS reference of 0.9740. The paper contributes an evaluation and governance substrate for financial-crime ML, with detector claims kept within the evidence boundary.
+Anti-money laundering (AML) machine-learning experiments are difficult to audit when private data, temporal validity, graph provenance, leakage controls, review capacity, and public claims are managed in separate tools. Relaytic-AML is a local-first agentic evaluation lab in which role-scoped agents write evidence cells and deterministic claim gates decide how those cells may be used. The current evidence pack reports PaySim synthetic temporal-fraud PR-AUC 0.6388, Elliptic temporal graph-feature PR-AUC 0.6688, and Elliptic2 context PR-AUC 0.9432 +/- 0.0009, reported as benchmark context against a RevClassifyDS reference of 0.9740. The contribution is the evaluation and release-governance substrate: local artifact truth, rowless handoff, reproducible paper assets, and evidence-bound public wording for financial-crime ML.
 
 ## 1. Introduction
 
@@ -12,7 +12,7 @@ A useful score is not enough. A reader needs to know which data stayed local, wh
 
 Relaytic began as a general local-first inference-engineering lab. Relaytic-AML is the financial-crime edition used here to test whether that architecture can support governed AML experimentation. It is a set of cooperating agents and deterministic harnesses around a local artifact store. The guide helps a user or another agent understand where the run is. The scout checks source posture, schema, leakage risk, and split feasibility. The strategist turns the objective into a task contract. The scientist challenges baselines, ablations, and budget choices. The builder executes bounded runs. Reviewers reconstruct traces. Release governors lint claims, figures, tables, source packages, and public wording against the evidence record.
 
-The paper is therefore a systems and methodology paper. The benchmark rows matter because they exercise the architecture under temporal, graph, operating-point, and claim-governance pressure. The central question is whether a local evaluation lab can keep evidence, agent assistance, privacy boundaries, and publishable claims aligned without turning proxy evidence into detector-superiority claims.
+Relaytic-AML contributes a local-first evidence and release-governance layer for AML machine-learning experiments, not a new detector architecture. The benchmark rows matter because they exercise the architecture under temporal, graph, operating-point, and claim-governance pressure. The central question is whether a local evaluation lab can keep evidence, agent assistance, privacy boundaries, and publishable claims aligned while preserving the role of each result.
 
 The work is organized around four research questions:
 
@@ -21,7 +21,7 @@ The work is organized around four research questions:
 - **RQ3:** Can the local artifact record support rowless handoff to external agents while preserving provenance?
 - **RQ4:** Do the benchmark rows demonstrate useful, bounded detector evidence under explicit split and budget contracts?
 
-This paper makes four contributions. First, it presents a workspace-backed, role-scoped agent runtime for AML evaluation. Second, it defines an evidence-cell schema tying each metric to dataset, split, command, artifact, budget, leakage posture, and operating point. Third, it contributes a release and interpretation-routing harness that turns local artifacts into tables, figures, source packages, and manuscript claims while recording the evidence needed for stronger future uses. Fourth, it gives public demonstrations on PaySim, Elliptic, and Elliptic2 reference rows under explicit evidence roles.
+This paper makes five contributions. First, it presents a workspace-backed, role-scoped agent runtime for AML evaluation. Second, it defines an evidence-cell schema tying each metric to dataset, split, command, artifact, budget, leakage posture, and operating point. Third, it contributes deterministic claim gates that route evidence into admissible paper uses. Fourth, it shows rowless handoff and interrupted-run recovery for external agents without exposing raw benchmark rows or private paths. Fifth, it generates reproducible paper assets and demonstrates the release path on PaySim, Elliptic, and Elliptic2 under explicit evidence roles.
 
 ## 2. Related Work
 
@@ -173,11 +173,11 @@ The feature policy is strictest for PaySim because simulator balance columns can
 
 PaySim is the most complete local modeling path in the current evidence pack. It should be read as an audited sequence rather than as a leaderboard claim. The earliest reference row was PR-AUC 0.2159. The later leakage-safe baseline improved to 0.3313. The small-sample probe screen then identified a strong XGBoost probe, but fixed-test eligibility was decided later among full-training finalists; Extra Trees had the best full-training validation PR-AUC and was the only competitive finalist evaluated on the fixed test. It reached fixed-test PR-AUC 0.6388 and ROC-AUC 0.9683. The improvement is meaningful inside the synthetic temporal-fraud contract because balance fields were excluded, prior-step destination history was added without raw account encoding, candidates were selected by validation evidence, and calibration and thresholding used validation-only partitions. The admissible interpretation is precise: Relaytic-AML produced a stronger, leakage-audited PaySim temporal-proxy row under a declared budget. It is supporting temporal-fraud evidence rather than real-bank AML performance.
 
-The review-budget metrics sharpen the interpretation. At the selected PaySim review budget, precision is 0.7033 and recall is 0.4716. The top of the queue is much richer than prevalence, but a large share of fraud remains outside the reviewed set. That is a useful operating result for an evaluation lab because it connects ranking quality to analyst capacity instead of treating PR-AUC as the whole story.
+The review-budget metrics sharpen the interpretation. At the selected PaySim review budget, precision is 0.7033 and recall is 0.4716. The fixed queue reviews 1,109 items, containing 780 true positives and 329 false positives; 874 of 1,654 positives remain outside the reviewed set. The top of the queue is much richer than prevalence, but it still misses substantial fraud. That is a useful operating result for an evaluation lab because it connects ranking quality to analyst capacity instead of treating PR-AUC as the whole story.
 
-Elliptic is a different kind of evidence. The validation-selected source-plus-structural LightGBM row reports test PR-AUC 0.6688, with review-budget precision 1.0000 and recall 0.0566. The result supports temporal graph-feature provenance and operating-point reporting. It also reveals a limitation: the current graph-structure-only floor is weak, and the final row is heavily influenced by source-provided anonymized features. Relaytic's contribution here is the graph-aware evidence path: feature provenance, temporal splits, operating-point metrics, and interpretation routing are made auditable together.
+Elliptic is a different kind of evidence. The validation-selected source-plus-structural LightGBM row reports test PR-AUC 0.6688, with review-budget precision 1.0000 and recall 0.0566. The fixed queue reviews 36 items, containing 36 true positives and 0 false positives; 600 of 636 positives remain outside the reviewed set. The result supports temporal graph-feature provenance and operating-point reporting. It also reveals a limitation: the current graph-structure-only floor is weak, and the final row is heavily influenced by source-provided anonymized features. Relaytic's contribution here is the graph-aware evidence path: feature provenance, temporal splits, operating-point metrics, and interpretation routing are made auditable together.
 
-Elliptic2 is intentionally framed as an external reference row. The repeated official-partition context row reports PR-AUC 0.9432 +/- 0.0009, and the content-hash robustness partition reports mean PR-AUC 0.9297. Those are strong absolute values, and the recorded RevClassifyDS reference of 0.9740 gives the reader a useful frontier marker. This is not a contribution of a new Elliptic2 detector. Relaytic's evidence role is to keep that modern benchmark context visible while recording the cohort and reference-execution evidence needed for stronger future comparison.
+Elliptic2 is the modern benchmark-context row. The repeated official-partition context row reports PR-AUC 0.9432 +/- 0.0009, and the content-hash robustness partition reports mean PR-AUC 0.9297. Those values sit beside the recorded RevClassifyDS reference of 0.9740, giving the reader a frontier marker while keeping Relaytic's role precise: carrying modern external benchmark evidence, cohort notes, and reference-execution requirements without converting that context into a detector contribution.
 
 ![Benchmark and review-budget evidence: PR-AUC is shown beside precision and recall at the bounded review queue instead of being interpreted alone.](figures/figure_3_review_budget.svg)
 
@@ -193,10 +193,10 @@ The system claim is evaluated through deterministic reader and agent tasks. Thes
 |---|---|---|---|---|
 | Metric provenance | metric provenance | PaySim selected PR-AUC cell | required fields present | pass; fields 13/13 in metric-cell audit |
 | Budget comparison | budget comparability | PaySim baseline and competitive cells | same dataset, split doctrine, and metric | pass; same split/metric; PR-AUC 0.3313 -> 0.6388 |
-| PaySim interpretation | interpretation-route check | PaySim publishability row | admissible use present; headline=false | pass; admissible use present; hard/headline=false |
+| PaySim interpretation | interpretation-route check | PaySim publishability row | bounded use present; headline claim blocked | pass; bounded use present; headline and hard performance claims blocked |
 | Elliptic2 reference role | reference role check | Elliptic2 publishability row | reference role visible; parity evidence required | pass; reference role visible; parity evidence required |
-| Rowless handoff | handoff recovery | agent handoff report | state, tools, next action; no rows | pass; raw rows=false; redactions=8; blocked fields=6 |
-| Interrupted recovery | no-lost-user recovery | guide recovery report | stage, shortlist, next action exposed | pass; partial run; missing=8; actions=6 |
+| Rowless handoff | handoff recovery | agent handoff report | state, tools, next action; no rows | pass; raw rows absent; 8 unsafe fields redacted; 6 blocked fields recorded |
+| Interrupted recovery | no-lost-user recovery | guide recovery report | stage, shortlist, next action exposed | pass; partial run recovered; 8 missing-evidence items and 6 actions exposed |
 | Stronger-use routing | routing cases | evidence-needs case studies | missing evidence recorded | pass; case studies record missing evidence |
 
 Table 5 reports the audit matrix behind the system claim. Each row names a behavior, a deterministic check, a pass criterion, and an observed signal: 13 of 13 provenance fields are present for the PaySim metric cell, baseline and competitive budgets are comparable under the same contract, Elliptic2 remains in its reference role, rowless handoff exposes no raw rows, and interrupted-run recovery surfaces state, missing evidence, and next actions.
@@ -205,11 +205,11 @@ Table 5 reports the audit matrix behind the system claim. Each row names a behav
 
 | Failure mode | Injected risk | Gate/check | Evidence | Expected behavior | Observed result |
 |---|---|---|---|---|---|
-| Leakage-column injection | PaySim balance fields are offered as candidate model inputs. | Leakage feature policy | PS-PR feature policy | Post-event balance fields stay out of allowed features. | 4 offered, 4 excluded, 0 used; labels=no |
-| Test-set selection violation | A model-selection path tries to use test evidence before the finalist is fixed. | Validation-only selection policy | PS-PR search contract | Only validation evidence may select, calibrate, or threshold the finalist. | validation-only probes; no test selection; one finalist test |
-| Over-strong claim attempt | Draft wording proposes real-bank superiority or RevClassifyDS parity. | Public claim gate | claim-gate report | Unsupported headline and hard-performance claims remain blocked. | 6 blocked claims; hard=no; headline=no |
-| Rowless handoff redaction | An external-agent packet requests raw rows, private paths, or sensitive fields. | Context export redaction | handoff redaction task | The export contains state and next actions, not raw rows or private paths. | raw rows=no; redactions=8; blocked fields=6 |
-| Interrupted-run recovery | A user or agent resumes a partial run without knowing which artifact to inspect. | No-lost-user guide | guide recovery task | The guide exposes current state, missing evidence, artifact shortlist, and next actions. | partial run; missing evidence=8; actions=6 |
+| Leakage-column injection | PaySim balance fields are offered as candidate model inputs. | Leakage feature policy | PS-PR feature policy | Post-event balance fields stay out of allowed features. | 4 offered, 4 excluded, 0 used;  labels=no |
+| Test-set selection violation | A model-selection path tries to use test evidence before the finalist is fixed. | Validation-only selection policy | PS-PR search contract | Only validation evidence may select, calibrate, or threshold the finalist. | validation-only probes;  no test selection;  one finalist test |
+| Over-strong claim attempt | Draft wording proposes real-bank superiority or RevClassifyDS parity. | Public claim gate | claim-gate report | Unsupported headline and hard-performance claims remain blocked. | 6 blocked claims;  hard=no;  headline=no |
+| Rowless handoff redaction | An external-agent packet requests raw rows, private paths, or sensitive fields. | Context export redaction | handoff redaction task | The export contains state and next actions, not raw rows or private paths. | raw rows absent;  8 unsafe fields redacted;  6 blocked fields recorded |
+| Interrupted-run recovery | A user or agent resumes a partial run without knowing which artifact to inspect. | No-lost-user guide | guide recovery task | The guide exposes current state, missing evidence, artifact shortlist, and next actions. | partial run;  8 missing-evidence items recorded;  6 recovery actions exposed |
 
 Table 6 adds injected failure cases. The point is not detector performance; the checks exercise whether the release path refuses leakage features, test-set model selection, over-strong claims, unsafe handoff, and lost-run states under deterministic system fixtures. These cases make the governance claim auditable without adding a new benchmark row.
 
@@ -217,12 +217,12 @@ Table 6 adds injected failure cases. The point is not detector performance; the 
 
 | Path | Disabled machinery | Unsafe signal | Artifact integrity | Handoff / recovery | Interpretation |
 |---|---|---|---|---|---|
-| Full governance path | none | 0 unsupported claims, leakage inputs, or raw fields | 0 missing fields; 3 table groups | actions=6 | Claim gate, leakage policy, redaction, provenance, and recovery guide are all active. |
-| No claim gate | public claim gate | 6 unsupported claims | 3 table groups unchanged | actions=6 | The claim gate is what keeps proxy evidence below hard AML, SOTA, RevClassifyDS parity, production, and business-value claims. |
-| No leakage policy | PaySim feature leakage policy | 4 leakage inputs | 0 missing fields; 1 unsafe table path | actions=6 | The leakage policy prevents post-event simulator fields from becoming apparently strong evidence. |
-| No rowless handoff redaction | external-agent redaction | 6 raw fields | 3 table groups unchanged | 6 raw fields; actions=6 | Rowless handoff is the privacy boundary that lets outside agents help without receiving raw data or local paths. |
-| No evidence-cell required fields | metric-cell required-field gate | 13 missing provenance fields | 13 missing fields; 1 unsafe table path | actions=6 | Required fields are what connect a reader-facing number back to dataset, split, command, artifact, leakage, budget, and claim state. |
-| No interrupted-run recovery guide | no-lost-user guide | 0 recovery actions | 3 table groups unchanged | actions=0 | The recovery guide is what keeps state navigation from depending on repo literacy. |
+| Full governance path | none | 0 unsupported claims, leakage inputs, or raw fields | 0 missing fields;  3 table groups | 6 recovery actions exposed | Claim gate, leakage policy, redaction, provenance, and recovery guide are all active. |
+| No claim gate | public claim gate | 6 unsupported claims | 3 table groups unchanged | 6 recovery actions exposed | The claim gate is what keeps proxy evidence below hard AML, SOTA, RevClassifyDS parity, production, and business-value claims. |
+| No leakage policy | PaySim feature leakage policy | 4 leakage inputs | 0 missing fields;  1 unsafe table path | 6 recovery actions exposed | The leakage policy prevents post-event simulator fields from becoming apparently strong evidence. |
+| No rowless handoff redaction | external-agent redaction | 6 raw fields | 3 table groups unchanged | 6 raw fields;  6 recovery actions exposed | Rowless handoff is the privacy boundary that lets outside agents help without receiving raw data or local paths. |
+| No evidence-cell required fields | metric-cell required-field gate | 13 missing provenance fields | 13 missing fields;  1 unsafe table path | 6 recovery actions exposed | Required fields are what connect a reader-facing number back to dataset, split, command, artifact, leakage, budget, and claim state. |
+| No interrupted-run recovery guide | no-lost-user guide | 0 recovery actions | 3 table groups unchanged | 0 recovery actions exposed | The recovery guide is what keeps state navigation from depending on repo literacy. |
 
 Table 7 compares the full governance path with disabled-component fixtures. The ablation does not change detector results. It tests whether claim gates, leakage policy, redaction, metric provenance, and recovery guidance change what can be released from the same evidence pack.
 
@@ -230,17 +230,17 @@ Table 7 compares the full governance path with disabled-component fixtures. The 
 
 | Invariant | Mechanism | Evidence and stress signal | Boundary |
 |---|---|---|---|
-| Metric-cell provenance | metric-cell audit plus required-field gate | metric audit: pass; stress missing-field ablation: missing provenance=13; safe=false | The invariant proves artifact completeness, not that the detector is optimal. |
-| Claim-strength monotonicity | claim lint, allowed-claims report, publishability matrix, and overclaim failure case | claim whitelist: pass; stress overclaim fixture: blocked claims=6; hard/headline=false | The gate is a deterministic release check; it is not an external peer review. |
-| Leakage and selection firewall | feature policy report, split contract, failure fixtures, and leakage ablation | leakage report: used=0; labels for features=false; stress leakage fixture: offered=4; excluded=4; used=0 | The current firewall is benchmark-specific; future datasets need their own leakage taxonomy. |
-| Rowless external-agent handoff | handoff evaluator plus redaction failure case | handoff eval: raw rows=false; redactions=8; blocked fields=6; stress redaction fixture: blocked fields=6; raw rows=false | The check proves deterministic redaction on fixtures, not a broad privacy certification. |
-| Interrupted-run recoverability | no-lost-user guide and partial-run recovery fixtures | recovery eval: state=partial run; missing=8; actions=6; stress recovery fixture: state=partial run; actions=6 | The check is deterministic; it does not measure human time-to-recovery. |
-| Benchmark role separation | publishability matrix and allowed-claims report | publishability rows: rows=5; supporting=5; hard/headline blocked; stress blocked claims: blocked=6 | Rows with external or proxy roles cannot be treated as unified leaderboard evidence. |
-| Local-first release safety | release go/no-go, claim lint, and public-claim whitelist | wording lint: pass; stress claim boundary: hard/headline blocked | Licensed benchmark files are not redistributed; reproduction depends on local access. |
+| Metric-cell provenance | metric-cell audit plus required-field gate | metric audit: pass; stress missing-field ablation: 13 provenance fields missing; release blocked | The invariant proves artifact completeness, not that the detector is optimal. |
+| Claim-strength monotonicity | claim lint, allowed-claims report, publishability matrix, and overclaim failure case | claim whitelist: pass; stress overclaim fixture: 6 unsupported claims blocked | The gate is a deterministic release check; it is not an external peer review. |
+| Leakage and selection firewall | feature policy report, split contract, failure fixtures, and leakage ablation | leakage report: 4 forbidden fields offered; 0 used; stress leakage fixture: 4 leakage fields offered; 4 excluded; 0 used | The current firewall is benchmark-specific; future datasets need their own leakage taxonomy. |
+| Rowless external-agent handoff | handoff evaluator plus redaction failure case | handoff eval: raw rows absent; 8 unsafe fields redacted; 6 blocked fields recorded; stress redaction fixture: 6 unsafe fields b... | The check proves deterministic redaction on fixtures, not a broad privacy certification. |
+| Interrupted-run recoverability | no-lost-user guide and partial-run recovery fixtures | recovery eval: partial run recovered; 8 missing-evidence items and 6 recovery actions exposed; stress recovery fixture: partial... | The check is deterministic; it does not measure human time-to-recovery. |
+| Benchmark role separation | publishability matrix and allowed-claims report | publishability rows: 5 supporting rows allowed; headline and hard performance claims blocked; stress blocked claims: 6 public c... | Rows with external or proxy roles cannot be treated as unified leaderboard evidence. |
+| Local-first release safety | release go/no-go, claim lint, and public-claim whitelist | wording lint: pass; stress claim boundary: headline and hard performance claims blocked | Licensed benchmark files are not redistributed; reproduction depends on local access. |
 
 Table 8 states the current invariants as release-time rules rather than prose preferences. Each invariant has a mechanism, evidence artifacts, an observed failure or ablation signal, and an explicit boundary. This is the core systems claim: Relaytic-AML makes agent-assisted evaluation safer by turning interpretation into checked state.
 
-**Hosted external-score case study.**
+**Table 9. Hosted external-score case study.**
 
 | Component | Observed evidence | Evidence | Admissible interpretation |
 |---|---|---|---|
@@ -249,7 +249,7 @@ Table 8 states the current invariants as release-time rules rather than prose pr
 | Rowless handoff | 11 exported fields; 16 blocked fields; no raw rows exported | handoff-redaction report | A downstream agent can inspect state without receiving rows, identifiers, paths, or secrets. |
 | Claim state | hosted detector-output governance only; 5 stronger claims blocked | claim-gate report | The public use is hosted detector-output governance only. |
 
-The hosted external-score case study makes the integration point concrete. A rowless detector-score artifact enters Relaytic with schema and content hashes, not raw rows. Relaytic emits one governance evidence cell, redacts unsafe handoff fields, and allows only hosted detector-output governance wording. This is not a detector-performance result; it shows how a stronger or third-party detector output can be wrapped by the same local evidence and claim boundary.
+The hosted external-score case study makes the integration point concrete. A rowless detector-score artifact enters Relaytic with schema and content hashes, not raw rows. Relaytic emits one governance evidence cell, redacts unsafe handoff fields, and routes the result as hosted detector-output governance evidence. This shows how a stronger or third-party detector output can be wrapped by the same local evidence and release boundary.
 
 ```json
 {
@@ -265,7 +265,7 @@ The hosted external-score case study makes the integration point concrete. A row
 }
 ```
 
-**Table 9. Evidence routing examples.**
+**Table 10. Evidence routing examples.**
 
 | Stronger future use | Current admissible use | Evidence needed |
 |---|---|---|
@@ -273,17 +273,17 @@ The hosted external-score case study makes the integration point concrete. A row
 | Elliptic2 reference-method comparison | external RevClassifyDS reference marker plus local context row | Faithful reference execution, cohort reconciliation, resource budget, and repeated parity report. |
 | Graph-native detector release | Elliptic temporal graph-feature evidence path | Graph-native release budget, neural baselines, repeated seeds, and graph-specific ablations. |
 
-Table 9 shows how stronger future uses are handled. Rather than letting narrative claims drift beyond the artifacts, the gate records the current admissible use and the evidence that would be needed before the stronger interpretation could be made.
+Table 10 shows how stronger future uses are handled. Rather than letting narrative claims drift beyond the artifacts, the gate records the current admissible use and the evidence that would be needed before the stronger interpretation could be made.
 
-**Table 10. Rowless handoff and interrupted-run recovery examples.**
+**Table 11. Rowless handoff and interrupted-run recovery examples.**
 
 | Scenario | Input state | Exported fields | Redacted fields | Observed signal |
 |---|---|---|---|---|
-| External-agent handoff | partial run with available guide state | state summary, action options, starter questions, tool contract, artifact shortlist | raw transaction rows, credentials, private paths, raw source files | raw rows=no; redactions=8; blocked fields=6 |
-| Safe next action | external model asked what to do next | six next actions, six starter questions, command options | unredacted local paths and data rows | actions=6; starter questions=6 |
-| Interrupted-run recovery | operator returns to partial run without artifact literacy | current state, missing evidence count, canonical artifact shortlist, context-export command | raw benchmark data and private machine paths | partial run; missing evidence=8; actions=6 |
+| External-agent handoff | partial run with available guide state | state summary, action options, starter questions, tool contract, artifact shortlist | raw transaction rows, credentials, private paths, raw source files | raw rows absent; 8 unsafe fields redacted; 6 blocked fields recorded |
+| Safe next action | external model asked what to do next | six next actions, six starter questions, command options | unredacted local paths and data rows | 6 next actions and 6 starter questions exposed |
+| Interrupted-run recovery | operator returns to partial run without artifact literacy | current state, missing evidence count, canonical artifact shortlist, context-export command | raw benchmark data and private machine paths | partial run recovered; 8 missing-evidence items and 6 actions exposed |
 
-Table 10 gives the practical external-agent story. A second model can receive state, commands, artifacts, and starter questions, while raw rows remain redacted together with private machine paths. The same mechanism helps an inexperienced or interrupted user recover the next action without knowing which internal artifact to inspect first.
+Table 11 gives the practical external-agent story. A second model can receive state, commands, artifacts, and starter questions, while raw rows remain redacted together with private machine paths. The same mechanism helps an inexperienced or interrupted user recover the next action without knowing which internal artifact to inspect first.
 
 ## 8. Limitations and Threats to Validity
 
@@ -299,25 +299,29 @@ The system is intentionally local-first, which creates a tradeoff. Privacy and p
 
 The repository is larger than this AML paper. Relaytic is the general local-first inference lab and public package; Relaytic-AML is the focused AML edition used here for the manuscript. A reader should start with the README and this paper. Development-control files record the build history, but they are not required to understand the paper claims.
 
-**Table 11. Reproducibility contract.**
+Repository: https://github.com/ML-Enthusiast-de/Relaytic. Public release tag: TODO before arXiv submission. Current source-candidate manifests record the generation commit hash and artifact hashes; a final tag should be created only after the P21 preflight reports a clean target.
+
+**Table 12. Reproducibility contract.**
 
 | Component | Command | Expected output | Environment or data dependency | Hash or seed record |
 |---|---|---|---|---|
-| Paper artifacts | paper-release; paper-arxiv-source | Markdown draft, arXiv main.tex, vector figures | Python >=3.10; CI matrix covers 3.10 and 3.11; full extra installs numpy, pandas, scikit-learn, matplotlib | deterministic generators; source hashes in manifest |
-| PaySim benchmark | release-safety paysim-competitive --budget-tier competitive --run-optional --format json | PaySim selected PR-AUC cell | local Kaggle PaySim file required | sha256 prefix 16910f90577b |
-| Elliptic benchmark | release-safety graph-baselines --budget-tier competitive --run-optional --format json | Elliptic selected PR-AUC cell | local Kaggle Elliptic files required | sha256 prefix 93e2e7b2405c plus 2 files |
-| System evaluation | release-safety paper-system-eval --format json | task, handoff, recovery, and claim-gate reports | repo-local deterministic fixtures | all required system-evaluation tasks pass in current evidence pack |
-| Failure-case evaluation | release-safety paper-failure-eval --format json | injected-risk failure-case reports | repo-local deterministic fixtures | all required failure cases pass in current evidence pack |
-| Governance ablation | release-safety paper-governance-ablation --format json | full-vs-disabled governance ablation reports | repo-local deterministic fixtures | full path safe; disabled fixtures expose expected failures |
-| Governance invariants | release-safety paper-invariants --format json | invariant and adjacent-systems reports | repo-local deterministic fixtures | 7 current invariants; 6 adjacent families; no stronger detector claim |
-| Hosted-score case study | release-safety paper-external-score-proof; paper-external-score-integration | external-score schema, evidence-cell, redaction, claim-map, and case-study reports | repo-local rowless fixture by default; optional local score files stay local | schema/content hash prefixes plus evidence-cell ID recorded |
+| Minimal paper rebuild | paper-release; paper-narrative-polish; paper-arxiv-source; paper-final-preflight | Markdown draft, arXiv source, vector figures, PDF preflight, and paper audits | Clean clone with Python >=3.10 and the full extra; final preflight follows local TeX compile | source, figure, PDF, and log checks in manifests |
+| PaySim benchmark | paysim-competitive --budget-tier competitive --run-optional | Selected PaySim PR-AUC and review-budget cells | Local Kaggle PaySim file; raw data not redistributed | sha256 prefix 16910f90577b |
+| Elliptic benchmark | graph-baselines --budget-tier competitive --run-optional | Selected Elliptic graph-feature evidence cells | Local Kaggle Elliptic files; raw data not redistributed | sha256 prefix 93e2e7b2405c plus 2 files |
+| System evaluation | paper-system-eval | navigation, handoff, recovery, and claim-gate reports | Repo-local deterministic fixtures | all required tasks pass in current evidence pack |
+| Failure cases | paper-failure-eval | leakage, test-selection, overclaim, redaction, and recovery stress cases | Repo-local deterministic fixtures | required failure cases pass |
+| Governance ablation | paper-governance-ablation | full path compared with disabled-governance fixtures | Repo-local deterministic fixtures | full path safe; disabled fixtures expose expected failures |
+| Governance invariants | paper-invariants | invariant map and adjacent-systems comparison | Repo-local deterministic fixtures | 7 invariants and 6 adjacent families recorded |
+| Hosted-score case study | paper-external-score-proof; paper-external-score-integration | rowless score schema, evidence cell, redaction, claim map, and case-study panel | Repo-local rowless fixture by default; optional local score files stay local | schema/content hash prefixes plus evidence-cell ID |
 
-Minimal regeneration commands are shown below.
+Minimal public checks use only repo-local deterministic fixtures and paper-generation artifacts. Full benchmark regeneration additionally requires local PaySim, Elliptic, and Elliptic2 access where the dataset licenses permit local use but not redistribution.
 
 Windows PowerShell:
 
 ```powershell
 py -3.11 -m pip install -e ".[full]"
+
+# Minimal public check: deterministic fixtures and paper generation.
 py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-failure-eval --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-governance-ablation --format json
@@ -327,13 +331,22 @@ py -3.11 -m relaytic.ui.cli release-safety paper-external-score-integration --fo
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py tests/test_paper_track_p19a.py tests/test_paper_track_p19b.py tests/test_paper_track_p20.py -q
+# After compiling docs/paper/arxiv_src/main.tex and copying main.pdf to the review PDF:
+py -3.11 -m relaytic.ui.cli release-safety paper-final-preflight --format json
+py -3.11 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py -q
+py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p16.py -q
+py -3.11 -m pytest tests/test_paper_track_p17.py tests/test_paper_track_p18.py -q
+py -3.11 -m pytest tests/test_paper_track_p19a.py tests/test_paper_track_p19b.py -q
+py -3.11 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q
+py -3.11 -m pytest tests/test_paper_strengthening_plan.py -q
 ```
 
 macOS/Linux:
 
 ```bash
 python3 -m pip install -e ".[full]"
+
+# Minimal public check: deterministic fixtures and paper generation.
 python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
 python3 -m relaytic.ui.cli release-safety paper-failure-eval --format json
 python3 -m relaytic.ui.cli release-safety paper-governance-ablation --format json
@@ -343,12 +356,19 @@ python3 -m relaytic.ui.cli release-safety paper-external-score-integration --for
 python3 -m relaytic.ui.cli release-safety paper-release --format json
 python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py tests/test_paper_track_p15.py tests/test_paper_track_p16.py tests/test_paper_track_p17.py tests/test_paper_track_p18.py tests/test_paper_track_p19a.py tests/test_paper_track_p19b.py tests/test_paper_track_p20.py -q
+# After compiling docs/paper/arxiv_src/main.tex and copying main.pdf to the review PDF:
+python3 -m relaytic.ui.cli release-safety paper-final-preflight --format json
+python3 -m pytest tests/test_paper_track_p13.py tests/test_paper_track_p14.py -q
+python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p16.py -q
+python3 -m pytest tests/test_paper_track_p17.py tests/test_paper_track_p18.py -q
+python3 -m pytest tests/test_paper_track_p19a.py tests/test_paper_track_p19b.py -q
+python3 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q
+python3 -m pytest tests/test_paper_strengthening_plan.py -q
 ```
 
 Raw benchmark data is not committed. PaySim and Elliptic require local downloads and are referenced through registry artifacts, split reports, hashes, and command ledgers. Elliptic2 remains context-only in this paper because the stronger reference-parity conditions are not satisfied locally. Clean clones can reproduce the paper-generation checks and repo-local public fixtures; full benchmark regeneration requires the locally licensed datasets named in the README.
 
-## Use of AI Assistance
+## AI Assistance Disclosure
 
 Large language model tools assisted with drafting, editing, repository inspection, consistency checks, and implementation work around the paper artifacts. They are not authors. The evidence cells, benchmark outputs, source code, figures, tables, limitations, and final interpretation remain the author's responsibility.
 

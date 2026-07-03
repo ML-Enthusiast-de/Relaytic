@@ -25,7 +25,7 @@
     {
       "check_id": "publication_table_count_present",
       "detail": {
-        "table_count": 12
+        "table_count": 13
       },
       "message": "The generated manuscript should contain the expected publication tables.",
       "passed": true,
@@ -55,5 +55,5 @@
   "schema_version": "relaytic.paper_narrative_polish.v1",
   "slice": "Paper Track P20",
   "status": "pass",
-  "table_count": 12
+  "table_count": 13
 }

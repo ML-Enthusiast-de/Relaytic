@@ -55,7 +55,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Anti-money laundering (AML)" in draft
     assert "PaySim synthetic temporal-fraud PR-AUC 0.6388" in draft
     assert "@yang2026skillopt" in draft
-    assert "detector claims kept within the evidence boundary" in draft
+    assert "evaluation and release-governance substrate" in draft
     assert "RQ1" in draft and "RQ4" in draft
     assert "Table 1. Representative evidence cells" in draft
     assert "Table 2a. Dataset scale and split contracts" in draft
@@ -72,11 +72,11 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Adjacent systems comparison" in draft
     assert "Table 8. Governance invariants and evidence map" in draft
     assert "Hosted external-score case study" in draft
-    assert "not a detector-performance result" in draft
+    assert "not a new detector architecture" in draft
     assert "paper-narrative-polish --format json" in draft
-    assert "Table 9. Evidence routing examples" in draft
-    assert "Table 10. Rowless handoff and interrupted-run recovery examples" in draft
-    assert "Table 11. Reproducibility contract" in draft
+    assert "Table 10. Evidence routing examples" in draft
+    assert "Table 11. Rowless handoff and interrupted-run recovery examples" in draft
+    assert "Table 12. Reproducibility contract" in draft
     assert ("TODO" + "_EVIDENCE") not in draft
     assert "pending isolated" + " test" not in draft
     for phrase in FORBIDDEN_READER_TONE_PHRASES:
@@ -171,7 +171,7 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert claims["headline_claims_allowed"] is False
     assert "Relaytic-AML: A Local-First Agentic Evaluation Lab" in draft
     assert "Hosted external-score case study" in draft
-    assert "not a detector-performance result" in draft
+    assert "without converting that context into a detector contribution" in draft
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
     assert "paper-narrative-polish --format json" in draft

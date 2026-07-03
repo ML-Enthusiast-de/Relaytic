@@ -1,0 +1,59 @@
+{
+  "checks": [
+    {
+      "check_id": "compiled_pdf_present",
+      "detail": {
+        "byte_count": 493637
+      },
+      "message": "arXiv source PDF must exist and have nontrivial size.",
+      "passed": true
+    },
+    {
+      "check_id": "compiled_pdf_matches_current_source",
+      "detail": {
+        "pdf_modified_unix": 1783083232.2903976,
+        "source_modified_unix": 1783083219.9842992
+      },
+      "message": "Compiled PDF should be newer than or as new as the generated TeX source.",
+      "passed": true
+    },
+    {
+      "check_id": "review_pdf_synchronized",
+      "detail": {
+        "review_pdf_bytes": 493637,
+        "source_pdf_bytes": 493637
+      },
+      "message": "Human review PDF should match the compiled source PDF size.",
+      "passed": true
+    },
+    {
+      "check_id": "latex_log_clean",
+      "detail": {
+        "status": "pass",
+        "violation_count": 0,
+        "violations": []
+      },
+      "message": "LaTeX log must not contain unresolved references, citation warnings, or overfull boxes.",
+      "passed": true
+    },
+    {
+      "check_id": "fonts_embedded_no_type3",
+      "detail": {
+        "status": "pass",
+        "violation_count": 0,
+        "violations": []
+      },
+      "message": "PDF fonts should be embedded and avoid Type 3 fonts.",
+      "passed": true
+    },
+    {
+      "check_id": "pdf_metadata_present_in_source",
+      "message": "PDF metadata must be present in the generated TeX source.",
+      "passed": true
+    }
+  ],
+  "failed_checks": [],
+  "schema_version": "relaytic.paper_final_preflight.v1",
+  "slice": "Paper Track P21",
+  "status": "pass"
+}

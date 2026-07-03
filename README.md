@@ -23,7 +23,7 @@ Deep audit, after the first read:
 
 - System-evaluation proof: `docs/reports/paper_system_task_eval.json`, `docs/reports/paper_system_behavior_eval.json`, `docs/reports/paper_agent_handoff_eval.json`, `docs/reports/paper_no_lost_user_eval.json`, and `docs/reports/paper_claim_gate_case_studies.json`.
 - Metric provenance and claim posture: `docs/reports/paper_result_table_final.json`, `docs/reports/paper_metric_cell_audit.json`, and `docs/reports/paper_publishability_matrix.json`.
-- Final polish/readiness checks: `docs/reports/paper_narrative_polish_manifest.json`, `docs/reports/paper_paysim_selection_story_review.json`, `docs/reports/paper_reader_guidance_audit.json`, and `docs/reports/paper_visual_table_polish_audit.json`.
+- Final polish/readiness checks: `docs/reports/paper_narrative_polish_manifest.json`, `docs/reports/paper_paysim_selection_story_review.json`, `docs/reports/paper_reader_guidance_audit.json`, `docs/reports/paper_visual_table_polish_audit.json`, `docs/reports/paper_final_preflight_manifest.json`, and `docs/reports/paper_final_release_changelog.md`.
 
 The long build-control files, especially `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`, are development provenance. They explain how the repo got here, but they are not required reading for the paper.
 
@@ -95,7 +95,7 @@ More context:
 
 The current paper draft presents Relaytic-AML as a local-first evaluation lab for financial-crime ML. It is an architecture and evidence-discipline paper, not a hard AML superiority result. Relaytic remains the general package and CLI. Relaytic-AML is the current flagship edition and the focus of the draft because AML makes privacy, temporal validity, graph context, human review, and claim discipline visible in one domain.
 
-The repo includes the Markdown draft, a compiled PDF draft, an arXiv source candidate, references, figures, tables, and the underlying public evidence artifacts. The final upload still needs local TeX/PDF inspection and a clean tag-target confirmation.
+The repo includes the Markdown draft, a compiled PDF draft, an arXiv source candidate, references, figures, tables, and the underlying public evidence artifacts. The final source/PDF preflight is ready for author review, but public upload still needs replacement of the release-tag placeholder, page-by-page human PDF inspection, and a clean tag-target confirmation.
 
 Inspect:
 
@@ -105,6 +105,7 @@ Inspect:
 - `docs/paper/figures/` and `docs/paper/tables/` for generated visual/table assets.
 - `docs/reports/paper_public_claims_allowed.json` for allowed and blocked public wording.
 - `docs/reports/paper_attention_pack.md` for claim-safe public post text.
+- `docs/reports/paper_final_preflight_manifest.json` and `docs/reports/paper_final_release_changelog.md` for the final source/PDF preflight state.
 
 Regenerate:
 
@@ -115,7 +116,15 @@ py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py -q
+Set-Location docs\paper\arxiv_src
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+Set-Location ..\..\..
+Copy-Item -LiteralPath docs\paper\arxiv_src\main.pdf -Destination docs\paper\relaytic_aml_arxiv_draft.pdf -Force
+py -3.11 -m relaytic.ui.cli release-safety paper-final-preflight --format json
+py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q
 ```
 
 macOS/Linux:
@@ -125,7 +134,15 @@ python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
 python3 -m relaytic.ui.cli release-safety paper-release --format json
 python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py -q
+cd docs/paper/arxiv_src
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+pdflatex -interaction=nonstopmode -halt-on-error main.tex
+cd ../../..
+cp docs/paper/arxiv_src/main.pdf docs/paper/relaytic_aml_arxiv_draft.pdf
+python3 -m relaytic.ui.cli release-safety paper-final-preflight --format json
+python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q
 ```
 
 Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked until later gates explicitly allow them.

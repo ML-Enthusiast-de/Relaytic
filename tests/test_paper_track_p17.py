@@ -121,4 +121,4 @@ def test_paper_track_p17_committed_governance_ablation_artifacts_are_ready() -> 
     assert "Paper P17 Governance-Ablation Pack" in summary
     assert "Table 7. Governance machinery ablation" in draft
     assert "No claim gate" in draft
-    assert "Table 10 gives the practical external-agent story" in draft
+    assert "Table 11 gives the practical external-agent story" in draft

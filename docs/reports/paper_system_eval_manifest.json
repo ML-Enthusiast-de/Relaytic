@@ -1,6 +1,6 @@
 {
   "artifact_hashes": {
-    "README.md": "81cd5af02d2458c4ce7e7a0a6e94ad603c185da3ab22537e93da86d3571ceab7",
+    "README.md": "f474c640c74fa9fe19ab18a82abb220da66996ceee43afcd22bb3034e3f35a76",
     "docs/reports/paper_claim_lint_report.json": "9123d9521638cfb866171a4ebeee931b556f6b8a9d65735d0aa24ebb2ed25322",
     "docs/reports/paper_external_dry_run_report.json": "ba3b1a75ef7b5d5e045e89ea3cead280643e8a4ef7d4b86512e64ac340bf252d",
     "docs/reports/paper_metric_cell_audit.json": "e22ab8c753c45aa2f79d9b148731e7ba2dc1ebb0837abf5e2c9f2167a31d9a5c",

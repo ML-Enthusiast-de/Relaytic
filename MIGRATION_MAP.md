@@ -1105,6 +1105,22 @@ P20 extends the existing release-safety paper-track boundary with paper-polish a
 
 Compatibility boundary: P20 does not add a benchmark result, does not claim detector superiority, and does not expand the public detector API. It only makes the current paper and repo guidance easier to audit before final preflight.
 
+## Paper Track P21 Final Source/PDF Preflight
+
+P21 extends the existing release-safety paper-track boundary with final source/PDF preflight and release changelog artifacts, not new benchmark or detector functionality.
+
+- introduced `src/relaytic/release_safety/paper_final_preflight.py`
+- introduced the public command `relaytic release-safety paper-final-preflight`
+- added generated artifacts:
+  - `docs/reports/paper_final_pdf_preflight.json`
+  - `docs/reports/paper_final_source_preflight.json`
+  - `docs/reports/paper_final_preflight_manifest.json`
+  - `docs/reports/paper_final_release_changelog.md`
+- updated the generated paper/source/PDF path so the final preflight checks public markers, wrapped command blocks, numbered hosted-score case-study placement, AI assistance disclosure naming, P14/P20 readiness, compiled PDF synchronization, LaTeX log posture, embedded fonts, and PDF metadata
+- separates tracked source inputs from ignored local TeX build outputs in the manifest so clean-clone readers are not told that local compile files are committed source artifacts
+
+Compatibility boundary: P21 does not add a benchmark result, does not claim detector superiority, and does not expand the public detector API. It marks the paper source/PDF bundle ready for author review while keeping upload blocked until the public release tag is chosen, the PDF is reviewed page by page, and the tag target is clean.
+
 ## Removal Criteria
 
 The remaining compatibility layer can be removed when all of the following are true:

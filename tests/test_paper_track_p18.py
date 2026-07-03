@@ -125,4 +125,4 @@ def test_paper_track_p18_committed_invariant_artifacts_are_ready() -> None:
     assert "Adjacent systems comparison" in draft
     assert "Table 8. Governance invariants and evidence map" in draft
     assert "Claim-strength monotonicity" in draft
-    assert "Table 10 gives the practical external-agent story" in draft
+    assert "Table 11 gives the practical external-agent story" in draft

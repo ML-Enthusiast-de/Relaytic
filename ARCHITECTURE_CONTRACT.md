@@ -68,7 +68,7 @@ Current canonical boundaries:
 Reserved future boundaries:
 
 - `src/relaytic/analytics/`, `src/relaytic/planning/`, `src/relaytic/modeling/`, `src/relaytic/memory/`, `src/relaytic/runs/`, `src/relaytic/assist/`, `src/relaytic/ui/`, `src/relaytic/search/`, `src/relaytic/benchmark/`, `src/relaytic/research/`, `src/relaytic/compiler/`, `src/relaytic/decision/`, `src/relaytic/runtime/`, and `src/relaytic/workspace/` now absorb the shipped Slice 15A through Slice 15M task-contract, architecture-routing, bounded-HPO, paper-grade benchmark, freshness-aware artifact-reuse, replay/shadow-tested imported-model, objective/split/metric-truth, first-class family-stack, staged portfolio-search, temporal-engine, operating-point, benchmark-truth-gate, competitive-specialization, and benchmark-generalization responsibilities; later work may introduce focused subpackages such as `src/relaytic/modeling/families/`, `src/relaytic/modeling/portfolio/`, or `src/relaytic/temporal/` only if they sharpen responsibility instead of forking a disconnected parallel stack
-- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, focused UI helpers such as `src/relaytic/ui/aml_environment.py`, and `src/relaytic/release_safety/paper_freeze.py` plus paper-track release-safety helpers now absorb the shipped AML productization, paper-freeze, PaySim temporal benchmark, Elliptic graph provenance, tabular baseline-suite, competitive PaySim gate, Elliptic graph-baseline work, thesis narrowing, operational paper metrics, reproducible paper-table generation, claim-linted paper drafting, external dry-run proof, claim-safe paper release packaging, arXiv source-bundle release-candidate packaging, measured system-evaluation packs, governance-invariant packs, hosted-score governance/case-study integration, and P20 paper narrative/guidance polish before Academy expansion resumes
+- `src/relaytic/benchmark/`, `src/relaytic/aml/`, `src/relaytic/casework/`, `src/relaytic/stream_risk/`, focused UI helpers such as `src/relaytic/ui/aml_environment.py`, and `src/relaytic/release_safety/paper_freeze.py` plus paper-track release-safety helpers now absorb the shipped AML productization, paper-freeze, PaySim temporal benchmark, Elliptic graph provenance, tabular baseline-suite, competitive PaySim gate, Elliptic graph-baseline work, thesis narrowing, operational paper metrics, reproducible paper-table generation, claim-linted paper drafting, external dry-run proof, claim-safe paper release packaging, arXiv source-bundle release-candidate packaging, measured system-evaluation packs, governance-invariant packs, hosted-score governance/case-study integration, P20 paper narrative/guidance polish, and P21 final source/PDF preflight before Academy expansion resumes
 - `src/relaytic/graph_fabric/` may still absorb richer graph and subgraph reasoning where it sharpens responsibility beyond the shipped `src/relaytic/aml/`, `src/relaytic/casework/`, and `src/relaytic/stream_risk/` slices
 - `src/relaytic/capability_academy/` should own Slice 16 and Slices 16A through 16F capability registries, replay/shadow trials, arena promotion scorecards, hunt campaigns, provider feedback, non-core specialist recruitment or retirement, and academy-state rendering
 - `src/relaytic/representation/` should own Slice 17 optional representation engines, latent-state reports, embedding indexes, and JEPA-style pretraining support
@@ -709,6 +709,15 @@ Current paper-track narrative/guidance polish artifact names from Paper Track P2
 - `paper_polish_readiness.md`
 
 Paper Track P20 extends `src/relaytic/release_safety/` with deterministic paper-polish checks. It separates PaySim probe screening from full-finalist validation, verifies that results have nearby interpretation, audits the paper-to-README guidance path, and requires the P20 manifest before P14 emits a source candidate for final P21 preflight. P20 does not add benchmark rows and does not relax detector-superiority, production-readiness, RevClassify parity, or real-bank AML blockers.
+
+Current paper-track final preflight artifact names from Paper Track P21:
+
+- `paper_final_pdf_preflight.json`
+- `paper_final_source_preflight.json`
+- `paper_final_preflight_manifest.json`
+- `paper_final_release_changelog.md`
+
+Paper Track P21 extends `src/relaytic/release_safety/` with deterministic final source/PDF preflight checks. It separates tracked paper/source inputs from ignored local TeX build outputs, verifies public markers, wrapped command blocks, numbered hosted-score case-study placement, AI assistance disclosure naming, P20/P14 readiness, compiled PDF synchronization, LaTeX log posture, embedded fonts, and PDF metadata. P21 marks the bundle ready for author review, keeps `arxiv_upload_ready` false, and records the remaining human upload blockers.
 
 Current trace and eval artifact names:
 
