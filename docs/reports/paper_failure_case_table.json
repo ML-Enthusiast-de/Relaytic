@@ -18,7 +18,7 @@
       "full_observed_result": "offered=4; excluded=4; used=0; labels_for_features=False",
       "gate_or_check": "Leakage feature policy",
       "injected_risk": "PaySim balance fields are offered as candidate model inputs.",
-      "observed_result": "4 offered, 4 excluded, 0 used; labels=no",
+      "observed_result": "4 offered, 4 excluded, 0 used; labels not used as features",
       "passed": true
     },
     {
@@ -44,7 +44,7 @@
       "full_observed_result": "blocked_claims=6; hard_allowed=False; headline_allowed=False",
       "gate_or_check": "Public claim gate",
       "injected_risk": "Draft wording proposes real-bank superiority or RevClassifyDS parity.",
-      "observed_result": "6 blocked claims; hard=no; headline=no",
+      "observed_result": "6 blocked claims; hard and headline claims blocked",
       "passed": true
     },
     {
@@ -57,7 +57,7 @@
       "full_observed_result": "raw_rows=False; redactions=8; blocked_fields=6",
       "gate_or_check": "Context export redaction",
       "injected_risk": "An external-agent packet requests raw rows, private paths, or sensitive fields.",
-      "observed_result": "raw rows=no; redactions=8; blocked fields=6",
+      "observed_result": "raw rows excluded from export; 8 unsafe fields redacted; 6 blocked fields recorded",
       "passed": true
     },
     {
@@ -70,7 +70,7 @@
       "full_observed_result": "state=partial_run; missing=8; actions=6",
       "gate_or_check": "No-lost-user guide",
       "injected_risk": "A user or agent resumes a partial run without knowing which artifact to inspect.",
-      "observed_result": "partial run; missing evidence=8; actions=6",
+      "observed_result": "partial run recovered; 8 missing-evidence items recorded; 6 recovery actions exposed",
       "passed": true
     }
   ],

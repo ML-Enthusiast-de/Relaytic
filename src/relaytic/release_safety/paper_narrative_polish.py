@@ -66,9 +66,6 @@ FORBIDDEN_P20_SOURCE_MARKERS = [
     "undefined references",
 ]
 
-ALLOWED_P21_RELEASE_TAG_TODO = "Public release tag: TODO before arXiv submission"
-
-
 def build_paper_narrative_polish_pack(
     project_root: str | Path,
     *,
@@ -463,7 +460,7 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
         ),
         _check(
             "no_unresolved_public_markers",
-            not _contains_any(_without_allowed_p21_placeholder(draft), FORBIDDEN_P20_SOURCE_MARKERS),
+            not _contains_any(draft, FORBIDDEN_P20_SOURCE_MARKERS),
             "Reader-facing paper must not contain unresolved TODO, pending, or reference markers.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
@@ -641,10 +638,6 @@ def _result_has_context(draft: str, marker: str, required_terms: list[str], *, w
 def _contains_any(text: str, phrases: list[str]) -> bool:
     lowered = text.lower()
     return any(phrase.lower() in lowered for phrase in phrases)
-
-
-def _without_allowed_p21_placeholder(text: str) -> str:
-    return text.replace(ALLOWED_P21_RELEASE_TAG_TODO, "")
 
 
 def _contains_private_path_marker(text: str) -> bool:

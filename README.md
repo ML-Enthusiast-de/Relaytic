@@ -95,7 +95,7 @@ More context:
 
 The current paper draft presents Relaytic-AML as a local-first evaluation lab for financial-crime ML. It is an architecture and evidence-discipline paper, not a hard AML superiority result. Relaytic remains the general package and CLI. Relaytic-AML is the current flagship edition and the focus of the draft because AML makes privacy, temporal validity, graph context, human review, and claim discipline visible in one domain.
 
-The repo includes the Markdown draft, a compiled PDF draft, an arXiv source candidate, references, figures, tables, and the underlying public evidence artifacts. The final source/PDF preflight is ready for author review, but public upload still needs replacement of the release-tag placeholder, page-by-page human PDF inspection, and a clean tag-target confirmation.
+The repo includes the Markdown draft, a compiled PDF draft, an arXiv source candidate, references, figures, tables, and the underlying public evidence artifacts. The final source/PDF preflight is ready for author review, but public upload still needs final public tag selection, page-by-page human PDF inspection, and a clean tag-target confirmation.
 
 Inspect:
 

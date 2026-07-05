@@ -4547,7 +4547,7 @@ Fallback rule:
 - if any preflight fails, do not mark the package upload-ready; record the blocker and schedule a repair slice
 
 Implemented status:
-- P21 is implemented. It adds `relaytic release-safety paper-final-preflight`, writes `paper_final_pdf_preflight.json`, `paper_final_source_preflight.json`, `paper_final_preflight_manifest.json`, and `paper_final_release_changelog.md`, rebuilds the canonical Markdown/LaTeX/PDF paper bundle, verifies LaTeX log/font/metadata/source-marker checks, and keeps `arxiv_upload_ready` false until the author replaces the public release-tag placeholder, performs final human page review, and confirms a clean tag target.
+- P21 is implemented. It adds `relaytic release-safety paper-final-preflight`, writes `paper_final_pdf_preflight.json`, `paper_final_source_preflight.json`, `paper_final_preflight_manifest.json`, and `paper_final_release_changelog.md`, rebuilds the canonical Markdown/LaTeX/PDF paper bundle, verifies LaTeX log/font/metadata/source-marker checks, and keeps `arxiv_upload_ready` false until the author selects the final public tag, performs final human page review, and confirms a clean tag target.
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

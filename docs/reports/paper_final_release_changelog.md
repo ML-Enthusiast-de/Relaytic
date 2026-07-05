@@ -25,6 +25,6 @@
 
 ## Remaining Author Action
 
-- replace the public-release-tag placeholder with the final tag before arXiv submission
+- create or select the final public tag after the reviewed source/PDF tree is clean
 - do one human page-by-page PDF inspection immediately before upload
 - confirm `git status --short` is clean at the tag target

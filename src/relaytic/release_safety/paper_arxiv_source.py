@@ -622,6 +622,10 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
             if code_lang == "algorithm":
                 code_buffer = []
             else:
+                if code_lang == "json":
+                    out.append(r"\Needspace{22\baselineskip}")
+                elif code_lang in {"powershell", "bash"}:
+                    out.append(r"\Needspace{14\baselineskip}")
                 out.append(r"\begin{Verbatim}[frame=single,framesep=6pt,fontsize=\footnotesize,breaklines=true,breakanywhere=true]")
             previous_blank = False
             continue
@@ -680,8 +684,11 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
         flush_table()
         if re.match(r"^Algorithm \d+\b", stripped):
             out.append(r"\Needspace{18\baselineskip}")
-        if re.match(r"^\*\*Table \d+\.", stripped):
-            out.append(r"\Needspace{20\baselineskip}")
+        table_caption = re.match(r"^\*\*Table (\d+[A-Za-z]?)\.", stripped)
+        if table_caption:
+            table_id = table_caption.group(1).lower()
+            baselines = 34 if table_id in {"8", "12"} else 22
+            out.append(rf"\Needspace{{{baselines}\baselineskip}}")
         if stripped in {"Windows PowerShell:", "macOS/Linux:"}:
             out.append(r"\Needspace{12\baselineskip}")
         out.append(_latex_inline(stripped))

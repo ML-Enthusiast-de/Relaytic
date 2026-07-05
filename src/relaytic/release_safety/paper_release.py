@@ -1084,6 +1084,7 @@ def _render_final_paper_v2(
     e2_hash = _format_metric(_metric_value(metrics, "elliptic2_p8b_modern_context.hash_partition_test_pr_auc_mean"))
     paysim_review_counts = _review_budget_count_summary(inputs, "paysim")
     elliptic_review_counts = _review_budget_count_summary(inputs, "elliptic")
+    source_candidate_line = _source_candidate_release_line(inputs)
 
     figure_manifest = _payload(inputs["figure_manifest"])
     architecture_figure = _render_figure_list(figure_manifest, figure_ids={"claim_gate_flow"})
@@ -1286,7 +1287,7 @@ def _render_final_paper_v2(
             "",
             "The repository is larger than this AML paper. Relaytic is the general local-first inference lab and public package; Relaytic-AML is the focused AML edition used here for the manuscript. A reader should start with the README and this paper. Development-control files record the build history, but they are not required to understand the paper claims.",
             "",
-            "Repository: https://github.com/ML-Enthusiast-de/Relaytic. Public release tag: TODO before arXiv submission. Current source-candidate manifests record the generation commit hash and artifact hashes; a final tag should be created only after the P21 preflight reports a clean target.",
+            source_candidate_line,
             "",
             reproducibility_table,
             "",
@@ -1644,9 +1645,9 @@ def _render_governance_invariant_table(inputs: dict[str, Any]) -> str:
         rows.append(
             [
                 str(row.get("name") or row.get("invariant_id") or ""),
-                _shorten_table_text(str(row.get("enforcement_mechanism") or ""), 90),
-                _shorten_table_text(_invariant_evidence_cell(row), 130),
-                _shorten_table_text(str(row.get("limitation_or_boundary") or ""), 95),
+                _shorten_table_text(str(row.get("enforcement_mechanism") or ""), 110),
+                _invariant_evidence_cell(row),
+                _shorten_table_text(str(row.get("limitation_or_boundary") or ""), 115),
             ]
         )
     if not rows:
@@ -1788,26 +1789,26 @@ def _invariant_evidence_cell(row: dict[str, Any]) -> str:
 
 def _evidence_table_label(evidence_id: str) -> str:
     labels = {
-        "all_numeric_cells_have_required_provenance": "metric audit",
+        "all_numeric_cells_have_required_provenance": "audit",
         "metric_cell_provenance_available": "provenance task",
-        "claim_safe_public_wording_allowed": "claim whitelist",
+        "claim_safe_public_wording_allowed": "claim lint",
         "hard_headline_claims_blocked": "publishability matrix",
-        "forbidden_balance_columns_used": "leakage report",
+        "forbidden_balance_columns_used": "leakage policy",
         "test_set_selection_violation": "test-selection fixture",
-        "external_context_rowless_and_redacted": "handoff eval",
+        "external_context_rowless_and_redacted": "handoff audit",
         "rowless_external_agent_handoff_recoverable": "handoff task",
-        "partial_run_state_recovery": "recovery eval",
+        "partial_run_state_recovery": "recovery audit",
         "partial_run_recovery_without_artifact_literacy": "recovery task",
-        "supporting_table_allowed": "publishability rows",
+        "supporting_table_allowed": "role matrix",
         "elliptic2_supporting_context_and_firewall_visible": "Elliptic2 role task",
         "wording_lint": "wording lint",
         "go_for_p13_claim_safe_release_pack": "go/no-go gate",
-        "No evidence-cell required fields": "missing-field ablation",
-        "overstrong_claim_attempt": "overclaim fixture",
-        "leakage_column_injection": "leakage fixture",
-        "rowless_handoff_redaction": "redaction fixture",
-        "interrupted_run_recovery": "recovery fixture",
-        "blocked_public_claims": "blocked claims",
+        "No evidence-cell required fields": "ablation",
+        "overstrong_claim_attempt": "overclaim stress",
+        "leakage_column_injection": "leakage stress",
+        "rowless_handoff_redaction": "redaction stress",
+        "interrupted_run_recovery": "recovery stress",
+        "blocked_public_claims": "claim stress",
         "detector_claim_boundary": "claim boundary",
     }
     return labels.get(evidence_id, _humanize_gate_token(evidence_id))
@@ -1818,14 +1819,14 @@ def _evidence_table_signal(value: Any, evidence_id: str) -> str:
         "all_numeric_cells_have_required_provenance": "pass",
         "claim_safe_public_wording_allowed": "pass",
         "forbidden_balance_columns_used": "4 forbidden fields offered; 0 used",
-        "external_context_rowless_and_redacted": "raw rows absent; 8 unsafe fields redacted; 6 blocked fields recorded",
-        "partial_run_state_recovery": "partial run recovered; 8 missing-evidence items and 6 recovery actions exposed",
-        "supporting_table_allowed": "5 supporting rows allowed; headline and hard performance claims blocked",
+        "external_context_rowless_and_redacted": "raw rows excluded; 8 unsafe fields redacted; 6 fields blocked",
+        "partial_run_state_recovery": "partial run recovered; 8 missing items; 6 actions exposed",
+        "supporting_table_allowed": "5 supporting rows allowed; hard/headline claims blocked",
         "wording_lint": "pass",
         "No evidence-cell required fields": "13 provenance fields missing; release blocked",
         "overstrong_claim_attempt": "6 unsupported claims blocked",
-        "leakage_column_injection": "4 leakage fields offered; 4 excluded; 0 used",
-        "rowless_handoff_redaction": "6 unsafe fields blocked; raw rows absent",
+        "leakage_column_injection": "4 leakage fields offered and excluded; 0 used",
+        "rowless_handoff_redaction": "6 unsafe fields blocked; raw rows excluded",
         "interrupted_run_recovery": "partial run recovered; 6 actions exposed",
         "blocked_public_claims": "6 public claims blocked",
         "detector_claim_boundary": "headline and hard performance claims blocked",
@@ -1855,7 +1856,7 @@ def _audit_result(task_id: str, passed: Callable[[str], str], signal: Callable[[
         "paysim_baseline_and_competitive_budget_comparable": "same split/metric; PR-AUC 0.3313 -> 0.6388",
         "paysim_claim_boundary_machine_readable": "bounded use present; headline and hard performance claims blocked",
         "elliptic2_supporting_context_and_firewall_visible": "reference role visible; parity evidence required",
-        "rowless_external_agent_handoff_recoverable": "raw rows absent; 8 unsafe fields redacted; 6 blocked fields recorded",
+        "rowless_external_agent_handoff_recoverable": "raw rows excluded from export; 8 unsafe fields redacted; 6 blocked fields recorded",
         "partial_run_recovery_without_artifact_literacy": "partial run recovered; 8 missing-evidence items and 6 actions exposed",
         "claim_gate_fails_closed_for_public_interpretation": "case studies record missing evidence",
     }.get(task_id, signal(task_id))
@@ -1864,7 +1865,7 @@ def _audit_result(task_id: str, passed: Callable[[str], str], signal: Callable[[
 
 def _paper_signal(signal_id: str, measured_signal: Any) -> str:
     display = {
-        "handoff_redaction": "raw rows absent; 8 unsafe fields redacted; 6 blocked fields recorded",
+        "handoff_redaction": "raw rows excluded from export; 8 unsafe fields redacted; 6 blocked fields recorded",
         "safe_next_action": "6 next actions and 6 starter questions exposed",
         "interrupted_recovery": "partial run recovered; 8 missing-evidence items and 6 actions exposed",
     }
@@ -1882,9 +1883,12 @@ def _reader_signal(value: str) -> str:
         "missing evidence=8": "8 missing-evidence items recorded",
         "redactions=8": "8 unsafe fields redacted",
         "blocked fields=6": "6 blocked fields recorded",
-        "raw rows=false": "raw rows absent",
-        "raw rows=no": "raw rows absent",
+        "raw rows absent": "raw rows excluded from export",
+        "raw rows=false": "raw rows excluded from export",
+        "raw rows=no": "raw rows excluded from export",
         "hard/headline=false": "headline and hard performance claims blocked",
+        "hard=no; headline=no": "hard and headline claims blocked",
+        "labels=no": "labels not used as features",
         "safe=false": "release blocked",
         "blocked claims=6": "6 unsupported claims blocked",
         "blocked=6": "6 public claims blocked",
@@ -1892,7 +1896,7 @@ def _reader_signal(value: str) -> str:
     }
     for old, new in replacements.items():
         text = text.replace(old, new)
-    return text.replace(";", "; ")
+    return " ".join(text.replace(";", "; ").split())
 
 
 def _review_budget_count_summary(inputs: dict[str, Any], dataset: str) -> str:
@@ -2868,6 +2872,16 @@ def _metric_lookup(inputs: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
 def _metric_value(metrics: dict[str, dict[str, Any]], cell_id: str) -> Any:
     return metrics.get(cell_id, {}).get("value")
+
+
+def _source_candidate_release_line(inputs: dict[str, Any]) -> str:
+    commit = str(inputs.get("git", {}).get("commit") or "").strip()
+    short_commit = commit[:12] if commit else "unavailable"
+    return (
+        "Repository: https://github.com/ML-Enthusiast-de/Relaytic. "
+        f"Source commit: {short_commit}. "
+        "The arXiv source bundle and preflight reports record artifact hashes for this candidate."
+    )
 
 
 def _read_artifact(path: Path) -> dict[str, Any]:

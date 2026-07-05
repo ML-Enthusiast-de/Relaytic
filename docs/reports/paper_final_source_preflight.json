@@ -6,7 +6,7 @@
         "status": "pass",
         "violations": []
       },
-      "message": "Reader-facing paper/source surfaces must be free of unresolved markers except the explicit release-tag placeholder.",
+      "message": "Reader-facing paper/source surfaces must be free of unresolved markers and release-tag placeholders.",
       "passed": true
     },
     {
@@ -30,7 +30,7 @@
     },
     {
       "check_id": "release_identifier_visible",
-      "message": "Reproducibility section must identify the repository and the remaining public release-tag action.",
+      "message": "Reproducibility section must identify the repository and a concrete source candidate commit.",
       "passed": true
     },
     {

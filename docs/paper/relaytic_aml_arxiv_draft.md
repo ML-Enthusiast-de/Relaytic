@@ -195,7 +195,7 @@ The system claim is evaluated through deterministic reader and agent tasks. Thes
 | Budget comparison | budget comparability | PaySim baseline and competitive cells | same dataset, split doctrine, and metric | pass; same split/metric; PR-AUC 0.3313 -> 0.6388 |
 | PaySim interpretation | interpretation-route check | PaySim publishability row | bounded use present; headline claim blocked | pass; bounded use present; headline and hard performance claims blocked |
 | Elliptic2 reference role | reference role check | Elliptic2 publishability row | reference role visible; parity evidence required | pass; reference role visible; parity evidence required |
-| Rowless handoff | handoff recovery | agent handoff report | state, tools, next action; no rows | pass; raw rows absent; 8 unsafe fields redacted; 6 blocked fields recorded |
+| Rowless handoff | handoff recovery | agent handoff report | state, tools, next action; no rows | pass; raw rows excluded from export; 8 unsafe fields redacted; 6 blocked fields recorded |
 | Interrupted recovery | no-lost-user recovery | guide recovery report | stage, shortlist, next action exposed | pass; partial run recovered; 8 missing-evidence items and 6 actions exposed |
 | Stronger-use routing | routing cases | evidence-needs case studies | missing evidence recorded | pass; case studies record missing evidence |
 
@@ -205,11 +205,11 @@ Table 5 reports the audit matrix behind the system claim. Each row names a behav
 
 | Failure mode | Injected risk | Gate/check | Evidence | Expected behavior | Observed result |
 |---|---|---|---|---|---|
-| Leakage-column injection | PaySim balance fields are offered as candidate model inputs. | Leakage feature policy | PS-PR feature policy | Post-event balance fields stay out of allowed features. | 4 offered, 4 excluded, 0 used;  labels=no |
-| Test-set selection violation | A model-selection path tries to use test evidence before the finalist is fixed. | Validation-only selection policy | PS-PR search contract | Only validation evidence may select, calibrate, or threshold the finalist. | validation-only probes;  no test selection;  one finalist test |
-| Over-strong claim attempt | Draft wording proposes real-bank superiority or RevClassifyDS parity. | Public claim gate | claim-gate report | Unsupported headline and hard-performance claims remain blocked. | 6 blocked claims;  hard=no;  headline=no |
-| Rowless handoff redaction | An external-agent packet requests raw rows, private paths, or sensitive fields. | Context export redaction | handoff redaction task | The export contains state and next actions, not raw rows or private paths. | raw rows absent;  8 unsafe fields redacted;  6 blocked fields recorded |
-| Interrupted-run recovery | A user or agent resumes a partial run without knowing which artifact to inspect. | No-lost-user guide | guide recovery task | The guide exposes current state, missing evidence, artifact shortlist, and next actions. | partial run;  8 missing-evidence items recorded;  6 recovery actions exposed |
+| Leakage-column injection | PaySim balance fields are offered as candidate model inputs. | Leakage feature policy | PS-PR feature policy | Post-event balance fields stay out of allowed features. | 4 offered, 4 excluded, 0 used; labels not used as features |
+| Test-set selection violation | A model-selection path tries to use test evidence before the finalist is fixed. | Validation-only selection policy | PS-PR search contract | Only validation evidence may select, calibrate, or threshold the finalist. | validation-only probes; no test selection; one finalist test |
+| Over-strong claim attempt | Draft wording proposes real-bank superiority or RevClassifyDS parity. | Public claim gate | claim-gate report | Unsupported headline and hard-performance claims remain blocked. | 6 blocked claims; hard and headline claims blocked |
+| Rowless handoff redaction | An external-agent packet requests raw rows, private paths, or sensitive fields. | Context export redaction | handoff redaction task | The export contains state and next actions, not raw rows or private paths. | raw rows excluded from export; 8 unsafe fields redacted; 6 blocked fields recorded |
+| Interrupted-run recovery | A user or agent resumes a partial run without knowing which artifact to inspect. | No-lost-user guide | guide recovery task | The guide exposes current state, missing evidence, artifact shortlist, and next actions. | partial run recovered; 8 missing-evidence items recorded; 6 recovery actions exposed |
 
 Table 6 adds injected failure cases. The point is not detector performance; the checks exercise whether the release path refuses leakage features, test-set model selection, over-strong claims, unsafe handoff, and lost-run states under deterministic system fixtures. These cases make the governance claim auditable without adding a new benchmark row.
 
@@ -217,11 +217,11 @@ Table 6 adds injected failure cases. The point is not detector performance; the 
 
 | Path | Disabled machinery | Unsafe signal | Artifact integrity | Handoff / recovery | Interpretation |
 |---|---|---|---|---|---|
-| Full governance path | none | 0 unsupported claims, leakage inputs, or raw fields | 0 missing fields;  3 table groups | 6 recovery actions exposed | Claim gate, leakage policy, redaction, provenance, and recovery guide are all active. |
+| Full governance path | none | 0 unsupported claims, leakage inputs, or raw fields | 0 missing fields; 3 table groups | 6 recovery actions exposed | Claim gate, leakage policy, redaction, provenance, and recovery guide are all active. |
 | No claim gate | public claim gate | 6 unsupported claims | 3 table groups unchanged | 6 recovery actions exposed | The claim gate is what keeps proxy evidence below hard AML, SOTA, RevClassifyDS parity, production, and business-value claims. |
-| No leakage policy | PaySim feature leakage policy | 4 leakage inputs | 0 missing fields;  1 unsafe table path | 6 recovery actions exposed | The leakage policy prevents post-event simulator fields from becoming apparently strong evidence. |
-| No rowless handoff redaction | external-agent redaction | 6 raw fields | 3 table groups unchanged | 6 raw fields;  6 recovery actions exposed | Rowless handoff is the privacy boundary that lets outside agents help without receiving raw data or local paths. |
-| No evidence-cell required fields | metric-cell required-field gate | 13 missing provenance fields | 13 missing fields;  1 unsafe table path | 6 recovery actions exposed | Required fields are what connect a reader-facing number back to dataset, split, command, artifact, leakage, budget, and claim state. |
+| No leakage policy | PaySim feature leakage policy | 4 leakage inputs | 0 missing fields; 1 unsafe table path | 6 recovery actions exposed | The leakage policy prevents post-event simulator fields from becoming apparently strong evidence. |
+| No rowless handoff redaction | external-agent redaction | 6 raw fields | 3 table groups unchanged | 6 raw fields; 6 recovery actions exposed | Rowless handoff is the privacy boundary that lets outside agents help without receiving raw data or local paths. |
+| No evidence-cell required fields | metric-cell required-field gate | 13 missing provenance fields | 13 missing fields; 1 unsafe table path | 6 recovery actions exposed | Required fields are what connect a reader-facing number back to dataset, split, command, artifact, leakage, budget, and claim state. |
 | No interrupted-run recovery guide | no-lost-user guide | 0 recovery actions | 3 table groups unchanged | 0 recovery actions exposed | The recovery guide is what keeps state navigation from depending on repo literacy. |
 
 Table 7 compares the full governance path with disabled-component fixtures. The ablation does not change detector results. It tests whether claim gates, leakage policy, redaction, metric provenance, and recovery guidance change what can be released from the same evidence pack.
@@ -230,12 +230,12 @@ Table 7 compares the full governance path with disabled-component fixtures. The 
 
 | Invariant | Mechanism | Evidence and stress signal | Boundary |
 |---|---|---|---|
-| Metric-cell provenance | metric-cell audit plus required-field gate | metric audit: pass; stress missing-field ablation: 13 provenance fields missing; release blocked | The invariant proves artifact completeness, not that the detector is optimal. |
-| Claim-strength monotonicity | claim lint, allowed-claims report, publishability matrix, and overclaim failure case | claim whitelist: pass; stress overclaim fixture: 6 unsupported claims blocked | The gate is a deterministic release check; it is not an external peer review. |
-| Leakage and selection firewall | feature policy report, split contract, failure fixtures, and leakage ablation | leakage report: 4 forbidden fields offered; 0 used; stress leakage fixture: 4 leakage fields offered; 4 excluded; 0 used | The current firewall is benchmark-specific; future datasets need their own leakage taxonomy. |
-| Rowless external-agent handoff | handoff evaluator plus redaction failure case | handoff eval: raw rows absent; 8 unsafe fields redacted; 6 blocked fields recorded; stress redaction fixture: 6 unsafe fields b... | The check proves deterministic redaction on fixtures, not a broad privacy certification. |
-| Interrupted-run recoverability | no-lost-user guide and partial-run recovery fixtures | recovery eval: partial run recovered; 8 missing-evidence items and 6 recovery actions exposed; stress recovery fixture: partial... | The check is deterministic; it does not measure human time-to-recovery. |
-| Benchmark role separation | publishability matrix and allowed-claims report | publishability rows: 5 supporting rows allowed; headline and hard performance claims blocked; stress blocked claims: 6 public c... | Rows with external or proxy roles cannot be treated as unified leaderboard evidence. |
+| Metric-cell provenance | metric-cell audit plus required-field gate | audit: pass; stress ablation: 13 provenance fields missing; release blocked | The invariant proves artifact completeness, not that the detector is optimal. |
+| Claim-strength monotonicity | claim lint, allowed-claims report, publishability matrix, and overclaim failure case | claim lint: pass; stress overclaim stress: 6 unsupported claims blocked | The gate is a deterministic release check; it is not an external peer review. |
+| Leakage and selection firewall | feature policy report, split contract, failure fixtures, and leakage ablation | leakage policy: 4 forbidden fields offered; 0 used; stress leakage stress: 4 leakage fields offered and excluded; 0 used | The current firewall is benchmark-specific; future datasets need their own leakage taxonomy. |
+| Rowless external-agent handoff | handoff evaluator plus redaction failure case | handoff audit: raw rows excluded; 8 unsafe fields redacted; 6 fields blocked; stress redaction stress: 6 unsafe fields blocked; raw rows excluded | The check proves deterministic redaction on fixtures, not a broad privacy certification. |
+| Interrupted-run recoverability | no-lost-user guide and partial-run recovery fixtures | recovery audit: partial run recovered; 8 missing items; 6 actions exposed; stress recovery stress: partial run recovered; 6 actions exposed | The check is deterministic; it does not measure human time-to-recovery. |
+| Benchmark role separation | publishability matrix and allowed-claims report | role matrix: 5 supporting rows allowed; hard/headline claims blocked; stress claim stress: 6 public claims blocked | Rows with external or proxy roles cannot be treated as unified leaderboard evidence. |
 | Local-first release safety | release go/no-go, claim lint, and public-claim whitelist | wording lint: pass; stress claim boundary: headline and hard performance claims blocked | Licensed benchmark files are not redistributed; reproduction depends on local access. |
 
 Table 8 states the current invariants as release-time rules rather than prose preferences. Each invariant has a mechanism, evidence artifacts, an observed failure or ablation signal, and an explicit boundary. This is the core systems claim: Relaytic-AML makes agent-assisted evaluation safer by turning interpretation into checked state.
@@ -279,7 +279,7 @@ Table 10 shows how stronger future uses are handled. Rather than letting narrati
 
 | Scenario | Input state | Exported fields | Redacted fields | Observed signal |
 |---|---|---|---|---|
-| External-agent handoff | partial run with available guide state | state summary, action options, starter questions, tool contract, artifact shortlist | raw transaction rows, credentials, private paths, raw source files | raw rows absent; 8 unsafe fields redacted; 6 blocked fields recorded |
+| External-agent handoff | partial run with available guide state | state summary, action options, starter questions, tool contract, artifact shortlist | raw transaction rows, credentials, private paths, raw source files | raw rows excluded from export; 8 unsafe fields redacted; 6 blocked fields recorded |
 | Safe next action | external model asked what to do next | six next actions, six starter questions, command options | unredacted local paths and data rows | 6 next actions and 6 starter questions exposed |
 | Interrupted-run recovery | operator returns to partial run without artifact literacy | current state, missing evidence count, canonical artifact shortlist, context-export command | raw benchmark data and private machine paths | partial run recovered; 8 missing-evidence items and 6 actions exposed |
 
@@ -299,7 +299,7 @@ The system is intentionally local-first, which creates a tradeoff. Privacy and p
 
 The repository is larger than this AML paper. Relaytic is the general local-first inference lab and public package; Relaytic-AML is the focused AML edition used here for the manuscript. A reader should start with the README and this paper. Development-control files record the build history, but they are not required to understand the paper claims.
 
-Repository: https://github.com/ML-Enthusiast-de/Relaytic. Public release tag: TODO before arXiv submission. Current source-candidate manifests record the generation commit hash and artifact hashes; a final tag should be created only after the P21 preflight reports a clean target.
+Repository: https://github.com/ML-Enthusiast-de/Relaytic. Source commit: 76559e019f39. The arXiv source bundle and preflight reports record artifact hashes for this candidate.
 
 **Table 12. Reproducibility contract.**
 

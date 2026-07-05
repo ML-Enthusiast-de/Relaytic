@@ -45,6 +45,7 @@ LOCAL_PAPER_FINAL_BUILD_REFS = [
 FORBIDDEN_FINAL_PUBLIC_MARKERS = [
     "TODO_EVIDENCE",
     "FIXME",
+    "Public release tag: TODO before arXiv submission",
     "pending isolated test",
     "pending main-table evidence",
     "unresolved reference",
@@ -52,8 +53,6 @@ FORBIDDEN_FINAL_PUBLIC_MARKERS = [
     "undefined references",
     "dummy",
 ]
-
-ALLOWED_FINAL_TODO = "Public release tag: TODO before arXiv submission"
 
 
 def build_paper_final_preflight_pack(
@@ -162,7 +161,7 @@ def render_paper_final_release_changelog(pack: dict[str, Any]) -> str:
         "",
         "## Remaining Author Action",
         "",
-        "- replace the public-release-tag placeholder with the final tag before arXiv submission",
+        "- create or select the final public tag after the reviewed source/PDF tree is clean",
         "- do one human page-by-page PDF inspection immediately before upload",
         "- confirm `git status --short` is clean at the tag target",
     ]
@@ -206,7 +205,7 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
         _check(
             "reader_public_markers_clean",
             not public_scan["violations"],
-            "Reader-facing paper/source surfaces must be free of unresolved markers except the explicit release-tag placeholder.",
+            "Reader-facing paper/source surfaces must be free of unresolved markers and release-tag placeholders.",
             detail=public_scan,
         ),
         _check(
@@ -229,8 +228,9 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
         _check(
             "release_identifier_visible",
             "Repository: https://github.com/ML-Enthusiast-de/Relaytic" in draft
-            and ALLOWED_FINAL_TODO in draft,
-            "Reproducibility section must identify the repository and the remaining public release-tag action.",
+            and "Source commit:" in draft
+            and "Public release tag: TODO before arXiv submission" not in draft,
+            "Reproducibility section must identify the repository and a concrete source candidate commit.",
         ),
         _check(
             "source_manifest_ready",
@@ -352,7 +352,7 @@ def _build_manifest(
     ]
     ready_for_author_review = all(check["passed"] for check in checks)
     upload_blockers = [
-        "replace `Public release tag: TODO before arXiv submission` with the final public tag",
+        "create or select the final public tag after the source/PDF tree is reviewed",
         "perform final human page-by-page PDF inspection immediately before upload",
         "confirm `git status --short` is empty at the tag target",
     ]
@@ -398,7 +398,7 @@ def _required_presence(inputs: dict[str, Any]) -> dict[str, Any]:
 def _public_marker_scan(surfaces: dict[str, str]) -> dict[str, Any]:
     violations = []
     for artifact_ref, text in surfaces.items():
-        scan_text = text.replace(ALLOWED_FINAL_TODO, "")
+        scan_text = text
         for marker in FORBIDDEN_FINAL_PUBLIC_MARKERS:
             for match in re.finditer(re.escape(marker), scan_text, flags=re.IGNORECASE):
                 violations.append(

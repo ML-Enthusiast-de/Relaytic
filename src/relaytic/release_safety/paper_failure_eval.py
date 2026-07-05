@@ -369,15 +369,15 @@ def _table_observed_result(case: dict[str, Any]) -> str:
     case_id = str(case.get("case_id") or "")
     observed = str(case.get("observed_result") or "")
     if case_id == "leakage_column_injection":
-        return "4 offered, 4 excluded, 0 used; labels=no"
+        return "4 offered, 4 excluded, 0 used; labels not used as features"
     if case_id == "test_set_selection_violation":
         return "validation-only probes; no test selection; one finalist test"
     if case_id == "overstrong_claim_attempt":
-        return "6 blocked claims; hard=no; headline=no"
+        return "6 blocked claims; hard and headline claims blocked"
     if case_id == "rowless_handoff_redaction":
-        return "raw rows=no; redactions=8; blocked fields=6"
+        return "raw rows excluded from export; 8 unsafe fields redacted; 6 blocked fields recorded"
     if case_id == "interrupted_run_recovery":
-        return "partial run; missing evidence=8; actions=6"
+        return "partial run recovered; 8 missing-evidence items recorded; 6 recovery actions exposed"
     return observed.replace("_", " ")
 
 

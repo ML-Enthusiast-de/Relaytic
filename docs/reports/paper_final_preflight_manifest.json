@@ -67,7 +67,7 @@
   "source_pdf_review_ready": true,
   "status": "ready_for_author_review_not_tagged",
   "upload_blockers_remaining": [
-    "replace `Public release tag: TODO before arXiv submission` with the final public tag",
+    "create or select the final public tag after the source/PDF tree is reviewed",
     "perform final human page-by-page PDF inspection immediately before upload",
     "confirm `git status --short` is empty at the tag target"
   ]

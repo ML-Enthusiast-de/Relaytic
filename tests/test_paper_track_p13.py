@@ -78,7 +78,10 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Table 11. Rowless handoff and interrupted-run recovery examples" in draft
     assert "Table 12. Reproducibility contract" in draft
     assert ("TODO" + "_EVIDENCE") not in draft
+    assert "TODO before arXiv" not in draft
     assert "pending isolated" + " test" not in draft
+    for machine_fragment in ("b...", "partial...", "public c...", "labels=no", "hard=no", "headline=no"):
+        assert machine_fragment not in draft
     for phrase in FORBIDDEN_READER_TONE_PHRASES:
         assert phrase.lower() not in draft.lower()
     assert "SOTA" in "\n".join(public_claims["blocked_public_claims"])
@@ -177,7 +180,10 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert "paper-narrative-polish --format json" in draft
     assert "arXiv-ready draft" not in draft
     assert ("TODO" + "_EVIDENCE") not in draft
+    assert "TODO before arXiv" not in draft
     assert "pending isolated" + " test" not in draft
+    for machine_fragment in ("b...", "partial...", "public c...", "labels=no", "hard=no", "headline=no"):
+        assert machine_fragment not in draft
     assert "## References" in draft
     for phrase in FORBIDDEN_READER_TONE_PHRASES:
         assert phrase.lower() not in draft.lower()

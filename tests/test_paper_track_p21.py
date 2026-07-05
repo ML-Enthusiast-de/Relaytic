@@ -45,7 +45,7 @@ def _seed_p21_fixture(root: Path, *, include_local_build: bool = True) -> None:
                 "Table 9. Hosted external-score case study",
                 "",
                 "Repository: https://github.com/ML-Enthusiast-de/Relaytic. "
-                "Public release tag: TODO before arXiv submission.",
+                "Source commit: 79108af70254.",
                 "",
                 "```powershell",
                 "py -3.11 -m relaytic.ui.cli release-safety paper-final-preflight --format json",
@@ -177,6 +177,8 @@ def test_paper_track_p21_committed_preflight_reports_are_ready() -> None:
     assert pdf["status"] == "pass"
     assert "Table 9. Hosted external-score case study" in draft
     assert "## AI Assistance Disclosure" in draft
+    assert "Source commit:" in draft
+    assert "Public release tag: TODO before arXiv submission" not in draft
     assert "\\section{AI Assistance Disclosure}" in main_tex
     assert "Use of AI Assistance" not in main_tex
     assert "Final Paper Preflight Changelog" in changelog
