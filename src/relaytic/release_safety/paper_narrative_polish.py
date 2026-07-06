@@ -427,7 +427,9 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
         filename = str(row.get("filename") or "")
         if filename and not (root / "docs" / "paper" / "figures" / filename).exists():
             missing_figures.append(filename)
-    table_count = len(re.findall(r"\*\*Table\s+\d+", draft))
+    main_table_count = len(re.findall(r"\*\*Table\s+\d+", draft))
+    appendix_table_count = len(re.findall(r"\*\*Appendix table\.", draft))
+    table_count = main_table_count + appendix_table_count
     checks = [
         _check(
             "figures_declared_and_present",
@@ -453,10 +455,15 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
         ),
         _check(
             "publication_table_count_present",
-            table_count >= 11,
-            "The generated manuscript should contain the expected publication tables.",
+            table_count >= 12 and "Table 5. System evaluation summary" in draft,
+            "The generated manuscript should contain compact main tables and detailed appendix audit tables.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
-            detail={"table_count": table_count},
+            detail={
+                "table_count": table_count,
+                "main_table_count": main_table_count,
+                "appendix_table_count": appendix_table_count,
+                "system_summary_table_present": "Table 5. System evaluation summary" in draft,
+            },
         ),
         _check(
             "no_unresolved_public_markers",

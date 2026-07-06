@@ -25,9 +25,12 @@
     {
       "check_id": "publication_table_count_present",
       "detail": {
+        "appendix_table_count": 7,
+        "main_table_count": 6,
+        "system_summary_table_present": true,
         "table_count": 13
       },
-      "message": "The generated manuscript should contain the expected publication tables.",
+      "message": "The generated manuscript should contain compact main tables and detailed appendix audit tables.",
       "passed": true,
       "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
     },

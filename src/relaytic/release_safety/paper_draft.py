@@ -248,7 +248,7 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
             "figure_id": "publishability_matrix",
             "filename": PAPER_FIGURE_FILENAMES["publishability_matrix"],
             "title": (
-                "Evidence routing examples: current cells map to admissible paper uses and to evidence "
+                "Claim routing summary: current cells map to admissible paper uses and to evidence "
                 "needed for stronger future interpretations."
             ),
             "source_type": "artifact_generated",
@@ -1011,7 +1011,7 @@ def _claim_gate_examples_svg_v2() -> str:
     parts = [
         _svg_header(width, height),
         '<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
-        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Evidence routing examples</text>',
+        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Claim routing summary</text>',
         '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">The release path promotes admissible interpretations and records evidence needed for stronger future use.</text>',
         '<text x="255" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence cell</text>',
         '<text x="610" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">admissible paper use</text>',

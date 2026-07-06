@@ -119,6 +119,6 @@ def test_paper_track_p17_committed_governance_ablation_artifacts_are_ready() -> 
     assert evaluation["disabled_fixture_count"] >= 5
     assert matrix["status"] == "pass"
     assert "Paper P17 Governance-Ablation Pack" in summary
-    assert "Table 7. Governance machinery ablation" in draft
+    assert "Appendix table. Governance machinery ablation" in draft
     assert "No claim gate" in draft
-    assert "Table 11 gives the practical external-agent story" in draft
+    assert "The handoff and recovery rows give the practical external-agent story." in draft

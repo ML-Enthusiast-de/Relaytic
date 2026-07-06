@@ -121,6 +121,6 @@ def test_paper_track_p16_committed_failure_case_artifacts_are_ready() -> None:
     assert evaluation["private_paths_exposed"] is False
     assert table["status"] == "pass"
     assert "Paper P16 Failure-Case Evaluation Pack" in summary
-    assert "Table 6. Failure-case evaluation" in draft
+    assert "Appendix table. Detailed failure-case fixtures" in draft
     assert "Leakage-column injection" in draft
-    assert "Table 11 gives the practical external-agent story" in draft
+    assert "The handoff and recovery rows give the practical external-agent story." in draft

@@ -46,7 +46,7 @@ The method has four claim-control rules:
 
 ![Benchmark and review-budget evidence: PR-AUC is shown beside precision and recall at the bounded review queue instead of being interpreted alone.](figures/figure_3_review_budget.svg)
 
-![Evidence routing examples: current cells map to admissible paper uses and to evidence needed for stronger future interpretations.](figures/figure_4_publishability_matrix.svg)
+![Claim routing summary: current cells map to admissible paper uses and to evidence needed for stronger future interpretations.](figures/figure_4_publishability_matrix.svg)
 
 ## Benchmarks
 

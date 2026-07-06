@@ -1121,6 +1121,17 @@ P21 extends the existing release-safety paper-track boundary with final source/P
 
 Compatibility boundary: P21 does not add a benchmark result, does not claim detector superiority, and does not expand the public detector API. It marks the paper source/PDF bundle ready for author review while keeping upload blocked until the public release tag is chosen, the PDF is reviewed page by page, and the tag target is clean.
 
+## Paper Track P22 Author-Review Layout Hardening
+
+P22 extends the paper-track release-safety boundary with generator-level layout and readability hardening for the final author-review bundle, not new benchmark or detector functionality.
+
+- updated the generated paper/source path so the main system-evaluation section stays compact while dense audit details render as appendix tables with real LaTeX captions
+- anchored figures and command-block platform labels so rendered pages do not strand headings, labels, or interpretation text
+- refreshed Figure 4 and rowless-handoff wording for reader-facing clarity without exposing private paths, raw rows, or unapproved score payload fields
+- regenerated the canonical Markdown, LaTeX, PDF, and preflight artifacts from source generators rather than editing the PDF by hand
+
+Compatibility boundary: P22 does not add a benchmark result, does not claim detector superiority, and does not expand the public detector API. It preserves the P21 final preflight contract while making the author-review bundle visually stable before the separate human release action.
+
 ## Removal Criteria
 
 The remaining compatibility layer can be removed when all of the following are true:

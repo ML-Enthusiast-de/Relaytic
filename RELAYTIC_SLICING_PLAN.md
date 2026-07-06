@@ -287,6 +287,7 @@ Stable slice numbering stays the same, but the preferred execution order after S
 74F-B. Paper Track P19-B - external score case-study and paper integration, if selected
 74G. Paper Track P20 - PaySim selection-story cleanup and paper visual/narrative polish
 74H. Paper Track P21 - final source/PDF preflight and release changelog
+74I. Paper Track P22 - author-review layout hardening and regression closure
 75. Slice 16
 76. Slice 16A
 77. Slice 16B
@@ -356,8 +357,8 @@ Why:
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
-- Paper Track P0 through P21 now come before Academy work because the current freeze pack deliberately blocked hard AML and SOTA claims; Relaytic first cleaned public surfaces, ran relevant benchmark tracks, challenged weak first-pass rows with competitive leakage-safe budgets, generated real numeric evidence, drafted a claim-safe paper, proved a clean paper-smoke path, produced a claim-safe P13 paper release pack, produced a P14 arXiv-compatible source bundle, added P15 measured user/agent handoff evidence, added P16 deterministic failure-case evidence, added P17 governance-ablation evidence, added P18 governance-invariant positioning, added P19-A hosted-score governance proof, integrated that proof through P19-B, added P20 PaySim/story/reader-guidance polish, and completed P21 final source/PDF preflight before expanding into capability evolution
-- Paper Track P21 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P21 preserves the evaluation-lab claim boundary, marks the source/PDF bundle ready for author review, and keeps public upload blocked on tag selection, human PDF review, and a clean tag target.
+- Paper Track P0 through P22 now come before Academy work because the current freeze pack deliberately blocked hard AML and SOTA claims; Relaytic first cleaned public surfaces, ran relevant benchmark tracks, challenged weak first-pass rows with competitive leakage-safe budgets, generated real numeric evidence, drafted a claim-safe paper, proved a clean paper-smoke path, produced a claim-safe P13 paper release pack, produced a P14 arXiv-compatible source bundle, added P15 measured user/agent handoff evidence, added P16 deterministic failure-case evidence, added P17 governance-ablation evidence, added P18 governance-invariant positioning, added P19-A hosted-score governance proof, integrated that proof through P19-B, added P20 PaySim/story/reader-guidance polish, completed P21 final source/PDF preflight, and used P22 to harden author-review layout/readability before expanding into capability evolution
+- Paper Track P22 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P22 preserves the evaluation-lab claim boundary, repairs final PDF/source layout roughness, marks the source/PDF bundle ready for author review, and keeps public upload blocked on tag selection, human PDF review, and a clean tag target.
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
 - Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, and adds Relaytic aliases for legacy API/tool names
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
@@ -366,7 +367,7 @@ Why:
 - Paper Track P5 is now implemented and inspects the raw Elliptic graph bundle, freezes graph provenance and temporal split artifacts, records unknown-label scope, allows only supporting loader/provenance wording, and keeps graph benchmark/SOTA claims blocked before numeric graph baselines run
 - Paper Track P6 is now implemented and runs the full PaySim tabular baseline suite under a train-only leakage-safe feature contract with explicit adapter versions, budget tiers, fallback states, and a publishability gate that blocks headline promotion until P6-A
 - Paper Track P6-A is now implemented and runs a competitive PaySim rerun with audited prior-step destination-history features, 14 recorded probe trials, five full-training finalists, validation-only calibration/threshold selection, and a supporting-only publishability pass for validation-selected Extra Trees (`test_pr_auc=0.638773`) while retaining hard-claim blockers before P7
-- Paper Track P21 is implemented; Slice 16A should start next unless the author is performing the separate human arXiv release action.
+- Paper Track P22 is implemented; Slice 16A should start next unless the author is performing the separate human arXiv release action.
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -379,7 +380,7 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P21. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, Paper Track P11 claim-linted paper draft generation, Paper Track P12 external dry-run proof, Paper Track P13 claim-safe paper release pack, Paper Track P14 final arXiv source bundle, Paper Track P15 measured system-evaluation proof pack, Paper Track P16 failure-case evaluation pack, Paper Track P17 governance machinery ablation pack, Paper Track P18 governance invariants and adjacent-systems positioning, Paper Track P19-A external score-file adapter proof pack, Paper Track P19-B hosted-score case-study integration, Paper Track P20 PaySim/story/reader-guidance polish, and Paper Track P21 final source/PDF preflight.
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P22. Latest named additions include Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U strong AML baselines and capability ablations, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 strong tabular baseline suite, Paper Track P6-A competitive PaySim rerun, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard graph-track decisions, Paper Track P8-A Elliptic2 modern recovery pilot, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible paper table generation, Paper Track P11 claim-linted paper draft generation, Paper Track P12 external dry-run proof, Paper Track P13 claim-safe paper release pack, Paper Track P14 final arXiv source bundle, Paper Track P15 measured system-evaluation proof pack, Paper Track P16 failure-case evaluation pack, Paper Track P17 governance machinery ablation pack, Paper Track P18 governance invariants and adjacent-systems positioning, Paper Track P19-A external score-file adapter proof pack, Paper Track P19-B hosted-score case-study integration, Paper Track P20 PaySim/story/reader-guidance polish, Paper Track P21 final source/PDF preflight, and Paper Track P22 author-review layout hardening.
 - next execution target: Slice 16A capability registry and capability cards; final arXiv upload remains a human release action
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
@@ -390,7 +391,7 @@ Why:
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
 - next planned paper follow-on: no implementation slice remains in the current paper track; final human upload work remains release-tag replacement, human PDF review, arXiv upload-package confirmation, and clean tag-target confirmation
-- next planned academy follow-on: Slice 16A, after P15 closed the upload-source, release-candidate, and measured system-evaluation gaps
+- next planned academy follow-on: Slice 16A, after P22 closed the author-review layout, release-candidate, and final preflight gaps
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, major artifact families, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, differentiated-handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces instead of treating UI as a separate late-polish track
@@ -4548,6 +4549,32 @@ Fallback rule:
 
 Implemented status:
 - P21 is implemented. It adds `relaytic release-safety paper-final-preflight`, writes `paper_final_pdf_preflight.json`, `paper_final_source_preflight.json`, `paper_final_preflight_manifest.json`, and `paper_final_release_changelog.md`, rebuilds the canonical Markdown/LaTeX/PDF paper bundle, verifies LaTeX log/font/metadata/source-marker checks, and keeps `arxiv_upload_ready` false until the author selects the final public tag, performs final human page review, and confirms a clean tag target.
+
+## Paper Track P22 - Author-review layout hardening and regression closure
+
+Goal:
+- make the author-review PDF/source bundle visually stable after final polish requests without adding benchmark claims
+
+Load-bearing improvement:
+- the paper has compact main-body evaluation, detailed appendix evidence, anchored figures, clean command-block page breaks, and regenerated source/PDF artifacts ready for author review
+
+Human surface:
+- one canonical Markdown/PDF/source bundle whose figures, tables, captions, command blocks, and appendix evidence can be reviewed page by page without generated-report roughness
+
+Agent surface:
+- final preflight, source manifests, P20 polish reports, P21 preflight reports, and paper-track regression tests agree on the current manuscript structure
+
+Intelligence source:
+- deterministic manuscript generation, LaTeX/source scans, rendered-page inspection, and paper-track regression tests; no new benchmark claims
+
+Proof obligation:
+- paper release, narrative polish, arXiv source generation, LaTeX compile, final preflight, focused P13-P21 paper tests, strengthening-plan regression tests, leak scan, font/log/metadata checks, and rendered-page inspection must pass
+
+Fallback rule:
+- if visual inspection finds a stranded heading, command label, clipped table, or split figure interpretation, repair the generator and regenerate rather than editing the PDF by hand
+
+Implemented status:
+- P22 is implemented. It anchors figures, keeps platform command labels with command blocks, compresses the main system-evaluation table, moves dense audit detail to appendix captions, refreshes Figure 4 and redaction wording, regenerates the canonical Markdown/LaTeX/PDF bundle, reruns final preflight, and keeps upload blocked until final public tag selection, author page review, and a clean tag target.
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

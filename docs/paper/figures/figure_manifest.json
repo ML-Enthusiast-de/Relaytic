@@ -43,7 +43,7 @@
         "docs/reports/paper_publishability_matrix.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Evidence routing examples: current cells map to admissible paper uses and to evidence needed for stronger future interpretations."
+      "title": "Claim routing summary: current cells map to admissible paper uses and to evidence needed for stronger future interpretations."
     }
   ],
   "schema_version": "relaytic.paper_draft.v1",

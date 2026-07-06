@@ -13,14 +13,14 @@ def _read(relative_path: str) -> str:
     return (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def test_paper_strengthening_track_records_stage_7_and_next_academy_slice() -> None:
+def test_paper_strengthening_track_records_stage_8_and_next_academy_slice() -> None:
     plan = _read("docs/build_slices/phase_paper_strengthening.md")
     slicing = _read("RELAYTIC_SLICING_PLAN.md")
     build = _read("RELAYTIC_BUILD_MASTER.md")
     status = _read("IMPLEMENTATION_STATUS.md")
     paper_track = _read("docs/build_slices/phase_paper_track.md")
 
-    for slice_id in ("P16", "P17", "P18", "P19", "P20", "P21"):
+    for slice_id in ("P16", "P17", "P18", "P19", "P20", "P21", "P22"):
         assert f"Paper Track {slice_id}" in plan
         assert f"Paper Track {slice_id}" in slicing
 
@@ -30,7 +30,8 @@ def test_paper_strengthening_track_records_stage_7_and_next_academy_slice() -> N
     assert "Paper Track P19-B" in slicing
     assert "Paper P19-A" in build
     assert "Paper P19-B" in build
-    assert "Stage 7/7 is implemented." in plan
+    assert "Paper P22" in build
+    assert "Stage 8/8 is implemented." in plan
     assert "Slice 16A is now the next implementation slice" in plan
     assert "P19-A produces the external score-file governance proof pack" in plan
     assert "P19-B turns that proof into a reader-facing hosted-score case study" in plan
@@ -41,16 +42,18 @@ def test_paper_strengthening_track_records_stage_7_and_next_academy_slice() -> N
     assert "Paper Track P19-B - external score case-study and paper integration** - implemented" in plan
     assert "Paper Track P20 - paper narrative and visual polish** - implemented" in plan
     assert "Paper Track P21 - final source/PDF preflight and changelog** - implemented" in plan
+    assert "Paper Track P22 - author-review layout hardening and regression closure** - implemented" in plan
     assert "Stage 3 Acceptance" in plan
     assert "Stage 4A Acceptance (completed)" in plan
     assert "Stage 4B Acceptance (completed)" in plan
     assert "Stage 5/6 Acceptance (completed)" in plan
     assert "Stage 7 Acceptance (completed)" in plan
+    assert "Stage 8 Acceptance (completed)" in plan
     assert "phase_paper_strengthening.md" in build
     assert "phase_paper_strengthening.md" in paper_track
     assert "latest paper-strengthening slice" in status
-    assert "Paper Track P21 final source/PDF preflight and release changelog" in status
-    assert "Paper Track P21 final source/PDF preflight" in status
+    assert "Paper Track P22 author-review layout hardening" in status
+    assert "P22, author-review layout hardening" in status
     assert "next recommended slice: Slice 16A" in status
 
 

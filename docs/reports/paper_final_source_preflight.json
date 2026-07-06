@@ -19,8 +19,34 @@
       "passed": true
     },
     {
-      "check_id": "hosted_score_case_study_numbered",
-      "message": "Hosted external-score material should be a numbered table rather than a floating internal panel.",
+      "check_id": "main_body_system_evaluation_compressed",
+      "detail": {
+        "appendix_missing_detail_titles": [],
+        "main_body_dense_table_violations": [],
+        "main_summary_present": true,
+        "status": "pass"
+      },
+      "message": "Main-body system evaluation should use one synthesis table and move dense audit logs to the appendix.",
+      "passed": true
+    },
+    {
+      "check_id": "latex_tables_use_real_captions",
+      "detail": {
+        "captionof_table_count": 13,
+        "status": "pass",
+        "violations": []
+      },
+      "message": "Generated LaTeX should use numbered table captions, not bold pseudo-caption text.",
+      "passed": true
+    },
+    {
+      "check_id": "section_headings_have_needspace_guards",
+      "detail": {
+        "section_count": 12,
+        "status": "pass",
+        "violations": []
+      },
+      "message": "Section headings should be guarded against orphan placement at page bottoms.",
       "passed": true
     },
     {

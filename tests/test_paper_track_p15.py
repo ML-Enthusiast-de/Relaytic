@@ -136,7 +136,8 @@ def test_paper_track_p15_committed_system_eval_artifacts_are_ready() -> None:
     assert no_lost["status"] == "pass"
     assert "Paper P15 System-Evaluation Proof Pack" in summary
     assert "The system claim is evaluated through deterministic reader and agent tasks." in draft
-    assert "rowless handoff exposes no raw rows" in draft
-    assert "Table 5 reports the audit matrix" in draft
+    assert "Rowless handoff" in draft
+    assert "Table 5. System evaluation summary" in draft
+    assert "The audit summary supports a narrow but useful conclusion." in draft
     assert "raw rows remain redacted" in draft
-    assert "Table 11 gives the practical external-agent story" in draft
+    assert "The handoff and recovery rows give the practical external-agent story." in draft

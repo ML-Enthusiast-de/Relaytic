@@ -484,7 +484,8 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\usepackage{tabularx}",
         r"\usepackage{siunitx}",
         r"\usepackage{graphicx}",
-        r"\usepackage[font=normalsize,labelfont=bf]{caption}",
+        r"\usepackage{float}",
+        r"\usepackage[font=normalsize,labelfont=bf,hypcap=false]{caption}",
         r"\usepackage{fvextra}",
         r"\usepackage{needspace}",
         r"\usepackage{algorithm}",
@@ -542,14 +543,24 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
     code_buffer: list[str] = []
     list_mode: str | None = None
     table_buffer: list[str] = []
+    pending_table_caption: str | None = None
+    pending_table_needspace = 22
     skip_role_line = False
     previous_blank = False
 
     def flush_table() -> None:
-        nonlocal table_buffer
+        nonlocal table_buffer, pending_table_caption, pending_table_needspace
         if table_buffer:
-            out.extend(_render_latex_table(table_buffer))
+            out.extend(
+                _render_latex_table(
+                    table_buffer,
+                    caption=pending_table_caption,
+                    needspace_baselines=pending_table_needspace,
+                )
+            )
             table_buffer = []
+        pending_table_caption = None
+        pending_table_needspace = 22
 
     def close_list() -> None:
         nonlocal list_mode
@@ -595,7 +606,7 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
             target = Path(image.group(2)).with_suffix(".pdf").as_posix()
             out.extend(
                 [
-                    r"\begin{figure}[htbp]",
+                    r"\begin{figure}[H]",
                     r"\centering",
                     f"\\includegraphics[width=\\linewidth]{{{target}}}",
                     f"\\caption{{{_latex_inline(caption)}}}",
@@ -650,8 +661,13 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
                 out.append(r"\begin{abstract}")
                 in_abstract = True
             elif level <= 2:
+                out.append(r"\Needspace{12\baselineskip}")
+                if text.lower().startswith("appendix:"):
+                    out.append(r"\appendix")
+                    text = text.split(":", 1)[1].strip() or "Detailed Records"
                 out.append(f"\\section{{{_latex_inline(text)}}}")
             elif level == 3:
+                out.append(r"\Needspace{8\baselineskip}")
                 out.append(f"\\subsection{{{_latex_inline(text)}}}")
             else:
                 out.append(f"\\paragraph{{{_latex_inline(text)}}}")
@@ -660,6 +676,9 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
             continue
 
         if not stripped:
+            if pending_table_caption and not table_buffer:
+                previous_blank = True
+                continue
             close_list()
             flush_table()
             if not previous_blank:
@@ -684,13 +703,14 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
         flush_table()
         if re.match(r"^Algorithm \d+\b", stripped):
             out.append(r"\Needspace{18\baselineskip}")
-        table_caption = re.match(r"^\*\*Table (\d+[A-Za-z]?)\.", stripped)
+        table_caption = _extract_table_caption(stripped)
         if table_caption:
-            table_id = table_caption.group(1).lower()
-            baselines = 34 if table_id in {"8", "12"} else 22
-            out.append(rf"\Needspace{{{baselines}\baselineskip}}")
+            pending_table_caption = table_caption["caption"]
+            pending_table_needspace = table_caption["needspace"]
+            previous_blank = False
+            continue
         if stripped in {"Windows PowerShell:", "macOS/Linux:"}:
-            out.append(r"\Needspace{12\baselineskip}")
+            out.append(r"\Needspace{22\baselineskip}")
         out.append(_latex_inline(stripped))
         previous_blank = False
 
@@ -699,6 +719,21 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
     if in_abstract:
         out.append(r"\end{abstract}")
     return out
+
+
+def _extract_table_caption(stripped: str) -> dict[str, Any] | None:
+    match = re.match(r"^\*\*(.+?)\.\*\*$", stripped)
+    if not match:
+        return None
+    title = match.group(1).strip()
+    lower = title.lower()
+    if not (lower.startswith("table ") or lower.startswith("appendix table")):
+        return None
+    caption = re.sub(r"^Table\s+[A-Za-z0-9-]+\.?\s*", "", title).strip()
+    caption = re.sub(r"^Appendix table\.?\s*", "", caption).strip()
+    caption = caption.rstrip(".") + "."
+    needspace = 34 if any(token in lower for token in ("governance invariants", "reproducibility")) else 22
+    return {"caption": caption, "needspace": needspace}
 
 
 def _render_algorithm_block(lines: list[str]) -> list[str]:
@@ -727,7 +762,12 @@ def _render_algorithm_block(lines: list[str]) -> list[str]:
     return rendered
 
 
-def _render_latex_table(lines: list[str]) -> list[str]:
+def _render_latex_table(
+    lines: list[str],
+    *,
+    caption: str | None = None,
+    needspace_baselines: int = 22,
+) -> list[str]:
     rows = []
     for line in lines:
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
@@ -742,8 +782,18 @@ def _render_latex_table(lines: list[str]) -> list[str]:
             row.append("")
     spec = _latex_table_spec(rows[0], col_count)
     size = r"\scriptsize" if col_count >= 5 else r"\small"
-    rendered = [
-        r"\begin{center}",
+    rendered = []
+    if caption:
+        rendered.extend(
+            [
+                rf"\Needspace{{{needspace_baselines}\baselineskip}}",
+                r"\begin{center}",
+                f"\\captionof{{table}}{{{_latex_inline(caption)}}}",
+            ]
+        )
+    else:
+        rendered.append(r"\begin{center}")
+    rendered.extend([
         size,
         r"\setlength{\tabcolsep}{3pt}",
         r"\renewcommand{\arraystretch}{1.16}",
@@ -751,7 +801,7 @@ def _render_latex_table(lines: list[str]) -> list[str]:
         r"\toprule",
         " & ".join(_latex_inline(cell) for cell in rows[0]) + r" \\",
         r"\midrule",
-    ]
+    ])
     for row in rows[1:]:
         rendered.append(" & ".join(_latex_inline(cell) for cell in row) + r" \\")
     rendered.extend([r"\bottomrule", r"\end{tabularx}", r"\end{center}", ""])
@@ -790,6 +840,35 @@ def _latex_table_spec(headers: list[str], col_count: int) -> str:
             r">{\raggedright\arraybackslash}X "
             r">{\raggedright\arraybackslash}p{0.19\linewidth} "
             r">{\raggedright\arraybackslash}p{0.18\linewidth}"
+            "@{}"
+        )
+    if normalized == ["dataset", "scale and split", "feature policy", "metrics", "evidence role"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.17\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.16\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.17\linewidth}"
+            "@{}"
+        )
+    if normalized == ["check", "what can fail", "relaytic mechanism", "observed signal", "boundary"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.15\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.22\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.17\linewidth}"
+            "@{}"
+        )
+    if normalized == ["path", "command", "reproduces", "data dependency"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.18\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.24\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.26\linewidth}"
             "@{}"
         )
     if normalized == ["family", "primary object", "relaytic-aml position", "boundary"]:

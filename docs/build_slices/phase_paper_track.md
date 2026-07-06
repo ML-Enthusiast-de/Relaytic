@@ -2,15 +2,15 @@
 
 ## Status
 
-P0 through P21 implemented. The paper-strengthening follow-on in `docs/build_slices/phase_paper_strengthening.md` now includes the final source/PDF preflight and release changelog. Slice 16A is the next implementation target; final arXiv upload remains a human release action with tag selection, page review, and clean tag-target confirmation.
+P0 through P22 implemented. The paper-strengthening follow-on in `docs/build_slices/phase_paper_strengthening.md` now includes the final source/PDF preflight, release changelog, and author-review layout hardening. Slice 16A is the next implementation target; final arXiv upload remains a human release action with tag selection, page review, and clean tag-target confirmation.
 
 ## Intent
 
-Paper Track P0 through P21 is the mandatory path plus the implemented strengthening stages between Slice 15Z-R and Slice 16A.
+Paper Track P0 through P22 is the mandatory path plus the implemented strengthening stages between Slice 15Z-R and Slice 16A.
 
 Slice 15Z-R froze a safe release pack, but it intentionally blocks hard AML and SOTA claims until real paper evidence exists. This track turns that frozen, honest state into a clean repo, relevant benchmark suite, reproducible result table, claim-linted draft, clean-clone dry run, claim-safe paper release pack, final arXiv source release candidate, and measured system-evaluation proof pack. The final upload still requires local PDF review, bibliography/source-policy confirmation, and clean tag-target proof.
 
-The P18-P21 strengthening track is not part of the original mandatory bridge. It is a user-triggered follow-on for adding formal invariants, optional external score-file governance evidence, optional hosted-score paper integration, visual polish, and final preflight before a stronger arXiv or systems/evaluation submission.
+The P18-P22 strengthening track is not part of the original mandatory bridge. It is a user-triggered follow-on for adding formal invariants, optional external score-file governance evidence, optional hosted-score paper integration, visual polish, final preflight, and author-review layout hardening before a stronger arXiv or systems/evaluation submission.
 
 ## Paper Thesis
 
@@ -403,4 +403,4 @@ Implemented acceptance:
 
 Follow-on:
 
-- `docs/build_slices/phase_paper_strengthening.md` records P16 through P21 as implemented. Slice 16A should start after the P21 final source/PDF preflight artifacts exist and any public upload action is handled as a separate human release step.
+- `docs/build_slices/phase_paper_strengthening.md` records P16 through P22 as implemented. Slice 16A should start after the P22 author-review layout hardening artifacts exist and any public upload action is handled as a separate human release step.

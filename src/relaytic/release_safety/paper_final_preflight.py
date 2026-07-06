@@ -201,6 +201,9 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
         }
     )
     command_scan = _command_block_scan(draft)
+    system_eval_scan = _main_body_system_eval_scan(draft)
+    table_caption_scan = _latex_table_caption_scan(main_tex)
+    section_spacing_scan = _section_needspace_scan(main_tex)
     checks = [
         _check(
             "reader_public_markers_clean",
@@ -215,10 +218,22 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
             detail=command_scan,
         ),
         _check(
-            "hosted_score_case_study_numbered",
-            "Table 9. Hosted external-score case study" in draft
-            and "Hosted external-score case study" not in draft.replace("Table 9. Hosted external-score case study", ""),
-            "Hosted external-score material should be a numbered table rather than a floating internal panel.",
+            "main_body_system_evaluation_compressed",
+            system_eval_scan["status"] == "pass",
+            "Main-body system evaluation should use one synthesis table and move dense audit logs to the appendix.",
+            detail=system_eval_scan,
+        ),
+        _check(
+            "latex_tables_use_real_captions",
+            table_caption_scan["status"] == "pass",
+            "Generated LaTeX should use numbered table captions, not bold pseudo-caption text.",
+            detail=table_caption_scan,
+        ),
+        _check(
+            "section_headings_have_needspace_guards",
+            section_spacing_scan["status"] == "pass",
+            "Section headings should be guarded against orphan placement at page bottoms.",
+            detail=section_spacing_scan,
         ),
         _check(
             "ai_disclosure_named_professionally",
@@ -254,6 +269,68 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
         "status": "pass" if all(check["passed"] for check in checks) else "fail",
         "checks": checks,
         "failed_checks": [check for check in checks if not check["passed"]],
+    }
+
+
+def _main_body_system_eval_scan(draft: str) -> dict[str, Any]:
+    appendix_marker = "## Appendix: Detailed Audit and Reproducibility Records"
+    if appendix_marker in draft:
+        main_body, appendix = draft.split(appendix_marker, 1)
+    else:
+        main_body, appendix = draft, ""
+    dense_titles = [
+        "Detailed failure-case fixtures",
+        "Governance machinery ablation",
+        "Governance invariants and evidence map",
+        "Hosted external-score case study",
+        "Evidence routing examples",
+        "Rowless handoff and interrupted-run recovery examples",
+    ]
+    violations = [title for title in dense_titles if title in main_body]
+    appendix_missing = [title for title in dense_titles if title not in appendix]
+    status = (
+        "pass"
+        if "Table 5. System evaluation summary" in main_body
+        and not violations
+        and not appendix_missing
+        else "fail"
+    )
+    return {
+        "status": status,
+        "main_summary_present": "Table 5. System evaluation summary" in main_body,
+        "main_body_dense_table_violations": violations,
+        "appendix_missing_detail_titles": appendix_missing,
+    }
+
+
+def _latex_table_caption_scan(main_tex: str) -> dict[str, Any]:
+    violations = []
+    for marker in [r"\textbf{Table", "Table 2a", "Table 2b"]:
+        if marker in main_tex:
+            violations.append(marker)
+    caption_count = main_tex.count(r"\captionof{table}")
+    if caption_count < 6:
+        violations.append("too_few_captionof_tables")
+    return {
+        "status": "pass" if not violations else "fail",
+        "captionof_table_count": caption_count,
+        "violations": violations,
+    }
+
+
+def _section_needspace_scan(main_tex: str) -> dict[str, Any]:
+    lines = main_tex.splitlines()
+    violations = []
+    for index, line in enumerate(lines):
+        if not line.startswith(r"\section{"):
+            continue
+        previous = "\n".join(lines[max(0, index - 3) : index])
+        if r"\Needspace" not in previous:
+            violations.append(line)
+    return {
+        "status": "pass" if not violations else "fail",
+        "section_count": sum(1 for line in lines if line.startswith(r"\section{")),
+        "violations": violations,
     }
 
 

@@ -42,7 +42,16 @@ def _seed_p21_fixture(root: Path, *, include_local_build: bool = True) -> None:
             [
                 "# Relaytic-AML",
                 "",
-                "Table 9. Hosted external-score case study",
+                "Table 5. System evaluation summary",
+                "",
+                "## Appendix: Detailed Audit and Reproducibility Records",
+                "",
+                "Appendix table. Detailed failure-case fixtures",
+                "Appendix table. Governance machinery ablation",
+                "Appendix table. Governance invariants and evidence map",
+                "Appendix table. Hosted external-score case study",
+                "Appendix table. Evidence routing examples",
+                "Appendix table. Rowless handoff and interrupted-run recovery examples",
                 "",
                 "Repository: https://github.com/ML-Enthusiast-de/Relaytic. "
                 "Source commit: 79108af70254.",
@@ -60,7 +69,22 @@ def _seed_p21_fixture(root: Path, *, include_local_build: bool = True) -> None:
         encoding="utf-8",
     )
     (source_dir / "main.tex").write_text(
-        "\\hypersetup{pdftitle={Relaytic-AML: Test},pdfauthor={ML-Enthusiast-de}}\n",
+        "\n".join(
+            [
+                "\\hypersetup{pdftitle={Relaytic-AML: Test},pdfauthor={ML-Enthusiast-de}}",
+                "\\Needspace{12\\baselineskip}",
+                "\\section{System Evaluation}",
+                "\\captionof{table}{System evaluation summary.}",
+                "\\captionof{table}{Reproducibility contract.}",
+                "\\captionof{table}{Detailed failure-case fixtures.}",
+                "\\captionof{table}{Governance machinery ablation.}",
+                "\\captionof{table}{Governance invariants and evidence map.}",
+                "\\captionof{table}{Hosted external-score case study.}",
+                "\\Needspace{12\\baselineskip}",
+                "\\section{AI Assistance Disclosure}",
+                "",
+            ]
+        ),
         encoding="utf-8",
     )
     (source_dir / "references.bib").write_text("@misc{fixture,title={Fixture}}\n", encoding="utf-8")
@@ -175,10 +199,14 @@ def test_paper_track_p21_committed_preflight_reports_are_ready() -> None:
     assert manifest["local_build_artifact_refs"] == LOCAL_PAPER_FINAL_BUILD_REFS
     assert source["status"] == "pass"
     assert pdf["status"] == "pass"
-    assert "Table 9. Hosted external-score case study" in draft
+    assert "Table 5. System evaluation summary" in draft
+    assert "Appendix table. Hosted external-score case study" in draft
     assert "## AI Assistance Disclosure" in draft
     assert "Source commit:" in draft
     assert "Public release tag: TODO before arXiv submission" not in draft
+    assert "Table 2a" not in main_tex
+    assert "\\textbf{Table" not in main_tex
+    assert "\\captionof{table}" in main_tex
     assert "\\section{AI Assistance Disclosure}" in main_tex
     assert "Use of AI Assistance" not in main_tex
     assert "Final Paper Preflight Changelog" in changelog

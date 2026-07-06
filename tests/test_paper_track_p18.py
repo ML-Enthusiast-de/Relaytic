@@ -123,6 +123,6 @@ def test_paper_track_p18_committed_invariant_artifacts_are_ready() -> None:
     assert adjacent["status"] == "pass"
     assert "Paper P18 Governance-Invariant Pack" in summary
     assert "Adjacent systems comparison" in draft
-    assert "Table 8. Governance invariants and evidence map" in draft
+    assert "Appendix table. Governance invariants and evidence map" in draft
     assert "Claim-strength monotonicity" in draft
-    assert "Table 11 gives the practical external-agent story" in draft
+    assert "The handoff and recovery rows give the practical external-agent story." in draft
