@@ -132,4 +132,4 @@ def test_paper_track_p19b_committed_artifacts_and_paper_are_ready() -> None:
     assert claim_map["allowed_claim_scope"] == "hosted_detector_output_governance_only"
     assert "paper-external-score-integration" in repro_card
     assert "Hosted external-score case study" in paper
-    assert "without converting that context into a detector contribution" in paper
+    assert "governed context" in paper

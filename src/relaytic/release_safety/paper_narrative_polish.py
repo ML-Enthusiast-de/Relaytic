@@ -24,6 +24,7 @@ PAPER_NARRATIVE_POLISH_FILENAMES = {
 
 REQUIRED_PAPER_NARRATIVE_POLISH_INPUT_REFS = [
     "README.md",
+    "docs/paper/README.md",
     "docs/paper/relaytic_aml_arxiv_draft.md",
     "docs/paper/references.bib",
     "docs/paper/figures/figure_manifest.json",
@@ -54,6 +55,18 @@ FORBIDDEN_P20_READER_TONE_PHRASES = [
     "good-looking result",
     "attractive number",
     "has earned",
+]
+
+FORBIDDEN_P20_AMBIGUOUS_REFERENT_PHRASES = [
+    "A useful score is not enough",
+    "In this setting, the score",
+    "the score only becomes useful",
+    "which score",
+    "This is the part",
+    "That is a useful operating result",
+    "The result supports",
+    "This is the pattern",
+    "That is the point",
 ]
 
 FORBIDDEN_P20_SOURCE_MARKERS = [
@@ -194,6 +207,7 @@ def _collect_inputs(*, root: Path, report_dir: Path) -> dict[str, Any]:
     return {
         "root": root,
         "readme": _read_text_artifact(root / "README.md", root=root),
+        "paper_readme": _read_text_artifact(paper / "README.md", root=root),
         "draft": _read_text_artifact(paper / "relaytic_aml_arxiv_draft.md", root=root),
         "references": _read_text_artifact(paper / "references.bib", root=root),
         "figure_manifest": _read_artifact(paper / "figures" / "figure_manifest.json", root=root),
@@ -306,7 +320,7 @@ def _build_paysim_selection_story_review(inputs: dict[str, Any]) -> dict[str, An
             _result_has_context(
                 draft,
                 "fixed-test PR-AUC 0.6388",
-                ["synthetic temporal-fraud", "validation evidence", "real-bank AML performance"],
+                ["synthetic temporal-fraud", "validation evidence", "leakage-audited PaySim temporal-proxy"],
             )
             and _result_has_context(
                 draft,
@@ -316,7 +330,7 @@ def _build_paysim_selection_story_review(inputs: dict[str, Any]) -> dict[str, An
             and _result_has_context(
                 draft,
                 "PR-AUC 0.9432",
-                ["RevClassifyDS reference", "modern benchmark-context", "detector contribution"],
+                ["RevClassifyDS reference", "modern benchmark-context", "governed context"],
             ),
             "Every main result needs nearby interpretation rather than a bare number.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
@@ -325,7 +339,7 @@ def _build_paysim_selection_story_review(inputs: dict[str, Any]) -> dict[str, An
             "detector_superiority_boundary_intact",
             "not evidence of bank-scale AML superiority" in draft
             and "not a new detector architecture" in draft
-            and "without converting that context into a detector contribution" in draft
+            and "governed context" in draft
             and "hard aml, headline, sota" in _text_payload(inputs["readme"]).lower(),
             "The detector-superiority boundary must remain visible in the paper and README.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
@@ -345,6 +359,7 @@ def _build_paysim_selection_story_review(inputs: dict[str, Any]) -> dict[str, An
 
 def _build_reader_guidance_audit(inputs: dict[str, Any]) -> dict[str, Any]:
     readme = _text_payload(inputs["readme"])
+    paper_readme = _text_payload(inputs["paper_readme"])
     draft = _text_payload(inputs["draft"])
     tasks = _payload(inputs["paper_system_task_eval"])
     task_ids = {
@@ -373,9 +388,19 @@ def _build_reader_guidance_audit(inputs: dict[str, Any]) -> dict[str, Any]:
             "Windows PowerShell" in readme
             and "macOS/Linux" in readme
             and "paper-narrative-polish --format json" in readme
-            and "paper-narrative-polish --format json" in draft,
+            and "README contains the full regeneration script" in draft
+            and "Appendix reproduction shortcut" in draft,
             "README and paper must expose copy-paste-safe Windows and macOS/Linux paper commands.",
             source_artifact="README.md",
+        ),
+        _check(
+            "release_snapshot_guidance_visible",
+            "final public release tag or archival snapshot" in readme
+            and "main branch can continue to evolve" in readme
+            and "final Git tag, GitHub Release, or archival snapshot" in paper_readme
+            and "The `main` branch may continue to evolve" in paper_readme,
+            "Paper readers should cite a fixed release snapshot while the main branch remains allowed to evolve.",
+            source_artifact="docs/paper/README.md",
         ),
         _check(
             "paper_avoids_internal_planning_guidance",
@@ -476,6 +501,13 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
             not _contains_any(draft, FORBIDDEN_P20_READER_TONE_PHRASES),
             "Paper wording should stay calm and professional.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
+        ),
+        _check(
+            "ambiguous_referent_lint_passed",
+            not _contains_any(draft, FORBIDDEN_P20_AMBIGUOUS_REFERENT_PHRASES),
+            "Reader-facing prose must name the metric, artifact, or system object before interpreting it.",
+            source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
+            detail={"forbidden_phrases": FORBIDDEN_P20_AMBIGUOUS_REFERENT_PHRASES},
         ),
         _check(
             "paper_body_avoids_private_or_internal_paths",

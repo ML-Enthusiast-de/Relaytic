@@ -26,7 +26,7 @@
 | --- | --- | --- |
 | Model cards and model reporting | trained model and intended-use report | adds command-level metric provenance, release gating, and stronger-claim blocking around AML experiments |
 | Datasheets and dataset documentation | dataset creation, composition, collection, and recommended use | connects dataset posture to split contracts, leakage controls, benchmark rows, and admissible claims |
-| ML reproducibility checklists | reporting checklist and reproducibility discipline | turns checklist-like obligations into executable paper-generation and release gates |
+| ML reproducibility checklists | reporting checklist and reproducibility discipline | turns checklist-like obligations into executable artifact-generation and release gates |
 | MLOps experiment tracking | runs, metrics, parameters, artifacts, lineage, and model versions | focuses on local AML evidence, privacy posture, rowless handoff, and public scientific claim admissibility |
 | Agent benchmarks and research-agent evaluations | agent performance on research, coding, or skill-use tasks | uses agents inside a governed local evaluation lab and then tests whether their outputs stay artifact-attached |
 | AML detector and benchmark papers | detector architecture, benchmark result, graph construction, or financial-crime dataset | provides the local evidence and claim-governance substrate that such detector studies can run through |

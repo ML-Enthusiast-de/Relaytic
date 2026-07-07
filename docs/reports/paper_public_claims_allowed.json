@@ -62,7 +62,7 @@
     "README.md"
   ],
   "wording_lint": {
-    "rule_count": 25,
+    "rule_count": 33,
     "schema_version": "relaytic.paper_release.v1",
     "status": "pass",
     "surface_count": 3,

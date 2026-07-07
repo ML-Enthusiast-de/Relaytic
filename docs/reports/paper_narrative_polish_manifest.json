@@ -7,6 +7,7 @@
         "missing_artifact_refs": [],
         "present_artifact_refs": [
           "README.md",
+          "docs/paper/README.md",
           "docs/paper/relaytic_aml_arxiv_draft.md",
           "docs/paper/references.bib",
           "docs/paper/figures/figure_manifest.json",
@@ -70,6 +71,7 @@
   ],
   "required_source_artifacts": [
     "README.md",
+    "docs/paper/README.md",
     "docs/paper/relaytic_aml_arxiv_draft.md",
     "docs/paper/references.bib",
     "docs/paper/figures/figure_manifest.json",

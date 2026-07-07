@@ -16,8 +16,11 @@ For a paper review, use this path:
 
 - Start with this README for navigation and claim boundaries.
 - Read `docs/paper/relaytic_aml_arxiv_draft.pdf` or `docs/paper/relaytic_aml_arxiv_draft.md` for the manuscript.
+- Use `docs/paper/README.md` if you want a compact map of the paper artifacts before opening generated reports.
 - Run the paper regeneration commands in the paper section below if you want to reproduce the reader-facing artifacts.
 - Use `ARCHITECTURE.md`, `INTEROPERABILITY.md`, `RUNTIME.md`, and `PROJECT_LAYOUT.md` only when you want the broader Relaytic platform context.
+
+For citation and public review, use a final public release tag or archival snapshot rather than treating the moving `main` branch as the paper version. The main branch can continue to evolve after submission; the release tag is the stable paper record. The paper artifact-generation pipeline is intentionally kept in the repository because the paper's claim is about local, auditable evidence. It is reproducibility infrastructure, not the recommended first reading path.
 
 Deep audit, after the first read:
 
@@ -97,9 +100,12 @@ The current paper draft presents Relaytic-AML as a local-first evaluation lab fo
 
 The repo includes the Markdown draft, a compiled PDF draft, an arXiv source candidate, references, figures, tables, and the underlying public evidence artifacts. The final source/PDF preflight is ready for author review, but public upload still needs final public tag selection, page-by-page human PDF inspection, and a clean tag-target confirmation.
 
+Repository publication guidance: keep this repository as the auditable source of record, but publish and cite a fixed release tag once the PDF is approved. A paper-only repository is not necessary if the tagged snapshot keeps the professional reader path stable while preserving the audit trail for reviewers who want to inspect it.
+
 Inspect:
 
 - `docs/paper/relaytic_aml_arxiv_draft.md` for the claim-safe paper draft.
+- `docs/paper/README.md` for the compact paper-artifact map.
 - `docs/paper/arxiv_src/` for the arXiv source bundle.
 - `docs/paper/references.bib` for citable sources.
 - `docs/paper/figures/` and `docs/paper/tables/` for generated visual/table assets.

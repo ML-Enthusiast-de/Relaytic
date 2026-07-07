@@ -19,6 +19,12 @@
       "source_artifact": "README.md"
     },
     {
+      "check_id": "release_snapshot_guidance_visible",
+      "message": "Paper readers should cite a fixed release snapshot while the main branch remains allowed to evolve.",
+      "passed": true,
+      "source_artifact": "docs/paper/README.md"
+    },
+    {
       "check_id": "paper_avoids_internal_planning_guidance",
       "message": "The paper should not point readers at internal planning files or slice names.",
       "passed": true,

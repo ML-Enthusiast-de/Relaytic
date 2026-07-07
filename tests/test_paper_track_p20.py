@@ -49,9 +49,17 @@ def test_paper_track_p20_builds_polish_readiness_pack() -> None:
     assert guidance["status"] == "pass"
     assert guidance["reader_path_ready"] is True
     assert guidance["paper_avoids_internal_planning_guidance"] is True
+    assert any(
+        check["check_id"] == "release_snapshot_guidance_visible" and check["passed"]
+        for check in guidance["checks"]
+    )
     assert polish["status"] == "pass"
     assert polish["figure_count"] == 4
     assert polish["table_count"] >= 11
+    assert any(
+        check["check_id"] == "ambiguous_referent_lint_passed" and check["passed"]
+        for check in polish["checks"]
+    )
 
 
 def test_paper_track_p20_cli_writes_polish_reports(
@@ -104,6 +112,7 @@ def test_paper_track_p20_committed_artifacts_and_reader_path_are_ready() -> None
     polish = _load_report("paper_visual_table_polish_audit.json")
     draft = (PAPER_DIR / "relaytic_aml_arxiv_draft.md").read_text(encoding="utf-8")
     readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
+    paper_readme = (PAPER_DIR / "README.md").read_text(encoding="utf-8")
 
     assert manifest["status"] == "ready_for_final_pdf_preflight"
     assert paysim["status"] == "pass"
@@ -111,8 +120,20 @@ def test_paper_track_p20_committed_artifacts_and_reader_path_are_ready() -> None
     assert polish["status"] == "pass"
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
+    assert "A PR-AUC value or a precision-at-review-budget number" in draft
+    assert "In this setting, the score" not in draft
+    assert "the score only becomes useful" not in draft
+    assert "The PaySim review-budget row is useful" in draft
+    assert "The Elliptic row supports" in draft
+    assert "That is a useful operating result" not in draft
     assert "small-sample probe screen" in draft
     assert "Competitive search | XGBoost probe" not in draft
-    assert "paper-narrative-polish --format json" in draft
+    assert "README contains the full regeneration script" in draft
+    assert "final release tag or archival snapshot" in draft
     assert "Deep audit, after the first read" in readme
+    assert "docs/paper/README.md" in readme
+    assert "paper artifact-generation pipeline" in readme
+    assert "release tag is the stable paper record" in readme
     assert "paper_narrative_polish_manifest.json" in readme
+    assert "Relaytic-AML Paper Artifacts" in paper_readme
+    assert "final Git tag, GitHub Release, or archival snapshot" in paper_readme

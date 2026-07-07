@@ -54,6 +54,12 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "@ye2026blazingaml" in draft
     assert "Anti-money laundering (AML)" in draft
     assert "PR-AUC rows of 0.6388" in draft
+    assert "A PR-AUC value or a precision-at-review-budget number" in draft
+    assert "In this setting, the score" not in draft
+    assert "the score only becomes useful" not in draft
+    assert "The PaySim review-budget row is useful" in draft
+    assert "The Elliptic row supports" in draft
+    assert "That is a useful operating result" not in draft
     assert "@yang2026skillopt" in draft
     assert "reproducible governance architecture" in draft
     assert "RQ1" in draft and "RQ4" in draft
@@ -72,7 +78,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Appendix table. Governance invariants and evidence map" in draft
     assert "Hosted external-score case study" in draft
     assert "not a new detector architecture" in draft
-    assert "paper-narrative-polish --format json" in draft
+    assert "README contains the full regeneration script" in draft
     assert "Appendix table. Evidence routing examples" in draft
     assert "Appendix table. Rowless handoff and interrupted-run recovery examples" in draft
     assert "Table 6. Reproducibility contract" in draft
@@ -173,10 +179,14 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert claims["headline_claims_allowed"] is False
     assert "Relaytic-AML: A Local-First Agentic Evaluation Lab" in draft
     assert "Hosted external-score case study" in draft
-    assert "without converting that context into a detector contribution" in draft
+    assert "A PR-AUC value or a precision-at-review-budget number" in draft
+    assert "In this setting, the score" not in draft
+    assert "The PaySim review-budget row is useful" in draft
+    assert "governed context" in draft
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
-    assert "paper-narrative-polish --format json" in draft
+    assert "README contains the full regeneration script" in draft
+    assert "final release tag or archival snapshot" in draft
     assert "Table 5. System evaluation summary" in draft
     assert "Appendix table. Detailed failure-case fixtures" in draft
     assert "arXiv-ready draft" not in draft

@@ -456,11 +456,11 @@ def _build_adjacent_systems_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]
             "primary_object": "reporting checklist and reproducibility discipline",
             "what_it_covers": "static items needed to make results easier to reproduce",
             "relaytic_aml_boundary": "does not claim full independent reproduction for licensed data",
-            "relaytic_aml_position": "turns checklist-like obligations into executable paper-generation and release gates",
+            "relaytic_aml_position": "turns checklist-like obligations into executable artifact-generation and release gates",
         },
         {
             "adjacent_family": "MLOps experiment tracking",
-            "representative_sources": [],
+            "representative_sources": ["zaharia2018mlflow"],
             "primary_object": "runs, metrics, parameters, artifacts, lineage, and model versions",
             "what_it_covers": "operational memory of experiments",
             "relaytic_aml_boundary": "is not a hosted tracker or production model registry",

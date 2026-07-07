@@ -47,6 +47,25 @@
       "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
     },
     {
+      "check_id": "ambiguous_referent_lint_passed",
+      "detail": {
+        "forbidden_phrases": [
+          "A useful score is not enough",
+          "In this setting, the score",
+          "the score only becomes useful",
+          "which score",
+          "This is the part",
+          "That is a useful operating result",
+          "The result supports",
+          "This is the pattern",
+          "That is the point"
+        ]
+      },
+      "message": "Reader-facing prose must name the metric, artifact, or system object before interpreting it.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
       "check_id": "paper_body_avoids_private_or_internal_paths",
       "message": "Paper body should not expose private paths or make readers chase internal report paths.",
       "passed": true,

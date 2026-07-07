@@ -90,7 +90,7 @@
     }
   ],
   "citation_audit": {
-    "bib_key_count": 19,
+    "bib_key_count": 20,
     "bib_keys": [
       "bellei2024elliptic2",
       "chen2025mlrbench",
@@ -110,9 +110,10 @@
       "weber2019elliptic",
       "wijk2025rebench",
       "yang2026skillopt",
-      "ye2026blazingaml"
+      "ye2026blazingaml",
+      "zaharia2018mlflow"
     ],
-    "cited_key_count": 19,
+    "cited_key_count": 20,
     "cited_keys": [
       "bellei2024elliptic2",
       "chen2025mlrbench",
@@ -132,7 +133,8 @@
       "weber2019elliptic",
       "wijk2025rebench",
       "yang2026skillopt",
-      "ye2026blazingaml"
+      "ye2026blazingaml",
+      "zaharia2018mlflow"
     ],
     "missing_bib_keys": [],
     "schema_version": "relaytic.paper_arxiv_source.v1",
@@ -199,14 +201,14 @@
   "schema_version": "relaytic.paper_arxiv_source.v1",
   "slice": "Paper Track P14",
   "source_hashes": {
-    "main_tex_sha256": "6d096c8103839f4882222efead2a75f2daf772f27d9f6bb5ea8c423bccfeb70b",
+    "main_tex_sha256": "6782ca90cbb897fda06af78c6b3b37d56bbaa0105bad83467de5c7f529796bef",
     "pdf_figure_sha256": {
-      "figure_1_claim_gate_flow.pdf": "abf0e8488886f3f0ed1b4c5e4923d029cccdb6b0f85b36615972ccc3ddf8632a",
-      "figure_2_supporting_pr_auc.pdf": "8e783e0e0d072c30de0f8cd34c63766e9532d56512bc466072b68548e652f30b",
-      "figure_3_review_budget.pdf": "32d75b8fee2126f2386ea04ed1025971cd778e5d25b7f8b54b369e26b9e94c19",
-      "figure_4_publishability_matrix.pdf": "d6e5b6befc7794e3353b898bee5dba68229ba56aedccc1ab9f5cb7fdfee78f66"
+      "figure_1_claim_gate_flow.pdf": "05bb36f292491984982b6c90b20894dfa0145a144ba679bc8b5b523703dba969",
+      "figure_2_supporting_pr_auc.pdf": "5f2b01b75d889908983395c6b9bc6694e7d8ce044c9cf4512e87fc882d2f41dc",
+      "figure_3_review_budget.pdf": "8cfdce73e31399644802c69b3788d2adf09cdd8d0c3bf69eab2d61a37ba76350",
+      "figure_4_publishability_matrix.pdf": "b993a183960df03270eed336472165c8d82b34049b497841135edf665a8635be"
     },
-    "references_bib_sha256": "eb3ff711c6e09fe5b138c44dafe701b93b00beae6a24dfca1042623f01cd130c"
+    "references_bib_sha256": "bcc822c4c20b37876db903fb5f31e9d87a6570fdcabd73e6fb83b81a04c957cb"
   },
   "source_release_candidate_ready": true,
   "source_tree": {
