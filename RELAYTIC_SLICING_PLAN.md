@@ -288,6 +288,7 @@ Stable slice numbering stays the same, but the preferred execution order after S
 74G. Paper Track P20 - PaySim selection-story cleanup and paper visual/narrative polish
 74H. Paper Track P21 - final source/PDF preflight and release changelog
 74I. Paper Track P22 - author-review layout hardening and regression closure
+74J. Paper Track P23 - novelty and adjacent-systems distinction hardening
 75. Slice 16
 76. Slice 16A
 77. Slice 16B
@@ -359,6 +360,7 @@ Why:
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
 - Paper Track P0 through P22 now come before Academy work because the current freeze pack deliberately blocked hard AML and SOTA claims; Relaytic first cleaned public surfaces, ran relevant benchmark tracks, challenged weak first-pass rows with competitive leakage-safe budgets, generated real numeric evidence, drafted a claim-safe paper, proved a clean paper-smoke path, produced a claim-safe P13 paper release pack, produced a P14 arXiv-compatible source bundle, added P15 measured user/agent handoff evidence, added P16 deterministic failure-case evidence, added P17 governance-ablation evidence, added P18 governance-invariant positioning, added P19-A hosted-score governance proof, integrated that proof through P19-B, added P20 PaySim/story/reader-guidance polish, completed P21 final source/PDF preflight, and used P22 to harden author-review layout/readability before expanding into capability evolution
 - Paper Track P22 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P22 preserves the evaluation-lab claim boundary, repairs final PDF/source layout roughness, marks the source/PDF bundle ready for author review, and keeps public upload blocked on tag selection, human PDF review, and a clean tag target.
+- Paper Track P23 is planned in `docs/build_slices/phase_paper_strengthening.md`: P23 should make the novelty lane unmistakable by distinguishing Relaytic-AML from detector papers, AML LLM triage, agentic SAR/compliance assistants, agent-governance layers, experiment tracking, model cards, datasheets, reproducibility checklists, and agent benchmarks. It must preserve the claim that Relaytic-AML is a local-first AML evaluation-evidence governance layer around detectors and agents, not a detector replacement or generic MLOps tool.
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
 - Paper Track P1 is now implemented and cleans the paper-facing public surface, records the retained compatibility boundary, and adds Relaytic aliases for legacy API/tool names
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy before benchmark implementation starts
@@ -367,7 +369,7 @@ Why:
 - Paper Track P5 is now implemented and inspects the raw Elliptic graph bundle, freezes graph provenance and temporal split artifacts, records unknown-label scope, allows only supporting loader/provenance wording, and keeps graph benchmark/SOTA claims blocked before numeric graph baselines run
 - Paper Track P6 is now implemented and runs the full PaySim tabular baseline suite under a train-only leakage-safe feature contract with explicit adapter versions, budget tiers, fallback states, and a publishability gate that blocks headline promotion until P6-A
 - Paper Track P6-A is now implemented and runs a competitive PaySim rerun with audited prior-step destination-history features, 14 recorded probe trials, five full-training finalists, validation-only calibration/threshold selection, and a supporting-only publishability pass for validation-selected Extra Trees (`test_pr_auc=0.638773`) while retaining hard-claim blockers before P7
-- Paper Track P22 is implemented; Slice 16A should start next unless the author is performing the separate human arXiv release action.
+- Paper Track P22 is implemented. Paper Track P23 is a planned optional pre-submission novelty/distinction hardening slice; Slice 16A should start next only if the author does not want that paper follow-on before the separate human arXiv release action.
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -390,7 +392,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned paper follow-on: no implementation slice remains in the current paper track; final human upload work remains release-tag replacement, human PDF review, arXiv upload-package confirmation, and clean tag-target confirmation
+- next planned paper follow-on: Paper Track P23 novelty and adjacent-systems distinction hardening, if the author wants one final paper-positioning slice before final human upload; final human upload work remains release-tag replacement, human PDF review, arXiv upload-package confirmation, and clean tag-target confirmation
 - next planned academy follow-on: Slice 16A, after P22 closed the author-review layout, release-candidate, and final preflight gaps
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
@@ -4575,6 +4577,55 @@ Fallback rule:
 
 Implemented status:
 - P22 is implemented. It anchors figures, keeps platform command labels with command blocks, compresses the main system-evaluation table, moves dense audit detail to appendix captions, refreshes Figure 4 and redaction wording, regenerates the canonical Markdown/LaTeX/PDF bundle, reruns final preflight, and keeps upload blocked until final public tag selection, author page review, and a clean tag target.
+
+## Paper Track P23 - Novelty and adjacent-systems distinction hardening
+
+Status:
+- planned
+
+Goal:
+- make the paper's novelty lane unmistakable before public submission
+- distinguish Relaytic-AML from adjacent detector, AML assistant, agent benchmark, agent-governance, MLOps, and documentation systems without sounding defensive
+- preserve the cautious claim that Relaytic-AML is a local-first AML evaluation-evidence governance layer around detectors and agents, not a detector replacement
+
+Load-bearing improvement:
+- a skeptical AML ML CTO or AI systems reviewer should understand that the paper is not claiming "better detector" or "MLflow plus agents"; it claims an artifact-backed governance substrate for local AML experimentation, rowless external-agent handoff, and public claim admissibility
+
+Human surface:
+- a short "what is new" paragraph/table in the manuscript that tells a reader what Relaytic-AML is, what it is not, and why a company would use it around existing detectors and agent-assisted workflows
+
+Agent surface:
+- a machine-readable novelty/distinction audit that another agent can use to verify the manuscript still separates Relaytic-AML from detector papers, AML LLM triage, SAR-writing agents, agent-governance layers, experiment tracking, model cards, datasheets, reproducibility checklists, and agent benchmarks
+
+Intelligence source:
+- the existing adjacent-systems comparison, P16-P22 system-evaluation artifacts, public claim gates, hosted-score proof, paper reader-guidance audit, and verified related-work sources
+
+Required outputs:
+- `paper_novelty_positioning_audit.json`
+- `paper_adjacent_systems_distinction_matrix.json`
+- refreshed `paper_adjacent_systems_comparison.json`
+- refreshed `paper_reader_guidance_audit.json` or successor check if the distinction changes reader guidance
+- regenerated Markdown, LaTeX, PDF, and final preflight reports if manuscript text changes
+
+Required behavior:
+- add or sharpen one concise reader-facing "what is new" distinction after related work
+- include nearby distinctions from AML detector/benchmark papers, AML LLM triage systems, agentic SAR/compliance narrative assistants, agent-governance/trust layers, MLOps experiment tracking, model cards, datasheets, reproducibility checklists, and agent-evaluation benchmarks
+- state that Relaytic-AML can wrap detector outputs and agent-assisted workflows through evidence cells, redacted handoff, and claim gates
+- avoid claiming detector superiority, RevClassifyDS parity, production AML readiness, business ROI, or generic agent-governance novelty
+- avoid a defensive tone; the distinction should read like category positioning, not an apology
+- add citations only for verified existing sources
+
+Minimum proof:
+- one regression check fails if the manuscript loses the "around detectors" governance framing
+- one regression check fails if AML LLM triage and agent-governance/trust-layer distinctions are missing
+- one regression check fails if the distinction table/paragraph describes Relaytic-AML as a detector replacement
+- public-wording and final preflight checks remain clean after regeneration
+
+Fallback rule:
+- if a candidate citation or adjacent system cannot be verified, do not cite it; keep the category distinction generic or move the source to a future-work note
+
+Planned status:
+- P23 is a triggerable pre-submission paper-positioning slice. It should be implemented before arXiv upload if the author wants the novelty distinction hardened beyond the current P18/P20/P22 framing. It should not add benchmark metrics or change model results.
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 
