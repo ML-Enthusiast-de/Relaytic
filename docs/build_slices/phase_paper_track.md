@@ -2,7 +2,7 @@
 
 ## Status
 
-P0 through P22 implemented. The paper-strengthening follow-on in `docs/build_slices/phase_paper_strengthening.md` now includes the final source/PDF preflight, release changelog, and author-review layout hardening. Slice 16A is the next implementation target; final arXiv upload remains a human release action with tag selection, page review, and clean tag-target confirmation.
+P0 through P23 are implemented. The paper-strengthening follow-on in `docs/build_slices/phase_paper_strengthening.md` records the completed final-source, author-review, and novelty-positioning stages. Planned Paper Track P24 in `docs/build_slices/phase_paper_release_integrity.md` is the next implementation target before Slice 16A; tag creation, release publication, and arXiv upload remain human actions.
 
 ## Intent
 

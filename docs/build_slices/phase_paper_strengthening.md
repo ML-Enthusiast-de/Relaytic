@@ -2,7 +2,7 @@
 
 ## Status
 
-Stage 9/9 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, P19-A produces the external score-file governance proof pack, P19-B turns that proof into a reader-facing hosted-score case study, P20 cleans the PaySim selection story plus reader-facing polish, P21 produces the final source/PDF preflight reports plus release changelog, P22 hardens author-review layout/readability over the final source/PDF bundle, and P23 hardens the paper's novelty and adjacent-systems distinction. Slice 16A remains the next academy implementation slice; final arXiv upload still requires author tag selection, human page review, and a clean tag target.
+Stage 9/9 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, P19-A produces the external score-file governance proof pack, P19-B turns that proof into a reader-facing hosted-score case study, P20 cleans the PaySim selection story plus reader-facing polish, P21 produces the final source/PDF preflight reports plus release changelog, P22 hardens author-review layout/readability over the final source/PDF bundle, and P23 hardens the paper's novelty and adjacent-systems distinction. The separate planned P24 release-integrity slice is defined in `phase_paper_release_integrity.md`; Slice 16A resumes after P24. Final tag creation and arXiv upload remain human actions.
 
 ## Intent
 
@@ -230,6 +230,6 @@ Stage 0 is complete when:
 
 1. This planning file exists.
 2. `RELAYTIC_BUILD_MASTER.md` and `RELAYTIC_SLICING_PLAN.md` reference P16-P23 as the paper-strengthening follow-on, with P16-P23 implemented.
-3. `IMPLEMENTATION_STATUS.md` records that P23 is implemented and that Slice 16A is the next engineering slice while public submission remains a human release action.
+3. `IMPLEMENTATION_STATUS.md` records that P23 is implemented and that the separate planned P24 release-integrity slice comes before Slice 16A while public submission remains a human release action.
 4. A regression test asserts that the plan includes P16-P23, the required failure cases, the governance-ablation metrics, the no-overclaim gates, and the P23 novelty/distinction acceptance criteria.
 5. No paper generator, benchmark result, PDF, or arXiv source behavior changes in Stage 0.

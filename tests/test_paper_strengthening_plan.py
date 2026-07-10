@@ -19,6 +19,7 @@ def test_paper_strengthening_track_records_stage_9_as_implemented() -> None:
     build = _read("RELAYTIC_BUILD_MASTER.md")
     status = _read("IMPLEMENTATION_STATUS.md")
     paper_track = _read("docs/build_slices/phase_paper_track.md")
+    release_integrity = _read("docs/build_slices/phase_paper_release_integrity.md")
 
     for slice_id in ("P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23"):
         assert f"Paper Track {slice_id}" in plan
@@ -34,7 +35,8 @@ def test_paper_strengthening_track_records_stage_9_as_implemented() -> None:
     assert "Paper P23" in build
     assert "Stage 9/9 is implemented." in plan
     assert "P23 hardens the paper's novelty and adjacent-systems distinction" in plan
-    assert "Slice 16A remains the next academy implementation slice" in plan
+    assert "separate planned P24 release-integrity slice" in plan
+    assert "Paper Track P24" in release_integrity
     assert "P19-A produces the external score-file governance proof pack" in plan
     assert "P19-B turns that proof into a reader-facing hosted-score case study" in plan
     assert "Paper Track P16 - failure-case evaluation pack** - implemented" in plan
@@ -58,7 +60,7 @@ def test_paper_strengthening_track_records_stage_9_as_implemented() -> None:
     assert "latest paper-strengthening slice" in status
     assert "Paper Track P22 author-review layout hardening" in status
     assert "P23, novelty and adjacent-systems distinction hardening" in status
-    assert "next recommended slice: Slice 16A capability registry and capability cards" in status
+    assert "next recommended slice: Paper Track P24" in status
     assert "latest paper-novelty-positioning slice" in status
 
 

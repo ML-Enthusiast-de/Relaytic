@@ -19,8 +19,8 @@ Current strategic doctrine:
 
 - Relaytic remains the public product and package
 - Relaytic-AML is the flagship frontier direction for all pre-academy work from now on
-- the Paper Track P0 through P23 is now completed as the mandatory pre-Academy paper path plus hosted-score proof, case-study integration, paper-polish, final source/PDF preflight, author-review layout-hardening, and novelty/distinction hardening; capability-academy slices may start from Slice 16A while final arXiv upload remains a human release action
-- the detailed paper-strengthening plan remains in `docs/build_slices/phase_paper_strengthening.md` for audit history and P16-P23 evidence obligations
+- the Paper Track P0 through P23 is completed; Paper Track P24 is now the required final release-integrity slice before Academy work or arXiv upload because factual protocol disclosure, bibliography verification, metric consistency, visual non-comparability, and exact-revision build attestation still need one bounded closure pass
+- the implemented strengthening history remains in `docs/build_slices/phase_paper_strengthening.md`; the planned P24 release-integrity contract lives in `docs/build_slices/phase_paper_release_integrity.md`
 - paper benchmark work must separate smoke, baseline, competitive, and release budgets; weak first-pass numbers can be retained as honest baselines but must not become headline paper claims without leakage-safe competitive reruns, HPO/search-budget accounting, and publishability gates
 - the paper-track execution brief lives at `docs/build_slices/phase_paper_track.md` and the normative slice contract lives in `RELAYTIC_SLICING_PLAN.md`
 
@@ -172,6 +172,7 @@ Paper P20. PaySim selection-story cleanup and paper visual/narrative polish
 Paper P21. final source/PDF preflight and release changelog
 Paper P22. author-review layout hardening and regression closure
 Paper P23. novelty and adjacent-systems distinction hardening
+Paper P24. release integrity, protocol disclosure, and revision-locked arXiv candidate
 16. Relaytic Academy umbrella track, governed capability evolution, and shadow-tested growth
 16A. capability registry and capability cards
 16B. offline replay packs and shadow mode
@@ -279,6 +280,7 @@ Stable numbering stays the same, but once Slice 07 is complete the preferred exe
 75H. Paper Track P21
 75I. Paper Track P22
 75J. Paper Track P23
+75K. Paper Track P24
 76. Slice 16
 77. Slice 16A
 78. Slice 16B
@@ -349,7 +351,7 @@ Reason:
 - Slice 15Y is now implemented and moves first contact to the flagship AML demo path with proof artifacts, claim-boundary labels, handbooks, and a paper benchmark runbook before repo cleanup and release freezing
 - Slice 15Z is now implemented and adds module-split evidence, repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before paper-freeze work
 - Slice 15Z-R is now implemented and freezes the relevant benchmark/release pack with catalog coverage, multidimensional result-table schema, explicit claim boundaries, reproducibility attestation, and blocked hard-performance claims until real holdout evidence exists
-- Paper Track P0 through P23 now come before Academy work because Relaytic needed a clean repo surface, real numeric benchmark table, external dry run, claim-linted paper, claim-safe public release pack, arXiv-compatible source release candidate, measured user/agent handoff evidence, deterministic failure-case evidence, governance-ablation evidence, formal governance-invariant positioning, hosted-score governance proof, hosted-score case-study integration, PaySim/story/reader-guidance polish, final source/PDF preflight, author-review layout hardening, and explicit novelty/distinction positioning before capability evolution resumed.
+- Paper Track P0 through P23 are implemented before Academy work because Relaytic needed a clean repo surface, real numeric benchmark evidence, a claim-safe paper, measured system behavior, and explicit novelty positioning. Planned Paper Track P24 now closes the remaining factual, methodological, bibliographic, visual, consistency, and exact-revision release obligations before capability evolution resumes.
 - Paper Track P0 is now implemented and freezes the 15Z-R baseline into explicit baseline and verification reports; Paper Track P1 should clean the public surface next
 - Paper Track P1 is now implemented and cleans paper-facing public surfaces, records retained compatibility boundaries, and adds Relaytic API/tool aliases
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy
@@ -386,7 +388,7 @@ Reason:
 Current repo state:
 
 - implemented through Slice 15Z-R plus Paper Track P0 through P23, with Slice 15R-A AML proof-pack alignment, Slice 15S flagship AML demo-bundle packaging, Slice 15T guarded business-value and analyst-hour proof, Slice 15U AML baseline and ablation relevance proof, Slice 15V raw graph/subgraph ingestion, Slice 15V-A no-lost guide/status/context-pack export, Slice 15W temporal weak-label claim gating, Slice 15X AML evaluation-environment scoring, Slice 15Y demo-first public documentation, Slice 15Z repo credibility cleanup, Slice 15Z-R paper/release freeze, Paper Track P0 baseline freeze, Paper Track P1 public-surface cleanup, Paper Track P2 thesis/claim contract, Paper Track P3 dataset registry, Paper Track P4 PaySim temporal benchmark, Paper Track P5 Elliptic graph provenance, Paper Track P6 tabular baseline suite, Paper Track P6-A competitive PaySim gate, Paper Track P7 Elliptic graph baseline suite, Paper Track P8 hard-track decisions, Paper Track P8-A Elliptic2 modern recovery, Paper Track P8-B competitive/robustness evidence, Paper Track P8-C reference-parity/cohort gate, Paper Track P8-D thesis narrowing, Paper Track P9 operational AML evaluation, Paper Track P10 reproducible table generation, Paper Track P11 paper draft generation, Paper Track P12 external dry-run proof, Paper Track P13 claim-safe arXiv release pack, Paper Track P14 arXiv source release candidate, Paper Track P15 measured system-evaluation proof pack, Paper Track P16 failure-case evaluation pack, Paper Track P17 governance machinery ablation pack, Paper Track P18 governance-invariant positioning, Paper Track P19-A external score-file adapter proof pack, Paper Track P19-B hosted-score case-study integration, Paper Track P20 PaySim/story/reader-guidance polish, Paper Track P21 final source/PDF preflight, Paper Track P22 author-review layout hardening, and Paper Track P23 novelty and adjacent-systems distinction hardening now landed
-- next execution target: Slice 16A capability registry and capability cards; final arXiv upload remains a human release action
+- next execution target: Paper Track P24 release integrity, protocol disclosure, and revision-locked arXiv candidate
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
 - latest handoff-and-learnings slice: Slice 12D
@@ -396,7 +398,7 @@ Current repo state:
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
 - next planned paper action: final human arXiv upload steps only: release tag, human PDF review, upload-package confirmation, and clean tag-target confirmation
-- next planned academy follow-on: Slice 16A, after P23 closed the paper-positioning follow-on
+- next planned academy follow-on: Slice 16A, after P24 closes the final paper release-integrity follow-on
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces rather than leaving the UI stale until late polish
 - the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [aml_frontier_contract.md](docs/specs/aml_frontier_contract.md), [aml_benchmark_pack.md](docs/specs/aml_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, performance recovery, AML proof/productization, academy, handoff, learnings, and external-agent continuation surfaces
