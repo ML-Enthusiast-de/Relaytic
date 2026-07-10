@@ -1,0 +1,66 @@
+{
+  "arxiv_upload_ready": false,
+  "checks": [
+    {
+      "check_id": "required_p23_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [],
+        "present_artifact_refs": [
+          "README.md",
+          "docs/paper/relaytic_aml_arxiv_draft.md",
+          "docs/paper/references.bib",
+          "docs/reports/paper_adjacent_systems_comparison.json",
+          "docs/reports/paper_governance_invariants.json",
+          "docs/reports/paper_external_score_claim_map.json",
+          "docs/reports/paper_reader_guidance_audit.json",
+          "docs/reports/paper_public_claims_allowed.json"
+        ]
+      },
+      "message": "P23 requires the current manuscript, references, P18 adjacent comparison, P20 reader guidance, public-claim gate, and hosted-score claim map.",
+      "passed": true,
+      "source_artifact": "docs/reports"
+    },
+    {
+      "check_id": "distinction_matrix_passed",
+      "message": "P23 distinction matrix must cover required adjacent systems and resolved citations.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_adjacent_systems_distinction_matrix.json"
+    },
+    {
+      "check_id": "novelty_audit_passed",
+      "message": "P23 manuscript novelty and claim-boundary audit must pass.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_novelty_positioning_audit.json"
+    },
+    {
+      "check_id": "generated_reports_redacted",
+      "message": "P23 generated reports must not expose private paths, secrets, or raw-row markers.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_novelty_positioning_manifest.json"
+    }
+  ],
+  "failed_checks": [],
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "next_slice": "Slice 16A - capability registry and capability cards",
+  "p23_implemented": true,
+  "report_artifact_refs": [
+    "docs/reports/paper_novelty_positioning_audit.json",
+    "docs/reports/paper_adjacent_systems_distinction_matrix.json",
+    "docs/reports/paper_novelty_positioning_manifest.json",
+    "docs/reports/paper_novelty_positioning_summary.md"
+  ],
+  "required_source_artifacts": [
+    "README.md",
+    "docs/paper/relaytic_aml_arxiv_draft.md",
+    "docs/paper/references.bib",
+    "docs/reports/paper_adjacent_systems_comparison.json",
+    "docs/reports/paper_governance_invariants.json",
+    "docs/reports/paper_external_score_claim_map.json",
+    "docs/reports/paper_reader_guidance_audit.json",
+    "docs/reports/paper_public_claims_allowed.json"
+  ],
+  "schema_version": "relaytic.paper_novelty_positioning.v1",
+  "slice": "Paper Track P23",
+  "status": "ready_for_final_author_review"
+}

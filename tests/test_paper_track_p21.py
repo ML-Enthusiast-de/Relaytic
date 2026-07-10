@@ -71,7 +71,8 @@ def _seed_p21_fixture(root: Path, *, include_local_build: bool = True) -> None:
     (source_dir / "main.tex").write_text(
         "\n".join(
             [
-                "\\hypersetup{pdftitle={Relaytic-AML: Test},pdfauthor={ML-Enthusiast-de}}",
+                "\\hypersetup{pdftitle={Relaytic-AML: Test},pdfauthor={Tobias Gehra}}",
+                "\\author{Tobias Gehra\\\\Independent Researcher\\\\\\href{mailto:t.gehra.ai@gmail.com}{\\texttt{t.gehra.ai@gmail.com}}}",
                 "\\Needspace{12\\baselineskip}",
                 "\\section{System Evaluation}",
                 "\\captionof{table}{System evaluation summary.}",
@@ -92,6 +93,9 @@ def _seed_p21_fixture(root: Path, *, include_local_build: bool = True) -> None:
     for filename, payload in {
         "paper_release_manifest.json": {"status": "ready_for_claim_safe_arxiv_release"},
         "paper_narrative_polish_manifest.json": {"status": "ready_for_final_pdf_preflight"},
+        "paper_novelty_positioning_manifest.json": {"status": "ready_for_final_author_review"},
+        "paper_novelty_positioning_audit.json": {"status": "pass"},
+        "paper_adjacent_systems_distinction_matrix.json": {"status": "pass"},
         "paper_arxiv_source_manifest.json": {"status": "ready_for_source_release_candidate"},
         "paper_submission_package_audit.json": {"status": "pass"},
     }.items():

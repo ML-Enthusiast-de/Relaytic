@@ -13,7 +13,7 @@ def _read(relative_path: str) -> str:
     return (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def test_paper_strengthening_track_records_stage_8_and_planned_stage_9() -> None:
+def test_paper_strengthening_track_records_stage_9_as_implemented() -> None:
     plan = _read("docs/build_slices/phase_paper_strengthening.md")
     slicing = _read("RELAYTIC_SLICING_PLAN.md")
     build = _read("RELAYTIC_BUILD_MASTER.md")
@@ -32,8 +32,8 @@ def test_paper_strengthening_track_records_stage_8_and_planned_stage_9() -> None
     assert "Paper P19-B" in build
     assert "Paper P22" in build
     assert "Paper P23" in build
-    assert "Stage 8/8 is implemented." in plan
-    assert "P23 is now registered as an optional pre-submission novelty/distinction hardening slice" in plan
+    assert "Stage 9/9 is implemented." in plan
+    assert "P23 hardens the paper's novelty and adjacent-systems distinction" in plan
     assert "Slice 16A remains the next academy implementation slice" in plan
     assert "P19-A produces the external score-file governance proof pack" in plan
     assert "P19-B turns that proof into a reader-facing hosted-score case study" in plan
@@ -45,21 +45,21 @@ def test_paper_strengthening_track_records_stage_8_and_planned_stage_9() -> None
     assert "Paper Track P20 - paper narrative and visual polish** - implemented" in plan
     assert "Paper Track P21 - final source/PDF preflight and changelog** - implemented" in plan
     assert "Paper Track P22 - author-review layout hardening and regression closure** - implemented" in plan
-    assert "Paper Track P23 - novelty and adjacent-systems distinction hardening** - planned" in plan
+    assert "Paper Track P23 - novelty and adjacent-systems distinction hardening** - implemented" in plan
     assert "Stage 3 Acceptance" in plan
     assert "Stage 4A Acceptance (completed)" in plan
     assert "Stage 4B Acceptance (completed)" in plan
     assert "Stage 5/6 Acceptance (completed)" in plan
     assert "Stage 7 Acceptance (completed)" in plan
     assert "Stage 8 Acceptance (completed)" in plan
-    assert "Stage 9 Acceptance (planned)" in plan
+    assert "Stage 9 Acceptance (completed)" in plan
     assert "phase_paper_strengthening.md" in build
     assert "phase_paper_strengthening.md" in paper_track
     assert "latest paper-strengthening slice" in status
     assert "Paper Track P22 author-review layout hardening" in status
-    assert "P22, author-review layout hardening" in status
-    assert "next recommended slice: Paper Track P23 novelty and adjacent-systems distinction hardening" in status
-    assert "optional Paper Track P23 novelty and adjacent-systems distinction hardening" in status
+    assert "P23, novelty and adjacent-systems distinction hardening" in status
+    assert "next recommended slice: Slice 16A capability registry and capability cards" in status
+    assert "latest paper-novelty-positioning slice" in status
 
 
 def test_paper_strengthening_plan_preserves_evidence_first_scope() -> None:

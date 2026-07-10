@@ -17,7 +17,7 @@ P13 permits only a claim-safe evaluation-environment release.
 - [ ] Include `docs/paper/references.bib` and verify every in-text citation has a matching BibTeX key.
 - [ ] Verify the converted PDF figures in `docs/paper/arxiv_src/figures/` are accepted by the selected arXiv processor.
 - [ ] Keep the table values synchronized with `docs/paper/tables/table_manifest.json` and `docs/reports/paper_metric_cell_audit.json`.
-- [ ] Verify the pseudonymous author block, affiliation, contact, and optional acknowledgements before upload.
+- [ ] Verify the author block, affiliation, contact, and optional acknowledgements before upload.
 - [ ] Confirm the AI-assistance disclosure is accurate before upload.
 
 ## Public Claim Discipline
@@ -36,7 +36,7 @@ P13 permits only a claim-safe evaluation-environment release.
 ## Tag And Release
 
 - [ ] Confirm `git status --short` is empty at the final tag target.
-- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `5092c822d8da474c34438fe32658aab9cbb0609f`; rerun the manifest after final edits if the source evidence changes.
+- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `7874eef05de1bf91e6bbe56e5da85965bd956e9c`; rerun the manifest after final edits if the source evidence changes.
 - [ ] Create tag after the final PDF/source matches the manifest: `git tag -a relaytic-aml-paper-p13-claim-safe -m "Relaytic-AML claim-safe paper release"`.
 - [ ] Attach or link the paper PDF, release manifest, public claims JSON, and benchmark artifacts.
 

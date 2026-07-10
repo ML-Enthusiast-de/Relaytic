@@ -26,7 +26,7 @@ Deep audit, after the first read:
 
 - System-evaluation proof: `docs/reports/paper_system_task_eval.json`, `docs/reports/paper_system_behavior_eval.json`, `docs/reports/paper_agent_handoff_eval.json`, `docs/reports/paper_no_lost_user_eval.json`, and `docs/reports/paper_claim_gate_case_studies.json`.
 - Metric provenance and claim posture: `docs/reports/paper_result_table_final.json`, `docs/reports/paper_metric_cell_audit.json`, and `docs/reports/paper_publishability_matrix.json`.
-- Final polish/readiness checks: `docs/reports/paper_narrative_polish_manifest.json`, `docs/reports/paper_paysim_selection_story_review.json`, `docs/reports/paper_reader_guidance_audit.json`, `docs/reports/paper_visual_table_polish_audit.json`, `docs/reports/paper_final_preflight_manifest.json`, and `docs/reports/paper_final_release_changelog.md`.
+- Final polish/readiness checks: `docs/reports/paper_narrative_polish_manifest.json`, `docs/reports/paper_paysim_selection_story_review.json`, `docs/reports/paper_reader_guidance_audit.json`, `docs/reports/paper_visual_table_polish_audit.json`, `docs/reports/paper_novelty_positioning_manifest.json`, `docs/reports/paper_adjacent_systems_distinction_matrix.json`, `docs/reports/paper_final_preflight_manifest.json`, and `docs/reports/paper_final_release_changelog.md`.
 
 The long build-control files, especially `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`, are development provenance. They explain how the repo got here, but they are not required reading for the paper.
 
@@ -119,8 +119,10 @@ Windows PowerShell:
 
 ```powershell
 py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 Set-Location docs\paper\arxiv_src
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
@@ -130,15 +132,17 @@ pdflatex -interaction=nonstopmode -halt-on-error main.tex
 Set-Location ..\..\..
 Copy-Item -LiteralPath docs\paper\arxiv_src\main.pdf -Destination docs\paper\relaytic_aml_arxiv_draft.pdf -Force
 py -3.11 -m relaytic.ui.cli release-safety paper-final-preflight --format json
-py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q
+py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py -q
 ```
 
 macOS/Linux:
 
 ```bash
 python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
+python3 -m relaytic.ui.cli release-safety paper-invariants --format json
 python3 -m relaytic.ui.cli release-safety paper-release --format json
 python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
+python3 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
 python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 cd docs/paper/arxiv_src
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
@@ -148,7 +152,7 @@ pdflatex -interaction=nonstopmode -halt-on-error main.tex
 cd ../../..
 cp docs/paper/arxiv_src/main.pdf docs/paper/relaytic_aml_arxiv_draft.pdf
 python3 -m relaytic.ui.cli release-safety paper-final-preflight --format json
-python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q
+python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py -q
 ```
 
 Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked until later gates explicitly allow them.
@@ -221,6 +225,7 @@ The repository already supports a working early product baseline. Treat the list
 - pre-Academy repo credibility reports under `docs/reports/`, including module-size audit, public-surface inventory, module-split evidence, extraction boundaries, and benchmark cleanup debt before the paper/release freeze
 - a paper/release freeze surface through `relaytic release-safety paper-freeze`, with relevant benchmark catalog, multidimensional result table, claim-boundary report, reproducibility attestation, and a safe attention-pack manifest that blocks hard AML performance claims until holdout evidence is frozen
 - a claim-safe paper surface through `relaytic release-safety paper-release`, with Markdown draft, citable references, paper tables, public attention text, arXiv submission notes, and allowed-public-claims report
+- a novelty-positioning surface through `relaytic release-safety paper-novelty-positioning`, with adjacent-system distinction checks and claim-boundary regression evidence for the paper
 - a final paper-source surface through `relaytic release-safety paper-arxiv-source`, with deterministic LaTeX source, converted PDF figures, citation/figure audits, source-package scanning, and a release-candidate checklist
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 

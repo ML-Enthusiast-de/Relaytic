@@ -48,7 +48,10 @@
           "docs/reports/paper_reader_guidance_audit.json",
           "docs/reports/paper_visual_table_polish_audit.json",
           "docs/reports/paper_narrative_polish_manifest.json",
-          "docs/reports/paper_polish_readiness.md"
+          "docs/reports/paper_polish_readiness.md",
+          "docs/reports/paper_novelty_positioning_manifest.json",
+          "docs/reports/paper_novelty_positioning_audit.json",
+          "docs/reports/paper_adjacent_systems_distinction_matrix.json"
         ]
       },
       "message": "P14 requires the P13 source refs plus the P20 narrative/guidance polish refs.",
@@ -60,6 +63,12 @@
       "message": "P20 story, reader guidance, and visual/table polish audits must pass before the final source/PDF preflight.",
       "passed": true,
       "source_artifact": "docs/reports/paper_narrative_polish_manifest.json"
+    },
+    {
+      "check_id": "p23_novelty_positioning_passed",
+      "message": "The source bundle requires P23 novelty and adjacent-systems distinction artifacts before final upload review.",
+      "passed": true,
+      "source_artifact": "docs/reports/paper_novelty_positioning_manifest.json"
     },
     {
       "check_id": "citation_audit_passed",
@@ -90,7 +99,7 @@
     }
   ],
   "citation_audit": {
-    "bib_key_count": 20,
+    "bib_key_count": 25,
     "bib_keys": [
       "bellei2024elliptic2",
       "chen2025mlrbench",
@@ -99,10 +108,15 @@
       "fatf2020virtualassets",
       "ffiecRedFlags",
       "fincenAdvisories",
+      "gaurav2025governanceaas",
       "gebru2021datasheets",
+      "kaptein2026runtimegovernance",
       "lopezrojas2016paysim",
       "mitchell2019modelcards",
+      "naik2025coinvestigator",
+      "naik2026llmopsaml",
       "pineau2021reproducibility",
+      "pirmorad2025amlgraphllm",
       "poon2026linemvgnn",
       "song2024revtrack",
       "starace2025paperbench",
@@ -113,7 +127,7 @@
       "ye2026blazingaml",
       "zaharia2018mlflow"
     ],
-    "cited_key_count": 20,
+    "cited_key_count": 25,
     "cited_keys": [
       "bellei2024elliptic2",
       "chen2025mlrbench",
@@ -122,10 +136,15 @@
       "fatf2020virtualassets",
       "ffiecRedFlags",
       "fincenAdvisories",
+      "gaurav2025governanceaas",
       "gebru2021datasheets",
+      "kaptein2026runtimegovernance",
       "lopezrojas2016paysim",
       "mitchell2019modelcards",
+      "naik2025coinvestigator",
+      "naik2026llmopsaml",
       "pineau2021reproducibility",
+      "pirmorad2025amlgraphllm",
       "poon2026linemvgnn",
       "song2024revtrack",
       "starace2025paperbench",
@@ -174,6 +193,11 @@
     "docs/reports/paper_narrative_polish_manifest.json",
     "docs/reports/paper_polish_readiness.md"
   ],
+  "p23_novelty_refs": [
+    "docs/reports/paper_novelty_positioning_manifest.json",
+    "docs/reports/paper_novelty_positioning_audit.json",
+    "docs/reports/paper_adjacent_systems_distinction_matrix.json"
+  ],
   "release_candidate_checklist_ref": "docs/reports/paper_release_candidate_checklist.md",
   "release_mode": "claim_safe_evaluation_environment_only",
   "release_tag_plan": {
@@ -191,7 +215,10 @@
       "docs/reports/paper_reader_guidance_audit.json",
       "docs/reports/paper_visual_table_polish_audit.json",
       "docs/reports/paper_narrative_polish_manifest.json",
-      "docs/reports/paper_polish_readiness.md"
+      "docs/reports/paper_polish_readiness.md",
+      "docs/reports/paper_novelty_positioning_manifest.json",
+      "docs/reports/paper_novelty_positioning_audit.json",
+      "docs/reports/paper_adjacent_systems_distinction_matrix.json"
     ],
     "creation_command": "git tag -a relaytic-aml-paper-p14-source-rc -m \"Relaytic-AML arXiv source release candidate\"",
     "requires_clean_status_command": "git status --short",
@@ -201,14 +228,14 @@
   "schema_version": "relaytic.paper_arxiv_source.v1",
   "slice": "Paper Track P14",
   "source_hashes": {
-    "main_tex_sha256": "6782ca90cbb897fda06af78c6b3b37d56bbaa0105bad83467de5c7f529796bef",
+    "main_tex_sha256": "3da063671fd8ce608101e7ccfcd9d3046f04c48bdce933093787b8d5f4a25603",
     "pdf_figure_sha256": {
-      "figure_1_claim_gate_flow.pdf": "05bb36f292491984982b6c90b20894dfa0145a144ba679bc8b5b523703dba969",
-      "figure_2_supporting_pr_auc.pdf": "5f2b01b75d889908983395c6b9bc6694e7d8ce044c9cf4512e87fc882d2f41dc",
-      "figure_3_review_budget.pdf": "8cfdce73e31399644802c69b3788d2adf09cdd8d0c3bf69eab2d61a37ba76350",
-      "figure_4_publishability_matrix.pdf": "b993a183960df03270eed336472165c8d82b34049b497841135edf665a8635be"
+      "figure_1_claim_gate_flow.pdf": "bee3f476df3b54ee9563bd21ceaf173ddeb58aa036f5052a8af6cf7f7b7a549c",
+      "figure_2_supporting_pr_auc.pdf": "607f7f2da7d95d4d5dbc8fa2bb3fe482d612ff4c820eda7c3e011d1054aab761",
+      "figure_3_review_budget.pdf": "57274c5a91209cccc92be3965eef8203bc4672f48bfd8cf6930dbea01a0f4993",
+      "figure_4_publishability_matrix.pdf": "8e8434b0ac7a1b33b3b178f370199e3d9a2d7d247e6fff00d6974138942e053a"
     },
-    "references_bib_sha256": "bcc822c4c20b37876db903fb5f31e9d87a6570fdcabd73e6fb83b81a04c957cb"
+    "references_bib_sha256": "8284296b5524663f61b578443fa6a4ad6a48b590a65b7b544983a868b445cbe0"
   },
   "source_release_candidate_ready": true,
   "source_tree": {

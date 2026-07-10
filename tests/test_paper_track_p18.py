@@ -37,7 +37,7 @@ def test_paper_track_p18_builds_governance_invariant_pack() -> None:
     assert invariants["proof_obligation_passed"] is True
     assert invariants["current_invariant_count"] >= 7
     assert adjacent["status"] == "pass"
-    assert adjacent["family_count"] >= 6
+    assert adjacent["family_count"] >= 9
     assert not adjacent["missing_required_families"]
     assert not invariants["claim_boundary"]["detector_superiority_claimed"]
     assert not invariants["claim_boundary"]["hard_real_bank_aml_superiority_claimed"]
@@ -58,6 +58,9 @@ def test_paper_track_p18_builds_governance_invariant_pack() -> None:
         "MLOps experiment tracking",
         "Agent benchmarks and research-agent evaluations",
         "AML detector and benchmark papers",
+        "AML LLM graph reasoning and triage systems",
+        "Agentic SAR and compliance narrative assistants",
+        "Agent governance and runtime trust layers",
     } <= families
     assert str(PROJECT_ROOT).replace("\\", "/") not in serialized.replace("\\", "/")
 

@@ -55,6 +55,32 @@
         "poon2026linemvgnn",
         "ye2026blazingaml"
       ]
+    },
+    {
+      "adjacent_family": "AML LLM graph reasoning and triage systems",
+      "missing_bib_keys": [],
+      "passed": true,
+      "representative_sources": [
+        "pirmorad2025amlgraphllm",
+        "naik2026llmopsaml"
+      ]
+    },
+    {
+      "adjacent_family": "Agentic SAR and compliance narrative assistants",
+      "missing_bib_keys": [],
+      "passed": true,
+      "representative_sources": [
+        "naik2025coinvestigator"
+      ]
+    },
+    {
+      "adjacent_family": "Agent governance and runtime trust layers",
+      "missing_bib_keys": [],
+      "passed": true,
+      "representative_sources": [
+        "gaurav2025governanceaas",
+        "kaptein2026runtimegovernance"
+      ]
     }
   ],
   "claim_boundary": "This comparison positions Relaytic-AML as an evaluation-lab and governance system, not as a detector-superiority paper.",
@@ -126,17 +152,52 @@
         "ye2026blazingaml"
       ],
       "what_it_covers": "modeling frontier for temporal and graph AML detection"
+    },
+    {
+      "adjacent_family": "AML LLM graph reasoning and triage systems",
+      "primary_object": "LLM reasoning, triage, serving, and evidence-rich prompts for AML workflows",
+      "relaytic_aml_boundary": "does not claim an LLM detector or AML LLM-serving stack",
+      "relaytic_aml_position": "keeps LLM or external-agent help downstream of rowless local evidence, artifact provenance, and claim gates",
+      "representative_sources": [
+        "pirmorad2025amlgraphllm",
+        "naik2026llmopsaml"
+      ],
+      "what_it_covers": "language-model assistance for suspiciousness reasoning, risk-factor extraction, and compliance-oriented outputs"
+    },
+    {
+      "adjacent_family": "Agentic SAR and compliance narrative assistants",
+      "primary_object": "human-in-the-loop SAR or compliance narrative drafting",
+      "relaytic_aml_boundary": "does not generate or validate regulatory SAR submissions",
+      "relaytic_aml_position": "governs the local experimental evidence and admissible claims that such narrative workflows should cite",
+      "representative_sources": [
+        "naik2025coinvestigator"
+      ],
+      "what_it_covers": "case narrative generation, compliance validation, investigator collaboration, and report-writing support"
+    },
+    {
+      "adjacent_family": "Agent governance and runtime trust layers",
+      "primary_object": "runtime policies, enforcement, logging, trust scoring, and path-dependent agent governance",
+      "relaytic_aml_boundary": "does not claim to be a general-purpose agent-governance product",
+      "relaytic_aml_position": "specializes governance to local AML evidence cells, rowless handoff, benchmark context, and paper/public claim admissibility",
+      "representative_sources": [
+        "gaurav2025governanceaas",
+        "kaptein2026runtimegovernance"
+      ],
+      "what_it_covers": "general agent action control across domains and heterogeneous agent stacks"
     }
   ],
   "covered_families": [
+    "AML LLM graph reasoning and triage systems",
     "AML detector and benchmark papers",
     "Agent benchmarks and research-agent evaluations",
+    "Agent governance and runtime trust layers",
+    "Agentic SAR and compliance narrative assistants",
     "Datasheets and dataset documentation",
     "ML reproducibility checklists",
     "MLOps experiment tracking",
     "Model cards and model reporting"
   ],
-  "family_count": 6,
+  "family_count": 9,
   "missing_required_families": [],
   "next_slice": "Paper Track P19 - hosted detector workflow demonstration, if selected",
   "schema_version": "relaytic.paper_invariants.v1",

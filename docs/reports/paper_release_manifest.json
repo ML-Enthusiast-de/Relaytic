@@ -139,7 +139,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "5092c822d8da474c34438fe32658aab9cbb0609f",
+  "git_commit": "7874eef05de1bf91e6bbe56e5da85965bd956e9c",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -360,6 +360,36 @@
       "citation_key": "deprez2025continualaml",
       "source_url": "https://arxiv.org/abs/2503.24259",
       "verified_role": "Recent continual-learning and drift context for AML graph systems."
+    },
+    {
+      "accessed_date": "2026-07-07",
+      "citation_key": "pirmorad2025amlgraphllm",
+      "source_url": "https://arxiv.org/abs/2507.14785",
+      "verified_role": "Recent AML graph-reasoning context using LLM in-context learning rather than a local evidence-governance layer."
+    },
+    {
+      "accessed_date": "2026-07-07",
+      "citation_key": "naik2025coinvestigator",
+      "source_url": "https://arxiv.org/abs/2509.08380",
+      "verified_role": "Agentic SAR and compliance-narrative assistant context for distinguishing Relaytic-AML from report-writing workflows."
+    },
+    {
+      "accessed_date": "2026-07-07",
+      "citation_key": "naik2026llmopsaml",
+      "source_url": "https://arxiv.org/abs/2605.11232",
+      "verified_role": "Compliance-grade LLMOps serving-stack context for distinguishing Relaytic-AML from AML LLM deployment infrastructure."
+    },
+    {
+      "accessed_date": "2026-07-07",
+      "citation_key": "gaurav2025governanceaas",
+      "source_url": "https://arxiv.org/abs/2508.18765",
+      "verified_role": "General multi-agent AI governance framework context."
+    },
+    {
+      "accessed_date": "2026-07-07",
+      "citation_key": "kaptein2026runtimegovernance",
+      "source_url": "https://arxiv.org/abs/2603.16586",
+      "verified_role": "Runtime path-policy governance context for agent systems."
     },
     {
       "accessed_date": "2026-07-07",

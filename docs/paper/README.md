@@ -21,7 +21,10 @@ The root README contains copy-paste-safe Windows and macOS/Linux command blocks.
 
 ```bash
 python -m pip install -e ".[full]"
+python -m relaytic.ui.cli release-safety paper-invariants --format json
 python -m relaytic.ui.cli release-safety paper-release --format json
+python -m relaytic.ui.cli release-safety paper-narrative-polish --format json
+python -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
 python -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 python -m relaytic.ui.cli release-safety paper-final-preflight --format json
 ```
@@ -35,6 +38,7 @@ The main reports live under `../reports/`. They are useful after reading the pap
 - `paper_release_manifest.json` for release-pack status.
 - `paper_public_claims_allowed.json` for allowed and blocked public wording.
 - `paper_metric_cell_audit.json` for metric provenance.
+- `paper_novelty_positioning_manifest.json` and `paper_adjacent_systems_distinction_matrix.json` for the novelty and adjacent-systems distinction gate.
 - `paper_final_preflight_manifest.json` for final source/PDF readiness.
 
 The build-control files in the repository root record development history. They are useful for maintainers, but they are not required to understand or evaluate the paper.

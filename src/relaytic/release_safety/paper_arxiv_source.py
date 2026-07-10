@@ -44,6 +44,11 @@ P20_REQUIRED_REFS = [
     "docs/reports/paper_narrative_polish_manifest.json",
     "docs/reports/paper_polish_readiness.md",
 ]
+P23_REQUIRED_REFS = [
+    "docs/reports/paper_novelty_positioning_manifest.json",
+    "docs/reports/paper_novelty_positioning_audit.json",
+    "docs/reports/paper_adjacent_systems_distinction_matrix.json",
+]
 
 ARXIV_ALLOWED_GRAPHIC_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".eps"}
 FORBIDDEN_SOURCE_PATTERNS = [
@@ -281,6 +286,15 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
             reports / "paper_narrative_polish_manifest.json"
         ),
         "paper_polish_readiness": _read_text_artifact(reports / "paper_polish_readiness.md"),
+        "paper_novelty_positioning_manifest": _read_artifact(
+            reports / "paper_novelty_positioning_manifest.json"
+        ),
+        "paper_novelty_positioning_audit": _read_artifact(
+            reports / "paper_novelty_positioning_audit.json"
+        ),
+        "paper_adjacent_systems_distinction_matrix": _read_artifact(
+            reports / "paper_adjacent_systems_distinction_matrix.json"
+        ),
         "draft": _read_text_artifact(paper / "relaytic_aml_arxiv_draft.md"),
         "references": _read_text_artifact(paper / "references.bib"),
         "figure_manifest": _read_artifact(figure_dir / "figure_manifest.json"),
@@ -355,6 +369,7 @@ def _build_source_manifest(
         },
         "p13_gate_refs": P13_REQUIRED_REFS,
         "p20_polish_refs": P20_REQUIRED_REFS,
+        "p23_novelty_refs": P23_REQUIRED_REFS,
         "citation_audit": citation_audit,
         "figure_audit": figure_audit,
         "submission_package_audit_ref": "docs/reports/paper_submission_package_audit.json",
@@ -372,6 +387,7 @@ def _build_source_manifest(
                 "docs/reports/paper_submission_package_audit.json",
                 "docs/reports/paper_release_candidate_checklist.md",
                 *P20_REQUIRED_REFS,
+                *P23_REQUIRED_REFS,
             ],
         },
         "next_slice": NEXT_PAPER_ARXIV_SOURCE_SLICE if source_ready else "Paper Track P14 repair",
@@ -388,6 +404,9 @@ def _source_checks(
     release_manifest = _payload(inputs["paper_release_manifest"])
     public_claims = _payload(inputs["paper_public_claims_allowed"])
     p20_manifest = _payload(inputs["paper_narrative_polish_manifest"])
+    p23_manifest = _payload(inputs["paper_novelty_positioning_manifest"])
+    p23_audit = _payload(inputs["paper_novelty_positioning_audit"])
+    p23_matrix = _payload(inputs["paper_adjacent_systems_distinction_matrix"])
     paysim_story = _payload(inputs["paper_paysim_selection_story_review"])
     guidance = _payload(inputs["paper_reader_guidance_audit"])
     polish = _payload(inputs["paper_visual_table_polish_audit"])
@@ -430,6 +449,14 @@ def _source_checks(
             source_artifact="docs/reports/paper_narrative_polish_manifest.json",
         ),
         _check(
+            "p23_novelty_positioning_passed",
+            p23_manifest.get("status") == "ready_for_final_author_review"
+            and p23_audit.get("status") == "pass"
+            and p23_matrix.get("status") == "pass",
+            "The source bundle requires P23 novelty and adjacent-systems distinction artifacts before final upload review.",
+            source_artifact="docs/reports/paper_novelty_positioning_manifest.json",
+        ),
+        _check(
             "citation_audit_passed",
             citation_audit.get("status") == "pass",
             "Every generated LaTeX citation must resolve in references.bib.",
@@ -461,7 +488,7 @@ def _required_artifact_presence(inputs: dict[str, Any]) -> dict[str, Any]:
     }
     present = []
     missing = []
-    for ref in [*P13_REQUIRED_REFS, *P20_REQUIRED_REFS]:
+    for ref in [*P13_REQUIRED_REFS, *P20_REQUIRED_REFS, *P23_REQUIRED_REFS]:
         artifact = by_ref.get(ref)
         if artifact and artifact.get("exists"):
             present.append(ref)
@@ -497,10 +524,10 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\setlength{\parskip}{0.65em}",
         r"\setlength{\parindent}{0pt}",
         r"\emergencystretch=4em",
-        r"\hypersetup{pdftitle={Relaytic-AML: A Local-First Agentic Evaluation Lab for Financial-Crime Machine Learning},pdfauthor={ML-Enthusiast-de},pdfsubject={Local-first AML evaluation lab},pdfkeywords={anti-money laundering, financial crime, reproducibility, AI evaluation, agentic systems}}",
+        r"\hypersetup{pdftitle={Relaytic-AML: A Local-First Agentic Evaluation Lab for Financial-Crime Machine Learning},pdfauthor={Tobias Gehra},pdfsubject={Local-first AML evaluation lab},pdfkeywords={anti-money laundering, financial crime, reproducibility, AI evaluation, agentic systems}}",
         "",
         f"\\title{{{_latex_inline(title)}}}",
-        r"\author{ML-Enthusiast-de\\Independent Researcher\\GitHub: \texttt{ML-Enthusiast-de}\\\href{mailto:83662706+ML-Enthusiast-de@users.noreply.github.com}{\texttt{83662706+ML-Enthusiast-de@users.noreply.github.com}}}",
+        r"\author{Tobias Gehra\\Independent Researcher\\GitHub: \texttt{ML-Enthusiast-de}\\\href{mailto:t.gehra.ai@gmail.com}{\texttt{t.gehra.ai@gmail.com}}}",
         r"\date{June 2026}",
         "",
         r"\begin{document}",
@@ -1402,9 +1429,10 @@ def _build_submission_package_audit(
     p13_claims = _payload(inputs["paper_public_claims_allowed"])
     compile_log_audit = _audit_compile_log(inputs)
     metadata_present = (
-        "ML-Enthusiast-de" in tex_source
+        "Tobias Gehra" in tex_source
         and "pdftitle=" in tex_source
-        and "pdfauthor={ML-Enthusiast-de}" in tex_source
+        and "pdfauthor={Tobias Gehra}" in tex_source
+        and "t.gehra.ai@gmail.com" in tex_source
         and r"\date{June 2026}" in tex_source
     )
     checks = [

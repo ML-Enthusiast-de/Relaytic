@@ -45,6 +45,9 @@ REQUIRED_ADJACENT_FAMILIES = [
     "MLOps experiment tracking",
     "Agent benchmarks and research-agent evaluations",
     "AML detector and benchmark papers",
+    "AML LLM graph reasoning and triage systems",
+    "Agentic SAR and compliance narrative assistants",
+    "Agent governance and runtime trust layers",
 ]
 
 
@@ -481,6 +484,30 @@ def _build_adjacent_systems_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]
             "what_it_covers": "modeling frontier for temporal and graph AML detection",
             "relaytic_aml_boundary": "is not a new graph-neural detector and does not claim detector SOTA",
             "relaytic_aml_position": "provides the local evidence and claim-governance substrate that such detector studies can run through",
+        },
+        {
+            "adjacent_family": "AML LLM graph reasoning and triage systems",
+            "representative_sources": ["pirmorad2025amlgraphllm", "naik2026llmopsaml"],
+            "primary_object": "LLM reasoning, triage, serving, and evidence-rich prompts for AML workflows",
+            "what_it_covers": "language-model assistance for suspiciousness reasoning, risk-factor extraction, and compliance-oriented outputs",
+            "relaytic_aml_boundary": "does not claim an LLM detector or AML LLM-serving stack",
+            "relaytic_aml_position": "keeps LLM or external-agent help downstream of rowless local evidence, artifact provenance, and claim gates",
+        },
+        {
+            "adjacent_family": "Agentic SAR and compliance narrative assistants",
+            "representative_sources": ["naik2025coinvestigator"],
+            "primary_object": "human-in-the-loop SAR or compliance narrative drafting",
+            "what_it_covers": "case narrative generation, compliance validation, investigator collaboration, and report-writing support",
+            "relaytic_aml_boundary": "does not generate or validate regulatory SAR submissions",
+            "relaytic_aml_position": "governs the local experimental evidence and admissible claims that such narrative workflows should cite",
+        },
+        {
+            "adjacent_family": "Agent governance and runtime trust layers",
+            "representative_sources": ["gaurav2025governanceaas", "kaptein2026runtimegovernance"],
+            "primary_object": "runtime policies, enforcement, logging, trust scoring, and path-dependent agent governance",
+            "what_it_covers": "general agent action control across domains and heterogeneous agent stacks",
+            "relaytic_aml_boundary": "does not claim to be a general-purpose agent-governance product",
+            "relaytic_aml_position": "specializes governance to local AML evidence cells, rowless handoff, benchmark context, and paper/public claim admissibility",
         },
     ]
 

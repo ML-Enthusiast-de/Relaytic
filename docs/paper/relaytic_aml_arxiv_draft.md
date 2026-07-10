@@ -31,6 +31,10 @@ Detector papers such as TransXion, BlazingAML, LineMVGNN, and RevClassifyDS push
 
 Experiment-tracking systems preserve runs and artifacts [@zaharia2018mlflow]; model cards describe trained models; datasheets describe data; reproducibility checklists improve reporting; and agent benchmarks evaluate agent behavior. Relaytic-AML handles a different responsibility: determining which public scientific claims a local AML evidence cell is allowed to support. The claim-governance responsibility is especially important when evidence comes from licensed files, proxy datasets, temporal graph tasks, or rowless handoff packets rather than from a single open leaderboard run.
 
+A closely related newer line uses LLMs and agents for AML triage, graph-context reasoning, suspicious activity report (SAR) narrative support, compliance serving stacks, and runtime agent governance [@pirmorad2025amlgraphllm; @naik2025coinvestigator; @naik2026llmopsaml; @gaurav2025governanceaas; @kaptein2026runtimegovernance]. Those systems make agent assistance more capable, but they also make evidence boundaries more important. Relaytic-AML is not a SAR drafting system, not an LLM detector, and not a general-purpose agent-governance product. Its role is narrower: keep local AML evidence, rowless handoff, and public claims aligned.
+
+**What is new.** Relaytic-AML is a governance substrate around detectors and agent-assisted workflows. It would be used to wrap detector outputs, LLM explanations, hosted score files, and paper tables with evidence cells, rowless handoff, and claim gates. A company would not use it as a detector replacement; it would use it to make the local evaluation record inspectable before a result becomes a benchmark row, a handoff packet, or a public claim. In short, Relaytic-AML is not a detector replacement. It is the local evidence layer around detectors and agents.
+
 **Table 1. Adjacent systems comparison.**
 
 | Family | Primary object | Relaytic-AML position | Boundary |
@@ -41,6 +45,9 @@ Experiment-tracking systems preserve runs and artifacts [@zaharia2018mlflow]; mo
 | MLOps experiment tracking [@zaharia2018mlflow] | runs, metrics, parameters, artifacts, lineage, and model versions | focuses on local AML evidence, privacy posture, rowless handoff, and public scientific claim admissibility | is not a hosted tracker or production model registry |
 | Agent benchmarks and research-agent evaluations [@chen2025mlrbench; @starace2025paperbench] | agent performance on research, coding, or skill-use tasks | uses agents inside a governed local evaluation lab and then tests whether their outputs stay artifact-attached | does not benchmark a general-purpose agent |
 | AML detector and benchmark papers [@weber2019elliptic; @bellei2024elliptic2] | detector architecture, benchmark result, graph construction, or financial-crime dataset | provides the local evidence and claim-governance substrate that such detector studies can run through | governs detector evidence rather than introducing a graph-neural model |
+| AML LLM graph reasoning and triage systems [@pirmorad2025amlgraphllm; @naik2026llmopsaml] | LLM reasoning, triage, serving, and evidence-rich prompts for AML workflows | keeps LLM or external-agent help downstream of rowless local evidence, artifact provenance, and claim gates | does not claim an LLM detector or AML LLM-serving stack |
+| Agentic SAR and compliance narrative assistants [@naik2025coinvestigator] | human-in-the-loop SAR or compliance narrative drafting | governs the local experimental evidence and admissible claims that such narrative workflows should cite | does not generate or validate regulatory SAR submissions |
+| Agent governance and runtime trust layers [@gaurav2025governanceaas; @kaptein2026runtimegovernance] | runtime policies, enforcement, logging, trust scoring, and path-dependent agent governance | specializes governance to local AML evidence cells, rowless handoff, benchmark context, and paper/public claim a... | does not claim to be a general-purpose agent-governance product |
 
 Relaytic-AML does not replace dataset documentation, model cards, experiment trackers, or detector papers. The system ties those concerns together for local AML research: a model result is only reader-facing after its source posture, split, leakage policy, budget, artifact field, handoff posture, and claim boundary are visible.
 
@@ -197,7 +204,7 @@ The system is intentionally local-first, which creates a tradeoff. Privacy and p
 
 The repository is larger than this AML paper. Relaytic is the general local-first inference lab and public package; Relaytic-AML is the focused AML edition used here for the manuscript. A reader should start with the README and this paper. Development-control files record the build history, but they are not required to understand the paper claims. Public citation should use the final release tag or archival snapshot selected at submission time, because the main branch can continue to evolve after the paper is posted.
 
-Repository: https://github.com/ML-Enthusiast-de/Relaytic. Source commit: 5092c822d8da. The arXiv source bundle and preflight reports record artifact hashes for this candidate.
+Repository: https://github.com/ML-Enthusiast-de/Relaytic. Source commit: 7874eef05de1. The arXiv source bundle and preflight reports record artifact hashes for this candidate.
 
 The compact contract below separates what a clean clone can reproduce immediately from what requires local benchmark access. The README contains the full regeneration script; the paper keeps the main path short enough to try without reading the generated audit files first.
 
@@ -205,7 +212,7 @@ The compact contract below separates what a clean clone can reproduce immediatel
 
 | Path | Command | Reproduces | Data dependency |
 |---|---|---|---|
-| Public paper rebuild | paper-release; paper-arxiv-source; paper-final-preflight | Markdown, LaTeX source, figures, PDF/log/font preflight | Clean clone with Python >=3.10 and local TeX for PDF checks |
+| Public paper rebuild | invariants; release; polish; novelty; source; final preflight | Markdown, LaTeX source, figures, PDF/log/font preflight | Clean clone with Python >=3.10 and local TeX for PDF checks |
 | System fixtures | paper-system-eval; paper-failure-eval; paper-governance-ablation; paper-invariants | navigation, handoff, recovery, claim-gate, and disabled-component checks | Repo-local deterministic fixtures only |
 | Hosted-score fixture | paper-external-score-proof; paper-external-score-integration | rowless score schema, evidence cell, redaction, and claim map | Repo-local rowless fixture; optional local score files stay local |
 | PaySim benchmark | paysim-competitive --budget-tier competitive --run-optional | selected PaySim PR-AUC and review-budget cells | Local Kaggle PaySim file; sha256 prefix 16910f90577b |
@@ -218,7 +225,10 @@ Minimal public check:
 
 ```bash
 python -m pip install -e ".[full]"
+python -m relaytic.ui.cli release-safety paper-invariants --format json
 python -m relaytic.ui.cli release-safety paper-release --format json
+python -m relaytic.ui.cli release-safety paper-narrative-polish --format json
+python -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
 python -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 python -m relaytic.ui.cli release-safety paper-final-preflight --format json
 ```
@@ -341,9 +351,12 @@ Windows PowerShell:
 
 ```powershell
 py -3.11 -m pip install -e ".[full]"
+py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-py -3.11 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q
+py -3.11 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py -q
 ```
 
 After compiling `docs/paper/arxiv_src/main.tex` and copying the PDF to the review draft, run `paper-final-preflight`. The README includes the exact compile/copy commands and the longer audit test matrix.
@@ -352,9 +365,12 @@ macOS/Linux:
 
 ```bash
 python3 -m pip install -e ".[full]"
+python3 -m relaytic.ui.cli release-safety paper-invariants --format json
 python3 -m relaytic.ui.cli release-safety paper-release --format json
+python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
+python3 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
 python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
-python3 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q
+python3 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py -q
 ```
 
 ## References
@@ -371,6 +387,11 @@ python3 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q
 - Tariq, H., and Hassani, M. (2026). Extracting Money Laundering Transactions from Quasi-Temporal Graph Representation. arXiv:2604.02899.
 - Ye, H., Laxman, A., Yuan, Y., Flautner, K., and Talati, N. (2026). BlazingAML: High-Throughput Anti-Money Laundering via Multi-Stage Graph Mining. arXiv:2604.12241.
 - Deprez, B., Wei, W., Verbeke, W., Baesens, B., Mets, K., and Verdonck, T. (2025). Advances in Continual Graph Learning for Anti-Money Laundering Systems. arXiv:2503.24259.
+- Pirmorad, E. (2025). Exploring the In-Context Learning Capabilities of LLMs for Money Laundering Detection in Financial Graphs. arXiv:2507.14785.
+- Naik, P. V., Dintakurthi, N. K., Hu, Z., Wang, Y., and Qiu, R. (2025). Co-Investigator AI. arXiv:2509.08380.
+- Naik, P. V., Dintakurthi, N. K., and Wang, Y. (2026). Rethinking LLMOps for Fraud and AML. arXiv:2605.11232.
+- Gaurav, Y., Heikkonen, J., and Chaudhary, V. (2025). Governance-as-a-Service. arXiv:2508.18765.
+- Kaptein, M., Khan, H., and Podstavnychy, V. (2026). Runtime Governance for AI Agents. arXiv:2603.16586.
 - Gebru, T. et al. (2021). Datasheets for Datasets. Communications of the ACM.
 - Mitchell, M. et al. (2019). Model Cards for Model Reporting. FAT* 2019.
 - Pineau, J. et al. (2021). Improving Reproducibility in Machine Learning Research. JMLR.

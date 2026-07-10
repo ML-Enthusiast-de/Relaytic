@@ -70,6 +70,11 @@
       "passed": true
     },
     {
+      "check_id": "p23_novelty_positioning_ready",
+      "message": "Final preflight requires P23 novelty and adjacent-systems distinction checks.",
+      "passed": true
+    },
+    {
       "check_id": "source_package_audit_passed",
       "message": "P21 requires the source/package audit to pass.",
       "passed": true

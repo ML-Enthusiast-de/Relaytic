@@ -13,11 +13,14 @@
           "docs/paper/arxiv_src/references.bib",
           "docs/reports/paper_release_manifest.json",
           "docs/reports/paper_narrative_polish_manifest.json",
+          "docs/reports/paper_novelty_positioning_manifest.json",
+          "docs/reports/paper_novelty_positioning_audit.json",
+          "docs/reports/paper_adjacent_systems_distinction_matrix.json",
           "docs/reports/paper_arxiv_source_manifest.json",
           "docs/reports/paper_submission_package_audit.json"
         ]
       },
-      "message": "P21 requires the tracked paper/source artifacts plus P13/P14/P20 manifests; local build outputs are checked by the PDF preflight.",
+      "message": "P21 requires the tracked paper/source artifacts plus P13/P14/P20/P23 manifests; local build outputs are checked by the PDF preflight.",
       "passed": true
     },
     {
@@ -59,6 +62,9 @@
     "docs/paper/arxiv_src/references.bib",
     "docs/reports/paper_release_manifest.json",
     "docs/reports/paper_narrative_polish_manifest.json",
+    "docs/reports/paper_novelty_positioning_manifest.json",
+    "docs/reports/paper_novelty_positioning_audit.json",
+    "docs/reports/paper_adjacent_systems_distinction_matrix.json",
     "docs/reports/paper_arxiv_source_manifest.json",
     "docs/reports/paper_submission_package_audit.json"
   ],

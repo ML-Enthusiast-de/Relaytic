@@ -2,7 +2,7 @@
 
 ## Status
 
-Stage 8/8 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, P19-A produces the external score-file governance proof pack, P19-B turns that proof into a reader-facing hosted-score case study, P20 cleans the PaySim selection story plus reader-facing polish, P21 produces the final source/PDF preflight reports plus release changelog, and P22 hardens author-review layout/readability over the final source/PDF bundle. P23 is now registered as an optional pre-submission novelty/distinction hardening slice. Slice 16A remains the next academy implementation slice; final arXiv upload still requires author tag selection, human page review, and a clean tag target.
+Stage 9/9 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, P19-A produces the external score-file governance proof pack, P19-B turns that proof into a reader-facing hosted-score case study, P20 cleans the PaySim selection story plus reader-facing polish, P21 produces the final source/PDF preflight reports plus release changelog, P22 hardens author-review layout/readability over the final source/PDF bundle, and P23 hardens the paper's novelty and adjacent-systems distinction. Slice 16A remains the next academy implementation slice; final arXiv upload still requires author tag selection, human page review, and a clean tag target.
 
 ## Intent
 
@@ -64,8 +64,8 @@ Stage 4 requires a short decision before implementation: prefer an external-scor
 9. **Paper Track P22 - author-review layout hardening and regression closure** - implemented
    Compress the main-body system-evaluation table, move dense audit detail to appendix captions, anchor figures, keep platform command labels with command blocks, refresh Figure 4 and rowless-handoff wording, regenerate the canonical Markdown/LaTeX/PDF bundle, and rerun final preflight without adding benchmark claims.
 
-10. **Paper Track P23 - novelty and adjacent-systems distinction hardening** - planned
-    Make the paper's novelty lane unmistakable before public submission. The slice should not add benchmark numbers or stronger detector claims. It should clarify that Relaytic-AML is not a detector replacement, not generic experiment tracking, not a model card or datasheet substitute, not a general agent benchmark, not an agent-governance trust layer, and not a SAR/narrative-writing assistant. Its distinct claim is a local-first AML evaluation-evidence governance layer around detectors and agents: evidence cells bind local runs to provenance, rowless handoff lets external agents inspect state without raw data, and claim gates decide which public or paper-facing interpretations are admissible.
+10. **Paper Track P23 - novelty and adjacent-systems distinction hardening** - implemented
+    Makes the paper's novelty lane unmistakable before public submission without adding benchmark numbers or stronger detector claims. It clarifies that Relaytic-AML is not a detector replacement, not generic experiment tracking, not a model card or datasheet substitute, not a general agent benchmark, not an agent-governance trust layer, and not a SAR/narrative-writing assistant. Its distinct claim is a local-first AML evaluation-evidence governance layer around detectors and agents: evidence cells bind local runs to provenance, rowless handoff lets external agents inspect state without raw data, and claim gates decide which public or paper-facing interpretations are admissible.
 
 ## Non-Negotiable Gates
 
@@ -80,7 +80,7 @@ Stage 4 requires a short decision before implementation: prefer an external-scor
 
 ## Expected Evidence Artifacts
 
-P16 through P22 introduce committed, machine-readable reports under `docs/reports/`. P16 writes `paper_failure_case_eval.json`, `paper_failure_case_table.json`, `paper_failure_case_manifest.json`, and `paper_failure_case_summary.md`. P17 writes `paper_governance_ablation_eval.json`, `paper_governance_ablation_matrix.json`, `paper_governance_ablation_manifest.json`, and `paper_governance_ablation_summary.md`. P18 writes `paper_governance_invariants.json`, `paper_adjacent_systems_comparison.json`, `paper_invariant_manifest.json`, and `paper_invariant_summary.md`. P19-A writes `paper_external_score_route_decision.json`, `paper_external_score_schema.json`, `paper_external_score_manifest.json`, `paper_external_score_evidence_cells.json`, `paper_external_score_claim_gate.json`, `paper_external_score_handoff_eval.json`, and `paper_external_score_summary.md`. P19-B writes `paper_external_score_case_study.json`, `paper_external_score_paper_panel.json`, `paper_external_score_claim_map.json`, `paper_external_score_repro_card.md`, and `paper_external_score_integration_manifest.json`. P20 writes `paper_paysim_selection_story_review.json`, `paper_reader_guidance_audit.json`, `paper_visual_table_polish_audit.json`, `paper_narrative_polish_manifest.json`, and `paper_polish_readiness.md`. P21 writes `paper_final_pdf_preflight.json`, `paper_final_source_preflight.json`, `paper_final_preflight_manifest.json`, and `paper_final_release_changelog.md`. P22 refreshes the P20/P21 polish and preflight reports plus the canonical Markdown/LaTeX/PDF artifacts after layout-hardening generator changes; it does not add benchmark metrics or headline detector claims. P23 should add a novelty/distinction audit and manuscript/source updates, tentatively `paper_novelty_positioning_audit.json`, `paper_adjacent_systems_distinction_matrix.json`, and refreshed P20/P21/P14 outputs, without adding benchmark numbers.
+P16 through P23 introduce committed, machine-readable reports under `docs/reports/`. P16 writes `paper_failure_case_eval.json`, `paper_failure_case_table.json`, `paper_failure_case_manifest.json`, and `paper_failure_case_summary.md`. P17 writes `paper_governance_ablation_eval.json`, `paper_governance_ablation_matrix.json`, `paper_governance_ablation_manifest.json`, and `paper_governance_ablation_summary.md`. P18 writes `paper_governance_invariants.json`, `paper_adjacent_systems_comparison.json`, `paper_invariant_manifest.json`, and `paper_invariant_summary.md`. P19-A writes `paper_external_score_route_decision.json`, `paper_external_score_schema.json`, `paper_external_score_manifest.json`, `paper_external_score_evidence_cells.json`, `paper_external_score_claim_gate.json`, `paper_external_score_handoff_eval.json`, and `paper_external_score_summary.md`. P19-B writes `paper_external_score_case_study.json`, `paper_external_score_paper_panel.json`, `paper_external_score_claim_map.json`, `paper_external_score_repro_card.md`, and `paper_external_score_integration_manifest.json`. P20 writes `paper_paysim_selection_story_review.json`, `paper_reader_guidance_audit.json`, `paper_visual_table_polish_audit.json`, `paper_narrative_polish_manifest.json`, and `paper_polish_readiness.md`. P21 writes `paper_final_pdf_preflight.json`, `paper_final_source_preflight.json`, `paper_final_preflight_manifest.json`, and `paper_final_release_changelog.md`. P22 refreshes the P20/P21 polish and preflight reports plus the canonical Markdown/LaTeX/PDF artifacts after layout-hardening generator changes; it does not add benchmark metrics or headline detector claims. P23 writes `paper_novelty_positioning_audit.json`, `paper_adjacent_systems_distinction_matrix.json`, `paper_novelty_positioning_manifest.json`, and `paper_novelty_positioning_summary.md`, and makes P14/P21 source preflight require those artifacts before final author review.
 
 - failure-case evaluation manifest and per-case reports
 - governance ablation matrix
@@ -116,7 +116,7 @@ P16 through P22 introduce committed, machine-readable reports under `docs/report
 - `paper_final_preflight_manifest.json`
 - `paper_final_release_changelog.md`
 - P22 refreshed `paper_visual_table_polish_audit.json`, `paper_final_pdf_preflight.json`, `paper_final_source_preflight.json`, `paper_final_preflight_manifest.json`, and the canonical Markdown/LaTeX/PDF bundle after layout-hardening generator changes
-- planned P23 novelty/distinction artifacts: `paper_novelty_positioning_audit.json`, `paper_adjacent_systems_distinction_matrix.json`, refreshed adjacent-systems comparison, and regenerated Markdown/LaTeX/PDF if implemented
+- P23 novelty/distinction artifacts: `paper_novelty_positioning_audit.json`, `paper_adjacent_systems_distinction_matrix.json`, `paper_novelty_positioning_manifest.json`, `paper_novelty_positioning_summary.md`, refreshed adjacent-systems comparison, and regenerated Markdown/LaTeX/PDF artifacts
 
 ## Stage 1 Acceptance
 
@@ -211,7 +211,7 @@ Stage 8 is complete when:
 4. The canonical Markdown, LaTeX source, and PDF are regenerated from the generators rather than manually edited.
 5. Final preflight reports `ready_for_author_review_not_tagged`, focused P13-P21 paper tests and strengthening-plan regression tests pass, the leak scan passes, fonts and metadata are clean, and rendered-page inspection covers figures, tables, appendix audit records, and command blocks.
 
-## Stage 9 Acceptance (planned)
+## Stage 9 Acceptance (completed)
 
 Stage 9 is complete when:
 
@@ -229,7 +229,7 @@ Stage 9 is complete when:
 Stage 0 is complete when:
 
 1. This planning file exists.
-2. `RELAYTIC_BUILD_MASTER.md` and `RELAYTIC_SLICING_PLAN.md` reference P16-P23 as the paper-strengthening follow-on, with P16-P22 implemented and P23 planned.
-3. `IMPLEMENTATION_STATUS.md` records that P23 is the optional next paper-positioning slice before public submission if the author selects it.
+2. `RELAYTIC_BUILD_MASTER.md` and `RELAYTIC_SLICING_PLAN.md` reference P16-P23 as the paper-strengthening follow-on, with P16-P23 implemented.
+3. `IMPLEMENTATION_STATUS.md` records that P23 is implemented and that Slice 16A is the next engineering slice while public submission remains a human release action.
 4. A regression test asserts that the plan includes P16-P23, the required failure cases, the governance-ablation metrics, the no-overclaim gates, and the P23 novelty/distinction acceptance criteria.
 5. No paper generator, benchmark result, PDF, or arXiv source behavior changes in Stage 0.

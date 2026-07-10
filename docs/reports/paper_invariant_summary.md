@@ -4,7 +4,7 @@
 - Invariant status: `pass`
 - Adjacent-systems status: `pass`
 - Current invariant count: `7`
-- Adjacent family count: `6`
+- Adjacent family count: `9`
 - Proof obligation passed: `True`
 - Next slice: `Paper Track P19 - hosted detector workflow demonstration, if selected`
 
@@ -30,3 +30,6 @@
 | MLOps experiment tracking | runs, metrics, parameters, artifacts, lineage, and model versions | focuses on local AML evidence, privacy posture, rowless handoff, and public scientific claim admissibility |
 | Agent benchmarks and research-agent evaluations | agent performance on research, coding, or skill-use tasks | uses agents inside a governed local evaluation lab and then tests whether their outputs stay artifact-attached |
 | AML detector and benchmark papers | detector architecture, benchmark result, graph construction, or financial-crime dataset | provides the local evidence and claim-governance substrate that such detector studies can run through |
+| AML LLM graph reasoning and triage systems | LLM reasoning, triage, serving, and evidence-rich prompts for AML workflows | keeps LLM or external-agent help downstream of rowless local evidence, artifact provenance, and claim gates |
+| Agentic SAR and compliance narrative assistants | human-in-the-loop SAR or compliance narrative drafting | governs the local experimental evidence and admissible claims that such narrative workflows should cite |
+| Agent governance and runtime trust layers | runtime policies, enforcement, logging, trust scoring, and path-dependent agent governance | specializes governance to local AML evidence cells, rowless handoff, benchmark context, and paper/public claim admissibility |

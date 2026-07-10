@@ -1680,6 +1680,26 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p23 = release_safety_sub.add_parser(
+        "paper-novelty-positioning",
+        help="Build Paper Track P23 novelty and adjacent-systems distinction reports.",
+    )
+    release_safety_p23.add_argument(
+        "--source-report-dir",
+        default=None,
+        help="Optional directory containing paper source reports. Defaults to docs/reports/.",
+    )
+    release_safety_p23.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P23 report artifacts. Defaults to docs/reports/.",
+    )
+    release_safety_p23.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3767,6 +3787,11 @@ def main(argv: list[str] | None = None) -> int:
                 )
             elif args.release_safety_command == "paper-final-preflight":
                 payload = _run_paper_final_preflight_surface(
+                    source_report_dir=args.source_report_dir,
+                    output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-novelty-positioning":
+                payload = _run_paper_novelty_positioning_surface(
                     source_report_dir=args.source_report_dir,
                     output_dir=args.output_dir,
                 )
@@ -8295,6 +8320,46 @@ def _run_paper_final_preflight_surface(
             "bundle": pack,
         },
         "human_output": render_paper_final_preflight_markdown(pack),
+    }
+
+
+def _run_paper_novelty_positioning_surface(
+    *,
+    source_report_dir: str | None,
+    output_dir: str | None,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        render_paper_novelty_positioning_markdown,
+        sync_paper_novelty_positioning_pack,
+    )
+
+    root = Path.cwd()
+    written = sync_paper_novelty_positioning_pack(
+        root,
+        source_report_dir=source_report_dir,
+        output_dir=output_dir,
+    )
+    pack: dict[str, Any] = {}
+    for key, path in written.items():
+        if path.suffix == ".json":
+            pack[key] = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            pack[key] = path.read_text(encoding="utf-8")
+    manifest = dict(pack["paper_novelty_positioning_manifest"])
+    audit = dict(pack["paper_novelty_positioning_audit"])
+    matrix = dict(pack["paper_adjacent_systems_distinction_matrix"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_novelty_positioning_manifest": manifest,
+            "paper_novelty_positioning_audit": audit,
+            "paper_adjacent_systems_distinction_matrix": matrix,
+            "paper_novelty_positioning_summary": pack["paper_novelty_positioning_summary"],
+            "bundle": pack,
+        },
+        "human_output": render_paper_novelty_positioning_markdown(pack),
     }
 
 

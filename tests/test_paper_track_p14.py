@@ -47,6 +47,8 @@ def test_paper_track_p14_builds_arxiv_source_release_candidate() -> None:
     assert manifest["figure_audit"]["svg_references_remaining"] == []
     assert manifest["next_slice"].startswith("Paper Track P21")
     assert any(check["check_id"] == "p20_narrative_polish_passed" and check["passed"] for check in manifest["checks"])
+    assert any(check["check_id"] == "p23_novelty_positioning_passed" and check["passed"] for check in manifest["checks"])
+    assert "docs/reports/paper_novelty_positioning_manifest.json" in manifest["p23_novelty_refs"]
     assert not manifest["failed_checks"]
 
     assert audit["status"] == "pass"
@@ -54,8 +56,9 @@ def test_paper_track_p14_builds_arxiv_source_release_candidate() -> None:
     assert any(check["check_id"] == "author_and_pdf_metadata_present" and check["passed"] for check in audit["checks"])
     assert audit["upload_blockers_remaining"]
     assert "replace placeholder author" not in "\n".join(audit["upload_blockers_remaining"])
-    assert "ML-Enthusiast" in main_tex
-    assert "pdftitle=" in main_tex and "pdfauthor=" in main_tex
+    assert "Tobias Gehra" in main_tex
+    assert "t.gehra.ai@gmail.com" in main_tex
+    assert "pdftitle=" in main_tex and "pdfauthor={Tobias Gehra}" in main_tex
     assert r"\begin{algorithm}" in main_tex
     assert ("TODO" + "_EVIDENCE") not in main_tex
     assert r"TODO\_EVIDENCE" not in main_tex
@@ -138,6 +141,7 @@ def test_paper_track_p14_committed_source_bundle_is_ready() -> None:
     assert manifest["citation_audit"]["status"] == "pass"
     assert manifest["figure_audit"]["status"] == "pass"
     assert any(check["check_id"] == "p20_narrative_polish_passed" and check["passed"] for check in manifest["checks"])
+    assert any(check["check_id"] == "p23_novelty_positioning_passed" and check["passed"] for check in manifest["checks"])
     assert audit["status"] == "pass"
     assert audit["violation_count"] == 0
     assert any(check["check_id"] == "author_and_pdf_metadata_present" and check["passed"] for check in audit["checks"])

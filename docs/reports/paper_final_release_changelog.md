@@ -14,6 +14,7 @@
 - split reproduction commands into copy-paste-safe Windows and macOS/Linux blocks
 - added concrete PaySim and Elliptic review-budget queue counts from existing artifacts
 - renamed the AI disclosure and kept it short and professional
+- added the P23 novelty and adjacent-systems distinction gate around detector and agent-assisted AML workflows
 
 ## Claims Intentionally Not Made
 

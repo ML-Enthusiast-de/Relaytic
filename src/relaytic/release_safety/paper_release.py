@@ -1153,6 +1153,10 @@ def _render_final_paper_v2(
             "",
             "Experiment-tracking systems preserve runs and artifacts [@zaharia2018mlflow]; model cards describe trained models; datasheets describe data; reproducibility checklists improve reporting; and agent benchmarks evaluate agent behavior. Relaytic-AML handles a different responsibility: determining which public scientific claims a local AML evidence cell is allowed to support. The claim-governance responsibility is especially important when evidence comes from licensed files, proxy datasets, temporal graph tasks, or rowless handoff packets rather than from a single open leaderboard run.",
             "",
+            "A closely related newer line uses LLMs and agents for AML triage, graph-context reasoning, suspicious activity report (SAR) narrative support, compliance serving stacks, and runtime agent governance [@pirmorad2025amlgraphllm; @naik2025coinvestigator; @naik2026llmopsaml; @gaurav2025governanceaas; @kaptein2026runtimegovernance]. Those systems make agent assistance more capable, but they also make evidence boundaries more important. Relaytic-AML is not a SAR drafting system, not an LLM detector, and not a general-purpose agent-governance product. Its role is narrower: keep local AML evidence, rowless handoff, and public claims aligned.",
+            "",
+            "**What is new.** Relaytic-AML is a governance substrate around detectors and agent-assisted workflows. It would be used to wrap detector outputs, LLM explanations, hosted score files, and paper tables with evidence cells, rowless handoff, and claim gates. A company would not use it as a detector replacement; it would use it to make the local evaluation record inspectable before a result becomes a benchmark row, a handoff packet, or a public claim. In short, Relaytic-AML is not a detector replacement. It is the local evidence layer around detectors and agents.",
+            "",
             adjacent_systems_table,
             "",
             "Relaytic-AML does not replace dataset documentation, model cards, experiment trackers, or detector papers. The system ties those concerns together for local AML research: a model result is only reader-facing after its source posture, split, leakage policy, budget, artifact field, handoff posture, and claim boundary are visible.",
@@ -1278,7 +1282,10 @@ def _render_final_paper_v2(
             "",
             "```bash",
             "python -m pip install -e \".[full]\"",
+            "python -m relaytic.ui.cli release-safety paper-invariants --format json",
             "python -m relaytic.ui.cli release-safety paper-release --format json",
+            "python -m relaytic.ui.cli release-safety paper-narrative-polish --format json",
+            "python -m relaytic.ui.cli release-safety paper-novelty-positioning --format json",
             "python -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
             "python -m relaytic.ui.cli release-safety paper-final-preflight --format json",
             "```",
@@ -1337,9 +1344,12 @@ def _render_final_paper_v2(
             "",
             "```powershell",
             "py -3.11 -m pip install -e \".[full]\"",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-release --format json",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "py -3.11 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q",
+            "py -3.11 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py -q",
             "```",
             "",
             "After compiling `docs/paper/arxiv_src/main.tex` and copying the PDF to the review draft, run `paper-final-preflight`. The README includes the exact compile/copy commands and the longer audit test matrix.",
@@ -1348,9 +1358,12 @@ def _render_final_paper_v2(
             "",
             "```bash",
             "python3 -m pip install -e \".[full]\"",
+            "python3 -m relaytic.ui.cli release-safety paper-invariants --format json",
             "python3 -m relaytic.ui.cli release-safety paper-release --format json",
+            "python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json",
+            "python3 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json",
             "python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
-            "python3 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py -q",
+            "python3 -m pytest tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py -q",
             "```",
             "",
             "## References",
@@ -1721,7 +1734,7 @@ def _render_handoff_recovery_table(inputs: dict[str, Any]) -> str:
 
 def _render_reproducibility_table(inputs: dict[str, Any]) -> str:
     rows = [
-        ["Public paper rebuild", "paper-release; paper-arxiv-source; paper-final-preflight", "Markdown, LaTeX source, figures, PDF/log/font preflight", "Clean clone with Python >=3.10 and local TeX for PDF checks"],
+        ["Public paper rebuild", "invariants; release; polish; novelty; source; final preflight", "Markdown, LaTeX source, figures, PDF/log/font preflight", "Clean clone with Python >=3.10 and local TeX for PDF checks"],
         ["System fixtures", "paper-system-eval; paper-failure-eval; paper-governance-ablation; paper-invariants", "navigation, handoff, recovery, claim-gate, and disabled-component checks", "Repo-local deterministic fixtures only"],
         ["Hosted-score fixture", "paper-external-score-proof; paper-external-score-integration", "rowless score schema, evidence cell, redaction, and claim map", "Repo-local rowless fixture; optional local score files stay local"],
         ["PaySim benchmark", "paysim-competitive --budget-tier competitive --run-optional", "selected PaySim PR-AUC and review-budget cells", f"Local Kaggle PaySim file; {_repro_hash_summary(inputs, 'paysim_temporal_transaction_fraud')}"],
@@ -2364,7 +2377,7 @@ def _render_arxiv_checklist(
             "- [ ] Include `docs/paper/references.bib` and verify every in-text citation has a matching BibTeX key.",
             "- [ ] Verify the converted PDF figures in `docs/paper/arxiv_src/figures/` are accepted by the selected arXiv processor.",
             "- [ ] Keep the table values synchronized with `docs/paper/tables/table_manifest.json` and `docs/reports/paper_metric_cell_audit.json`.",
-            "- [ ] Verify the pseudonymous author block, affiliation, contact, and optional acknowledgements before upload.",
+            "- [ ] Verify the author block, affiliation, contact, and optional acknowledgements before upload.",
             "- [ ] Confirm the AI-assistance disclosure is accurate before upload.",
             "",
             "## Public Claim Discipline",
@@ -2518,6 +2531,52 @@ def _render_references_bib() -> str:
   url = {https://arxiv.org/abs/2503.24259}
 }
 
+@misc{pirmorad2025amlgraphllm,
+  title = {{Exploring the In-Context Learning Capabilities of LLMs for Money Laundering Detection in Financial Graphs}},
+  author = {Pirmorad, Erfan},
+  year = {2025},
+  eprint = {2507.14785},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2507.14785},
+  url = {https://arxiv.org/abs/2507.14785}
+}
+
+@misc{naik2025coinvestigator,
+  title = {{Co-Investigator AI: The Rise of Agentic AI for Smarter, Trustworthy AML Compliance Narratives}},
+  author = {Naik, Prathamesh Vasudeo and Dintakurthi, Naresh Kumar and Hu, Zhanghao and Wang, Yue and Qiu, Robby},
+  year = {2025},
+  eprint = {2509.08380},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2509.08380}
+}
+
+@misc{naik2026llmopsaml,
+  title = {{Rethinking LLMOps for Fraud and AML: Building a Compliance-Grade LLM Serving Stack}},
+  author = {Naik, Prathamesh Vasudeo and Dintakurthi, Naresh Kumar and Wang, Yue},
+  year = {2026},
+  eprint = {2605.11232},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2605.11232}
+}
+
+@misc{gaurav2025governanceaas,
+  title = {{Governance-as-a-Service: A Multi-Agent Framework for AI System Compliance and Policy Enforcement}},
+  author = {Gaurav, Yugam and Heikkonen, Jukka and Chaudhary, Vishal},
+  year = {2025},
+  eprint = {2508.18765},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2508.18765}
+}
+
+@misc{kaptein2026runtimegovernance,
+  title = {{Runtime Governance for AI Agents: Policies on Paths}},
+  author = {Kaptein, Maurits and Khan, Hassan and Podstavnychy, Vitalii},
+  year = {2026},
+  eprint = {2603.16586},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2603.16586}
+}
+
 @article{gebru2021datasheets,
   title = {{Datasheets for Datasets}},
   author = {Gebru, Timnit and Morgenstern, Jamie and Vecchione, Briana and Vaughan, Jennifer Wortman and Wallach, Hanna and Daume III, Hal and Crawford, Kate},
@@ -2622,6 +2681,11 @@ def _render_reference_section() -> str:
             "- Tariq, H., and Hassani, M. (2026). Extracting Money Laundering Transactions from Quasi-Temporal Graph Representation. arXiv:2604.02899.",
             "- Ye, H., Laxman, A., Yuan, Y., Flautner, K., and Talati, N. (2026). BlazingAML: High-Throughput Anti-Money Laundering via Multi-Stage Graph Mining. arXiv:2604.12241.",
             "- Deprez, B., Wei, W., Verbeke, W., Baesens, B., Mets, K., and Verdonck, T. (2025). Advances in Continual Graph Learning for Anti-Money Laundering Systems. arXiv:2503.24259.",
+            "- Pirmorad, E. (2025). Exploring the In-Context Learning Capabilities of LLMs for Money Laundering Detection in Financial Graphs. arXiv:2507.14785.",
+            "- Naik, P. V., Dintakurthi, N. K., Hu, Z., Wang, Y., and Qiu, R. (2025). Co-Investigator AI. arXiv:2509.08380.",
+            "- Naik, P. V., Dintakurthi, N. K., and Wang, Y. (2026). Rethinking LLMOps for Fraud and AML. arXiv:2605.11232.",
+            "- Gaurav, Y., Heikkonen, J., and Chaudhary, V. (2025). Governance-as-a-Service. arXiv:2508.18765.",
+            "- Kaptein, M., Khan, H., and Podstavnychy, V. (2026). Runtime Governance for AI Agents. arXiv:2603.16586.",
             "- Gebru, T. et al. (2021). Datasheets for Datasets. Communications of the ACM.",
             "- Mitchell, M. et al. (2019). Model Cards for Model Reporting. FAT* 2019.",
             "- Pineau, J. et al. (2021). Improving Reproducibility in Machine Learning Research. JMLR.",
@@ -2706,6 +2770,36 @@ def _source_verification_records() -> list[dict[str, str]]:
             "citation_key": "deprez2025continualaml",
             "source_url": "https://arxiv.org/abs/2503.24259",
             "verified_role": "Recent continual-learning and drift context for AML graph systems.",
+            "accessed_date": SOURCE_VERIFICATION_DATE,
+        },
+        {
+            "citation_key": "pirmorad2025amlgraphllm",
+            "source_url": "https://arxiv.org/abs/2507.14785",
+            "verified_role": "Recent AML graph-reasoning context using LLM in-context learning rather than a local evidence-governance layer.",
+            "accessed_date": SOURCE_VERIFICATION_DATE,
+        },
+        {
+            "citation_key": "naik2025coinvestigator",
+            "source_url": "https://arxiv.org/abs/2509.08380",
+            "verified_role": "Agentic SAR and compliance-narrative assistant context for distinguishing Relaytic-AML from report-writing workflows.",
+            "accessed_date": SOURCE_VERIFICATION_DATE,
+        },
+        {
+            "citation_key": "naik2026llmopsaml",
+            "source_url": "https://arxiv.org/abs/2605.11232",
+            "verified_role": "Compliance-grade LLMOps serving-stack context for distinguishing Relaytic-AML from AML LLM deployment infrastructure.",
+            "accessed_date": SOURCE_VERIFICATION_DATE,
+        },
+        {
+            "citation_key": "gaurav2025governanceaas",
+            "source_url": "https://arxiv.org/abs/2508.18765",
+            "verified_role": "General multi-agent AI governance framework context.",
+            "accessed_date": SOURCE_VERIFICATION_DATE,
+        },
+        {
+            "citation_key": "kaptein2026runtimegovernance",
+            "source_url": "https://arxiv.org/abs/2603.16586",
+            "verified_role": "Runtime path-policy governance context for agent systems.",
             "accessed_date": SOURCE_VERIFICATION_DATE,
         },
         {

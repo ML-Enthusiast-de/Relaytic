@@ -33,6 +33,9 @@ REQUIRED_PAPER_FINAL_PREFLIGHT_INPUT_REFS = [
     "docs/paper/arxiv_src/references.bib",
     "docs/reports/paper_release_manifest.json",
     "docs/reports/paper_narrative_polish_manifest.json",
+    "docs/reports/paper_novelty_positioning_manifest.json",
+    "docs/reports/paper_novelty_positioning_audit.json",
+    "docs/reports/paper_adjacent_systems_distinction_matrix.json",
     "docs/reports/paper_arxiv_source_manifest.json",
     "docs/reports/paper_submission_package_audit.json",
 ]
@@ -150,6 +153,7 @@ def render_paper_final_release_changelog(pack: dict[str, Any]) -> str:
         "- split reproduction commands into copy-paste-safe Windows and macOS/Linux blocks",
         "- added concrete PaySim and Elliptic review-budget queue counts from existing artifacts",
         "- renamed the AI disclosure and kept it short and professional",
+        "- added the P23 novelty and adjacent-systems distinction gate around detector and agent-assisted AML workflows",
         "",
         "## Claims Intentionally Not Made",
         "",
@@ -182,6 +186,9 @@ def _collect_inputs(*, root: Path, report_dir: Path) -> dict[str, Any]:
         "main_log": _read_text_artifact(source_dir / "main.log", root=root),
         "paper_release_manifest": _read_json_artifact(report_dir / "paper_release_manifest.json", root=root),
         "paper_narrative_polish_manifest": _read_json_artifact(report_dir / "paper_narrative_polish_manifest.json", root=root),
+        "paper_novelty_positioning_manifest": _read_json_artifact(report_dir / "paper_novelty_positioning_manifest.json", root=root),
+        "paper_novelty_positioning_audit": _read_json_artifact(report_dir / "paper_novelty_positioning_audit.json", root=root),
+        "paper_adjacent_systems_distinction_matrix": _read_json_artifact(report_dir / "paper_adjacent_systems_distinction_matrix.json", root=root),
         "paper_arxiv_source_manifest": _read_json_artifact(report_dir / "paper_arxiv_source_manifest.json", root=root),
         "paper_submission_package_audit": _read_json_artifact(report_dir / "paper_submission_package_audit.json", root=root),
     }
@@ -256,6 +263,13 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
             "p20_polish_ready",
             _payload(inputs["paper_narrative_polish_manifest"]).get("status") == "ready_for_final_pdf_preflight",
             "P21 requires the P20 paper-polish gate to pass.",
+        ),
+        _check(
+            "p23_novelty_positioning_ready",
+            _payload(inputs["paper_novelty_positioning_manifest"]).get("status") == "ready_for_final_author_review"
+            and _payload(inputs["paper_novelty_positioning_audit"]).get("status") == "pass"
+            and _payload(inputs["paper_adjacent_systems_distinction_matrix"]).get("status") == "pass",
+            "Final preflight requires P23 novelty and adjacent-systems distinction checks.",
         ),
         _check(
             "source_package_audit_passed",
@@ -384,7 +398,8 @@ def _build_pdf_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
         _check(
             "pdf_metadata_present_in_source",
             "pdftitle={Relaytic-AML:" in _text_payload(inputs["main_tex"])
-            and "pdfauthor={ML-Enthusiast-de}" in _text_payload(inputs["main_tex"]),
+            and "pdfauthor={Tobias Gehra}" in _text_payload(inputs["main_tex"])
+            and "t.gehra.ai@gmail.com" in _text_payload(inputs["main_tex"]),
             "PDF metadata must be present in the generated TeX source.",
         ),
     ]
@@ -408,7 +423,7 @@ def _build_manifest(
         _check(
             "required_inputs_present",
             not required["missing_artifact_refs"],
-            "P21 requires the tracked paper/source artifacts plus P13/P14/P20 manifests; local build outputs are checked by the PDF preflight.",
+            "P21 requires the tracked paper/source artifacts plus P13/P14/P20/P23 manifests; local build outputs are checked by the PDF preflight.",
             detail=required,
         ),
         _check(
