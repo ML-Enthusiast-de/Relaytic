@@ -96,6 +96,7 @@ def _seed_p21_fixture(root: Path, *, include_local_build: bool = True) -> None:
         "paper_novelty_positioning_manifest.json": {"status": "ready_for_final_author_review"},
         "paper_novelty_positioning_audit.json": {"status": "pass"},
         "paper_adjacent_systems_distinction_matrix.json": {"status": "pass"},
+        "paper_p24_release_manifest.json": {"status": "release_candidate_ready_for_human_upload"},
         "paper_arxiv_source_manifest.json": {"status": "ready_for_source_release_candidate"},
         "paper_submission_package_audit.json": {"status": "pass"},
     }.items():
@@ -203,10 +204,13 @@ def test_paper_track_p21_committed_preflight_reports_are_ready() -> None:
     assert manifest["local_build_artifact_refs"] == LOCAL_PAPER_FINAL_BUILD_REFS
     assert source["status"] == "pass"
     assert pdf["status"] == "pass"
-    assert "Table 5. System evaluation summary" in draft
+    assert "Table 5. Deterministic artifact and release-gate checks" in draft
     assert "Appendix table. Hosted external-score case study" in draft
     assert "## AI Assistance Disclosure" in draft
-    assert "Source commit:" in draft
+    assert (
+        "Source commit:" in draft
+        or "final clean-release command injects and verifies the exact source revision" in draft
+    )
     assert "Public release tag: TODO before arXiv submission" not in draft
     assert "Table 2a" not in main_tex
     assert "\\textbf{Table" not in main_tex

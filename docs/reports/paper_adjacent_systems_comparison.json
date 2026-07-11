@@ -52,7 +52,7 @@
         "bellei2024elliptic2",
         "song2024revtrack",
         "chen2026transxion",
-        "poon2026linemvgnn",
+        "poon2025linemvgnn",
         "ye2026blazingaml"
       ]
     },
@@ -148,7 +148,7 @@
         "bellei2024elliptic2",
         "song2024revtrack",
         "chen2026transxion",
-        "poon2026linemvgnn",
+        "poon2025linemvgnn",
         "ye2026blazingaml"
       ],
       "what_it_covers": "modeling frontier for temporal and graph AML detection"

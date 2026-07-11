@@ -319,18 +319,18 @@ def _build_paysim_selection_story_review(inputs: dict[str, Any]) -> dict[str, An
             "results_have_nearby_interpretation",
             _result_has_context(
                 draft,
-                "fixed-test PR-AUC 0.6388",
-                ["synthetic temporal-fraud", "validation evidence", "leakage-audited PaySim temporal-proxy"],
+                "PR-AUC 0.6388",
+                ["synthetic temporal-fraud", "single-seed point estimate", "validation"],
             )
             and _result_has_context(
                 draft,
                 "test PR-AUC 0.6688",
-                ["36 true positives", "0 false positives", "limitation"],
+                ["temporal shift", "36 of 11,184", "seed-42 point estimate"],
             )
             and _result_has_context(
                 draft,
                 "PR-AUC 0.9432",
-                ["RevClassifyDS reference", "modern benchmark-context", "governed context"],
+                ["RevClassifyDS", "external reference", "confirmatory"],
             ),
             "Every main result needs nearby interpretation rather than a bare number.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
@@ -339,7 +339,7 @@ def _build_paysim_selection_story_review(inputs: dict[str, Any]) -> dict[str, An
             "detector_superiority_boundary_intact",
             "not evidence of bank-scale AML superiority" in draft
             and "not a new detector architecture" in draft
-            and "governed context" in draft
+            and "not a detector contribution" in draft
             and "hard aml, headline, sota" in _text_payload(inputs["readme"]).lower(),
             "The detector-superiority boundary must remain visible in the paper and README.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
@@ -465,8 +465,8 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
         ),
         _check(
             "figure_four_metric_grouping_explained",
-            "Figure 4 separates ranking metrics from operating-point metrics" in draft
-            and "Precision and recall at the selected review budget" in draft,
+            "Figure 4 separates local ranking evidence, external reference context, and realized review queues" in draft
+            and "must not be read as a cross-dataset leaderboard" in draft,
             "Figure 4 must not mix PR-AUC and review-budget metrics without interpretation.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
@@ -480,14 +480,14 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
         ),
         _check(
             "publication_table_count_present",
-            table_count >= 12 and "Table 5. System evaluation summary" in draft,
+            table_count >= 12 and "Table 5. Deterministic artifact and release-gate checks" in draft,
             "The generated manuscript should contain compact main tables and detailed appendix audit tables.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
             detail={
                 "table_count": table_count,
                 "main_table_count": main_table_count,
                 "appendix_table_count": appendix_table_count,
-                "system_summary_table_present": "Table 5. System evaluation summary" in draft,
+                "system_summary_table_present": "Table 5. Deterministic artifact and release-gate checks" in draft,
             },
         ),
         _check(

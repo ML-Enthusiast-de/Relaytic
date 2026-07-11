@@ -53,25 +53,26 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "@chen2026transxion" in draft
     assert "@ye2026blazingaml" in draft
     assert "Anti-money laundering (AML)" in draft
-    assert "PR-AUC rows of 0.6388" in draft
-    assert "A PR-AUC value or a precision-at-review-budget number" in draft
+    assert "selected PaySim and Elliptic test PR-AUC point estimates are 0.6388 and 0.6688" in draft
+    assert "A precision-recall area under the curve (PR-AUC) estimate" in draft
     assert "In this setting, the score" not in draft
     assert "the score only becomes useful" not in draft
-    assert "The PaySim review-budget row is useful" in draft
-    assert "The Elliptic row supports" in draft
+    assert "realized test queue of 1,109 of 123,580 transactions" in draft
+    assert "Elliptic is a different evidence contract" in draft
     assert "That is a useful operating result" not in draft
     assert "@yang2026skillopt" in draft
-    assert "reproducible governance architecture" in draft
+    assert "evaluation, governance, and reproducibility architecture" in draft
     assert "RQ1" in draft and "RQ4" in draft
     assert "Table 1. Adjacent systems comparison" in draft
     assert "Table 2. Representative evidence cells" in draft
-    assert "Table 3. Dataset, split, and feature policy" in draft
+    assert "Table 3a. Dataset scale and exact split contracts" in draft
+    assert "Table 3b. Feature, leakage, and metric policy" in draft
     assert "Table 4. PaySim modeling path" in draft
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
-    assert "small-sample probe screen" in draft
+    assert "small-sample probe identified" in draft
     assert "Competitive search | XGBoost probe" not in draft
-    assert "Table 5. System evaluation summary" in draft
+    assert "Table 5. Deterministic artifact and release-gate checks" in draft
     assert "Appendix table. Detailed failure-case fixtures" in draft
     assert "Appendix table. Governance machinery ablation" in draft
     assert "Adjacent systems comparison" in draft
@@ -81,7 +82,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "README contains the full regeneration script" in draft
     assert "Appendix table. Evidence routing examples" in draft
     assert "Appendix table. Rowless handoff and interrupted-run recovery examples" in draft
-    assert "Table 6. Reproducibility contract" in draft
+    assert "Table 6. Reproduction modes and dependencies" in draft
     assert ("TODO" + "_EVIDENCE") not in draft
     assert "TODO before arXiv" not in draft
     assert "pending isolated" + " test" not in draft
@@ -179,15 +180,15 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert claims["headline_claims_allowed"] is False
     assert "Relaytic-AML: A Local-First Agentic Evaluation Lab" in draft
     assert "Hosted external-score case study" in draft
-    assert "A PR-AUC value or a precision-at-review-budget number" in draft
+    assert "A precision-recall area under the curve (PR-AUC) estimate" in draft
     assert "In this setting, the score" not in draft
-    assert "The PaySim review-budget row is useful" in draft
-    assert "governed context" in draft
+    assert "realized test queue of 1,109 of 123,580 transactions" in draft
+    assert "modern benchmark context" in draft
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
     assert "README contains the full regeneration script" in draft
     assert "final release tag or archival snapshot" in draft
-    assert "Table 5. System evaluation summary" in draft
+    assert "Table 5. Deterministic artifact and release-gate checks" in draft
     assert "Appendix table. Detailed failure-case fixtures" in draft
     assert "arXiv-ready draft" not in draft
     assert ("TODO" + "_EVIDENCE") not in draft

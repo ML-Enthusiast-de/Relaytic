@@ -1132,6 +1132,18 @@ P22 extends the paper-track release-safety boundary with generator-level layout 
 
 Compatibility boundary: P22 does not add a benchmark result, does not claim detector superiority, and does not expand the public detector API. It preserves the P21 final preflight contract while making the author-review bundle visually stable before the separate human release action.
 
+## Paper Track P24 Release Integrity
+
+P24 extends the paper release-safety boundary without changing detector APIs or benchmark values.
+
+- introduced `src/relaytic/release_safety/paper_release_integrity.py`
+- introduced `relaytic release-safety paper-release-integrity`, including a `--final` mode that refuses dirty worktrees and builds into `dist/paper-release/<commit>/`
+- added machine-readable evidence-authority, metric, split, protocol, citation, statistical, visual, reproduction, semantic, conflict, and release-manifest reports
+- updated `paper-arxiv-source` and `paper-final-preflight` so the final source path depends on passing P24 integrity reports
+- preserved the public `relaytic` package and CLI namespace; no legacy compatibility surface was expanded
+
+Compatibility boundary: P24 is publication infrastructure. It does not add a detector, alter benchmark outputs, claim production AML validity, create a tag, or upload to arXiv.
+
 ## Removal Criteria
 
 The remaining compatibility layer can be removed when all of the following are true:

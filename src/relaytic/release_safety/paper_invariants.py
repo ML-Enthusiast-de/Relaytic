@@ -479,7 +479,7 @@ def _build_adjacent_systems_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]
         },
         {
             "adjacent_family": "AML detector and benchmark papers",
-            "representative_sources": ["weber2019elliptic", "bellei2024elliptic2", "song2024revtrack", "chen2026transxion", "poon2026linemvgnn", "ye2026blazingaml"],
+            "representative_sources": ["weber2019elliptic", "bellei2024elliptic2", "song2024revtrack", "chen2026transxion", "poon2025linemvgnn", "ye2026blazingaml"],
             "primary_object": "detector architecture, benchmark result, graph construction, or financial-crime dataset",
             "what_it_covers": "modeling frontier for temporal and graph AML detection",
             "relaytic_aml_boundary": "is not a new graph-neural detector and does not claim detector SOTA",

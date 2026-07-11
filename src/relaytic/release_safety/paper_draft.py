@@ -237,8 +237,8 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
             "figure_id": "review_budget",
             "filename": PAPER_FIGURE_FILENAMES["review_budget"],
             "title": (
-                "Benchmark and review-budget evidence: PR-AUC is shown beside precision and recall at "
-                "the bounded review queue instead of being interpreted alone."
+                "Benchmark evidence by task contract: local ranking estimates, Elliptic2 external-reference "
+                "context, and validation-threshold review queues are shown in separate panels."
             ),
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_operational_metric_table.json", "docs/reports/paper_metric_cell_audit.json"],
@@ -932,71 +932,53 @@ def _evidence_cell_schema_svg_v2() -> str:
     return "\n".join(parts)
 
 def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
-    ranking = [
-        ("PaySim", "synthetic temporal proxy", _cell_value(cells, "paysim_p6a_competitive_selected.test_pr_auc"), "#2a9d8f"),
-        ("Elliptic", "temporal graph features", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.test_pr_auc"), "#457b9d"),
-        ("Elliptic2", "local context row", _cell_value(cells, "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean"), "#d6a83a"),
-    ]
+    paysim_pr = _cell_value(cells, "paysim_p6a_competitive_selected.test_pr_auc")
+    elliptic_pr = _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.test_pr_auc")
+    elliptic2_pr = _cell_value(cells, "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean")
     revclassify_ref = _cell_value(cells, "elliptic2_p8b_modern_context.published_reference_pr_auc")
-    operating = [
-        ("PaySim precision", "top queue", _cell_value(cells, "paysim_p6a_competitive_selected.precision_at_review_budget"), "#2a9d8f"),
-        ("PaySim recall", "reviewed fraud", _cell_value(cells, "paysim_p6a_competitive_selected.recall_at_review_budget"), "#6f9f18"),
-        ("Elliptic precision", "top queue", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget"), "#457b9d"),
-        ("Elliptic recall", "reviewed illicit", _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.recall_at_review_budget"), "#f4a261"),
-    ]
-    width = 1400
-    height = 700
+    pay_precision = _cell_value(cells, "paysim_p6a_competitive_selected.precision_at_review_budget")
+    pay_recall = _cell_value(cells, "paysim_p6a_competitive_selected.recall_at_review_budget")
+    ell_precision = _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget")
+    ell_recall = _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.recall_at_review_budget")
+    width = 1500
+    height = 900
     parts = [
         _svg_header(width, height),
-        '<rect x="38" y="30" width="1324" height="606" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
-        '<text x="700" y="72" text-anchor="middle" font-size="26" font-weight="700" fill="#1f2937">Benchmark evidence and review-budget context</text>',
-        '<text x="700" y="106" text-anchor="middle" font-size="18" fill="#4b5563">Ranking metrics and operating-point metrics are grouped separately because they answer different questions.</text>',
+        '<rect x="38" y="28" width="1424" height="824" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
+        '<text x="750" y="70" text-anchor="middle" font-size="26" font-weight="700" fill="#1f2937">Benchmark evidence by task contract</text>',
+        '<text x="750" y="104" text-anchor="middle" font-size="17" fill="#4b5563">Ranking evidence, external context, and realized review queues are reported in separate panels.</text>',
     ]
-    def panel(
-        x0: int,
-        y0: int,
-        title: str,
-        values: list[tuple[str, str, Any, str]],
-        *,
-        marker: tuple[str, Any, str] | None = None,
-    ) -> None:
-        panel_w = 610
-        plot_x = x0 + 230
-        plot_w = 300
-        value_x = plot_x + plot_w + 26
-        parts.append(f'<rect x="{x0}" y="{y0}" width="{panel_w}" height="390" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
-        parts.append(f'<text x="{x0 + 26}" y="{y0 + 40}" font-size="19" font-weight="700" fill="#1f2937">{_xml_escape(title)}</text>')
-        for tick in [0.0, 0.5, 1.0]:
-            tx = plot_x + tick * plot_w
-            parts.append(f'<line x1="{tx:.1f}" y1="{y0 + 66}" x2="{tx:.1f}" y2="{y0 + 326}" stroke="#e5e7eb" stroke-width="1"/>')
-            parts.append(f'<text x="{tx:.1f}" y="{y0 + 352}" text-anchor="middle" font-size="13" fill="#4b5563">{_format_tick(tick)}</text>')
-        if marker is not None:
-            marker_label, marker_value, marker_note = marker
-            marker_float = float(marker_value) if isinstance(marker_value, (int, float)) else 0.0
-            marker_float = max(0.0, min(1.0, marker_float))
-            mx = plot_x + marker_float * plot_w
-            parts.append(f'<line x1="{mx:.1f}" y1="{y0 + 68}" x2="{mx:.1f}" y2="{y0 + 296}" stroke="#374151" stroke-width="1.5" stroke-dasharray="5 5"/>')
-            parts.append(f'<text x="{x0 + panel_w - 26}" y="{y0 + 74}" text-anchor="end" font-size="12" font-weight="700" fill="#374151">{_xml_escape(marker_label)} {_format_metric(marker_value)}</text>')
-            parts.append(f'<text x="{x0 + panel_w - 26}" y="{y0 + 92}" text-anchor="end" font-size="11" fill="#4b5563">{_xml_escape(marker_note)}</text>')
-        for index, (label, detail, raw_value, color) in enumerate(values):
-            y = y0 + 86 + index * 62
-            value = float(raw_value) if isinstance(raw_value, (int, float)) else 0.0
-            value = max(0.0, min(1.0, value))
-            parts.append(f'<text x="{x0 + 26}" y="{y + 15}" font-size="15" font-weight="700" fill="#1f2937">{_xml_escape(label)}</text>')
-            parts.append(f'<text x="{x0 + 26}" y="{y + 36}" font-size="13" fill="#4b5563">{_xml_escape(detail)}</text>')
-            parts.append(f'<rect x="{plot_x}" y="{y + 5}" width="{plot_w}" height="24" rx="4" fill="#edf1f6" stroke="#d1d5db" stroke-width="0.8"/>')
-            parts.append(f'<rect x="{plot_x}" y="{y + 5}" width="{value * plot_w:.1f}" height="24" rx="4" fill="{color}"/>')
-            parts.append(f'<text x="{value_x}" y="{y + 24}" font-size="14" font-weight="700" fill="#1f2937">{_format_metric(raw_value)}</text>')
-    panel(
-        70,
-        148,
-        "Panel A: PR-AUC ranking evidence",
-        ranking,
-        marker=("RevClassifyDS ref.", revclassify_ref, "external paper marker"),
-    )
-    panel(720, 148, "Panel B: fixed review queue", operating)
-    parts.append('<rect x="122" y="574" width="1156" height="42" rx="5" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>')
-    parts.append('<text x="700" y="601" text-anchor="middle" font-size="15" fill="#4b5563">RevClassifyDS is an external reference marker; precision/recall rows use the fixed review-budget policy.</text>')
+
+    def metric_bar(x: int, y: int, label: str, detail: str, value: Any, color: str, width_px: int = 320) -> None:
+        numeric = max(0.0, min(1.0, float(value) if isinstance(value, (int, float)) else 0.0))
+        parts.append(f'<text x="{x}" y="{y}" font-size="15" font-weight="700" fill="#1f2937">{_xml_escape(label)}</text>')
+        parts.append(f'<text x="{x}" y="{y + 23}" font-size="13" fill="#4b5563">{_xml_escape(detail)}</text>')
+        parts.append(f'<rect x="{x + 190}" y="{y - 17}" width="{width_px}" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>')
+        parts.append(f'<rect x="{x + 190}" y="{y - 17}" width="{numeric * width_px:.1f}" height="25" rx="3" fill="{color}"/>')
+        parts.append(f'<text x="{x + 190 + width_px + 18}" y="{y + 2}" font-size="15" font-weight="700" fill="#1f2937">{_format_metric(value)}</text>')
+
+    # Panel A deliberately gives each local dataset its own labeled contract block.
+    parts.append('<rect x="70" y="142" width="660" height="310" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
+    parts.append('<text x="96" y="181" font-size="19" font-weight="700" fill="#1f2937">A. Local test ranking evidence</text>')
+    metric_bar(100, 240, "PaySim", "synthetic temporal proxy; seed 42", paysim_pr, "#2a9d8f")
+    metric_bar(100, 333, "Elliptic", "later graph window; seed 42", elliptic_pr, "#457b9d")
+    parts.append('<text x="100" y="410" font-size="13" fill="#4b5563">Single-seed point estimates; bars summarize within-task ranking only.</text>')
+
+    parts.append('<rect x="770" y="142" width="660" height="310" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
+    parts.append('<text x="796" y="181" font-size="19" font-weight="700" fill="#1f2937">B. Elliptic2 reference context</text>')
+    metric_bar(800, 240, "Local context", "RevTrack-evaluable cohort; 3 seeds", elliptic2_pr, "#d6a83a")
+    metric_bar(800, 333, "RevClassifyDS", "published external reference", revclassify_ref, "#4b5563")
+    parts.append('<text x="800" y="395" font-size="13" fill="#4b5563">Cohort equivalence and parity are not established; test exposure is disclosed.</text>')
+
+    parts.append('<rect x="70" y="486" width="1360" height="242" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
+    parts.append('<text x="96" y="525" font-size="19" font-weight="700" fill="#1f2937">C. Validation-threshold review queues</text>')
+    metric_bar(100, 582, "PaySim precision", "realized 1,109 / 123,580 (0.8974%)", pay_precision, "#2a9d8f", 270)
+    metric_bar(100, 662, "PaySim recall", "requested queue fraction 0.5000%", pay_recall, "#6f9f18", 270)
+    metric_bar(800, 582, "Elliptic precision", "realized 36 / 11,184 (0.3219%)", ell_precision, "#457b9d", 270)
+    metric_bar(800, 662, "Elliptic recall", "requested queue fraction 0.5000%", ell_recall, "#f4a261", 270)
+
+    parts.append('<rect x="170" y="762" width="1160" height="48" rx="5" fill="#f5f7fa" stroke="#9ca3af" stroke-width="1"/>')
+    parts.append('<text x="750" y="792" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">Values across datasets and task contracts are not directly comparable.</text>')
     parts.append('</svg>')
     return "\n".join(parts)
 

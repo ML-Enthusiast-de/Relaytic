@@ -1,0 +1,133 @@
+{
+  "checks": [
+    {
+      "actual": [
+        1,
+        445,
+        6010937,
+        5007
+      ],
+      "display_tokens": [
+        "1-445",
+        "6,010,937",
+        "5,007"
+      ],
+      "expected": [
+        1,
+        445,
+        6010937,
+        5007
+      ],
+      "passed": true,
+      "split": "PaySim train"
+    },
+    {
+      "actual": [
+        446,
+        594,
+        228103,
+        1552
+      ],
+      "display_tokens": [
+        "446-594",
+        "228,103",
+        "1,552"
+      ],
+      "expected": [
+        446,
+        594,
+        228103,
+        1552
+      ],
+      "passed": true,
+      "split": "PaySim validation"
+    },
+    {
+      "actual": [
+        595,
+        743,
+        123580,
+        1654
+      ],
+      "display_tokens": [
+        "595-743",
+        "123,580",
+        "1,654"
+      ],
+      "expected": [
+        595,
+        743,
+        123580,
+        1654
+      ],
+      "passed": true,
+      "split": "PaySim test"
+    },
+    {
+      "actual": [
+        1,
+        29,
+        26381,
+        2871
+      ],
+      "display_tokens": [
+        "1-29",
+        "26,381",
+        "2,871"
+      ],
+      "expected": [
+        1,
+        29,
+        26381,
+        2871
+      ],
+      "passed": true,
+      "split": "Elliptic train"
+    },
+    {
+      "actual": [
+        30,
+        39,
+        8999,
+        1038
+      ],
+      "display_tokens": [
+        "30-39",
+        "8,999",
+        "1,038"
+      ],
+      "expected": [
+        30,
+        39,
+        8999,
+        1038
+      ],
+      "passed": true,
+      "split": "Elliptic validation"
+    },
+    {
+      "actual": [
+        40,
+        49,
+        11184,
+        636
+      ],
+      "display_tokens": [
+        "40-49",
+        "11,184",
+        "636"
+      ],
+      "expected": [
+        40,
+        49,
+        11184,
+        636
+      ],
+      "passed": true,
+      "split": "Elliptic test"
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "pass"
+}

@@ -60,7 +60,7 @@ def test_paper_strengthening_track_records_stage_9_as_implemented() -> None:
     assert "latest paper-strengthening slice" in status
     assert "Paper Track P22 author-review layout hardening" in status
     assert "P23, novelty and adjacent-systems distinction hardening" in status
-    assert "next recommended slice: Paper Track P24" in status
+    assert "next recommended action: review and commit the P24 source candidate" in status
     assert "latest paper-novelty-positioning slice" in status
 
 

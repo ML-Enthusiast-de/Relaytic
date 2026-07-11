@@ -1,6 +1,6 @@
 # Paper Track P24 - Release integrity, protocol disclosure, and revision-locked arXiv candidate
 
-Status: planned
+Status: implemented; exact-revision final build awaits the reviewed clean commit
 
 Trigger: `implement P24`
 

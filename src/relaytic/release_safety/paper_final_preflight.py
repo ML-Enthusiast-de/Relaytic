@@ -36,6 +36,7 @@ REQUIRED_PAPER_FINAL_PREFLIGHT_INPUT_REFS = [
     "docs/reports/paper_novelty_positioning_manifest.json",
     "docs/reports/paper_novelty_positioning_audit.json",
     "docs/reports/paper_adjacent_systems_distinction_matrix.json",
+    "docs/reports/paper_p24_release_manifest.json",
     "docs/reports/paper_arxiv_source_manifest.json",
     "docs/reports/paper_submission_package_audit.json",
 ]
@@ -189,6 +190,7 @@ def _collect_inputs(*, root: Path, report_dir: Path) -> dict[str, Any]:
         "paper_novelty_positioning_manifest": _read_json_artifact(report_dir / "paper_novelty_positioning_manifest.json", root=root),
         "paper_novelty_positioning_audit": _read_json_artifact(report_dir / "paper_novelty_positioning_audit.json", root=root),
         "paper_adjacent_systems_distinction_matrix": _read_json_artifact(report_dir / "paper_adjacent_systems_distinction_matrix.json", root=root),
+        "paper_p24_release_manifest": _read_json_artifact(report_dir / "paper_p24_release_manifest.json", root=root),
         "paper_arxiv_source_manifest": _read_json_artifact(report_dir / "paper_arxiv_source_manifest.json", root=root),
         "paper_submission_package_audit": _read_json_artifact(report_dir / "paper_submission_package_audit.json", root=root),
     }
@@ -250,9 +252,12 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
         _check(
             "release_identifier_visible",
             "Repository: https://github.com/ML-Enthusiast-de/Relaytic" in draft
-            and "Source commit:" in draft
+            and (
+                "Source commit:" in draft
+                or "final clean-release command injects and verifies the exact source revision" in draft
+            )
             and "Public release tag: TODO before arXiv submission" not in draft,
-            "Reproducibility section must identify the repository and a concrete source candidate commit.",
+            "Reproducibility must identify the repository and either a clean source commit or the exact-revision final-build mechanism.",
         ),
         _check(
             "source_manifest_ready",
@@ -270,6 +275,12 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
             and _payload(inputs["paper_novelty_positioning_audit"]).get("status") == "pass"
             and _payload(inputs["paper_adjacent_systems_distinction_matrix"]).get("status") == "pass",
             "Final preflight requires P23 novelty and adjacent-systems distinction checks.",
+        ),
+        _check(
+            "p24_release_integrity_ready",
+            _payload(inputs["paper_p24_release_manifest"]).get("status")
+            == "release_candidate_ready_for_human_upload",
+            "Final preflight requires all P24 evidence, protocol, metric, split, citation, semantic, and visual checks.",
         ),
         _check(
             "source_package_audit_passed",
@@ -302,16 +313,21 @@ def _main_body_system_eval_scan(draft: str) -> dict[str, Any]:
     ]
     violations = [title for title in dense_titles if title in main_body]
     appendix_missing = [title for title in dense_titles if title not in appendix]
+    summary_titles = (
+        "Table 5. Deterministic artifact and release-gate checks",
+        "Table 5. System evaluation summary",
+    )
+    main_summary_present = any(title in main_body for title in summary_titles)
     status = (
         "pass"
-        if "Table 5. System evaluation summary" in main_body
+        if main_summary_present
         and not violations
         and not appendix_missing
         else "fail"
     )
     return {
         "status": status,
-        "main_summary_present": "Table 5. System evaluation summary" in main_body,
+        "main_summary_present": main_summary_present,
         "main_body_dense_table_violations": violations,
         "appendix_missing_detail_titles": appendix_missing,
     }

@@ -26,9 +26,9 @@
       "check_id": "publication_table_count_present",
       "detail": {
         "appendix_table_count": 7,
-        "main_table_count": 6,
+        "main_table_count": 7,
         "system_summary_table_present": true,
-        "table_count": 13
+        "table_count": 14
       },
       "message": "The generated manuscript should contain compact main tables and detailed appendix audit tables.",
       "passed": true,
@@ -77,5 +77,5 @@
   "schema_version": "relaytic.paper_narrative_polish.v1",
   "slice": "Paper Track P20",
   "status": "pass",
-  "table_count": 13
+  "table_count": 14
 }

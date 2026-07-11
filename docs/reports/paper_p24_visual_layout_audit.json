@@ -1,0 +1,23 @@
+{
+  "checks": [
+    {
+      "check": "three distinct panels",
+      "passed": true
+    },
+    {
+      "check": "non-comparability sentence inside figure",
+      "passed": true
+    },
+    {
+      "check": "vector source",
+      "passed": true
+    },
+    {
+      "check": "realized queue context",
+      "passed": true
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "pass"
+}

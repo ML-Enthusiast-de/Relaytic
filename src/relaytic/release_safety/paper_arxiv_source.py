@@ -49,6 +49,12 @@ P23_REQUIRED_REFS = [
     "docs/reports/paper_novelty_positioning_audit.json",
     "docs/reports/paper_adjacent_systems_distinction_matrix.json",
 ]
+P24_REQUIRED_REFS = [
+    "docs/reports/paper_p24_release_manifest.json",
+    "docs/reports/paper_p24_metric_consistency_audit.json",
+    "docs/reports/paper_p24_split_consistency_audit.json",
+    "docs/reports/paper_p24_semantic_source_audit.json",
+]
 
 ARXIV_ALLOWED_GRAPHIC_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".eps"}
 FORBIDDEN_SOURCE_PATTERNS = [
@@ -168,10 +174,11 @@ def build_paper_arxiv_source_pack(
     project_root: str | Path,
     *,
     source_dir: str | Path | None = None,
+    paper_dir: str | Path | None = None,
 ) -> dict[str, Any]:
     """Build the deterministic P14 arXiv source bundle and package audits."""
     root = Path(project_root)
-    inputs = _collect_inputs(root)
+    inputs = _collect_inputs(root, paper_dir=Path(paper_dir) if paper_dir is not None else None)
     arxiv_source_dir = Path(source_dir) if source_dir is not None else root / PAPER_ARXIV_SOURCE_DOC_DIR / PAPER_ARXIV_SOURCE_DIRNAME
     tex_source = _render_latex_source(inputs=inputs)
     figures = _build_pdf_figures(inputs=inputs)
@@ -213,6 +220,7 @@ def sync_paper_arxiv_source_pack(
     *,
     output_dir: str | Path | None = None,
     source_dir: str | Path | None = None,
+    paper_dir: str | Path | None = None,
 ) -> dict[str, Path]:
     """Write the P14 source bundle under docs/paper/arxiv_src and reports under docs/reports."""
     root = Path(project_root)
@@ -223,7 +231,7 @@ def sync_paper_arxiv_source_pack(
     arxiv_source_dir.mkdir(parents=True, exist_ok=True)
     figure_dir.mkdir(parents=True, exist_ok=True)
 
-    pack = build_paper_arxiv_source_pack(root, source_dir=arxiv_source_dir)
+    pack = build_paper_arxiv_source_pack(root, source_dir=arxiv_source_dir, paper_dir=paper_dir)
     written: dict[str, Path] = {}
     for key, filename in PAPER_ARXIV_SOURCE_FILENAMES.items():
         path = report_dir / filename
@@ -267,9 +275,9 @@ def render_paper_arxiv_source_markdown(pack: dict[str, Any]) -> str:
     ).rstrip() + "\n"
 
 
-def _collect_inputs(root: Path) -> dict[str, Any]:
+def _collect_inputs(root: Path, *, paper_dir: Path | None = None) -> dict[str, Any]:
     reports = root / PAPER_ARXIV_SOURCE_REPORT_DIR
-    paper = root / PAPER_ARXIV_SOURCE_DOC_DIR
+    paper = paper_dir if paper_dir is not None else root / PAPER_ARXIV_SOURCE_DOC_DIR
     figure_dir = paper / "figures"
     return {
         "root": root,
@@ -295,6 +303,10 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "paper_adjacent_systems_distinction_matrix": _read_artifact(
             reports / "paper_adjacent_systems_distinction_matrix.json"
         ),
+        "paper_p24_release_manifest": _read_artifact(reports / "paper_p24_release_manifest.json"),
+        "paper_p24_metric_consistency_audit": _read_artifact(reports / "paper_p24_metric_consistency_audit.json"),
+        "paper_p24_split_consistency_audit": _read_artifact(reports / "paper_p24_split_consistency_audit.json"),
+        "paper_p24_semantic_source_audit": _read_artifact(reports / "paper_p24_semantic_source_audit.json"),
         "draft": _read_text_artifact(paper / "relaytic_aml_arxiv_draft.md"),
         "references": _read_text_artifact(paper / "references.bib"),
         "figure_manifest": _read_artifact(figure_dir / "figure_manifest.json"),
@@ -388,6 +400,7 @@ def _build_source_manifest(
                 "docs/reports/paper_release_candidate_checklist.md",
                 *P20_REQUIRED_REFS,
                 *P23_REQUIRED_REFS,
+                *P24_REQUIRED_REFS,
             ],
         },
         "next_slice": NEXT_PAPER_ARXIV_SOURCE_SLICE if source_ready else "Paper Track P14 repair",
@@ -407,6 +420,7 @@ def _source_checks(
     p23_manifest = _payload(inputs["paper_novelty_positioning_manifest"])
     p23_audit = _payload(inputs["paper_novelty_positioning_audit"])
     p23_matrix = _payload(inputs["paper_adjacent_systems_distinction_matrix"])
+    p24_manifest = _payload(inputs["paper_p24_release_manifest"])
     paysim_story = _payload(inputs["paper_paysim_selection_story_review"])
     guidance = _payload(inputs["paper_reader_guidance_audit"])
     polish = _payload(inputs["paper_visual_table_polish_audit"])
@@ -457,6 +471,20 @@ def _source_checks(
             source_artifact="docs/reports/paper_novelty_positioning_manifest.json",
         ),
         _check(
+            "p24_release_integrity_passed",
+            p24_manifest.get("status") == "release_candidate_ready_for_human_upload"
+            and all(
+                _payload(inputs[key]).get("status") == "pass"
+                for key in (
+                    "paper_p24_metric_consistency_audit",
+                    "paper_p24_split_consistency_audit",
+                    "paper_p24_semantic_source_audit",
+                )
+            ),
+            "The source bundle requires P24 metric, split, semantic, and release-integrity gates.",
+            source_artifact="docs/reports/paper_p24_release_manifest.json",
+        ),
+        _check(
             "citation_audit_passed",
             citation_audit.get("status") == "pass",
             "Every generated LaTeX citation must resolve in references.bib.",
@@ -488,7 +516,7 @@ def _required_artifact_presence(inputs: dict[str, Any]) -> dict[str, Any]:
     }
     present = []
     missing = []
-    for ref in [*P13_REQUIRED_REFS, *P20_REQUIRED_REFS, *P23_REQUIRED_REFS]:
+    for ref in [*P13_REQUIRED_REFS, *P20_REQUIRED_REFS, *P23_REQUIRED_REFS, *P24_REQUIRED_REFS]:
         artifact = by_ref.get(ref)
         if artifact and artifact.get("exists"):
             present.append(ref)
@@ -528,7 +556,7 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         "",
         f"\\title{{{_latex_inline(title)}}}",
         r"\author{Tobias Gehra\\Independent Researcher\\GitHub: \texttt{ML-Enthusiast-de}\\\href{mailto:t.gehra.ai@gmail.com}{\texttt{t.gehra.ai@gmail.com}}}",
-        r"\date{June 2026}",
+        r"\date{July 2026}",
         "",
         r"\begin{document}",
         r"\maketitle",
@@ -815,11 +843,12 @@ def _render_latex_table(
             [
                 rf"\Needspace{{{needspace_baselines}\baselineskip}}",
                 r"\begin{center}",
+                r"\begin{minipage}{\linewidth}",
                 f"\\captionof{{table}}{{{_latex_inline(caption)}}}",
             ]
         )
     else:
-        rendered.append(r"\begin{center}")
+        rendered.extend([r"\begin{center}", r"\begin{minipage}{\linewidth}"])
     rendered.extend([
         size,
         r"\setlength{\tabcolsep}{3pt}",
@@ -831,7 +860,7 @@ def _render_latex_table(
     ])
     for row in rows[1:]:
         rendered.append(" & ".join(_latex_inline(cell) for cell in row) + r" \\")
-    rendered.extend([r"\bottomrule", r"\end{tabularx}", r"\end{center}", ""])
+    rendered.extend([r"\bottomrule", r"\end{tabularx}", r"\end{minipage}", r"\end{center}", ""])
     return rendered
 
 
@@ -877,6 +906,26 @@ def _latex_table_spec(headers: list[str], col_count: int) -> str:
             r">{\raggedright\arraybackslash}X "
             r">{\raggedright\arraybackslash}p{0.16\linewidth} "
             r">{\raggedright\arraybackslash}p{0.17\linewidth}"
+            "@{}"
+        )
+    if normalized == ["dataset", "unit / positive", "train", "validation", "test"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.13\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.22\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}X"
+            "@{}"
+        )
+    if normalized == ["dataset", "split policy", "allowed information", "excluded information", "primary reporting"]:
+        return (
+            "@{}"
+            r">{\raggedright\arraybackslash}p{0.12\linewidth} "
+            r">{\raggedright\arraybackslash}p{0.19\linewidth} "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}X "
+            r">{\raggedright\arraybackslash}p{0.20\linewidth}"
             "@{}"
         )
     if normalized == ["check", "what can fail", "relaytic mechanism", "observed signal", "boundary"]:
@@ -964,6 +1013,7 @@ def _latex_inline(text: str) -> str:
     converted = _convert_markdown_citations(converted)
     converted = _convert_inline_code(converted)
     converted = _convert_bold(converted)
+    converted = converted.replace(r"$\pm$", r"\ensuremath{\pm}")
     return _escape_latex(converted)
 
 
@@ -1011,6 +1061,7 @@ def _escape_latex(text: str) -> str:
     text = re.sub(r"\\texttt\{[^}]*\}", lambda match: hold("texttt", match.group(0)), text)
     text = re.sub(r"\\nolinkurl\{[^}]*\}", lambda match: hold("nolinkurl", match.group(0)), text)
     text = re.sub(r"\\textbf\{[^}]*\}", lambda match: hold("textbf", match.group(0)), text)
+    text = re.sub(r"\\ensuremath\{\\pm\}", lambda match: hold("math", match.group(0)), text)
     replacements = {
         "\\": r"\textbackslash{}",
         "&": r"\&",
@@ -1433,7 +1484,7 @@ def _build_submission_package_audit(
         and "pdftitle=" in tex_source
         and "pdfauthor={Tobias Gehra}" in tex_source
         and "t.gehra.ai@gmail.com" in tex_source
-        and r"\date{June 2026}" in tex_source
+        and r"\date{July 2026}" in tex_source
     )
     checks = [
         _check(

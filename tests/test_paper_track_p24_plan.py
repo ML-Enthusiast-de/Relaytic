@@ -20,13 +20,13 @@ def test_p24_release_integrity_slice_is_planned_before_academy() -> None:
     status = _read("IMPLEMENTATION_STATUS.md")
 
     assert "Paper Track P24" in plan
-    assert "Status: planned" in plan
+    assert "Status: implemented" in plan
     assert "Trigger: `implement P24`" in plan
     assert "Paper Track P24" in slicing
     assert "Paper P24" in build
-    assert "next execution target: Paper Track P24" in slicing
-    assert "next planned paper-integrity slice: P24" in status
-    assert "Slice 16A resumes only after P24" in slicing
+    assert "next execution target: human review, clean commit, and P24 exact-revision final build" in slicing
+    assert "latest paper-integrity slice: P24" in status
+    assert "Slice 16A" in slicing and "paper release decision" in slicing
 
 
 def test_p24_plan_preserves_factual_and_claim_boundaries() -> None:

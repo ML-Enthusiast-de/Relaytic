@@ -127,7 +127,7 @@
       "artifact_ref": "docs/paper/references.bib",
       "exists": true,
       "input_id": "references",
-      "sha256_prefix": "8284296b5524"
+      "sha256_prefix": "671fe6deabe1"
     }
   ],
   "next_slice": "Paper Track P19 - hosted detector workflow demonstration, if selected",

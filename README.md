@@ -120,9 +120,11 @@ Windows PowerShell:
 ```powershell
 py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-draft --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 Set-Location docs\paper\arxiv_src
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
@@ -132,7 +134,7 @@ pdflatex -interaction=nonstopmode -halt-on-error main.tex
 Set-Location ..\..\..
 Copy-Item -LiteralPath docs\paper\arxiv_src\main.pdf -Destination docs\paper\relaytic_aml_arxiv_draft.pdf -Force
 py -3.11 -m relaytic.ui.cli release-safety paper-final-preflight --format json
-py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py -q
+py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py tests/test_paper_track_p24.py -q
 ```
 
 macOS/Linux:
@@ -140,9 +142,11 @@ macOS/Linux:
 ```bash
 python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
 python3 -m relaytic.ui.cli release-safety paper-invariants --format json
+python3 -m relaytic.ui.cli release-safety paper-draft --format json
 python3 -m relaytic.ui.cli release-safety paper-release --format json
 python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 python3 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
+python3 -m relaytic.ui.cli release-safety paper-release-integrity --format json
 python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 cd docs/paper/arxiv_src
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
@@ -152,8 +156,10 @@ pdflatex -interaction=nonstopmode -halt-on-error main.tex
 cd ../../..
 cp docs/paper/arxiv_src/main.pdf docs/paper/relaytic_aml_arxiv_draft.pdf
 python3 -m relaytic.ui.cli release-safety paper-final-preflight --format json
-python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py -q
+python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py tests/test_paper_track_p24.py -q
 ```
+
+After the reviewed source changes are committed and `git status --short` is empty, build the upload artifacts from that exact revision with `py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --final --format json` on Windows or the equivalent `python3` command on macOS/Linux. The command refuses a dirty worktree and writes the PDF, source archive, hashes, and revision manifest under `dist/paper-release/<commit>/`.
 
 Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked until later gates explicitly allow them.
 

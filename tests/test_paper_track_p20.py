@@ -120,13 +120,13 @@ def test_paper_track_p20_committed_artifacts_and_reader_path_are_ready() -> None
     assert polish["status"] == "pass"
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
-    assert "A PR-AUC value or a precision-at-review-budget number" in draft
+    assert "A precision-recall area under the curve (PR-AUC) estimate" in draft
     assert "In this setting, the score" not in draft
     assert "the score only becomes useful" not in draft
-    assert "The PaySim review-budget row is useful" in draft
-    assert "The Elliptic row supports" in draft
+    assert "realized test queue of 1,109 of 123,580 transactions" in draft
+    assert "Elliptic is a different evidence contract" in draft
     assert "That is a useful operating result" not in draft
-    assert "small-sample probe screen" in draft
+    assert "small-sample probe identified" in draft
     assert "Competitive search | XGBoost probe" not in draft
     assert "README contains the full regeneration script" in draft
     assert "final release tag or archival snapshot" in draft

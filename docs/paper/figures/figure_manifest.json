@@ -33,7 +33,7 @@
         "docs/reports/paper_metric_cell_audit.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Benchmark and review-budget evidence: PR-AUC is shown beside precision and recall at the bounded review queue instead of being interpreted alone."
+      "title": "Benchmark evidence by task contract: local ranking estimates, Elliptic2 external-reference context, and validation-threshold review queues are shown in separate panels."
     },
     {
       "figure_id": "publishability_matrix",

@@ -32,7 +32,7 @@
     {
       "check_id": "latex_tables_use_real_captions",
       "detail": {
-        "captionof_table_count": 13,
+        "captionof_table_count": 14,
         "status": "pass",
         "violations": []
       },
@@ -56,7 +56,7 @@
     },
     {
       "check_id": "release_identifier_visible",
-      "message": "Reproducibility section must identify the repository and a concrete source candidate commit.",
+      "message": "Reproducibility must identify the repository and either a clean source commit or the exact-revision final-build mechanism.",
       "passed": true
     },
     {
@@ -72,6 +72,11 @@
     {
       "check_id": "p23_novelty_positioning_ready",
       "message": "Final preflight requires P23 novelty and adjacent-systems distinction checks.",
+      "passed": true
+    },
+    {
+      "check_id": "p24_release_integrity_ready",
+      "message": "Final preflight requires all P24 evidence, protocol, metric, split, citation, semantic, and visual checks.",
       "passed": true
     },
     {

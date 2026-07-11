@@ -1700,6 +1700,26 @@ def build_parser() -> argparse.ArgumentParser:
         default="human",
         help="CLI output format. Human is default; JSON is stable for agents.",
     )
+    release_safety_p24 = release_safety_sub.add_parser(
+        "paper-release-integrity",
+        help="Run Paper Track P24 scientific, semantic, and exact-revision release checks.",
+    )
+    release_safety_p24.add_argument(
+        "--output-dir",
+        default=None,
+        help="Optional output directory for P24 reports. Defaults to docs/reports/.",
+    )
+    release_safety_p24.add_argument(
+        "--final",
+        action="store_true",
+        help="Build an out-of-tree exact-revision PDF and source bundle; requires a clean worktree.",
+    )
+    release_safety_p24.add_argument(
+        "--format",
+        choices=["human", "json", "both"],
+        default="human",
+        help="CLI output format. Human is default; JSON is stable for agents.",
+    )
 
     doctor = sub.add_parser(
         "doctor",
@@ -3794,6 +3814,11 @@ def main(argv: list[str] | None = None) -> int:
                 payload = _run_paper_novelty_positioning_surface(
                     source_report_dir=args.source_report_dir,
                     output_dir=args.output_dir,
+                )
+            elif args.release_safety_command == "paper-release-integrity":
+                payload = _run_paper_release_integrity_surface(
+                    output_dir=args.output_dir,
+                    final=args.final,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -8360,6 +8385,41 @@ def _run_paper_novelty_positioning_surface(
             "bundle": pack,
         },
         "human_output": render_paper_novelty_positioning_markdown(pack),
+    }
+
+
+def _run_paper_release_integrity_surface(
+    *,
+    output_dir: str | None,
+    final: bool,
+) -> dict[str, Any]:
+    from relaytic.release_safety import (
+        build_exact_revision_release,
+        render_paper_release_integrity_markdown,
+        sync_paper_release_integrity_pack,
+    )
+
+    root = Path.cwd()
+    if final:
+        manifest = build_exact_revision_release(root)
+        return {
+            "surface_payload": manifest,
+            "human_output": "# Paper P24 Exact-Revision Release\n\n"
+            f"- Status: `{manifest.get('status')}`\n"
+            f"- Source commit: `{manifest.get('source_commit')}`\n",
+        }
+    written = sync_paper_release_integrity_pack(root, output_dir=output_dir)
+    pack = {key: json.loads(path.read_text(encoding="utf-8")) for key, path in written.items()}
+    manifest = dict(pack["paper_p24_release_manifest"])
+    return {
+        "surface_payload": {
+            "status": manifest["status"],
+            "output_dir": str(Path(output_dir) if output_dir else root / "docs" / "reports"),
+            "paths": {key: str(path) for key, path in written.items()},
+            "paper_p24_release_manifest": manifest,
+            "bundle": pack,
+        },
+        "human_output": render_paper_release_integrity_markdown(pack),
     }
 
 

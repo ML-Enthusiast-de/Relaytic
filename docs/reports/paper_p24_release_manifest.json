@@ -1,0 +1,140 @@
+{
+  "arxiv_upload_ready": false,
+  "benchmark_values_changed": false,
+  "checks": [
+    {
+      "passed": true,
+      "report": "paper_p24_evidence_authority",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_baseline_metric_snapshot",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_artifact_conflict_audit",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_protocol_disclosure_audit",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_bibliography_verification",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_claim_citation_map",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_statistical_reporting_decision",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_visual_layout_audit",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_reproduction_semantics",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_metric_consistency_audit",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_split_consistency_audit",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_semantic_source_audit",
+      "status": "pass"
+    }
+  ],
+  "exact_revision_release_required": true,
+  "git": {
+    "commit": "b592241674febe91fe835f56c4d8a7778693d215",
+    "dirty": true,
+    "status_short": [
+      " M IMPLEMENTATION_STATUS.md",
+      " M MIGRATION_MAP.md",
+      " M README.md",
+      " M RELAYTIC_BUILD_MASTER.md",
+      " M RELAYTIC_SLICING_PLAN.md",
+      " M docs/build_slices/phase_paper_release_integrity.md",
+      " M docs/paper/arxiv_src/figures/figure_1_claim_gate_flow.pdf",
+      " M docs/paper/arxiv_src/figures/figure_2_supporting_pr_auc.pdf",
+      " M docs/paper/arxiv_src/figures/figure_3_review_budget.pdf",
+      " M docs/paper/arxiv_src/figures/figure_4_publishability_matrix.pdf",
+      " M docs/paper/arxiv_src/main.tex",
+      " M docs/paper/arxiv_src/references.bib",
+      " M docs/paper/figures/figure_3_review_budget.svg",
+      " M docs/paper/figures/figure_manifest.json",
+      " M docs/paper/references.bib",
+      " M docs/paper/relaytic_aml_arxiv_draft.md",
+      " M docs/paper/relaytic_aml_arxiv_draft.pdf",
+      " M docs/paper/relaytic_aml_draft.md",
+      " M docs/reports/paper_adjacent_systems_comparison.json",
+      " M docs/reports/paper_arxiv_source_manifest.json",
+      " M docs/reports/paper_arxiv_submission_checklist.md",
+      " M docs/reports/paper_final_pdf_preflight.json",
+      " M docs/reports/paper_final_preflight_manifest.json",
+      " M docs/reports/paper_final_release_changelog.md",
+      " M docs/reports/paper_final_source_preflight.json",
+      " M docs/reports/paper_invariant_manifest.json",
+      " M docs/reports/paper_release_manifest.json",
+      " M docs/reports/paper_visual_table_polish_audit.json",
+      " M src/relaytic/release_safety/__init__.py",
+      " M src/relaytic/release_safety/paper_arxiv_source.py",
+      " M src/relaytic/release_safety/paper_draft.py",
+      " M src/relaytic/release_safety/paper_final_preflight.py",
+      " M src/relaytic/release_safety/paper_invariants.py",
+      " M src/relaytic/release_safety/paper_narrative_polish.py",
+      " M src/relaytic/release_safety/paper_release.py",
+      " M src/relaytic/ui/cli.py",
+      " M tests/test_paper_strengthening_plan.py",
+      " M tests/test_paper_track_p13.py",
+      " M tests/test_paper_track_p15.py",
+      " M tests/test_paper_track_p19b.py",
+      " M tests/test_paper_track_p20.py",
+      " M tests/test_paper_track_p21.py",
+      " M tests/test_paper_track_p24_plan.py",
+      "?? docs/reports/paper_p24_artifact_conflict_audit.json",
+      "?? docs/reports/paper_p24_baseline_metric_snapshot.json",
+      "?? docs/reports/paper_p24_bibliography_verification.json",
+      "?? docs/reports/paper_p24_claim_citation_map.json",
+      "?? docs/reports/paper_p24_evidence_authority.json",
+      "?? docs/reports/paper_p24_metric_consistency_audit.json",
+      "?? docs/reports/paper_p24_protocol_disclosure_audit.json",
+      "?? docs/reports/paper_p24_release_manifest.json",
+      "?? docs/reports/paper_p24_reproduction_semantics.json",
+      "?? docs/reports/paper_p24_semantic_source_audit.json",
+      "?? docs/reports/paper_p24_split_consistency_audit.json",
+      "?? docs/reports/paper_p24_statistical_reporting_decision.json",
+      "?? docs/reports/paper_p24_visual_layout_audit.json",
+      "?? src/relaytic/release_safety/paper_release_integrity.py",
+      "?? tests/test_paper_track_p24.py"
+    ]
+  },
+  "human_owned_actions": [
+    "commit the reviewed source",
+    "run final mode from the clean commit",
+    "inspect the exact-revision PDF",
+    "create a tag and upload if approved"
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "release_candidate_ready_for_human_upload"
+}
