@@ -229,8 +229,11 @@ def _build_novelty_audit(*, inputs: dict[str, Any], matrix: dict[str, Any]) -> d
         ),
         _check(
             "not_detector_replacement_boundary_present",
-            "would not use it as a detector replacement" in normalized
-            and "not a detector replacement" in normalized,
+            "governance substrate around detectors" in normalized
+            and (
+                "not a new detector" in normalized
+                or "rather than a replacement for them" in normalized
+            ),
             "The paper must say Relaytic-AML wraps detector workflows rather than replacing detectors.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),

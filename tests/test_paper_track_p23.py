@@ -112,5 +112,5 @@ def test_paper_track_p23_committed_artifacts_are_ready() -> None:
     assert "What is new" in draft
     assert "governance substrate around detectors and agent-assisted workflows" in draft
     assert "wrap detector outputs" in draft
-    assert "not a detector replacement" in draft
+    assert "governance substrate for detector studies rather than a replacement" in draft
     assert "not a SAR drafting system" in draft

@@ -150,7 +150,7 @@ def _build_limitations_matrix(inputs: dict[str, Any]) -> dict[str, Any]:
         ),
         _limitation(
             "LIM-03-elliptic2-context-only",
-            "Elliptic2 is retained as modern context and limitation evidence only; it is not a Relaytic performance contribution in this paper.",
+            "Elliptic2 is retained as modern context and limitation evidence only. It is not a Relaytic performance contribution in this paper.",
             dataset_id="elliptic2_subgraph_aml",
             affected_claims=["claim_subgraph_or_synthetic_bank_graph", "claim_sota_or_hard_aml_superiority"],
             evidence_refs=[
@@ -227,7 +227,7 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
             "filename": PAPER_FIGURE_FILENAMES["supporting_pr_auc"],
             "title": (
                 "Evidence-cell schema: every reported number carries dataset, split, command, artifact, "
-                "budget, leakage posture, operating point, metric, and value; interpretation is stored separately."
+                "budget, leakage posture, operating point, metric, and value. Interpretation is stored separately."
             ),
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_metric_cell_audit.json", "docs/reports/paper_result_table_final.json"],
@@ -318,7 +318,7 @@ def _render_paper_draft(
             "",
             "Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC "
             f"{_metric_value(key, 'paysim_p6a_competitive_selected.test_pr_auc')} and the Elliptic graph-feature row reports test PR-AUC "
-            f"{_metric_value(key, 'elliptic_p7_selected_graph_feature_baseline.test_pr_auc')}; both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates are not established. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.",
+            f"{_metric_value(key, 'elliptic_p7_selected_graph_feature_baseline.test_pr_auc')}. Both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates are not established. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.",
             "",
             "## Introduction",
             "",
@@ -555,7 +555,7 @@ def _render_related_work_sources(related: dict[str, Any]) -> str:
 def _render_benchmark_rows(table: dict[str, Any]) -> str:
     rows = _all_table_rows(table)
     if not rows:
-        return "No P10 benchmark rows were available; this draft is blocked until table generation succeeds."
+        return "No P10 benchmark rows were available. This draft is blocked until table generation succeeds."
     lines = ["| Track | Role | Budget | Claim state | Gate |", "|---|---|---|---|---|"]
     for row in rows:
         lines.append(
@@ -650,7 +650,7 @@ def _claim_gate_flow_svg() -> str:
     parts.append('<text x="490" y="378" text-anchor="middle" font-size="17" fill="#293241">Rowless external handoff</text>')
     parts.append('<rect x="645" y="354" width="280" height="36" rx="6" fill="#fdeeee" stroke="#8d99ae" stroke-width="1.0"/>')
     parts.append('<text x="785" y="378" text-anchor="middle" font-size="17" fill="#293241">Claim gates fail closed</text>')
-    parts.append('<text x="30" y="454" font-size="17" fill="#5b6472">Benchmarks exercise this architecture; they do not replace the local-first artifact and claim-control thesis.</text>')
+    parts.append('<text x="30" y="454" font-size="17" fill="#5b6472">Benchmarks exercise this architecture. They do not replace the local-first artifact and claim-control thesis.</text>')
     parts.append("</svg>")
     return "\n".join(parts)
 
@@ -707,7 +707,7 @@ def _supporting_pr_auc_svg(cells: list[dict[str, Any]]) -> str:
         values=values,
         width=1080,
         height=500,
-        footer="PaySim improves materially under the synthetic task; Elliptic2 remains context, not a parity claim.",
+        footer="PaySim improves materially under the synthetic task. Elliptic2 remains context, not a parity claim.",
     )
 
 
@@ -861,7 +861,7 @@ def _architecture_flow_svg_v2() -> str:
         _svg_header(width, height),
         '<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
         '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Relaytic-AML evidence loop</text>',
-        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Local artifacts are authoritative; agents propose, execute, review, and gate claims through files.</text>',
+        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Local artifacts are authoritative. Agents propose, execute, review, and gate claims through files.</text>',
     ]
     box_w = 205
     gap = 22
@@ -909,7 +909,7 @@ def _evidence_cell_schema_svg_v2() -> str:
         _svg_header(width, height),
         '<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
         '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Evidence-cell facts</text>',
-        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Evidence cells store metric facts; claim gates store admissible use and missing evidence.</text>',
+        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Evidence cells store metric facts. Claim gates store admissible use and missing evidence.</text>',
     ]
     box_w = 340
     box_h = 96
@@ -951,24 +951,25 @@ def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
 
     def metric_bar(x: int, y: int, label: str, detail: str, value: Any, color: str, width_px: int = 320) -> None:
         numeric = max(0.0, min(1.0, float(value) if isinstance(value, (int, float)) else 0.0))
-        parts.append(f'<text x="{x}" y="{y}" font-size="15" font-weight="700" fill="#1f2937">{_xml_escape(label)}</text>')
-        parts.append(f'<text x="{x}" y="{y + 23}" font-size="13" fill="#4b5563">{_xml_escape(detail)}</text>')
+        parts.append(f'<text x="{x}" y="{y}" font-size="18" font-weight="700" fill="#1f2937">{_xml_escape(label)}</text>')
+        parts.append(f'<text x="{x}" y="{y + 25}" font-size="16" fill="#4b5563">{_xml_escape(detail)}</text>')
         parts.append(f'<rect x="{x + 190}" y="{y - 17}" width="{width_px}" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>')
         parts.append(f'<rect x="{x + 190}" y="{y - 17}" width="{numeric * width_px:.1f}" height="25" rx="3" fill="{color}"/>')
-        parts.append(f'<text x="{x + 190 + width_px + 18}" y="{y + 2}" font-size="15" font-weight="700" fill="#1f2937">{_format_metric(value)}</text>')
+        parts.append(f'<text x="{x + 190 + width_px + 18}" y="{y + 2}" font-size="18" font-weight="700" fill="#1f2937">{_format_metric(value)}</text>')
 
     # Panel A deliberately gives each local dataset its own labeled contract block.
     parts.append('<rect x="70" y="142" width="660" height="310" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
     parts.append('<text x="96" y="181" font-size="19" font-weight="700" fill="#1f2937">A. Local test ranking evidence</text>')
-    metric_bar(100, 240, "PaySim", "synthetic temporal proxy; seed 42", paysim_pr, "#2a9d8f")
-    metric_bar(100, 333, "Elliptic", "later graph window; seed 42", elliptic_pr, "#457b9d")
-    parts.append('<text x="100" y="410" font-size="13" fill="#4b5563">Single-seed point estimates; bars summarize within-task ranking only.</text>')
+    metric_bar(100, 240, "PaySim", "synthetic temporal proxy, seed 42", paysim_pr, "#2a9d8f")
+    metric_bar(100, 333, "Elliptic", "later graph window, seed 42", elliptic_pr, "#457b9d")
+    parts.append('<text x="100" y="410" font-size="16" fill="#4b5563">Single-seed point estimates. Bars summarize within-task ranking only.</text>')
 
     parts.append('<rect x="770" y="142" width="660" height="310" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
     parts.append('<text x="796" y="181" font-size="19" font-weight="700" fill="#1f2937">B. Elliptic2 reference context</text>')
-    metric_bar(800, 240, "Local context", "RevTrack-evaluable cohort; 3 seeds", elliptic2_pr, "#d6a83a")
+    metric_bar(800, 240, "Local context", "RevTrack-evaluable cohort, 3 seeds", elliptic2_pr, "#d6a83a")
     metric_bar(800, 333, "RevClassifyDS", "published external reference", revclassify_ref, "#4b5563")
-    parts.append('<text x="800" y="395" font-size="13" fill="#4b5563">Cohort equivalence and parity are not established; test exposure is disclosed.</text>')
+    parts.append('<text x="800" y="393" font-size="15" fill="#4b5563">Cohort equivalence and parity are not established.</text>')
+    parts.append('<text x="800" y="416" font-size="15" fill="#4b5563">The earlier official-test exposure is disclosed.</text>')
 
     parts.append('<rect x="70" y="486" width="1360" height="242" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
     parts.append('<text x="96" y="525" font-size="19" font-weight="700" fill="#1f2937">C. Validation-threshold review queues</text>')
@@ -1001,7 +1002,7 @@ def _claim_gate_examples_svg_v2() -> str:
     ]
     for index, (track, evidence, admissible, needed) in enumerate(rows):
         y = 178 + index * 118
-        parts.append(f'<text x="78" y="{y + 44}" font-size="18" font-weight="700" fill="#1f2937">{_xml_escape(track)}</text>')
+        parts.append(f'<text x="132" y="{y + 44}" text-anchor="end" font-size="17" font-weight="700" fill="#1f2937">{_xml_escape(track)}</text>')
         for x, label, fill, stroke, color in [
             (150, evidence, "#eef6f3", "#91c7b1", "#1f2937"),
             (505, admissible, "#eef4ff", "#9db7e5", "#1f2937"),

@@ -18,7 +18,7 @@
     },
     {
       "check_id": "table_four_selection_story_clean",
-      "message": "Table 4 must not imply the probe winner was the final model-selection decision.",
+      "message": "Table 5 must not imply the probe winner was the final model-selection decision.",
       "passed": true,
       "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
     },
@@ -31,6 +31,22 @@
         "table_count": 14
       },
       "message": "The generated manuscript should contain compact main tables and detailed appendix audit tables.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "impersonal_scientific_voice_and_punctuation",
+      "detail": {
+        "first_person_hits": [],
+        "reader_visible_semicolons": 0
+      },
+      "message": "Reader-facing prose must avoid first-person narration and reader-visible semicolons.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "tables_and_figures_introduced_in_prose",
+      "message": "Every main table and figure must be introduced by the surrounding scientific argument.",
       "passed": true,
       "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
     },

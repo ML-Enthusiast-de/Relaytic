@@ -26,7 +26,7 @@ Deep audit, after the first read:
 
 - System-evaluation proof: `docs/reports/paper_system_task_eval.json`, `docs/reports/paper_system_behavior_eval.json`, `docs/reports/paper_agent_handoff_eval.json`, `docs/reports/paper_no_lost_user_eval.json`, and `docs/reports/paper_claim_gate_case_studies.json`.
 - Metric provenance and claim posture: `docs/reports/paper_result_table_final.json`, `docs/reports/paper_metric_cell_audit.json`, and `docs/reports/paper_publishability_matrix.json`.
-- Final polish/readiness checks: `docs/reports/paper_narrative_polish_manifest.json`, `docs/reports/paper_paysim_selection_story_review.json`, `docs/reports/paper_reader_guidance_audit.json`, `docs/reports/paper_visual_table_polish_audit.json`, `docs/reports/paper_novelty_positioning_manifest.json`, `docs/reports/paper_adjacent_systems_distinction_matrix.json`, `docs/reports/paper_final_preflight_manifest.json`, and `docs/reports/paper_final_release_changelog.md`.
+- Final integrity/readiness checks: `docs/reports/paper_p24_release_manifest.json`, `docs/reports/paper_p24_metric_consistency_audit.json`, `docs/reports/paper_p24_split_consistency_audit.json`, `docs/reports/paper_p24_bibliography_verification.json`, and `docs/reports/paper_final_preflight_manifest.json`.
 
 The long build-control files, especially `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`, are development provenance. They explain how the repo got here, but they are not required reading for the paper.
 
@@ -112,6 +112,7 @@ Inspect:
 - `docs/reports/paper_public_claims_allowed.json` for allowed and blocked public wording.
 - `docs/reports/paper_attention_pack.md` for claim-safe public post text.
 - `docs/reports/paper_final_preflight_manifest.json` and `docs/reports/paper_final_release_changelog.md` for the final source/PDF preflight state.
+- `docs/reports/paper_p24_release_manifest.json` for the consolidated protocol, citation, metric, split, semantic, and visual integrity gate.
 
 Regenerate:
 

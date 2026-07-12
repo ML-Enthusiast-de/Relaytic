@@ -22,7 +22,7 @@
         "docs/reports/paper_result_table_final.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Evidence-cell schema: every reported number carries dataset, split, command, artifact, budget, leakage posture, operating point, metric, and value; interpretation is stored separately."
+      "title": "Evidence-cell schema: every reported number carries dataset, split, command, artifact, budget, leakage posture, operating point, metric, and value. Interpretation is stored separately."
     },
     {
       "figure_id": "review_budget",

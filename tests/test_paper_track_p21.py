@@ -42,7 +42,7 @@ def _seed_p21_fixture(root: Path, *, include_local_build: bool = True) -> None:
             [
                 "# Relaytic-AML",
                 "",
-                "Table 5. System evaluation summary",
+                "Table 6. System evaluation summary",
                 "",
                 "## Appendix: Detailed Audit and Reproducibility Records",
                 "",
@@ -204,7 +204,7 @@ def test_paper_track_p21_committed_preflight_reports_are_ready() -> None:
     assert manifest["local_build_artifact_refs"] == LOCAL_PAPER_FINAL_BUILD_REFS
     assert source["status"] == "pass"
     assert pdf["status"] == "pass"
-    assert "Table 5. Deterministic artifact and release-gate checks" in draft
+    assert "Table 6. Deterministic artifact and release-gate checks" in draft
     assert "Appendix table. Hosted external-score case study" in draft
     assert "## AI Assistance Disclosure" in draft
     assert (

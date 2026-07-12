@@ -808,7 +808,7 @@ def _render_algorithm_block(lines: list[str]) -> list[str]:
         else:
             body.append(r"\State " + _latex_inline(re.sub(r"^\d+\.\s*", "", stripped)))
     rendered = [
-        r"\begin{algorithm}[htbp]",
+        r"\begin{algorithm}[H]",
         f"\\caption{{{_latex_inline(caption)}}}",
         r"\begin{algorithmic}[1]",
     ]

@@ -63,16 +63,25 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "@yang2026skillopt" in draft
     assert "evaluation, governance, and reproducibility architecture" in draft
     assert "RQ1" in draft and "RQ4" in draft
+    assert "### Specialist Roles and State" in draft
+    assert "### Harness Execution and Control Loops" in draft
+    assert "strict action protocol" in draft
+    assert "append-only event stream" in draft
+    assert "Three control loops operate at different levels" in draft
+    manuscript_body = draft.split("## References", 1)[0]
+    prose_without_citations = re.sub(r"\[@[^\]]+\]", "", manuscript_body)
+    assert not re.search(r"\b(?:I|we|our|ours|us)\b", prose_without_citations, flags=re.IGNORECASE)
+    assert ";" not in prose_without_citations
     assert "Table 1. Adjacent systems comparison" in draft
     assert "Table 2. Representative evidence cells" in draft
-    assert "Table 3a. Dataset scale and exact split contracts" in draft
-    assert "Table 3b. Feature, leakage, and metric policy" in draft
-    assert "Table 4. PaySim modeling path" in draft
+    assert "Table 3. Dataset scale and exact split contracts" in draft
+    assert "Table 4. Feature, leakage, and metric policy" in draft
+    assert "Table 5. PaySim modeling path" in draft
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
     assert "small-sample probe identified" in draft
     assert "Competitive search | XGBoost probe" not in draft
-    assert "Table 5. Deterministic artifact and release-gate checks" in draft
+    assert "Table 6. Deterministic artifact and release-gate checks" in draft
     assert "Appendix table. Detailed failure-case fixtures" in draft
     assert "Appendix table. Governance machinery ablation" in draft
     assert "Adjacent systems comparison" in draft
@@ -82,7 +91,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "README contains the full regeneration script" in draft
     assert "Appendix table. Evidence routing examples" in draft
     assert "Appendix table. Rowless handoff and interrupted-run recovery examples" in draft
-    assert "Table 6. Reproduction modes and dependencies" in draft
+    assert "Table 7. Reproduction modes and dependencies" in draft
     assert ("TODO" + "_EVIDENCE") not in draft
     assert "TODO before arXiv" not in draft
     assert "pending isolated" + " test" not in draft
@@ -188,7 +197,7 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert "Full finalist selection" in draft
     assert "README contains the full regeneration script" in draft
     assert "final release tag or archival snapshot" in draft
-    assert "Table 5. Deterministic artifact and release-gate checks" in draft
+    assert "Table 6. Deterministic artifact and release-gate checks" in draft
     assert "Appendix table. Detailed failure-case fixtures" in draft
     assert "arXiv-ready draft" not in draft
     assert ("TODO" + "_EVIDENCE") not in draft

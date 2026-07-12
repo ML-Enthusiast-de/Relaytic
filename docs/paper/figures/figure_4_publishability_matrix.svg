@@ -5,7 +5,7 @@
 <text x="255" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence cell</text>
 <text x="610" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">admissible paper use</text>
 <text x="965" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence for stronger use</text>
-<text x="78" y="222" font-size="18" font-weight="700" fill="#1f2937">PaySim</text>
+<text x="132" y="222" text-anchor="end" font-size="17" font-weight="700" fill="#1f2937">PaySim</text>
 <rect x="150" y="178" width="210" height="84" rx="6" fill="#eef6f3" stroke="#91c7b1" stroke-width="1.2"/>
 <text x="255.0" y="212.0" text-anchor="middle" font-size="15" fill="#1f2937">PS-PR evidence</text>
 <text x="255.0" y="231.0" text-anchor="middle" font-size="15" fill="#1f2937">cell</text>
@@ -19,7 +19,7 @@
 <polygon points="490,220 480,213 480,227" fill="#6b7280"/>
 <line x1="730" y1="220" x2="846" y2="220" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="6 6"/>
 <polygon points="846,220 836,213 836,227" fill="#6b7280"/>
-<text x="78" y="340" font-size="18" font-weight="700" fill="#1f2937">Elliptic</text>
+<text x="132" y="340" text-anchor="end" font-size="17" font-weight="700" fill="#1f2937">Elliptic</text>
 <rect x="150" y="296" width="210" height="84" rx="6" fill="#eef6f3" stroke="#91c7b1" stroke-width="1.2"/>
 <text x="255.0" y="330.0" text-anchor="middle" font-size="15" fill="#1f2937">EL-PR graph-</text>
 <text x="255.0" y="349.0" text-anchor="middle" font-size="15" fill="#1f2937">feature cell</text>
@@ -33,7 +33,7 @@
 <polygon points="490,338 480,331 480,345" fill="#6b7280"/>
 <line x1="730" y1="338" x2="846" y2="338" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="6 6"/>
 <polygon points="846,338 836,331 836,345" fill="#6b7280"/>
-<text x="78" y="458" font-size="18" font-weight="700" fill="#1f2937">Elliptic2</text>
+<text x="132" y="458" text-anchor="end" font-size="17" font-weight="700" fill="#1f2937">Elliptic2</text>
 <rect x="150" y="414" width="210" height="84" rx="6" fill="#eef6f3" stroke="#91c7b1" stroke-width="1.2"/>
 <text x="255.0" y="448.0" text-anchor="middle" font-size="15" fill="#1f2937">E2 reference</text>
 <text x="255.0" y="467.0" text-anchor="middle" font-size="15" fill="#1f2937">row</text>

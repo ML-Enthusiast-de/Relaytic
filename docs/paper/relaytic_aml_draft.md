@@ -4,7 +4,7 @@ Source-draft status: generated evidence draft used by the release pipeline. For 
 
 ## Abstract
 
-Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC 0.6388 and the Elliptic graph-feature row reports test PR-AUC 0.6688; both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates are not established. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.
+Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC 0.6388 and the Elliptic graph-feature row reports test PR-AUC 0.6688. Both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates are not established. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.
 
 ## Introduction
 
@@ -42,7 +42,7 @@ The method has four claim-control rules:
 
 ![Relaytic-AML local-first architecture: local data and artifacts flow through role-scoped agents into evidence cells, interpretation gates, and paper/release/handoff surfaces.](figures/figure_1_claim_gate_flow.svg)
 
-![Evidence-cell schema: every reported number carries dataset, split, command, artifact, budget, leakage posture, operating point, metric, and value; interpretation is stored separately.](figures/figure_2_supporting_pr_auc.svg)
+![Evidence-cell schema: every reported number carries dataset, split, command, artifact, budget, leakage posture, operating point, metric, and value. Interpretation is stored separately.](figures/figure_2_supporting_pr_auc.svg)
 
 ![Benchmark evidence by task contract: local ranking estimates, Elliptic2 external-reference context, and validation-threshold review queues are shown in separate panels.](figures/figure_3_review_budget.svg)
 
@@ -82,7 +82,7 @@ The PaySim competitive result improved over the PaySim baseline under the record
 
 - **LIM-01-paysim-proxy**: PaySim is synthetic mobile-money fraud evidence. It is useful for a temporal proxy workflow, but it is not real-bank AML superiority evidence. Required repair: Add a real financial-crime holdout or partner-approved private evaluation before making hard AML claims.
 - **LIM-02-elliptic-supporting-graph**: The Elliptic row is a supporting temporal graph-feature result. It does not prove graph-neural or graph benchmark superiority. Required repair: Run repeated-seed graph baselines and promote a graph-native candidate only if it beats strong feature baselines under the same split.
-- **LIM-03-elliptic2-context-only**: Elliptic2 is retained as modern context and limitation evidence only; it is not a Relaytic performance contribution in this paper. Required repair: Reproduce the RevClassify reference setup faithfully or define a new leakage-resistant subgraph protocol with viable cohort proof.
+- **LIM-03-elliptic2-context-only**: Elliptic2 is retained as modern context and limitation evidence only. It is not a Relaytic performance contribution in this paper. Required repair: Reproduce the RevClassify reference setup faithfully or define a new leakage-resistant subgraph protocol with viable cohort proof.
 - **LIM-04-operational-assumptions**: Operational review-budget rows are supporting estimates because aggregate case packets, same-queue incumbent comparisons, and analyst-hour assumptions are not fully frozen. Required repair: Freeze case-packet completeness and compare against the same review queue or an approved incumbent baseline.
 - **LIM-05-clean-clone-pending**: The first draft is generated from committed evidence, but P12 must still prove clean-clone install, paper-smoke reproduction, leak scan, and claim lint. Required repair: Run Paper Track P12 from a clean clone and record the external dry-run report before arXiv release.
 

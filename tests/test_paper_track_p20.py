@@ -134,6 +134,6 @@ def test_paper_track_p20_committed_artifacts_and_reader_path_are_ready() -> None
     assert "docs/paper/README.md" in readme
     assert "paper artifact-generation pipeline" in readme
     assert "release tag is the stable paper record" in readme
-    assert "paper_narrative_polish_manifest.json" in readme
-    assert "Relaytic-AML Paper Artifacts" in paper_readme
+    assert "paper_p24_release_manifest.json" in readme
+    assert "Relaytic-AML Paper" in paper_readme
     assert "final Git tag, GitHub Release, or archival snapshot" in paper_readme

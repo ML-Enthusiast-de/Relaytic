@@ -79,7 +79,7 @@
         "docs/reports/paper_p8d_thesis_decision.json"
       ],
       "limitation_id": "LIM-03-elliptic2-context-only",
-      "limitation_text": "Elliptic2 is retained as modern context and limitation evidence only; it is not a Relaytic performance contribution in this paper.",
+      "limitation_text": "Elliptic2 is retained as modern context and limitation evidence only. It is not a Relaytic performance contribution in this paper.",
       "paper_section": "Limitations",
       "required_repair": "Reproduce the RevClassify reference setup faithfully or define a new leakage-resistant subgraph protocol with viable cohort proof."
     },

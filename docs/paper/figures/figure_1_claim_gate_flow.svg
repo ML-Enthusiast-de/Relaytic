@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1220" height="640" viewBox="0 0 1220 640" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
 <rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>
 <text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Relaytic-AML evidence loop</text>
-<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Local artifacts are authoritative; agents propose, execute, review, and gate claims through files.</text>
+<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Local artifacts are authoritative. Agents propose, execute, review, and gate claims through files.</text>
 <rect x="64" y="148" width="205" height="214" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.3"/>
 <text x="166.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Local inputs</text>
 <line x1="86" y1="214" x2="247" y2="214" stroke="#c8d0dc" stroke-width="1"/>

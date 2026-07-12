@@ -314,8 +314,8 @@ def _main_body_system_eval_scan(draft: str) -> dict[str, Any]:
     violations = [title for title in dense_titles if title in main_body]
     appendix_missing = [title for title in dense_titles if title not in appendix]
     summary_titles = (
-        "Table 5. Deterministic artifact and release-gate checks",
-        "Table 5. System evaluation summary",
+        "Table 6. Deterministic artifact and release-gate checks",
+        "Table 6. System evaluation summary",
     )
     main_summary_present = any(title in main_body for title in summary_titles)
     status = (

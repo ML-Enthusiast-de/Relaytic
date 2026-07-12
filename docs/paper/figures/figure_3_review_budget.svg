@@ -4,52 +4,53 @@
 <text x="750" y="104" text-anchor="middle" font-size="17" fill="#4b5563">Ranking evidence, external context, and realized review queues are reported in separate panels.</text>
 <rect x="70" y="142" width="660" height="310" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>
 <text x="96" y="181" font-size="19" font-weight="700" fill="#1f2937">A. Local test ranking evidence</text>
-<text x="100" y="240" font-size="15" font-weight="700" fill="#1f2937">PaySim</text>
-<text x="100" y="263" font-size="13" fill="#4b5563">synthetic temporal proxy; seed 42</text>
+<text x="100" y="240" font-size="18" font-weight="700" fill="#1f2937">PaySim</text>
+<text x="100" y="265" font-size="16" fill="#4b5563">synthetic temporal proxy, seed 42</text>
 <rect x="290" y="223" width="320" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>
 <rect x="290" y="223" width="204.4" height="25" rx="3" fill="#2a9d8f"/>
-<text x="628" y="242" font-size="15" font-weight="700" fill="#1f2937">0.6388</text>
-<text x="100" y="333" font-size="15" font-weight="700" fill="#1f2937">Elliptic</text>
-<text x="100" y="356" font-size="13" fill="#4b5563">later graph window; seed 42</text>
+<text x="628" y="242" font-size="18" font-weight="700" fill="#1f2937">0.6388</text>
+<text x="100" y="333" font-size="18" font-weight="700" fill="#1f2937">Elliptic</text>
+<text x="100" y="358" font-size="16" fill="#4b5563">later graph window, seed 42</text>
 <rect x="290" y="316" width="320" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>
 <rect x="290" y="316" width="214.0" height="25" rx="3" fill="#457b9d"/>
-<text x="628" y="335" font-size="15" font-weight="700" fill="#1f2937">0.6688</text>
-<text x="100" y="410" font-size="13" fill="#4b5563">Single-seed point estimates; bars summarize within-task ranking only.</text>
+<text x="628" y="335" font-size="18" font-weight="700" fill="#1f2937">0.6688</text>
+<text x="100" y="410" font-size="16" fill="#4b5563">Single-seed point estimates. Bars summarize within-task ranking only.</text>
 <rect x="770" y="142" width="660" height="310" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>
 <text x="796" y="181" font-size="19" font-weight="700" fill="#1f2937">B. Elliptic2 reference context</text>
-<text x="800" y="240" font-size="15" font-weight="700" fill="#1f2937">Local context</text>
-<text x="800" y="263" font-size="13" fill="#4b5563">RevTrack-evaluable cohort; 3 seeds</text>
+<text x="800" y="240" font-size="18" font-weight="700" fill="#1f2937">Local context</text>
+<text x="800" y="265" font-size="16" fill="#4b5563">RevTrack-evaluable cohort, 3 seeds</text>
 <rect x="990" y="223" width="320" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>
 <rect x="990" y="223" width="301.8" height="25" rx="3" fill="#d6a83a"/>
-<text x="1328" y="242" font-size="15" font-weight="700" fill="#1f2937">0.9432</text>
-<text x="800" y="333" font-size="15" font-weight="700" fill="#1f2937">RevClassifyDS</text>
-<text x="800" y="356" font-size="13" fill="#4b5563">published external reference</text>
+<text x="1328" y="242" font-size="18" font-weight="700" fill="#1f2937">0.9432</text>
+<text x="800" y="333" font-size="18" font-weight="700" fill="#1f2937">RevClassifyDS</text>
+<text x="800" y="358" font-size="16" fill="#4b5563">published external reference</text>
 <rect x="990" y="316" width="320" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>
 <rect x="990" y="316" width="311.7" height="25" rx="3" fill="#4b5563"/>
-<text x="1328" y="335" font-size="15" font-weight="700" fill="#1f2937">0.9740</text>
-<text x="800" y="395" font-size="13" fill="#4b5563">Cohort equivalence and parity are not established; test exposure is disclosed.</text>
+<text x="1328" y="335" font-size="18" font-weight="700" fill="#1f2937">0.9740</text>
+<text x="800" y="393" font-size="15" fill="#4b5563">Cohort equivalence and parity are not established.</text>
+<text x="800" y="416" font-size="15" fill="#4b5563">The earlier official-test exposure is disclosed.</text>
 <rect x="70" y="486" width="1360" height="242" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>
 <text x="96" y="525" font-size="19" font-weight="700" fill="#1f2937">C. Validation-threshold review queues</text>
-<text x="100" y="582" font-size="15" font-weight="700" fill="#1f2937">PaySim precision</text>
-<text x="100" y="605" font-size="13" fill="#4b5563">realized 1,109 / 123,580 (0.8974%)</text>
+<text x="100" y="582" font-size="18" font-weight="700" fill="#1f2937">PaySim precision</text>
+<text x="100" y="607" font-size="16" fill="#4b5563">realized 1,109 / 123,580 (0.8974%)</text>
 <rect x="290" y="565" width="270" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>
 <rect x="290" y="565" width="189.9" height="25" rx="3" fill="#2a9d8f"/>
-<text x="578" y="584" font-size="15" font-weight="700" fill="#1f2937">0.7033</text>
-<text x="100" y="662" font-size="15" font-weight="700" fill="#1f2937">PaySim recall</text>
-<text x="100" y="685" font-size="13" fill="#4b5563">requested queue fraction 0.5000%</text>
+<text x="578" y="584" font-size="18" font-weight="700" fill="#1f2937">0.7033</text>
+<text x="100" y="662" font-size="18" font-weight="700" fill="#1f2937">PaySim recall</text>
+<text x="100" y="687" font-size="16" fill="#4b5563">requested queue fraction 0.5000%</text>
 <rect x="290" y="645" width="270" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>
 <rect x="290" y="645" width="127.3" height="25" rx="3" fill="#6f9f18"/>
-<text x="578" y="664" font-size="15" font-weight="700" fill="#1f2937">0.4716</text>
-<text x="800" y="582" font-size="15" font-weight="700" fill="#1f2937">Elliptic precision</text>
-<text x="800" y="605" font-size="13" fill="#4b5563">realized 36 / 11,184 (0.3219%)</text>
+<text x="578" y="664" font-size="18" font-weight="700" fill="#1f2937">0.4716</text>
+<text x="800" y="582" font-size="18" font-weight="700" fill="#1f2937">Elliptic precision</text>
+<text x="800" y="607" font-size="16" fill="#4b5563">realized 36 / 11,184 (0.3219%)</text>
 <rect x="990" y="565" width="270" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>
 <rect x="990" y="565" width="270.0" height="25" rx="3" fill="#457b9d"/>
-<text x="1278" y="584" font-size="15" font-weight="700" fill="#1f2937">1.0000</text>
-<text x="800" y="662" font-size="15" font-weight="700" fill="#1f2937">Elliptic recall</text>
-<text x="800" y="685" font-size="13" fill="#4b5563">requested queue fraction 0.5000%</text>
+<text x="1278" y="584" font-size="18" font-weight="700" fill="#1f2937">1.0000</text>
+<text x="800" y="662" font-size="18" font-weight="700" fill="#1f2937">Elliptic recall</text>
+<text x="800" y="687" font-size="16" fill="#4b5563">requested queue fraction 0.5000%</text>
 <rect x="990" y="645" width="270" height="25" rx="3" fill="#edf1f6" stroke="#9ca3af" stroke-width="0.9"/>
 <rect x="990" y="645" width="15.3" height="25" rx="3" fill="#f4a261"/>
-<text x="1278" y="664" font-size="15" font-weight="700" fill="#1f2937">0.0566</text>
+<text x="1278" y="664" font-size="18" font-weight="700" fill="#1f2937">0.0566</text>
 <rect x="170" y="762" width="1160" height="48" rx="5" fill="#f5f7fa" stroke="#9ca3af" stroke-width="1"/>
 <text x="750" y="792" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">Values across datasets and task contracts are not directly comparable.</text>
 </svg>

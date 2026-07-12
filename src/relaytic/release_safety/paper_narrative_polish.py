@@ -395,10 +395,12 @@ def _build_reader_guidance_audit(inputs: dict[str, Any]) -> dict[str, Any]:
         ),
         _check(
             "release_snapshot_guidance_visible",
-            "final public release tag or archival snapshot" in readme
-            and "main branch can continue to evolve" in readme
-            and "final Git tag, GitHub Release, or archival snapshot" in paper_readme
-            and "The `main` branch may continue to evolve" in paper_readme,
+            "release tag" in readme.lower()
+            and "archival snapshot" in readme.lower()
+            and "main branch can continue to evolve" in readme.lower()
+            and "final git tag" in paper_readme.lower()
+            and "archival snapshot" in paper_readme.lower()
+            and "`main` branch may continue to evolve" in paper_readme.lower(),
             "Paper readers should cite a fixed release snapshot while the main branch remains allowed to evolve.",
             source_artifact="docs/paper/README.md",
         ),
@@ -455,6 +457,22 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
     main_table_count = len(re.findall(r"\*\*Table\s+\d+", draft))
     appendix_table_count = len(re.findall(r"\*\*Appendix table\.", draft))
     table_count = main_table_count + appendix_table_count
+    manuscript_body = draft.split("## References", 1)[0]
+    prose_without_citations = re.sub(r"\[@[^\]]+\]", "", manuscript_body)
+    first_person_hits = re.findall(r"\b(?:I|we|our|ours|us)\b", prose_without_citations, flags=re.IGNORECASE)
+    introduced_surfaces = (
+        "Table 1 distinguishes" in draft
+        and "Table 2 presents" in draft
+        and "can be seen in Table 3" in draft
+        and "shown in Table 4" in draft
+        and "can be seen in Table 5" in draft
+        and "Table 6 reports" in draft
+        and "Table 7 separates" in draft
+        and "shown in Figure 1" in draft
+        and "seen in Figure 2" in draft
+        and "shown in Figure 3" in draft
+        and "Figure 4 separates" in draft
+    )
     checks = [
         _check(
             "figures_declared_and_present",
@@ -475,20 +493,33 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
             "Competitive search | XGBoost probe" not in draft
             and "Probe screen" in draft
             and "Full finalist selection" in draft,
-            "Table 4 must not imply the probe winner was the final model-selection decision.",
+            "Table 5 must not imply the probe winner was the final model-selection decision.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
         _check(
             "publication_table_count_present",
-            table_count >= 12 and "Table 5. Deterministic artifact and release-gate checks" in draft,
+            table_count >= 12 and "Table 6. Deterministic artifact and release-gate checks" in draft,
             "The generated manuscript should contain compact main tables and detailed appendix audit tables.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
             detail={
                 "table_count": table_count,
                 "main_table_count": main_table_count,
                 "appendix_table_count": appendix_table_count,
-                "system_summary_table_present": "Table 5. Deterministic artifact and release-gate checks" in draft,
+                "system_summary_table_present": "Table 6. Deterministic artifact and release-gate checks" in draft,
             },
+        ),
+        _check(
+            "impersonal_scientific_voice_and_punctuation",
+            not first_person_hits and ";" not in prose_without_citations,
+            "Reader-facing prose must avoid first-person narration and reader-visible semicolons.",
+            source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
+            detail={"first_person_hits": first_person_hits, "reader_visible_semicolons": prose_without_citations.count(";")},
+        ),
+        _check(
+            "tables_and_figures_introduced_in_prose",
+            introduced_surfaces,
+            "Every main table and figure must be introduced by the surrounding scientific argument.",
+            source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
         _check(
             "no_unresolved_public_markers",
