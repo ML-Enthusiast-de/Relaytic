@@ -317,6 +317,10 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
         release_tag=tag,
         source_commit=commit,
     )
+    canonical_figure_dir = root / "docs" / "paper" / "figures"
+    if not canonical_figure_dir.is_dir():
+        raise ValueError("Final paper release requires the canonical vector figure directory.")
+    shutil.copytree(canonical_figure_dir, paper_dir / "figures", dirs_exist_ok=True)
     sync_paper_arxiv_source_pack(root, output_dir=reports_dir, source_dir=source_dir, paper_dir=paper_dir)
     _compile_latex(source_dir)
 
@@ -335,7 +339,7 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
     source_archive = release_root / "relaytic_aml_arxiv_source.tar.gz"
     with tarfile.open(source_archive, "w:gz") as archive:
         for path in sorted(source_dir.rglob("*")):
-            if path.is_file() and path.suffix not in {".aux", ".bbl", ".blg", ".log", ".out", ".pdf"}:
+            if path.is_file() and path.suffix not in {".aux", ".bbl", ".blg", ".log", ".out"} and path.name != "main.pdf":
                 archive.add(path, arcname=path.relative_to(source_dir))
 
     integrity = build_paper_release_integrity_pack(root)
