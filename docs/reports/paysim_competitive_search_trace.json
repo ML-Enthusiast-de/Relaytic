@@ -466,6 +466,7 @@
     {
       "adapter_module": "scikit-learn",
       "adapter_version": "1.7.1",
+      "calibration_status": "not_calibrated_after_nonselection",
       "configuration": {
         "class_weight": "balanced",
         "imbalance_fit_surface": "train_only",
@@ -481,9 +482,11 @@
       "family_role": "strong_boosted_tree",
       "random_seed": 42,
       "runtime_seconds": 104.226588,
+      "selection_outcome": "not_selected",
       "selection_surface": "validation_pr_auc_only",
       "source_probe_trial_id": "sklearn_hist_gradient_boosting_probe_3",
       "stage": "full_train_finalist",
+      "test_eligibility": "not_eligible",
       "test_evaluated": false,
       "test_metrics": null,
       "training_row_count": 6010937,
@@ -494,11 +497,13 @@
         "positive_rate": 0.006804,
         "pr_auc": 0.467368,
         "roc_auc": 0.970059
-      }
+      },
+      "validation_rank": 4
     },
     {
       "adapter_module": "scikit-learn",
       "adapter_version": "1.7.1",
+      "calibration_status": "not_calibrated_after_nonselection",
       "configuration": {
         "bootstrap": true,
         "class_weight": "balanced_subsample",
@@ -515,9 +520,11 @@
       "family_role": "strong_tree_ensemble",
       "random_seed": 42,
       "runtime_seconds": 340.167852,
+      "selection_outcome": "not_selected",
       "selection_surface": "validation_pr_auc_only",
       "source_probe_trial_id": "sklearn_extra_trees_probe_1",
       "stage": "full_train_finalist",
+      "test_eligibility": "not_eligible",
       "test_evaluated": false,
       "test_metrics": null,
       "training_row_count": 6010937,
@@ -528,11 +535,13 @@
         "positive_rate": 0.006804,
         "pr_auc": 0.568725,
         "roc_auc": 0.97027
-      }
+      },
+      "validation_rank": 1
     },
     {
       "adapter_module": "scikit-learn",
       "adapter_version": "1.7.1",
+      "calibration_status": "not_calibrated_after_nonselection",
       "configuration": {
         "bootstrap": true,
         "class_weight": "balanced_subsample",
@@ -549,9 +558,11 @@
       "family_role": "strong_tree_ensemble",
       "random_seed": 42,
       "runtime_seconds": 486.122975,
+      "selection_outcome": "not_selected",
       "selection_surface": "validation_pr_auc_only",
       "source_probe_trial_id": "sklearn_random_forest_probe_1",
       "stage": "full_train_finalist",
+      "test_eligibility": "not_eligible",
       "test_evaluated": false,
       "test_metrics": null,
       "training_row_count": 6010937,
@@ -562,11 +573,13 @@
         "positive_rate": 0.006804,
         "pr_auc": 0.540468,
         "roc_auc": 0.967461
-      }
+      },
+      "validation_rank": 3
     },
     {
       "adapter_module": "lightgbm",
       "adapter_version": "4.6.0",
+      "calibration_status": "not_calibrated_after_nonselection",
       "configuration": {
         "colsample_bytree": 0.9,
         "imbalance_fit_surface": "train_only",
@@ -585,9 +598,11 @@
       "family_role": "optional_boosted_tree_adapter",
       "random_seed": 42,
       "runtime_seconds": 80.460187,
+      "selection_outcome": "not_selected",
       "selection_surface": "validation_pr_auc_only",
       "source_probe_trial_id": "lightgbm_classifier_probe_2",
       "stage": "full_train_finalist",
+      "test_eligibility": "not_eligible",
       "test_evaluated": false,
       "test_metrics": null,
       "training_row_count": 6010937,
@@ -598,11 +613,13 @@
         "positive_rate": 0.006804,
         "pr_auc": 0.062345,
         "roc_auc": 0.84581
-      }
+      },
+      "validation_rank": 5
     },
     {
       "adapter_module": "xgboost",
       "adapter_version": "3.0.4",
+      "calibration_status": "not_calibrated_after_nonselection",
       "configuration": {
         "colsample_bytree": 0.9,
         "eval_metric": "logloss",
@@ -623,9 +640,11 @@
       "family_role": "optional_boosted_tree_adapter",
       "random_seed": 42,
       "runtime_seconds": 104.916489,
+      "selection_outcome": "not_selected",
       "selection_surface": "validation_pr_auc_only",
       "source_probe_trial_id": "xgboost_classifier_probe_3",
       "stage": "full_train_finalist",
+      "test_eligibility": "not_eligible",
       "test_evaluated": false,
       "test_metrics": null,
       "training_row_count": 6010937,
@@ -636,7 +655,8 @@
         "positive_rate": 0.006804,
         "pr_auc": 0.540486,
         "roc_auc": 0.963127
-      }
+      },
+      "validation_rank": 2
     }
   ],
   "calibration_trace": {
@@ -661,6 +681,7 @@
   "effective_budget_tier": "competitive",
   "fallback_or_not_run": [],
   "full_train_finalist_fit_count": 5,
+  "full_training_finalist_count": 5,
   "hpo_trial_count": 14,
   "optional_execution_requested": true,
   "probe_policy": {
@@ -671,12 +692,19 @@
     "random_seed": 42,
     "sampling_policy": "train_only_all_positives_plus_seeded_negative_subsample_for_probe"
   },
+  "protocol_metadata_refresh": {
+    "mode": "recorded_artifact_reconciliation",
+    "models_refit": false,
+    "raw_data_loaded": false,
+    "test_partition_re_evaluated": false
+  },
   "random_seeds": [
     42
   ],
   "schema_version": "relaytic.paysim_competitive_benchmark.v1",
   "selected_finalist": {
     "calibration_method": "platt_sigmoid",
+    "comparison_operator": ">=",
     "configuration": {
       "bootstrap": true,
       "class_weight": "balanced_subsample",
@@ -707,33 +735,56 @@
     "review_budget_fraction": 0.005,
     "selection_surface": "validation_pr_auc_only_before_test_evaluation",
     "test_operating_point": {
+      "comparison_operator": ">=",
+      "evaluation_row_count": 123580,
       "false_positive_count": 329,
       "false_positive_rate": 0.002698,
+      "positive_count": 1654,
       "precision_at_k": 0.703336,
       "recall_at_review_budget": 0.471584,
       "requested_review_fraction": 0.005,
       "review_fraction": 0.008974,
       "reviewed_count": 1109,
+      "tie_rule": "include_scores_equal_to_threshold",
       "true_positive_count": 780
     },
     "test_pr_auc": 0.638773,
     "test_roc_auc": 0.968282,
+    "threshold_applied_unchanged_to_test": true,
     "threshold_selection_surface": "validation_operating_partition_only",
+    "tie_rule": "include_scores_equal_to_threshold",
     "validation_operating_point": {
+      "comparison_operator": ">=",
+      "evaluation_row_count": 111601,
       "false_positive_count": 272,
       "false_positive_rate": 0.00245,
+      "positive_count": 568,
       "precision_at_k": 0.513417,
       "recall_at_review_budget": 0.505282,
       "requested_review_fraction": 0.005,
       "review_fraction": 0.005009,
       "reviewed_count": 559,
+      "tie_rule": "include_scores_equal_to_threshold",
       "true_positive_count": 287
     },
     "validation_pr_auc": 0.568725,
     "validation_threshold": 0.404453
   },
+  "selection_tie_detected": false,
   "slice": "Paper Track P6-A",
   "status": "competitive_executed",
-  "summary": "P6-A executes bounded competitive search, full-training finalist refits, validation-only calibration and threshold choice, then one fixed test evaluation.",
-  "test_visibility_policy": "test_scores_are_materialized_for_the_validation_selected_finalist_only"
+  "summary": "P6-A used bounded search, full-training finalist refits, validation-only calibration and threshold choice, then evaluated one competitive finalist after protocol freeze. Earlier P4 and P6 baseline results used the same fixed test partition.",
+  "test_exposure_contract": {
+    "competitive_finalists_tested_after_freeze": 1,
+    "competitive_selection_used_test": false,
+    "prior_test_exposure_roles": [
+      "P4 reference",
+      "P6 baseline"
+    ],
+    "test_partition_fixed": true,
+    "test_partition_previously_exposed": true,
+    "untouched_holdout_claim_allowed": false
+  },
+  "test_visibility_policy": "test_scores_are_materialized_for_the_validation_selected_finalist_only",
+  "tie_break_rule": "not_required_distinct_validation_pr_auc"
 }

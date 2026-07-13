@@ -1,0 +1,59 @@
+{
+  "checks": [
+    {
+      "check": "selection surface",
+      "observed": "validation_pr_auc_only_before_test_evaluation",
+      "pass_criterion": "validation_pr_auc_only_before_test_evaluation",
+      "passed": true
+    },
+    {
+      "check": "previous exposure disclosure",
+      "observed": {
+        "competitive_finalists_tested_after_freeze": 1,
+        "competitive_selection_used_test": false,
+        "prior_test_exposure_roles": [
+          "P4 reference",
+          "P6 baseline"
+        ],
+        "test_partition_fixed": true,
+        "test_partition_previously_exposed": true,
+        "untouched_holdout_claim_allowed": false
+      },
+      "pass_criterion": "fixed partition, P4/P6 exposure recorded, and no untouched-holdout claim",
+      "passed": true
+    },
+    {
+      "check": "post-freeze evaluation budget",
+      "observed": "one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze",
+      "pass_criterion": "one validation-selected competitive finalist after protocol freeze",
+      "passed": true
+    },
+    {
+      "check": "full-training finalist disclosure",
+      "observed": {
+        "count": 5,
+        "selected": "sklearn_extra_trees"
+      },
+      "pass_criterion": "five full-training finalists with one selected final model",
+      "passed": true
+    },
+    {
+      "check": "reader-facing disclosure",
+      "observed": "P4/P6 exposure and non-untouched status appear in the manuscript",
+      "pass_criterion": "the paper does not present PaySim test evidence as untouched",
+      "passed": true
+    },
+    {
+      "check": "claim gate",
+      "observed": [
+        "PaySim test partition was an untouched holdout",
+        "PaySim test partition was inspected only once across the project"
+      ],
+      "pass_criterion": "untouched and one-time-inspection claims are blocked",
+      "passed": true
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "pass"
+}

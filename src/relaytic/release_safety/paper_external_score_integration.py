@@ -242,6 +242,7 @@ def _build_case_study(inputs: dict[str, Any]) -> dict[str, Any]:
         "detector_performance_metric": bool(schema.get("metric", {}).get("detector_performance_metric")),
         "paper_role": first_cell.get("paper_role") or "hosted_detector_output_governance_evidence",
         "publishable": bool(first_cell.get("publishable")) if first_cell else False,
+        "reader_facing_result": "schema_completeness_invariant_pass" if first_cell.get("value") == 1.0 else "schema_completeness_invariant_fail",
     }
     rowless_redaction = {
         "rowless_handoff_passed": bool(handoff.get("rowless_handoff_passed")),
@@ -312,10 +313,10 @@ def _build_paper_panel(case_study: dict[str, Any]) -> dict[str, Any]:
             "component": "Evidence emitted",
             "observed": (
                 f"{len(case_study.get('evidence_cell_ids', []))} evidence cell; "
-                f"metadata-completeness metric; value {_format_panel_value(metric.get('value'))}"
+                "required metadata fields present; schema-completeness invariant passed"
             ),
             "evidence_ref": "docs/reports/paper_external_score_evidence_cells.json",
-            "reader_takeaway": "Relaytic records the governance metric as auditable evidence, not as detector novelty.",
+            "reader_takeaway": "This is a governance check, not detector accuracy, ranking performance, or model novelty.",
         },
         {
             "component": "Rowless handoff",
@@ -542,6 +543,8 @@ def _auditable_record_snippet(cell: dict[str, Any]) -> dict[str, Any]:
         "artifact_ref": cell.get("artifact_ref") or "not_available",
         "metric": cell.get("metric") or "not_available",
         "value": cell.get("value") if "value" in cell else "not_available",
+        "invariant_state": "pass" if cell.get("value") == 1.0 else "fail",
+        "detector_performance_metric": False,
         "leakage_posture": cell.get("leakage_posture") or "not_available",
         "claim_state": cell.get("claim_state") or "not_available",
     }

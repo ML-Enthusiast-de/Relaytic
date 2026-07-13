@@ -552,7 +552,7 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\setlength{\parskip}{0.65em}",
         r"\setlength{\parindent}{0pt}",
         r"\emergencystretch=4em",
-        r"\hypersetup{pdftitle={Relaytic-AML: A Local-First Agentic Evaluation Lab for Financial-Crime Machine Learning},pdfauthor={Tobias Gehra},pdfsubject={Local-first AML evaluation lab},pdfkeywords={anti-money laundering, financial crime, reproducibility, AI evaluation, agentic systems}}",
+        r"\hypersetup{pdftitle={Relaytic-AML: A Local-First, Agent-Assisted Evaluation Lab for Financial-Crime Machine Learning},pdfauthor={Tobias Gehra},pdfsubject={Local-first AML evaluation lab},pdfkeywords={anti-money laundering, financial crime, reproducibility, AI evaluation, agent-assisted systems}}",
         "",
         f"\\title{{{_latex_inline(title)}}}",
         r"\author{Tobias Gehra\\Independent Researcher\\GitHub: \texttt{ML-Enthusiast-de}\\\href{mailto:t.gehra.ai@gmail.com}{\texttt{t.gehra.ai@gmail.com}}}",

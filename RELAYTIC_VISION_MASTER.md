@@ -113,16 +113,16 @@ It is:
 
 Any slice that does not strengthen at least one of those axes is polish, not frontier progress.
 
-## World-class proof doctrine
+## High-Assurance Proof Doctrine
 
-Relaytic should not call itself world-class because it has many artifacts, many agents, or a polished shell.
+Relaytic's credibility must come from repeatable evidence, not from the number of artifacts, agents, or polished surfaces.
 
-The product becomes world-class only when it can repeatedly prove:
+The product earns trust when it can repeatedly prove:
 
 - **protocol conformance**
   CLI, MCP, mission control, and later richer UI or host shells must expose the same run truth, next action, trace posture, and adjudication outcome rather than drifting into surface-specific behavior
 - **flagship demo proof**
-  Relaytic should keep a small set of recruiter-safe and lab-safe flagship demos with explicit scorecards, not just ad hoc walkthroughs
+  Relaytic should keep a small set of externally reviewable, lab-safe flagship demos with explicit scorecards, not just ad hoc walkthroughs
 - **human-supervision success**
   a first-time human should be able to start, recover, inspect why Relaytic changed course, and complete a useful run without repo literacy or hidden operator lore
 - **workspace-continuity proof**
@@ -3999,7 +3999,7 @@ Before the first autonomous/guided run, the UI must present a setup flow where t
 
 ## 30A. Operator onboarding, health, backup, restore, and diagnostics
 
-Relaytic must feel operable, not just architecturally impressive.
+Relaytic must feel operable, not merely architecturally elaborate.
 
 ### Required operator surfaces
 

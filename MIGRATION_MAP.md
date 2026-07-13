@@ -1144,6 +1144,18 @@ P24 extends the paper release-safety boundary without changing detector APIs or 
 
 Compatibility boundary: P24 is publication infrastructure. It does not add a detector, alter benchmark outputs, claim production AML validity, create a tag, or upload to arXiv.
 
+## Paper Track P25 Evidence Disclosure And Immutable Release Finalization
+
+P25 extends the existing paper release-safety boundary without changing Relaytic's detector API or benchmark values.
+
+- added a disclosure-only reconciliation path for the recorded PaySim P6-A protocol artifacts, avoiding a further evaluation of its already exposed fixed test partition
+- added recorded operating-point provenance fields and audit checks for threshold transfer, comparison rule, tie inclusion, partition sizes, queue counts, precision, and recall
+- pinned the RevClassifyDS context reference to the versioned RevTrack paper PDF and recorded its source location and SHA-256
+- added machine-readable benchmark execution statuses and `--require-full-rerun` command semantics
+- strengthened exact-revision builds so `paper-release-integrity --final` requires a local release tag resolving to HEAD and injects that tag with the full commit hash into the out-of-tree source/PDF bundle
+
+Compatibility boundary: P25 is publication and evidence-governance infrastructure. It does not retrain a detector, alter a benchmark measurement, create a Git tag automatically, publish a release, or upload to arXiv.
+
 ## Removal Criteria
 
 The remaining compatibility layer can be removed when all of the following are true:

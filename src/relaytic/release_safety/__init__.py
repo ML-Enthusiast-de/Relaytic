@@ -96,6 +96,7 @@ from .paysim_competitive import (
     PAYSIM_COMPETITIVE_REPORT_DIR,
     PAYSIM_COMPETITIVE_SCHEMA_VERSION,
     build_paysim_competitive_pack,
+    refresh_paysim_competitive_protocol_metadata,
     render_paysim_competitive_markdown,
     sync_paysim_competitive_pack,
 )
@@ -132,6 +133,7 @@ from .elliptic2_competitive import (
     ELLIPTIC2_COMPETITIVE_REPORT_DIR,
     ELLIPTIC2_COMPETITIVE_SCHEMA_VERSION,
     build_elliptic2_competitive_pack,
+    refresh_elliptic2_reference_metadata,
     render_elliptic2_competitive_markdown,
     sync_elliptic2_competitive_pack,
 )
@@ -545,6 +547,7 @@ __all__ = [
     "render_paper_hard_graph_track_markdown",
     "render_elliptic2_recovery_markdown",
     "render_elliptic2_competitive_markdown",
+    "refresh_elliptic2_reference_metadata",
     "render_elliptic2_reference_parity_markdown",
     "render_paper_p8d_thesis_markdown",
     "render_paper_operational_metrics_markdown",
@@ -569,6 +572,7 @@ __all__ = [
     "render_elliptic_graph_markdown",
     "render_paysim_benchmark_markdown",
     "render_paysim_competitive_markdown",
+    "refresh_paysim_competitive_protocol_metadata",
     "render_release_safety_markdown",
     "run_release_safety_scan",
     "sync_paper_freeze_pack",

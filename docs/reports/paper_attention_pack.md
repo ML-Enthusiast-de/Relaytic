@@ -12,7 +12,7 @@ The Relaytic-AML draft presents a local-first architecture for agent-assisted an
 
 ## Public Post
 
-I finished a first claim-safe Relaytic-AML paper draft. The core idea is local-first agentic evaluation: keep the workspace as the authority, give humans and agents clear roles, export redacted context instead of private rows, and make every metric traceable before anybody turns it into a claim. The draft foregrounds the Relaytic architecture, role boundaries, intended company and research uses, current anti-money-laundering context, figures, an arXiv source candidate, and explicit limitations for PaySim, Elliptic, Elliptic2, and AMLSim-style tracks.
+The Relaytic-AML paper presents a claim-bounded local evaluation architecture. The workspace remains authoritative, humans and agents have explicit roles, handoff exports redacted context rather than private rows, and each reported metric is traceable before it becomes a public claim. The draft covers architecture, role boundaries, research and operational use, current anti-money-laundering context, figures, reproducible source, and explicit benchmark limitations.
 
 The benchmark rows are supporting evidence for that architecture, not the identity of the system. PaySim and Elliptic are supporting evidence only, Elliptic2 is modern context only, and stronger claims stay blocked until the gates earn them. The public story is that Relaytic-AML is an auditable local evaluation environment where agents and humans can see what is proven, what is blocked, and what would need to happen next.
 

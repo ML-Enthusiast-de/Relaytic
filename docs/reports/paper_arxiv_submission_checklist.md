@@ -28,7 +28,7 @@ P13 permits only a claim-safe evaluation-environment release.
 
 ## Suggested arXiv Metadata
 
-- Title: `Relaytic-AML: A Local-First Agentic Evaluation Lab for Financial-Crime Machine Learning`
+- Title: `Relaytic-AML: A Local-First, Agent-Assisted Evaluation Lab for Financial-Crime Machine Learning`
 - Primary category: `cs.LG`
 - Secondary categories: `q-fin.GN`, `cs.SI`, `cs.CY`
 - Keywords: anti-money laundering, financial crime, graph machine learning, reproducibility, evaluation environments, claim gating
@@ -36,8 +36,8 @@ P13 permits only a claim-safe evaluation-environment release.
 ## Tag And Release
 
 - [ ] Confirm `git status --short` is empty at the final tag target.
-- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `b288580619d1e89a1d0610a05b92c674f960e75d`; rerun the manifest after final edits if the source evidence changes.
-- [ ] Create tag after the final PDF/source matches the manifest: `git tag -a relaytic-aml-paper-p13-claim-safe -m "Relaytic-AML claim-safe paper release"`.
+- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `5a6c897012291f9fcec8c3702514c487ea003a35`; rerun the manifest after final edits if the source evidence changes.
+- [ ] Create tag after the final PDF/source matches the manifest: `git tag -a relaytic-aml-arxiv-v1 -m "Relaytic-AML claim-safe paper release"`.
 - [ ] Attach or link the paper PDF, release manifest, public claims JSON, and benchmark artifacts.
 
 ## Fallback

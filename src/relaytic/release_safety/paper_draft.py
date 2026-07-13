@@ -582,7 +582,7 @@ def _render_results_table(key: dict[str, dict[str, Any]]) -> str:
         ("PaySim competitive", "paysim_p6a_competitive_selected.recall_at_review_budget", "recall at review budget", "supporting-only"),
         ("Elliptic graph-feature", "elliptic_p7_selected_graph_feature_baseline.test_pr_auc", "test PR-AUC", "supporting-only"),
         ("Elliptic graph-feature", "elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget", "precision at review budget", "supporting-only"),
-        ("Elliptic2 context", "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean", "official-partition PR-AUC mean", "modern context only"),
+        ("Elliptic2 context", "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean", "provided RevTrack TST PR-AUC mean", "modern context only"),
         ("Elliptic2 context", "elliptic2_p8b_modern_context.published_reference_pr_auc", "published RevClassifyDS PR-AUC", "reference context"),
     ]
     lines = ["| Evidence row | Metric | Value | Claim posture | Provenance |", "|---|---:|---:|---|---|"]
@@ -897,7 +897,7 @@ def _evidence_cell_schema_svg_v2() -> str:
     fields = [
         ("cell_id", "paper-cell:paysim...test_pr_auc"),
         ("dataset_id", "PaySim / Elliptic / Elliptic2"),
-        ("split", "train, validation, test, official"),
+        ("split", "train, validation, test, provided TST"),
         ("command", "relaytic release-safety ..."),
         ("artifact_ref.field", "manifest.json -> test_pr_auc"),
         ("budget_tier", "baseline, competitive, context"),
@@ -969,7 +969,7 @@ def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
     metric_bar(800, 240, "Local context", "RevTrack-evaluable cohort, 3 seeds", elliptic2_pr, "#d6a83a")
     metric_bar(800, 333, "RevClassifyDS", "published external reference", revclassify_ref, "#4b5563")
     parts.append('<text x="800" y="393" font-size="15" fill="#4b5563">Cohort equivalence and parity are not established.</text>')
-    parts.append('<text x="800" y="416" font-size="15" fill="#4b5563">The earlier official-test exposure is disclosed.</text>')
+    parts.append('<text x="800" y="416" font-size="15" fill="#4b5563">Prior provided-RevTrack-TST exposure is disclosed.</text>')
 
     parts.append('<rect x="70" y="486" width="1360" height="242" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
     parts.append('<text x="96" y="525" font-size="19" font-weight="700" fill="#1f2937">C. Validation-threshold review queues</text>')

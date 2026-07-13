@@ -1,5 +1,5 @@
 {
-  "allowed_wording": "Relaytic executed a repeated-seed, alternate-split modern-context baseline on the pinned RevTrack-evaluable Elliptic2 cohort. Results may be reported as supporting evidence with the official preprocessing boundary explicit; no SOTA, full-core, or end-to-end superiority claim is allowed.",
+  "allowed_wording": "Relaytic executed a repeated-seed, alternate-split modern-context baseline on the pinned RevTrack-evaluable Elliptic2 cohort. Results may be reported as supporting evidence with the provided RevTrack preprocessing boundary explicit; no SOTA, full-core, or end-to-end superiority claim is allowed.",
   "blocked_reason_codes": [
     "within_declared_reference_parity_margin",
     "official_reference_locally_reproduced",
@@ -9,6 +9,15 @@
     "entity_disjoint_generalization_not_yet_proven"
   ],
   "end_to_end_relaytic_superiority_claim_allowed": false,
+  "execution_status": {
+    "blocked_reason_codes": [],
+    "dataset_execution": "recorded_prior_local_revtrack_execution",
+    "effective_tier": "competitive",
+    "optional_adapter_execution_requested": false,
+    "optional_adapter_skips": [],
+    "requested_tier": "competitive",
+    "status": "executed"
+  },
   "hard_aml_claim_allowed": false,
   "headline_or_sota_claim_allowed": false,
   "next_slice": "Paper Track P8-C - modern subgraph reference parity and leakage-resistant cohort protocol",

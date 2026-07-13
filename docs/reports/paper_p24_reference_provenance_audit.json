@@ -1,0 +1,31 @@
+{
+  "checks": [
+    {
+      "check": "versioned RevTrack source",
+      "observed": "https://arxiv.org/pdf/2410.08394v1",
+      "pass_criterion": "arXiv v1 PDF is pinned",
+      "passed": true
+    },
+    {
+      "check": "published metric location",
+      "observed": "Song et al. (2024), Table 1, RevClassifyDS row, full-shot PR-AUC column",
+      "pass_criterion": "Table 1, RevClassifyDS full-shot PR-AUC",
+      "passed": true
+    },
+    {
+      "check": "versioned PDF digest",
+      "observed": "b253d97531a0da6fd16a46bb54904437d4373984dfb2559e69c2104faaa08728",
+      "pass_criterion": "b253d97531a0da6fd16a46bb54904437d4373984dfb2559e69c2104faaa08728",
+      "passed": true
+    },
+    {
+      "check": "reader-facing cohort boundary",
+      "observed": "published reference is described as context, not parity",
+      "pass_criterion": "paper identifies the reference as a published context metric",
+      "passed": true
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "pass"
+}

@@ -10,7 +10,7 @@
 <text x="488.0" y="214.0" text-anchor="start" font-size="14" fill="#374151">PaySim / Elliptic / Elliptic2</text>
 <rect x="842" y="148" width="340" height="96" rx="6" fill="#fff8e5" stroke="#1f2937" stroke-width="1.1"/>
 <text x="864" y="182" font-size="18" font-weight="700" fill="#1f2937">split</text>
-<text x="864.0" y="214.0" text-anchor="start" font-size="14" fill="#374151">train, validation, test, official</text>
+<text x="864.0" y="214.0" text-anchor="start" font-size="14" fill="#374151">train, validation, test, provided TST</text>
 <rect x="90" y="278" width="340" height="96" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.1"/>
 <text x="112" y="312" font-size="18" font-weight="700" fill="#1f2937">command</text>
 <text x="112.0" y="344.0" text-anchor="start" font-size="14" fill="#374151">relaytic release-safety ...</text>

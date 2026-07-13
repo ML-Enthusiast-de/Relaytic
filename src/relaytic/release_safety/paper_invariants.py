@@ -35,6 +35,7 @@ REQUIRED_PAPER_INVARIANT_INPUT_REFS = [
     "docs/reports/paper_governance_ablation_eval.json",
     "docs/reports/paper_governance_ablation_manifest.json",
     "docs/reports/paysim_leakage_safe_feature_report.json",
+    "docs/reports/paysim_competitive_benchmark_manifest.json",
     "docs/paper/references.bib",
 ]
 
@@ -106,7 +107,7 @@ def render_paper_invariant_markdown(pack: dict[str, Any]) -> str:
         f"- Adjacent-systems status: `{adjacent_report.get('status') or 'unknown'}`",
         f"- Current invariant count: `{invariant_report.get('current_invariant_count') or 0}`",
         f"- Adjacent family count: `{adjacent_report.get('family_count') or 0}`",
-        f"- Proof obligation passed: `{invariant_report.get('proof_obligation_passed')}`",
+        f"- Evidence-completeness check passed: `{invariant_report.get('proof_obligation_passed')}`",
         f"- Next slice: `{manifest.get('next_slice') or 'unknown'}`",
         "",
         "## Governance Invariants",
@@ -172,6 +173,7 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "governance_ablation_eval": _read_artifact(reports / "paper_governance_ablation_eval.json", root=root),
         "governance_ablation_manifest": _read_artifact(reports / "paper_governance_ablation_manifest.json", root=root),
         "paysim_feature_report": _read_artifact(reports / "paysim_leakage_safe_feature_report.json", root=root),
+        "paysim_competitive_manifest": _read_artifact(reports / "paysim_competitive_benchmark_manifest.json", root=root),
         "references": _read_text_artifact(paper / "references.bib", root=root),
     }
 
@@ -186,6 +188,7 @@ def _build_invariant_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
     handoff = _payload(inputs["agent_handoff_eval"])
     recovery = _payload(inputs["no_lost_user_eval"])
     feature_report = _payload(inputs["paysim_feature_report"])
+    paysim_competitive_manifest = _payload(inputs["paysim_competitive_manifest"])
     go_no_go = _payload(inputs["release_go_no_go"])
     claim_lint = _payload(inputs["claim_lint"])
 
@@ -217,7 +220,7 @@ def _build_invariant_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     requirement="disabled required-field gate exposes missing provenance",
                 )
             ],
-            limitation_or_boundary="The invariant proves artifact completeness, not that the detector is optimal.",
+            limitation_or_boundary="The invariant checks artifact completeness. It does not establish detector optimality.",
             paper_claim_allowed="The paper may claim audited provenance for reported metrics.",
             stronger_claim_blocked="Metric provenance alone does not justify detector superiority or production AML readiness.",
         ),
@@ -261,7 +264,7 @@ def _build_invariant_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
         _invariant(
             invariant_id="I3_leakage_and_selection_firewall",
             name="Leakage and selection firewall",
-            statement="Leakage-prone fields and test-selection paths cannot become publishable evidence.",
+            statement="Leakage-prone fields and test-selection paths are checked before benchmark evidence is released.",
             enforcement_mechanism="feature policy report, split contract, failure fixtures, and leakage ablation",
             evidence_refs=[
                 _evidence_ref(
@@ -275,6 +278,12 @@ def _build_invariant_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     "test_set_selection_violation",
                     failure_signal.get("test_set_selection_violation"),
                     requirement="test-selection fixture is blocked",
+                ),
+                _evidence_ref(
+                    "docs/reports/paysim_competitive_benchmark_manifest.json",
+                    "test_exposure_contract",
+                    json.dumps(paysim_competitive_manifest.get("test_exposure_contract", {}), sort_keys=True),
+                    requirement="validation-only competitive selection is recorded while earlier P4/P6 test exposure remains disclosed",
                 ),
             ],
             failure_or_ablation_refs=[
@@ -292,8 +301,8 @@ def _build_invariant_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                 ),
             ],
             limitation_or_boundary="The current firewall is benchmark-specific; future datasets need their own leakage taxonomy.",
-            paper_claim_allowed="The paper may claim leakage-audited PaySim feature construction and test-selection discipline.",
-            stronger_claim_blocked="No separate destination-history ablation or real-bank deployment claim is supported.",
+            paper_claim_allowed="The paper may claim leakage-audited PaySim feature construction and validation-only competitive selection with disclosed prior test exposure.",
+            stronger_claim_blocked="No untouched-holdout, separate destination-history ablation, or real-bank deployment claim is supported.",
         ),
         _invariant(
             invariant_id="I4_rowless_external_handoff",
@@ -328,7 +337,7 @@ def _build_invariant_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     requirement="disabled redaction exposes blocked fields",
                 ),
             ],
-            limitation_or_boundary="The check proves deterministic redaction on fixtures, not a broad privacy certification.",
+            limitation_or_boundary="The check evaluates deterministic redaction on fixtures. It is not a broad privacy certification.",
             paper_claim_allowed="The paper may claim rowless local-first handoff for the tested external-agent surfaces.",
             stronger_claim_blocked="It cannot claim production-grade privacy certification without separate review.",
         ),

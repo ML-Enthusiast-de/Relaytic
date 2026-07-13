@@ -42,7 +42,7 @@ def test_p24_reader_surfaces_disclose_protocol_and_statistical_boundaries() -> N
         "single-seed point estimates",
         "same-step events do not see one another",
         "validation PR-AUC 0.9767",
-        "confirmatory rather than an untouched-test estimate",
+        "confirmatory rather than blind or untouched evidence",
         "scores equal to the threshold are included",
         "Deterministic Artifact and Release-Gate Evaluation",
     ):

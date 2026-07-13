@@ -290,6 +290,7 @@ Stable slice numbering stays the same, but the preferred execution order after S
 74I. Paper Track P22 - author-review layout hardening and regression closure
 74J. Paper Track P23 - novelty and adjacent-systems distinction hardening
 74K. Paper Track P24 - release integrity, protocol disclosure, and revision-locked arXiv candidate
+74L. Paper Track P25 - evidence disclosure and immutable release finalization
 75. Slice 16
 76. Slice 16A
 77. Slice 16B
@@ -359,7 +360,7 @@ Why:
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
-- Paper Track P0 through P24 are implemented before Academy work; P24 closes factual protocol disclosure, bibliography correctness, metric/split consistency, visual non-comparability, and exact-revision release tooling before the human release decision
+- Paper Track P0 through P25 are implemented before Academy work; P25 closes PaySim prior-test-exposure disclosure, review-threshold provenance, versioned-reference provenance, execution-status semantics, and immutable tagged-release tooling before publication.
 - Paper Track P22 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P22 preserves the evaluation-lab claim boundary, repairs final PDF/source layout roughness, marks the source/PDF bundle ready for author review, and keeps public upload blocked on tag selection, human PDF review, and a clean tag target.
 - Paper Track P23 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P23 makes the novelty lane explicit by distinguishing Relaytic-AML from detector papers, AML LLM triage, agentic SAR/compliance assistants, agent-governance layers, experiment tracking, model cards, datasheets, reproducibility checklists, and agent benchmarks. It preserves the claim that Relaytic-AML is a local-first AML evaluation-evidence governance layer around detectors and agents, not a detector replacement or generic MLOps tool.
 - Paper Track P24 is implemented in `docs/build_slices/phase_paper_release_integrity.md`: it provides factual and bibliographic correction, exact split/queue disclosure, Elliptic shift interpretation, Elliptic2 evidence-role precision, honest single-seed reporting, non-misleading Figure 4 design, semantic consistency checks, and an out-of-tree release command tied to one clean Git revision.
@@ -371,7 +372,7 @@ Why:
 - Paper Track P5 is now implemented and inspects the raw Elliptic graph bundle, freezes graph provenance and temporal split artifacts, records unknown-label scope, allows only supporting loader/provenance wording, and keeps graph benchmark/SOTA claims blocked before numeric graph baselines run
 - Paper Track P6 is now implemented and runs the full PaySim tabular baseline suite under a train-only leakage-safe feature contract with explicit adapter versions, budget tiers, fallback states, and a publishability gate that blocks headline promotion until P6-A
 - Paper Track P6-A is now implemented and runs a competitive PaySim rerun with audited prior-step destination-history features, 14 recorded probe trials, five full-training finalists, validation-only calibration/threshold selection, and a supporting-only publishability pass for validation-selected Extra Trees (`test_pr_auc=0.638773`) while retaining hard-claim blockers before P7
-- Paper Track P24 is implemented. The tracked candidate is ready for author review; the exact-revision build, tag creation, public release publication, and arXiv upload remain human-owned actions after a clean commit.
+- Paper Track P25 is implemented. The tracked candidate is ready for author review; the exact-revision build requires a tag resolving to the reviewed clean commit. Public release publication and arXiv upload remain external author actions.
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -1523,7 +1524,7 @@ Minimum proof:
 
 Innovation hook:
 
-- this is the slice that turns Relaytic from an impressive CLI-first lab into something people can actually show, evaluate, and adopt without hiding the rigor under raw artifacts
+- this is the slice that turns Relaytic from a CLI-first lab into a system that people can show, evaluate, and adopt without hiding the rigor under raw artifacts
 
 ## Slice 11C - Mission-control clarity, capabilities, and guided stage navigation
 
@@ -4667,6 +4668,31 @@ Minimum proof:
 
 Fallback rule:
 - unresolved evidence narrows or blocks the affected statement; it is never filled by inference or aggregate-number reconstruction
+
+## Paper Track P25 - Evidence disclosure and immutable release finalization
+
+Status:
+- implemented
+
+Goal:
+- finalize the paper-release boundary without changing benchmark values
+- make prior-test exposure, operating-point provenance, versioned external-reference provenance, benchmark execution status, and release identity explicit and machine-auditable
+
+Required behavior:
+- record PaySim P4/P6 prior test exposure while preserving validation-only P6-A selection and blocking untouched-holdout wording
+- capture the source threshold, comparator, tie rule, partition counts, queue count, precision, recall, and review fraction for reader-facing operating points
+- pin RevClassifyDS reference context to the versioned RevTrack PDF, table location, DOI, access date, and content hash
+- expose a machine-readable run status for each benchmark command and fail `--require-full-rerun` when a benchmark did not execute
+- require a pre-existing release tag that resolves to HEAD for the final out-of-tree source/PDF bundle
+
+Minimum proof:
+- P25 audits recompute operating-point metrics from recorded counts
+- the manuscript discloses PaySim test exposure and does not call that partition untouched
+- source, PDF, bundle, and final manifest agree on the full commit and release tag
+- final mode rejects dirty, untagged, or mismatched source revisions
+
+Detailed contract:
+- `docs/build_slices/phase_paper_release_finalization.md`
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 

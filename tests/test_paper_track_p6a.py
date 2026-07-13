@@ -44,7 +44,9 @@ def test_paper_track_p6a_runs_smoke_competitive_contract_without_test_search(tmp
     assert manifest["hpo_trial_count"] >= 3
     assert manifest["finalist_family_count"] >= 3
 
-    assert budget["test_evaluation_policy"] == "only_validation_selected_finalist_is_evaluated_on_test"
+    assert budget["test_evaluation_policy"] == "one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze"
+    assert budget["test_partition_previously_exposed"] is True
+    assert budget["untouched_holdout_claim_allowed"] is False
     assert budget["threshold_policy"] == "validation_operating_partition_only_then_fixed_test_application"
     assert trace["hpo_trial_count"] >= 3
     assert trace["calibration_trace"]["test_used_for_calibration_or_selection"] is False

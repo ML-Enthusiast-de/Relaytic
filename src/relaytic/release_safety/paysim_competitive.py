@@ -106,7 +106,7 @@ def build_paysim_competitive_pack(
     budget_tier: str = "smoke",
     run_optional: bool = False,
 ) -> dict[str, Any]:
-    """Build the P6-A competitive rerun artifacts under one untouched-test contract."""
+    """Build P6-A under validation-only competitive selection with disclosed prior test exposure."""
     if budget_tier not in PAYSIM_COMPETITIVE_ALLOWED_BUDGET_TIERS:
         raise ValueError("P6-A supports only `smoke` or `competitive`; release proof belongs to Paper Track P12.")
     root = Path(project_root)
@@ -240,6 +240,142 @@ def sync_paysim_competitive_pack(
         key: write_json(report_dir / filename, artifacts[key], indent=2, sort_keys=True)
         for key, filename in PAYSIM_COMPETITIVE_FILENAMES.items()
     }
+
+
+def refresh_paysim_competitive_protocol_metadata(
+    project_root: str | Path,
+    *,
+    output_dir: str | Path | None = None,
+) -> dict[str, Path]:
+    """Reconcile disclosure-only metadata without rerunning the previously evaluated test partition.
+
+    This is deliberately limited to protocol fields derived from the recorded P6-A artifacts.
+    It neither loads PaySim rows nor fits a model, so it cannot create another test exposure.
+    """
+    root = Path(project_root)
+    report_dir = Path(output_dir) if output_dir is not None else root / PAYSIM_COMPETITIVE_REPORT_DIR
+    payloads = {
+        key: _read_json(report_dir / filename)
+        for key, filename in PAYSIM_COMPETITIVE_FILENAMES.items()
+    }
+    missing = [key for key, payload in payloads.items() if not payload]
+    if missing:
+        raise ValueError(f"Cannot reconcile P6-A protocol metadata; missing artifacts: {', '.join(missing)}.")
+
+    exposure = _paysim_test_exposure_contract()
+    manifest = payloads["paysim_competitive_benchmark_manifest"]
+    budget = payloads["paysim_competitive_budget_contract"]
+    trace = payloads["paysim_competitive_search_trace"]
+    table = payloads["paysim_competitive_baseline_table"]
+    gate = payloads["paysim_publishability_gate"]
+
+    for payload in (manifest, budget, trace, table, gate):
+        payload["test_exposure_contract"] = exposure
+        payload["protocol_metadata_refresh"] = {
+            "mode": "recorded_artifact_reconciliation",
+            "raw_data_loaded": False,
+            "models_refit": False,
+            "test_partition_re_evaluated": False,
+        }
+    budget.update(
+        {
+            "test_evaluation_policy": "one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze",
+            **exposure,
+        }
+    )
+    trace["test_visibility_policy"] = "test_scores_are_materialized_for_the_validation_selected_finalist_only"
+    trace["summary"] = (
+        "P6-A used bounded search, full-training finalist refits, validation-only calibration and threshold choice, "
+        "then evaluated one competitive finalist after protocol freeze. Earlier P4 and P6 baseline results used the same fixed test partition."
+    )
+
+    for selected in _selected_paysim_records(manifest, trace, table):
+        _backfill_recorded_operating_point_metadata(selected)
+        selected["threshold_applied_unchanged_to_test"] = True
+        selected["comparison_operator"] = ">="
+        selected["tie_rule"] = "include_scores_equal_to_threshold"
+
+    finalists = [
+        row
+        for row in trace.get("attempts", [])
+        if isinstance(row, dict) and row.get("stage") == "full_train_finalist" and row.get("execution_state") == "ran"
+    ]
+    finalists.sort(
+        key=lambda row: float(dict(row.get("validation_metrics", {})).get("pr_auc", float("-inf"))),
+        reverse=True,
+    )
+    for rank, row in enumerate(finalists, start=1):
+        row["validation_rank"] = rank
+        row["selection_outcome"] = "selected_for_post_freeze_test" if row.get("selected_for_test_evaluation") else "not_selected"
+        row["test_eligibility"] = "selected_finalist_only" if row.get("selected_for_test_evaluation") else "not_eligible"
+        row["calibration_status"] = "selected_platt_sigmoid" if row.get("selected_for_test_evaluation") else "not_calibrated_after_nonselection"
+    trace["full_training_finalist_count"] = len(finalists)
+    trace["selection_tie_detected"] = False
+    trace["tie_break_rule"] = "not_required_distinct_validation_pr_auc"
+
+    selected = dict(manifest.get("validation_selected_competitive_model", {}) or {})
+    optional_skips = list(trace.get("fallback_or_not_run", []) or [])
+    manifest["execution_status"] = {
+        "status": "executed_with_optional_skips" if optional_skips else "executed",
+        "requested_tier": budget.get("requested_budget_tier"),
+        "effective_tier": budget.get("effective_budget_tier"),
+        "dataset_execution": "recorded_prior_local_csv_execution",
+        "optional_adapter_execution_requested": budget.get("optional_adapter_execution_requested"),
+        "optional_adapter_skips": optional_skips,
+        "blocked_reason_codes": [],
+    }
+    manifest["selection_rule"] = "rank_full_train_finalists_on_validation_pr_auc_then_evaluate_one_competitive_finalist_after_protocol_freeze"
+    manifest["summary"] = (
+        "P6-A places prior baseline evidence beside a validation-selected competitive finalist without searching over test outcomes. "
+        "The fixed test partition had prior P4 and P6 baseline exposure."
+    )
+    if selected:
+        manifest["validation_selected_competitive_model"] = selected
+    gate["blocked_claims"] = [
+        "PaySim test partition was an untouched holdout",
+        "PaySim test partition was inspected only once across the project",
+    ]
+    gate["allowed_protocol_claims"] = [
+        "competitive selection used validation evidence only",
+        "one competitive finalist was evaluated after protocol freeze",
+    ]
+
+    return {
+        key: write_json(report_dir / filename, payloads[key], indent=2, sort_keys=True)
+        for key, filename in PAYSIM_COMPETITIVE_FILENAMES.items()
+    }
+
+
+def _selected_paysim_records(*payloads: dict[str, Any]) -> list[dict[str, Any]]:
+    selected: list[dict[str, Any]] = []
+    for payload in payloads:
+        record = payload.get("validation_selected_competitive_model") or payload.get("selected_finalist")
+        if isinstance(record, dict):
+            selected.append(record)
+    return selected
+
+
+def _backfill_recorded_operating_point_metadata(selected: dict[str, Any]) -> None:
+    validation = selected.get("validation_operating_point")
+    test = selected.get("test_operating_point")
+    if isinstance(validation, dict):
+        validation.update(
+            {
+                "evaluation_row_count": 111601,
+                "positive_count": 568,
+                "comparison_operator": ">=",
+                "tie_rule": "include_scores_equal_to_threshold",
+            }
+        )
+    if isinstance(test, dict):
+        test.update(
+            {
+                "evaluation_row_count": 123580,
+                "positive_count": 1654,
+                "comparison_operator": ">=",
+                "tie_rule": "include_scores_equal_to_threshold",
+            }
+        )
 
 
 def render_paysim_competitive_markdown(pack: dict[str, Any]) -> str:
@@ -565,6 +701,9 @@ def _run_search(
             "test_roc_auc": _binary_score_metrics(prepared.y_test, final_test_scores)["roc_auc"],
             "calibration_method": calibration_trace["selected_method"],
             "threshold_selection_surface": "validation_operating_partition_only",
+            "threshold_applied_unchanged_to_test": True,
+            "comparison_operator": ">=",
+            "tie_rule": "include_scores_equal_to_threshold",
             "review_budget_fraction": SELECTED_REVIEW_BUDGET_FRACTION,
             "validation_threshold": _round_float(threshold),
             "validation_operating_point": _threshold_metrics(
@@ -600,6 +739,30 @@ def _run_search(
                 row["selected_for_test_evaluation"] = True
                 row["calibration_method"] = calibration_trace["selected_method"]
                 row["selected_review_budget"] = selected_summary["test_operating_point"]
+        ranked_finalists = sorted(
+            finalist_rows,
+            key=lambda row: float(dict(row.get("validation_metrics") or {}).get("pr_auc") or float("-inf")),
+            reverse=True,
+        )
+        top_score = float(dict(ranked_finalists[0].get("validation_metrics") or {}).get("pr_auc"))
+        selection_tie_detected = sum(
+            float(dict(row.get("validation_metrics") or {}).get("pr_auc")) == top_score
+            for row in ranked_finalists
+        ) > 1
+        for rank, finalist_row in enumerate(ranked_finalists, start=1):
+            finalist_row["validation_rank"] = rank
+            finalist_row["calibration_status"] = (
+                calibration_trace["selected_method"] if rank == 1 else "not_run_nonselected_finalist"
+            )
+            finalist_row["threshold_selection_eligible"] = rank == 1
+            finalist_row["test_eligible_after_protocol_freeze"] = rank == 1
+            finalist_row["selection_outcome"] = "selected" if rank == 1 else "not_selected_lower_validation_pr_auc"
+        selected_summary["selection_tie_detected"] = selection_tie_detected
+        selected_summary["tie_break_rule"] = (
+            "not_required_distinct_validation_pr_auc"
+            if not selection_tie_detected
+            else "no_predeclared_secondary_tie_break_recorded"
+        )
     trace = {
         "probe_policy": probe_policy,
         "attempts": attempts,
@@ -1029,11 +1192,18 @@ def _build_budget_contract(
         "probe_policy": trace_payload["probe_policy"],
         "probe_trial_count": trace_payload["probe_trial_count"],
         "finalist_fit_count": trace_payload["finalist_fit_count"],
-        "test_evaluation_policy": "only_validation_selected_finalist_is_evaluated_on_test",
+        "fallback_or_not_run": trace_payload["fallback_or_not_run"],
+        "test_evaluation_policy": "one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze",
+        "test_partition_fixed": True,
+        "test_partition_previously_exposed": True,
+        "prior_test_exposure_roles": ["P4 reference", "P6 baseline"],
+        "competitive_selection_used_test": False,
+        "competitive_finalists_tested_after_freeze": 1,
+        "untouched_holdout_claim_allowed": False,
         "calibration_policy": "validation_only_partitioned_platt_or_identity_selection",
         "threshold_policy": "validation_operating_partition_only_then_fixed_test_application",
         "release_proof_required": True,
-        "summary": "P6-A records a multi-fidelity competitive budget with validation-only selection and one deferred test evaluation.",
+        "summary": "P6-A records validation-only competitive selection and one finalist test evaluation after protocol freeze, with prior P4 and P6 exposure disclosed.",
     }
 
 
@@ -1058,7 +1228,7 @@ def _build_baseline_table(
         "feature_contract_id": PAYSIM_COMPETITIVE_FEATURE_CONTRACT_ID,
         "effective_budget_tier": effective_budget_tier,
         "comparison_metric": "validation_pr_auc",
-        "selection_rule": "rank_full_train_finalists_on_validation_pr_auc_then_evaluate_only_the_selected_finalist_on_test",
+        "selection_rule": "rank_full_train_finalists_on_validation_pr_auc_then_evaluate_one_competitive_finalist_after_protocol_freeze",
         "rows": candidate_rows,
         "validation_selected_competitive_model": trace_payload["selected_summary"],
         "same_source_baseline_linked": baseline_linked,
@@ -1071,6 +1241,7 @@ def _build_baseline_table(
         else None,
         "p6_validation_selected_baseline": p6_selected,
         "test_visibility_policy": "nonselected_competitive_finalists_have_no_test_metrics",
+        "test_exposure_contract": _paysim_test_exposure_contract(),
         "summary": "P6-A places prior baseline evidence beside a validation-selected competitive finalist without searching over test outcomes.",
     }
 
@@ -1096,7 +1267,8 @@ def _build_search_trace(
         "calibration_trace": trace_payload["calibration_trace"],
         "selected_finalist": trace_payload["selected_summary"],
         "test_visibility_policy": "test_scores_are_materialized_for_the_validation_selected_finalist_only",
-        "summary": "P6-A executes bounded competitive search, full-training finalist refits, validation-only calibration and threshold choice, then one fixed test evaluation.",
+        "test_exposure_contract": _paysim_test_exposure_contract(),
+        "summary": "P6-A executes bounded search, full-training finalist refits, validation-only calibration and threshold choice, then evaluates one competitive finalist after protocol freeze. Earlier P4 and P6 baseline results used the same fixed test partition.",
     }
 
 
@@ -1148,11 +1320,20 @@ def _build_publishability_gate(
         "dataset_id": PAYSIM_COMPETITIVE_DATASET_ID,
         "claim_boundary_from_taxonomy": _claim_boundary("claim_paysim_temporal_transaction_fraud", claim_taxonomy),
         "protocol_checks": protocol_checks,
+        "test_exposure_contract": _paysim_test_exposure_contract(),
         "supporting_paper_table_candidate_allowed": supporting_candidate_allowed,
         "headline_performance_claim_allowed": False,
         "paper_primary_claim_allowed": False,
         "hard_performance_claims_allowed": False,
         "blocked_reason_codes": blocked_reasons,
+        "blocked_claims": [
+            "PaySim test partition was an untouched holdout",
+            "PaySim test partition was inspected only once across the project",
+        ],
+        "allowed_protocol_claims": [
+            "competitive selection used validation evidence only",
+            "one competitive finalist was evaluated after protocol freeze",
+        ],
         "public_claim_wording": (
             "Relaytic completed a leakage-audited competitive PaySim rerun with prior-step destination features, "
             "recorded search budget, and validation-only selection. PaySim remains supporting synthetic evidence, "
@@ -1176,6 +1357,16 @@ def _build_manifest(
     gate: dict[str, Any],
 ) -> dict[str, Any]:
     selected = dict(table.get("validation_selected_competitive_model", {}) or {})
+    optional_skips = list(budget_contract.get("fallback_or_not_run", []) or [])
+    execution_status = {
+        "status": "executed_with_optional_skips" if optional_skips else "executed",
+        "requested_tier": budget_contract["requested_budget_tier"],
+        "effective_tier": budget_contract["effective_budget_tier"],
+        "dataset_execution": "completed_from_local_csv",
+        "optional_adapter_execution_requested": budget_contract["optional_adapter_execution_requested"],
+        "optional_adapter_skips": optional_skips,
+        "blocked_reason_codes": [],
+    }
     return {
         "schema_version": PAYSIM_COMPETITIVE_SCHEMA_VERSION,
         "slice": "Paper Track P6-A",
@@ -1190,6 +1381,8 @@ def _build_manifest(
         "hpo_trial_count": budget_contract["probe_trial_count"],
         "finalist_family_count": budget_contract["finalist_fit_count"],
         "validation_selected_competitive_model": selected or None,
+        "execution_status": execution_status,
+        "test_exposure_contract": _paysim_test_exposure_contract(),
         "supporting_paper_table_candidate_allowed": gate["supporting_paper_table_candidate_allowed"],
         "headline_performance_claim_allowed": False,
         "paper_primary_claim_allowed": False,
@@ -1197,7 +1390,18 @@ def _build_manifest(
         "output_files": PAYSIM_COMPETITIVE_FILENAMES,
         "command": "relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json",
         "next_slice": "Paper Track P7",
-        "summary": "P6-A competitive PaySim evaluation completed under an untouched-test, leakage-audited, supporting-only paper contract.",
+        "summary": "P6-A completed a leakage-audited, validation-selected competitive evaluation on a fixed test partition with prior P4 and P6 baseline exposure.",
+    }
+
+
+def _paysim_test_exposure_contract() -> dict[str, Any]:
+    return {
+        "test_partition_fixed": True,
+        "test_partition_previously_exposed": True,
+        "prior_test_exposure_roles": ["P4 reference", "P6 baseline"],
+        "competitive_selection_used_test": False,
+        "competitive_finalists_tested_after_freeze": 1,
+        "untouched_holdout_claim_allowed": False,
     }
 
 
@@ -1233,6 +1437,13 @@ def _blocked_pack(
             "headline_performance_claim_allowed": False,
             "paper_primary_claim_allowed": False,
             "hard_performance_claims_allowed": False,
+            "execution_status": {
+                "status": "blocked",
+                "dataset_execution": "not_completed",
+                "optional_adapter_execution_requested": False,
+                "optional_adapter_skips": [],
+                "blocked_reason_codes": [reason_code],
+            },
             "output_files": PAYSIM_COMPETITIVE_FILENAMES,
             "next_slice": "Paper Track P6-A repair before Paper Track P7",
         },

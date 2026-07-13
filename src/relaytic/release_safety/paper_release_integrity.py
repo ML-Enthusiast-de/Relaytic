@@ -21,6 +21,10 @@ PAPER_RELEASE_INTEGRITY_FILENAMES = {
     "paper_p24_baseline_metric_snapshot": "paper_p24_baseline_metric_snapshot.json",
     "paper_p24_artifact_conflict_audit": "paper_p24_artifact_conflict_audit.json",
     "paper_p24_protocol_disclosure_audit": "paper_p24_protocol_disclosure_audit.json",
+    "paper_p24_paysim_protocol_audit": "paper_p24_paysim_protocol_audit.json",
+    "paper_p24_operating_point_audit": "paper_p24_operating_point_audit.json",
+    "paper_p24_reference_provenance_audit": "paper_p24_reference_provenance_audit.json",
+    "paper_p24_execution_status_audit": "paper_p24_execution_status_audit.json",
     "paper_p24_bibliography_verification": "paper_p24_bibliography_verification.json",
     "paper_p24_claim_citation_map": "paper_p24_claim_citation_map.json",
     "paper_p24_statistical_reporting_decision": "paper_p24_statistical_reporting_decision.json",
@@ -126,13 +130,13 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
             "topic": "Elliptic2 cohort",
             "authoritative_current_core": {"subgraphs": 121810, "positives": 2763},
             "authoritative_evaluable_cohort": {"rows": 110902, "positives": 2578},
-            "resolution": "report both populations; benchmark metrics apply only to the pinned RevTrack-evaluable cohort",
+            "resolution": "report both populations. Benchmark metrics apply only to the pinned RevTrack-evaluable cohort.",
             "passed": all(token in markdown for token in ("121,810", "110,902", "2,763", "2,578")),
         },
         {
             "topic": "Elliptic2 test exposure",
-            "resolution": "describe repeated official-partition estimate as confirmatory rather than untouched",
-            "passed": "confirmatory rather than an untouched-test estimate" in markdown,
+            "resolution": "describe the repeated RevTrack TST estimate as confirmatory, with prior test exposure disclosed",
+            "passed": "confirmatory rather than blind or untouched evidence" in markdown,
         },
     ]
     conflict_audit = _report("pass" if all(row["passed"] for row in conflicts) else "fail", conflicts=conflicts)
@@ -145,7 +149,7 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
         "Elliptic unknown-label policy": ["Unknown-label nodes", "never targets or metric rows"],
         "Elliptic validation-test gap": ["validation PR-AUC 0.9767", "test PR-AUC 0.6688"],
         "Review-threshold transfer": ["applying that threshold unchanged to test", "scores equal to the threshold are included"],
-        "Elliptic2 partition provenance": ["TRN", "VAL", "TST", "pinned RevTrack"],
+        "Elliptic2 partition provenance": ["TRN", "VAL", "TST", "provided RevTrack"],
         "Single-seed disclosure": ["single-seed point estimates"],
         "Calibration boundary": ["Raw and calibrated test PR-AUC are both"],
     }
@@ -155,13 +159,18 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
     ]
     protocol_audit = _report("pass" if all(row["passed"] for row in protocol_checks) else "fail", checks=protocol_checks)
 
+    paysim_protocol = _paysim_protocol_audit(reports, markdown)
+    operating_point_audit = _operating_point_audit(reports, markdown)
+    reference_provenance_audit = _reference_provenance_audit(reports, markdown)
+    execution_status_audit = _execution_status_audit(reports, markdown)
+
     bib_keys = set(re.findall(r"@\w+\s*\{\s*([^,\s]+)", bibliography))
     citation_checks = [
         {"citation_key": key, "primary_url": url, "present": key in bib_keys}
         for key, url in VERIFIED_CITATIONS.items()
     ]
     author_repairs = {
-        "gaurav2025governanceaas": "Pervez, Helen and Gaurav, Suyash and Heikkonen, Jukka and Chaudhary, Jatin",
+        "gaurav2025governanceaas": "Gaurav, Suyash and Heikkonen, Jukka and Chaudhary, Jatin",
         "kaptein2026runtimegovernance": "Kaptein, Maurits and Khan, Vassilis-Javed and Podstavnychy, Andriy",
         "naik2026llmopsaml": "Naik, Prathamesh Vasudeo and Dintakurthi, Naresh and Wang, Yue",
     }
@@ -171,7 +180,7 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
     ]
     bibliography_verification = _report(
         "pass" if all(row["present"] for row in citation_checks) and all(row["passed"] for row in author_checks) else "fail",
-        verification_date="2026-07-11",
+        verification_date="2026-07-13",
         primary_source_checks=citation_checks,
         corrected_author_checks=author_checks,
         verification_method="primary arXiv records, DOI landing pages, or publisher/proceedings pages",
@@ -216,7 +225,7 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
         {"mode": "deterministic fixtures", "passed": "Deterministic fixtures" in markdown},
         {"mode": "artifact verification", "passed": "Artifact verification" in markdown},
         {"mode": "raw-data rerun", "passed": "raw-data rerun" in markdown.lower()},
-        {"mode": "optional execution semantics", "passed": "does not guarantee" in markdown and "blocked reasons" in markdown},
+        {"mode": "optional execution semantics", "passed": "--require-full-rerun" in markdown and "prior test exposure remains disclosed" in markdown},
     ]
     reproduction_semantics = _report("pass" if all(row["passed"] for row in reproduction_checks) else "fail", checks=reproduction_checks)
 
@@ -231,6 +240,10 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
         "paper_p24_baseline_metric_snapshot": baseline_snapshot,
         "paper_p24_artifact_conflict_audit": conflict_audit,
         "paper_p24_protocol_disclosure_audit": protocol_audit,
+        "paper_p24_paysim_protocol_audit": paysim_protocol,
+        "paper_p24_operating_point_audit": operating_point_audit,
+        "paper_p24_reference_provenance_audit": reference_provenance_audit,
+        "paper_p24_execution_status_audit": execution_status_audit,
         "paper_p24_bibliography_verification": bibliography_verification,
         "paper_p24_claim_citation_map": claim_citation_map,
         "paper_p24_statistical_reporting_decision": statistical_decision,
@@ -269,8 +282,8 @@ def sync_paper_release_integrity_pack(
     }
 
 
-def build_exact_revision_release(project_root: str | Path) -> dict[str, Any]:
-    """Build final paper artifacts out of tree and refuse an uncommitted source state."""
+def build_exact_revision_release(project_root: str | Path, *, release_tag: str | None = None) -> dict[str, Any]:
+    """Build an immutable, tagged paper release outside the working tree."""
     root = Path(project_root)
     git = _git_state(root)
     if git["dirty"]:
@@ -278,6 +291,14 @@ def build_exact_revision_release(project_root: str | Path) -> dict[str, Any]:
     commit = str(git["commit"] or "")
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("Final paper release could not resolve a full Git commit SHA.")
+    tag = str(release_tag or "").strip()
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]*", tag):
+        raise ValueError("Final paper release requires a valid release tag name.")
+    tagged_commit = _git(root, "rev-list", "-n", "1", tag).strip()
+    if not tagged_commit:
+        raise ValueError(f"Final paper release requires local tag `{tag}`.")
+    if tagged_commit != commit:
+        raise ValueError(f"Release tag `{tag}` must resolve to the current HEAD commit.")
 
     from relaytic.release_safety.paper_arxiv_source import sync_paper_arxiv_source_pack
     from relaytic.release_safety.paper_release import sync_paper_release_pack
@@ -289,13 +310,26 @@ def build_exact_revision_release(project_root: str | Path) -> dict[str, Any]:
     if release_root.exists():
         shutil.rmtree(release_root)
     reports_dir.mkdir(parents=True, exist_ok=True)
-    sync_paper_release_pack(root, output_dir=reports_dir, paper_dir=paper_dir, source_commit=commit)
+    sync_paper_release_pack(
+        root,
+        output_dir=reports_dir,
+        paper_dir=paper_dir,
+        release_tag=tag,
+        source_commit=commit,
+    )
     sync_paper_arxiv_source_pack(root, output_dir=reports_dir, source_dir=source_dir, paper_dir=paper_dir)
     _compile_latex(source_dir)
 
     built_pdf = source_dir / "main.pdf"
     if not built_pdf.is_file():
         raise ValueError("LaTeX compilation did not produce main.pdf.")
+    source_text = _read_text(source_dir / "main.tex")
+    required_release_tokens = (tag, commit, "archive/refs/tags")
+    if not all(token in source_text for token in required_release_tokens):
+        raise ValueError("Final source does not contain the required immutable release metadata.")
+    forbidden_release_tokens = ("dirty", "under review", "pending release")
+    if any(token in source_text.lower() for token in forbidden_release_tokens):
+        raise ValueError("Final source contains a non-final release-status phrase.")
     pdf_path = release_root / "relaytic_aml_arxiv.pdf"
     shutil.copy2(built_pdf, pdf_path)
     source_archive = release_root / "relaytic_aml_arxiv_source.tar.gz"
@@ -310,6 +344,8 @@ def build_exact_revision_release(project_root: str | Path) -> dict[str, Any]:
         "schema_version": PAPER_RELEASE_INTEGRITY_SCHEMA_VERSION,
         "status": "pass" if integrity_ok else "fail",
         "source_commit": commit,
+        "release_tag": tag,
+        "tagged_commit": tagged_commit,
         "clean_worktree_before_build": True,
         "paper_integrity_status": integrity["paper_p24_release_manifest"]["status"],
     }
@@ -318,8 +354,10 @@ def build_exact_revision_release(project_root: str | Path) -> dict[str, Any]:
         "schema_version": PAPER_RELEASE_INTEGRITY_SCHEMA_VERSION,
         "status": "release_candidate_ready_for_human_upload" if integrity_ok else "blocked",
         "source_commit": commit,
+        "release_tag": tag,
+        "tagged_commit": tagged_commit,
         "clean_worktree_before_build": True,
-        "arxiv_upload_ready": bool(integrity_ok),
+        "arxiv_upload_ready": bool(integrity_ok and tagged_commit == commit),
         "artifacts": {
             "pdf": {"path": pdf_path.relative_to(root).as_posix(), "sha256": _sha256(pdf_path)},
             "source_bundle": {"path": source_archive.relative_to(root).as_posix(), "sha256": _sha256(source_archive)},
@@ -344,6 +382,215 @@ def render_paper_release_integrity_markdown(pack: dict[str, Any]) -> str:
             "- Exact-revision final build remains a clean-worktree, human-triggered release action.",
         ]
     ) + "\n"
+
+
+def _paysim_protocol_audit(reports: Path, markdown: str) -> dict[str, Any]:
+    manifest = _read_json(reports / "paysim_competitive_benchmark_manifest.json")
+    budget = _read_json(reports / "paysim_competitive_budget_contract.json")
+    trace = _read_json(reports / "paysim_competitive_search_trace.json")
+    gate = _read_json(reports / "paysim_publishability_gate.json")
+    exposure = dict(manifest.get("test_exposure_contract", {}) or {})
+    selected = dict(manifest.get("validation_selected_competitive_model", {}) or {})
+    finalist_rows = [
+        row
+        for row in trace.get("attempts", [])
+        if isinstance(row, dict) and row.get("stage") == "full_train_finalist" and row.get("execution_state") == "ran"
+    ]
+    checks = [
+        {
+            "check": "selection surface",
+            "observed": selected.get("selection_surface"),
+            "pass_criterion": "validation_pr_auc_only_before_test_evaluation",
+            "passed": selected.get("selection_surface") == "validation_pr_auc_only_before_test_evaluation",
+        },
+        {
+            "check": "previous exposure disclosure",
+            "observed": exposure,
+            "pass_criterion": "fixed partition, P4/P6 exposure recorded, and no untouched-holdout claim",
+            "passed": exposure.get("test_partition_fixed") is True
+            and exposure.get("test_partition_previously_exposed") is True
+            and exposure.get("prior_test_exposure_roles") == ["P4 reference", "P6 baseline"]
+            and exposure.get("untouched_holdout_claim_allowed") is False,
+        },
+        {
+            "check": "post-freeze evaluation budget",
+            "observed": budget.get("test_evaluation_policy"),
+            "pass_criterion": "one validation-selected competitive finalist after protocol freeze",
+            "passed": budget.get("test_evaluation_policy")
+            == "one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze"
+            and exposure.get("competitive_finalists_tested_after_freeze") == 1,
+        },
+        {
+            "check": "full-training finalist disclosure",
+            "observed": {"count": len(finalist_rows), "selected": selected.get("family_id")},
+            "pass_criterion": "five full-training finalists with one selected final model",
+            "passed": len(finalist_rows) == 5 and bool(selected.get("family_id")),
+        },
+        {
+            "check": "reader-facing disclosure",
+            "observed": "P4/P6 exposure and non-untouched status appear in the manuscript",
+            "pass_criterion": "the paper does not present PaySim test evidence as untouched",
+            "passed": all(
+                phrase in markdown
+                for phrase in (
+                    "prior P4 and P6 exposure",
+                    "not presented as untouched",
+                    "validation-only selection",
+                )
+            ),
+        },
+        {
+            "check": "claim gate",
+            "observed": gate.get("blocked_claims"),
+            "pass_criterion": "untouched and one-time-inspection claims are blocked",
+            "passed": all(
+                phrase in list(gate.get("blocked_claims", []))
+                for phrase in (
+                    "PaySim test partition was an untouched holdout",
+                    "PaySim test partition was inspected only once across the project",
+                )
+            ),
+        },
+    ]
+    return _report("pass" if all(row["passed"] for row in checks) else "fail", checks=checks)
+
+
+def _operating_point_audit(reports: Path, markdown: str) -> dict[str, Any]:
+    sources = [
+        ("PaySim", _read_json(reports / "paysim_competitive_benchmark_manifest.json"), "validation_selected_competitive_model"),
+        ("Elliptic", _read_json(reports / "paper_graph_feature_table.json"), "validation_selected_competitive_baseline"),
+    ]
+    checks = []
+    for name, payload, field in sources:
+        selected = dict(payload.get(field, {}) or {})
+        validation = dict(selected.get("validation_operating_point", {}) or {})
+        test = dict(selected.get("test_operating_point", {}) or {})
+        threshold = selected.get("validation_threshold")
+        validation_count = int(validation.get("evaluation_row_count", 0) or 0)
+        test_count = int(test.get("evaluation_row_count", 0) or 0)
+        validation_recomputed = _operating_row_matches(validation, validation_count)
+        test_recomputed = _operating_row_matches(test, test_count)
+        checks.append(
+            {
+                "benchmark": name,
+                "artifact_ref": f"docs/reports/{'paysim_competitive_benchmark_manifest.json' if name == 'PaySim' else 'paper_graph_feature_table.json'}",
+                "threshold": threshold,
+                "validation_operating_partition_rows": validation_count,
+                "test_partition_rows": test_count,
+                "observed_test_queue": test.get("reviewed_count"),
+                "pass_criterion": "validation threshold is transferred unchanged and counts reproduce the stated precision, recall, and queue fraction",
+                "validation_count_recomputed": validation_recomputed,
+                "test_count_recomputed": test_recomputed,
+                "threshold_transfer_recorded": selected.get("threshold_applied_unchanged_to_test") is True
+                and selected.get("comparison_operator") == ">="
+                and selected.get("tie_rule") == "include_scores_equal_to_threshold",
+                "reader_display_present": all(
+                    value in markdown
+                    for value in (
+                        f"{float(selected.get('test_pr_auc', 0.0)):.4f}",
+                        f"{float(test.get('precision_at_k', 0.0)):.4f}",
+                        f"{float(test.get('recall_at_review_budget', 0.0)):.4f}",
+                    )
+                ),
+            }
+        )
+        checks[-1]["passed"] = all(
+            checks[-1][name]
+            for name in (
+                "validation_count_recomputed",
+                "test_count_recomputed",
+                "threshold_transfer_recorded",
+                "reader_display_present",
+            )
+        )
+    return _report("pass" if all(row["passed"] for row in checks) else "fail", checks=checks)
+
+
+def _reference_provenance_audit(reports: Path, markdown: str) -> dict[str, Any]:
+    scorecard = _read_json(reports / "elliptic2_revclassify_reference_scorecard.json")
+    reference = dict(scorecard.get("reference", {}) or {})
+    expected_hash = "b253d97531a0da6fd16a46bb54904437d4373984dfb2559e69c2104faaa08728"
+    checks = [
+        {
+            "check": "versioned RevTrack source",
+            "observed": reference.get("versioned_pdf_url"),
+            "pass_criterion": "arXiv v1 PDF is pinned",
+            "passed": reference.get("versioned_pdf_url") == "https://arxiv.org/pdf/2410.08394v1",
+        },
+        {
+            "check": "published metric location",
+            "observed": reference.get("source"),
+            "pass_criterion": "Table 1, RevClassifyDS full-shot PR-AUC",
+            "passed": "Table 1" in str(reference.get("source", "")) and "RevClassifyDS" in str(reference.get("source", "")),
+        },
+        {
+            "check": "versioned PDF digest",
+            "observed": reference.get("versioned_pdf_sha256"),
+            "pass_criterion": expected_hash,
+            "passed": reference.get("versioned_pdf_sha256") == expected_hash,
+        },
+        {
+            "check": "reader-facing cohort boundary",
+            "observed": "published reference is described as context, not parity",
+            "pass_criterion": "paper identifies the reference as a published context metric",
+            "passed": "RevClassifyDS" in markdown and "shown only as an external reference" in markdown,
+        },
+    ]
+    return _report("pass" if all(row["passed"] for row in checks) else "fail", checks=checks)
+
+
+def _execution_status_audit(reports: Path, markdown: str) -> dict[str, Any]:
+    manifests = [
+        ("PaySim", _read_json(reports / "paysim_competitive_benchmark_manifest.json")),
+        ("Elliptic", _read_json(reports / "paper_graph_baseline_manifest.json")),
+        ("Elliptic2", _read_json(reports / "elliptic2_publishability_gate.json")),
+    ]
+    checks = []
+    for name, manifest in manifests:
+        execution = dict(manifest.get("execution_status", {}) or {})
+        checks.append(
+            {
+                "benchmark": name,
+                "observed_status": execution.get("status"),
+                "blocked_reason_codes": execution.get("blocked_reason_codes", []),
+                "pass_criterion": "a machine-readable execution status and blocked reasons are emitted",
+                "passed": execution.get("status") in {"executed", "executed_with_optional_skips", "skipped", "blocked"}
+                and isinstance(execution.get("blocked_reason_codes"), list),
+            }
+        )
+    paper_check = {
+        "benchmark": "reproduction instructions",
+        "observed_status": "require-full-rerun command documented",
+        "blocked_reason_codes": [],
+        "pass_criterion": "full-rerun commands reject skipped benchmark execution",
+        "passed": "--require-full-rerun" in markdown,
+    }
+    checks.append(paper_check)
+    return _report("pass" if all(row["passed"] for row in checks) else "fail", checks=checks)
+
+
+def _operating_row_matches(point: dict[str, Any], row_count: int) -> bool:
+    if row_count <= 0:
+        return False
+    reviewed = _integer_or_default(point.get("reviewed_count"), default=-1)
+    true_positive = _integer_or_default(point.get("true_positive_count"), default=-1)
+    false_positive = _integer_or_default(point.get("false_positive_count"), default=-1)
+    if reviewed != true_positive + false_positive or reviewed <= 0:
+        return False
+    positive_count = _integer_or_default(point.get("positive_count"), default=0)
+    return (
+        _numeric_close(point.get("review_fraction"), reviewed / row_count, tolerance=1e-6)
+        and _numeric_close(point.get("precision_at_k"), true_positive / reviewed, tolerance=1e-6)
+        and positive_count > 0
+        and _numeric_close(point.get("recall_at_review_budget"), true_positive / positive_count, tolerance=1e-6)
+    )
+
+
+def _integer_or_default(value: Any, *, default: int) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def _split_checks(reports: Path, markdown: str) -> list[dict[str, Any]]:

@@ -11,8 +11,8 @@
     {
       "component": "Evidence emitted",
       "evidence_ref": "docs/reports/paper_external_score_evidence_cells.json",
-      "observed": "1 evidence cell; metadata-completeness metric; value 1.0000",
-      "reader_takeaway": "Relaytic records the governance metric as auditable evidence, not as detector novelty."
+      "observed": "1 evidence cell; required metadata fields present; schema-completeness invariant passed",
+      "reader_takeaway": "This is a governance check, not detector accuracy, ranking performance, or model novelty."
     },
     {
       "component": "Rowless handoff",

@@ -10,6 +10,15 @@
     "publishability_gate": "docs/reports/paper_graph_publishability_gate.json"
   },
   "excluded_cross_step_edge_count": 0,
+  "execution_status": {
+    "blocked_reason_codes": [],
+    "dataset_execution": "completed_from_local_elliptic_bundle",
+    "effective_tier": "competitive",
+    "optional_adapter_execution_requested": true,
+    "optional_adapter_skips": [],
+    "requested_tier": "competitive",
+    "status": "executed"
+  },
   "feature_contract_id": "p7_elliptic_same_step_observable_graph_features_v1",
   "graph_model_execution_state": "ran_shadow_only",
   "hard_performance_claims_allowed": false,

@@ -585,7 +585,7 @@ def _public_safe_claim_generation_task(payloads: dict[str, dict[str, Any]]) -> d
         summary=(
             "Relaytic exposes public-claim boundaries instead of promoting an unsupported headline."
             if status == "pass"
-            else "Relaytic needs explicit public-claim boundaries for safe paper or hiring-facing claims."
+            else "Relaytic needs explicit public-claim boundaries for safe paper or public-facing claims."
         ),
         options_now=["inspect_public_claim_guard", "inspect_paper_claim_guard", "export_external_context"],
         details={

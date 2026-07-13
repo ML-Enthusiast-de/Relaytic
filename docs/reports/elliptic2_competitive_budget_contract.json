@@ -72,6 +72,6 @@
   "selection_rule": "choose the candidate with highest official-validation PR-AUC; evaluate official test only for that candidate; freeze it for repeated and robustness runs",
   "slice": "Paper Track P8-B",
   "status": "executed",
-  "test_exposure_disclosure": "P8-A exposed the official test metrics before this competitive suite; the alternate content-hash partition supplies new robustness evidence, not a pristine benchmark replacement.",
+  "test_exposure_disclosure": "P8-A exposed the provided RevTrack TST metrics before this competitive suite. The alternate content-hash partition supplies additional robustness evidence, not a pristine benchmark replacement.",
   "validation_selected_candidate_id": "p8b_pooled_moments_lgbm"
 }

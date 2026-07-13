@@ -21,12 +21,12 @@
       "case_id": "test_set_selection_violation",
       "claim_boundary": "supports governance evidence only; not detector benchmark evidence",
       "evidence_cell_id": "paysim_p6a_competitive_selected.test_pr_auc",
-      "expected_behavior": "Only validation evidence may select, calibrate, or threshold the finalist.",
+      "expected_behavior": "Only validation evidence may select, calibrate, or threshold the finalist. Prior P4/P6 test exposure must remain disclosed.",
       "failure_mode": "Test-set selection violation",
       "fixture_scope": "system-level safety/audit fixture",
       "gate_or_check": "Validation-only selection policy",
       "injected_risk": "A model-selection path tries to use test evidence before the finalist is fixed.",
-      "observed_result": "probe_surfaces=1 validation-only; test_used_for_selection=False; final_policy=only_validation_selected_finalist_is_evaluated_on_test",
+      "observed_result": "probe_surfaces=1 validation-only; test_used_for_selection=False; final_policy=one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze; prior_test_exposure=True",
       "passed": true
     },
     {

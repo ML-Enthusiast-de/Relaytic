@@ -46,7 +46,7 @@
       }
     }
   ],
-  "runtime_seconds": 92.186264,
+  "runtime_seconds": 106.864498,
   "schema_version": "relaytic.paper_graph_baseline_suite.v1",
   "slice": "Paper Track P7",
   "status": "ok",

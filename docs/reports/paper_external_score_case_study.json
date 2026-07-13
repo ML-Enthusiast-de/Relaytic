@@ -22,6 +22,8 @@
     "claim_state": "hosted_detector_output_governance_only",
     "command": "relaytic release-safety paper-external-score-proof",
     "dataset_id": "p19a_hosted_score_fixture",
+    "detector_performance_metric": false,
+    "invariant_state": "pass",
     "leakage_posture": "rowless_no_training_or_label_data_exported",
     "metric": "hosted_score_metadata_completeness",
     "split": "fixture_holdout",
@@ -103,6 +105,7 @@
     "metric_role": "governance_metric",
     "paper_role": "hosted_detector_output_governance_evidence",
     "publishable": true,
+    "reader_facing_result": "schema_completeness_invariant_pass",
     "value": 1.0
   },
   "relaytic_checks": [

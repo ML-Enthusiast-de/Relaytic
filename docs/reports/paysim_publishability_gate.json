@@ -1,4 +1,12 @@
 {
+  "allowed_protocol_claims": [
+    "competitive selection used validation evidence only",
+    "one competitive finalist was evaluated after protocol freeze"
+  ],
+  "blocked_claims": [
+    "PaySim test partition was an untouched holdout",
+    "PaySim test partition was inspected only once across the project"
+  ],
   "blocked_reason_codes": [
     "paysim_is_supporting_proxy_not_real_bank_holdout",
     "release_budget_and_clean_clone_proof_not_executed",
@@ -20,10 +28,27 @@
     "test_not_used_for_model_or_calibration_selection": true,
     "validation_improves_on_p6_baseline": true
   },
+  "protocol_metadata_refresh": {
+    "mode": "recorded_artifact_reconciliation",
+    "models_refit": false,
+    "raw_data_loaded": false,
+    "test_partition_re_evaluated": false
+  },
   "public_claim_wording": "Relaytic completed a leakage-audited competitive PaySim rerun with prior-step destination features, recorded search budget, and validation-only selection. PaySim remains supporting synthetic evidence, not a real-world AML or SOTA headline.",
   "schema_version": "relaytic.paysim_competitive_benchmark.v1",
   "slice": "Paper Track P6-A",
   "status": "pass_supporting_only",
   "summary": "P6-A admits a supporting PaySim paper-table candidate while keeping headline and hard AML claims blocked for graph and release proof.",
-  "supporting_paper_table_candidate_allowed": true
+  "supporting_paper_table_candidate_allowed": true,
+  "test_exposure_contract": {
+    "competitive_finalists_tested_after_freeze": 1,
+    "competitive_selection_used_test": false,
+    "prior_test_exposure_roles": [
+      "P4 reference",
+      "P6 baseline"
+    ],
+    "test_partition_fixed": true,
+    "test_partition_previously_exposed": true,
+    "untouched_holdout_claim_allowed": false
+  }
 }

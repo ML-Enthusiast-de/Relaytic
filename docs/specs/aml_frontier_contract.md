@@ -17,7 +17,7 @@ The repository now tells a credible story about:
 - human and agent operability
 - benchmark rigor and benchmark-truth gates
 
-But that is still not enough to make the project feel top-tier to a frontier lab, a payment-risk org, or an AML team.
+But that is still not enough to satisfy a rigorous technical review by a payment-risk organization or AML team.
 
 The missing piece is a sharper thesis.
 

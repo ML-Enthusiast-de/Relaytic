@@ -24,9 +24,10 @@
       "feature_view_id": "structural_same_snapshot_only"
     },
     {
-      "claim_scope": "source_provided_anonymized_snapshot_features_may_include_source_aggregates_not_relabelled_as_relaytic_graph_engineering",
+      "claim_scope": "source_provided_anonymized_local_and_one_hop_neighbor_aggregate_features_not_relabelled_as_relaytic_graph_engineering",
       "feature_count": 165,
-      "feature_view_id": "source_provided_flattened_features"
+      "feature_view_id": "source_provided_flattened_features",
+      "source_feature_boundary": "supplied_by_elliptic_not_reconstructed_by_relaytic"
     },
     {
       "claim_scope": "source_features_augmented_with_relaytic_label_free_graph_structure",
@@ -50,7 +51,7 @@
     "feature_view_id": "structural_same_snapshot_only",
     "row_id": "structural_same_snapshot_extra_trees_floor",
     "row_status": "baseline",
-    "runtime_seconds": 1.097327,
+    "runtime_seconds": 1.20788,
     "selection_role": "predeclared_structural_floor",
     "test_evaluated": true,
     "test_metrics": {
@@ -62,15 +63,21 @@
       "roc_auc": 0.463107
     },
     "test_operating_point": {
+      "comparison_operator": ">=",
+      "evaluation_row_count": 11184,
       "false_positive_count": 723,
       "false_positive_rate": 0.068544,
+      "positive_count": 636,
       "precision_at_k": 0.004132,
       "recall_at_review_budget": 0.004717,
       "requested_review_fraction": 0.005,
       "review_fraction": 0.064914,
       "reviewed_count": 726,
+      "threshold": 0.783827,
+      "tie_rule": "include_scores_equal_to_threshold",
       "true_positive_count": 3
     },
+    "threshold_applied_unchanged_to_test": true,
     "validation_metrics": {
       "log_loss": 0.722025,
       "n_samples": 8999,
@@ -78,7 +85,23 @@
       "positive_rate": 0.115346,
       "pr_auc": 0.196117,
       "roc_auc": 0.695775
-    }
+    },
+    "validation_operating_point": {
+      "comparison_operator": ">=",
+      "evaluation_row_count": 8999,
+      "false_positive_count": 87,
+      "false_positive_rate": 0.010928,
+      "positive_count": 1038,
+      "precision_at_k": 0.147059,
+      "recall_at_review_budget": 0.014451,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.011335,
+      "reviewed_count": 102,
+      "threshold": 0.783827,
+      "tie_rule": "include_scores_equal_to_threshold",
+      "true_positive_count": 15
+    },
+    "validation_threshold": 0.783827
   },
   "rows": [
     {
@@ -96,7 +119,7 @@
       "feature_view_id": "structural_same_snapshot_only",
       "row_id": "structural_same_snapshot_extra_trees_floor",
       "row_status": "baseline",
-      "runtime_seconds": 1.097327,
+      "runtime_seconds": 1.20788,
       "selection_role": "predeclared_structural_floor",
       "test_evaluated": true,
       "test_metrics": {
@@ -108,15 +131,21 @@
         "roc_auc": 0.463107
       },
       "test_operating_point": {
+        "comparison_operator": ">=",
+        "evaluation_row_count": 11184,
         "false_positive_count": 723,
         "false_positive_rate": 0.068544,
+        "positive_count": 636,
         "precision_at_k": 0.004132,
         "recall_at_review_budget": 0.004717,
         "requested_review_fraction": 0.005,
         "review_fraction": 0.064914,
         "reviewed_count": 726,
+        "threshold": 0.783827,
+        "tie_rule": "include_scores_equal_to_threshold",
         "true_positive_count": 3
       },
+      "threshold_applied_unchanged_to_test": true,
       "validation_metrics": {
         "log_loss": 0.722025,
         "n_samples": 8999,
@@ -124,7 +153,23 @@
         "positive_rate": 0.115346,
         "pr_auc": 0.196117,
         "roc_auc": 0.695775
-      }
+      },
+      "validation_operating_point": {
+        "comparison_operator": ">=",
+        "evaluation_row_count": 8999,
+        "false_positive_count": 87,
+        "false_positive_rate": 0.010928,
+        "positive_count": 1038,
+        "precision_at_k": 0.147059,
+        "recall_at_review_budget": 0.014451,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.011335,
+        "reviewed_count": 102,
+        "threshold": 0.783827,
+        "tie_rule": "include_scores_equal_to_threshold",
+        "true_positive_count": 15
+      },
+      "validation_threshold": 0.783827
     },
     {
       "adapter_module": "scikit-learn",
@@ -142,7 +187,7 @@
       "family_id": "sklearn_extra_trees",
       "feature_view_id": "structural_same_snapshot_only",
       "row_status": "competitive",
-      "runtime_seconds": 0.832561,
+      "runtime_seconds": 0.962277,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -173,7 +218,7 @@
       "family_id": "sklearn_extra_trees",
       "feature_view_id": "structural_same_snapshot_only",
       "row_status": "competitive",
-      "runtime_seconds": 0.965391,
+      "runtime_seconds": 1.214425,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -204,7 +249,7 @@
       "family_id": "sklearn_extra_trees",
       "feature_view_id": "source_provided_flattened_features",
       "row_status": "competitive",
-      "runtime_seconds": 6.348718,
+      "runtime_seconds": 6.819846,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -235,7 +280,7 @@
       "family_id": "sklearn_extra_trees",
       "feature_view_id": "source_features_plus_structural_snapshot",
       "row_status": "competitive",
-      "runtime_seconds": 6.917278,
+      "runtime_seconds": 7.695556,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -266,7 +311,7 @@
       "family_id": "sklearn_hist_gradient_boosting",
       "feature_view_id": "source_provided_flattened_features",
       "row_status": "competitive",
-      "runtime_seconds": 11.01993,
+      "runtime_seconds": 10.883933,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -297,7 +342,7 @@
       "family_id": "sklearn_hist_gradient_boosting",
       "feature_view_id": "source_features_plus_structural_snapshot",
       "row_status": "competitive",
-      "runtime_seconds": 8.252029,
+      "runtime_seconds": 9.063214,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -328,7 +373,7 @@
       "family_id": "sklearn_extra_trees",
       "feature_view_id": "source_provided_flattened_features",
       "row_status": "competitive",
-      "runtime_seconds": 9.686054,
+      "runtime_seconds": 10.838698,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -359,7 +404,7 @@
       "family_id": "sklearn_extra_trees",
       "feature_view_id": "source_features_plus_structural_snapshot",
       "row_status": "competitive",
-      "runtime_seconds": 10.50047,
+      "runtime_seconds": 10.808933,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -390,7 +435,7 @@
       "family_id": "sklearn_hist_gradient_boosting",
       "feature_view_id": "source_features_plus_structural_snapshot",
       "row_status": "competitive",
-      "runtime_seconds": 10.965492,
+      "runtime_seconds": 12.390356,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -425,7 +470,7 @@
       "family_id": "lightgbm_classifier",
       "feature_view_id": "structural_same_snapshot_only",
       "row_status": "competitive",
-      "runtime_seconds": 0.896955,
+      "runtime_seconds": 0.906357,
       "selected_for_view_test_evaluation": true,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
@@ -464,7 +509,7 @@
       "family_id": "lightgbm_classifier",
       "feature_view_id": "source_provided_flattened_features",
       "row_status": "competitive",
-      "runtime_seconds": 5.714453,
+      "runtime_seconds": 9.807894,
       "selected_for_view_test_evaluation": true,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
@@ -503,7 +548,7 @@
       "family_id": "lightgbm_classifier",
       "feature_view_id": "source_features_plus_structural_snapshot",
       "row_status": "competitive",
-      "runtime_seconds": 5.966298,
+      "runtime_seconds": 9.247617,
       "selected_for_view_test_evaluation": true,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
@@ -544,7 +589,7 @@
       "family_id": "xgboost_classifier",
       "feature_view_id": "source_features_plus_structural_snapshot",
       "row_status": "competitive",
-      "runtime_seconds": 5.59584,
+      "runtime_seconds": 6.81181,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -579,7 +624,7 @@
       "family_id": "lightgbm_classifier",
       "feature_view_id": "source_provided_flattened_features",
       "row_status": "competitive",
-      "runtime_seconds": 11.089943,
+      "runtime_seconds": 12.254767,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -614,7 +659,7 @@
       "family_id": "lightgbm_classifier",
       "feature_view_id": "source_features_plus_structural_snapshot",
       "row_status": "competitive",
-      "runtime_seconds": 11.342454,
+      "runtime_seconds": 11.585542,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -651,7 +696,7 @@
       "family_id": "xgboost_classifier",
       "feature_view_id": "source_provided_flattened_features",
       "row_status": "competitive",
-      "runtime_seconds": 7.674496,
+      "runtime_seconds": 8.338502,
       "selection_surface": "validation_pr_auc_only_before_test_evaluation",
       "stage": "validation_search",
       "test_evaluated": false,
@@ -686,6 +731,7 @@
       "selected_method": "platt_sigmoid",
       "test_used_for_selection": false
     },
+    "comparison_operator": ">=",
     "configuration": {
       "class_weight": "balanced",
       "colsample_bytree": 0.9,
@@ -705,13 +751,18 @@
     "fixed_fpr": {
       "target_fpr": 0.001,
       "test": {
+        "comparison_operator": ">=",
+        "evaluation_row_count": 11184,
         "false_positive_count": 19,
         "false_positive_rate": 0.001801,
+        "positive_count": 636,
         "precision_at_k": 0.951031,
         "recall_at_review_budget": 0.580189,
         "requested_review_fraction": null,
         "review_fraction": 0.034692,
         "reviewed_count": 388,
+        "threshold": 0.814277,
+        "tie_rule": "include_scores_equal_to_threshold",
         "true_positive_count": 369
       }
     },
@@ -722,19 +773,44 @@
     "selection_surface": "validation_pr_auc_within_predeclared_feature_view_before_test_evaluation",
     "test_evaluation_role": "paired_feature_view_comparison_not_test_driven_model_selection",
     "test_operating_point": {
+      "comparison_operator": ">=",
+      "evaluation_row_count": 11184,
       "false_positive_count": 0,
       "false_positive_rate": 0.0,
+      "positive_count": 636,
       "precision_at_k": 1.0,
       "recall_at_review_budget": 0.056604,
       "requested_review_fraction": 0.005,
       "review_fraction": 0.003219,
       "reviewed_count": 36,
+      "threshold": 0.99982,
+      "tie_rule": "include_scores_equal_to_threshold",
       "true_positive_count": 36
     },
     "test_pr_auc": 0.668756,
     "test_roc_auc": 0.892915,
+    "threshold_applied_unchanged_to_test": true,
+    "threshold_selection_surface": "validation_operating_partition_only",
+    "tie_rule": "include_scores_equal_to_threshold",
     "trial_id": "source_features_plus_structural_snapshot::lightgbm_classifier::12",
-    "validation_pr_auc": 0.976654
+    "validation_operating_partition_row_count": 4145,
+    "validation_operating_point": {
+      "comparison_operator": ">=",
+      "evaluation_row_count": 4145,
+      "false_positive_count": 0,
+      "false_positive_rate": 0.0,
+      "positive_count": 265,
+      "precision_at_k": 1.0,
+      "recall_at_review_budget": 0.079245,
+      "requested_review_fraction": 0.005,
+      "review_fraction": 0.005066,
+      "reviewed_count": 21,
+      "threshold": 0.99982,
+      "tie_rule": "include_scores_equal_to_threshold",
+      "true_positive_count": 21
+    },
+    "validation_pr_auc": 0.976654,
+    "validation_threshold": 0.99982
   },
   "validation_selected_view_rows": [
     {
@@ -747,6 +823,7 @@
         "selected_method": "platt_sigmoid",
         "test_used_for_selection": false
       },
+      "comparison_operator": ">=",
       "configuration": {
         "class_weight": "balanced",
         "colsample_bytree": 0.9,
@@ -766,13 +843,18 @@
       "fixed_fpr": {
         "target_fpr": 0.001,
         "test": {
+          "comparison_operator": ">=",
+          "evaluation_row_count": 11184,
           "false_positive_count": 1855,
           "false_positive_rate": 0.175863,
+          "positive_count": 636,
           "precision_at_k": 0.077114,
           "recall_at_review_budget": 0.243711,
           "requested_review_fraction": null,
           "review_fraction": 0.179721,
           "reviewed_count": 2010,
+          "threshold": 0.234636,
+          "tie_rule": "include_scores_equal_to_threshold",
           "true_positive_count": 155
         }
       },
@@ -782,19 +864,44 @@
       "selection_surface": "validation_pr_auc_within_predeclared_feature_view_before_test_evaluation",
       "test_evaluation_role": "paired_feature_view_comparison_not_test_driven_model_selection",
       "test_operating_point": {
+        "comparison_operator": ">=",
+        "evaluation_row_count": 11184,
         "false_positive_count": 1855,
         "false_positive_rate": 0.175863,
+        "positive_count": 636,
         "precision_at_k": 0.077114,
         "recall_at_review_budget": 0.243711,
         "requested_review_fraction": 0.005,
         "review_fraction": 0.179721,
         "reviewed_count": 2010,
+        "threshold": 0.234636,
+        "tie_rule": "include_scores_equal_to_threshold",
         "true_positive_count": 155
       },
       "test_pr_auc": 0.058018,
       "test_roc_auc": 0.495392,
+      "threshold_applied_unchanged_to_test": true,
+      "threshold_selection_surface": "validation_operating_partition_only",
+      "tie_rule": "include_scores_equal_to_threshold",
       "trial_id": "structural_same_snapshot_only::lightgbm_classifier::10",
-      "validation_pr_auc": 0.226946
+      "validation_operating_partition_row_count": 4145,
+      "validation_operating_point": {
+        "comparison_operator": ">=",
+        "evaluation_row_count": 4145,
+        "false_positive_count": 87,
+        "false_positive_rate": 0.022423,
+        "positive_count": 265,
+        "precision_at_k": 0.147059,
+        "recall_at_review_budget": 0.056604,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.024608,
+        "reviewed_count": 102,
+        "threshold": 0.234636,
+        "tie_rule": "include_scores_equal_to_threshold",
+        "true_positive_count": 15
+      },
+      "validation_pr_auc": 0.226946,
+      "validation_threshold": 0.234636
     },
     {
       "adapter_module": "lightgbm",
@@ -806,6 +913,7 @@
         "selected_method": "platt_sigmoid",
         "test_used_for_selection": false
       },
+      "comparison_operator": ">=",
       "configuration": {
         "class_weight": "balanced",
         "colsample_bytree": 0.9,
@@ -825,13 +933,18 @@
       "fixed_fpr": {
         "target_fpr": 0.001,
         "test": {
+          "comparison_operator": ">=",
+          "evaluation_row_count": 11184,
           "false_positive_count": 18,
           "false_positive_rate": 0.001706,
+          "positive_count": 636,
           "precision_at_k": 0.95288,
           "recall_at_review_budget": 0.572327,
           "requested_review_fraction": null,
           "review_fraction": 0.034156,
           "reviewed_count": 382,
+          "threshold": 0.88697,
+          "tie_rule": "include_scores_equal_to_threshold",
           "true_positive_count": 364
         }
       },
@@ -841,19 +954,44 @@
       "selection_surface": "validation_pr_auc_within_predeclared_feature_view_before_test_evaluation",
       "test_evaluation_role": "paired_feature_view_comparison_not_test_driven_model_selection",
       "test_operating_point": {
+        "comparison_operator": ">=",
+        "evaluation_row_count": 11184,
         "false_positive_count": 0,
         "false_positive_rate": 0.0,
+        "positive_count": 636,
         "precision_at_k": 1.0,
         "recall_at_review_budget": 0.04717,
         "requested_review_fraction": 0.005,
         "review_fraction": 0.002682,
         "reviewed_count": 30,
+        "threshold": 0.999818,
+        "tie_rule": "include_scores_equal_to_threshold",
         "true_positive_count": 30
       },
       "test_pr_auc": 0.664168,
       "test_roc_auc": 0.888775,
+      "threshold_applied_unchanged_to_test": true,
+      "threshold_selection_surface": "validation_operating_partition_only",
+      "tie_rule": "include_scores_equal_to_threshold",
       "trial_id": "source_provided_flattened_features::lightgbm_classifier::11",
-      "validation_pr_auc": 0.975675
+      "validation_operating_partition_row_count": 4145,
+      "validation_operating_point": {
+        "comparison_operator": ">=",
+        "evaluation_row_count": 4145,
+        "false_positive_count": 0,
+        "false_positive_rate": 0.0,
+        "positive_count": 265,
+        "precision_at_k": 1.0,
+        "recall_at_review_budget": 0.079245,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.005066,
+        "reviewed_count": 21,
+        "threshold": 0.999818,
+        "tie_rule": "include_scores_equal_to_threshold",
+        "true_positive_count": 21
+      },
+      "validation_pr_auc": 0.975675,
+      "validation_threshold": 0.999818
     },
     {
       "adapter_module": "lightgbm",
@@ -865,6 +1003,7 @@
         "selected_method": "platt_sigmoid",
         "test_used_for_selection": false
       },
+      "comparison_operator": ">=",
       "configuration": {
         "class_weight": "balanced",
         "colsample_bytree": 0.9,
@@ -884,13 +1023,18 @@
       "fixed_fpr": {
         "target_fpr": 0.001,
         "test": {
+          "comparison_operator": ">=",
+          "evaluation_row_count": 11184,
           "false_positive_count": 19,
           "false_positive_rate": 0.001801,
+          "positive_count": 636,
           "precision_at_k": 0.951031,
           "recall_at_review_budget": 0.580189,
           "requested_review_fraction": null,
           "review_fraction": 0.034692,
           "reviewed_count": 388,
+          "threshold": 0.814277,
+          "tie_rule": "include_scores_equal_to_threshold",
           "true_positive_count": 369
         }
       },
@@ -901,19 +1045,44 @@
       "selection_surface": "validation_pr_auc_within_predeclared_feature_view_before_test_evaluation",
       "test_evaluation_role": "paired_feature_view_comparison_not_test_driven_model_selection",
       "test_operating_point": {
+        "comparison_operator": ">=",
+        "evaluation_row_count": 11184,
         "false_positive_count": 0,
         "false_positive_rate": 0.0,
+        "positive_count": 636,
         "precision_at_k": 1.0,
         "recall_at_review_budget": 0.056604,
         "requested_review_fraction": 0.005,
         "review_fraction": 0.003219,
         "reviewed_count": 36,
+        "threshold": 0.99982,
+        "tie_rule": "include_scores_equal_to_threshold",
         "true_positive_count": 36
       },
       "test_pr_auc": 0.668756,
       "test_roc_auc": 0.892915,
+      "threshold_applied_unchanged_to_test": true,
+      "threshold_selection_surface": "validation_operating_partition_only",
+      "tie_rule": "include_scores_equal_to_threshold",
       "trial_id": "source_features_plus_structural_snapshot::lightgbm_classifier::12",
-      "validation_pr_auc": 0.976654
+      "validation_operating_partition_row_count": 4145,
+      "validation_operating_point": {
+        "comparison_operator": ">=",
+        "evaluation_row_count": 4145,
+        "false_positive_count": 0,
+        "false_positive_rate": 0.0,
+        "positive_count": 265,
+        "precision_at_k": 1.0,
+        "recall_at_review_budget": 0.079245,
+        "requested_review_fraction": 0.005,
+        "review_fraction": 0.005066,
+        "reviewed_count": 21,
+        "threshold": 0.99982,
+        "tie_rule": "include_scores_equal_to_threshold",
+        "true_positive_count": 21
+      },
+      "validation_pr_auc": 0.976654,
+      "validation_threshold": 0.99982
     }
   ]
 }

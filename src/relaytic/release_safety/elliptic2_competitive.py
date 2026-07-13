@@ -36,8 +36,13 @@ ELLIPTIC2_PUBLISHED_REFERENCE = {
     "metric": "pr_auc",
     "RevClassify_BP": {"pr_auc": 0.972, "f1": 0.954},
     "RevClassify_DS": {"pr_auc": 0.974, "f1": 0.953},
-    "source": "official paper Table 2, full-shot subgraph classification",
+    "source": "Song et al. (2024), Table 1, RevClassifyDS row, full-shot PR-AUC column",
     "paper_url": "https://arxiv.org/abs/2410.08394",
+    "versioned_pdf_url": "https://arxiv.org/pdf/2410.08394v1",
+    "paper_doi": "10.1145/3677052.3698635",
+    "accessed": "2026-07-13",
+    "versioned_pdf_sha256": "b253d97531a0da6fd16a46bb54904437d4373984dfb2559e69c2104faaa08728",
+    "cohort_scope": "published Elliptic2 full-shot benchmark; not asserted equivalent to Relaytic's pinned RevTrack-evaluable cohort",
 }
 ELLIPTIC2_ROBUSTNESS_SPLIT_ID = "p8b_label_stratified_content_hash_v1"
 ELLIPTIC2_REFERENCE_SPLIT_ID = "p8a_revtrack_official_partition_comparability_v1"
@@ -187,6 +192,73 @@ def sync_elliptic2_competitive_pack(
         key: write_json(report_dir / filename, artifacts[key], indent=2, sort_keys=True)
         for key, filename in ELLIPTIC2_COMPETITIVE_FILENAMES.items()
     }
+
+
+def refresh_elliptic2_reference_metadata(
+    project_root: str | Path,
+    *,
+    output_dir: str | Path | None = None,
+) -> dict[str, Path]:
+    """Reconcile versioned-reference provenance without executing the P8-B suite again."""
+    root = Path(project_root)
+    report_dir = Path(output_dir) if output_dir is not None else root / ELLIPTIC2_COMPETITIVE_REPORT_DIR
+    payloads = {
+        key: _read_json(report_dir / filename)
+        for key, filename in ELLIPTIC2_COMPETITIVE_FILENAMES.items()
+    }
+    missing = [key for key, payload in payloads.items() if not payload]
+    if missing:
+        raise ValueError(f"Cannot reconcile P8-B reference metadata; missing artifacts: {', '.join(missing)}.")
+
+    scorecard = payloads["elliptic2_revclassify_reference_scorecard"]
+    scorecard["reference"] = dict(ELLIPTIC2_PUBLISHED_REFERENCE)
+    scorecard["reference_metadata_refresh"] = {
+        "mode": "versioned_reference_provenance_reconciliation",
+        "benchmark_reexecuted": False,
+        "published_value_changed": False,
+    }
+    budget = payloads["elliptic2_competitive_budget_contract"]
+    budget["test_exposure_disclosure"] = (
+        "P8-A exposed the provided RevTrack TST metrics before this competitive suite. "
+        "The alternate content-hash partition supplies additional robustness evidence, not a pristine benchmark replacement."
+    )
+    trace = payloads["elliptic2_relaytic_candidate_search_trace"]
+    trace["prior_test_exposure_disclosure"] = (
+        "The provided RevTrack TST partition was exposed during P8-A. Candidate selection in P8-B remained validation-only."
+    )
+    gate = payloads["elliptic2_publishability_gate"]
+    gate["execution_status"] = {
+        "status": "executed",
+        "requested_tier": budget.get("requested_budget_tier"),
+        "effective_tier": budget.get("effective_budget_tier"),
+        "dataset_execution": "recorded_prior_local_revtrack_execution",
+        "optional_adapter_execution_requested": False,
+        "optional_adapter_skips": [],
+        "blocked_reason_codes": [],
+    }
+    gate["blocked_reason_codes"] = [
+        "official_revtrack_preprocessing_and_embeddings_consumed" if code == "official_revtrack_preprocessing_and_embeddings_consumed" else code
+        for code in list(gate.get("blocked_reason_codes", []))
+    ]
+    gate["allowed_wording"] = str(gate.get("allowed_wording", "")).replace(
+        "official preprocessing boundary", "provided RevTrack preprocessing boundary"
+    )
+
+    written = {
+        key: write_json(report_dir / filename, payloads[key], indent=2, sort_keys=True)
+        for key, filename in ELLIPTIC2_COMPETITIVE_FILENAMES.items()
+    }
+    metric_audit_path = report_dir / "paper_metric_cell_audit.json"
+    metric_audit = _read_json(metric_audit_path)
+    if metric_audit:
+        for cell in metric_audit.get("numeric_cells", []):
+            if not isinstance(cell, dict) or not str(cell.get("cell_id", "")).startswith("elliptic2_p8b_modern_context"):
+                continue
+            cell["leakage_posture"] = "provided_revtrack_tst_prior_exposure_disclosed_content_hash_partition_used_as_robustness_check"
+            if cell.get("split") == "official_test":
+                cell["split"] = "provided_revtrack_tst"
+        written["paper_metric_cell_audit"] = write_json(metric_audit_path, metric_audit, indent=2, sort_keys=True)
+    return written
 
 
 def render_elliptic2_competitive_markdown(pack: dict[str, Any]) -> str:
@@ -621,6 +693,15 @@ def _build_publishability_gate(
         "schema_version": ELLIPTIC2_COMPETITIVE_SCHEMA_VERSION,
         "slice": "Paper Track P8-B",
         "status": "pass_supporting_modern_context_only" if supporting else "blocked",
+        "execution_status": {
+            "status": "executed",
+            "requested_tier": budget.get("requested_budget_tier"),
+            "effective_tier": budget.get("effective_budget_tier"),
+            "dataset_execution": "completed_from_local_revtrack_assets",
+            "optional_adapter_execution_requested": False,
+            "optional_adapter_skips": [],
+            "blocked_reason_codes": [],
+        },
         "protocol_checks": checks,
         "supporting_paper_row_allowed": supporting,
         "reference_parity_claim_allowed": parity,
@@ -676,6 +757,13 @@ def _blocked_pack(
             "headline_or_sota_claim_allowed": False,
             "end_to_end_relaytic_superiority_claim_allowed": False,
             "hard_aml_claim_allowed": False,
+            "execution_status": {
+                "status": "blocked",
+                "dataset_execution": "not_completed",
+                "optional_adapter_execution_requested": False,
+                "optional_adapter_skips": [],
+                "blocked_reason_codes": [reason_code],
+            },
             "next_slice": "Paper Track P8-B repair before Paper Track P9",
             "p9_allowed": False,
         },

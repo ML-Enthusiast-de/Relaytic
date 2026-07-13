@@ -73,7 +73,7 @@ The current result table is intentionally supporting-only. It is useful because 
 | PaySim competitive | recall at review budget | 0.4716 | supporting-only | `paper-cell:paysim_p6a_competitive_selected.recall_at_review_budget` |
 | Elliptic graph-feature | test PR-AUC | 0.6688 | supporting-only | `paper-cell:elliptic_p7_selected_graph_feature_baseline.test_pr_auc` |
 | Elliptic graph-feature | precision at review budget | 1.0000 | supporting-only | `paper-cell:elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget` |
-| Elliptic2 context | official-partition PR-AUC mean | 0.9432 | modern context only | `paper-cell:elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean` |
+| Elliptic2 context | provided RevTrack TST PR-AUC mean | 0.9432 | modern context only | `paper-cell:elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean` |
 | Elliptic2 context | published RevClassifyDS PR-AUC | 0.9740 | reference context | `paper-cell:elliptic2_p8b_modern_context.published_reference_pr_auc` |
 
 The PaySim competitive result improved over the PaySim baseline under the recorded temporal proxy contract, but PaySim remains synthetic. The Elliptic graph-feature result is credible supporting graph evidence, but it does not promote a graph-neural claim. The Elliptic2 context row shows a strong reproduced local candidate relative to many ordinary baselines, yet it remains below the recorded RevClassifyDS reference and cannot support a parity or headline detector claim in this source draft.
@@ -98,11 +98,11 @@ Run from the repository root. External-local dataset paths are intentionally pla
 relaytic release-safety paysim-benchmark --format json
 relaytic release-safety elliptic-graph --format json
 relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json
-relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json
-relaytic release-safety graph-baselines --budget-tier competitive --run-optional --format json
+relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --require-full-rerun --format json
+relaytic release-safety graph-baselines --budget-tier competitive --run-optional --require-full-rerun --format json
 relaytic release-safety hard-graph-tracks --format json
 relaytic release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --prepare-selected-embeddings --run-pilot --hash-large-assets --format json
-relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --format json
+relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --require-full-rerun --format json
 relaytic release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json
 relaytic release-safety paper-thesis-decision --format json
 relaytic release-safety paper-operational-metrics --format json

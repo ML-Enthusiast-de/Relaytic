@@ -1222,6 +1222,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run installed LightGBM and XGBoost candidates within the declared competitive search budget.",
     )
     release_safety_competitive.add_argument(
+        "--require-full-rerun",
+        action="store_true",
+        help="Fail unless the benchmark executed from local data at the requested tier; optional adapter skips remain explicit.",
+    )
+    release_safety_competitive.add_argument(
         "--format",
         choices=["human", "json", "both"],
         default="human",
@@ -1251,6 +1256,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--run-optional",
         action="store_true",
         help="Run installed LightGBM, XGBoost, and PyG graph-shadow candidates.",
+    )
+    release_safety_graph_baselines.add_argument(
+        "--require-full-rerun",
+        action="store_true",
+        help="Fail unless the Elliptic benchmark executed from local data at the requested tier; optional adapter skips remain explicit.",
     )
     release_safety_graph_baselines.add_argument(
         "--format",
@@ -1347,6 +1357,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--run-suite",
         action="store_true",
         help="Execute candidates, repeated seeds, and the deterministic hash robustness partition.",
+    )
+    release_safety_elliptic2_competitive.add_argument(
+        "--require-full-rerun",
+        action="store_true",
+        help="Fail unless the Elliptic2 suite executed from local RevTrack assets at the requested tier.",
     )
     release_safety_elliptic2_competitive.add_argument(
         "--format",
@@ -1713,6 +1728,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--final",
         action="store_true",
         help="Build an out-of-tree exact-revision PDF and source bundle; requires a clean worktree.",
+    )
+    release_safety_p24.add_argument(
+        "--release-tag",
+        default=None,
+        help="Immutable Git tag resolving to HEAD. Required with --final.",
     )
     release_safety_p24.add_argument(
         "--format",
@@ -3701,6 +3721,7 @@ def main(argv: list[str] | None = None) -> int:
                     output_dir=args.output_dir,
                     budget_tier=args.budget_tier,
                     run_optional=args.run_optional,
+                    require_full_rerun=args.require_full_rerun,
                 )
             elif args.release_safety_command == "graph-baselines":
                 payload = _run_paper_graph_baseline_surface(
@@ -3708,6 +3729,7 @@ def main(argv: list[str] | None = None) -> int:
                     output_dir=args.output_dir,
                     budget_tier=args.budget_tier,
                     run_optional=args.run_optional,
+                    require_full_rerun=args.require_full_rerun,
                 )
             elif args.release_safety_command == "hard-graph-tracks":
                 payload = _run_paper_hard_graph_track_surface(
@@ -3730,6 +3752,7 @@ def main(argv: list[str] | None = None) -> int:
                     output_dir=args.output_dir,
                     budget_tier=args.budget_tier,
                     run_suite=args.run_suite,
+                    require_full_rerun=args.require_full_rerun,
                 )
             elif args.release_safety_command == "elliptic2-reference-parity":
                 payload = _run_elliptic2_reference_parity_surface(
@@ -3819,6 +3842,7 @@ def main(argv: list[str] | None = None) -> int:
                 payload = _run_paper_release_integrity_surface(
                     output_dir=args.output_dir,
                     final=args.final,
+                    release_tag=args.release_tag,
                 )
             else:
                 parser.error("Unsupported release-safety subcommand.")
@@ -7563,6 +7587,7 @@ def _run_paysim_competitive_surface(
     output_dir: str | None,
     budget_tier: str,
     run_optional: bool,
+    require_full_rerun: bool,
 ) -> dict[str, Any]:
     from relaytic.release_safety import (
         render_paysim_competitive_markdown,
@@ -7582,6 +7607,11 @@ def _run_paysim_competitive_surface(
         for key, path in written.items()
     }
     manifest = dict(pack["paysim_competitive_benchmark_manifest"])
+    _require_full_benchmark_rerun(
+        benchmark="PaySim competitive",
+        execution_status=dict(manifest.get("execution_status", {}) or {}),
+        required=require_full_rerun,
+    )
     return {
         "surface_payload": {
             "status": manifest["status"],
@@ -7600,6 +7630,7 @@ def _run_paper_graph_baseline_surface(
     output_dir: str | None,
     budget_tier: str,
     run_optional: bool,
+    require_full_rerun: bool,
 ) -> dict[str, Any]:
     from relaytic.release_safety import (
         render_paper_graph_baseline_markdown,
@@ -7619,6 +7650,11 @@ def _run_paper_graph_baseline_surface(
         for key, path in written.items()
     }
     manifest = dict(pack["paper_graph_baseline_manifest"])
+    _require_full_benchmark_rerun(
+        benchmark="Elliptic graph baseline",
+        execution_status=dict(manifest.get("execution_status", {}) or {}),
+        required=require_full_rerun,
+    )
     return {
         "surface_payload": {
             "status": manifest["status"],
@@ -7707,6 +7743,7 @@ def _run_elliptic2_competitive_surface(
     output_dir: str | None,
     budget_tier: str,
     run_suite: bool,
+    require_full_rerun: bool,
 ) -> dict[str, Any]:
     from relaytic.release_safety import (
         render_elliptic2_competitive_markdown,
@@ -7726,6 +7763,11 @@ def _run_elliptic2_competitive_surface(
     )
     pack = {key: json.loads(path.read_text(encoding="utf-8")) for key, path in written.items()}
     gate = dict(pack["elliptic2_publishability_gate"])
+    _require_full_benchmark_rerun(
+        benchmark="Elliptic2 competitive suite",
+        execution_status=dict(gate.get("execution_status", {}) or {}),
+        required=require_full_rerun,
+    )
     return {
         "surface_payload": {
             "status": gate["status"],
@@ -8392,6 +8434,7 @@ def _run_paper_release_integrity_surface(
     *,
     output_dir: str | None,
     final: bool,
+    release_tag: str | None,
 ) -> dict[str, Any]:
     from relaytic.release_safety import (
         build_exact_revision_release,
@@ -8401,7 +8444,9 @@ def _run_paper_release_integrity_surface(
 
     root = Path.cwd()
     if final:
-        manifest = build_exact_revision_release(root)
+        if not release_tag:
+            raise ValueError("`--release-tag` is required with `paper-release-integrity --final`.")
+        manifest = build_exact_revision_release(root, release_tag=release_tag)
         return {
             "surface_payload": manifest,
             "human_output": "# Paper P24 Exact-Revision Release\n\n"
@@ -8421,6 +8466,20 @@ def _run_paper_release_integrity_surface(
         },
         "human_output": render_paper_release_integrity_markdown(pack),
     }
+
+
+def _require_full_benchmark_rerun(
+    *,
+    benchmark: str,
+    execution_status: dict[str, Any],
+    required: bool,
+) -> None:
+    if not required:
+        return
+    status = str(execution_status.get("status") or "missing")
+    if status not in {"executed", "executed_with_optional_skips"}:
+        reasons = ", ".join(str(reason) for reason in execution_status.get("blocked_reason_codes", [])) or "no status reason recorded"
+        raise ValueError(f"{benchmark} did not complete a full local rerun: {status} ({reasons}).")
 
 
 def _scan_git_safety_passthrough(*, paths: list[str]) -> dict[str, Any]:

@@ -2166,7 +2166,7 @@ def _build_aml_demo_scorecard(
         ready_demo_count=ready_demo_count,
         scored_demos=demos,
         summary=(
-            f"Relaytic-AML currently scores `{ready_demo_count}` recruiter-safe AML demo(s); current run story is `{current_run_story or 'none'}`."
+            f"Relaytic-AML currently scores `{ready_demo_count}` externally reviewable AML demo(s). Current run story: `{current_run_story or 'none'}`."
         ),
         trace=trace,
     )
@@ -2202,7 +2202,7 @@ def _build_aml_public_claim_guard(
     claim_boundaries = [
         "Relaytic-AML claims are workload-specific unless both flagship AML tracks are covered.",
         "Public AML claims remain gated by benchmark truth, release safety, and benchmark-generalization audits.",
-        "Recruiter-safe demos are not the same as broader paper-primary AML claims.",
+        "Externally reviewable demos are not the same as broader paper-primary AML claims.",
     ]
     return AMLPublicClaimGuard(
         schema_version=AML_PUBLIC_CLAIM_GUARD_SCHEMA_VERSION,

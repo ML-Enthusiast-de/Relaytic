@@ -39,7 +39,7 @@
         }
       ],
       "invariant_id": "I1_metric_cell_provenance",
-      "limitation_or_boundary": "The invariant proves artifact completeness, not that the detector is optimal.",
+      "limitation_or_boundary": "The invariant checks artifact completeness. It does not establish detector optimality.",
       "name": "Metric-cell provenance",
       "paper_claim_allowed": "The paper may claim audited provenance for reported metrics.",
       "statement": "Every reader-facing number must resolve to dataset, split, command, artifact field, metric, budget tier, leakage posture, and claim state.",
@@ -96,8 +96,14 @@
         {
           "artifact_ref": "docs/reports/paper_failure_case_eval.json",
           "evidence_id": "test_set_selection_violation",
-          "observed_signal": "probe_surfaces=1 validation-only; test_used_for_selection=False; final_policy=only_validation_selected_finalist_is_evaluated_on_test",
+          "observed_signal": "probe_surfaces=1 validation-only; test_used_for_selection=False; final_policy=one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze; prior_test_exposure=True",
           "requirement": "test-selection fixture is blocked"
+        },
+        {
+          "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+          "evidence_id": "test_exposure_contract",
+          "observed_signal": "{\"competitive_finalists_tested_after_freeze\": 1, \"competitive_selection_used_test\": false, \"prior_test_exposure_roles\": [\"P4 reference\", \"P6 baseline\"], \"test_partition_fixed\": true, \"test_partition_previously_exposed\": ",
+          "requirement": "validation-only competitive selection is recorded while earlier P4/P6 test exposure remains disclosed"
         }
       ],
       "failure_or_ablation_refs": [
@@ -117,9 +123,9 @@
       "invariant_id": "I3_leakage_and_selection_firewall",
       "limitation_or_boundary": "The current firewall is benchmark-specific; future datasets need their own leakage taxonomy.",
       "name": "Leakage and selection firewall",
-      "paper_claim_allowed": "The paper may claim leakage-audited PaySim feature construction and test-selection discipline.",
-      "statement": "Leakage-prone fields and test-selection paths cannot become publishable evidence.",
-      "stronger_claim_blocked": "No separate destination-history ablation or real-bank deployment claim is supported."
+      "paper_claim_allowed": "The paper may claim leakage-audited PaySim feature construction and validation-only competitive selection with disclosed prior test exposure.",
+      "statement": "Leakage-prone fields and test-selection paths are checked before benchmark evidence is released.",
+      "stronger_claim_blocked": "No untouched-holdout, separate destination-history ablation, or real-bank deployment claim is supported."
     },
     {
       "current_status": "current_checked",
@@ -153,7 +159,7 @@
         }
       ],
       "invariant_id": "I4_rowless_external_handoff",
-      "limitation_or_boundary": "The check proves deterministic redaction on fixtures, not a broad privacy certification.",
+      "limitation_or_boundary": "The check evaluates deterministic redaction on fixtures. It is not a broad privacy certification.",
       "name": "Rowless external-agent handoff",
       "paper_claim_allowed": "The paper may claim rowless local-first handoff for the tested external-agent surfaces.",
       "statement": "External handoff exposes state, safe actions, and artifact references without raw rows, secrets, or private paths.",

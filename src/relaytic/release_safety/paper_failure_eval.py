@@ -179,6 +179,7 @@ def _test_selection_case(inputs: dict[str, Any]) -> dict[str, Any]:
     threshold_surface = str(selected.get("threshold_selection_surface") or "")
     test_used = bool(calibration.get("test_used_for_calibration_or_selection"))
     test_policy = str(budget.get("test_evaluation_policy") or "")
+    exposure = dict(budget.get("test_exposure_contract") or {})
     passed = (
         bool(search_artifact.get("exists"))
         and bool(budget_artifact.get("exists"))
@@ -186,7 +187,10 @@ def _test_selection_case(inputs: dict[str, Any]) -> dict[str, Any]:
         and all(surface.startswith("validation_") for surface in attempt_surfaces if surface)
         and selected_surface.startswith("validation_")
         and threshold_surface.startswith("validation_")
-        and test_policy == "only_validation_selected_finalist_is_evaluated_on_test"
+        and test_policy == "one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze"
+        and exposure.get("competitive_selection_used_test") is False
+        and exposure.get("test_partition_previously_exposed") is True
+        and exposure.get("untouched_holdout_claim_allowed") is False
     )
     return _case(
         case_id="test_set_selection_violation",
@@ -196,10 +200,11 @@ def _test_selection_case(inputs: dict[str, Any]) -> dict[str, Any]:
         artifact_label="PaySim search contract",
         artifact_ref=str(search_artifact.get("artifact_ref") or "docs/reports/paysim_competitive_search_trace.json"),
         evidence_cell_id="paysim_p6a_competitive_selected.test_pr_auc",
-        expected_behavior="Only validation evidence may select, calibrate, or threshold the finalist.",
+        expected_behavior="Only validation evidence may select, calibrate, or threshold the finalist. Prior P4/P6 test exposure must remain disclosed.",
         observed_result=(
             f"probe_surfaces={len(attempt_surfaces)} validation-only; "
-            f"test_used_for_selection={test_used}; final_policy={test_policy}"
+            f"test_used_for_selection={test_used}; final_policy={test_policy}; "
+            f"prior_test_exposure={exposure.get('test_partition_previously_exposed')}"
         ),
         passed=passed,
     )

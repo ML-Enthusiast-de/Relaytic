@@ -234,7 +234,7 @@ def _performance_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
     selected = dict(paysim.get("validation_selected_competitive_model", {}))
     if selected:
         gate = _payload(inputs["paysim_gate"])
-        command = paysim.get("command") or "relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json"
+        command = "relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --require-full-rerun --format json"
         rows.append(
             _table_row(
                 row_id="paysim_p6a_competitive_selected",
@@ -264,13 +264,24 @@ def _performance_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     _operating_metric("recall_at_review_budget", selected, "recall_at_review_budget", command, gate, paysim, inputs),
                     _fixed_fpr_metric("fixed_fpr_recall", selected, "recall_at_review_budget", command, gate, paysim, inputs),
                 ],
+                protocol_metadata={
+                    "test_exposure_contract": paysim.get("test_exposure_contract") or {
+                        "test_partition_fixed": True,
+                        "test_partition_previously_exposed": True,
+                        "prior_test_exposure_roles": ["P4 reference", "P6 baseline"],
+                        "competitive_selection_used_test": False,
+                        "competitive_finalists_tested_after_freeze": 1,
+                        "untouched_holdout_claim_allowed": False,
+                    },
+                    "operating_point": _operating_point_provenance(selected),
+                },
             )
         )
     graph = _payload(inputs["graph_table"])
     selected_graph = dict(graph.get("validation_selected_competitive_baseline", {}))
     if selected_graph:
         gate = _payload(inputs["graph_gate"])
-        command = "relaytic release-safety graph-baselines --budget-tier competitive --run-optional --format json"
+        command = "relaytic release-safety graph-baselines --budget-tier competitive --run-optional --require-full-rerun --format json"
         rows.append(
             _table_row(
                 row_id="elliptic_p7_selected_graph_feature_baseline",
@@ -300,6 +311,10 @@ def _performance_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     _graph_operating_metric("recall_at_review_budget", selected_graph, "recall_at_review_budget", command, gate, graph),
                     _graph_fixed_fpr_metric("fixed_fpr_recall", selected_graph, "recall_at_review_budget", command, gate, graph),
                 ],
+                protocol_metadata={
+                    "feature_view_boundary": "source-provided local and one-hop neighbor aggregates remain distinct from Relaytic-derived same-step structural features",
+                    "operating_point": _operating_point_provenance(selected_graph),
+                },
             )
         )
     return rows
@@ -390,7 +405,7 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
     p8b = _payload(inputs["elliptic2_gate"])
     repeated = _payload(inputs["elliptic2_repeated"])
     if p8b or repeated:
-        command = "relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --format json"
+        command = "relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --require-full-rerun --format json"
         rows.append(
             _table_row(
                 row_id="elliptic2_p8b_modern_context",
@@ -400,11 +415,11 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                 evidence_role="supporting_modern_context_only",
                 model_family=repeated.get("candidate_id") or "p8b_pooled_moments_lgbm",
                 budget_tier="competitive_context",
-                split_contract_id="official_revtrack_partition_and_content_hash_robustness_partition",
+                split_contract_id="provided_revtrack_trn_val_tst_partition_and_content_hash_robustness_partition",
                 claim_state="supporting_context_only_not_performance_contribution",
                 publishability_gate_ref="docs/reports/elliptic2_publishability_gate.json",
                 publishability_gate_status=p8b.get("status"),
-                leakage_posture="official_test_prior_exposure_disclosed_hash_partition_used_as_robustness_check",
+                leakage_posture="revtrack_tst_prior_exposure_disclosed_hash_partition_used_as_robustness_check",
                 command=command,
                 artifact_refs=[
                     "docs/reports/elliptic2_publishability_gate.json",
@@ -416,7 +431,7 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     _context_metric(
                         "official_partition_test_pr_auc_mean",
                         _deep_get(repeated, ["official_partition", "test_pr_auc_mean"]),
-                        "official_test",
+                        "provided_revtrack_tst",
                         "docs/reports/elliptic2_repeated_seed_scorecard.json",
                         "official_partition.test_pr_auc_mean",
                         command,
@@ -425,7 +440,7 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     _context_metric(
                         "official_partition_test_pr_auc_std",
                         _deep_get(repeated, ["official_partition", "test_pr_auc_std"]),
-                        "official_test",
+                        "provided_revtrack_tst",
                         "docs/reports/elliptic2_repeated_seed_scorecard.json",
                         "official_partition.test_pr_auc_std",
                         command,
@@ -747,11 +762,11 @@ def _build_reproduction_commands(
         "relaytic release-safety paysim-benchmark --format json",
         "relaytic release-safety elliptic-graph --format json",
         "relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json",
-        "relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --format json",
-        "relaytic release-safety graph-baselines --budget-tier competitive --run-optional --format json",
+        "relaytic release-safety paysim-competitive --budget-tier competitive --run-optional --require-full-rerun --format json",
+        "relaytic release-safety graph-baselines --budget-tier competitive --run-optional --require-full-rerun --format json",
         "relaytic release-safety hard-graph-tracks --format json",
         "relaytic release-safety elliptic2-recovery --core-data-dir <external-local-core-dir> --revtrack-dir <external-local-revtrack-dir> --prepare-selected-embeddings --run-pilot --hash-large-assets --format json",
-        "relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --format json",
+        "relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --require-full-rerun --format json",
         "relaytic release-safety elliptic2-reference-parity --revtrack-dir <external-local-revtrack-dir> --run-neural --format json",
         "relaytic release-safety paper-thesis-decision --format json",
         "relaytic release-safety paper-operational-metrics --format json",
@@ -783,6 +798,7 @@ def _table_row(
     command: str,
     artifact_refs: list[str],
     metrics: list[dict[str, Any]],
+    protocol_metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "row_id": row_id,
@@ -801,6 +817,26 @@ def _table_row(
         "run_directory_ref": RUN_DIRECTORY_REF,
         "artifact_refs": artifact_refs,
         "metrics": metrics,
+        "protocol_metadata": protocol_metadata or {},
+    }
+
+
+def _operating_point_provenance(selected: dict[str, Any]) -> dict[str, Any]:
+    validation = dict(selected.get("validation_operating_point") or {})
+    test = dict(selected.get("test_operating_point") or {})
+    threshold = selected.get("validation_threshold")
+    if threshold is None:
+        threshold = validation.get("threshold")
+    return {
+        "calibration_method": selected.get("calibration_method")
+        or dict(selected.get("calibration") or {}).get("selected_method"),
+        "validation_threshold": threshold,
+        "requested_review_fraction": selected.get("review_budget_fraction"),
+        "validation": validation,
+        "test": test,
+        "comparison_operator": selected.get("comparison_operator") or validation.get("comparison_operator") or ">=",
+        "tie_rule": selected.get("tie_rule") or validation.get("tie_rule") or "include_scores_equal_to_threshold",
+        "threshold_applied_unchanged_to_test": bool(selected.get("threshold_applied_unchanged_to_test", True)),
     }
 
 
@@ -814,7 +850,7 @@ def _selected_metric(
     manifest: dict[str, Any],
     inputs: dict[str, Any],
 ) -> dict[str, Any]:
-    return _metric_cell(
+    cell = _metric_cell(
         "paysim_p6a_competitive_selected",
         metric_id,
         selected.get(field),
@@ -830,6 +866,16 @@ def _selected_metric(
         publishability_gate_status=gate.get("status"),
         headline_metric_candidate=False,
     )
+    if split == "test":
+        cell["test_exposure_contract"] = manifest.get("test_exposure_contract") or {
+            "test_partition_fixed": True,
+            "test_partition_previously_exposed": True,
+            "prior_test_exposure_roles": ["P4 reference", "P6 baseline"],
+            "competitive_selection_used_test": False,
+            "competitive_finalists_tested_after_freeze": 1,
+            "untouched_holdout_claim_allowed": False,
+        }
+    return cell
 
 
 def _operating_metric(
@@ -842,7 +888,7 @@ def _operating_metric(
     inputs: dict[str, Any],
 ) -> dict[str, Any]:
     op = dict(selected.get("test_operating_point", {}))
-    return _metric_cell(
+    cell = _metric_cell(
         "paysim_p6a_competitive_selected",
         metric_id,
         op.get(field),
@@ -857,6 +903,16 @@ def _operating_metric(
         publishability_gate_ref="docs/reports/paysim_publishability_gate.json",
         publishability_gate_status=gate.get("status"),
     )
+    cell["operating_point_provenance"] = _operating_point_provenance(selected)
+    cell["test_exposure_contract"] = manifest.get("test_exposure_contract") or {
+        "test_partition_fixed": True,
+        "test_partition_previously_exposed": True,
+        "prior_test_exposure_roles": ["P4 reference", "P6 baseline"],
+        "competitive_selection_used_test": False,
+        "competitive_finalists_tested_after_freeze": 1,
+        "untouched_holdout_claim_allowed": False,
+    }
+    return cell
 
 
 def _fixed_fpr_metric(
@@ -921,7 +977,7 @@ def _graph_operating_metric(
     graph: dict[str, Any],
 ) -> dict[str, Any]:
     op = dict(selected.get("test_operating_point", {}))
-    return _metric_cell(
+    cell = _metric_cell(
         "elliptic_p7_selected_graph_feature_baseline",
         metric_id,
         op.get(field),
@@ -936,6 +992,8 @@ def _graph_operating_metric(
         publishability_gate_ref="docs/reports/paper_graph_publishability_gate.json",
         publishability_gate_status=gate.get("status"),
     )
+    cell["operating_point_provenance"] = _operating_point_provenance(selected)
+    return cell
 
 
 def _graph_fixed_fpr_metric(
@@ -984,7 +1042,7 @@ def _context_metric(
         claim_state="supporting_context_only_not_performance_contribution",
         budget_tier="competitive_context",
         command=command,
-        leakage_posture="official_test_prior_exposure_disclosed_hash_partition_used_as_robustness_check",
+        leakage_posture="revtrack_tst_prior_exposure_disclosed_hash_partition_used_as_robustness_check",
         publishability_gate_ref="docs/reports/elliptic2_publishability_gate.json",
         publishability_gate_status=gate.get("status"),
     )

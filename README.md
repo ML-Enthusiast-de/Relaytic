@@ -160,7 +160,7 @@ python3 -m relaytic.ui.cli release-safety paper-final-preflight --format json
 python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py tests/test_paper_track_p24.py -q
 ```
 
-After the reviewed source changes are committed and `git status --short` is empty, build the upload artifacts from that exact revision with `py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --final --format json` on Windows or the equivalent `python3` command on macOS/Linux. The command refuses a dirty worktree and writes the PDF, source archive, hashes, and revision manifest under `dist/paper-release/<commit>/`.
+After the reviewed source changes are committed and `git status --short` is empty, create an annotated release tag at that exact revision, then build the upload artifacts with `py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --final --release-tag relaytic-aml-arxiv-v1 --format json` on Windows or the equivalent `python3` command on macOS/Linux. The command refuses a dirty worktree or a tag that does not resolve to `HEAD`, then writes the PDF, source archive, hashes, and revision manifest under `dist/paper-release/<commit>/`.
 
 Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked until later gates explicitly allow them.
 

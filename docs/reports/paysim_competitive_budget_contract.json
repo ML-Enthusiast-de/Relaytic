@@ -1,10 +1,16 @@
 {
   "calibration_policy": "validation_only_partitioned_platt_or_identity_selection",
+  "competitive_finalists_tested_after_freeze": 1,
+  "competitive_selection_used_test": false,
   "dataset_row_count": 6362620,
   "effective_budget_reason": "requested_budget_executed",
   "effective_budget_tier": "competitive",
   "finalist_fit_count": 5,
   "optional_adapter_execution_requested": true,
+  "prior_test_exposure_roles": [
+    "P4 reference",
+    "P6 baseline"
+  ],
   "probe_policy": {
     "finalist_refit_policy": "full_training_rows_only",
     "full_training_row_count": 6010937,
@@ -14,6 +20,12 @@
     "sampling_policy": "train_only_all_positives_plus_seeded_negative_subsample_for_probe"
   },
   "probe_trial_count": 14,
+  "protocol_metadata_refresh": {
+    "mode": "recorded_artifact_reconciliation",
+    "models_refit": false,
+    "raw_data_loaded": false,
+    "test_partition_re_evaluated": false
+  },
   "random_seeds": [
     42
   ],
@@ -23,6 +35,20 @@
   "slice": "Paper Track P6-A",
   "status": "executed",
   "summary": "P6-A records a multi-fidelity competitive budget with validation-only selection and one deferred test evaluation.",
-  "test_evaluation_policy": "only_validation_selected_finalist_is_evaluated_on_test",
-  "threshold_policy": "validation_operating_partition_only_then_fixed_test_application"
+  "test_evaluation_policy": "one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze",
+  "test_exposure_contract": {
+    "competitive_finalists_tested_after_freeze": 1,
+    "competitive_selection_used_test": false,
+    "prior_test_exposure_roles": [
+      "P4 reference",
+      "P6 baseline"
+    ],
+    "test_partition_fixed": true,
+    "test_partition_previously_exposed": true,
+    "untouched_holdout_claim_allowed": false
+  },
+  "test_partition_fixed": true,
+  "test_partition_previously_exposed": true,
+  "threshold_policy": "validation_operating_partition_only_then_fixed_test_application",
+  "untouched_holdout_claim_allowed": false
 }

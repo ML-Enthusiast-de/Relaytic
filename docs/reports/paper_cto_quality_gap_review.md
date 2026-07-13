@@ -37,7 +37,7 @@ The current paper has a credible and useful systems thesis:
 - deterministic failure cases and governance ablations
 - formal governance invariants mapped to generated evidence artifacts
 
-This is enough for a serious independent arXiv systems paper. It is not yet enough for a top-tier, high-attention AML systems paper by itself.
+This is enough for a serious independent arXiv systems paper. It does not by itself establish broad production AML validation.
 
 ## CTO Read
 
@@ -64,7 +64,7 @@ Current quality level:
 - Good independent arXiv systems/evaluation paper: yes.
 - Credible AML governance/evaluation-lab paper: yes.
 - Top visible arXiv paper in the style of major agent-evaluation or AML benchmark papers: not yet.
-- Hiring-signal paper for strong ML systems roles: close, but it needs one more concrete enterprise-relevant demonstration.
+- External technical-review signal: the paper would benefit from one more concrete enterprise-relevant demonstration.
 
 The paper should not try to compete with TransXion, BlazingAML, LineMVGNN, or Elliptic2 as a detector or dataset paper. Its best route is to show that Relaytic-AML is the local-first governance substrate those kinds of detector workflows should run through.
 

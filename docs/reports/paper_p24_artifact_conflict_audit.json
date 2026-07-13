@@ -10,12 +10,12 @@
         "rows": 110902
       },
       "passed": true,
-      "resolution": "report both populations; benchmark metrics apply only to the pinned RevTrack-evaluable cohort",
+      "resolution": "report both populations. Benchmark metrics apply only to the pinned RevTrack-evaluable cohort.",
       "topic": "Elliptic2 cohort"
     },
     {
       "passed": true,
-      "resolution": "describe repeated official-partition estimate as confirmatory rather than untouched",
+      "resolution": "describe the repeated RevTrack TST estimate as confirmatory, with prior test exposure disclosed",
       "topic": "Elliptic2 test exposure"
     }
   ],

@@ -17,6 +17,7 @@
           "docs/reports/paper_governance_ablation_eval.json",
           "docs/reports/paper_governance_ablation_manifest.json",
           "docs/reports/paysim_leakage_safe_feature_report.json",
+          "docs/reports/paysim_competitive_benchmark_manifest.json",
           "docs/paper/references.bib"
         ]
       },
@@ -55,7 +56,7 @@
       "artifact_ref": "docs/reports/paper_metric_cell_audit.json",
       "exists": true,
       "input_id": "metric_cell_audit",
-      "sha256_prefix": "e22ab8c753c4"
+      "sha256_prefix": "f3a943845159"
     },
     {
       "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
@@ -103,7 +104,7 @@
       "artifact_ref": "docs/reports/paper_failure_case_eval.json",
       "exists": true,
       "input_id": "failure_case_eval",
-      "sha256_prefix": "a7abf9da24a1"
+      "sha256_prefix": "74acf7e87fa5"
     },
     {
       "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
@@ -115,13 +116,19 @@
       "artifact_ref": "docs/reports/paper_governance_ablation_manifest.json",
       "exists": true,
       "input_id": "governance_ablation_manifest",
-      "sha256_prefix": "befaa3a39f76"
+      "sha256_prefix": "92acd16e6b99"
     },
     {
       "artifact_ref": "docs/reports/paysim_leakage_safe_feature_report.json",
       "exists": true,
       "input_id": "paysim_feature_report",
       "sha256_prefix": "5929bba64511"
+    },
+    {
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "exists": true,
+      "input_id": "paysim_competitive_manifest",
+      "sha256_prefix": "17e64e1e170f"
     },
     {
       "artifact_ref": "docs/paper/references.bib",
@@ -150,6 +157,7 @@
     "docs/reports/paper_governance_ablation_eval.json",
     "docs/reports/paper_governance_ablation_manifest.json",
     "docs/reports/paysim_leakage_safe_feature_report.json",
+    "docs/reports/paysim_competitive_benchmark_manifest.json",
     "docs/paper/references.bib"
   ],
   "schema_version": "relaytic.paper_invariants.v1",

@@ -2,7 +2,7 @@
   "corrected_author_checks": [
     {
       "citation_key": "gaurav2025governanceaas",
-      "expected_author_field": "Pervez, Helen and Gaurav, Suyash and Heikkonen, Jukka and Chaudhary, Jatin",
+      "expected_author_field": "Gaurav, Suyash and Heikkonen, Jukka and Chaudhary, Jatin",
       "passed": true
     },
     {
@@ -91,6 +91,6 @@
   "schema_version": "relaytic.paper_release_integrity.v1",
   "slice": "Paper Track P24",
   "status": "pass",
-  "verification_date": "2026-07-11",
+  "verification_date": "2026-07-13",
   "verification_method": "primary arXiv records, DOI landing pages, or publisher/proceedings pages"
 }

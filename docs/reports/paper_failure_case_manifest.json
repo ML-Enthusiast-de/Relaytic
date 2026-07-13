@@ -3,9 +3,9 @@
     "docs/reports/paper_agent_handoff_eval.json": "3b228b1d99b4f2a6d0ae22a3fdfe6451fc8f2383d88066edecee93fa4bd2d290",
     "docs/reports/paper_claim_gate_case_studies.json": "e67a9a0f3d340bbc3d96d16b4e96f0ccfa6dd2a09cb1d813d87dd4d215cd72e2",
     "docs/reports/paper_no_lost_user_eval.json": "6a68a1c96069a3b39524f281352ad72c60db344e501a432804693923411477d0",
-    "docs/reports/paper_public_claims_allowed.json": "4318a61dcd778affd5b7d9fb85ecb090dcf8d061846ee3558877f3768e226568",
-    "docs/reports/paysim_competitive_budget_contract.json": "a987738376a7eb702269a649009b3f8a949a47fcc78f2fc8f82f935ced6a2feb",
-    "docs/reports/paysim_competitive_search_trace.json": "f37673ff705233e9b82d45ebf3f1551fdc687023c1470160718e9be104152a4a",
+    "docs/reports/paper_public_claims_allowed.json": "a84d9784381b3464015bd5cc84a177d776cb5f2b5735e68f1ffe484bac23e3f5",
+    "docs/reports/paysim_competitive_budget_contract.json": "7560c3ce38a2454970b210a4827c4ff5a1511e7b5294a130e6a7d4dbe4a34311",
+    "docs/reports/paysim_competitive_search_trace.json": "0d32af4e89dfa206e255cf83f7f9625ab7a158c8858dd15b3b4e180c7d18c444",
     "docs/reports/paysim_leakage_safe_feature_report.json": "5929bba645118009267ea68cfd6ad806377589ba933fed4f44500c7a1c405d12"
   },
   "checks": [

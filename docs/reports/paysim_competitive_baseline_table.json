@@ -17,6 +17,12 @@
     "test_recall_at_review_budget": 0.258162,
     "validation_pr_auc": 0.275821
   },
+  "protocol_metadata_refresh": {
+    "mode": "recorded_artifact_reconciliation",
+    "models_refit": false,
+    "raw_data_loaded": false,
+    "test_partition_re_evaluated": false
+  },
   "rows": [
     {
       "budget_tier": "competitive",
@@ -264,9 +270,21 @@
   "split_contract_id": "split_paysim_chronological_step_v1",
   "status": "ok",
   "summary": "P6-A places prior baseline evidence beside a validation-selected competitive finalist without searching over test outcomes.",
+  "test_exposure_contract": {
+    "competitive_finalists_tested_after_freeze": 1,
+    "competitive_selection_used_test": false,
+    "prior_test_exposure_roles": [
+      "P4 reference",
+      "P6 baseline"
+    ],
+    "test_partition_fixed": true,
+    "test_partition_previously_exposed": true,
+    "untouched_holdout_claim_allowed": false
+  },
   "test_visibility_policy": "nonselected_competitive_finalists_have_no_test_metrics",
   "validation_selected_competitive_model": {
     "calibration_method": "platt_sigmoid",
+    "comparison_operator": ">=",
     "configuration": {
       "bootstrap": true,
       "class_weight": "balanced_subsample",
@@ -297,26 +315,36 @@
     "review_budget_fraction": 0.005,
     "selection_surface": "validation_pr_auc_only_before_test_evaluation",
     "test_operating_point": {
+      "comparison_operator": ">=",
+      "evaluation_row_count": 123580,
       "false_positive_count": 329,
       "false_positive_rate": 0.002698,
+      "positive_count": 1654,
       "precision_at_k": 0.703336,
       "recall_at_review_budget": 0.471584,
       "requested_review_fraction": 0.005,
       "review_fraction": 0.008974,
       "reviewed_count": 1109,
+      "tie_rule": "include_scores_equal_to_threshold",
       "true_positive_count": 780
     },
     "test_pr_auc": 0.638773,
     "test_roc_auc": 0.968282,
+    "threshold_applied_unchanged_to_test": true,
     "threshold_selection_surface": "validation_operating_partition_only",
+    "tie_rule": "include_scores_equal_to_threshold",
     "validation_operating_point": {
+      "comparison_operator": ">=",
+      "evaluation_row_count": 111601,
       "false_positive_count": 272,
       "false_positive_rate": 0.00245,
+      "positive_count": 568,
       "precision_at_k": 0.513417,
       "recall_at_review_budget": 0.505282,
       "requested_review_fraction": 0.005,
       "review_fraction": 0.005009,
       "reviewed_count": 559,
+      "tie_rule": "include_scores_equal_to_threshold",
       "true_positive_count": 287
     },
     "validation_pr_auc": 0.568725,

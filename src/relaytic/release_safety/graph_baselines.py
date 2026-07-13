@@ -446,6 +446,14 @@ def _execute_tabular_graph_baselines(
         "validation_metrics": _binary_score_metrics(validation_y, fixed_validation_scores),
         "test_metrics": _binary_score_metrics(test_y, fixed_test_scores),
         "test_evaluated": True,
+        "validation_threshold": _round_float(fixed_threshold),
+        "validation_operating_point": _threshold_metrics(
+            validation_y,
+            fixed_validation_scores,
+            threshold=fixed_threshold,
+            requested_fraction=SELECTED_REVIEW_BUDGET_FRACTION,
+        ),
+        "threshold_applied_unchanged_to_test": True,
         "test_operating_point": _threshold_metrics(
             test_y,
             fixed_test_scores,
@@ -597,6 +605,18 @@ def _evaluate_validation_selected_candidate(
         "test_roc_auc": _binary_score_metrics(test_y, test_scores)["roc_auc"],
         "raw_test_pr_auc": _binary_score_metrics(test_y, raw_test)["pr_auc"],
         "review_budget_fraction": SELECTED_REVIEW_BUDGET_FRACTION,
+        "validation_threshold": _round_float(review_threshold),
+        "validation_operating_partition_row_count": int(len(operating_y)),
+        "validation_operating_point": _threshold_metrics(
+            operating_y,
+            operating_scores,
+            threshold=review_threshold,
+            requested_fraction=SELECTED_REVIEW_BUDGET_FRACTION,
+        ),
+        "threshold_selection_surface": "validation_operating_partition_only",
+        "threshold_applied_unchanged_to_test": True,
+        "comparison_operator": ">=",
+        "tie_rule": "include_scores_equal_to_threshold",
         "test_operating_point": _threshold_metrics(
             test_y,
             test_scores,
@@ -961,7 +981,8 @@ def _build_feature_table(
             {
                 "feature_view_id": "source_provided_flattened_features",
                 "feature_count": graph_data.feature_value_count,
-                "claim_scope": "source_provided_anonymized_snapshot_features_may_include_source_aggregates_not_relabelled_as_relaytic_graph_engineering",
+                "claim_scope": "source_provided_anonymized_local_and_one_hop_neighbor_aggregate_features_not_relabelled_as_relaytic_graph_engineering",
+                "source_feature_boundary": "supplied_by_elliptic_not_reconstructed_by_relaytic",
             },
             {
                 "feature_view_id": "source_features_plus_structural_snapshot",
@@ -1125,6 +1146,8 @@ def _build_manifest(
     gate: dict[str, Any],
 ) -> dict[str, Any]:
     selected = dict(feature_table.get("validation_selected_competitive_baseline", {}) or {})
+    graph_shadow_state = str(shadow_scorecard.get("graph_model_execution_state") or "unknown")
+    optional_skips = [] if graph_shadow_state == "ran_shadow_only" else [f"graph_shadow:{graph_shadow_state}"]
     source_files = [
         {
             "role": role,
@@ -1155,6 +1178,15 @@ def _build_manifest(
         "selected_feature_view_id": selected.get("feature_view_id"),
         "selected_test_pr_auc": selected.get("test_pr_auc"),
         "graph_model_execution_state": shadow_scorecard["graph_model_execution_state"],
+        "execution_status": {
+            "status": "executed_with_optional_skips" if optional_skips else "executed",
+            "requested_tier": budget_contract["requested_budget_tier"],
+            "effective_tier": budget_contract["effective_budget_tier"],
+            "dataset_execution": "completed_from_local_elliptic_bundle",
+            "optional_adapter_execution_requested": budget_contract["optional_adapters_requested"],
+            "optional_adapter_skips": optional_skips,
+            "blocked_reason_codes": [],
+        },
         "runtime_environment": {
             "python": platform.python_version(),
             "numpy": _module_version("numpy"),
@@ -1201,6 +1233,13 @@ def _blocked_pack(
     manifest = {
         **base,
         "requested_budget_tier": budget_tier,
+        "execution_status": {
+            "status": "blocked",
+            "dataset_execution": "not_completed",
+            "optional_adapter_execution_requested": False,
+            "optional_adapter_skips": [],
+            "blocked_reason_codes": [reason_code],
+        },
         "supporting_graph_table_candidate_allowed": False,
         "headline_graph_claim_allowed": False,
         "hard_performance_claims_allowed": False,

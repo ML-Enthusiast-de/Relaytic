@@ -1412,7 +1412,7 @@ def _build_cards(
                 "card_id": "guided_demo",
                 "title": "Guided Demo",
                 "value": "5-step flow",
-                "detail": "Mission control now exposes a recruiter-friendly demo path, mode explanations, and stuck recovery instead of assuming repo literacy.",
+                "detail": "Mission control now exposes an external-review demo path, mode explanations, and stuck recovery instead of assuming repo literacy.",
                 "severity": "normal",
             },
             {
@@ -2540,7 +2540,7 @@ def _build_question_starters(
             {
                 "category": "demo",
                 "question": "show me a demo flow",
-                "detail": "Explains the quickest recruiter-safe walkthrough from install check to first reviewed run.",
+                "detail": "Explains the quickest externally reviewable walkthrough from install check to first reviewed run.",
             },
             {
                 "category": "modes",
@@ -2710,7 +2710,7 @@ def _build_control_center_layout(
         {"panel_id": "welcome", "title": "What Relaytic is and what it needs before a run exists"},
         {"panel_id": "first_steps", "title": "Fastest path from onboarding into the first governed run"},
         {"panel_id": "captured_onboarding_state", "title": "What Relaytic has already captured from the human and what it still needs next"},
-        {"panel_id": "guided_demo", "title": "A recruiter-safe walkthrough from install check to first reviewed run"},
+        {"panel_id": "guided_demo", "title": "An externally reviewable walkthrough from install check to first reviewed run"},
         {"panel_id": "modes_explained", "title": "What each product surface is for and when to use it"},
         {"panel_id": "stuck_help", "title": "Recovery guidance when the next step is unclear"},
         {"panel_id": "interaction_modes", "title": "Dashboard, terminal chat, workflow, and host integration paths"},
@@ -2815,7 +2815,7 @@ def _build_onboarding_status(
             "mode_id": "guided_demo",
             "name": "Guided Demo",
             "kind": "workflow",
-            "detail": "Use this when you want one short recruiter-safe path from install check to first reviewed run.",
+            "detail": "Use this when you want one short externally reviewable path from install check to first reviewed run.",
             "command": _demo_guide_path(),
         },
     ]

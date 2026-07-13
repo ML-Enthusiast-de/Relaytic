@@ -6,7 +6,7 @@ The future flagship domain story for these demos is **Relaytic-AML**. The generi
 
 This document defines the public-safe and lab-safe flagship demos Relaytic should maintain once the later mission-control slices land.
 
-The goal is to make Relaytic impressive through repeatable proof, not narration.
+The goal is to demonstrate Relaytic through repeatable proof rather than narration.
 
 ## Demo 1: New AML dataset to governed alert policy
 

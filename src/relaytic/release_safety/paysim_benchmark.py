@@ -710,7 +710,12 @@ def _threshold_metrics(
     recall = _safe_divide(float(true_positive), float(positives))
     fpr = _safe_divide(float(false_positive), float(negatives))
     return {
+        "threshold": _round_float(float(threshold)),
+        "comparison_operator": ">=",
+        "tie_rule": "include_scores_equal_to_threshold",
         "requested_review_fraction": requested_fraction,
+        "evaluation_row_count": int(len(y)),
+        "positive_count": positives,
         "reviewed_count": reviewed,
         "review_fraction": _round_float(_safe_divide(float(reviewed), float(len(y)))),
         "true_positive_count": true_positive,

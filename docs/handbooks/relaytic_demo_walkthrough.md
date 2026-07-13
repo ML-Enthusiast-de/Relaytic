@@ -6,7 +6,7 @@ This walkthrough is the shortest reliable path for showing Relaytic to someone w
 
 Use it for:
 
-- recruiter demos
+- external technical demos
 - first-contact user demos
 - internal onboarding
 - agent-host demo sessions

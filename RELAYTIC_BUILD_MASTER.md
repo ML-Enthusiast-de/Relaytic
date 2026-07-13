@@ -65,7 +65,7 @@ Relaytic should be treated as frontier work only when a slice strengthens at lea
 
 If a slice mainly adds surface area, prose, or orchestration without strengthening one of those axes, it is not sharp enough.
 
-The remaining world-class proof tracks that later slices must make explicit are:
+The remaining high-assurance proof tracks that later slices must make explicit are:
 
 - protocol conformance across CLI, MCP, mission control, and any richer UI shell
 - flagship demo scorecards that remain reproducible across releases

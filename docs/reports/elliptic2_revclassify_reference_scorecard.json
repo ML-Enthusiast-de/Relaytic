@@ -25,10 +25,20 @@
       "f1": 0.953,
       "pr_auc": 0.974
     },
+    "accessed": "2026-07-13",
+    "cohort_scope": "published Elliptic2 full-shot benchmark; not asserted equivalent to Relaytic's pinned RevTrack-evaluable cohort",
     "metric": "pr_auc",
+    "paper_doi": "10.1145/3677052.3698635",
     "paper_url": "https://arxiv.org/abs/2410.08394",
     "reference_id": "revclassify_icaif_2024_full_shot",
-    "source": "official paper Table 2, full-shot subgraph classification"
+    "source": "Song et al. (2024), Table 1, RevClassifyDS row, full-shot PR-AUC column",
+    "versioned_pdf_sha256": "b253d97531a0da6fd16a46bb54904437d4373984dfb2559e69c2104faaa08728",
+    "versioned_pdf_url": "https://arxiv.org/pdf/2410.08394v1"
+  },
+  "reference_metadata_refresh": {
+    "benchmark_reexecuted": false,
+    "mode": "versioned_reference_provenance_reconciliation",
+    "published_value_changed": false
   },
   "reference_repository": {
     "classification_checkpoint_count": 0,

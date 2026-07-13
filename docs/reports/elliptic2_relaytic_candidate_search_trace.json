@@ -89,6 +89,7 @@
     }
   ],
   "prior_test_exposure_disclosed": true,
+  "prior_test_exposure_disclosure": "The provided RevTrack TST partition was exposed during P8-A. Candidate selection in P8-B remained validation-only.",
   "schema_version": "relaytic.elliptic2_competitive.v1",
   "selection_metric": "official_validation_pr_auc",
   "selection_policy": "candidate view and configuration selected using official validation only; only selected candidate evaluated on official test",

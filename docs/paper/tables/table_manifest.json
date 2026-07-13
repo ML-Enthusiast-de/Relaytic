@@ -6,7 +6,7 @@
   "tables": [
     {
       "artifact_ref": "docs/paper/tables/table_1_evidence_summary.md",
-      "byte_count": 1825,
+      "byte_count": 1831,
       "paper_claim_role": "claim_safe_supporting_evidence_only",
       "source_refs": [
         "docs/reports/paper_result_table_final.json",
