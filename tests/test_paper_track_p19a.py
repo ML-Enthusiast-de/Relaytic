@@ -10,6 +10,7 @@ from relaytic.release_safety import (
     PAPER_EXTERNAL_SCORE_FILENAMES,
     build_paper_external_score_pack,
 )
+from relaytic.release_safety.paper_evidence_contract import EVIDENCE_CELL_INTERPRETIVE_FIELDS
 from relaytic.ui.cli import main
 
 
@@ -42,7 +43,12 @@ def test_paper_track_p19a_builds_external_score_proof_pack() -> None:
     assert schema["metric"]["detector_performance_metric"] is False
     assert cells["evidence_cell_count"] == 1
     assert cells["evidence_cells"][0]["cell_id"] == "p19a.external_score.hosted_metadata_completeness"
-    assert cells["evidence_cells"][0]["claim_state"] == "hosted_detector_output_governance_only"
+    assert not EVIDENCE_CELL_INTERPRETIVE_FIELDS.intersection(cells["evidence_cells"][0])
+    assert cells["evidence_gate_separation"]["status"] == "pass"
+    assert gate["gate_id"] == "p19a.external_score.hosted_output_gate"
+    assert gate["evidence_cell_ids"] == ["p19a.external_score.hosted_metadata_completeness"]
+    assert gate["admissible_use"] == "hosted detector-output governance only"
+    assert gate["stronger_claim_status"] == "blocked"
     assert gate["publishable"] is True
     assert gate["allowed_claim_scope"] == "hosted_detector_output_governance_only"
     assert not gate["detector_superiority_claimed"]
@@ -117,7 +123,7 @@ def test_paper_track_p19a_fails_closed_without_required_metadata(tmp_path: Path)
     assert gate["publishable"] is False
     assert "required_metadata_complete" in gate["failed_checks"]
     assert "rowless_input_contract" in gate["failed_checks"]
-    assert "claim_state_bounded" in gate["failed_checks"]
+    assert "factual_input_has_no_interpretive_fields" in gate["failed_checks"]
     assert handoff["rowless_handoff_passed"] is False
     assert "private-entity" not in serialized
     assert str(tmp_path).replace("\\", "/") not in serialized.replace("\\", "/")
@@ -139,6 +145,8 @@ def test_paper_track_p19a_committed_external_score_artifacts_are_ready() -> None
     assert route["selected_route"] == "external_score_file_adapter"
     assert schema["accepted"] is True
     assert cells["evidence_cell_count"] == 1
+    assert not EVIDENCE_CELL_INTERPRETIVE_FIELDS.intersection(cells["evidence_cells"][0])
+    assert cells["evidence_gate_separation"]["status"] == "pass"
     assert gate["publishable"] is True
     assert handoff["rowless_handoff_passed"] is True
     assert "Paper P19-A External Score-File Proof Pack" in summary

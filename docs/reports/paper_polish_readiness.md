@@ -24,4 +24,4 @@ P20 checks whether the current paper reads as a professional AI systems/evaluati
 
 - compile and inspect the final PDF from the regenerated source bundle
 - run LaTeX warning, font-embedding, metadata, and rendered-page checks
-- confirm a clean git tag target before any public upload
+- confirm a clean immutable source revision before any public upload

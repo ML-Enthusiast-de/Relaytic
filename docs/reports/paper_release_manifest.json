@@ -5,7 +5,7 @@
   "checks": [
     {
       "check_id": "p10_table_pack_passed",
-      "message": "P10 table pack and metric-cell audit must pass.",
+      "message": "P10 table pack and evidence-cell audit must pass.",
       "passed": true,
       "source_artifact": "docs/reports/paper_metric_cell_audit.json"
     },
@@ -139,7 +139,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "5a6c897012291f9fcec8c3702514c487ea003a35",
+  "git_commit": "e36c7be655a7c4168f61d613e084c67848ed708a",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -197,7 +197,7 @@
     "table_manifest_ref": "docs/paper/tables/table_manifest.json"
   },
   "public_claims_ref": "docs/reports/paper_public_claims_allowed.json",
-  "release_date": "2026-07-13",
+  "release_date": "2026-07-14",
   "release_mode": "claim_safe_evaluation_environment_only",
   "release_tag_plan": {
     "artifact_refs": [
@@ -248,9 +248,10 @@
       "paper_public_claims_allowed.json",
       "paper_release_manifest.json"
     ],
-    "creation_command": "git tag -a relaytic-aml-arxiv-v1 -m \"Relaytic-AML claim-safe paper release\"",
-    "note": "P13 writes a tag plan and verifies the artifact set; it does not create or push tags automatically.",
-    "tag": "relaytic-aml-arxiv-v1",
+    "creation_command": null,
+    "mode": "immutable_commit",
+    "note": "No public release tag is claimed; final artifacts identify an immutable commit.",
+    "tag": null,
     "tag_created_by_this_slice": false
   },
   "required_source_artifacts": [
@@ -290,181 +291,181 @@
   "slice": "Paper Track P13",
   "source_verification": [
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "lopezrojas2016paysim",
       "source_url": "https://www.msc-les.org/proceedings/emss/2016/EMSS2016_249.pdf",
       "verified_role": "PaySim synthetic mobile-money simulator source and caveat."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "fatf2020virtualassets",
       "source_url": "https://www.fatf-gafi.org/en/publications/Methodsandtrends/Virtual-assets-red-flag-indicators.html",
       "verified_role": "Official virtual-asset red-flag categories for transaction pattern, anonymity, geography, sender/recipient, and source-of-funds context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "ffiecRedFlags",
       "source_url": "https://bsaaml.ffiec.gov/manual/Appendices/07",
       "verified_role": "Official BSA/AML examination red-flag examples for funds transfers, inconsistent activity, cross-border flows, and unusual transactions."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "weber2019elliptic",
       "source_url": "https://arxiv.org/abs/1908.02591",
       "verified_role": "Elliptic transaction graph size, features, and AML benchmark context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "bellei2024elliptic2",
       "source_url": "https://arxiv.org/abs/2404.19109",
       "verified_role": "Elliptic2 subgraph benchmark scale and task framing."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "song2024revtrack",
       "source_url": "https://arxiv.org/abs/2410.08394",
       "verified_role": "RevTrack/RevClassify modern reference and subgraph-method context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "chen2026transxion",
       "source_url": "https://arxiv.org/abs/2604.17420",
       "verified_role": "Recent AML benchmark-realism context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "poon2025linemvgnn",
       "source_url": "https://doi.org/10.3390/ai6040069",
       "verified_role": "Published multi-view directed transaction-graph detector context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "tariq2026extraqt",
       "source_url": "https://arxiv.org/abs/2604.02899",
       "verified_role": "Recent quasi-temporal transaction-graph detector context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "ye2026blazingaml",
       "source_url": "https://arxiv.org/abs/2604.12241",
       "verified_role": "Recent high-throughput AML graph-mining systems context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "deprez2025continualaml",
-      "source_url": "https://arxiv.org/abs/2503.24259",
-      "verified_role": "Recent continual-learning and drift context for AML graph systems."
+      "source_url": "https://doi.org/10.1002/wics.70040",
+      "verified_role": "Peer-reviewed continual-learning and drift context for AML graph systems."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "pirmorad2025amlgraphllm",
       "source_url": "https://arxiv.org/abs/2507.14785",
       "verified_role": "Recent AML graph-reasoning context using LLM in-context learning rather than a local evidence-governance layer."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "naik2025coinvestigator",
       "source_url": "https://arxiv.org/abs/2509.08380",
       "verified_role": "Agentic SAR and compliance-narrative assistant context for distinguishing Relaytic-AML from report-writing workflows."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "naik2026llmopsaml",
       "source_url": "https://arxiv.org/abs/2605.11232",
       "verified_role": "Compliance-grade LLMOps serving-stack context for distinguishing Relaytic-AML from AML LLM deployment infrastructure."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "gaurav2025governanceaas",
       "source_url": "https://arxiv.org/abs/2508.18765",
       "verified_role": "General multi-agent AI governance framework context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "kaptein2026runtimegovernance",
       "source_url": "https://arxiv.org/abs/2603.16586",
       "verified_role": "Runtime path-policy governance context for agent systems."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "gebru2021datasheets",
       "source_url": "https://arxiv.org/abs/1803.09010",
       "verified_role": "Dataset documentation and transparency context; arXiv source retained because the CACM article page blocks automated access."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "mitchell2019modelcards",
       "source_url": "https://arxiv.org/abs/1810.03993",
       "verified_role": "Model reporting context for distinguishing model documentation from Relaytic-AML's evidence-cell and claim-gating workflow."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "pineau2021reproducibility",
       "source_url": "https://www.jmlr.org/papers/v22/20-303.html",
       "verified_role": "ML reproducibility checklist and code/data discipline context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "zaharia2018mlflow",
       "source_url": "https://people.eecs.berkeley.edu/~matei/papers/2018/ieee_mlflow.pdf",
       "verified_role": "Experiment-tracking and ML lifecycle context for run, artifact, parameter, and model lineage comparisons."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "chen2025mlrbench",
       "source_url": "https://arxiv.org/abs/2505.19955",
       "verified_role": "Agent-generated ML research reliability and invalidated-experiment risk context."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "starace2025paperbench",
       "source_url": "https://arxiv.org/abs/2504.01848",
       "verified_role": "AI-agent paper replication benchmark context and gap between fluent research artifacts and validated experimental reproduction."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "wijk2025rebench",
       "source_url": "https://proceedings.mlr.press/v267/wijk25a.html",
       "verified_role": "Recent research-engineering benchmark context comparing language-model agents with human experts."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "yang2026skillopt",
       "source_url": "https://arxiv.org/abs/2605.23904",
       "verified_role": "Recent agentic-ML context for treating external agent state and validation-gated updates as first-class research objects."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "saito2015precisionrecall",
       "source_url": "https://doi.org/10.1371/journal.pone.0118432",
       "verified_role": "Primary support for precision-recall analysis on imbalanced classification tasks."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "kleppmann2019localfirst",
       "source_url": "https://doi.org/10.1145/3359591.3359737",
       "verified_role": "Canonical local-first software definition and ownership principles."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "geurts2006extratrees",
       "source_url": "https://doi.org/10.1007/s10994-006-6226-1",
       "verified_role": "Primary Extremely Randomized Trees method citation."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "chen2016xgboost",
       "source_url": "https://doi.org/10.1145/2939672.2939785",
       "verified_role": "Primary XGBoost method citation."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "ke2017lightgbm",
       "source_url": "https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html",
       "verified_role": "Primary LightGBM method citation."
     },
     {
-      "accessed_date": "2026-07-13",
+      "accessed_date": "2026-07-14",
       "citation_key": "platt1999probabilistic",
       "source_url": "https://www.microsoft.com/en-us/research/publication/probabilistic-outputs-for-support-vector-machines-and-comparisons-to-regularized-likelihood-methods/",
       "verified_role": "Primary Platt probability-scaling method citation."
@@ -476,8 +477,8 @@
     "required_before_upload": [
       "convert the Markdown draft into final TeX/PDF source",
       "convert SVG figures into figure formats accepted by the selected arXiv processor",
-      "confirm author block, license, acknowledgements, local PDF inspection, and clean tag target",
-      "rerun release-safety checks from the final clean tag target"
+      "confirm author block, license, acknowledgements, local PDF inspection, and a clean cited revision",
+      "rerun release-safety checks from the final clean public revision"
     ]
   }
 }

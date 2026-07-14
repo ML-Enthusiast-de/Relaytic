@@ -177,7 +177,7 @@ def render_paper_external_score_repro_card(case_study: dict[str, Any]) -> str:
             "- The default fixture is rowless and contains no raw transactions, identifiers, secrets, licensed data, or private machine paths.",
             (
                 "- Optional local score artifacts remain local. Relaytic records only schema fields, hash prefixes, "
-                "metric policy, leakage posture, claim state, and redaction evidence."
+                "metric metadata, leakage posture, a separate claim gate, and redaction evidence."
             ),
             "",
             "Evidence identifiers:",
@@ -240,8 +240,7 @@ def _build_case_study(inputs: dict[str, Any]) -> dict[str, Any]:
         "metric_role": first_cell.get("metric_role") or schema.get("metric", {}).get("role") or "not_available",
         "value": first_cell.get("value") if "value" in first_cell else schema.get("metric", {}).get("value"),
         "detector_performance_metric": bool(schema.get("metric", {}).get("detector_performance_metric")),
-        "paper_role": first_cell.get("paper_role") or "hosted_detector_output_governance_evidence",
-        "publishable": bool(first_cell.get("publishable")) if first_cell else False,
+        "invariant_state": first_cell.get("invariant_state") or "not_available",
         "reader_facing_result": "schema_completeness_invariant_pass" if first_cell.get("value") == 1.0 else "schema_completeness_invariant_fail",
     }
     rowless_redaction = {
@@ -275,7 +274,8 @@ def _build_case_study(inputs: dict[str, Any]) -> dict[str, Any]:
         "rowless_redaction": rowless_redaction,
         "evidence_cell_ids": [str(cell.get("cell_id")) for cell in cells if cell.get("cell_id")],
         "auditable_record_snippet": _auditable_record_snippet(first_cell),
-        "allowed_claim_state": gate.get("allowed_claim_scope") or "not_available",
+        "claim_gate_id": gate.get("gate_id") or "not_available",
+        "admissible_use": gate.get("admissible_use") or "not_available",
         "allowed_public_claims": list(gate.get("allowed_public_claims", [])),
         "blocked_stronger_claims": [
             {
@@ -288,8 +288,9 @@ def _build_case_study(inputs: dict[str, Any]) -> dict[str, Any]:
         ],
         "interpretation": (
             "This case study shows that Relaytic-AML can host a rowless detector-score artifact as governed evidence: "
-            "the adapter records schema and content hashes, creates evidence cells, redacts unsafe handoff fields, "
-            "and blocks stronger detector or production claims. It is not a detector-performance result."
+            "the adapter records schema and content hashes, creates a factual evidence cell, redacts unsafe handoff "
+            "fields, and emits a separate gate that blocks stronger detector or production claims. It is not a "
+            "detector-performance result."
         ),
     }
 
@@ -328,7 +329,7 @@ def _build_paper_panel(case_study: dict[str, Any]) -> dict[str, Any]:
             "reader_takeaway": "A downstream agent can inspect state without receiving rows, identifiers, paths, or secrets.",
         },
         {
-            "component": "Claim state",
+            "component": "Claim gate",
             "observed": f"hosted detector-output governance only; {len(blocked)} stronger claims blocked",
             "evidence_ref": "docs/reports/paper_external_score_claim_gate.json",
             "reader_takeaway": "The public use is hosted detector-output governance only.",
@@ -348,10 +349,10 @@ def _build_claim_map(case_study: dict[str, Any]) -> dict[str, Any]:
     return {
         "schema_version": PAPER_EXTERNAL_SCORE_INTEGRATION_SCHEMA_VERSION,
         "status": "pass" if case_study.get("status") == "pass" else "blocked",
-        "allowed_claim_scope": case_study.get("allowed_claim_state"),
+        "allowed_claim_scope": case_study.get("admissible_use"),
         "paper_safe_sentence": (
             "Relaytic-AML can wrap a rowless external detector-score artifact in schema, hash, redaction, "
-            "evidence-cell, and claim-state controls."
+            "a factual evidence cell and a separate interpretation gate."
         ),
         "allowed_claims": list(case_study.get("allowed_public_claims", [])),
         "blocked_claims": list(case_study.get("blocked_stronger_claims", [])),
@@ -546,7 +547,7 @@ def _auditable_record_snippet(cell: dict[str, Any]) -> dict[str, Any]:
         "invariant_state": "pass" if cell.get("value") == 1.0 else "fail",
         "detector_performance_metric": False,
         "leakage_posture": cell.get("leakage_posture") or "not_available",
-        "claim_state": cell.get("claim_state") or "not_available",
+        "rowless_export_status": cell.get("rowless_export_status") or "not_available",
     }
 
 

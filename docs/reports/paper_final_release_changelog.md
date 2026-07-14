@@ -26,6 +26,6 @@
 
 ## Remaining Author Action
 
-- create or select the final public tag after the reviewed source/PDF tree is clean
+- publish the final immutable source commit, or separately verify an optional release tag
 - do one human page-by-page PDF inspection immediately before upload
-- confirm `git status --short` is clean at the tag target
+- confirm `git status --short` is clean at the cited revision

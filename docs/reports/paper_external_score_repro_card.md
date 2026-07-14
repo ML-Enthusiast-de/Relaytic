@@ -29,12 +29,12 @@ Expected outputs:
 Data and privacy boundary:
 
 - The default fixture is rowless and contains no raw transactions, identifiers, secrets, licensed data, or private machine paths.
-- Optional local score artifacts remain local. Relaytic records only schema fields, hash prefixes, metric policy, leakage posture, claim state, and redaction evidence.
+- Optional local score artifacts remain local. Relaytic records only schema fields, hash prefixes, metric metadata, leakage posture, a separate claim gate, and redaction evidence.
 
 Evidence identifiers:
 
 - Evidence cell: `p19a.external_score.hosted_metadata_completeness`
 - Dataset: `p19a_hosted_score_fixture`
 - Split: `fixture_holdout`
-- Schema hash prefix: `4b2b70a58b0c`
-- Content hash prefix: `dac68c3801f5`
+- Schema hash prefix: `0534b78322c7`
+- Content hash prefix: `8d3c767fd26d`

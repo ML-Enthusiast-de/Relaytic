@@ -1156,6 +1156,18 @@ P25 extends the existing paper release-safety boundary without changing Relaytic
 
 Compatibility boundary: P25 is publication and evidence-governance infrastructure. It does not retrain a detector, alter a benchmark measurement, create a Git tag automatically, publish a release, or upload to arXiv.
 
+## Paper Track P26 Evidence And Gate Separation
+
+P26 extends the existing paper release-safety boundary without changing detector APIs or benchmark values.
+
+- introduced `src/relaytic/release_safety/paper_evidence_contract.py` with factual evidence-cell and separate claim-gate schemas
+- added `paper_claim_gate_records.json` and P26 separation, validation-subsplit, and release-reference audits
+- updated PaySim and hosted-score examples so interpretive publication fields no longer live in evidence cells
+- documented the exact PaySim and Elliptic selection, calibration, and threshold-selection surfaces
+- changed exact-revision release identity from mandatory tag use to either a verified tag or an immutable commit present on the public remote
+
+Compatibility boundary: P26 changes paper artifact schemas from `relaytic.paper_evidence_cell.v1` to `relaytic.paper_evidence_cell.v2`. It does not change benchmark measurements, retrain a model, claim detector superiority, create a tag, publish a release, or upload to arXiv.
+
 ## Removal Criteria
 
 The remaining compatibility layer can be removed when all of the following are true:

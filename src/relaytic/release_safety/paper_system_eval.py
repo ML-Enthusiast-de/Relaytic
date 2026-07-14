@@ -545,15 +545,16 @@ def _build_reader_task_eval(
         "artifact_ref",
         "artifact_field",
         "budget_tier",
-        "claim_state",
+        "calibration_status",
         "command",
         "dataset_id",
         "leakage_posture",
-        "metric_id",
-        "publishability_gate_ref",
-        "publishability_gate_status",
+        "metric",
+        "model_identifier",
         "row_id",
+        "run_directory_ref",
         "split",
+        "test_exposure_contract",
         "value",
     }
     no_lost_tasks = _task_pass_map(no_lost_user_eval.get("tasks", []))
@@ -605,8 +606,9 @@ def _build_reader_task_eval(
             "reader_task",
             "metric_cell_provenance_available",
             metric_audit.get("status") == "pass"
+            and dict(metric_audit.get("evidence_gate_separation") or {}).get("status") == "pass"
             and required_metric_fields.issubset(set(pay_comp_cell.keys())),
-            "A reviewer should be able to trace the PaySim competitive PR-AUC cell to dataset, split, command, artifact field, budget, leakage posture, and claim state.",
+            "A reviewer should be able to trace the PaySim competitive PR-AUC cell to factual dataset, split, command, artifact, budget, leakage, calibration, and exposure fields, then resolve interpretation through a separate gate.",
             "audit_status="
             f"{metric_audit.get('status')}; required_fields_present={len(required_metric_fields & set(pay_comp_cell.keys()))}/{len(required_metric_fields)}",
             "docs/reports/paper_metric_cell_audit.json",
@@ -702,7 +704,7 @@ def _build_reader_task_eval(
             )
             and "docs/reports/paysim_competitive_benchmark_manifest.json"
             in set(paysim_result_row.get("artifact_refs", []) or []),
-            "The result table should connect the reader-facing row to metric cells and source artifacts.",
+            "The result table should connect the reader-facing row to evidence cells and source artifacts.",
             "row_present="
             f"{bool(paysim_result_row)}; artifact_refs={len(paysim_result_row.get('artifact_refs', []) or [])}",
             "docs/reports/paper_result_table_final.json",

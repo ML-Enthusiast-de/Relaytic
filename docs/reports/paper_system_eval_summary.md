@@ -15,7 +15,7 @@ The reader-task suite checks `11`/`11` concrete navigation, provenance, privacy,
 | --- | --- | --- | --- |
 | repo_navigation_separates_relaytic_from_aml_paper | readme_present=True; mentions_pdf=True | README.md | `pass` |
 | cross_platform_reproduction_path_visible | windows_path=True; unix_path=True | README.md | `pass` |
-| metric_cell_provenance_available | audit_status=pass; required_fields_present=13/13 | docs/reports/paper_metric_cell_audit.json | `pass` |
+| metric_cell_provenance_available | audit_status=pass; required_fields_present=14/14 | docs/reports/paper_metric_cell_audit.json | `pass` |
 | paysim_baseline_and_competitive_budget_comparable | baseline=0.331345; competitive=0.638773; improved=True | docs/reports/paper_metric_cell_audit.json | `pass` |
 | paysim_claim_boundary_machine_readable | supporting=True; hard=False; reasons=2 | docs/reports/paper_publishability_matrix.json | `pass` |
 | elliptic2_supporting_context_and_firewall_visible | context_role=modern_context_only; firewall_status=blocked_supporting_only_thesis_narrowing_required | docs/reports/paper_publishability_matrix.json | `pass` |
@@ -45,7 +45,7 @@ The reader-task suite checks `11`/`11` concrete navigation, provenance, privacy,
 | claim_gate | p13_release_manifest_claim_safe | status=ready_for_claim_safe_arxiv_release; release_allowed=True | `pass` |
 | reader_task | repo_navigation_separates_relaytic_from_aml_paper | readme_present=True; mentions_pdf=True | `pass` |
 | reader_task | cross_platform_reproduction_path_visible | windows_path=True; unix_path=True | `pass` |
-| reader_task | metric_cell_provenance_available | audit_status=pass; required_fields_present=13/13 | `pass` |
+| reader_task | metric_cell_provenance_available | audit_status=pass; required_fields_present=14/14 | `pass` |
 | reader_task | paysim_baseline_and_competitive_budget_comparable | baseline=0.331345; competitive=0.638773; improved=True | `pass` |
 | reader_task | paysim_claim_boundary_machine_readable | supporting=True; hard=False; reasons=2 | `pass` |
 | reader_task | elliptic2_supporting_context_and_firewall_visible | context_role=modern_context_only; firewall_status=blocked_supporting_only_thesis_narrowing_required | `pass` |

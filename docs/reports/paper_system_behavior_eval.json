@@ -146,8 +146,8 @@
       "track": "reader_task"
     },
     {
-      "expected_behavior": "A reviewer should be able to trace the PaySim competitive PR-AUC cell to dataset, split, command, artifact field, budget, leakage posture, and claim state.",
-      "measured_signal": "audit_status=pass; required_fields_present=13/13",
+      "expected_behavior": "A reviewer should be able to trace the PaySim competitive PR-AUC cell to factual dataset, split, command, artifact, budget, leakage, calibration, and exposure fields, then resolve interpretation through a separate gate.",
+      "measured_signal": "audit_status=pass; required_fields_present=14/14",
       "passed": true,
       "required": true,
       "source_artifact": "docs/reports/paper_metric_cell_audit.json",
@@ -218,7 +218,7 @@
       "track": "reader_task"
     },
     {
-      "expected_behavior": "The result table should connect the reader-facing row to metric cells and source artifacts.",
+      "expected_behavior": "The result table should connect the reader-facing row to evidence cells and source artifacts.",
       "measured_signal": "row_present=True; artifact_refs=4",
       "passed": true,
       "required": true,

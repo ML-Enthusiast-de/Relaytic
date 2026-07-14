@@ -21,7 +21,7 @@
           "docs/paper/references.bib"
         ]
       },
-      "message": "P18 requires the P10-P17 governance, failure, and metric-cell evidence artifacts.",
+      "message": "P18 requires the P10-P17 governance, failure, and evidence-cell artifacts.",
       "passed": true
     },
     {
@@ -56,7 +56,7 @@
       "artifact_ref": "docs/reports/paper_metric_cell_audit.json",
       "exists": true,
       "input_id": "metric_cell_audit",
-      "sha256_prefix": "f3a943845159"
+      "sha256_prefix": "8d96165af5f1"
     },
     {
       "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
@@ -86,7 +86,7 @@
       "artifact_ref": "docs/reports/paper_system_task_eval.json",
       "exists": true,
       "input_id": "system_task_eval",
-      "sha256_prefix": "8b40f361fec4"
+      "sha256_prefix": "749aea5953e7"
     },
     {
       "artifact_ref": "docs/reports/paper_agent_handoff_eval.json",
@@ -110,13 +110,13 @@
       "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
       "exists": true,
       "input_id": "governance_ablation_eval",
-      "sha256_prefix": "013a946b7f1f"
+      "sha256_prefix": "b603a9db549c"
     },
     {
       "artifact_ref": "docs/reports/paper_governance_ablation_manifest.json",
       "exists": true,
       "input_id": "governance_ablation_manifest",
-      "sha256_prefix": "92acd16e6b99"
+      "sha256_prefix": "88c4dd0ca123"
     },
     {
       "artifact_ref": "docs/reports/paysim_leakage_safe_feature_report.json",
@@ -134,7 +134,7 @@
       "artifact_ref": "docs/paper/references.bib",
       "exists": true,
       "input_id": "references",
-      "sha256_prefix": "671fe6deabe1"
+      "sha256_prefix": "cf334f7f8905"
     }
   ],
   "next_slice": "Paper Track P19 - hosted detector workflow demonstration, if selected",

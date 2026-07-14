@@ -311,7 +311,7 @@ def refresh_paysim_competitive_protocol_metadata(
         row["calibration_status"] = "selected_platt_sigmoid" if row.get("selected_for_test_evaluation") else "not_calibrated_after_nonselection"
     trace["full_training_finalist_count"] = len(finalists)
     trace["selection_tie_detected"] = False
-    trace["tie_break_rule"] = "not_required_distinct_validation_pr_auc"
+    trace["tie_break_rule"] = "not_required_unique_winner_at_reported_precision"
 
     selected = dict(manifest.get("validation_selected_competitive_model", {}) or {})
     optional_skips = list(trace.get("fallback_or_not_run", []) or [])
@@ -759,7 +759,7 @@ def _run_search(
             finalist_row["selection_outcome"] = "selected" if rank == 1 else "not_selected_lower_validation_pr_auc"
         selected_summary["selection_tie_detected"] = selection_tie_detected
         selected_summary["tie_break_rule"] = (
-            "not_required_distinct_validation_pr_auc"
+            "not_required_unique_winner_at_reported_precision"
             if not selection_tie_detected
             else "no_predeclared_secondary_tie_break_recorded"
         )
@@ -1045,6 +1045,29 @@ def _calibrate_selected_scores(
             "partition_policy": partition_policy,
             "calibration_row_count": int(len(calibration_indices)) if calibration_indices is not None else 0,
             "operating_point_row_count": int(len(operating_indices)),
+            "model_selection_subset": _validation_subset_summary(
+                y_validation,
+                validation_steps,
+                np.arange(len(y_validation)),
+                purpose="full_validation_model_selection",
+            ),
+            "calibration_subset": _validation_subset_summary(
+                y_validation,
+                validation_steps,
+                calibration_indices if calibration_indices is not None else np.asarray([], dtype=int),
+                purpose="platt_calibration_fit",
+            ),
+            "threshold_selection_subset": _validation_subset_summary(
+                y_validation,
+                validation_steps,
+                operating_indices,
+                purpose="calibration_comparison_and_review_threshold_selection",
+            ),
+            "calibration_threshold_overlap_count": int(
+                len(np.intersect1d(calibration_indices, operating_indices))
+                if calibration_indices is not None
+                else len(operating_indices)
+            ),
             "candidates": report_rows,
             "selected_method": selected["method"],
             "test_used_for_calibration_or_selection": False,
@@ -1070,6 +1093,24 @@ def _calibration_partitions(
     if _has_two_classes(y_validation[calibration]) and _has_two_classes(y_validation[operating]):
         return calibration, operating, "validation_only_deterministic_alternating_fallback_for_class_coverage"
     return None, np.arange(len(y_validation)), "identity_calibration_fallback_insufficient_validation_class_coverage"
+
+
+def _validation_subset_summary(
+    labels: np.ndarray,
+    steps: np.ndarray,
+    indices: np.ndarray,
+    *,
+    purpose: str,
+) -> dict[str, Any]:
+    selected_steps = steps[indices] if len(indices) else np.asarray([], dtype=steps.dtype)
+    selected_labels = labels[indices] if len(indices) else np.asarray([], dtype=labels.dtype)
+    return {
+        "purpose": purpose,
+        "row_count": int(len(indices)),
+        "positive_count": int(selected_labels.sum()) if len(indices) else 0,
+        "step_min": int(selected_steps.min()) if len(indices) else None,
+        "step_max": int(selected_steps.max()) if len(indices) else None,
+    }
 
 
 def _rule_scores(frame: pd.DataFrame) -> np.ndarray:

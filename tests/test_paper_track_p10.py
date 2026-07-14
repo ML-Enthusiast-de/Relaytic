@@ -7,6 +7,7 @@ from typing import Any
 import pytest
 
 from relaytic.release_safety import PAPER_TABLE_FILENAMES, build_paper_table_pack
+from relaytic.release_safety.paper_evidence_contract import EVIDENCE_CELL_INTERPRETIVE_FIELDS
 from relaytic.ui.cli import main
 
 
@@ -214,6 +215,7 @@ def test_paper_track_p10_generates_provenance_backed_tables(tmp_path: Path) -> N
     table = pack["paper_result_table_final"]
     audit = pack["paper_metric_cell_audit"]
     matrix = pack["paper_publishability_matrix"]
+    gate_pack = pack["paper_claim_gate_records"]
 
     assert set(pack) == set(PAPER_TABLE_FILENAMES)
     assert table["status"] == "tables_generated_claim_guarded"
@@ -231,17 +233,24 @@ def test_paper_track_p10_generates_provenance_backed_tables(tmp_path: Path) -> N
         "command",
         "run_directory_ref",
         "artifact_ref",
-        "claim_state",
+        "metric",
+        "value",
         "budget_tier",
         "leakage_posture",
-        "publishability_gate_ref",
-        "publishability_gate_status",
     }
     for cell in audit["numeric_cells"]:
         assert required.issubset(cell), cell["cell_id"]
         assert all(cell[field] not in (None, "", []) for field in required), cell["cell_id"]
+        assert not EVIDENCE_CELL_INTERPRETIVE_FIELDS.intersection(cell), cell["cell_id"]
     assert any(cell["budget_tier"] == "competitive" for cell in audit["numeric_cells"])
-    assert all(not cell["headline_metric_candidate"] for cell in audit["numeric_cells"])
+    assert gate_pack["status"] == "pass"
+    assert gate_pack["separation_audit"]["status"] == "pass"
+    gated_cell_ids = {
+        cell_id
+        for gate in gate_pack["claim_gates"]
+        for cell_id in gate["evidence_cell_ids"]
+    }
+    assert gated_cell_ids == {cell["cell_id"] for cell in audit["numeric_cells"]}
     paysim_gate = next(row for row in matrix["rows"] if row["dataset_id"] == "paysim_temporal_transaction_fraud")
     assert "graph_benchmark_evidence_not_yet_executed_p7_required" not in paysim_gate["blocked_reason_codes"]
 
@@ -293,15 +302,23 @@ def test_paper_track_p10_committed_reports_are_ready_for_p11() -> None:
     table = _load_report("paper_result_table_final.json")
     audit = _load_report("paper_metric_cell_audit.json")
     matrix = _load_report("paper_publishability_matrix.json")
+    gate_pack = _load_report("paper_claim_gate_records.json")
 
     assert table["status"] == "tables_generated_claim_guarded"
     assert table["paper_can_continue_to_p11"] is True
     assert audit["status"] == "pass"
     assert audit["violations"] == []
-    assert audit["headline_metric_cell_count"] == 0
+    assert audit["checks"]["evidence_cells_are_factual_only"] is True
+    assert audit["checks"]["all_public_cells_have_separate_gate"] is True
     assert matrix["status"] == "supporting_tables_ready_hard_claims_blocked"
     assert matrix["hard_claims_allowed"] is False
     assert matrix["headline_claims_allowed"] is False
+    assert gate_pack["status"] == "pass"
+    assert gate_pack["separation_audit"]["status"] == "pass"
+    assert all(
+        not EVIDENCE_CELL_INTERPRETIVE_FIELDS.intersection(cell)
+        for cell in audit["numeric_cells"]
+    )
 
     paysim = next(row for row in matrix["rows"] if row["dataset_id"] == "paysim_temporal_transaction_fraud")
     assert "graph_benchmark_evidence_not_yet_executed_p7_required" not in paysim["blocked_reason_codes"]

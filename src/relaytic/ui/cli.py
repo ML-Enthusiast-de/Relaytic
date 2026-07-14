@@ -1732,7 +1732,7 @@ def build_parser() -> argparse.ArgumentParser:
     release_safety_p24.add_argument(
         "--release-tag",
         default=None,
-        help="Immutable Git tag resolving to HEAD. Required with --final.",
+        help="Optional immutable Git tag. When supplied, it must exist locally and remotely and resolve to HEAD.",
     )
     release_safety_p24.add_argument(
         "--format",
@@ -8444,8 +8444,6 @@ def _run_paper_release_integrity_surface(
 
     root = Path.cwd()
     if final:
-        if not release_tag:
-            raise ValueError("`--release-tag` is required with `paper-release-integrity --final`.")
         manifest = build_exact_revision_release(root, release_tag=release_tag)
         return {
             "surface_payload": manifest,

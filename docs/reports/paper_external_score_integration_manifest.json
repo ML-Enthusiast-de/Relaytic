@@ -14,7 +14,7 @@
     },
     {
       "check_id": "adapter_contract_hashes_available",
-      "observed": "schema_hash=4b2b70a58b0c; content_hash=dac68c3801f5",
+      "observed": "schema_hash=0534b78322c7; content_hash=8d3c767fd26d",
       "passed": true,
       "requirement": "adapter input has schema and content hash prefixes"
     },
@@ -56,7 +56,7 @@
     }
   ],
   "claim_boundary": {
-    "allowed": "hosted_detector_output_governance_only",
+    "allowed": "hosted detector-output governance only",
     "detector_superiority_claimed": false,
     "graph_neural_detector_novelty_claimed": false,
     "production_aml_readiness_claimed": false,

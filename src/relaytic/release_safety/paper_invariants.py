@@ -195,21 +195,21 @@ def _build_invariant_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         _invariant(
             invariant_id="I1_metric_cell_provenance",
-            name="Metric-cell provenance",
-            statement="Every reader-facing number must resolve to dataset, split, command, artifact field, metric, budget tier, leakage posture, and claim state.",
-            enforcement_mechanism="metric-cell audit plus required-field gate",
+            name="Evidence-cell provenance",
+            statement="Every reader-facing number must resolve to factual dataset, split, command, artifact, metric, budget, leakage, operating-point, and exposure fields, while interpretation resolves through a separate claim gate.",
+            enforcement_mechanism="evidence-cell audit plus required-field gate",
             evidence_refs=[
                 _evidence_ref(
                     "docs/reports/paper_metric_cell_audit.json",
                     "all_numeric_cells_have_required_provenance",
                     _check_signal(metric_audit, "all_numeric_cells_have_required_provenance"),
-                    requirement="numeric metric cells contain the required provenance fields",
+                    requirement="numeric evidence cells contain the required provenance fields",
                 ),
                 _evidence_ref(
                     "docs/reports/paper_system_task_eval.json",
                     "metric_cell_provenance_available",
                     task_signal.get("metric_cell_provenance_available"),
-                    requirement="reader task can trace the PaySim metric cell",
+                    requirement="reader task can trace the PaySim evidence cell",
                 ),
             ],
             failure_or_ablation_refs=[
@@ -606,7 +606,7 @@ def _build_manifest(
         _check(
             "required_inputs_present",
             not required["missing_artifact_refs"],
-            "P18 requires the P10-P17 governance, failure, and metric-cell evidence artifacts.",
+            "P18 requires the P10-P17 governance, failure, and evidence-cell artifacts.",
             detail=required,
         ),
         _check(

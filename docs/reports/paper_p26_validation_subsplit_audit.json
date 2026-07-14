@@ -1,0 +1,123 @@
+{
+  "checks": [
+    {
+      "check": "PaySim full validation reconciles",
+      "passed": true
+    },
+    {
+      "check": "PaySim nested subsets reconcile",
+      "passed": true
+    },
+    {
+      "check": "PaySim threshold denominator and positives reconcile",
+      "passed": true
+    },
+    {
+      "check": "Elliptic full validation reconciles",
+      "passed": true
+    },
+    {
+      "check": "Elliptic nested subsets reconcile",
+      "passed": true
+    },
+    {
+      "check": "Elliptic threshold denominator and positives reconcile",
+      "passed": true
+    },
+    {
+      "check": "reader-facing subset disclosure present",
+      "passed": true
+    },
+    {
+      "check": "nested chronological windows are disjoint",
+      "passed": true
+    },
+    {
+      "check": "thresholds match artifacts and reader display",
+      "passed": true
+    },
+    {
+      "check": "displayed PaySim runner-up tie has consistent prose",
+      "passed": true
+    }
+  ],
+  "datasets": {
+    "Elliptic": {
+      "calibration": {
+        "boundary": "30-35",
+        "count": 4854,
+        "positive_count": 773
+      },
+      "calibration_use": "fit Platt sigmoid calibration on the earlier subset",
+      "full_validation": {
+        "boundary": "30-39",
+        "count": 8999,
+        "positive_count": 1038
+      },
+      "nested_overlap_policy": "calibration and threshold-selection subsets are chronologically ordered and disjoint",
+      "order_field": "time_step",
+      "selection_scope": "the full validation partition selected the model and feature view and therefore overlaps both nested subsets",
+      "source_identity": {
+        "files": [
+          {
+            "role": "classes",
+            "sha256": "93e2e7b2405c735ba752bf6ba06b947561deddd1f5a8fc91e46f6a4c0e439493"
+          },
+          {
+            "role": "edges",
+            "sha256": "a35053ba68a98e4382cae2ba65b9d9e36b23b6439e02dff084971b1b72a5156e"
+          },
+          {
+            "role": "features",
+            "sha256": "fd7f83573443c9e302e371d3f110e3b6224160f5d1ed8a287757936127800ff0"
+          }
+        ]
+      },
+      "source_refs": [
+        "docs/reports/elliptic_temporal_split_report.json",
+        "docs/reports/paper_graph_feature_table.json",
+        "src/relaytic/release_safety/graph_baselines.py:_calibrate_scores"
+      ],
+      "threshold_selection": {
+        "boundary": "36-39",
+        "count": 4145,
+        "positive_count": 265
+      },
+      "threshold_use": "compare calibration choices by log loss and select the 0.5% threshold on the later subset"
+    },
+    "PaySim": {
+      "calibration": {
+        "boundary": "446-540",
+        "count": 116502,
+        "positive_count": 984
+      },
+      "calibration_use": "fit Platt sigmoid calibration on the earlier subset",
+      "full_validation": {
+        "boundary": "446-594",
+        "count": 228103,
+        "positive_count": 1552
+      },
+      "nested_overlap_policy": "calibration and threshold-selection subsets are chronologically ordered and disjoint",
+      "order_field": "step",
+      "selection_scope": "the full validation partition selected the finalist and therefore overlaps both nested subsets",
+      "source_identity": {
+        "sha256": "16910f90577b0d981bf8ff289714510bb89bc71bff7d3f220f024e287e4eea6b"
+      },
+      "source_refs": [
+        "docs/reports/paysim_temporal_split_report.json",
+        "docs/reports/paysim_competitive_search_trace.json",
+        "src/relaytic/release_safety/paysim_competitive.py:_calibration_partitions"
+      ],
+      "threshold_selection": {
+        "boundary": "541-594",
+        "count": 111601,
+        "positive_count": 568
+      },
+      "threshold_use": "compare calibration choices by log loss and select the 0.5% threshold on the later subset"
+    }
+  },
+  "derivation": "Nested counts and positives were recomputed from the hash-identified local sources during P26 and are reconciled here against the full validation and operating-point artifacts. The implemented median-boundary rules define the chronological subwindows. No model was refit and no benchmark value was changed.",
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P26",
+  "status": "pass"
+}

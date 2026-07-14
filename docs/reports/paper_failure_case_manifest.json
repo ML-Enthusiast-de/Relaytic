@@ -5,7 +5,7 @@
     "docs/reports/paper_no_lost_user_eval.json": "6a68a1c96069a3b39524f281352ad72c60db344e501a432804693923411477d0",
     "docs/reports/paper_public_claims_allowed.json": "a84d9784381b3464015bd5cc84a177d776cb5f2b5735e68f1ffe484bac23e3f5",
     "docs/reports/paysim_competitive_budget_contract.json": "7560c3ce38a2454970b210a4827c4ff5a1511e7b5294a130e6a7d4dbe4a34311",
-    "docs/reports/paysim_competitive_search_trace.json": "0d32af4e89dfa206e255cf83f7f9625ab7a158c8858dd15b3b4e180c7d18c444",
+    "docs/reports/paysim_competitive_search_trace.json": "aeacb383b72acb8a4651f1b445bd718289ebfcb02127351a6553599fcbdc7fcc",
     "docs/reports/paysim_leakage_safe_feature_report.json": "5929bba645118009267ea68cfd6ad806377589ba933fed4f44500c7a1c405d12"
   },
   "checks": [

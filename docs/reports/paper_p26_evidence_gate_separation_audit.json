@@ -1,0 +1,21 @@
+{
+  "checks": {
+    "every_public_cell_has_gate": true,
+    "gate_references_resolve": true,
+    "interpretive_fields_absent_from_cells": true
+  },
+  "claim_gate_count": 8,
+  "evidence_cell_count": 45,
+  "factual_cell_schema": "relaytic.paper_evidence_cell.v2",
+  "interpretive_gate_schema": "relaytic.paper_claim_gate.v2",
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P26",
+  "source_artifacts": [
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_claim_gate_records.json",
+    "docs/reports/paper_external_score_evidence_cells.json",
+    "docs/reports/paper_external_score_claim_gate.json"
+  ],
+  "status": "pass",
+  "violations": []
+}

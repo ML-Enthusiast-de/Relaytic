@@ -31,7 +31,7 @@
       "full_observed_result": "probe_surfaces=1 validation-only; test_used_for_selection=False; final_policy=one_competitive_finalist_evaluated_after_validation_only_selection_and_protocol_freeze; prior_test_exposure=True",
       "gate_or_check": "Validation-only selection policy",
       "injected_risk": "A model-selection path tries to use test evidence before the finalist is fixed.",
-      "observed_result": "validation-only probes; no test selection; one finalist test",
+      "observed_result": "validation-only probes; no test selection; one competitive finalist evaluated after protocol freeze",
       "passed": true
     },
     {

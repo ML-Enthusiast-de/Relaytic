@@ -10,7 +10,7 @@ Financial-crime machine learning is often evaluated through isolated model score
 
 AML and fraud detection systems are rare-event decision systems, not only classifiers. A model can look strong under a single metric while still being unusable if the split leaks future information, if graph evidence is flattened into an overbroad claim, if review capacity is ignored, or if paper text drifts beyond what the benchmark actually proves. Relaytic-AML treats those failure modes as first-class evaluation objects.
 
-This source draft argues for a claim-gated evaluation environment. Each numeric cell in the result table is tied to a command, dataset, split, run-directory reference, artifact field, budget tier, leakage posture, and claim state. Public claims are allowed only when the evidence pack and publishability gates agree. The current package allows supporting evidence claims and blocks hard AML, headline performance, and hard business-value claims.
+This source draft describes a claim-gated evaluation environment. Each numeric cell is tied to factual command, dataset, split, run-directory, artifact, metric, budget, leakage, operating-point, and exposure fields. Interpretation is stored in a separate gate record. Public claims are allowed only when the evidence pack and those gates agree.
 
 The paper therefore asks whether a local artifact system can make AML evaluation more credible by keeping model score, temporal correctness, graph provenance, operational review utility, and public claim boundaries inspectable together.
 
@@ -50,16 +50,16 @@ The method has four claim-control rules:
 
 ## Benchmarks
 
-| Track | Role | Budget | Claim state | Gate |
-|---|---|---|---|---|
-| PaySim synthetic mobile-money transaction fraud | baseline_reference_appendix | baseline | baseline_only_not_headline | blocked |
-| PaySim synthetic mobile-money transaction fraud | supporting_temporal_proxy_numeric_candidate | competitive | supporting-only | pass_supporting_only |
-| Elliptic Bitcoin temporal graph | supporting_temporal_graph_numeric_candidate | competitive | supporting-only | pass_supporting_only |
-| paysim_temporal_transaction_fraud | supporting_operational_proxy_only | operational_evaluation | supporting-only | supporting_operational_metrics_ready_hard_claims_blocked |
-| elliptic_flattened_graph_aml | supporting_graph_operational_metric_only | operational_evaluation | supporting-only | supporting_operational_metrics_ready_hard_claims_blocked |
-| Elliptic2 subgraph AML | supporting_modern_context_only | competitive_context | supporting_context_only_not_performance_contribution | pass_supporting_modern_context_only |
-| Elliptic2 subgraph AML | limitation_and_claim_firewall | reference_parity_gate | blocked_claim_evidence | blocked_supporting_only_thesis_narrowing_required |
-| AMLSim synthetic bank graph | blocked_pending_reproducible_generation | blocked | blocked_or_future_proxy | hard_tracks_blocked_with_p8d_thesis_narrowing_accepted |
+| Track | Budget | Separate gate | Factual metric cells |
+|---|---|---|---|
+| PaySim synthetic mobile-money transaction fraud | baseline | paysim_p6_validation_selected_baseline.publication_gate | 2 |
+| PaySim synthetic mobile-money transaction fraud | competitive | paysim_p6a_competitive_selected.publication_gate | 6 |
+| Elliptic Bitcoin temporal graph | competitive | elliptic_p7_selected_graph_feature_baseline.publication_gate | 6 |
+| paysim_temporal_transaction_fraud | operational_evaluation | paysim_p6a_competitive_selected_review_budget_operational.publication_gate | 11 |
+| elliptic_flattened_graph_aml | operational_evaluation | elliptic_p7_selected_graph_feature_review_budget_operational.publication_gate | 11 |
+| Elliptic2 subgraph AML | competitive_context | elliptic2_p8b_modern_context.publication_gate | 5 |
+| Elliptic2 subgraph AML | reference_parity_gate | elliptic2_p8c_claim_firewall.publication_gate | 3 |
+| AMLSim synthetic bank graph | blocked | amlsim_p8_blocked_generation.publication_gate | 0 |
 
 ## Results
 

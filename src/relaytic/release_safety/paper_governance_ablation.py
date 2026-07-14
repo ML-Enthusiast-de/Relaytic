@@ -41,13 +41,10 @@ REQUIRED_METRIC_CELL_FIELDS = [
     "command",
     "artifact_ref",
     "artifact_field",
-    "metric_id",
+    "metric",
     "value",
     "budget_tier",
     "leakage_posture",
-    "claim_state",
-    "publishability_gate_ref",
-    "publishability_gate_status",
 ]
 
 FORBIDDEN_PAYSIM_BALANCE_COLUMNS = [
@@ -283,13 +280,13 @@ def _build_ablation_rows(full: dict[str, Any]) -> list[dict[str, Any]]:
         (
             "no_evidence_cell_required_fields",
             "No evidence-cell required fields",
-            "metric-cell required-field gate",
+            "evidence-cell required-field gate",
             {
                 "missing_provenance_fields": int(full.get("required_metric_field_count") or 0),
                 "unsafe_publishable_tables_generated": 1,
             },
             "A metric row could enter a table with required provenance missing.",
-            "Required fields are what connect a reader-facing number back to dataset, split, command, artifact, leakage, budget, and claim state.",
+            "Required fields connect a reader-facing measurement to its dataset, split, command, artifact, leakage posture, budget, operating-point provenance, and exposure status. Interpretation remains in a separate gate record.",
         ),
         (
             "no_recovery_guide",
@@ -484,7 +481,7 @@ def _build_manifest(
         _check(
             "full_path_metric_provenance_complete",
             bool(full.get("safe_to_publish")) and int(full.get("missing_provenance_fields") or 0) == 0,
-            "The full path must retain required metric-cell provenance fields.",
+            "The full path must retain required evidence-cell provenance fields.",
             source_artifact="docs/reports/paper_metric_cell_audit.json",
         ),
         _check(

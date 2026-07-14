@@ -602,6 +602,7 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
     pending_table_needspace = 22
     skip_role_line = False
     previous_blank = False
+    reserved_code_needspace = False
 
     def flush_table() -> None:
         nonlocal table_buffer, pending_table_caption, pending_table_needspace
@@ -624,7 +625,7 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
             out.append("")
             list_mode = None
 
-    for raw_line in lines:
+    for line_index, raw_line in enumerate(lines):
         line = raw_line.rstrip()
         stripped = line.strip()
 
@@ -688,9 +689,11 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
             if code_lang == "algorithm":
                 code_buffer = []
             else:
-                if code_lang == "json":
+                if reserved_code_needspace:
+                    reserved_code_needspace = False
+                elif code_lang == "json":
                     out.append(r"\Needspace{22\baselineskip}")
-                elif code_lang in {"powershell", "bash"}:
+                elif code_lang in {"powershell", "bash", "text"}:
                     out.append(r"\Needspace{14\baselineskip}")
                 out.append(r"\begin{Verbatim}[frame=single,framesep=6pt,fontsize=\footnotesize,breaklines=true,breakanywhere=true]")
             previous_blank = False
@@ -756,6 +759,15 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
 
         close_list()
         flush_table()
+        next_nonblank = next(
+            (candidate.strip() for candidate in lines[line_index + 1 :] if candidate.strip()),
+            "",
+        )
+        if next_nonblank.startswith("```"):
+            next_code_lang = next_nonblank.strip("`").strip().lower()
+            baselines = 24 if next_code_lang == "json" else 16
+            out.append(rf"\Needspace{{{baselines}\baselineskip}}")
+            reserved_code_needspace = True
         if re.match(r"^Algorithm \d+\b", stripped):
             out.append(r"\Needspace{18\baselineskip}")
         table_caption = _extract_table_caption(stripped)
@@ -764,8 +776,6 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
             pending_table_needspace = table_caption["needspace"]
             previous_blank = False
             continue
-        if stripped in {"Windows PowerShell:", "macOS/Linux:"}:
-            out.append(r"\Needspace{22\baselineskip}")
         out.append(_latex_inline(stripped))
         previous_blank = False
 
@@ -838,7 +848,17 @@ def _render_latex_table(
     spec = _latex_table_spec(rows[0], col_count)
     size = r"\scriptsize" if col_count >= 5 else r"\small"
     rendered = []
-    if caption:
+    page_float = caption == "Adjacent systems comparison."
+    if page_float:
+        rendered.extend(
+            [
+                r"\begin{table}[p]",
+                r"\centering",
+                f"\\caption{{{_latex_inline(caption)}}}",
+                r"\begin{minipage}{\linewidth}",
+            ]
+        )
+    elif caption:
         rendered.extend(
             [
                 rf"\Needspace{{{needspace_baselines}\baselineskip}}",
@@ -860,7 +880,9 @@ def _render_latex_table(
     ])
     for row in rows[1:]:
         rendered.append(" & ".join(_latex_inline(cell) for cell in row) + r" \\")
-    rendered.extend([r"\bottomrule", r"\end{tabularx}", r"\end{minipage}", r"\end{center}", ""])
+    rendered.extend([r"\bottomrule", r"\end{tabularx}", r"\end{minipage}"])
+    rendered.append(r"\end{table}" if page_float else r"\end{center}")
+    rendered.append("")
     return rendered
 
 
@@ -1553,7 +1575,7 @@ def _build_submission_package_audit(
         "upload_blockers_remaining": [
             "run a human TeX compile and inspect the produced PDF",
             "generate and include bibliography output if the final arXiv upload uses BibTeX rather than static bibliography output",
-            "confirm git status --short is empty at the tag target",
+            "confirm git status --short is empty at the final cited revision",
         ],
     }
 
@@ -1627,15 +1649,15 @@ def _render_release_candidate_checklist(*, manifest: dict[str, Any], package_aud
             "- [x] Generated LaTeX citations resolve against `references.bib`.",
             "- [x] Source-package audit blocks local paths, secrets, legacy prototype wording, and unguarded hard claims.",
             "",
-            "## Human gates before upload or tag",
+            "## Human gates before upload or release",
             "",
             "- [x] Author block and PDF metadata are present in `docs/paper/arxiv_src/main.tex`.",
             "- [ ] Run `pdflatex`, `bibtex`, `pdflatex`, and `pdflatex` from `docs/paper/arxiv_src/`; inspect the generated PDF.",
             "- [ ] Include generated bibliography output if the final arXiv upload uses BibTeX rather than an inline bibliography.",
             "- [ ] Confirm the AI-assistance disclosure accurately describes any LLM drafting, editing, or code-review help.",
             "- [ ] Rerun `relaytic release-safety paper-arxiv-source --format json` after any manual source edits.",
-            "- [ ] Rerun `relaytic scan-git-safety` from the tag target.",
-            "- [ ] Confirm `git status --short` is empty before creating `relaytic-aml-paper-p14-source-rc`.",
+            "- [ ] Rerun `relaytic scan-git-safety` from the final cited revision.",
+            "- [ ] Confirm `git status --short` is empty and the cited commit exists on the public remote.",
             "",
             "## Claim boundary",
             "",

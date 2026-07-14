@@ -75,11 +75,11 @@
     },
     {
       "condition_id": "no_evidence_cell_required_fields",
-      "disabled_machinery": "metric-cell required-field gate",
+      "disabled_machinery": "evidence-cell required-field gate",
       "fixture_scope": "deterministic disabled-component ablation fixture",
-      "interpretation": "Required fields are what connect a reader-facing number back to dataset, split, command, artifact, leakage, budget, and claim state.",
+      "interpretation": "Required fields connect a reader-facing measurement to its dataset, split, command, artifact, leakage posture, budget, operating-point provenance, and exposure status. Interpretation remains in a separate gate record.",
       "leakage_features_allowed": 0,
-      "missing_provenance_fields": 13,
+      "missing_provenance_fields": 10,
       "observed_failure": "A metric row could enter a table with required provenance missing.",
       "path": "No evidence-cell required fields",
       "private_paths_would_be_exposed": false,
@@ -126,7 +126,7 @@
     "raw_rows_exposed": false,
     "recovery_next_actions_available": 6,
     "redaction_count": 8,
-    "required_metric_field_count": 13,
+    "required_metric_field_count": 10,
     "safe_to_publish": true,
     "sample_metric_cell_id": "paysim_p6a_competitive_selected.test_pr_auc",
     "source_signals": {
@@ -144,7 +144,7 @@
   "guardrail_delta": {
     "handoff_fields_redacted_or_blocked": 6,
     "leakage_features_prevented": 4,
-    "metric_fields_required": 13,
+    "metric_fields_required": 10,
     "recovery_actions_preserved": 6,
     "unsupported_claims_prevented": 6
   },

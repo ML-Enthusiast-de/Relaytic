@@ -10,13 +10,19 @@
       "check_id": "score_schema_accepted",
       "observed": "accepted=True",
       "passed": true,
-      "requirement": "score artifact has required schema, metadata, rowless posture, and bounded claim state"
+      "requirement": "score artifact has required factual schema, metadata, and rowless posture"
     },
     {
       "check_id": "evidence_cells_created",
       "observed": "count=1",
       "passed": true,
       "requirement": "at least one evidence cell is emitted"
+    },
+    {
+      "check_id": "evidence_and_claim_gate_separate",
+      "observed": "status=pass",
+      "passed": true,
+      "requirement": "factual evidence fields and interpretive gate fields are stored in separate records"
     },
     {
       "check_id": "claim_gate_publishable",
@@ -43,12 +49,12 @@
   "failed_checks": [],
   "input_summary": {
     "artifact_ref": "fixture:p19a_external_score_rowless_v1",
-    "content_hash_prefix": "dac68c3801f5",
+    "content_hash_prefix": "8d3c767fd26d",
     "input_exists": true,
     "input_filename": "p19a_external_score_rowless_fixture.json",
     "metadata_exists": true,
     "metadata_source": "embedded_fixture",
-    "schema_hash_prefix": "4b2b70a58b0c",
+    "schema_hash_prefix": "0534b78322c7",
     "source_kind": "deterministic_rowless_fixture"
   },
   "next_slice": "Paper Track P19-B - external score case-study and paper integration",
@@ -68,7 +74,7 @@
     "paper_external_score_schema": "paper_external_score_schema.json",
     "paper_external_score_summary": "paper_external_score_summary.md"
   },
-  "schema_version": "relaytic.paper_external_score.v1",
+  "schema_version": "relaytic.paper_external_score.v2",
   "slice": "Paper Track P19-A",
   "status": "ready_for_hosted_score_governance"
 }

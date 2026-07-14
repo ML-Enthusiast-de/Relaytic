@@ -37,6 +37,9 @@ REQUIRED_PAPER_FINAL_PREFLIGHT_INPUT_REFS = [
     "docs/reports/paper_novelty_positioning_audit.json",
     "docs/reports/paper_adjacent_systems_distinction_matrix.json",
     "docs/reports/paper_p24_release_manifest.json",
+    "docs/reports/paper_p26_evidence_gate_separation_audit.json",
+    "docs/reports/paper_p26_validation_subsplit_audit.json",
+    "docs/reports/paper_p26_release_reference_audit.json",
     "docs/reports/paper_arxiv_source_manifest.json",
     "docs/reports/paper_submission_package_audit.json",
 ]
@@ -56,6 +59,9 @@ FORBIDDEN_FINAL_PUBLIC_MARKERS = [
     "unresolved citation",
     "undefined references",
     "dummy",
+    "review draft",
+    "review build",
+    "uncommitted review build",
 ]
 
 
@@ -166,9 +172,9 @@ def render_paper_final_release_changelog(pack: dict[str, Any]) -> str:
         "",
         "## Remaining Author Action",
         "",
-        "- create or select the final public tag after the reviewed source/PDF tree is clean",
+        "- publish the final immutable source commit, or separately verify an optional release tag",
         "- do one human page-by-page PDF inspection immediately before upload",
-        "- confirm `git status --short` is clean at the tag target",
+        "- confirm `git status --short` is clean at the cited revision",
     ]
     return "\n".join(lines).rstrip() + "\n"
 
@@ -191,6 +197,15 @@ def _collect_inputs(*, root: Path, report_dir: Path) -> dict[str, Any]:
         "paper_novelty_positioning_audit": _read_json_artifact(report_dir / "paper_novelty_positioning_audit.json", root=root),
         "paper_adjacent_systems_distinction_matrix": _read_json_artifact(report_dir / "paper_adjacent_systems_distinction_matrix.json", root=root),
         "paper_p24_release_manifest": _read_json_artifact(report_dir / "paper_p24_release_manifest.json", root=root),
+        "paper_p26_evidence_gate_separation_audit": _read_json_artifact(
+            report_dir / "paper_p26_evidence_gate_separation_audit.json", root=root
+        ),
+        "paper_p26_validation_subsplit_audit": _read_json_artifact(
+            report_dir / "paper_p26_validation_subsplit_audit.json", root=root
+        ),
+        "paper_p26_release_reference_audit": _read_json_artifact(
+            report_dir / "paper_p26_release_reference_audit.json", root=root
+        ),
         "paper_arxiv_source_manifest": _read_json_artifact(report_dir / "paper_arxiv_source_manifest.json", root=root),
         "paper_submission_package_audit": _read_json_artifact(report_dir / "paper_submission_package_audit.json", root=root),
     }
@@ -281,6 +296,18 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
             _payload(inputs["paper_p24_release_manifest"]).get("status")
             == "release_candidate_ready_for_human_upload",
             "Final preflight requires all P24 evidence, protocol, metric, split, citation, semantic, and visual checks.",
+        ),
+        _check(
+            "p26_release_corrections_ready",
+            all(
+                _payload(inputs[key]).get("status") == "pass"
+                for key in (
+                    "paper_p26_evidence_gate_separation_audit",
+                    "paper_p26_validation_subsplit_audit",
+                    "paper_p26_release_reference_audit",
+                )
+            ),
+            "Final preflight requires factual evidence cells, separate gates, documented validation sub-splits, and a supported release identity.",
         ),
         _check(
             "source_package_audit_passed",
@@ -460,9 +487,9 @@ def _build_manifest(
     ]
     ready_for_author_review = all(check["passed"] for check in checks)
     upload_blockers = [
-        "create or select the final public tag after the source/PDF tree is reviewed",
+        "publish and verify the final immutable source commit",
         "perform final human page-by-page PDF inspection immediately before upload",
-        "confirm `git status --short` is empty at the tag target",
+        "confirm `git status --short` is empty at the cited revision",
     ]
     return {
         "schema_version": PAPER_FINAL_PREFLIGHT_SCHEMA_VERSION,

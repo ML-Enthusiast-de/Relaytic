@@ -17,6 +17,9 @@
           "docs/reports/paper_novelty_positioning_audit.json",
           "docs/reports/paper_adjacent_systems_distinction_matrix.json",
           "docs/reports/paper_p24_release_manifest.json",
+          "docs/reports/paper_p26_evidence_gate_separation_audit.json",
+          "docs/reports/paper_p26_validation_subsplit_audit.json",
+          "docs/reports/paper_p26_release_reference_audit.json",
           "docs/reports/paper_arxiv_source_manifest.json",
           "docs/reports/paper_submission_package_audit.json"
         ]
@@ -67,6 +70,9 @@
     "docs/reports/paper_novelty_positioning_audit.json",
     "docs/reports/paper_adjacent_systems_distinction_matrix.json",
     "docs/reports/paper_p24_release_manifest.json",
+    "docs/reports/paper_p26_evidence_gate_separation_audit.json",
+    "docs/reports/paper_p26_validation_subsplit_audit.json",
+    "docs/reports/paper_p26_release_reference_audit.json",
     "docs/reports/paper_arxiv_source_manifest.json",
     "docs/reports/paper_submission_package_audit.json"
   ],
@@ -75,8 +81,8 @@
   "source_pdf_review_ready": true,
   "status": "ready_for_author_review_not_tagged",
   "upload_blockers_remaining": [
-    "create or select the final public tag after the source/PDF tree is reviewed",
+    "publish and verify the final immutable source commit",
     "perform final human page-by-page PDF inspection immediately before upload",
-    "confirm `git status --short` is empty at the tag target"
+    "confirm `git status --short` is empty at the cited revision"
   ]
 }

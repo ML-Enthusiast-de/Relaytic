@@ -59,8 +59,8 @@ def test_paper_strengthening_track_records_stage_9_as_implemented() -> None:
     assert "phase_paper_strengthening.md" in paper_track
     assert "latest paper-strengthening slice" in status
     assert "Paper Track P22 author-review layout hardening" in status
-    assert "P24, release integrity and revision-locked artifact generation" in status
-    assert "next recommended action: review and commit the P24 source candidate" in status
+    assert "latest paper-integrity slice: P24 corrected factual" in status
+    assert "next recommended action: commit and push the reviewed P26 source candidate" in status
     assert "latest paper-novelty-positioning slice" in status
 
 

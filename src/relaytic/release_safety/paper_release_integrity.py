@@ -12,6 +12,7 @@ import tarfile
 from typing import Any
 
 from relaytic.core.json_utils import write_json
+from relaytic.release_safety.paper_evidence_contract import audit_evidence_gate_separation
 
 
 PAPER_RELEASE_INTEGRITY_SCHEMA_VERSION = "relaytic.paper_release_integrity.v1"
@@ -33,6 +34,9 @@ PAPER_RELEASE_INTEGRITY_FILENAMES = {
     "paper_p24_metric_consistency_audit": "paper_p24_metric_consistency_audit.json",
     "paper_p24_split_consistency_audit": "paper_p24_split_consistency_audit.json",
     "paper_p24_semantic_source_audit": "paper_p24_semantic_source_audit.json",
+    "paper_p26_evidence_gate_separation_audit": "paper_p26_evidence_gate_separation_audit.json",
+    "paper_p26_validation_subsplit_audit": "paper_p26_validation_subsplit_audit.json",
+    "paper_p26_release_reference_audit": "paper_p26_release_reference_audit.json",
     "paper_p24_release_manifest": "paper_p24_release_manifest.json",
 }
 
@@ -66,6 +70,7 @@ VERIFIED_CITATIONS = {
     "chen2016xgboost": "https://doi.org/10.1145/2939672.2939785",
     "ke2017lightgbm": "https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html",
     "platt1999probabilistic": "https://www.microsoft.com/en-us/research/publication/probabilistic-outputs-for-support-vector-machines-and-comparisons-to-regularized-likelihood-methods/",
+    "deprez2025continualaml": "https://doi.org/10.1002/wics.70040",
     "gaurav2025governanceaas": "https://arxiv.org/abs/2508.18765",
     "kaptein2026runtimegovernance": "https://arxiv.org/abs/2603.16586",
     "naik2026llmopsaml": "https://arxiv.org/abs/2605.11232",
@@ -180,7 +185,7 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
     ]
     bibliography_verification = _report(
         "pass" if all(row["present"] for row in citation_checks) and all(row["passed"] for row in author_checks) else "fail",
-        verification_date="2026-07-13",
+        verification_date="2026-07-14",
         primary_source_checks=citation_checks,
         corrected_author_checks=author_checks,
         verification_method="primary arXiv records, DOI landing pages, or publisher/proceedings pages",
@@ -234,6 +239,9 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
 
     semantic_findings = _semantic_findings(markdown, bibliography)
     semantic_source = _report("pass" if not semantic_findings else "fail", findings=semantic_findings)
+    evidence_gate_separation = _evidence_gate_separation_audit(reports)
+    validation_subsplits = _validation_subsplit_audit(reports, markdown)
+    release_reference = _release_reference_audit(root, markdown)
 
     pack = {
         "paper_p24_evidence_authority": evidence_authority,
@@ -252,17 +260,20 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
         "paper_p24_metric_consistency_audit": metric_consistency,
         "paper_p24_split_consistency_audit": split_consistency,
         "paper_p24_semantic_source_audit": semantic_source,
+        "paper_p26_evidence_gate_separation_audit": evidence_gate_separation,
+        "paper_p26_validation_subsplit_audit": validation_subsplits,
+        "paper_p26_release_reference_audit": release_reference,
     }
     checks = [{"report": key, "status": value["status"], "passed": value["status"] == "pass"} for key, value in pack.items()]
     pack["paper_p24_release_manifest"] = _report(
         "release_candidate_ready_for_human_upload" if all(row["passed"] for row in checks) else "blocked_pending_p24_repairs",
-        slice="Paper Track P24",
+        slice="Paper Track P24 with P26 release corrections",
         checks=checks,
         git=git,
         exact_revision_release_required=True,
         arxiv_upload_ready=False,
         benchmark_values_changed=False,
-        human_owned_actions=["commit the reviewed source", "run final mode from the clean commit", "inspect the exact-revision PDF", "create a tag and upload if approved"],
+        human_owned_actions=["commit the reviewed source", "push the immutable commit", "run final mode from the clean public commit", "inspect and upload the exact-revision artifacts"],
     )
     return pack
 
@@ -283,7 +294,7 @@ def sync_paper_release_integrity_pack(
 
 
 def build_exact_revision_release(project_root: str | Path, *, release_tag: str | None = None) -> dict[str, Any]:
-    """Build an immutable, tagged paper release outside the working tree."""
+    """Build an immutable commit- or verified-tag paper release outside the worktree."""
     root = Path(project_root)
     git = _git_state(root)
     if git["dirty"]:
@@ -292,13 +303,28 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("Final paper release could not resolve a full Git commit SHA.")
     tag = str(release_tag or "").strip()
-    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]*", tag):
-        raise ValueError("Final paper release requires a valid release tag name.")
-    tagged_commit = _git(root, "rev-list", "-n", "1", tag).strip()
-    if not tagged_commit:
-        raise ValueError(f"Final paper release requires local tag `{tag}`.")
-    if tagged_commit != commit:
-        raise ValueError(f"Release tag `{tag}` must resolve to the current HEAD commit.")
+    if tag and not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]*", tag):
+        raise ValueError("Final paper release received an invalid release tag name.")
+    remote_refs = _git(root, "ls-remote", "origin")
+    remote_commit_exists = any(line.startswith(f"{commit}\t") for line in remote_refs.splitlines())
+    if not remote_commit_exists:
+        raise ValueError("Final paper release requires the exact source commit to exist on the public origin remote.")
+    tagged_commit = _git(root, "rev-list", "-n", "1", tag).strip() if tag else ""
+    remote_tagged_commit = ""
+    if tag:
+        if not tagged_commit:
+            raise ValueError(f"Final paper release requires local tag `{tag}`.")
+        if tagged_commit != commit:
+            raise ValueError(f"Release tag `{tag}` must resolve to the current HEAD commit.")
+        remote_tag_lines = [
+            line for line in remote_refs.splitlines() if line.endswith(f"refs/tags/{tag}") or line.endswith(f"refs/tags/{tag}^{{}}")
+        ]
+        remote_tagged_commit = next(
+            (line.split("\t", 1)[0] for line in remote_tag_lines if line.endswith("^{}")),
+            remote_tag_lines[0].split("\t", 1)[0] if remote_tag_lines else "",
+        )
+        if remote_tagged_commit != commit:
+            raise ValueError(f"Release tag `{tag}` must exist remotely and resolve to the current HEAD commit.")
 
     from relaytic.release_safety.paper_arxiv_source import sync_paper_arxiv_source_pack
     from relaytic.release_safety.paper_release import sync_paper_release_pack
@@ -314,7 +340,7 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
         root,
         output_dir=reports_dir,
         paper_dir=paper_dir,
-        release_tag=tag,
+        release_tag=tag or None,
         source_commit=commit,
     )
     canonical_figure_dir = root / "docs" / "paper" / "figures"
@@ -328,7 +354,11 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
     if not built_pdf.is_file():
         raise ValueError("LaTeX compilation did not produce main.pdf.")
     source_text = _read_text(source_dir / "main.tex")
-    required_release_tokens = (tag, commit, "archive/refs/tags")
+    required_release_tokens = (
+        (tag, commit, "archive/refs/tags")
+        if tag
+        else (commit, f"/commit/{commit}", f"/archive/{commit}.tar.gz")
+    )
     if not all(token in source_text for token in required_release_tokens):
         raise ValueError("Final source does not contain the required immutable release metadata.")
     forbidden_release_tokens = ("dirty", "under review", "pending release")
@@ -348,8 +378,11 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
         "schema_version": PAPER_RELEASE_INTEGRITY_SCHEMA_VERSION,
         "status": "pass" if integrity_ok else "fail",
         "source_commit": commit,
-        "release_tag": tag,
-        "tagged_commit": tagged_commit,
+        "release_identity_mode": "verified_tag" if tag else "immutable_commit",
+        "release_tag": tag or None,
+        "tagged_commit": tagged_commit or None,
+        "remote_tagged_commit": remote_tagged_commit or None,
+        "remote_commit_exists": remote_commit_exists,
         "clean_worktree_before_build": True,
         "paper_integrity_status": integrity["paper_p24_release_manifest"]["status"],
     }
@@ -358,10 +391,17 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
         "schema_version": PAPER_RELEASE_INTEGRITY_SCHEMA_VERSION,
         "status": "release_candidate_ready_for_human_upload" if integrity_ok else "blocked",
         "source_commit": commit,
-        "release_tag": tag,
-        "tagged_commit": tagged_commit,
+        "release_identity_mode": "verified_tag" if tag else "immutable_commit",
+        "release_tag": tag or None,
+        "tagged_commit": tagged_commit or None,
+        "remote_tagged_commit": remote_tagged_commit or None,
+        "remote_commit_exists": remote_commit_exists,
         "clean_worktree_before_build": True,
-        "arxiv_upload_ready": bool(integrity_ok and tagged_commit == commit),
+        "arxiv_upload_ready": bool(
+            integrity_ok
+            and remote_commit_exists
+            and (not tag or (tagged_commit == commit and remote_tagged_commit == commit))
+        ),
         "artifacts": {
             "pdf": {"path": pdf_path.relative_to(root).as_posix(), "sha256": _sha256(pdf_path)},
             "source_bundle": {"path": source_archive.relative_to(root).as_posix(), "sha256": _sha256(source_archive)},
@@ -632,6 +672,12 @@ def _semantic_findings(markdown: str, bibliography: str) -> list[dict[str, str]]
         "unsupported statistical qualifier": r"\b(?:statistically significant|significant improvement|meaningful improvement)\b",
         "universal prevention claim": r"\b(?:prevents all|always prevents|guarantees privacy|production-ready AML)\b",
         "obsolete citation key": r"poon2026linemvgnn|fincenAdvisories",
+        "merged evidence interpretation field": r"\bclaim_state\b",
+        "reader-facing calibration identifier": r"\bplatt_sigmoid\b",
+        "machine comparison expression": r"score\s*>=\s*threshold",
+        "incorrect single-seed grammar": r"\bseeds 42\b",
+        "incorrect finalist distinction": r"all finalist scores are distinct|finalist scores were distinct|unique XGBoost runner-up",
+        "development-build wording": r"review draft|review build|uncommitted review build",
     }
     combined = markdown + "\n" + bibliography
     for rule, pattern in patterns.items():
@@ -669,6 +715,209 @@ def _numeric_close(actual: Any, expected: float, tolerance: float = 5e-7) -> boo
         return abs(float(actual) - expected) <= tolerance
     except (TypeError, ValueError):
         return False
+
+
+def _evidence_gate_separation_audit(reports: Path) -> dict[str, Any]:
+    metric_audit = _read_json(reports / "paper_metric_cell_audit.json")
+    gate_pack = _read_json(reports / "paper_claim_gate_records.json")
+    external_cells = _read_json(reports / "paper_external_score_evidence_cells.json")
+    external_gate = _read_json(reports / "paper_external_score_claim_gate.json")
+    cells = [
+        *[dict(cell) for cell in metric_audit.get("numeric_cells", []) if isinstance(cell, dict)],
+        *[dict(cell) for cell in external_cells.get("evidence_cells", []) if isinstance(cell, dict)],
+    ]
+    gates = [dict(gate) for gate in gate_pack.get("claim_gates", []) if isinstance(gate, dict)]
+    if external_gate.get("publishable"):
+        gates.append(external_gate)
+    audit = audit_evidence_gate_separation(evidence_cells=cells, claim_gates=gates)
+    return _report(
+        audit["status"],
+        slice="Paper Track P26",
+        evidence_cell_count=audit["evidence_cell_count"],
+        claim_gate_count=audit["claim_gate_count"],
+        factual_cell_schema=audit["evidence_cell_schema"],
+        interpretive_gate_schema=audit["claim_gate_schema"],
+        checks={
+            "interpretive_fields_absent_from_cells": not any(
+                row.get("violation") == "interpretive_fields_in_evidence_cell" for row in audit["violations"]
+            ),
+            "every_public_cell_has_gate": audit["all_public_cells_have_separate_gate"],
+            "gate_references_resolve": not any(
+                row.get("violation") == "gate_references_missing_evidence_cells" for row in audit["violations"]
+            ),
+        },
+        violations=audit["violations"],
+        source_artifacts=[
+            "docs/reports/paper_metric_cell_audit.json",
+            "docs/reports/paper_claim_gate_records.json",
+            "docs/reports/paper_external_score_evidence_cells.json",
+            "docs/reports/paper_external_score_claim_gate.json",
+        ],
+    )
+
+
+def _validation_subsplit_audit(reports: Path, markdown: str) -> dict[str, Any]:
+    paysim_split = _read_json(reports / "paysim_temporal_split_report.json")
+    paysim_trace = _read_json(reports / "paysim_competitive_search_trace.json")
+    paysim_manifest = _read_json(reports / "paysim_competitive_benchmark_manifest.json")
+    elliptic_split = _read_json(reports / "elliptic_temporal_split_report.json")
+    graph_table = _read_json(reports / "paper_graph_feature_table.json")
+    graph_manifest = _read_json(reports / "paper_graph_baseline_manifest.json")
+    recorded = {
+        "PaySim": {
+            "order_field": "step",
+            "full_validation": {"boundary": "446-594", "count": 228103, "positive_count": 1552},
+            "calibration": {"boundary": "446-540", "count": 116502, "positive_count": 984},
+            "threshold_selection": {"boundary": "541-594", "count": 111601, "positive_count": 568},
+            "selection_scope": "the full validation partition selected the finalist and therefore overlaps both nested subsets",
+            "nested_overlap_policy": "calibration and threshold-selection subsets are chronologically ordered and disjoint",
+            "calibration_use": "fit Platt sigmoid calibration on the earlier subset",
+            "threshold_use": "compare calibration choices by log loss and select the 0.5% threshold on the later subset",
+            "source_refs": [
+                "docs/reports/paysim_temporal_split_report.json",
+                "docs/reports/paysim_competitive_search_trace.json",
+                "src/relaytic/release_safety/paysim_competitive.py:_calibration_partitions",
+            ],
+            "source_identity": {
+                "sha256": paysim_split.get("source_sha256") or paysim_manifest.get("source_sha256"),
+            },
+        },
+        "Elliptic": {
+            "order_field": "time_step",
+            "full_validation": {"boundary": "30-39", "count": 8999, "positive_count": 1038},
+            "calibration": {"boundary": "30-35", "count": 4854, "positive_count": 773},
+            "threshold_selection": {"boundary": "36-39", "count": 4145, "positive_count": 265},
+            "selection_scope": "the full validation partition selected the model and feature view and therefore overlaps both nested subsets",
+            "nested_overlap_policy": "calibration and threshold-selection subsets are chronologically ordered and disjoint",
+            "calibration_use": "fit Platt sigmoid calibration on the earlier subset",
+            "threshold_use": "compare calibration choices by log loss and select the 0.5% threshold on the later subset",
+            "source_refs": [
+                "docs/reports/elliptic_temporal_split_report.json",
+                "docs/reports/paper_graph_feature_table.json",
+                "src/relaytic/release_safety/graph_baselines.py:_calibrate_scores",
+            ],
+            "source_identity": {
+                "files": [
+                    {"role": row.get("role"), "sha256": row.get("sha256")}
+                    for row in graph_manifest.get("source_files", [])
+                    if isinstance(row, dict)
+                ],
+            },
+        },
+    }
+    paysim_validation = next(
+        (row for row in paysim_split.get("split_rows", []) if row.get("split") == "validation"), {}
+    )
+    elliptic_validation = next(
+        (row for row in elliptic_split.get("split_rows", []) if row.get("split") == "validation"), {}
+    )
+    paysim_operating = dict(paysim_trace.get("selected_finalist", {}).get("validation_operating_point") or {})
+    paysim_calibration = dict(paysim_trace.get("calibration_trace") or {})
+    elliptic_operating = dict(
+        graph_table.get("validation_selected_competitive_baseline", {}).get("validation_operating_point") or {}
+    )
+    paysim_selected = dict(paysim_manifest.get("validation_selected_competitive_model") or {})
+    elliptic_selected = dict(graph_table.get("validation_selected_competitive_baseline") or {})
+    checks = [
+        {
+            "check": "PaySim full validation reconciles",
+            "passed": paysim_validation.get("row_count") == 228103 and paysim_validation.get("positive_count") == 1552,
+        },
+        {
+            "check": "PaySim nested subsets reconcile",
+            "passed": 116502 + 111601 == 228103
+            and 984 + 568 == 1552
+            and paysim_calibration.get("calibration_row_count") == 116502
+            and paysim_calibration.get("operating_point_row_count") == 111601,
+        },
+        {
+            "check": "PaySim threshold denominator and positives reconcile",
+            "passed": paysim_operating.get("evaluation_row_count") == 111601 and paysim_operating.get("positive_count") == 568,
+        },
+        {
+            "check": "Elliptic full validation reconciles",
+            "passed": elliptic_validation.get("known_label_count") == 8999 and elliptic_validation.get("illicit_count") == 1038,
+        },
+        {
+            "check": "Elliptic nested subsets reconcile",
+            "passed": 4854 + 4145 == 8999 and 773 + 265 == 1038,
+        },
+        {
+            "check": "Elliptic threshold denominator and positives reconcile",
+            "passed": elliptic_operating.get("evaluation_row_count") == 4145 and elliptic_operating.get("positive_count") == 265,
+        },
+        {
+            "check": "reader-facing subset disclosure present",
+            "passed": all(token in markdown for token in ("446-540", "541-594", "30-35", "36-39", "Threshold-selection queue")),
+        },
+        {
+            "check": "nested chronological windows are disjoint",
+            "passed": 540 < 541 and 35 < 36,
+        },
+        {
+            "check": "thresholds match artifacts and reader display",
+            "passed": _numeric_close(paysim_selected.get("validation_threshold"), 0.404453)
+            and _numeric_close(elliptic_selected.get("validation_threshold"), 0.99982)
+            and "0.4045" in markdown
+            and "0.9998" in markdown,
+        },
+        {
+            "check": "displayed PaySim runner-up tie has consistent prose",
+            "passed": _displayed_paysim_runner_up_tie(paysim_trace)
+            and "joint XGBoost and Random Forest runner-up rows" in markdown
+            and "all finalist scores are distinct" not in markdown.lower(),
+        },
+    ]
+    return _report(
+        "pass" if all(row["passed"] for row in checks) else "fail",
+        slice="Paper Track P26",
+        datasets=recorded,
+        checks=checks,
+        derivation=(
+            "Nested counts and positives were recomputed from the hash-identified local sources during P26 and are "
+            "reconciled here against the full validation and operating-point artifacts. The implemented median-boundary "
+            "rules define the chronological subwindows. No model was refit and no benchmark value was changed."
+        ),
+    )
+
+
+def _displayed_paysim_runner_up_tie(trace: dict[str, Any]) -> bool:
+    finalists = [
+        row
+        for row in trace.get("attempts", [])
+        if isinstance(row, dict) and row.get("stage") == "full_train_finalist" and row.get("execution_state") == "ran"
+    ]
+    scores = sorted(
+        [round(float(dict(row.get("validation_metrics") or {}).get("pr_auc")), 4) for row in finalists],
+        reverse=True,
+    )
+    return len(scores) >= 3 and scores[0] > scores[1] and scores[1] == scores[2]
+
+
+def _release_reference_audit(root: Path, markdown: str) -> dict[str, Any]:
+    local_tags = set(_git(root, "tag", "--list").splitlines())
+    remote_output = _git(root, "ls-remote", "--tags", "origin")
+    remote_tags = {
+        ref.removeprefix("refs/tags/").removesuffix("^{}")
+        for line in remote_output.splitlines()
+        if "\t" in line
+        for ref in [line.split("\t", 1)[1]]
+    }
+    named_tag = "relaytic-aml-arxiv-v1"
+    paper_claims_tag = named_tag in markdown or "archive/refs/tags" in markdown
+    pass_state = not paper_claims_tag
+    return _report(
+        "pass" if pass_state else "fail",
+        slice="Paper Track P26",
+        release_identity_mode="immutable_commit",
+        paper_claims_release_tag=paper_claims_tag,
+        examined_tag=named_tag,
+        local_tag_exists=named_tag in local_tags,
+        remote_checked=bool(remote_output),
+        remote_tag_exists=named_tag in remote_tags,
+        public_tag_archive_claim_allowed=named_tag in remote_tags,
+        decision="The manuscript uses an immutable commit and does not claim a public tag archive.",
+    )
 
 
 def _report(status: str, **payload: Any) -> dict[str, Any]:

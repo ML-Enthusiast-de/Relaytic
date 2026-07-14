@@ -22,11 +22,11 @@ def test_slice15y_readme_starts_with_aml_demo_path() -> None:
     assert "Demo-only" in readme
     assert "Dev-benchmark" in readme
     assert "Holdout-benchmark" in readme
-    assert "Paper-ready" in readme
+    assert "Claim-safe paper-ready" in readme
     assert "[Why Relaytic-AML](docs/why_relaytic_aml.md)" in readme
     assert "[Product Story](docs/product_story.md)" in readme
     assert "[Paper Benchmark Runbook](docs/paper_benchmark_runbook.md)" in readme
-    assert readme.count("**Slice 15Y** demo-first documentation rewrite") == 1
+    assert "**Slice 15Y**" not in readme
 
 
 def test_slice15y_story_docs_exist_and_link_to_proof_artifacts() -> None:

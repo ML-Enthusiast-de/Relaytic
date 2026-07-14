@@ -1,0 +1,194 @@
+{
+  "claim_gates": [
+    {
+      "admissible_use": "baseline reference under the recorded dataset and split contract",
+      "evidence_cell_ids": [
+        "paysim_p6_validation_selected_baseline.validation_pr_auc",
+        "paysim_p6_validation_selected_baseline.test_pr_auc"
+      ],
+      "gate_id": "paysim_p6_validation_selected_baseline.publication_gate",
+      "gate_reasons": [
+        "PaySim is synthetic proxy evidence and the fixed test partition has prior baseline exposure"
+      ],
+      "missing_evidence": [
+        "genuinely unseen holdout",
+        "real or partner-approved AML validation"
+      ],
+      "publication_role": "baseline_reference_appendix",
+      "schema_version": "relaytic.paper_claim_gate.v2",
+      "source_gate_ref": "docs/reports/paper_publishability_gate.json",
+      "source_gate_status": "blocked",
+      "stronger_claim_status": "blocked"
+    },
+    {
+      "admissible_use": "bounded PaySim temporal-proxy demonstration",
+      "evidence_cell_ids": [
+        "paysim_p6a_competitive_selected.validation_pr_auc",
+        "paysim_p6a_competitive_selected.test_pr_auc",
+        "paysim_p6a_competitive_selected.test_roc_auc",
+        "paysim_p6a_competitive_selected.precision_at_review_budget",
+        "paysim_p6a_competitive_selected.recall_at_review_budget",
+        "paysim_p6a_competitive_selected.fixed_fpr_recall"
+      ],
+      "gate_id": "paysim_p6a_competitive_selected.publication_gate",
+      "gate_reasons": [
+        "the fixed test partition had prior P4 reference and P6 baseline exposure",
+        "competitive selection did not use test evidence and one finalist was evaluated after protocol freeze"
+      ],
+      "missing_evidence": [
+        "genuinely unseen chronological or external holdout",
+        "incumbent queue comparison under the same operating contract"
+      ],
+      "publication_role": "supporting_temporal_proxy_numeric_candidate",
+      "schema_version": "relaytic.paper_claim_gate.v2",
+      "source_gate_ref": "docs/reports/paysim_publishability_gate.json",
+      "source_gate_status": "pass_supporting_only",
+      "stronger_claim_status": "blocked"
+    },
+    {
+      "admissible_use": "bounded Elliptic temporal graph-feature demonstration",
+      "evidence_cell_ids": [
+        "elliptic_p7_selected_graph_feature_baseline.validation_pr_auc",
+        "elliptic_p7_selected_graph_feature_baseline.test_pr_auc",
+        "elliptic_p7_selected_graph_feature_baseline.test_roc_auc",
+        "elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget",
+        "elliptic_p7_selected_graph_feature_baseline.recall_at_review_budget",
+        "elliptic_p7_selected_graph_feature_baseline.fixed_fpr_recall"
+      ],
+      "gate_id": "elliptic_p7_selected_graph_feature_baseline.publication_gate",
+      "gate_reasons": [
+        "the result is a single-seed temporal graph-feature estimate on public blockchain data"
+      ],
+      "missing_evidence": [
+        "repeated-seed detector study",
+        "graph-native ablations",
+        "real-bank validation"
+      ],
+      "publication_role": "supporting_temporal_graph_numeric_candidate",
+      "schema_version": "relaytic.paper_claim_gate.v2",
+      "source_gate_ref": "docs/reports/paper_graph_publishability_gate.json",
+      "source_gate_status": "pass_supporting_only",
+      "stronger_claim_status": "blocked"
+    },
+    {
+      "admissible_use": "supporting operational proxy only",
+      "evidence_cell_ids": [
+        "paysim_p6a_competitive_selected_review_budget_operational.false_positive_count",
+        "paysim_p6a_competitive_selected_review_budget_operational.false_positive_rate",
+        "paysim_p6a_competitive_selected_review_budget_operational.precision_at_k",
+        "paysim_p6a_competitive_selected_review_budget_operational.recall_at_review_budget",
+        "paysim_p6a_competitive_selected_review_budget_operational.requested_review_fraction",
+        "paysim_p6a_competitive_selected_review_budget_operational.review_fraction",
+        "paysim_p6a_competitive_selected_review_budget_operational.reviewed_count",
+        "paysim_p6a_competitive_selected_review_budget_operational.true_positive_count",
+        "paysim_p6a_competitive_selected_review_budget_operational.prevalence_matched_baseline_cases_for_same_true_positives",
+        "paysim_p6a_competitive_selected_review_budget_operational.false_positive_reduction_vs_prevalence_baseline",
+        "paysim_p6a_competitive_selected_review_budget_operational.analyst_hours_saved_estimate"
+      ],
+      "gate_id": "paysim_p6a_competitive_selected_review_budget_operational.publication_gate",
+      "gate_reasons": [
+        "PaySim is synthetic proxy evidence and the fixed test partition has prior baseline exposure"
+      ],
+      "missing_evidence": [
+        "genuinely unseen holdout",
+        "real or partner-approved AML validation"
+      ],
+      "publication_role": "supporting_operational_proxy_only",
+      "schema_version": "relaytic.paper_claim_gate.v2",
+      "source_gate_ref": "docs/reports/paper_operational_claim_guard.json",
+      "source_gate_status": "supporting_operational_metrics_ready_hard_claims_blocked",
+      "stronger_claim_status": "blocked"
+    },
+    {
+      "admissible_use": "supporting graph operational metric only",
+      "evidence_cell_ids": [
+        "elliptic_p7_selected_graph_feature_review_budget_operational.false_positive_count",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.false_positive_rate",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.precision_at_k",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.recall_at_review_budget",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.requested_review_fraction",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.review_fraction",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.reviewed_count",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.true_positive_count",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.prevalence_matched_baseline_cases_for_same_true_positives",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.false_positive_reduction_vs_prevalence_baseline",
+        "elliptic_p7_selected_graph_feature_review_budget_operational.analyst_hours_saved_estimate"
+      ],
+      "gate_id": "elliptic_p7_selected_graph_feature_review_budget_operational.publication_gate",
+      "gate_reasons": [
+        "the result is a single-seed temporal graph-feature estimate on public blockchain data"
+      ],
+      "missing_evidence": [
+        "repeated-seed detector study",
+        "graph-native ablations",
+        "real-bank validation"
+      ],
+      "publication_role": "supporting_graph_operational_metric_only",
+      "schema_version": "relaytic.paper_claim_gate.v2",
+      "source_gate_ref": "docs/reports/paper_operational_claim_guard.json",
+      "source_gate_status": "supporting_operational_metrics_ready_hard_claims_blocked",
+      "stronger_claim_status": "blocked"
+    },
+    {
+      "admissible_use": "Elliptic2 modern benchmark context",
+      "evidence_cell_ids": [
+        "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean",
+        "elliptic2_p8b_modern_context.official_partition_test_pr_auc_std",
+        "elliptic2_p8b_modern_context.hash_partition_test_pr_auc_mean",
+        "elliptic2_p8b_modern_context.published_reference_pr_auc",
+        "elliptic2_p8b_modern_context.gap_to_published_reference_pr_auc"
+      ],
+      "gate_id": "elliptic2_p8b_modern_context.publication_gate",
+      "gate_reasons": [
+        "the RevTrack TST partition had prior exposure",
+        "the local cohort is not established as equivalent to the published RevClassifyDS cohort"
+      ],
+      "missing_evidence": [
+        "faithful reference replay",
+        "cohort-equivalence proof",
+        "blind or external holdout"
+      ],
+      "publication_role": "supporting_modern_context_only",
+      "schema_version": "relaytic.paper_claim_gate.v2",
+      "source_gate_ref": "docs/reports/elliptic2_publishability_gate.json",
+      "source_gate_status": "pass_supporting_modern_context_only",
+      "stronger_claim_status": "blocked"
+    },
+    {
+      "admissible_use": "cohort and reference-parity limitation evidence",
+      "evidence_cell_ids": [
+        "elliptic2_p8c_claim_firewall.largest_component_row_fraction",
+        "elliptic2_p8c_claim_firewall.revtrack_evaluable_row_count",
+        "elliptic2_p8c_claim_firewall.official_core_subgraph_count"
+      ],
+      "gate_id": "elliptic2_p8c_claim_firewall.publication_gate",
+      "gate_reasons": [
+        "reference parity and cohort equivalence are not established"
+      ],
+      "missing_evidence": [
+        "executable reference method",
+        "accepted parity protocol",
+        "resource-complete rerun"
+      ],
+      "publication_role": "limitation_and_claim_firewall",
+      "schema_version": "relaytic.paper_claim_gate.v2",
+      "source_gate_ref": "docs/reports/elliptic2_reference_parity_gate.json",
+      "source_gate_status": "blocked_supporting_only_thesis_narrowing_required",
+      "stronger_claim_status": "blocked"
+    }
+  ],
+  "gate_count": 7,
+  "schema_version": "relaytic.paper_claim_gate.v2",
+  "separation_audit": {
+    "all_public_cells_have_separate_gate": true,
+    "claim_gate_count": 7,
+    "claim_gate_schema": "relaytic.paper_claim_gate.v2",
+    "evidence_cell_count": 44,
+    "evidence_cell_schema": "relaytic.paper_evidence_cell.v2",
+    "schema_version": "relaytic.paper_evidence_gate_audit.v1",
+    "status": "pass",
+    "violations": []
+  },
+  "slice": "Paper Track P26",
+  "status": "pass"
+}

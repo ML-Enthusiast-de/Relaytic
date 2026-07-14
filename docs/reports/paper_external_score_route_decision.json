@@ -17,14 +17,14 @@
     }
   ],
   "artifact_id": "p19a_external_score_rowless_fixture_v1",
-  "claim_state": "hosted_detector_output_governance_only",
+  "claim_gate_ref": "p19a.external_score.hosted_output_gate",
   "dataset_id": "p19a_hosted_score_fixture",
   "input_artifact_ref": "fixture:p19a_external_score_rowless_v1",
   "next_slice": "Paper Track P19-B - external score case-study and paper integration",
   "paper_claim_boundary": "hosted detector-output governance, not detector superiority",
   "preferred_route": "external_score_file_adapter",
   "route_reason": "The external score route proves Relaytic-AML can host detector-output evidence without claiming detector novelty.",
-  "schema_version": "relaytic.paper_external_score.v1",
+  "schema_version": "relaytic.paper_external_score.v2",
   "selected_route": "external_score_file_adapter",
   "split": "fixture_holdout",
   "status": "selected"

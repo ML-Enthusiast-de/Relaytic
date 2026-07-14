@@ -1,7 +1,8 @@
 {
+  "admissible_use": "hosted detector-output governance only",
   "allowed_claim_scope": "hosted_detector_output_governance_only",
   "allowed_public_claims": [
-    "Relaytic-AML can convert a rowless external detector-score artifact into evidence cells with schema, hash, leakage-posture, and claim-state metadata.",
+    "Relaytic-AML can convert a rowless external detector-score artifact into a factual evidence cell plus a separate interpretation gate.",
     "Relaytic-AML can produce a rowless handoff summary for hosted detector-output governance."
   ],
   "blocked_claims": [
@@ -48,7 +49,7 @@
       "check_id": "required_metadata_complete",
       "observed": "missing=0",
       "passed": true,
-      "requirement": "artifact carries dataset, split, schema, metric, leakage, and claim-state metadata"
+      "requirement": "artifact carries dataset, split, schema, metric, and leakage metadata"
     },
     {
       "check_id": "rowless_input_contract",
@@ -57,10 +58,10 @@
       "requirement": "artifact does not expose raw rows, identifiers, local paths, secrets, or raw score payloads"
     },
     {
-      "check_id": "claim_state_bounded",
-      "observed": "claim_state=hosted_detector_output_governance_only",
+      "check_id": "factual_input_has_no_interpretive_fields",
+      "observed": "interpretive_fields=0",
       "passed": true,
-      "requirement": "claim state is hosted detector-output governance only"
+      "requirement": "the factual score record does not carry claim or publication fields"
     },
     {
       "check_id": "detector_performance_not_promoted",
@@ -70,12 +71,25 @@
     }
   ],
   "detector_superiority_claimed": false,
+  "evidence_cell_ids": [
+    "p19a.external_score.hosted_metadata_completeness"
+  ],
   "failed_checks": [],
+  "gate_id": "p19a.external_score.hosted_output_gate",
+  "gate_reasons": [
+    "the fixture measures hosted-score metadata completeness rather than detector performance",
+    "raw rows and entity identifiers are excluded from the export"
+  ],
   "graph_neural_detector_novelty_claimed": false,
   "hard_real_bank_aml_superiority_claimed": false,
+  "missing_evidence": [
+    "independent detector benchmark comparison",
+    "production controls and analyst outcome study"
+  ],
   "production_aml_readiness_claimed": false,
   "publishable": true,
   "revclassify_parity_claimed": false,
-  "schema_version": "relaytic.paper_external_score.v1",
-  "status": "pass"
+  "schema_version": "relaytic.paper_claim_gate.v2",
+  "status": "pass",
+  "stronger_claim_status": "blocked"
 }

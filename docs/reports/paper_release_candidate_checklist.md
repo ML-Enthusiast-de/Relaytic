@@ -14,15 +14,15 @@
 - [x] Generated LaTeX citations resolve against `references.bib`.
 - [x] Source-package audit blocks local paths, secrets, legacy prototype wording, and unguarded hard claims.
 
-## Human gates before upload or tag
+## Human gates before upload or release
 
 - [x] Author block and PDF metadata are present in `docs/paper/arxiv_src/main.tex`.
 - [ ] Run `pdflatex`, `bibtex`, `pdflatex`, and `pdflatex` from `docs/paper/arxiv_src/`; inspect the generated PDF.
 - [ ] Include generated bibliography output if the final arXiv upload uses BibTeX rather than an inline bibliography.
 - [ ] Confirm the AI-assistance disclosure accurately describes any LLM drafting, editing, or code-review help.
 - [ ] Rerun `relaytic release-safety paper-arxiv-source --format json` after any manual source edits.
-- [ ] Rerun `relaytic scan-git-safety` from the tag target.
-- [ ] Confirm `git status --short` is empty before creating `relaytic-aml-paper-p14-source-rc`.
+- [ ] Rerun `relaytic scan-git-safety` from the final cited revision.
+- [ ] Confirm `git status --short` is empty and the cited commit exists on the public remote.
 
 ## Claim boundary
 

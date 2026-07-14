@@ -747,6 +747,25 @@ def _calibrate_scores(
                 "selected_method": "identity",
                 "partition_policy": "identity_fallback_insufficient_temporal_validation_class_coverage",
                 "test_used_for_selection": False,
+                "model_selection_subset": _graph_validation_subset_summary(
+                    validation_y,
+                    validation_times,
+                    np.arange(len(validation_y)),
+                    purpose="full_validation_model_and_feature_view_selection",
+                ),
+                "calibration_subset": _graph_validation_subset_summary(
+                    validation_y,
+                    validation_times,
+                    np.asarray([], dtype=int),
+                    purpose="calibration_not_fitted",
+                ),
+                "threshold_selection_subset": _graph_validation_subset_summary(
+                    validation_y,
+                    validation_times,
+                    np.arange(len(validation_y)),
+                    purpose="identity_fallback_and_review_threshold_selection",
+                ),
+                "calibration_threshold_overlap_count": int(len(validation_y)),
             },
             validation_scores,
             test_scores,
@@ -766,11 +785,48 @@ def _calibrate_scores(
             "identity_operating_log_loss": _round_float(identity_loss),
             "platt_operating_log_loss": _round_float(calibrated_loss),
             "test_used_for_selection": False,
+            "model_selection_subset": _graph_validation_subset_summary(
+                validation_y,
+                validation_times,
+                np.arange(len(validation_y)),
+                purpose="full_validation_model_and_feature_view_selection",
+            ),
+            "calibration_subset": _graph_validation_subset_summary(
+                validation_y,
+                validation_times,
+                calibration,
+                purpose="platt_calibration_fit",
+            ),
+            "threshold_selection_subset": _graph_validation_subset_summary(
+                validation_y,
+                validation_times,
+                operating,
+                purpose="calibration_comparison_and_review_threshold_selection",
+            ),
+            "calibration_threshold_overlap_count": int(len(np.intersect1d(calibration, operating))),
         },
         calibrated_validation if use_calibrated else validation_scores,
         calibrated_test if use_calibrated else test_scores,
         operating,
     )
+
+
+def _graph_validation_subset_summary(
+    labels: np.ndarray,
+    time_steps: np.ndarray,
+    indices: np.ndarray,
+    *,
+    purpose: str,
+) -> dict[str, Any]:
+    selected_times = time_steps[indices] if len(indices) else np.asarray([], dtype=time_steps.dtype)
+    selected_labels = labels[indices] if len(indices) else np.asarray([], dtype=labels.dtype)
+    return {
+        "purpose": purpose,
+        "node_count": int(len(indices)),
+        "positive_count": int(selected_labels.sum()) if len(indices) else 0,
+        "time_step_min": int(selected_times.min()) if len(indices) else None,
+        "time_step_max": int(selected_times.max()) if len(indices) else None,
+    }
 
 
 def _build_graph_model_shadow_scorecard(

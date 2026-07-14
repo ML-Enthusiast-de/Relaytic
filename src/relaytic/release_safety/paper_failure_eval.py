@@ -376,7 +376,7 @@ def _table_observed_result(case: dict[str, Any]) -> str:
     if case_id == "leakage_column_injection":
         return "4 offered, 4 excluded, 0 used; labels not used as features"
     if case_id == "test_set_selection_violation":
-        return "validation-only probes; no test selection; one finalist test"
+        return "validation-only probes; no test selection; one competitive finalist evaluated after protocol freeze"
     if case_id == "overstrong_claim_attempt":
         return "6 blocked claims; hard and headline claims blocked"
     if case_id == "rowless_handoff_redaction":

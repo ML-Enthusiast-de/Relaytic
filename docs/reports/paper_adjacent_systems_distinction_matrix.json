@@ -53,7 +53,7 @@
     {
       "adjacent_system_type": "Agent governance and runtime trust layers",
       "citation_status": "pass",
-      "distinct_relaytic_aml_role": "specialize governance to AML metric cells, rowless handoff, benchmark-context routing, and public paper/release wording",
+      "distinct_relaytic_aml_role": "specialize governance to AML evidence cells, rowless handoff, benchmark-context routing, and public paper/release wording",
       "missing_bib_keys": [],
       "optimizes_for": "general runtime policy enforcement, trust scoring, path-dependent controls, and agent action logs",
       "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
@@ -80,7 +80,7 @@
     {
       "adjacent_system_type": "Model cards and model reporting",
       "citation_status": "pass",
-      "distinct_relaytic_aml_role": "materialize the provenance and claim-state inputs a model report would need to be defensible",
+      "distinct_relaytic_aml_role": "materialize factual provenance and separate interpretation records that a defensible model report can cite",
       "missing_bib_keys": [],
       "optimizes_for": "model documentation, intended use, evaluation summaries, and caveats",
       "paper_use": "category positioning only; no benchmark number or stronger detector claim added",

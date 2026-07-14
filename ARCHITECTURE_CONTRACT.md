@@ -681,7 +681,7 @@ Current paper-track arXiv source artifact names from Paper Track P14:
 - `docs/paper/arxiv_src/figures/figure_3_review_budget.pdf`
 - `docs/paper/arxiv_src/figures/figure_4_publishability_matrix.pdf`
 
-Paper Track P14 extends `src/relaytic/release_safety/` with a deterministic arXiv source-bundle generator. It consumes the P13 claim-safe paper pack, renders a top-level LaTeX source file, copies the bibliography, converts the generated SVG figure pack into PDF figures for the selected pdfLaTeX processor, audits citation resolution and figure references, scans the generated package for local paths, secrets, stale prototype wording, and unguarded hard claims, and records a release-candidate checklist. P14 keeps `arxiv_upload_ready` false until real author metadata, local TeX/PDF inspection, and clean tag-target proof are completed.
+Paper Track P14 extends `src/relaytic/release_safety/` with a deterministic arXiv source-bundle generator. It consumes the P13 claim-safe paper pack, renders a top-level LaTeX source file, copies the bibliography, converts the generated SVG figure pack into PDF figures for the selected pdfLaTeX processor, audits citation resolution and figure references, scans the generated package for local paths, secrets, stale prototype wording, and unguarded hard claims, and records a release-candidate checklist. P14 keeps `arxiv_upload_ready` false until author metadata, local TeX/PDF inspection, and clean immutable-revision proof are completed.
 
 Current paper-track hosted-score artifact names from Paper Track P19-A/P19-B:
 
@@ -720,6 +720,8 @@ Current paper-track final preflight artifact names from Paper Track P21:
 Paper Track P21 extends `src/relaytic/release_safety/` with deterministic final source/PDF preflight checks. It separates tracked paper/source inputs from ignored local TeX build outputs, verifies public markers, wrapped command blocks, numbered hosted-score case-study placement, AI assistance disclosure naming, P20/P14 readiness, compiled PDF synchronization, LaTeX log posture, embedded fonts, and PDF metadata. P21 marks the bundle ready for author review, keeps `arxiv_upload_ready` false, and records the remaining human upload blockers.
 
 Paper Track P22 reuses the P21 final preflight contract while hardening the manuscript generators for author review. It keeps dense audit tables in appendices with real LaTeX captions, anchors figures and command-block labels against awkward page breaks, refreshes reader-facing Figure 4 and rowless-handoff wording, regenerates the canonical Markdown/LaTeX/PDF bundle, and keeps the paper boundary unchanged: no new benchmark rows, no detector-superiority claim, and no public upload readiness until the human tag, page-review, and clean-target checks are complete.
+
+Paper Track P26 keeps factual measurement provenance and publication interpretation in separate artifact types. `relaytic.paper_evidence_cell.v2` contains dataset, split, command, artifact, metric, value, budget, leakage, operating-point, calibration, exposure, and hash facts where applicable. `relaytic.paper_claim_gate.v2` references those cells and contains admissible use, stronger-claim status, gate reasons, and missing evidence. Public cells without gates, gates with missing cell references, and cells containing interpretive fields fail closed. Final release identity may use a verified public tag or an immutable commit present on the public remote.
 
 Current trace and eval artifact names:
 

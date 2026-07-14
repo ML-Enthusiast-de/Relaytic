@@ -73,6 +73,11 @@
       "primary_url": "https://www.microsoft.com/en-us/research/publication/probabilistic-outputs-for-support-vector-machines-and-comparisons-to-regularized-likelihood-methods/"
     },
     {
+      "citation_key": "deprez2025continualaml",
+      "present": true,
+      "primary_url": "https://doi.org/10.1002/wics.70040"
+    },
+    {
       "citation_key": "gaurav2025governanceaas",
       "present": true,
       "primary_url": "https://arxiv.org/abs/2508.18765"
@@ -91,6 +96,6 @@
   "schema_version": "relaytic.paper_release_integrity.v1",
   "slice": "Paper Track P24",
   "status": "pass",
-  "verification_date": "2026-07-13",
+  "verification_date": "2026-07-14",
   "verification_method": "primary arXiv records, DOI landing pages, or publisher/proceedings pages"
 }

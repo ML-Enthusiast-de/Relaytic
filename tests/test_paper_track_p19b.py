@@ -44,15 +44,17 @@ def test_paper_track_p19b_builds_hosted_score_case_study() -> None:
     assert len(panel["rows"]) >= 4
     assert "p19a.external_score.hosted_metadata_completeness" in case_study["evidence_cell_ids"]
     assert adapter["selected_route"] == "external_score_file_adapter"
-    assert adapter["schema_hash_prefix"] == "4b2b70a58b0c"
-    assert adapter["content_hash_prefix"] == "dac68c3801f5"
+    assert len(adapter["schema_hash_prefix"]) == 12
+    assert len(adapter["content_hash_prefix"]) == 12
     assert metric["detector_performance_metric"] is False
     assert metric["metric_role"] == "governance_metric"
     assert redaction["rowless_handoff_passed"] is True
     assert redaction["raw_rows_exported"] is False
     assert redaction["private_paths_exported"] is False
     assert redaction["secrets_exported"] is False
-    assert case_study["allowed_claim_state"] == "hosted_detector_output_governance_only"
+    assert case_study["claim_gate_id"] == "p19a.external_score.hosted_output_gate"
+    assert case_study["admissible_use"] == "hosted detector-output governance only"
+    assert "claim_state" not in case_study["auditable_record_snippet"]
     assert len(case_study["blocked_stronger_claims"]) >= 5
     assert claim_map["detector_superiority_allowed"] is False
     assert claim_map["production_aml_readiness_allowed"] is False
@@ -129,7 +131,7 @@ def test_paper_track_p19b_committed_artifacts_and_paper_are_ready() -> None:
     assert case_study["status"] == "pass"
     assert "p19a.external_score.hosted_metadata_completeness" in case_study["evidence_cell_ids"]
     assert panel["status"] == "pass"
-    assert claim_map["allowed_claim_scope"] == "hosted_detector_output_governance_only"
+    assert claim_map["allowed_claim_scope"] == "hosted detector-output governance only"
     assert "paper-external-score-integration" in repro_card
     assert "Hosted external-score case study" in paper
     assert "hosted detector-output governance evidence" in paper

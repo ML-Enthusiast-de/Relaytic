@@ -77,7 +77,7 @@
   "upload_blockers_remaining": [
     "run a human TeX compile and inspect the produced PDF",
     "generate and include bibliography output if the final arXiv upload uses BibTeX rather than static bibliography output",
-    "confirm git status --short is empty at the tag target"
+    "confirm git status --short is empty at the final cited revision"
   ],
   "violation_count": 0,
   "violations": []

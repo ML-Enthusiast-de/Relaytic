@@ -20,7 +20,7 @@ For a paper review, use this path:
 - Run the paper regeneration commands in the paper section below if you want to reproduce the reader-facing artifacts.
 - Use `ARCHITECTURE.md`, `INTEROPERABILITY.md`, `RUNTIME.md`, and `PROJECT_LAYOUT.md` only when you want the broader Relaytic platform context.
 
-For citation and public review, use a final public release tag or archival snapshot rather than treating the moving `main` branch as the paper version. The main branch can continue to evolve after submission; the release tag is the stable paper record. The paper artifact-generation pipeline is intentionally kept in the repository because the paper's claim is about local, auditable evidence. It is reproducibility infrastructure, not the recommended first reading path.
+For citation and public review, use the immutable source commit recorded in the final release bundle, or a release tag only after that tag has been verified on the public remote. Do not treat the moving `main` branch as the paper version. The paper artifact-generation pipeline remains in the repository because the paper's claim is about local, auditable evidence. It is reproducibility infrastructure, not the recommended first reading path.
 
 Deep audit, after the first read:
 
@@ -98,9 +98,9 @@ More context:
 
 The current paper draft presents Relaytic-AML as a local-first evaluation lab for financial-crime ML. It is an architecture and evidence-discipline paper, not a hard AML superiority result. Relaytic remains the general package and CLI. Relaytic-AML is the current flagship edition and the focus of the draft because AML makes privacy, temporal validity, graph context, human review, and claim discipline visible in one domain.
 
-The repo includes the Markdown draft, a compiled PDF draft, an arXiv source candidate, references, figures, tables, and the underlying public evidence artifacts. The final source/PDF preflight is ready for author review, but public upload still needs final public tag selection, page-by-page human PDF inspection, and a clean tag-target confirmation.
+The repo includes the Markdown manuscript, compiled PDF, arXiv source candidate, references, figures, tables, and underlying public evidence artifacts. The exact-revision release command requires a clean source commit that exists on the public remote, then records that immutable commit in the PDF and source bundle. A tag is optional and may be cited only when the command verifies it locally and remotely.
 
-Repository publication guidance: keep this repository as the auditable source of record, but publish and cite a fixed release tag once the PDF is approved. A paper-only repository is not necessary if the tagged snapshot keeps the professional reader path stable while preserving the audit trail for reviewers who want to inspect it.
+Repository publication guidance: keep this repository as the auditable source of record and cite the exact public commit stored in the final release manifest. A separate paper-only repository is unnecessary because the immutable snapshot preserves both a concise reader path and the deeper audit trail.
 
 Inspect:
 
@@ -121,6 +121,9 @@ Windows PowerShell:
 ```powershell
 py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-external-score-proof --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-external-score-integration --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-tables --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-draft --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
@@ -143,6 +146,9 @@ macOS/Linux:
 ```bash
 python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
 python3 -m relaytic.ui.cli release-safety paper-invariants --format json
+python3 -m relaytic.ui.cli release-safety paper-external-score-proof --format json
+python3 -m relaytic.ui.cli release-safety paper-external-score-integration --format json
+python3 -m relaytic.ui.cli release-safety paper-tables --format json
 python3 -m relaytic.ui.cli release-safety paper-draft --format json
 python3 -m relaytic.ui.cli release-safety paper-release --format json
 python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
@@ -160,7 +166,7 @@ python3 -m relaytic.ui.cli release-safety paper-final-preflight --format json
 python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py tests/test_paper_track_p24.py -q
 ```
 
-After the reviewed source changes are committed and `git status --short` is empty, create an annotated release tag at that exact revision, then build the upload artifacts with `py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --final --release-tag relaytic-aml-arxiv-v1 --format json` on Windows or the equivalent `python3` command on macOS/Linux. The command refuses a dirty worktree or a tag that does not resolve to `HEAD`, then writes the PDF, source archive, hashes, and revision manifest under `dist/paper-release/<commit>/`.
+After the final source changes are committed, pushed to the public remote, and `git status --short` is empty, build the upload artifacts with `py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --final --format json` on Windows or the equivalent `python3` command on macOS/Linux. The command refuses a dirty worktree or a source commit absent from the public remote, then writes the PDF, source archive, hashes, and revision manifest under `dist/paper-release/<commit>/`. A tag may be supplied with `--release-tag` only after it exists locally and remotely at the same commit.
 
 Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked until later gates explicitly allow them.
 
@@ -236,7 +242,7 @@ The repository already supports a working early product baseline. Treat the list
 - a final paper-source surface through `relaytic release-safety paper-arxiv-source`, with deterministic LaTeX source, converted PDF figures, citation/figure audits, source-package scanning, and a release-candidate checklist
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
-Relaytic has a longer internal build history, but the public story is now simpler: Relaytic is the local-first inference lab, and Relaytic-AML is the flagship edition used to prove the architecture in a demanding domain. Detailed build history lives in `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`. The next product work is capability-card and academy-style hardening, while the paper work is human-facing: inspect the compiled PDF, confirm a clean tag target, and submit only claim-safe wording.
+Relaytic has a longer internal build history, but the public story is now simpler: Relaytic is the local-first inference lab, and Relaytic-AML is the flagship edition used to prove the architecture in a demanding domain. Detailed build history lives in `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`. The next product work is capability-card and academy-style hardening, while the paper work is human-facing: inspect the compiled PDF, confirm the exact public source revision, and submit only claim-safe wording.
 
 That ordering is deliberate. Relaytic is more useful when judged as a serious AML evaluation lab than as a generic capability-evolution project with no sharp domain wedge.
 

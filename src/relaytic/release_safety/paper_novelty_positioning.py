@@ -199,14 +199,15 @@ def _build_novelty_audit(*, inputs: dict[str, Any], matrix: dict[str, Any]) -> d
     checks = [
         _check(
             "what_is_new_section_present",
-            "what is new" in normalized and "governance substrate around detectors and agent-assisted workflows" in normalized,
+            "system distinction" in normalized
+            and "executable provenance record and a separate interpretation gate" in normalized,
             "The manuscript must contain a concise reader-facing distinction section after related work.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
         _check(
             "around_detectors_and_agents_framing_present",
-            "around detectors and agent-assisted workflows" in normalized
-            and "wrap detector outputs" in normalized
+            "one layer around that work" in normalized
+            and "between a detector run and every outward-facing table" in normalized
             and "rowless handoff" in normalized
             and "claim gates" in normalized,
             "The manuscript must frame Relaytic-AML as a layer around detectors and agents.",
@@ -229,11 +230,8 @@ def _build_novelty_audit(*, inputs: dict[str, Any], matrix: dict[str, Any]) -> d
         ),
         _check(
             "not_detector_replacement_boundary_present",
-            "governance substrate around detectors" in normalized
-            and (
-                "not a new detector" in normalized
-                or "rather than a replacement for them" in normalized
-            ),
+            "governs detector evidence rather than introducing a graph-neural model" in normalized
+            and "rather than a new detector or detector-superiority result" in normalized,
             "The paper must say Relaytic-AML wraps detector workflows rather than replacing detectors.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
@@ -381,7 +379,7 @@ def _distinction_templates() -> list[dict[str, Any]]:
             ["gaurav2025governanceaas", "kaptein2026runtimegovernance"],
             "general runtime policy enforcement, trust scoring, path-dependent controls, and agent action logs",
             "a general-purpose agent-governance platform or broad organizational risk layer",
-            "specialize governance to AML metric cells, rowless handoff, benchmark-context routing, and public paper/release wording",
+            "specialize governance to AML evidence cells, rowless handoff, benchmark-context routing, and public paper/release wording",
         ),
         _row(
             "MLOps experiment tracking",
@@ -395,7 +393,7 @@ def _distinction_templates() -> list[dict[str, Any]]:
             ["mitchell2019modelcards"],
             "model documentation, intended use, evaluation summaries, and caveats",
             "a replacement for final model reporting",
-            "materialize the provenance and claim-state inputs a model report would need to be defensible",
+            "materialize factual provenance and separate interpretation records that a defensible model report can cite",
         ),
         _row(
             "Datasheets and dataset documentation",

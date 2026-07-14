@@ -35,9 +35,10 @@ P13 permits only a claim-safe evaluation-environment release.
 
 ## Tag And Release
 
-- [ ] Confirm `git status --short` is empty at the final tag target.
-- [ ] Confirm the final tag target contains the release-pack artifacts generated from base commit `5a6c897012291f9fcec8c3702514c487ea003a35`; rerun the manifest after final edits if the source evidence changes.
-- [ ] Create tag after the final PDF/source matches the manifest: `git tag -a relaytic-aml-arxiv-v1 -m "Relaytic-AML claim-safe paper release"`.
+- [ ] Confirm `git status --short` is empty at the final commit.
+- [ ] Verify the final commit exists on the public remote before citing its commit URL.
+- [ ] Confirm the PDF, source archive, and revision manifest report the same full commit.
+- [ ] Confirm the release pack was regenerated after source commit `e36c7be655a7c4168f61d613e084c67848ed708a` if the evidence changed.
 - [ ] Attach or link the paper PDF, release manifest, public claims JSON, and benchmark artifacts.
 
 ## Fallback

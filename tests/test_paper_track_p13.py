@@ -45,7 +45,8 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert manifest["next_slice"].startswith("Paper Track P14")
     assert manifest["hard_claims_allowed"] is False
     assert manifest["headline_claims_allowed"] is False
-    assert manifest["release_tag_plan"]["tag"] == "relaytic-aml-paper-p13-claim-safe"
+    assert manifest["release_tag_plan"]["mode"] == "immutable_commit"
+    assert manifest["release_tag_plan"]["tag"] is None
     assert public_claims["status"] == "claim_safe_public_wording_allowed"
     assert public_claims["wording_lint"]["status"] == "pass"
     assert "@weber2019elliptic" in draft
@@ -79,7 +80,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Table 5. PaySim modeling path" in draft
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
-    assert "small-sample probe identified" in draft
+    assert "A small-sample XGBoost probe reached" in draft
     assert "Competitive search | XGBoost probe" not in draft
     assert "Table 6. Deterministic artifact and release-gate checks" in draft
     assert "Appendix table. Detailed failure-case fixtures" in draft
@@ -87,7 +88,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Adjacent systems comparison" in draft
     assert "Appendix table. Governance invariants and evidence map" in draft
     assert "Hosted external-score case study" in draft
-    assert "not a new detector architecture" in draft
+    assert "rather than a new detector or detector-superiority result" in draft
     assert "README contains the full regeneration script" in draft
     assert "Appendix table. Evidence routing examples" in draft
     assert "Appendix table. Rowless handoff and interrupted-run recovery examples" in draft
@@ -104,7 +105,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "paper-cell:paysim_p6a_competitive_selected.test_pr_auc" in tables["evidence_summary"]
     assert "@misc{weber2019elliptic" in references
     assert "@misc{chen2026transxion" in references
-    assert "@misc{deprez2025continualaml" in references
+    assert "@article{deprez2025continualaml" in references
     assert "@misc{yang2026skillopt" in references
     assert any(item["citation_key"] == "song2024revtrack" for item in manifest["source_verification"])
     assert any(
@@ -187,7 +188,7 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert claims["wording_lint"]["status"] == "pass"
     assert claims["hard_claims_allowed"] is False
     assert claims["headline_claims_allowed"] is False
-    assert "Relaytic-AML: A Local-First Agentic Evaluation Lab" in draft
+    assert "Relaytic-AML: A Local-First, Agent-Assisted Evaluation Lab" in draft
     assert "Hosted external-score case study" in draft
     assert "A precision-recall area under the curve (PR-AUC) estimate" in draft
     assert "In this setting, the score" not in draft
@@ -196,7 +197,7 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
     assert "README contains the full regeneration script" in draft
-    assert "final release tag or archival snapshot" in draft
+    assert "immutable source commit recorded in the release bundle" in draft
     assert "Table 6. Deterministic artifact and release-gate checks" in draft
     assert "Appendix table. Detailed failure-case fixtures" in draft
     assert "arXiv-ready draft" not in draft

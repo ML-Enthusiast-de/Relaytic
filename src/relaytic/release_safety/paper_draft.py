@@ -324,7 +324,7 @@ def _render_paper_draft(
             "",
             "AML and fraud detection systems are rare-event decision systems, not only classifiers. A model can look strong under a single metric while still being unusable if the split leaks future information, if graph evidence is flattened into an overbroad claim, if review capacity is ignored, or if paper text drifts beyond what the benchmark actually proves. Relaytic-AML treats those failure modes as first-class evaluation objects.",
             "",
-            "This source draft argues for a claim-gated evaluation environment. Each numeric cell in the result table is tied to a command, dataset, split, run-directory reference, artifact field, budget tier, leakage posture, and claim state. Public claims are allowed only when the evidence pack and publishability gates agree. The current package allows supporting evidence claims and blocks hard AML, headline performance, and hard business-value claims.",
+            "This source draft describes a claim-gated evaluation environment. Each numeric cell is tied to factual command, dataset, split, run-directory, artifact, metric, budget, leakage, operating-point, and exposure fields. Interpretation is stored in a separate gate record. Public claims are allowed only when the evidence pack and those gates agree.",
             "",
             "The paper therefore asks whether a local artifact system can make AML evaluation more credible by keeping model score, temporal correctness, graph provenance, operational review utility, and public claim boundaries inspectable together.",
             "",
@@ -556,17 +556,16 @@ def _render_benchmark_rows(table: dict[str, Any]) -> str:
     rows = _all_table_rows(table)
     if not rows:
         return "No P10 benchmark rows were available. This draft is blocked until table generation succeeds."
-    lines = ["| Track | Role | Budget | Claim state | Gate |", "|---|---|---|---|---|"]
+    lines = ["| Track | Budget | Separate gate | Factual metric cells |", "|---|---|---|---|"]
     for row in rows:
         lines.append(
             "| "
             + " | ".join(
                 [
                     _escape_md(str(row.get("dataset_display_name") or row.get("dataset_id") or "unknown")),
-                    _escape_md(str(row.get("evidence_role") or "supporting")),
                     _escape_md(str(row.get("budget_tier") or "unknown")),
-                    _escape_md(str(row.get("claim_state") or "unknown")),
-                    _escape_md(str(row.get("publishability_gate_status") or "unknown")),
+                    _escape_md(str(row.get("claim_gate_id") or "missing")),
+                    str(len([cell for cell in row.get("metrics", []) if isinstance(cell, dict) and cell.get("value") is not None])),
                 ]
             )
             + " |"

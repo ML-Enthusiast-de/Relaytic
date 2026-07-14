@@ -1,0 +1,13 @@
+{
+  "decision": "The manuscript uses an immutable commit and does not claim a public tag archive.",
+  "examined_tag": "relaytic-aml-arxiv-v1",
+  "local_tag_exists": true,
+  "paper_claims_release_tag": false,
+  "public_tag_archive_claim_allowed": false,
+  "release_identity_mode": "immutable_commit",
+  "remote_checked": true,
+  "remote_tag_exists": false,
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P26",
+  "status": "pass"
+}

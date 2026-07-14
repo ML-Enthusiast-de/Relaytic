@@ -786,5 +786,5 @@
     "untouched_holdout_claim_allowed": false
   },
   "test_visibility_policy": "test_scores_are_materialized_for_the_validation_selected_finalist_only",
-  "tie_break_rule": "not_required_distinct_validation_pr_auc"
+  "tie_break_rule": "not_required_unique_winner_at_reported_precision"
 }

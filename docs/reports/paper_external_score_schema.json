@@ -1,12 +1,12 @@
 {
   "accepted": true,
   "artifact_ref": "fixture:p19a_external_score_rowless_v1",
-  "claim_state": "hosted_detector_output_governance_only",
-  "claim_state_allowed": true,
-  "content_hash_prefix": "dac68c3801f5",
+  "content_hash_prefix": "8d3c767fd26d",
+  "factual_input": true,
   "forbidden_fields_detected": [],
   "input_exists": true,
   "input_filename": "p19a_external_score_rowless_fixture.json",
+  "interpretive_fields_detected": [],
   "leakage_posture": "rowless_no_training_or_label_data_exported",
   "metric": {
     "detector_performance_metric": false,
@@ -24,13 +24,11 @@
     "score_artifact_type",
     "schema_fields",
     "metric",
-    "metric_policy",
-    "leakage_posture",
-    "claim_state"
+    "leakage_posture"
   ],
   "required_metadata_completeness": 1.0,
   "required_missing": [],
-  "required_present_count": 11,
+  "required_present_count": 9,
   "rowless_input": true,
   "schema_fields": [
     {
@@ -52,9 +50,9 @@
       "rowless": true
     }
   ],
-  "schema_hash": "4b2b70a58b0ce8716fdae619eb77599d953cc939e2b5fea026427055e0acd93e",
-  "schema_hash_prefix": "4b2b70a58b0c",
-  "schema_version": "relaytic.paper_external_score.v1",
+  "schema_hash": "0534b78322c7aa1f44f7ef637ad15bf129dffcd92dc1fed8767391358142ddcb",
+  "schema_hash_prefix": "0534b78322c7",
+  "schema_version": "relaytic.paper_external_score.v2",
   "source_kind": "deterministic_rowless_fixture",
   "status": "pass"
 }

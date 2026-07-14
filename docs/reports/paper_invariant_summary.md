@@ -12,7 +12,7 @@
 
 | Invariant | Enforcement | Evidence | Boundary |
 | --- | --- | --- | --- |
-| Metric-cell provenance | metric-cell audit plus required-field gate | all_numeric_cells_have_required_provenance; metric_cell_provenance_available | The invariant checks artifact completeness. It does not establish detector optimality. |
+| Evidence-cell provenance | evidence-cell audit plus required-field gate | all_numeric_cells_have_required_provenance; metric_cell_provenance_available | The invariant checks artifact completeness. It does not establish detector optimality. |
 | Claim-strength monotonicity | claim lint, allowed-claims report, publishability matrix, and overclaim failure case | claim_safe_public_wording_allowed; hard_headline_claims_blocked | The gate is a deterministic release check; it is not an external peer review. |
 | Leakage and selection firewall | feature policy report, split contract, failure fixtures, and leakage ablation | forbidden_balance_columns_used; test_set_selection_violation; test_exposure_contract | The current firewall is benchmark-specific; future datasets need their own leakage taxonomy. |
 | Rowless external-agent handoff | handoff evaluator plus redaction failure case | external_context_rowless_and_redacted; rowless_external_agent_handoff_recoverable | The check evaluates deterministic redaction on fixtures. It is not a broad privacy certification. |

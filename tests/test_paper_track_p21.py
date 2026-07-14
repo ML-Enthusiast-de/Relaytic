@@ -97,6 +97,9 @@ def _seed_p21_fixture(root: Path, *, include_local_build: bool = True) -> None:
         "paper_novelty_positioning_audit.json": {"status": "pass"},
         "paper_adjacent_systems_distinction_matrix.json": {"status": "pass"},
         "paper_p24_release_manifest.json": {"status": "release_candidate_ready_for_human_upload"},
+        "paper_p26_evidence_gate_separation_audit.json": {"status": "pass"},
+        "paper_p26_validation_subsplit_audit.json": {"status": "pass"},
+        "paper_p26_release_reference_audit.json": {"status": "pass"},
         "paper_arxiv_source_manifest.json": {"status": "ready_for_source_release_candidate"},
         "paper_submission_package_audit.json": {"status": "pass"},
     }.items():

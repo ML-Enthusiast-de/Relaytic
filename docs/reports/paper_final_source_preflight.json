@@ -80,6 +80,11 @@
       "passed": true
     },
     {
+      "check_id": "p26_release_corrections_ready",
+      "message": "Final preflight requires factual evidence cells, separate gates, documented validation sub-splits, and a supported release identity.",
+      "passed": true
+    },
+    {
       "check_id": "source_package_audit_passed",
       "message": "P21 requires the source/package audit to pass.",
       "passed": true

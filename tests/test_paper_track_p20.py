@@ -126,14 +126,14 @@ def test_paper_track_p20_committed_artifacts_and_reader_path_are_ready() -> None
     assert "realized test queue of 1,109 of 123,580 transactions" in draft
     assert "Elliptic is a different evidence contract" in draft
     assert "That is a useful operating result" not in draft
-    assert "small-sample probe identified" in draft
+    assert "A small-sample XGBoost probe reached" in draft
     assert "Competitive search | XGBoost probe" not in draft
     assert "README contains the full regeneration script" in draft
-    assert "final release tag or archival snapshot" in draft
+    assert "immutable source commit recorded in the release bundle" in draft
     assert "Deep audit, after the first read" in readme
     assert "docs/paper/README.md" in readme
     assert "paper artifact-generation pipeline" in readme
-    assert "release tag is the stable paper record" in readme
+    assert "immutable source commit recorded in the final release bundle" in readme
     assert "paper_p24_release_manifest.json" in readme
     assert "Relaytic-AML Paper" in paper_readme
-    assert "final Git tag, GitHub Release, or archival snapshot" in paper_readme
+    assert "immutable source commit recorded in the final bundle" in paper_readme

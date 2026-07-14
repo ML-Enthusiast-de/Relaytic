@@ -8,9 +8,15 @@ from pathlib import Path
 from typing import Any
 
 from relaytic.core.json_utils import dumps_json, write_json
+from relaytic.release_safety.paper_evidence_contract import (
+    EVIDENCE_CELL_INTERPRETIVE_FIELDS,
+    PAPER_CLAIM_GATE_SCHEMA_VERSION,
+    PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+    audit_evidence_gate_separation,
+)
 
 
-PAPER_EXTERNAL_SCORE_SCHEMA_VERSION = "relaytic.paper_external_score.v1"
+PAPER_EXTERNAL_SCORE_SCHEMA_VERSION = "relaytic.paper_external_score.v2"
 PAPER_EXTERNAL_SCORE_REPORT_DIR = Path("docs") / "reports"
 NEXT_PAPER_EXTERNAL_SCORE_SLICE = "Paper Track P19-B - external score case-study and paper integration"
 
@@ -33,9 +39,7 @@ REQUIRED_EXTERNAL_SCORE_FIELDS = [
     "score_artifact_type",
     "schema_fields",
     "metric",
-    "metric_policy",
     "leakage_posture",
-    "claim_state",
 ]
 
 FORBIDDEN_EXTERNAL_SCORE_FIELDS = [
@@ -57,7 +61,7 @@ FORBIDDEN_EXTERNAL_SCORE_FIELDS = [
     "token",
 ]
 
-ALLOWED_EXTERNAL_SCORE_CLAIM_STATE = "hosted_detector_output_governance_only"
+HOSTED_SCORE_ADMISSIBLE_USE = "hosted detector-output governance only"
 
 
 def build_paper_external_score_pack(
@@ -77,6 +81,11 @@ def build_paper_external_score_pack(
     schema_report = _build_schema_report(source=source, normalized=normalized)
     evidence_cells = _build_evidence_cells(source=source, normalized=normalized, schema_report=schema_report)
     claim_gate = _build_claim_gate(source=source, normalized=normalized, schema_report=schema_report)
+    separation_audit = audit_evidence_gate_separation(
+        evidence_cells=evidence_cells.get("evidence_cells", []),
+        claim_gates=[claim_gate] if claim_gate.get("publishable") else [],
+    )
+    evidence_cells["evidence_gate_separation"] = separation_audit
     handoff_eval = _build_handoff_eval(source=source, normalized=normalized, schema_report=schema_report)
     route_decision = _build_route_decision(
         source=source,
@@ -153,7 +162,7 @@ def render_paper_external_score_markdown(pack: dict[str, Any]) -> str:
         "",
         "## Evidence Cells",
         "",
-        "| Cell | Dataset | Split | Metric | Value | Claim state |",
+        "| Cell | Dataset | Split | Metric | Value | Rowless |",
         "| --- | --- | --- | --- | --- | --- |",
     ]
     for cell in cells:
@@ -168,7 +177,7 @@ def render_paper_external_score_markdown(pack: dict[str, Any]) -> str:
                     _escape_md(str(cell.get("split") or "")),
                     _escape_md(str(cell.get("metric") or "")),
                     _escape_md(str(cell.get("value") or "")),
-                    _escape_md(str(cell.get("claim_state") or "")),
+                    _escape_md(str(cell.get("rowless") or "")),
                 ]
             )
             + " |"
@@ -288,14 +297,7 @@ def _default_score_fixture() -> dict[str, Any]:
             "role": "governance_metric",
             "detector_performance_metric": False,
         },
-        "metric_policy": {
-            "selection_surface": "not_applicable_to_fixture",
-            "detector_performance_promoted": False,
-            "operating_point_promoted": False,
-            "paper_role": "systems_governance_evidence_only",
-        },
         "leakage_posture": "rowless_no_training_or_label_data_exported",
-        "claim_state": ALLOWED_EXTERNAL_SCORE_CLAIM_STATE,
         "payload_summary": {
             "score_count": 1200,
             "row_count": 1200,
@@ -317,7 +319,7 @@ def _default_score_fixture() -> dict[str, Any]:
                 "schema_hash",
                 "content_hash_prefix",
                 "leakage_posture",
-                "claim_state",
+                "claim_gate_ref",
             ],
             "redact_fields": FORBIDDEN_EXTERNAL_SCORE_FIELDS,
         },
@@ -336,13 +338,13 @@ def _normalize_score_artifact(source: dict[str, Any]) -> dict[str, Any]:
         if not _has_required_value(merged.get(field))
     ]
     forbidden_hits = _find_forbidden_fields(merged)
+    interpretive_field_hits = _find_named_fields(merged, EVIDENCE_CELL_INTERPRETIVE_FIELDS)
     schema_fingerprint = {
         "artifact_id": merged.get("artifact_id"),
         "score_artifact_type": merged.get("score_artifact_type"),
         "schema_fields": schema_fields,
         "metric_name": metric.get("name"),
         "metric_role": metric.get("role"),
-        "claim_state": merged.get("claim_state"),
     }
     return {
         "artifact_id": str(merged.get("artifact_id") or ""),
@@ -353,14 +355,13 @@ def _normalize_score_artifact(source: dict[str, Any]) -> dict[str, Any]:
         "score_artifact_type": str(merged.get("score_artifact_type") or ""),
         "schema_fields": schema_fields,
         "metric": metric,
-        "metric_policy": dict(merged.get("metric_policy") or {}),
         "leakage_posture": str(merged.get("leakage_posture") or ""),
-        "claim_state": str(merged.get("claim_state") or ""),
         "payload_summary": dict(merged.get("payload_summary") or {}),
         "handoff_policy": dict(merged.get("handoff_policy") or {}),
         "required_missing": required_missing,
         "required_present_count": len(REQUIRED_EXTERNAL_SCORE_FIELDS) - len(required_missing),
         "forbidden_field_hits": forbidden_hits,
+        "interpretive_field_hits": interpretive_field_hits,
         "schema_hash": _sha256_text(_json_canonical(schema_fingerprint)),
         "schema_hash_prefix": _sha256_text(_json_canonical(schema_fingerprint))[:12],
         "metric_name": str(metric.get("name") or ""),
@@ -373,8 +374,8 @@ def _build_schema_report(*, source: dict[str, Any], normalized: dict[str, Any]) 
     parse_ok = bool(source.get("exists")) and not source.get("parse_error")
     metadata_complete = not normalized["required_missing"]
     rowless_input = not normalized["forbidden_field_hits"]
-    claim_state_allowed = normalized["claim_state"] == ALLOWED_EXTERNAL_SCORE_CLAIM_STATE
-    accepted = parse_ok and metadata_complete and rowless_input and claim_state_allowed
+    factual_input = not normalized["interpretive_field_hits"]
+    accepted = parse_ok and metadata_complete and rowless_input and factual_input
     return {
         "schema_version": PAPER_EXTERNAL_SCORE_SCHEMA_VERSION,
         "status": "pass" if accepted else "blocked",
@@ -396,7 +397,8 @@ def _build_schema_report(*, source: dict[str, Any], normalized: dict[str, Any]) 
         ),
         "forbidden_fields_detected": normalized["forbidden_field_hits"],
         "rowless_input": rowless_input,
-        "claim_state_allowed": claim_state_allowed,
+        "factual_input": factual_input,
+        "interpretive_fields_detected": normalized["interpretive_field_hits"],
         "schema_fields": _schema_field_summaries(normalized["schema_fields"]),
         "metric": {
             "name": normalized["metric_name"],
@@ -405,7 +407,6 @@ def _build_schema_report(*, source: dict[str, Any], normalized: dict[str, Any]) 
             "detector_performance_metric": bool(normalized["metric"].get("detector_performance_metric")),
         },
         "leakage_posture": normalized["leakage_posture"],
-        "claim_state": normalized["claim_state"],
     }
 
 
@@ -417,6 +418,7 @@ def _build_evidence_cells(
 ) -> dict[str, Any]:
     accepted = bool(schema_report["accepted"])
     cell = {
+        "cell_schema": PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
         "cell_id": "p19a.external_score.hosted_metadata_completeness",
         "dataset_id": normalized["dataset_id"],
         "dataset_role": normalized["dataset_role"],
@@ -429,11 +431,13 @@ def _build_evidence_cells(
         "metric": normalized["metric_name"],
         "value": normalized["metric_value"],
         "metric_role": normalized["metric_role"],
+        "detector_performance_metric": bool(normalized["metric"].get("detector_performance_metric")),
+        "budget_tier": "deterministic_fixture",
         "leakage_posture": normalized["leakage_posture"],
-        "claim_state": normalized["claim_state"],
-        "publishable": accepted,
+        "invariant_state": "pass" if accepted else "blocked",
         "rowless": bool(schema_report["rowless_input"]),
-        "paper_role": "hosted_detector_output_governance_evidence",
+        "rowless_export_status": "rowless" if bool(schema_report["rowless_input"]) else "blocked",
+        "source_posture": source.get("source_kind"),
     }
     return {
         "schema_version": PAPER_EXTERNAL_SCORE_SCHEMA_VERSION,
@@ -450,7 +454,7 @@ def _build_evidence_cells(
             "metric",
             "value",
             "leakage_posture",
-            "claim_state",
+            "budget_tier",
         ],
     }
 
@@ -478,7 +482,7 @@ def _build_claim_gate(
             "required_metadata_complete",
             not normalized["required_missing"],
             f"missing={len(normalized['required_missing'])}",
-            "artifact carries dataset, split, schema, metric, leakage, and claim-state metadata",
+            "artifact carries dataset, split, schema, metric, and leakage metadata",
         ),
         _check(
             "rowless_input_contract",
@@ -487,10 +491,10 @@ def _build_claim_gate(
             "artifact does not expose raw rows, identifiers, local paths, secrets, or raw score payloads",
         ),
         _check(
-            "claim_state_bounded",
-            normalized["claim_state"] == ALLOWED_EXTERNAL_SCORE_CLAIM_STATE,
-            f"claim_state={normalized['claim_state'] or 'missing'}",
-            "claim state is hosted detector-output governance only",
+            "factual_input_has_no_interpretive_fields",
+            not normalized["interpretive_field_hits"],
+            f"interpretive_fields={len(normalized['interpretive_field_hits'])}",
+            "the factual score record does not carry claim or publication fields",
         ),
         _check(
             "detector_performance_not_promoted",
@@ -501,14 +505,26 @@ def _build_claim_gate(
     ]
     publishable = all(check["passed"] for check in checks)
     return {
-        "schema_version": PAPER_EXTERNAL_SCORE_SCHEMA_VERSION,
+        "schema_version": PAPER_CLAIM_GATE_SCHEMA_VERSION,
+        "gate_id": "p19a.external_score.hosted_output_gate",
+        "evidence_cell_ids": ["p19a.external_score.hosted_metadata_completeness"] if publishable else [],
         "status": "pass" if publishable else "blocked",
         "publishable": publishable,
         "allowed_claim_scope": "hosted_detector_output_governance_only",
+        "admissible_use": HOSTED_SCORE_ADMISSIBLE_USE,
+        "stronger_claim_status": "blocked",
+        "gate_reasons": [
+            "the fixture measures hosted-score metadata completeness rather than detector performance",
+            "raw rows and entity identifiers are excluded from the export",
+        ],
+        "missing_evidence": [
+            "independent detector benchmark comparison",
+            "production controls and analyst outcome study",
+        ],
         "checks": checks,
         "failed_checks": [check["check_id"] for check in checks if not check["passed"]],
         "allowed_public_claims": [
-            "Relaytic-AML can convert a rowless external detector-score artifact into evidence cells with schema, hash, leakage-posture, and claim-state metadata.",
+            "Relaytic-AML can convert a rowless external detector-score artifact into a factual evidence cell plus a separate interpretation gate.",
             "Relaytic-AML can produce a rowless handoff summary for hosted detector-output governance.",
         ]
         if publishable
@@ -568,7 +584,7 @@ def _build_handoff_eval(
             "schema_hash",
             "content_hash_prefix",
             "leakage_posture",
-            "claim_state",
+            "claim_gate_ref",
         ]
     redacted_fields = list(dict.fromkeys(list(policy.get("redact_fields") or []) + FORBIDDEN_EXTERNAL_SCORE_FIELDS))
     exported_payload = {
@@ -582,7 +598,7 @@ def _build_handoff_eval(
         "schema_hash_prefix": normalized["schema_hash_prefix"],
         "content_hash_prefix": source.get("content_hash_prefix"),
         "leakage_posture": normalized["leakage_posture"],
-        "claim_state": normalized["claim_state"],
+        "claim_gate_ref": "p19a.external_score.hosted_output_gate",
     }
     rowless_handoff = bool(schema_report["rowless_input"]) and not any(
         field in exported_payload for field in redacted_fields
@@ -605,7 +621,7 @@ def _build_handoff_eval(
         "source_path_recorded": False,
         "input_filename_recorded": bool(source.get("input_filename")),
         "input_absolute_path_recorded": False,
-        "pass_criterion": "only schema, hash prefixes, metadata, governance metric, leakage posture, and claim state are exported",
+        "pass_criterion": "only schema, hash prefixes, factual metadata, governance metric, leakage posture, and a gate reference are exported",
     }
 
 
@@ -628,7 +644,7 @@ def _build_route_decision(
         "route_reason": (
             "The external score route proves Relaytic-AML can host detector-output evidence without claiming detector novelty."
             if selected
-            else "The route remains blocked until required score metadata, rowless posture, and bounded claim state pass."
+            else "The route remains blocked until required score metadata, rowless posture, and evidence/gate separation pass."
         ),
         "alternatives": [
             {
@@ -651,7 +667,7 @@ def _build_route_decision(
         "artifact_id": normalized["artifact_id"],
         "dataset_id": normalized["dataset_id"],
         "split": normalized["split"],
-        "claim_state": normalized["claim_state"],
+        "claim_gate_ref": "p19a.external_score.hosted_output_gate",
         "paper_claim_boundary": "hosted detector-output governance, not detector superiority",
         "next_slice": NEXT_PAPER_EXTERNAL_SCORE_SLICE if selected else "Paper Track P20 - narrative and visual polish",
     }
@@ -678,13 +694,19 @@ def _build_manifest(
             "score_schema_accepted",
             bool(schema_report["accepted"]),
             f"accepted={schema_report['accepted']}",
-            "score artifact has required schema, metadata, rowless posture, and bounded claim state",
+            "score artifact has required factual schema, metadata, and rowless posture",
         ),
         _check(
             "evidence_cells_created",
             evidence_cells["evidence_cell_count"] >= 1,
             f"count={evidence_cells['evidence_cell_count']}",
             "at least one evidence cell is emitted",
+        ),
+        _check(
+            "evidence_and_claim_gate_separate",
+            dict(evidence_cells.get("evidence_gate_separation") or {}).get("status") == "pass",
+            f"status={dict(evidence_cells.get('evidence_gate_separation') or {}).get('status')}",
+            "factual evidence fields and interpretive gate fields are stored in separate records",
         ),
         _check(
             "claim_gate_publishable",
@@ -779,6 +801,22 @@ def _find_forbidden_fields(value: Any, *, prefix: str = "") -> list[str]:
     return hits
 
 
+def _find_named_fields(value: Any, names: set[str] | frozenset[str], *, prefix: str = "") -> list[str]:
+    hits: list[str] = []
+    normalized_names = {name.lower() for name in names}
+    if isinstance(value, dict):
+        for key, item in value.items():
+            key_text = str(key)
+            path = f"{prefix}.{key_text}" if prefix else key_text
+            if key_text.lower() in normalized_names:
+                hits.append(path)
+            hits.extend(_find_named_fields(item, names, prefix=path))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            hits.extend(_find_named_fields(item, names, prefix=f"{prefix}[{index}]"))
+    return hits
+
+
 def _has_required_value(value: Any) -> bool:
     if value is None:
         return False
@@ -799,4 +837,3 @@ def _sha256_text(text: str) -> str:
 
 def _escape_md(value: str) -> str:
     return value.replace("|", "\\|").replace("\n", " ")
-

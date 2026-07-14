@@ -7,6 +7,11 @@ from pathlib import Path
 from typing import Any
 
 from relaytic.core.json_utils import write_json
+from relaytic.release_safety.paper_evidence_contract import (
+    PAPER_CLAIM_GATE_SCHEMA_VERSION,
+    PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+    audit_evidence_gate_separation,
+)
 
 
 PAPER_TABLE_SCHEMA_VERSION = "relaytic.paper_table_generator.v1"
@@ -17,6 +22,7 @@ PAPER_TABLE_FILENAMES = {
     "paper_reproduction_commands": "paper_reproduction_commands.md",
     "paper_metric_cell_audit": "paper_metric_cell_audit.json",
     "paper_publishability_matrix": "paper_publishability_matrix.json",
+    "paper_claim_gate_records": "paper_claim_gate_records.json",
 }
 
 RUN_DIRECTORY_REF = "docs/reports"
@@ -29,8 +35,29 @@ def build_paper_table_pack(project_root: str | Path) -> dict[str, Any]:
     inputs = _collect_inputs(reports)
     result_table = _build_result_table(inputs)
     cells = _collect_metric_cells(result_table)
-    audit = _build_metric_cell_audit(inputs=inputs, result_table=result_table, cells=cells)
-    provenance = _build_table_provenance(inputs=inputs, result_table=result_table, cells=cells)
+    claim_gates = _collect_claim_gate_records(result_table)
+    _remove_internal_gate_specs(result_table)
+    separation_audit = audit_evidence_gate_separation(evidence_cells=cells, claim_gates=claim_gates)
+    audit = _build_metric_cell_audit(
+        inputs=inputs,
+        result_table=result_table,
+        cells=cells,
+        separation_audit=separation_audit,
+    )
+    provenance = _build_table_provenance(
+        inputs=inputs,
+        result_table=result_table,
+        cells=cells,
+        claim_gates=claim_gates,
+    )
+    claim_gate_records = {
+        "schema_version": PAPER_CLAIM_GATE_SCHEMA_VERSION,
+        "slice": "Paper Track P26",
+        "status": separation_audit["status"],
+        "gate_count": len(claim_gates),
+        "claim_gates": claim_gates,
+        "separation_audit": separation_audit,
+    }
     publishability = _build_publishability_matrix(inputs=inputs, result_table=result_table, audit=audit)
     commands = _build_reproduction_commands(inputs=inputs, result_table=result_table, audit=audit)
     result_table["metric_cell_audit_status"] = audit["status"]
@@ -46,6 +73,7 @@ def build_paper_table_pack(project_root: str | Path) -> dict[str, Any]:
         "paper_reproduction_commands": commands,
         "paper_metric_cell_audit": audit,
         "paper_publishability_matrix": publishability,
+        "paper_claim_gate_records": claim_gate_records,
     }
 
 
@@ -186,7 +214,7 @@ def _performance_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                 model_family=selected_baseline.get("family_id"),
                 budget_tier="baseline",
                 split_contract_id=baseline.get("split_contract_id") or "split_paysim_chronological_step_v1",
-                claim_state="baseline_only_not_headline",
+                source_claim_posture="baseline_only_not_headline",
                 publishability_gate_ref="docs/reports/paper_publishability_gate.json",
                 publishability_gate_status=_payload(inputs["p6_publishability_gate"]).get("status"),
                 leakage_posture="train_only_features_validation_only_thresholds",
@@ -205,7 +233,7 @@ def _performance_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                         split="validation",
                         artifact_ref="docs/reports/paper_tabular_baseline_table.json",
                         artifact_field="validation_selected_baseline.validation_pr_auc",
-                        claim_state="baseline_only_not_headline",
+                        source_claim_posture="baseline_only_not_headline",
                         budget_tier="baseline",
                         command="relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json",
                         leakage_posture="train_only_features_validation_only_thresholds",
@@ -220,7 +248,7 @@ def _performance_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                         split="test",
                         artifact_ref="docs/reports/paper_tabular_baseline_table.json",
                         artifact_field="validation_selected_baseline.test_pr_auc",
-                        claim_state="baseline_only_not_headline",
+                        source_claim_posture="baseline_only_not_headline",
                         budget_tier="baseline",
                         command="relaytic release-safety tabular-baselines --budget-tier baseline --run-optional --format json",
                         leakage_posture="train_only_features_validation_only_thresholds",
@@ -245,7 +273,7 @@ def _performance_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                 model_family=selected.get("family_id"),
                 budget_tier=paysim.get("effective_budget_tier") or "competitive",
                 split_contract_id=paysim.get("split_contract_id") or "split_paysim_chronological_step_v1",
-                claim_state=gate.get("claim_boundary_from_taxonomy") or "supporting-only",
+                source_claim_posture=gate.get("claim_boundary_from_taxonomy") or "supporting-only",
                 publishability_gate_ref="docs/reports/paysim_publishability_gate.json",
                 publishability_gate_status=gate.get("status"),
                 leakage_posture="prior_step_destination_history_forbidden_balance_fields_excluded_validation_only_selection",
@@ -292,7 +320,7 @@ def _performance_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                 model_family=selected_graph.get("family_id"),
                 budget_tier=graph.get("effective_budget_tier") or "competitive",
                 split_contract_id="split_elliptic_temporal_step_v1",
-                claim_state=gate.get("claim_posture") or "supporting-only",
+                source_claim_posture=gate.get("claim_posture") or "supporting-only",
                 publishability_gate_ref="docs/reports/paper_graph_publishability_gate.json",
                 publishability_gate_status=gate.get("status"),
                 leakage_posture="same_time_step_graph_snapshot_validation_only_selection",
@@ -340,7 +368,7 @@ def _operational_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     split="test",
                     artifact_ref="docs/reports/paper_operational_metric_table.json",
                     artifact_field=f"rows[{source.get('row_id')}].review_budget_metrics.{metric_id}",
-                    claim_state=source.get("claim_boundary") or "supporting-only",
+                    source_claim_posture=source.get("claim_boundary") or "supporting-only",
                     budget_tier="operational_evaluation",
                     command=command,
                     leakage_posture="derived_from_validation_selected_test_operating_point",
@@ -364,7 +392,7 @@ def _operational_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     split="test",
                     artifact_ref="docs/reports/paper_operational_metric_table.json",
                     artifact_field=f"rows[{source.get('row_id')}].operational_estimates.{metric_id}",
-                    claim_state="supporting_burden_proxy_not_business_value_claim",
+                    source_claim_posture="supporting_burden_proxy_not_business_value_claim",
                     budget_tier="operational_evaluation",
                     command=command,
                     leakage_posture="derived_from_test_operating_point_and_test_prevalence",
@@ -383,7 +411,7 @@ def _operational_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                 model_family=source.get("model_family"),
                 budget_tier="operational_evaluation",
                 split_contract_id=_split_contract_for_dataset(source.get("dataset_id")),
-                claim_state=source.get("claim_boundary") or "supporting-only",
+                source_claim_posture=source.get("claim_boundary") or "supporting-only",
                 publishability_gate_ref="docs/reports/paper_operational_claim_guard.json",
                 publishability_gate_status=guard.get("status"),
                 leakage_posture="claim_guarded_operating_point_derived_evidence",
@@ -416,7 +444,7 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                 model_family=repeated.get("candidate_id") or "p8b_pooled_moments_lgbm",
                 budget_tier="competitive_context",
                 split_contract_id="provided_revtrack_trn_val_tst_partition_and_content_hash_robustness_partition",
-                claim_state="supporting_context_only_not_performance_contribution",
+                source_claim_posture="supporting_context_only_not_performance_contribution",
                 publishability_gate_ref="docs/reports/elliptic2_publishability_gate.json",
                 publishability_gate_status=p8b.get("status"),
                 leakage_posture="revtrack_tst_prior_exposure_disclosed_hash_partition_used_as_robustness_check",
@@ -491,7 +519,7 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                 model_family=None,
                 budget_tier="reference_parity_gate",
                 split_contract_id="component_grouped_entity_disjoint_audit",
-                claim_state="blocked_claim_evidence",
+                source_claim_posture="blocked_claim_evidence",
                 publishability_gate_ref="docs/reports/elliptic2_reference_parity_gate.json",
                 publishability_gate_status=p8c.get("status"),
                 leakage_posture="faithful_reference_parity_not_executable_current_core_equivalence_not_proven",
@@ -543,7 +571,7 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
             model_family=None,
             budget_tier="blocked",
             split_contract_id="split_amlsim_seeded_temporal_v1",
-            claim_state="blocked_or_future_proxy",
+            source_claim_posture="blocked_or_future_proxy",
             publishability_gate_ref="docs/reports/subgraph_benchmark_blocker_report.json",
             publishability_gate_status=_payload(inputs["subgraph_blocker"]).get("decision_state") or _payload(inputs["subgraph_blocker"]).get("status"),
             leakage_posture="not_evaluated_seeded_generation_not_frozen",
@@ -573,6 +601,7 @@ def _build_metric_cell_audit(
     inputs: dict[str, Any],
     result_table: dict[str, Any],
     cells: list[dict[str, Any]],
+    separation_audit: dict[str, Any],
 ) -> dict[str, Any]:
     p9_guard = _payload(inputs["p9_claim_guard"])
     numeric_cells = [cell for cell in cells if cell.get("value") is not None]
@@ -584,11 +613,9 @@ def _build_metric_cell_audit(
         "command",
         "run_directory_ref",
         "artifact_ref",
-        "claim_state",
         "budget_tier",
         "leakage_posture",
-        "publishability_gate_ref",
-        "publishability_gate_status",
+        "metric",
     ]
     for cell in numeric_cells:
         missing = [field for field in required_fields if cell.get(field) in (None, "", [])]
@@ -600,14 +627,7 @@ def _build_metric_cell_audit(
                     "missing_fields": missing,
                 }
             )
-        if cell.get("headline_metric_candidate") and cell.get("budget_tier") not in ("competitive", "release"):
-            violations.append(
-                {
-                    "cell_id": cell.get("cell_id"),
-                    "violation": "headline_metric_not_competitive_or_release_budget",
-                    "budget_tier": cell.get("budget_tier"),
-                }
-            )
+    violations.extend(separation_audit.get("violations", []))
     dependency_ready = bool(p9_guard.get("paper_can_continue_to_p10")) and result_table.get("status") == "tables_generated_claim_guarded"
     status = "pass" if dependency_ready and not violations and numeric_cells else "blocked"
     return {
@@ -617,15 +637,16 @@ def _build_metric_cell_audit(
         "paper_can_continue_to_p11": status == "pass",
         "numeric_cell_count": len(numeric_cells),
         "blocked_or_empty_cell_count": len(blocked_cells),
-        "headline_metric_cell_count": sum(1 for cell in numeric_cells if bool(cell.get("headline_metric_candidate"))),
+        "evidence_cell_schema": PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+        "claim_gate_schema": PAPER_CLAIM_GATE_SCHEMA_VERSION,
+        "evidence_gate_separation": separation_audit,
         "checks": {
             "p9_operational_claim_guard_allows_p10": bool(p9_guard.get("paper_can_continue_to_p10")),
             "all_numeric_cells_have_required_provenance": not any(
                 violation.get("violation") == "numeric_cell_missing_required_provenance" for violation in violations
             ),
-            "headline_metrics_are_competitive_or_release_budget": not any(
-                violation.get("violation") == "headline_metric_not_competitive_or_release_budget" for violation in violations
-            ),
+            "evidence_cells_are_factual_only": separation_audit.get("status") == "pass",
+            "all_public_cells_have_separate_gate": bool(separation_audit.get("all_public_cells_have_separate_gate")),
             "hard_claims_remain_blocked_until_gates_pass": not bool(p9_guard.get("hard_business_value_claim_allowed")),
         },
         "violations": violations,
@@ -640,6 +661,7 @@ def _build_table_provenance(
     inputs: dict[str, Any],
     result_table: dict[str, Any],
     cells: list[dict[str, Any]],
+    claim_gates: list[dict[str, Any]],
 ) -> dict[str, Any]:
     artifacts = []
     for key, artifact in inputs.items():
@@ -668,13 +690,14 @@ def _build_table_provenance(
                 "dataset_id": row.get("dataset_id"),
                 "table_group": row.get("table_group"),
                 "budget_tier": row.get("budget_tier"),
-                "claim_state": row.get("claim_state"),
+                "claim_gate_id": f"{row.get('row_id')}.publication_gate",
                 "command": row.get("command"),
                 "artifact_refs": row.get("artifact_refs", []),
             }
             for row in _all_rows(result_table)
         ],
         "cell_provenance": cells,
+        "claim_gate_records": claim_gates,
     }
 
 
@@ -791,7 +814,7 @@ def _table_row(
     model_family: Any,
     budget_tier: str,
     split_contract_id: str,
-    claim_state: str,
+    source_claim_posture: str,
     publishability_gate_ref: str,
     publishability_gate_status: Any,
     leakage_posture: str,
@@ -805,19 +828,22 @@ def _table_row(
         "table_group": table_group,
         "dataset_id": dataset_id,
         "dataset_display_name": dataset_display_name,
-        "evidence_role": evidence_role,
         "model_family": model_family,
         "budget_tier": budget_tier,
         "split_contract_id": split_contract_id,
-        "claim_state": claim_state,
-        "publishability_gate_ref": publishability_gate_ref,
-        "publishability_gate_status": publishability_gate_status,
+        "claim_gate_id": f"{row_id}.publication_gate",
         "leakage_posture": leakage_posture,
         "command": command,
         "run_directory_ref": RUN_DIRECTORY_REF,
         "artifact_refs": artifact_refs,
         "metrics": metrics,
         "protocol_metadata": protocol_metadata or {},
+        "_claim_gate_spec": {
+            "publication_role": evidence_role,
+            "source_claim_posture": source_claim_posture,
+            "source_gate_ref": publishability_gate_ref,
+            "source_gate_status": publishability_gate_status,
+        },
     }
 
 
@@ -858,7 +884,7 @@ def _selected_metric(
         split=split,
         artifact_ref="docs/reports/paysim_competitive_benchmark_manifest.json",
         artifact_field=f"validation_selected_competitive_model.{field}",
-        claim_state=gate.get("claim_boundary_from_taxonomy") or "supporting-only",
+        source_claim_posture=gate.get("claim_boundary_from_taxonomy") or "supporting-only",
         budget_tier=manifest.get("effective_budget_tier") or "competitive",
         command=command,
         leakage_posture="prior_step_destination_history_forbidden_balance_fields_excluded_validation_only_selection",
@@ -866,6 +892,8 @@ def _selected_metric(
         publishability_gate_status=gate.get("status"),
         headline_metric_candidate=False,
     )
+    cell["model_identifier"] = selected.get("family_id") or "not_recorded"
+    cell["calibration_status"] = selected.get("calibration_method") or "not_recorded"
     if split == "test":
         cell["test_exposure_contract"] = manifest.get("test_exposure_contract") or {
             "test_partition_fixed": True,
@@ -896,7 +924,7 @@ def _operating_metric(
         split="test",
         artifact_ref="docs/reports/paysim_competitive_benchmark_manifest.json",
         artifact_field=f"validation_selected_competitive_model.test_operating_point.{field}",
-        claim_state=gate.get("claim_boundary_from_taxonomy") or "supporting-only",
+        source_claim_posture=gate.get("claim_boundary_from_taxonomy") or "supporting-only",
         budget_tier=manifest.get("effective_budget_tier") or "competitive",
         command=command,
         leakage_posture="validation_selected_review_budget_fixed_on_test",
@@ -933,7 +961,7 @@ def _fixed_fpr_metric(
         split="test",
         artifact_ref="docs/reports/paysim_competitive_benchmark_manifest.json",
         artifact_field=f"validation_selected_competitive_model.fixed_fpr.test.{field}",
-        claim_state=gate.get("claim_boundary_from_taxonomy") or "supporting-only",
+        source_claim_posture=gate.get("claim_boundary_from_taxonomy") or "supporting-only",
         budget_tier=manifest.get("effective_budget_tier") or "competitive",
         command=command,
         leakage_posture="validation_fixed_fpr_threshold_fixed_on_test",
@@ -959,7 +987,7 @@ def _graph_metric(
         split=split,
         artifact_ref="docs/reports/paper_graph_feature_table.json",
         artifact_field=f"validation_selected_competitive_baseline.{field}",
-        claim_state=gate.get("claim_posture") or "supporting-only",
+        source_claim_posture=gate.get("claim_posture") or "supporting-only",
         budget_tier=graph.get("effective_budget_tier") or "competitive",
         command=command,
         leakage_posture="same_time_step_graph_snapshot_validation_only_selection",
@@ -985,7 +1013,7 @@ def _graph_operating_metric(
         split="test",
         artifact_ref="docs/reports/paper_graph_feature_table.json",
         artifact_field=f"validation_selected_competitive_baseline.test_operating_point.{field}",
-        claim_state=gate.get("claim_posture") or "supporting-only",
+        source_claim_posture=gate.get("claim_posture") or "supporting-only",
         budget_tier=graph.get("effective_budget_tier") or "competitive",
         command=command,
         leakage_posture="validation_selected_review_budget_fixed_on_test",
@@ -1013,7 +1041,7 @@ def _graph_fixed_fpr_metric(
         split="test",
         artifact_ref="docs/reports/paper_graph_feature_table.json",
         artifact_field=f"validation_selected_competitive_baseline.fixed_fpr.test.{field}",
-        claim_state=gate.get("claim_posture") or "supporting-only",
+        source_claim_posture=gate.get("claim_posture") or "supporting-only",
         budget_tier=graph.get("effective_budget_tier") or "competitive",
         command=command,
         leakage_posture="validation_fixed_fpr_threshold_fixed_on_test",
@@ -1039,7 +1067,7 @@ def _context_metric(
         split=split,
         artifact_ref=artifact_ref,
         artifact_field=artifact_field,
-        claim_state="supporting_context_only_not_performance_contribution",
+        source_claim_posture="supporting_context_only_not_performance_contribution",
         budget_tier="competitive_context",
         command=command,
         leakage_posture="revtrack_tst_prior_exposure_disclosed_hash_partition_used_as_robustness_check",
@@ -1065,7 +1093,7 @@ def _limitation_metric(
         split=split,
         artifact_ref=artifact_ref,
         artifact_field=artifact_field,
-        claim_state="blocked_claim_evidence",
+        source_claim_posture="blocked_claim_evidence",
         budget_tier="reference_parity_gate",
         command=command,
         leakage_posture="faithful_reference_parity_not_executable_current_core_equivalence_not_proven",
@@ -1090,7 +1118,7 @@ def _blocked_metric(
         split="blocked",
         artifact_ref=artifact_ref,
         artifact_field="status",
-        claim_state="blocked_or_future_proxy",
+        source_claim_posture="blocked_or_future_proxy",
         budget_tier="blocked",
         command=command,
         leakage_posture="not_evaluated_seeded_generation_not_frozen",
@@ -1098,7 +1126,8 @@ def _blocked_metric(
         publishability_gate_status=gate_status or "blocked",
         headline_metric_candidate=False,
     )
-    cell["missing_reason"] = missing_reason
+    cell["cell_schema"] = "relaytic.paper_metric_placeholder.v1"
+    cell["blocked_reason"] = missing_reason
     return cell
 
 
@@ -1111,7 +1140,7 @@ def _metric_cell(
     split: str,
     artifact_ref: str,
     artifact_field: str,
-    claim_state: str,
+    source_claim_posture: str,
     budget_tier: str,
     command: str,
     leakage_posture: str,
@@ -1119,10 +1148,12 @@ def _metric_cell(
     publishability_gate_status: Any,
     headline_metric_candidate: bool = False,
 ) -> dict[str, Any]:
+    del source_claim_posture, publishability_gate_ref, publishability_gate_status, headline_metric_candidate
     return {
-        "cell_schema": "paper_metric_cell.v1",
+        "cell_schema": PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
         "cell_id": f"{row_id}.{metric_id}",
         "row_id": row_id,
+        "metric": metric_id,
         "metric_id": metric_id,
         "value": _json_scalar(value),
         "dataset_id": dataset_id,
@@ -1131,19 +1162,15 @@ def _metric_cell(
         "run_directory_ref": RUN_DIRECTORY_REF,
         "artifact_ref": artifact_ref,
         "artifact_field": artifact_field,
-        "claim_state": claim_state,
         "budget_tier": budget_tier,
         "leakage_posture": leakage_posture,
-        "publishability_gate_ref": publishability_gate_ref,
-        "publishability_gate_status": publishability_gate_status,
-        "headline_metric_candidate": headline_metric_candidate,
     }
 
 
 def _collect_metric_cells(payload: Any) -> list[dict[str, Any]]:
     cells: list[dict[str, Any]] = []
     if isinstance(payload, dict):
-        if payload.get("cell_schema") == "paper_metric_cell.v1":
+        if payload.get("cell_schema") == PAPER_EVIDENCE_CELL_SCHEMA_VERSION:
             cells.append(dict(payload))
         for value in payload.values():
             cells.extend(_collect_metric_cells(value))
@@ -1151,6 +1178,105 @@ def _collect_metric_cells(payload: Any) -> list[dict[str, Any]]:
         for item in payload:
             cells.extend(_collect_metric_cells(item))
     return cells
+
+
+def _collect_claim_gate_records(result_table: dict[str, Any]) -> list[dict[str, Any]]:
+    gates: list[dict[str, Any]] = []
+    for row in _all_rows(result_table):
+        spec = dict(row.get("_claim_gate_spec") or {})
+        cell_ids = [
+            str(cell.get("cell_id"))
+            for cell in row.get("metrics", [])
+            if isinstance(cell, dict)
+            and cell.get("cell_schema") == PAPER_EVIDENCE_CELL_SCHEMA_VERSION
+            and cell.get("cell_id")
+        ]
+        if not cell_ids:
+            continue
+        row_id = str(row.get("row_id") or "")
+        gate_reasons, missing_evidence = _gate_explanation(row_id=row_id, spec=spec)
+        gates.append(
+            {
+                "schema_version": PAPER_CLAIM_GATE_SCHEMA_VERSION,
+                "gate_id": f"{row_id}.publication_gate",
+                "evidence_cell_ids": cell_ids,
+                "admissible_use": _admissible_use(str(spec.get("publication_role") or "supporting evidence")),
+                "publication_role": str(spec.get("publication_role") or "supporting_evidence"),
+                "stronger_claim_status": "blocked",
+                "gate_reasons": gate_reasons,
+                "missing_evidence": missing_evidence,
+                "source_gate_ref": spec.get("source_gate_ref"),
+                "source_gate_status": spec.get("source_gate_status"),
+            }
+        )
+    return gates
+
+
+def _remove_internal_gate_specs(payload: Any) -> None:
+    if isinstance(payload, dict):
+        payload.pop("_claim_gate_spec", None)
+        for value in payload.values():
+            _remove_internal_gate_specs(value)
+    elif isinstance(payload, list):
+        for item in payload:
+            _remove_internal_gate_specs(item)
+
+
+def _admissible_use(publication_role: str) -> str:
+    roles = {
+        "baseline_reference_appendix": "baseline reference under the recorded dataset and split contract",
+        "supporting_temporal_proxy_numeric_candidate": "bounded PaySim temporal-proxy demonstration",
+        "supporting_temporal_graph_numeric_candidate": "bounded Elliptic temporal graph-feature demonstration",
+        "supporting_burden_proxy_not_business_value_claim": "review-burden proxy under the recorded queue contract",
+        "supporting_modern_context_only": "Elliptic2 modern benchmark context",
+        "limitation_and_claim_firewall": "cohort and reference-parity limitation evidence",
+        "blocked_pending_reproducible_generation": "blocked benchmark placeholder with no numeric claim",
+    }
+    return roles.get(publication_role, publication_role.replace("_", " "))
+
+
+def _gate_explanation(*, row_id: str, spec: dict[str, Any]) -> tuple[list[str], list[str]]:
+    if row_id == "paysim_p6a_competitive_selected":
+        return (
+            [
+                "the fixed test partition had prior P4 reference and P6 baseline exposure",
+                "competitive selection did not use test evidence and one finalist was evaluated after protocol freeze",
+            ],
+            [
+                "genuinely unseen chronological or external holdout",
+                "incumbent queue comparison under the same operating contract",
+            ],
+        )
+    if row_id.startswith("paysim_"):
+        return (
+            ["PaySim is synthetic proxy evidence and the fixed test partition has prior baseline exposure"],
+            ["genuinely unseen holdout", "real or partner-approved AML validation"],
+        )
+    if row_id.startswith("elliptic_p7"):
+        return (
+            ["the result is a single-seed temporal graph-feature estimate on public blockchain data"],
+            ["repeated-seed detector study", "graph-native ablations", "real-bank validation"],
+        )
+    if row_id.startswith("elliptic2_p8b"):
+        return (
+            [
+                "the RevTrack TST partition had prior exposure",
+                "the local cohort is not established as equivalent to the published RevClassifyDS cohort",
+            ],
+            ["faithful reference replay", "cohort-equivalence proof", "blind or external holdout"],
+        )
+    if row_id.startswith("elliptic2_p8c"):
+        return (
+            ["reference parity and cohort equivalence are not established"],
+            ["executable reference method", "accepted parity protocol", "resource-complete rerun"],
+        )
+    if row_id.startswith("amlsim"):
+        return (
+            ["the seeded AMLSim generation contract is not frozen"],
+            ["versioned generator", "configuration hash", "seed manifest", "executed benchmark evidence"],
+        )
+    status = str(spec.get("source_claim_posture") or spec.get("source_gate_status") or "supporting-only evidence")
+    return ([status.replace("_", " ")], ["stronger benchmark or deployment evidence"])
 
 
 def _all_rows(result_table: dict[str, Any]) -> list[dict[str, Any]]:

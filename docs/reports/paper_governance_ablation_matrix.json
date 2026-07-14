@@ -85,14 +85,14 @@
       "unsafe_signal": "6 raw fields"
     },
     {
-      "artifact_integrity": "13 missing fields; 1 unsafe table path",
+      "artifact_integrity": "10 missing fields; 1 unsafe table path",
       "condition_id": "no_evidence_cell_required_fields",
-      "disabled_machinery": "metric-cell required-field gate",
+      "disabled_machinery": "evidence-cell required-field gate",
       "handoff_recovery": "actions=6",
-      "interpretation": "Required fields are what connect a reader-facing number back to dataset, split, command, artifact, leakage, budget, and claim state.",
+      "interpretation": "Required fields connect a reader-facing measurement to its dataset, split, command, artifact, leakage posture, budget, operating-point provenance, and exposure status. Interpretation remains in a separate gate record.",
       "metrics": {
         "leakage_features_allowed": 0,
-        "missing_provenance_fields": 13,
+        "missing_provenance_fields": 10,
         "publishable_tables_generated": 3,
         "raw_fields_exported": 0,
         "recovery_next_actions_available": 6,
@@ -101,7 +101,7 @@
       },
       "path": "No evidence-cell required fields",
       "safe_to_publish": false,
-      "unsafe_signal": "13 missing provenance fields"
+      "unsafe_signal": "10 missing provenance fields"
     },
     {
       "artifact_integrity": "3 table groups unchanged",

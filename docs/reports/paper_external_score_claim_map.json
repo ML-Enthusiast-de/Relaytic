@@ -1,7 +1,7 @@
 {
-  "allowed_claim_scope": "hosted_detector_output_governance_only",
+  "allowed_claim_scope": "hosted detector-output governance only",
   "allowed_claims": [
-    "Relaytic-AML can convert a rowless external detector-score artifact into evidence cells with schema, hash, leakage-posture, and claim-state metadata.",
+    "Relaytic-AML can convert a rowless external detector-score artifact into a factual evidence cell plus a separate interpretation gate.",
     "Relaytic-AML can produce a rowless handoff summary for hosted detector-output governance."
   ],
   "blocked_claims": [
@@ -34,7 +34,7 @@
   "detector_superiority_allowed": false,
   "graph_neural_detector_novelty_allowed": false,
   "headline_performance_claim_allowed": false,
-  "paper_safe_sentence": "Relaytic-AML can wrap a rowless external detector-score artifact in schema, hash, redaction, evidence-cell, and claim-state controls.",
+  "paper_safe_sentence": "Relaytic-AML can wrap a rowless external detector-score artifact in schema, hash, redaction, a factual evidence cell and a separate interpretation gate.",
   "production_aml_readiness_allowed": false,
   "real_bank_validation_allowed": false,
   "revclassifyds_parity_allowed": false,

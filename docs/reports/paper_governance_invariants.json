@@ -15,34 +15,34 @@
   "invariants": [
     {
       "current_status": "current_checked",
-      "enforcement_mechanism": "metric-cell audit plus required-field gate",
+      "enforcement_mechanism": "evidence-cell audit plus required-field gate",
       "evidence_refs": [
         {
           "artifact_ref": "docs/reports/paper_metric_cell_audit.json",
           "evidence_id": "all_numeric_cells_have_required_provenance",
           "observed_signal": "True",
-          "requirement": "numeric metric cells contain the required provenance fields"
+          "requirement": "numeric evidence cells contain the required provenance fields"
         },
         {
           "artifact_ref": "docs/reports/paper_system_task_eval.json",
           "evidence_id": "metric_cell_provenance_available",
-          "observed_signal": "audit_status=pass; required_fields_present=13/13",
-          "requirement": "reader task can trace the PaySim metric cell"
+          "observed_signal": "audit_status=pass; required_fields_present=14/14",
+          "requirement": "reader task can trace the PaySim evidence cell"
         }
       ],
       "failure_or_ablation_refs": [
         {
           "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
           "evidence_id": "No evidence-cell required fields",
-          "observed_signal": "unsafe_claims=0; leakage=0; raw_fields=0; missing_provenance=13; recovery_actions=6; safe=False",
+          "observed_signal": "unsafe_claims=0; leakage=0; raw_fields=0; missing_provenance=10; recovery_actions=6; safe=False",
           "requirement": "disabled required-field gate exposes missing provenance"
         }
       ],
       "invariant_id": "I1_metric_cell_provenance",
       "limitation_or_boundary": "The invariant checks artifact completeness. It does not establish detector optimality.",
-      "name": "Metric-cell provenance",
+      "name": "Evidence-cell provenance",
       "paper_claim_allowed": "The paper may claim audited provenance for reported metrics.",
-      "statement": "Every reader-facing number must resolve to dataset, split, command, artifact field, metric, budget tier, leakage posture, and claim state.",
+      "statement": "Every reader-facing number must resolve to factual dataset, split, command, artifact, metric, budget, leakage, operating-point, and exposure fields, while interpretation resolves through a separate claim gate.",
       "stronger_claim_blocked": "Metric provenance alone does not justify detector superiority or production AML readiness."
     },
     {

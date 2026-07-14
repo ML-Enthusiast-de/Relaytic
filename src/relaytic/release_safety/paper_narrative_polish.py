@@ -320,7 +320,7 @@ def _build_paysim_selection_story_review(inputs: dict[str, Any]) -> dict[str, An
             _result_has_context(
                 draft,
                 "PR-AUC 0.6388",
-                ["synthetic temporal-fraud", "single-seed point estimate", "validation"],
+                ["validation", "prior P4 and P6 exposure", "not presented as untouched"],
             )
             and _result_has_context(
                 draft,
@@ -338,7 +338,7 @@ def _build_paysim_selection_story_review(inputs: dict[str, Any]) -> dict[str, An
         _check(
             "detector_superiority_boundary_intact",
             "not evidence of bank-scale AML superiority" in draft
-            and "not a new detector architecture" in draft
+            and "rather than a new detector or detector-superiority result" in draft
             and "not a detector contribution" in draft
             and "hard aml, headline, sota" in _text_payload(inputs["readme"]).lower(),
             "The detector-superiority boundary must remain visible in the paper and README.",
@@ -395,11 +395,11 @@ def _build_reader_guidance_audit(inputs: dict[str, Any]) -> dict[str, Any]:
         ),
         _check(
             "release_snapshot_guidance_visible",
-            "release tag" in readme.lower()
-            and "archival snapshot" in readme.lower()
-            and "main branch can continue to evolve" in readme.lower()
-            and "final git tag" in paper_readme.lower()
-            and "archival snapshot" in paper_readme.lower()
+            "immutable source commit" in readme.lower()
+            and "release tag only after" in readme.lower()
+            and "moving `main` branch" in readme.lower()
+            and "immutable source commit" in paper_readme.lower()
+            and "separately verified release tag" in paper_readme.lower()
             and "`main` branch may continue to evolve" in paper_readme.lower(),
             "Paper readers should cite a fixed release snapshot while the main branch remains allowed to evolve.",
             source_artifact="docs/paper/README.md",
@@ -629,7 +629,7 @@ def _build_manifest(
         "upload_blockers_remaining": [
             "compile and inspect the final PDF from the regenerated source bundle",
             "run LaTeX warning, font-embedding, metadata, and rendered-page checks",
-            "confirm a clean git tag target before any public upload",
+            "confirm a clean immutable source revision before any public upload",
         ],
         "checks": checks,
         "failed_checks": [check for check in checks if not check["passed"]],

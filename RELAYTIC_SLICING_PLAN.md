@@ -291,6 +291,7 @@ Stable slice numbering stays the same, but the preferred execution order after S
 74J. Paper Track P23 - novelty and adjacent-systems distinction hardening
 74K. Paper Track P24 - release integrity, protocol disclosure, and revision-locked arXiv candidate
 74L. Paper Track P25 - evidence disclosure and immutable release finalization
+74M. Paper Track P26 - factual evidence/gate separation and validation-subsplit disclosure
 75. Slice 16
 76. Slice 16A
 77. Slice 16B
@@ -360,8 +361,8 @@ Why:
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
-- Paper Track P0 through P25 are implemented before Academy work; P25 closes PaySim prior-test-exposure disclosure, review-threshold provenance, versioned-reference provenance, execution-status semantics, and immutable tagged-release tooling before publication.
-- Paper Track P22 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P22 preserves the evaluation-lab claim boundary, repairs final PDF/source layout roughness, marks the source/PDF bundle ready for author review, and keeps public upload blocked on tag selection, human PDF review, and a clean tag target.
+- Paper Track P0 through P26 are implemented before Academy work; P26 separates factual evidence cells from interpretive claim gates, documents validation sub-splits, corrects finalist-tie wording, and supports an immutable public-commit release when no verified tag exists.
+- Paper Track P22 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P22 preserves the evaluation-lab claim boundary, repairs final PDF/source layout roughness, marks the source/PDF bundle ready for author review, and keeps public upload blocked on human PDF review and a clean public immutable revision. P26 makes release tags optional and verifies them locally and remotely when supplied.
 - Paper Track P23 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P23 makes the novelty lane explicit by distinguishing Relaytic-AML from detector papers, AML LLM triage, agentic SAR/compliance assistants, agent-governance layers, experiment tracking, model cards, datasheets, reproducibility checklists, and agent benchmarks. It preserves the claim that Relaytic-AML is a local-first AML evaluation-evidence governance layer around detectors and agents, not a detector replacement or generic MLOps tool.
 - Paper Track P24 is implemented in `docs/build_slices/phase_paper_release_integrity.md`: it provides factual and bibliographic correction, exact split/queue disclosure, Elliptic shift interpretation, Elliptic2 evidence-role precision, honest single-seed reporting, non-misleading Figure 4 design, semantic consistency checks, and an out-of-tree release command tied to one clean Git revision.
 - Paper Track P0 is now implemented and records the frozen 15Z-R baseline, verification commands, and hard-claim blocked posture before any paper benchmark implementation starts
@@ -372,7 +373,8 @@ Why:
 - Paper Track P5 is now implemented and inspects the raw Elliptic graph bundle, freezes graph provenance and temporal split artifacts, records unknown-label scope, allows only supporting loader/provenance wording, and keeps graph benchmark/SOTA claims blocked before numeric graph baselines run
 - Paper Track P6 is now implemented and runs the full PaySim tabular baseline suite under a train-only leakage-safe feature contract with explicit adapter versions, budget tiers, fallback states, and a publishability gate that blocks headline promotion until P6-A
 - Paper Track P6-A is now implemented and runs a competitive PaySim rerun with audited prior-step destination-history features, 14 recorded probe trials, five full-training finalists, validation-only calibration/threshold selection, and a supporting-only publishability pass for validation-selected Extra Trees (`test_pr_auc=0.638773`) while retaining hard-claim blockers before P7
-- Paper Track P25 is implemented. The tracked candidate is ready for author review; the exact-revision build requires a tag resolving to the reviewed clean commit. Public release publication and arXiv upload remain external author actions.
+- Paper Track P25 is implemented and is superseded by P26 for release identity. A verified tag remains supported, but the exact-revision build may instead use a clean immutable commit that exists on the public remote.
+- Paper Track P26 is implemented in `docs/build_slices/phase_paper_evidence_separation.md`. It introduces factual evidence-cell and separate claim-gate schemas, publishes deterministic separation and validation-subsplit audits, removes the unsupported public tag claim, and preserves all detector-performance claim boundaries.
 - Slice 16 is the umbrella academy track and should not be treated as one undifferentiated implementation pass; it exists so post-AML capability evolution has one coherent contract
 - Slice 16A should start the academy by freezing capability cards and registry truth before replay, hunt, or recruitment logic appears
 - Slice 16B should come before any live academy authority because replay packs and shadow mode are the main trust boundary for future capability growth
@@ -385,8 +387,8 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P24. P24 is the latest named addition and closes protocol disclosure, bibliography accuracy, metric/split/semantic consistency, visual non-comparability, and exact-revision release tooling.
-- next execution target: human review, clean commit, and P24 exact-revision final build; then Slice 16A if the paper release decision is complete
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P26. P26 closes factual evidence/gate separation, validation-subsplit disclosure, finalist-story consistency, and immutable public-revision release identity.
+- next execution target: human review, clean public commit, and P26 exact-revision final build; then Slice 16A if the paper release decision is complete
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -395,7 +397,7 @@ Why:
 - latest runtime-and-permission slice: Slice 13B
 - latest background-and-resume slice: Slice 13C
 - latest mission-control-and-proof slice: Slice 15
-- next planned paper action: run P24 final mode from the clean reviewed commit, inspect its PDF and hashes, then perform the human tag/release/upload actions
+- next planned paper action: run final mode from the clean reviewed public commit, inspect its PDF and hashes, then perform the human release/upload actions; a verified tag is optional
 - next planned academy follow-on: Slice 16A, after the paper release decision
 - late optional representation follow-on after the academy track: Slice 17
 - final planned cleanup follow-on after Slice 17: Slice 18
@@ -4553,7 +4555,7 @@ Fallback rule:
 - if any preflight fails, do not mark the package upload-ready; record the blocker and schedule a repair slice
 
 Implemented status:
-- P21 is implemented. It adds `relaytic release-safety paper-final-preflight`, writes `paper_final_pdf_preflight.json`, `paper_final_source_preflight.json`, `paper_final_preflight_manifest.json`, and `paper_final_release_changelog.md`, rebuilds the canonical Markdown/LaTeX/PDF paper bundle, verifies LaTeX log/font/metadata/source-marker checks, and keeps `arxiv_upload_ready` false until the author selects the final public tag, performs final human page review, and confirms a clean tag target.
+- P21 is implemented. It adds `relaytic release-safety paper-final-preflight`, writes `paper_final_pdf_preflight.json`, `paper_final_source_preflight.json`, `paper_final_preflight_manifest.json`, and `paper_final_release_changelog.md`, rebuilds the canonical Markdown/LaTeX/PDF paper bundle, verifies LaTeX log/font/metadata/source-marker checks, and keeps `arxiv_upload_ready` false until final human page review and clean immutable-revision confirmation.
 
 ## Paper Track P22 - Author-review layout hardening and regression closure
 
@@ -4579,7 +4581,7 @@ Fallback rule:
 - if visual inspection finds a stranded heading, command label, clipped table, or split figure interpretation, repair the generator and regenerate rather than editing the PDF by hand
 
 Implemented status:
-- P22 is implemented. It anchors figures, keeps platform command labels with command blocks, compresses the main system-evaluation table, moves dense audit detail to appendix captions, refreshes Figure 4 and redaction wording, regenerates the canonical Markdown/LaTeX/PDF bundle, reruns final preflight, and keeps upload blocked until final public tag selection, author page review, and a clean tag target.
+- P22 is implemented. It anchors figures, keeps platform command labels with command blocks, compresses the main system-evaluation table, moves dense audit detail to appendix captions, refreshes Figure 4 and redaction wording, regenerates the canonical Markdown/LaTeX/PDF bundle, reruns final preflight, and keeps upload blocked until author page review and a clean immutable source revision.
 
 ## Paper Track P23 - Novelty and adjacent-systems distinction hardening
 
@@ -4693,6 +4695,33 @@ Minimum proof:
 
 Detailed contract:
 - `docs/build_slices/phase_paper_release_finalization.md`
+
+## Paper Track P26 - Factual evidence/gate separation and validation-subsplit disclosure
+
+Status:
+- implemented
+
+Goal:
+- restore the paper's central separation between measurement provenance and publication interpretation
+- document the exact PaySim and Elliptic validation sub-splits without changing benchmark values
+- make release identity truthful when the previously planned tag is not public
+
+Required behavior:
+- factual evidence cells reject interpretive fields, including nested occurrences
+- every public evidence cell resolves to a separate claim-gate record
+- gate references to absent evidence cells fail closed
+- PaySim and Elliptic selection, calibration, and threshold-selection surfaces report boundaries, counts, positives, and overlap policy
+- PaySim finalist prose treats XGBoost and Random Forest as joint runners-up at displayed precision while retaining a unique winner
+- final mode accepts either a verified public tag or a clean immutable commit present on the public remote
+
+Minimum proof:
+- P26 schema, sub-split, and release-reference audits pass
+- deterministic tests reject merged records, ungated cells, and dangling gate references
+- the canonical paper contains separate PaySim and hosted-score records, correct sub-split disclosure, and no unsupported tag archive
+- final PDF and arXiv source bundle identify the same public immutable revision
+
+Detailed contract:
+- `docs/build_slices/phase_paper_evidence_separation.md`
 
 ## Slice 16 - Relaytic Academy, governed capability evolution, and shadow-tested growth
 
