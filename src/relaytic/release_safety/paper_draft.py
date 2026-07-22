@@ -853,7 +853,7 @@ def _architecture_flow_svg_v2() -> str:
         ("Local inputs", "dataset_registry.json\nsplit_contracts.json\nsource hashes", "#f5f7fa"),
         ("Role loops", "guide -> scout\nstrategist -> scientist\nbuilder -> reviewers", "#eef6f3"),
         ("Run artifacts", "benchmark_manifest.json\nfeature_report.json\nsearch_trace.json", "#fff8e5"),
-        ("Evidence cells", "cell_id\nmetric + value\nartifact field", "#f3f0fb"),
+        ("Typed cells", "cell_id + cell_type\nfactual observation\nartifact field", "#f3f0fb"),
         ("Release gates", "admissible use\nmissing evidence\nrelease wording", "#fdeeee"),
     ]
     parts = [
@@ -893,40 +893,37 @@ def _architecture_flow_svg_v2() -> str:
 def _evidence_cell_schema_svg_v2() -> str:
     width = 1220
     height = 640
-    fields = [
-        ("cell_id", "paper-cell:paysim...test_pr_auc"),
-        ("dataset_id", "PaySim / Elliptic / Elliptic2"),
-        ("split", "train, validation, test, provided TST"),
-        ("command", "relaytic release-safety ..."),
-        ("artifact_ref.field", "manifest.json -> test_pr_auc"),
-        ("budget_tier", "baseline, competitive, context"),
-        ("leakage_posture", "forbidden fields excluded"),
-        ("operating_point", "review budget and threshold"),
-        ("metric_value", "PR-AUC 0.6388"),
-    ]
     parts = [
         _svg_header(width, height),
         '<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
-        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Evidence-cell facts</text>',
-        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Evidence cells store metric facts. Claim gates store admissible use and missing evidence.</text>',
+        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Typed factual evidence</text>',
+        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">A common provenance base branches into metric observations and system invariants.</text>',
+        '<rect x="90" y="132" width="1040" height="116" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.2"/>',
+        '<text x="610" y="163" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">Common factual base</text>',
+        '<text x="610" y="194" text-anchor="middle" font-size="15" fill="#374151">cell schema and type  |  cell ID  |  dataset and split  |  command</text>',
+        '<text x="610" y="220" text-anchor="middle" font-size="15" fill="#374151">artifact reference and field  |  budget tier  |  leakage posture</text>',
+        '<line x1="610" y1="248" x2="610" y2="278" stroke="#1f2937" stroke-width="1.6"/>',
+        '<line x1="340" y1="278" x2="880" y2="278" stroke="#1f2937" stroke-width="1.6"/>',
+        '<line x1="340" y1="278" x2="340" y2="300" stroke="#1f2937" stroke-width="1.6"/>',
+        '<line x1="880" y1="278" x2="880" y2="300" stroke="#1f2937" stroke-width="1.6"/>',
+        '<polygon points="340,306 333,295 347,295" fill="#1f2937"/>',
+        '<polygon points="880,306 873,295 887,295" fill="#1f2937"/>',
+        '<rect x="90" y="306" width="500" height="170" rx="6" fill="#eef6f3" stroke="#1f2937" stroke-width="1.2"/>',
+        '<text x="340" y="339" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">metric_evidence_cell</text>',
+        '<text x="116" y="372" font-size="15" fill="#374151">metric + numeric value</text>',
+        '<text x="116" y="399" font-size="15" fill="#374151">model + calibration + exposure status</text>',
+        '<text x="116" y="426" font-size="15" fill="#374151">operating-point applicability + reference</text>',
+        '<text x="116" y="453" font-size="14" fill="#4b5563">Role: detector ranking or review-budget measurement</text>',
+        '<rect x="630" y="306" width="500" height="170" rx="6" fill="#fff8e5" stroke="#1f2937" stroke-width="1.2"/>',
+        '<text x="880" y="339" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">invariant_evidence_cell</text>',
+        '<text x="656" y="372" font-size="15" fill="#374151">invariant name + observed value + state</text>',
+        '<text x="656" y="399" font-size="15" fill="#374151">rowless-export status</text>',
+        '<text x="656" y="426" font-size="15" fill="#374151">detector metric fields prohibited</text>',
+        '<text x="656" y="453" font-size="14" fill="#4b5563">Role: factual governance or handoff state</text>',
+        '<rect x="90" y="516" width="1040" height="56" rx="5" fill="#ffffff" stroke="#c96b6b" stroke-width="1.2"/>',
+        '<text x="610" y="540" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">Separate claim-gate record</text>',
+        '<text x="610" y="561" text-anchor="middle" font-size="14" fill="#4b5563">evidence cell IDs  |  admissible use  |  blocked status  |  reason  |  missing evidence</text>',
     ]
-    box_w = 340
-    box_h = 96
-    start_x = 90
-    start_y = 148
-    gap_x = 36
-    gap_y = 34
-    for index, (field, example) in enumerate(fields):
-        col = index % 3
-        row = index // 3
-        x = start_x + col * (box_w + gap_x)
-        y = start_y + row * (box_h + gap_y)
-        fill = ["#f5f7fa", "#eef6f3", "#fff8e5"][col]
-        parts.append(f'<rect x="{x}" y="{y}" width="{box_w}" height="{box_h}" rx="6" fill="{fill}" stroke="#1f2937" stroke-width="1.1"/>')
-        parts.append(f'<text x="{x + 22}" y="{y + 34}" font-size="18" font-weight="700" fill="#1f2937">{_xml_escape(field)}</text>')
-        parts.extend(_svg_text_lines(example, x + 22, y + 66, font_size=14, anchor="start", line_height=18, fill="#374151"))
-    parts.append('<rect x="90" y="540" width="1040" height="32" rx="5" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>')
-    parts.append('<text x="610" y="561" text-anchor="middle" font-size="14" fill="#4b5563">Gate outputs are separate records: evidence_cell_ids, admissible_use, stronger_claim_status, missing_evidence.</text>')
     parts.append('</svg>')
     return "\n".join(parts)
 
@@ -968,7 +965,7 @@ def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
     metric_bar(800, 240, "Local context", "RevTrack-evaluable cohort, 3 seeds", elliptic2_pr, "#d6a83a")
     metric_bar(800, 333, "RevClassifyDS", "published external reference", revclassify_ref, "#4b5563")
     parts.append('<text x="800" y="393" font-size="15" fill="#4b5563">Cohort equivalence and parity are not established.</text>')
-    parts.append('<text x="800" y="416" font-size="15" fill="#4b5563">Prior provided-RevTrack-TST exposure is disclosed.</text>')
+    parts.append('<text x="800" y="416" font-size="15" fill="#4b5563">Prior exposure to the provided RevTrack TST split is disclosed.</text>')
 
     parts.append('<rect x="70" y="486" width="1360" height="242" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
     parts.append('<text x="96" y="525" font-size="19" font-weight="700" fill="#1f2937">C. Validation-threshold review queues</text>')

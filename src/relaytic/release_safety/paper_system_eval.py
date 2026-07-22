@@ -9,6 +9,7 @@ import re
 from typing import Any
 
 from relaytic.core.json_utils import write_json
+from relaytic.release_safety.paper_evidence_contract import METRIC_EVIDENCE_CELL_REQUIRED_FIELDS
 
 
 PAPER_SYSTEM_EVAL_SCHEMA_VERSION = "relaytic.paper_system_eval.v1"
@@ -217,6 +218,8 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         "paper_result_table_final": _read_artifact(reports / "paper_result_table_final.json", root=root),
         "paper_metric_cell_audit": _read_artifact(reports / "paper_metric_cell_audit.json", root=root),
         "paper_publishability_matrix": _read_artifact(reports / "paper_publishability_matrix.json", root=root),
+        "paysim_p6_feature_report": _read_artifact(reports / "paper_leakage_safe_feature_report.json", root=root),
+        "paysim_p6a_feature_report": _read_artifact(reports / "paysim_leakage_safe_feature_report.json", root=root),
         "paper_public_claims_allowed": _read_artifact(reports / "paper_public_claims_allowed.json", root=root),
         "paper_release_manifest": _read_artifact(reports / "paper_release_manifest.json", root=root),
         "paper_arxiv_source_manifest": _read_artifact(reports / "paper_arxiv_source_manifest.json", root=root),
@@ -541,22 +544,15 @@ def _build_reader_task_eval(
         role="claim_firewall",
     )
     paysim_result_row = _find_result_row(result_table, "paysim_p6a_competitive_selected")
-    required_metric_fields = {
-        "artifact_ref",
-        "artifact_field",
-        "budget_tier",
-        "calibration_status",
-        "command",
-        "dataset_id",
-        "leakage_posture",
-        "metric",
-        "model_identifier",
-        "row_id",
-        "run_directory_ref",
-        "split",
-        "test_exposure_contract",
-        "value",
-    }
+    required_metric_fields = set(METRIC_EVIDENCE_CELL_REQUIRED_FIELDS)
+    p6_features = _payload(inputs["paysim_p6_feature_report"])
+    p6a_features = _payload(inputs["paysim_p6a_feature_report"])
+    feature_contracts_differ = (
+        bool(p6_features.get("feature_contract_id"))
+        and bool(p6a_features.get("feature_contract_id"))
+        and p6_features.get("feature_contract_id") != p6a_features.get("feature_contract_id")
+        and set(p6_features.get("feature_columns", [])) != set(p6a_features.get("feature_columns", []))
+    )
     no_lost_tasks = _task_pass_map(no_lost_user_eval.get("tasks", []))
     handoff_tasks = _task_pass_map(agent_handoff_eval.get("tasks", []))
     claim_cases = _case_pass_map(claim_gate_case_studies.get("cases", []))
@@ -618,11 +614,16 @@ def _build_reader_task_eval(
             "paysim_baseline_and_competitive_budget_comparable",
             pay_improved
             and pay_base_cell.get("dataset_id") == pay_comp_cell.get("dataset_id")
+            and pay_base_cell.get("split") == pay_comp_cell.get("split")
             and pay_base_cell.get("metric_id") == pay_comp_cell.get("metric_id") == "test_pr_auc"
             and pay_base_cell.get("budget_tier") == "baseline"
-            and pay_comp_cell.get("budget_tier") == "competitive",
-            "A reviewer should be able to compare the PaySim baseline and competitive budgets under the same metric and dataset contract.",
-            f"baseline={pay_base_value}; competitive={pay_comp_value}; improved={pay_improved}",
+            and pay_comp_cell.get("budget_tier") == "competitive"
+            and feature_contracts_differ,
+            "A reviewer should be able to compare PaySim budget tiers under the same dataset, temporal split, and metric while seeing that the competitive route adds a separately audited feature contract.",
+            (
+                f"baseline={pay_base_value}; competitive={pay_comp_value}; improved={pay_improved}; "
+                f"feature_contract_same={not feature_contracts_differ}"
+            ),
             "docs/reports/paper_metric_cell_audit.json",
         ),
         _task(

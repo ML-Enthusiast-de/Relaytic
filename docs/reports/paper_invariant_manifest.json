@@ -56,7 +56,7 @@
       "artifact_ref": "docs/reports/paper_metric_cell_audit.json",
       "exists": true,
       "input_id": "metric_cell_audit",
-      "sha256_prefix": "8d96165af5f1"
+      "sha256_prefix": "f5d23e38d6b5"
     },
     {
       "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
@@ -86,7 +86,7 @@
       "artifact_ref": "docs/reports/paper_system_task_eval.json",
       "exists": true,
       "input_id": "system_task_eval",
-      "sha256_prefix": "749aea5953e7"
+      "sha256_prefix": "02f5d1f9611d"
     },
     {
       "artifact_ref": "docs/reports/paper_agent_handoff_eval.json",
@@ -110,13 +110,13 @@
       "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
       "exists": true,
       "input_id": "governance_ablation_eval",
-      "sha256_prefix": "b603a9db549c"
+      "sha256_prefix": "9ddd58bf2a0d"
     },
     {
       "artifact_ref": "docs/reports/paper_governance_ablation_manifest.json",
       "exists": true,
       "input_id": "governance_ablation_manifest",
-      "sha256_prefix": "88c4dd0ca123"
+      "sha256_prefix": "d71e0c36578b"
     },
     {
       "artifact_ref": "docs/reports/paysim_leakage_safe_feature_report.json",
@@ -134,7 +134,7 @@
       "artifact_ref": "docs/paper/references.bib",
       "exists": true,
       "input_id": "references",
-      "sha256_prefix": "cf334f7f8905"
+      "sha256_prefix": "5c25b5f4ee91"
     }
   ],
   "next_slice": "Paper Track P19 - hosted detector workflow demonstration, if selected",

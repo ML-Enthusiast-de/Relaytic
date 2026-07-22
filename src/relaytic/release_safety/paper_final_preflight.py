@@ -269,7 +269,7 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
             "Repository: https://github.com/ML-Enthusiast-de/Relaytic" in draft
             and (
                 "Source commit:" in draft
-                or "final clean-release command injects and verifies the exact source revision" in draft
+                or "This review candidate does not claim an archival revision." in draft
             )
             and "Public release tag: TODO before arXiv submission" not in draft,
             "Reproducibility must identify the repository and either a clean source commit or the exact-revision final-build mechanism.",

@@ -32,7 +32,7 @@ def test_paper_track_p19b_builds_hosted_score_case_study() -> None:
     claim_map = pack["paper_external_score_claim_map"]
     repro_card = pack["paper_external_score_repro_card"]
     adapter = case_study["adapter_input_contract"]
-    metric = case_study["metric_policy"]
+    invariant = case_study["invariant_policy"]
     redaction = case_study["rowless_redaction"]
     serialized = json.dumps(pack, sort_keys=True)
 
@@ -46,8 +46,10 @@ def test_paper_track_p19b_builds_hosted_score_case_study() -> None:
     assert adapter["selected_route"] == "external_score_file_adapter"
     assert len(adapter["schema_hash_prefix"]) == 12
     assert len(adapter["content_hash_prefix"]) == 12
-    assert metric["detector_performance_metric"] is False
-    assert metric["metric_role"] == "governance_metric"
+    assert invariant["detector_performance_metric"] is False
+    assert invariant["invariant_name"] == "hosted_score_metadata_completeness"
+    assert invariant["invariant_state"] == "pass"
+    assert invariant["operating_point_applicability"] == "not_applicable"
     assert redaction["rowless_handoff_passed"] is True
     assert redaction["raw_rows_exported"] is False
     assert redaction["private_paths_exported"] is False

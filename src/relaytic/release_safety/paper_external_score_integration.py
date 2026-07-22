@@ -235,13 +235,17 @@ def _build_case_study(inputs: dict[str, Any]) -> dict[str, Any]:
         or schema.get("content_hash_prefix")
         or "not_available",
     }
-    metric_policy = {
-        "metric": first_cell.get("metric") or schema.get("metric", {}).get("name") or "not_available",
-        "metric_role": first_cell.get("metric_role") or schema.get("metric", {}).get("role") or "not_available",
-        "value": first_cell.get("value") if "value" in first_cell else schema.get("metric", {}).get("value"),
-        "detector_performance_metric": bool(schema.get("metric", {}).get("detector_performance_metric")),
+    invariant_policy = {
+        "invariant_name": first_cell.get("invariant_name") or "not_available",
+        "observed_value": first_cell.get("observed_value"),
+        "detector_performance_metric": bool(first_cell.get("detector_performance_metric")),
         "invariant_state": first_cell.get("invariant_state") or "not_available",
-        "reader_facing_result": "schema_completeness_invariant_pass" if first_cell.get("value") == 1.0 else "schema_completeness_invariant_fail",
+        "operating_point_applicability": first_cell.get("operating_point_applicability") or "not_available",
+        "reader_facing_result": (
+            "schema_completeness_invariant_pass"
+            if first_cell.get("invariant_state") == "pass"
+            else "schema_completeness_invariant_fail"
+        ),
     }
     rowless_redaction = {
         "rowless_handoff_passed": bool(handoff.get("rowless_handoff_passed")),
@@ -270,7 +274,7 @@ def _build_case_study(inputs: dict[str, Any]) -> dict[str, Any]:
         "checks": checks,
         "adapter_input_contract": adapter_input_contract,
         "relaytic_checks": _compact_checks(manifest.get("checks", [])) + _compact_checks(gate.get("checks", [])),
-        "metric_policy": metric_policy,
+        "invariant_policy": invariant_policy,
         "rowless_redaction": rowless_redaction,
         "evidence_cell_ids": [str(cell.get("cell_id")) for cell in cells if cell.get("cell_id")],
         "auditable_record_snippet": _auditable_record_snippet(first_cell),
@@ -297,7 +301,6 @@ def _build_case_study(inputs: dict[str, Any]) -> dict[str, Any]:
 
 def _build_paper_panel(case_study: dict[str, Any]) -> dict[str, Any]:
     adapter = dict(case_study.get("adapter_input_contract", {}))
-    metric = dict(case_study.get("metric_policy", {}))
     redaction = dict(case_study.get("rowless_redaction", {}))
     blocked = list(case_study.get("blocked_stronger_claims", []))
     rows = [
@@ -537,15 +540,19 @@ def _format_panel_value(value: Any) -> str:
 
 def _auditable_record_snippet(cell: dict[str, Any]) -> dict[str, Any]:
     return {
+        "cell_schema": cell.get("cell_schema") or "not_available",
         "cell_id": cell.get("cell_id") or "not_available",
+        "cell_type": cell.get("cell_type") or "not_available",
         "dataset_id": cell.get("dataset_id") or "not_available",
         "split": cell.get("split") or "not_available",
         "command": cell.get("command") or "relaytic release-safety paper-external-score-proof",
         "artifact_ref": cell.get("artifact_ref") or "not_available",
-        "metric": cell.get("metric") or "not_available",
-        "value": cell.get("value") if "value" in cell else "not_available",
-        "invariant_state": "pass" if cell.get("value") == 1.0 else "fail",
-        "detector_performance_metric": False,
+        "artifact_field": cell.get("artifact_field") or "not_available",
+        "invariant_name": cell.get("invariant_name") or "not_available",
+        "invariant_state": cell.get("invariant_state") or "not_available",
+        "observed_value": cell.get("observed_value"),
+        "detector_performance_metric": bool(cell.get("detector_performance_metric")),
+        "operating_point_applicability": cell.get("operating_point_applicability") or "not_available",
         "leakage_posture": cell.get("leakage_posture") or "not_available",
         "rowless_export_status": cell.get("rowless_export_status") or "not_available",
     }

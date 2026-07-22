@@ -3,26 +3,28 @@
   "evidence_cell_count": 1,
   "evidence_cells": [
     {
+      "artifact_field": "accepted",
       "artifact_hash_prefix": "8d3c767fd26d",
-      "artifact_ref": "fixture:p19a_external_score_rowless_v1",
+      "artifact_ref": "docs/reports/paper_external_score_schema.json",
       "budget_tier": "deterministic_fixture",
       "cell_id": "p19a.external_score.hosted_metadata_completeness",
-      "cell_schema": "relaytic.paper_evidence_cell.v2",
+      "cell_schema": "relaytic.paper_invariant_evidence_cell.v1",
+      "cell_type": "invariant_evidence_cell",
       "command": "relaytic release-safety paper-external-score-proof",
       "dataset_id": "p19a_hosted_score_fixture",
       "dataset_role": "deterministic_system_fixture",
       "detector_performance_metric": false,
+      "invariant_name": "hosted_score_metadata_completeness",
       "invariant_state": "pass",
       "leakage_posture": "rowless_no_training_or_label_data_exported",
-      "metric": "hosted_score_metadata_completeness",
-      "metric_role": "governance_metric",
+      "observed_value": true,
+      "operating_point_applicability": "not_applicable",
       "rowless": true,
       "rowless_export_status": "rowless",
       "schema_hash_prefix": "0534b78322c7",
       "source_posture": "deterministic_rowless_fixture",
       "split": "fixture_holdout",
-      "split_role": "fixed_evaluation_surface",
-      "value": 1.0
+      "split_role": "fixed_evaluation_surface"
     }
   ],
   "evidence_gate_separation": {
@@ -30,21 +32,35 @@
     "claim_gate_count": 1,
     "claim_gate_schema": "relaytic.paper_claim_gate.v2",
     "evidence_cell_count": 1,
-    "evidence_cell_schema": "relaytic.paper_evidence_cell.v2",
-    "schema_version": "relaytic.paper_evidence_gate_audit.v1",
+    "evidence_cell_type_counts": {
+      "invariant_evidence_cell": 1,
+      "metric_evidence_cell": 0
+    },
+    "evidence_type_system_schema": "relaytic.paper_evidence_type_system.v1",
+    "invariant_evidence_cell_schema": "relaytic.paper_invariant_evidence_cell.v1",
+    "metric_evidence_cell_schema": "relaytic.paper_metric_evidence_cell.v1",
+    "schema_version": "relaytic.paper_evidence_gate_audit.v2",
     "status": "pass",
     "violations": []
   },
+  "required_cell_field_count": 16,
   "required_cell_fields": [
+    "cell_schema",
     "cell_id",
+    "cell_type",
     "dataset_id",
     "split",
     "command",
     "artifact_ref",
-    "metric",
-    "value",
+    "artifact_field",
+    "budget_tier",
     "leakage_posture",
-    "budget_tier"
+    "invariant_name",
+    "invariant_state",
+    "observed_value",
+    "detector_performance_metric",
+    "operating_point_applicability",
+    "rowless_export_status"
   ],
   "schema_version": "relaytic.paper_external_score.v2",
   "status": "pass"

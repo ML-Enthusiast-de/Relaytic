@@ -28,7 +28,8 @@ P26 does not rerun detector selection, alter benchmark measurements, claim an un
 
 ## Implemented outputs
 
-- factual schema: `relaytic.paper_evidence_cell.v2`
+- metric schema: `relaytic.paper_metric_evidence_cell.v1`
+- invariant schema: `relaytic.paper_invariant_evidence_cell.v1`
 - interpretive schema: `relaytic.paper_claim_gate.v2`
 - table-gate artifact: `docs/reports/paper_claim_gate_records.json`
 - separation audit: `docs/reports/paper_p26_evidence_gate_separation_audit.json`

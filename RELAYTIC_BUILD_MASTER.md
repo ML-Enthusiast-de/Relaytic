@@ -470,7 +470,7 @@ If the goal is to turn the current implementation into something that looks genu
 
 Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.
 Slices 10, 10B, 10C, and 10A are the current category-shift unlocks that turned Relaytic from a governed inference lab into a more explicit decision-and-discovery system with skeptical steering. Slice 11A added real incumbent pressure, Slice 11B completed the first adoption unlock because humans and external agents can now launch, inspect, and demo the system from one coherent control surface, and Slice 11C made that surface legible enough to act as a real MVP cockpit instead of only a technical dashboard.
-Paper Track P0 through P26 is the completed mandatory pre-Academy arXiv engineering path. P26 adds factual evidence/gate separation, validation-subsplit disclosure, finalist-story consistency, and truthful immutable public-revision identity to the P24/P25 integrity path. Slices 16A through 16F remain the later governed capability-evolution track.
+Paper Track P0 through P27 is the completed mandatory pre-Academy arXiv engineering path. P27 adds typed metric/invariant evidence, authoritative schema counts, truthful PaySim feature-contract comparison, generated-surface consistency, and separate candidate, archival, and public-verification release states. Slices 16A through 16F remain the later governed capability-evolution track.
 
 ## Source of truth precedence
 

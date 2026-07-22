@@ -1168,6 +1168,19 @@ P26 extends the existing paper release-safety boundary without changing detector
 
 Compatibility boundary: P26 changes paper artifact schemas from `relaytic.paper_evidence_cell.v1` to `relaytic.paper_evidence_cell.v2`. It does not change benchmark measurements, retrain a model, claim detector superiority, create a tag, publish a release, or upload to arXiv.
 
+## Paper Track P27 Typed Evidence And Release-Candidate Consistency
+
+P27 replaces the temporary universal P26 factual-cell shape with two explicit paper-only schemas.
+
+- metric observations use `relaytic.paper_metric_evidence_cell.v1`
+- system invariants use `relaytic.paper_invariant_evidence_cell.v1`
+- claim interpretation remains in `relaytic.paper_claim_gate.v2`
+- the generated `paper_evidence_schema_contract.json` is the authority for fields and fixture counts
+- candidate manuscripts no longer cite the generation-base commit; final mode injects the clean committed revision
+- final bundles can be inspected locally before push, while `--verify-public` adds the post-push origin check
+
+Compatibility boundary: this changes generated paper evidence and release metadata only. Public detector APIs, benchmark values, model artifacts, and legacy package compatibility are unchanged.
+
 ## Removal Criteria
 
 The remaining compatibility layer can be removed when all of the following are true:

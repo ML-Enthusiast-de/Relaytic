@@ -1,0 +1,24 @@
+{
+  "checks": [
+    {
+      "check": "canonical manuscript matches generator",
+      "observed": true,
+      "pass_criterion": true,
+      "passed": true
+    },
+    {
+      "check": "canonical SVG figures match generator",
+      "observed": {
+        "claim_gate_flow": true,
+        "publishability_matrix": true,
+        "review_budget": true,
+        "supporting_pr_auc": true
+      },
+      "pass_criterion": "all true",
+      "passed": true
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P27",
+  "status": "pass"
+}

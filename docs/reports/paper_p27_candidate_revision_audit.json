@@ -1,0 +1,22 @@
+{
+  "archival_revision_claimed": false,
+  "checks": [
+    {
+      "check": "candidate has no source-commit claim",
+      "observed": false,
+      "pass_criterion": false,
+      "passed": true
+    },
+    {
+      "check": "candidate mode is explicit",
+      "observed": true,
+      "pass_criterion": true,
+      "passed": true
+    }
+  ],
+  "release_mode": "review_candidate",
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P27",
+  "status": "pass",
+  "worktree_dirty": true
+}

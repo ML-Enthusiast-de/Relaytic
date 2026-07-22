@@ -9,6 +9,10 @@ import re
 from typing import Any
 
 from relaytic.core.json_utils import write_json
+from relaytic.release_safety.paper_evidence_contract import (
+    DISABLED_REQUIRED_FIELD_ABLATION_FIELDS,
+    METRIC_EVIDENCE_CELL_REQUIRED_FIELDS,
+)
 
 
 PAPER_GOVERNANCE_ABLATION_SCHEMA_VERSION = "relaytic.paper_governance_ablation.v1"
@@ -34,18 +38,8 @@ REQUIRED_GOVERNANCE_ABLATION_INPUT_REFS = [
     "docs/reports/paper_failure_case_eval.json",
 ]
 
-REQUIRED_METRIC_CELL_FIELDS = [
-    "cell_id",
-    "dataset_id",
-    "split",
-    "command",
-    "artifact_ref",
-    "artifact_field",
-    "metric",
-    "value",
-    "budget_tier",
-    "leakage_posture",
-]
+REQUIRED_METRIC_CELL_FIELDS = list(METRIC_EVIDENCE_CELL_REQUIRED_FIELDS)
+assert REQUIRED_METRIC_CELL_FIELDS == list(DISABLED_REQUIRED_FIELD_ABLATION_FIELDS)
 
 FORBIDDEN_PAYSIM_BALANCE_COLUMNS = [
     "oldbalanceOrg",

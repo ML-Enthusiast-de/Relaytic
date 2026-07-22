@@ -10,8 +10,10 @@ from typing import Any
 from relaytic.core.json_utils import dumps_json, write_json
 from relaytic.release_safety.paper_evidence_contract import (
     EVIDENCE_CELL_INTERPRETIVE_FIELDS,
+    INVARIANT_EVIDENCE_CELL_REQUIRED_FIELDS,
+    INVARIANT_EVIDENCE_CELL_TYPE,
     PAPER_CLAIM_GATE_SCHEMA_VERSION,
-    PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+    PAPER_INVARIANT_EVIDENCE_CELL_SCHEMA_VERSION,
     audit_evidence_gate_separation,
 )
 
@@ -418,25 +420,27 @@ def _build_evidence_cells(
 ) -> dict[str, Any]:
     accepted = bool(schema_report["accepted"])
     cell = {
-        "cell_schema": PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+        "cell_schema": PAPER_INVARIANT_EVIDENCE_CELL_SCHEMA_VERSION,
         "cell_id": "p19a.external_score.hosted_metadata_completeness",
+        "cell_type": INVARIANT_EVIDENCE_CELL_TYPE,
         "dataset_id": normalized["dataset_id"],
         "dataset_role": normalized["dataset_role"],
         "split": normalized["split"],
         "split_role": normalized["split_role"],
         "command": "relaytic release-safety paper-external-score-proof",
-        "artifact_ref": source.get("artifact_ref"),
+        "artifact_ref": "docs/reports/paper_external_score_schema.json",
+        "artifact_field": "accepted",
         "artifact_hash_prefix": source.get("content_hash_prefix"),
         "schema_hash_prefix": normalized["schema_hash_prefix"],
-        "metric": normalized["metric_name"],
-        "value": normalized["metric_value"],
-        "metric_role": normalized["metric_role"],
+        "invariant_name": "hosted_score_metadata_completeness",
+        "observed_value": accepted,
         "detector_performance_metric": bool(normalized["metric"].get("detector_performance_metric")),
         "budget_tier": "deterministic_fixture",
         "leakage_posture": normalized["leakage_posture"],
         "invariant_state": "pass" if accepted else "blocked",
         "rowless": bool(schema_report["rowless_input"]),
         "rowless_export_status": "rowless" if bool(schema_report["rowless_input"]) else "blocked",
+        "operating_point_applicability": "not_applicable",
         "source_posture": source.get("source_kind"),
     }
     return {
@@ -445,17 +449,8 @@ def _build_evidence_cells(
         "evidence_cell_count": 1 if accepted else 0,
         "evidence_cells": [cell] if accepted else [],
         "blocked_cell": None if accepted else cell,
-        "required_cell_fields": [
-            "cell_id",
-            "dataset_id",
-            "split",
-            "command",
-            "artifact_ref",
-            "metric",
-            "value",
-            "leakage_posture",
-            "budget_tier",
-        ],
+        "required_cell_fields": list(INVARIANT_EVIDENCE_CELL_REQUIRED_FIELDS),
+        "required_cell_field_count": len(INVARIANT_EVIDENCE_CELL_REQUIRED_FIELDS),
     }
 
 

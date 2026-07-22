@@ -8,9 +8,12 @@ from typing import Any
 
 from relaytic.core.json_utils import write_json
 from relaytic.release_safety.paper_evidence_contract import (
+    METRIC_EVIDENCE_CELL_REQUIRED_FIELDS,
+    METRIC_EVIDENCE_CELL_TYPE,
     PAPER_CLAIM_GATE_SCHEMA_VERSION,
-    PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+    PAPER_METRIC_EVIDENCE_CELL_SCHEMA_VERSION,
     audit_evidence_gate_separation,
+    build_evidence_schema_contract,
 )
 
 
@@ -23,6 +26,7 @@ PAPER_TABLE_FILENAMES = {
     "paper_metric_cell_audit": "paper_metric_cell_audit.json",
     "paper_publishability_matrix": "paper_publishability_matrix.json",
     "paper_claim_gate_records": "paper_claim_gate_records.json",
+    "paper_evidence_schema_contract": "paper_evidence_schema_contract.json",
 }
 
 RUN_DIRECTORY_REF = "docs/reports"
@@ -38,6 +42,7 @@ def build_paper_table_pack(project_root: str | Path) -> dict[str, Any]:
     claim_gates = _collect_claim_gate_records(result_table)
     _remove_internal_gate_specs(result_table)
     separation_audit = audit_evidence_gate_separation(evidence_cells=cells, claim_gates=claim_gates)
+    schema_contract = build_evidence_schema_contract()
     audit = _build_metric_cell_audit(
         inputs=inputs,
         result_table=result_table,
@@ -52,7 +57,7 @@ def build_paper_table_pack(project_root: str | Path) -> dict[str, Any]:
     )
     claim_gate_records = {
         "schema_version": PAPER_CLAIM_GATE_SCHEMA_VERSION,
-        "slice": "Paper Track P26",
+        "slice": "Paper Track P27",
         "status": separation_audit["status"],
         "gate_count": len(claim_gates),
         "claim_gates": claim_gates,
@@ -74,6 +79,7 @@ def build_paper_table_pack(project_root: str | Path) -> dict[str, Any]:
         "paper_metric_cell_audit": audit,
         "paper_publishability_matrix": publishability,
         "paper_claim_gate_records": claim_gate_records,
+        "paper_evidence_schema_contract": schema_contract,
     }
 
 
@@ -140,6 +146,7 @@ def _collect_inputs(reports: Path) -> dict[str, Any]:
         "graph_split": _read_artifact(reports / "elliptic_temporal_split_report.json"),
         "elliptic2_gate": _read_artifact(reports / "elliptic2_publishability_gate.json"),
         "elliptic2_repeated": _read_artifact(reports / "elliptic2_repeated_seed_scorecard.json"),
+        "elliptic2_reference_scorecard": _read_artifact(reports / "elliptic2_revclassify_reference_scorecard.json"),
         "elliptic2_parity_gate": _read_artifact(reports / "elliptic2_reference_parity_gate.json"),
         "elliptic2_entity_split": _read_artifact(reports / "elliptic2_entity_disjoint_split_report.json"),
         "elliptic2_cohort": _read_artifact(reports / "elliptic2_evaluable_cohort_reconciliation.json"),
@@ -432,6 +439,7 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
     rows = []
     p8b = _payload(inputs["elliptic2_gate"])
     repeated = _payload(inputs["elliptic2_repeated"])
+    reference_scorecard = _payload(inputs["elliptic2_reference_scorecard"])
     if p8b or repeated:
         command = "relaytic release-safety elliptic2-competitive --revtrack-dir <external-local-revtrack-dir> --budget-tier competitive --run-suite --require-full-rerun --format json"
         rows.append(
@@ -452,6 +460,7 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                 artifact_refs=[
                     "docs/reports/elliptic2_publishability_gate.json",
                     "docs/reports/elliptic2_repeated_seed_scorecard.json",
+                    "docs/reports/elliptic2_revclassify_reference_scorecard.json",
                     "docs/reports/elliptic2_split_robustness_report.json",
                     "docs/reports/paper_p8d_evidence_role_matrix.json",
                 ],
@@ -485,10 +494,10 @@ def _context_rows(inputs: dict[str, Any]) -> list[dict[str, Any]]:
                     ),
                     _context_metric(
                         "published_reference_pr_auc",
-                        p8b.get("published_reference_pr_auc"),
+                        _deep_get(reference_scorecard, ["reference", "RevClassify_DS", "pr_auc"]),
                         "reported_reference",
-                        "docs/reports/elliptic2_publishability_gate.json",
-                        "published_reference_pr_auc",
+                        "docs/reports/elliptic2_revclassify_reference_scorecard.json",
+                        "reference.RevClassify_DS.pr_auc",
                         command,
                         p8b,
                     ),
@@ -607,18 +616,12 @@ def _build_metric_cell_audit(
     numeric_cells = [cell for cell in cells if cell.get("value") is not None]
     blocked_cells = [cell for cell in cells if cell.get("value") is None]
     violations = []
-    required_fields = [
-        "dataset_id",
-        "split",
-        "command",
-        "run_directory_ref",
-        "artifact_ref",
-        "budget_tier",
-        "leakage_posture",
-        "metric",
-    ]
     for cell in numeric_cells:
-        missing = [field for field in required_fields if cell.get(field) in (None, "", [])]
+        missing = [
+            field
+            for field in METRIC_EVIDENCE_CELL_REQUIRED_FIELDS
+            if cell.get(field) in (None, "", [])
+        ]
         if missing:
             violations.append(
                 {
@@ -637,7 +640,9 @@ def _build_metric_cell_audit(
         "paper_can_continue_to_p11": status == "pass",
         "numeric_cell_count": len(numeric_cells),
         "blocked_or_empty_cell_count": len(blocked_cells),
-        "evidence_cell_schema": PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+        "evidence_cell_schema": PAPER_METRIC_EVIDENCE_CELL_SCHEMA_VERSION,
+        "metric_required_fields": list(METRIC_EVIDENCE_CELL_REQUIRED_FIELDS),
+        "metric_required_field_count": len(METRIC_EVIDENCE_CELL_REQUIRED_FIELDS),
         "claim_gate_schema": PAPER_CLAIM_GATE_SCHEMA_VERSION,
         "evidence_gate_separation": separation_audit,
         "checks": {
@@ -894,6 +899,12 @@ def _selected_metric(
     )
     cell["model_identifier"] = selected.get("family_id") or "not_recorded"
     cell["calibration_status"] = selected.get("calibration_method") or "not_recorded"
+    cell["operating_point_applicability"] = "contextual_operating_point_recorded"
+    cell["operating_point_ref"] = (
+        "docs/reports/paysim_competitive_benchmark_manifest.json#"
+        f"validation_selected_competitive_model.{split}_operating_point"
+    )
+    cell["exposure_status"] = "validation_selection_surface" if split == "validation" else "fixed_test_previously_exposed"
     if split == "test":
         cell["test_exposure_contract"] = manifest.get("test_exposure_contract") or {
             "test_partition_fixed": True,
@@ -932,6 +943,14 @@ def _operating_metric(
         publishability_gate_status=gate.get("status"),
     )
     cell["operating_point_provenance"] = _operating_point_provenance(selected)
+    cell["operating_point_applicability"] = "applicable"
+    cell["operating_point_ref"] = (
+        "docs/reports/paysim_competitive_benchmark_manifest.json#"
+        "validation_selected_competitive_model.test_operating_point"
+    )
+    cell["calibration_status"] = selected.get("calibration_method") or "not_recorded"
+    cell["exposure_status"] = "fixed_test_previously_exposed"
+    cell["model_identifier"] = selected.get("family_id") or "not_recorded"
     cell["test_exposure_contract"] = manifest.get("test_exposure_contract") or {
         "test_partition_fixed": True,
         "test_partition_previously_exposed": True,
@@ -953,7 +972,7 @@ def _fixed_fpr_metric(
     inputs: dict[str, Any],
 ) -> dict[str, Any]:
     fixed = _deep_get(selected, ["fixed_fpr", "test"]) or {}
-    return _metric_cell(
+    cell = _metric_cell(
         "paysim_p6a_competitive_selected",
         metric_id,
         fixed.get(field) if isinstance(fixed, dict) else None,
@@ -968,6 +987,15 @@ def _fixed_fpr_metric(
         publishability_gate_ref="docs/reports/paysim_publishability_gate.json",
         publishability_gate_status=gate.get("status"),
     )
+    cell["operating_point_applicability"] = "applicable"
+    cell["operating_point_ref"] = (
+        "docs/reports/paysim_competitive_benchmark_manifest.json#"
+        "validation_selected_competitive_model.fixed_fpr"
+    )
+    cell["calibration_status"] = selected.get("calibration_method") or "not_recorded"
+    cell["exposure_status"] = "fixed_test_previously_exposed"
+    cell["model_identifier"] = selected.get("family_id") or "not_recorded"
+    return cell
 
 
 def _graph_metric(
@@ -979,7 +1007,7 @@ def _graph_metric(
     gate: dict[str, Any],
     graph: dict[str, Any],
 ) -> dict[str, Any]:
-    return _metric_cell(
+    cell = _metric_cell(
         "elliptic_p7_selected_graph_feature_baseline",
         metric_id,
         selected.get(field),
@@ -994,6 +1022,15 @@ def _graph_metric(
         publishability_gate_ref="docs/reports/paper_graph_publishability_gate.json",
         publishability_gate_status=gate.get("status"),
     )
+    cell["operating_point_applicability"] = "contextual_operating_point_recorded"
+    cell["operating_point_ref"] = (
+        "docs/reports/paper_graph_feature_table.json#"
+        f"validation_selected_competitive_baseline.{split}_operating_point"
+    )
+    cell["calibration_status"] = selected.get("calibration_method") or "not_recorded"
+    cell["exposure_status"] = "validation_selection_surface" if split == "validation" else "public_temporal_test_surface"
+    cell["model_identifier"] = selected.get("family_id") or "not_recorded"
+    return cell
 
 
 def _graph_operating_metric(
@@ -1021,6 +1058,14 @@ def _graph_operating_metric(
         publishability_gate_status=gate.get("status"),
     )
     cell["operating_point_provenance"] = _operating_point_provenance(selected)
+    cell["operating_point_applicability"] = "applicable"
+    cell["operating_point_ref"] = (
+        "docs/reports/paper_graph_feature_table.json#"
+        "validation_selected_competitive_baseline.test_operating_point"
+    )
+    cell["calibration_status"] = selected.get("calibration_method") or "not_recorded"
+    cell["exposure_status"] = "public_temporal_test_surface"
+    cell["model_identifier"] = selected.get("family_id") or "not_recorded"
     return cell
 
 
@@ -1033,7 +1078,7 @@ def _graph_fixed_fpr_metric(
     graph: dict[str, Any],
 ) -> dict[str, Any]:
     fixed = _deep_get(selected, ["fixed_fpr", "test"]) or {}
-    return _metric_cell(
+    cell = _metric_cell(
         "elliptic_p7_selected_graph_feature_baseline",
         metric_id,
         fixed.get(field) if isinstance(fixed, dict) else None,
@@ -1048,6 +1093,15 @@ def _graph_fixed_fpr_metric(
         publishability_gate_ref="docs/reports/paper_graph_publishability_gate.json",
         publishability_gate_status=gate.get("status"),
     )
+    cell["operating_point_applicability"] = "applicable"
+    cell["operating_point_ref"] = (
+        "docs/reports/paper_graph_feature_table.json#"
+        "validation_selected_competitive_baseline.fixed_fpr"
+    )
+    cell["calibration_status"] = selected.get("calibration_method") or "not_recorded"
+    cell["exposure_status"] = "public_temporal_test_surface"
+    cell["model_identifier"] = selected.get("family_id") or "not_recorded"
+    return cell
 
 
 def _context_metric(
@@ -1059,7 +1113,7 @@ def _context_metric(
     command: str,
     gate: dict[str, Any],
 ) -> dict[str, Any]:
-    return _metric_cell(
+    cell = _metric_cell(
         "elliptic2_p8b_modern_context",
         metric_id,
         value,
@@ -1074,6 +1128,23 @@ def _context_metric(
         publishability_gate_ref="docs/reports/elliptic2_publishability_gate.json",
         publishability_gate_status=gate.get("status"),
     )
+    cell["calibration_status"] = "not_recorded"
+    cell["operating_point_applicability"] = "not_applicable"
+    cell["operating_point_ref"] = "not_applicable"
+    if metric_id == "published_reference_pr_auc":
+        cell["model_identifier"] = "RevClassify_DS_published_reference"
+        cell["exposure_status"] = "external_published_reference_not_locally_generated"
+        cell["provenance_role"] = "external_published_reference"
+        cell["published_source_ref"] = "Song et al. (2024), Table 1, RevClassifyDS full-shot PR-AUC"
+        cell["cohort_equivalence_status"] = "not_established"
+    else:
+        cell["model_identifier"] = "p8b_pooled_moments_lgbm"
+        cell["exposure_status"] = (
+            "provided_revtrack_tst_previously_exposed"
+            if split == "provided_revtrack_tst"
+            else "content_hash_robustness_partition"
+        )
+    return cell
 
 
 def _limitation_metric(
@@ -1150,8 +1221,9 @@ def _metric_cell(
 ) -> dict[str, Any]:
     del source_claim_posture, publishability_gate_ref, publishability_gate_status, headline_metric_candidate
     return {
-        "cell_schema": PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+        "cell_schema": PAPER_METRIC_EVIDENCE_CELL_SCHEMA_VERSION,
         "cell_id": f"{row_id}.{metric_id}",
+        "cell_type": METRIC_EVIDENCE_CELL_TYPE,
         "row_id": row_id,
         "metric": metric_id,
         "metric_id": metric_id,
@@ -1164,13 +1236,21 @@ def _metric_cell(
         "artifact_field": artifact_field,
         "budget_tier": budget_tier,
         "leakage_posture": leakage_posture,
+        "operating_point_applicability": "not_applicable",
+        "operating_point_ref": "not_applicable",
+        "calibration_status": "not_recorded",
+        "exposure_status": "not_recorded",
+        "model_identifier": "not_recorded",
     }
 
 
 def _collect_metric_cells(payload: Any) -> list[dict[str, Any]]:
     cells: list[dict[str, Any]] = []
     if isinstance(payload, dict):
-        if payload.get("cell_schema") == PAPER_EVIDENCE_CELL_SCHEMA_VERSION:
+        if (
+            payload.get("cell_type") == METRIC_EVIDENCE_CELL_TYPE
+            and payload.get("cell_schema") == PAPER_METRIC_EVIDENCE_CELL_SCHEMA_VERSION
+        ):
             cells.append(dict(payload))
         for value in payload.values():
             cells.extend(_collect_metric_cells(value))
@@ -1188,7 +1268,8 @@ def _collect_claim_gate_records(result_table: dict[str, Any]) -> list[dict[str, 
             str(cell.get("cell_id"))
             for cell in row.get("metrics", [])
             if isinstance(cell, dict)
-            and cell.get("cell_schema") == PAPER_EVIDENCE_CELL_SCHEMA_VERSION
+            and cell.get("cell_type") == METRIC_EVIDENCE_CELL_TYPE
+            and cell.get("cell_schema") == PAPER_METRIC_EVIDENCE_CELL_SCHEMA_VERSION
             and cell.get("cell_id")
         ]
         if not cell_ids:

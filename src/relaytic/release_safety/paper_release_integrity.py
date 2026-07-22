@@ -12,7 +12,12 @@ import tarfile
 from typing import Any
 
 from relaytic.core.json_utils import write_json
-from relaytic.release_safety.paper_evidence_contract import audit_evidence_gate_separation
+from relaytic.release_safety.paper_evidence_contract import (
+    METRIC_EVIDENCE_CELL_REQUIRED_FIELDS,
+    MISSING_FIELD_STRESS_FIXTURE_OMITTED_FIELDS,
+    audit_evidence_gate_separation,
+    build_evidence_schema_contract,
+)
 
 
 PAPER_RELEASE_INTEGRITY_SCHEMA_VERSION = "relaytic.paper_release_integrity.v1"
@@ -37,6 +42,10 @@ PAPER_RELEASE_INTEGRITY_FILENAMES = {
     "paper_p26_evidence_gate_separation_audit": "paper_p26_evidence_gate_separation_audit.json",
     "paper_p26_validation_subsplit_audit": "paper_p26_validation_subsplit_audit.json",
     "paper_p26_release_reference_audit": "paper_p26_release_reference_audit.json",
+    "paper_p27_evidence_schema_audit": "paper_p27_evidence_schema_audit.json",
+    "paper_p27_feature_contract_audit": "paper_p27_feature_contract_audit.json",
+    "paper_p27_generated_surface_audit": "paper_p27_generated_surface_audit.json",
+    "paper_p27_candidate_revision_audit": "paper_p27_candidate_revision_audit.json",
     "paper_p24_release_manifest": "paper_p24_release_manifest.json",
 }
 
@@ -242,6 +251,10 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
     evidence_gate_separation = _evidence_gate_separation_audit(reports)
     validation_subsplits = _validation_subsplit_audit(reports, markdown)
     release_reference = _release_reference_audit(root, markdown)
+    evidence_schema = _evidence_schema_audit(reports, markdown)
+    feature_contract = _feature_contract_audit(reports, markdown)
+    generated_surfaces = _generated_surface_audit(root, markdown)
+    candidate_revision = _candidate_revision_audit(markdown, git)
 
     pack = {
         "paper_p24_evidence_authority": evidence_authority,
@@ -263,17 +276,23 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
         "paper_p26_evidence_gate_separation_audit": evidence_gate_separation,
         "paper_p26_validation_subsplit_audit": validation_subsplits,
         "paper_p26_release_reference_audit": release_reference,
+        "paper_p27_evidence_schema_audit": evidence_schema,
+        "paper_p27_feature_contract_audit": feature_contract,
+        "paper_p27_generated_surface_audit": generated_surfaces,
+        "paper_p27_candidate_revision_audit": candidate_revision,
     }
     checks = [{"report": key, "status": value["status"], "passed": value["status"] == "pass"} for key, value in pack.items()]
     pack["paper_p24_release_manifest"] = _report(
         "release_candidate_ready_for_human_upload" if all(row["passed"] for row in checks) else "blocked_pending_p24_repairs",
-        slice="Paper Track P24 with P26 release corrections",
+        slice="Paper Track P24 with P27 release-candidate corrections",
         checks=checks,
         git=git,
+        release_mode="review_candidate",
+        archival_revision_claimed=False,
         exact_revision_release_required=True,
         arxiv_upload_ready=False,
         benchmark_values_changed=False,
-        human_owned_actions=["commit the reviewed source", "push the immutable commit", "run final mode from the clean public commit", "inspect and upload the exact-revision artifacts"],
+        human_owned_actions=["commit the reviewed source", "run final mode from the clean commit", "inspect the exact-revision artifacts", "push the reviewed commit", "verify public revision availability"],
     )
     return pack
 
@@ -293,7 +312,12 @@ def sync_paper_release_integrity_pack(
     }
 
 
-def build_exact_revision_release(project_root: str | Path, *, release_tag: str | None = None) -> dict[str, Any]:
+def build_exact_revision_release(
+    project_root: str | Path,
+    *,
+    release_tag: str | None = None,
+    require_public: bool = False,
+) -> dict[str, Any]:
     """Build an immutable commit- or verified-tag paper release outside the worktree."""
     root = Path(project_root)
     git = _git_state(root)
@@ -307,7 +331,7 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
         raise ValueError("Final paper release received an invalid release tag name.")
     remote_refs = _git(root, "ls-remote", "origin")
     remote_commit_exists = any(line.startswith(f"{commit}\t") for line in remote_refs.splitlines())
-    if not remote_commit_exists:
+    if require_public and not remote_commit_exists:
         raise ValueError("Final paper release requires the exact source commit to exist on the public origin remote.")
     tagged_commit = _git(root, "rev-list", "-n", "1", tag).strip() if tag else ""
     remote_tagged_commit = ""
@@ -328,6 +352,15 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
 
     from relaytic.release_safety.paper_arxiv_source import sync_paper_arxiv_source_pack
     from relaytic.release_safety.paper_release import sync_paper_release_pack
+
+    generated_surface_audit = _generated_surface_audit(
+        root,
+        _read_text(root / "docs" / "paper" / "relaytic_aml_arxiv_draft.md"),
+    )
+    if generated_surface_audit["status"] != "pass":
+        raise ValueError(
+            "Final paper release requires committed manuscript and figure surfaces to match their generators."
+        )
 
     release_root = root / "dist" / "paper-release" / commit
     paper_dir = release_root / "paper"
@@ -364,6 +397,9 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
     forbidden_release_tokens = ("dirty", "under review", "pending release")
     if any(token in source_text.lower() for token in forbidden_release_tokens):
         raise ValueError("Final source contains a non-final release-status phrase.")
+    pdf_text = _pdf_to_text(built_pdf)
+    if commit not in pdf_text:
+        raise ValueError("Final PDF does not expose the same full source commit as the generated TeX source.")
     pdf_path = release_root / "relaytic_aml_arxiv.pdf"
     shutil.copy2(built_pdf, pdf_path)
     source_archive = release_root / "relaytic_aml_arxiv_source.tar.gz"
@@ -383,20 +419,29 @@ def build_exact_revision_release(project_root: str | Path, *, release_tag: str |
         "tagged_commit": tagged_commit or None,
         "remote_tagged_commit": remote_tagged_commit or None,
         "remote_commit_exists": remote_commit_exists,
+        "public_revision_required": require_public,
         "clean_worktree_before_build": True,
+        "generated_surfaces_match_source": True,
+        "tex_revision_matches_source": commit in source_text,
+        "pdf_revision_matches_source": commit in pdf_text,
         "paper_integrity_status": integrity["paper_p24_release_manifest"]["status"],
     }
     preflight_path = write_json(release_root / "final_preflight.json", preflight, indent=2, sort_keys=True)
     manifest = {
         "schema_version": PAPER_RELEASE_INTEGRITY_SCHEMA_VERSION,
-        "status": "release_candidate_ready_for_human_upload" if integrity_ok else "blocked",
+        "status": "exact_revision_bundle_ready" if integrity_ok else "blocked",
+        "release_mode": "archival_final",
         "source_commit": commit,
         "release_identity_mode": "verified_tag" if tag else "immutable_commit",
         "release_tag": tag or None,
         "tagged_commit": tagged_commit or None,
         "remote_tagged_commit": remote_tagged_commit or None,
         "remote_commit_exists": remote_commit_exists,
+        "public_revision_required": require_public,
         "clean_worktree_before_build": True,
+        "generated_surfaces_match_source": True,
+        "tex_revision_matches_source": commit in source_text,
+        "pdf_revision_matches_source": commit in pdf_text,
         "arxiv_upload_ready": bool(
             integrity_ok
             and remote_commit_exists
@@ -732,12 +777,18 @@ def _evidence_gate_separation_audit(reports: Path) -> dict[str, Any]:
     audit = audit_evidence_gate_separation(evidence_cells=cells, claim_gates=gates)
     return _report(
         audit["status"],
-        slice="Paper Track P26",
+        slice="Paper Track P27",
         evidence_cell_count=audit["evidence_cell_count"],
+        evidence_cell_type_counts=audit["evidence_cell_type_counts"],
         claim_gate_count=audit["claim_gate_count"],
-        factual_cell_schema=audit["evidence_cell_schema"],
+        evidence_type_system_schema=audit["evidence_type_system_schema"],
+        metric_evidence_cell_schema=audit["metric_evidence_cell_schema"],
+        invariant_evidence_cell_schema=audit["invariant_evidence_cell_schema"],
         interpretive_gate_schema=audit["claim_gate_schema"],
         checks={
+            "all_cells_typed": not any(
+                row.get("violation") == "untyped_evidence_cell" for row in audit["violations"]
+            ),
             "interpretive_fields_absent_from_cells": not any(
                 row.get("violation") == "interpretive_fields_in_evidence_cell" for row in audit["violations"]
             ),
@@ -752,6 +803,7 @@ def _evidence_gate_separation_audit(reports: Path) -> dict[str, Any]:
             "docs/reports/paper_claim_gate_records.json",
             "docs/reports/paper_external_score_evidence_cells.json",
             "docs/reports/paper_external_score_claim_gate.json",
+            "docs/reports/paper_evidence_schema_contract.json",
         ],
     )
 
@@ -894,6 +946,144 @@ def _displayed_paysim_runner_up_tie(trace: dict[str, Any]) -> bool:
     return len(scores) >= 3 and scores[0] > scores[1] and scores[1] == scores[2]
 
 
+def _evidence_schema_audit(reports: Path, markdown: str) -> dict[str, Any]:
+    expected = build_evidence_schema_contract()
+    recorded = _read_json(reports / "paper_evidence_schema_contract.json")
+    metric_audit = _read_json(reports / "paper_metric_cell_audit.json")
+    ablation = _read_json(reports / "paper_governance_ablation_eval.json")
+    metric_count = len(METRIC_EVIDENCE_CELL_REQUIRED_FIELDS)
+    omitted_count = len(MISSING_FIELD_STRESS_FIXTURE_OMITTED_FIELDS)
+    checks = [
+        {
+            "check": "generated schema contract matches code",
+            "observed": recorded.get("schema_version"),
+            "pass_criterion": expected.get("schema_version"),
+            "passed": recorded == expected,
+        },
+        {
+            "check": "metric audit uses authoritative field count",
+            "observed": metric_audit.get("metric_required_field_count"),
+            "pass_criterion": metric_count,
+            "passed": metric_audit.get("metric_required_field_count") == metric_count,
+        },
+        {
+            "check": "disabled-field ablation uses full metric contract",
+            "observed": dict(ablation.get("full_path_metrics") or {}).get("required_metric_field_count"),
+            "pass_criterion": metric_count,
+            "passed": dict(ablation.get("full_path_metrics") or {}).get("required_metric_field_count") == metric_count,
+        },
+        {
+            "check": "reader disclosure includes both fixture counts",
+            "observed": f"metric={metric_count}; omitted={omitted_count}",
+            "pass_criterion": "authoritative counts appear in typed-contract table",
+            "passed": f"| {metric_count} |" in markdown and f"| {omitted_count} |" in markdown,
+        },
+    ]
+    return _report(
+        "pass" if all(row["passed"] for row in checks) else "fail",
+        slice="Paper Track P27",
+        checks=checks,
+        metric_required_field_count=metric_count,
+        missing_field_stress_omitted_count=omitted_count,
+    )
+
+
+def _feature_contract_audit(reports: Path, markdown: str) -> dict[str, Any]:
+    p6 = _read_json(reports / "paper_leakage_safe_feature_report.json")
+    p6a = _read_json(reports / "paysim_leakage_safe_feature_report.json")
+    same_dataset = p6.get("dataset_id") == p6a.get("dataset_id") and bool(p6.get("dataset_id"))
+    same_split = p6.get("split_contract_id") == p6a.get("split_contract_id") and bool(p6.get("split_contract_id"))
+    distinct_features = (
+        p6.get("feature_contract_id") != p6a.get("feature_contract_id")
+        and set(p6.get("feature_columns", [])) != set(p6a.get("feature_columns", []))
+    )
+    checks = [
+        {"check": "same dataset", "observed": same_dataset, "pass_criterion": True, "passed": same_dataset},
+        {"check": "same temporal split contract", "observed": same_split, "pass_criterion": True, "passed": same_split},
+        {"check": "distinct feature contracts disclosed", "observed": distinct_features, "pass_criterion": True, "passed": distinct_features},
+        {
+            "check": "manuscript avoids false same-feature claim",
+            "observed": "same dataset, split, feature, and metric contract" in markdown,
+            "pass_criterion": False,
+            "passed": "same dataset, split, feature, and metric contract" not in markdown
+            and "distinct audited feature contract" in markdown,
+        },
+    ]
+    return _report(
+        "pass" if all(row["passed"] for row in checks) else "fail",
+        slice="Paper Track P27",
+        checks=checks,
+        p6_feature_contract_id=p6.get("feature_contract_id"),
+        p6a_feature_contract_id=p6a.get("feature_contract_id"),
+    )
+
+
+def _generated_surface_audit(root: Path, markdown: str) -> dict[str, Any]:
+    from relaytic.release_safety.paper_draft import build_paper_draft_pack
+    from relaytic.release_safety.paper_release import build_paper_release_pack
+
+    release_pack = build_paper_release_pack(root)
+    draft_pack = build_paper_draft_pack(root)
+    figure_dir = root / "docs" / "paper" / "figures"
+    generated_figures = dict(draft_pack.get("figures") or {})
+    filenames = {
+        "claim_gate_flow": "figure_1_claim_gate_flow.svg",
+        "supporting_pr_auc": "figure_2_supporting_pr_auc.svg",
+        "review_budget": "figure_3_review_budget.svg",
+        "publishability_matrix": "figure_4_publishability_matrix.svg",
+    }
+    figure_checks = {
+        figure_id: _read_text(figure_dir / filename) == str(generated_figures.get(figure_id) or "")
+        for figure_id, filename in filenames.items()
+    }
+    checks = [
+        {
+            "check": "canonical manuscript matches generator",
+            "observed": markdown == str(release_pack.get("paper_final_draft") or ""),
+            "pass_criterion": True,
+            "passed": markdown == str(release_pack.get("paper_final_draft") or ""),
+        },
+        {
+            "check": "canonical SVG figures match generator",
+            "observed": figure_checks,
+            "pass_criterion": "all true",
+            "passed": all(figure_checks.values()),
+        },
+    ]
+    return _report(
+        "pass" if all(row["passed"] for row in checks) else "fail",
+        slice="Paper Track P27",
+        checks=checks,
+    )
+
+
+def _candidate_revision_audit(markdown: str, git: dict[str, Any]) -> dict[str, Any]:
+    stale_revision = bool(re.search(r"Source commit:\s*[0-9a-f]{7,40}", markdown))
+    candidate_marker = "This review candidate does not claim an archival revision." in markdown
+    checks = [
+        {
+            "check": "candidate has no source-commit claim",
+            "observed": stale_revision,
+            "pass_criterion": False,
+            "passed": not stale_revision,
+        },
+        {
+            "check": "candidate mode is explicit",
+            "observed": candidate_marker,
+            "pass_criterion": True,
+            "passed": candidate_marker,
+        },
+    ]
+    return _report(
+        "pass" if all(row["passed"] for row in checks) else "fail",
+        slice="Paper Track P27",
+        release_mode="review_candidate",
+        archival_revision_claimed=False,
+        worktree_dirty=bool(git.get("dirty")),
+        checks=checks,
+    )
+
+
 def _release_reference_audit(root: Path, markdown: str) -> dict[str, Any]:
     local_tags = set(_git(root, "tag", "--list").splitlines())
     remote_output = _git(root, "ls-remote", "--tags", "origin")
@@ -905,18 +1095,22 @@ def _release_reference_audit(root: Path, markdown: str) -> dict[str, Any]:
     }
     named_tag = "relaytic-aml-arxiv-v1"
     paper_claims_tag = named_tag in markdown or "archive/refs/tags" in markdown
-    pass_state = not paper_claims_tag
+    paper_claims_commit = bool(re.search(r"Source commit:\s*[0-9a-f]{7,40}", markdown))
+    candidate_marker = "This review candidate does not claim an archival revision." in markdown
+    pass_state = not paper_claims_tag and not paper_claims_commit and candidate_marker
     return _report(
         "pass" if pass_state else "fail",
         slice="Paper Track P26",
         release_identity_mode="immutable_commit",
         paper_claims_release_tag=paper_claims_tag,
+        paper_claims_source_commit=paper_claims_commit,
+        candidate_marker_present=candidate_marker,
         examined_tag=named_tag,
         local_tag_exists=named_tag in local_tags,
         remote_checked=bool(remote_output),
         remote_tag_exists=named_tag in remote_tags,
         public_tag_archive_claim_allowed=named_tag in remote_tags,
-        decision="The manuscript uses an immutable commit and does not claim a public tag archive.",
+        decision="The review candidate claims no archival revision. Final mode injects the immutable commit.",
     )
 
 
@@ -962,6 +1156,19 @@ def _compile_latex(source_dir: Path) -> None:
         if completed.returncode != 0:
             tail = (completed.stdout + "\n" + completed.stderr)[-4000:]
             raise ValueError(f"Paper build failed for {' '.join(command)}:\n{tail}")
+
+
+def _pdf_to_text(path: Path) -> str:
+    completed = subprocess.run(
+        ["pdftotext", str(path), "-"],
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=60,
+    )
+    if completed.returncode != 0:
+        raise ValueError("Final paper release requires pdftotext to verify PDF/source revision identity.")
+    return completed.stdout
 
 
 def _sha256(path: Path) -> str:

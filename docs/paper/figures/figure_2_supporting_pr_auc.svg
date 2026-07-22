@@ -1,34 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1220" height="640" viewBox="0 0 1220 640" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
 <rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>
-<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Evidence-cell facts</text>
-<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Evidence cells store metric facts. Claim gates store admissible use and missing evidence.</text>
-<rect x="90" y="148" width="340" height="96" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.1"/>
-<text x="112" y="182" font-size="18" font-weight="700" fill="#1f2937">cell_id</text>
-<text x="112.0" y="214.0" text-anchor="start" font-size="14" fill="#374151">paper-cell:paysim...test_pr_auc</text>
-<rect x="466" y="148" width="340" height="96" rx="6" fill="#eef6f3" stroke="#1f2937" stroke-width="1.1"/>
-<text x="488" y="182" font-size="18" font-weight="700" fill="#1f2937">dataset_id</text>
-<text x="488.0" y="214.0" text-anchor="start" font-size="14" fill="#374151">PaySim / Elliptic / Elliptic2</text>
-<rect x="842" y="148" width="340" height="96" rx="6" fill="#fff8e5" stroke="#1f2937" stroke-width="1.1"/>
-<text x="864" y="182" font-size="18" font-weight="700" fill="#1f2937">split</text>
-<text x="864.0" y="214.0" text-anchor="start" font-size="14" fill="#374151">train, validation, test, provided TST</text>
-<rect x="90" y="278" width="340" height="96" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.1"/>
-<text x="112" y="312" font-size="18" font-weight="700" fill="#1f2937">command</text>
-<text x="112.0" y="344.0" text-anchor="start" font-size="14" fill="#374151">relaytic release-safety ...</text>
-<rect x="466" y="278" width="340" height="96" rx="6" fill="#eef6f3" stroke="#1f2937" stroke-width="1.1"/>
-<text x="488" y="312" font-size="18" font-weight="700" fill="#1f2937">artifact_ref.field</text>
-<text x="488.0" y="344.0" text-anchor="start" font-size="14" fill="#374151">manifest.json -&gt; test_pr_auc</text>
-<rect x="842" y="278" width="340" height="96" rx="6" fill="#fff8e5" stroke="#1f2937" stroke-width="1.1"/>
-<text x="864" y="312" font-size="18" font-weight="700" fill="#1f2937">budget_tier</text>
-<text x="864.0" y="344.0" text-anchor="start" font-size="14" fill="#374151">baseline, competitive, context</text>
-<rect x="90" y="408" width="340" height="96" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.1"/>
-<text x="112" y="442" font-size="18" font-weight="700" fill="#1f2937">leakage_posture</text>
-<text x="112.0" y="474.0" text-anchor="start" font-size="14" fill="#374151">forbidden fields excluded</text>
-<rect x="466" y="408" width="340" height="96" rx="6" fill="#eef6f3" stroke="#1f2937" stroke-width="1.1"/>
-<text x="488" y="442" font-size="18" font-weight="700" fill="#1f2937">operating_point</text>
-<text x="488.0" y="474.0" text-anchor="start" font-size="14" fill="#374151">review budget and threshold</text>
-<rect x="842" y="408" width="340" height="96" rx="6" fill="#fff8e5" stroke="#1f2937" stroke-width="1.1"/>
-<text x="864" y="442" font-size="18" font-weight="700" fill="#1f2937">metric_value</text>
-<text x="864.0" y="474.0" text-anchor="start" font-size="14" fill="#374151">PR-AUC 0.6388</text>
-<rect x="90" y="540" width="1040" height="32" rx="5" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>
-<text x="610" y="561" text-anchor="middle" font-size="14" fill="#4b5563">Gate outputs are separate records: evidence_cell_ids, admissible_use, stronger_claim_status, missing_evidence.</text>
+<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Typed factual evidence</text>
+<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">A common provenance base branches into metric observations and system invariants.</text>
+<rect x="90" y="132" width="1040" height="116" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.2"/>
+<text x="610" y="163" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">Common factual base</text>
+<text x="610" y="194" text-anchor="middle" font-size="15" fill="#374151">cell schema and type  |  cell ID  |  dataset and split  |  command</text>
+<text x="610" y="220" text-anchor="middle" font-size="15" fill="#374151">artifact reference and field  |  budget tier  |  leakage posture</text>
+<line x1="610" y1="248" x2="610" y2="278" stroke="#1f2937" stroke-width="1.6"/>
+<line x1="340" y1="278" x2="880" y2="278" stroke="#1f2937" stroke-width="1.6"/>
+<line x1="340" y1="278" x2="340" y2="300" stroke="#1f2937" stroke-width="1.6"/>
+<line x1="880" y1="278" x2="880" y2="300" stroke="#1f2937" stroke-width="1.6"/>
+<polygon points="340,306 333,295 347,295" fill="#1f2937"/>
+<polygon points="880,306 873,295 887,295" fill="#1f2937"/>
+<rect x="90" y="306" width="500" height="170" rx="6" fill="#eef6f3" stroke="#1f2937" stroke-width="1.2"/>
+<text x="340" y="339" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">metric_evidence_cell</text>
+<text x="116" y="372" font-size="15" fill="#374151">metric + numeric value</text>
+<text x="116" y="399" font-size="15" fill="#374151">model + calibration + exposure status</text>
+<text x="116" y="426" font-size="15" fill="#374151">operating-point applicability + reference</text>
+<text x="116" y="453" font-size="14" fill="#4b5563">Role: detector ranking or review-budget measurement</text>
+<rect x="630" y="306" width="500" height="170" rx="6" fill="#fff8e5" stroke="#1f2937" stroke-width="1.2"/>
+<text x="880" y="339" text-anchor="middle" font-size="19" font-weight="700" fill="#1f2937">invariant_evidence_cell</text>
+<text x="656" y="372" font-size="15" fill="#374151">invariant name + observed value + state</text>
+<text x="656" y="399" font-size="15" fill="#374151">rowless-export status</text>
+<text x="656" y="426" font-size="15" fill="#374151">detector metric fields prohibited</text>
+<text x="656" y="453" font-size="14" fill="#4b5563">Role: factual governance or handoff state</text>
+<rect x="90" y="516" width="1040" height="56" rx="5" fill="#ffffff" stroke="#c96b6b" stroke-width="1.2"/>
+<text x="610" y="540" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">Separate claim-gate record</text>
+<text x="610" y="561" text-anchor="middle" font-size="14" fill="#4b5563">evidence cell IDs  |  admissible use  |  blocked status  |  reason  |  missing evidence</text>
 </svg>

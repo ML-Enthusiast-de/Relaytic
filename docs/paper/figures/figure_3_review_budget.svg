@@ -28,7 +28,7 @@
 <rect x="990" y="316" width="311.7" height="25" rx="3" fill="#4b5563"/>
 <text x="1328" y="335" font-size="18" font-weight="700" fill="#1f2937">0.9740</text>
 <text x="800" y="393" font-size="15" fill="#4b5563">Cohort equivalence and parity are not established.</text>
-<text x="800" y="416" font-size="15" fill="#4b5563">Prior provided-RevTrack-TST exposure is disclosed.</text>
+<text x="800" y="416" font-size="15" fill="#4b5563">Prior exposure to the provided RevTrack TST split is disclosed.</text>
 <rect x="70" y="486" width="1360" height="242" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>
 <text x="96" y="525" font-size="19" font-weight="700" fill="#1f2937">C. Validation-threshold review queues</text>
 <text x="100" y="582" font-size="18" font-weight="700" fill="#1f2937">PaySim precision</text>

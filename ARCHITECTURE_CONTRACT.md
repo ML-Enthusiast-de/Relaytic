@@ -1132,3 +1132,12 @@ Rename work and semantic changes should not be mixed casually. If a slice change
 - what stays compatible
 - what is intentionally broken
 - when the shim is expected to disappear
+
+## Paper Evidence Contract
+
+- reader-facing detector measurements must use a typed metric evidence cell with factual provenance, calibration, exposure, model, and operating-point fields
+- deterministic governance and handoff observations must use a typed invariant evidence cell and must not contain detector metric or value fields
+- admissible use, claim strength, release wording, and missing evidence belong only in a separate claim-gate record
+- generated paper tables, figures, and release checks must derive required-field and fixture counts from one schema contract
+- review candidates must not claim an archival source revision
+- archival builds must come from a clean commit, match committed generated surfaces, and expose the same full revision in source and PDF

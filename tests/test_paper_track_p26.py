@@ -7,8 +7,9 @@ import pytest
 
 from relaytic.release_safety import build_paper_release_integrity_pack
 from relaytic.release_safety.paper_evidence_contract import (
+    METRIC_EVIDENCE_CELL_TYPE,
     PAPER_CLAIM_GATE_SCHEMA_VERSION,
-    PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+    PAPER_METRIC_EVIDENCE_CELL_SCHEMA_VERSION,
     audit_evidence_gate_separation,
 )
 
@@ -21,16 +22,23 @@ pytestmark = pytest.mark.prepush
 
 def _factual_cell() -> dict[str, object]:
     return {
-        "cell_schema": PAPER_EVIDENCE_CELL_SCHEMA_VERSION,
+        "cell_schema": PAPER_METRIC_EVIDENCE_CELL_SCHEMA_VERSION,
         "cell_id": "fixture.metric",
+        "cell_type": METRIC_EVIDENCE_CELL_TYPE,
         "dataset_id": "fixture",
         "split": "test",
         "command": "relaytic fixture",
         "artifact_ref": "fixture.json",
+        "artifact_field": "pr_auc",
         "metric": "pr_auc",
         "value": 0.5,
         "budget_tier": "fixture",
         "leakage_posture": "fixture_only",
+        "operating_point_applicability": "not_applicable",
+        "operating_point_ref": "not_applicable",
+        "calibration_status": "not_recorded",
+        "exposure_status": "fixture_only",
+        "model_identifier": "fixture_model",
     }
 
 
@@ -83,7 +91,9 @@ def test_p26_committed_cells_and_gates_are_strictly_separate() -> None:
     audit = json.loads((REPORT_DIR / "paper_p26_evidence_gate_separation_audit.json").read_text(encoding="utf-8"))
 
     assert audit["status"] == "pass"
-    assert audit["factual_cell_schema"] == PAPER_EVIDENCE_CELL_SCHEMA_VERSION
+    assert audit["metric_evidence_cell_schema"] == PAPER_METRIC_EVIDENCE_CELL_SCHEMA_VERSION
+    assert audit["evidence_cell_type_counts"]["metric_evidence_cell"] > 0
+    assert audit["evidence_cell_type_counts"]["invariant_evidence_cell"] > 0
     assert audit["interpretive_gate_schema"] == PAPER_CLAIM_GATE_SCHEMA_VERSION
     assert all(audit["checks"].values())
     assert audit["violations"] == []

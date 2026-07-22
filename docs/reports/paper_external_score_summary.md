@@ -12,7 +12,7 @@
 
 | Cell | Dataset | Split | Metric | Value | Rowless |
 | --- | --- | --- | --- | --- | --- |
-| p19a.external_score.hosted_metadata_completeness | p19a_hosted_score_fixture | fixture_holdout | hosted_score_metadata_completeness | 1.0 | True |
+| p19a.external_score.hosted_metadata_completeness | p19a_hosted_score_fixture | fixture_holdout |  |  | True |
 
 ## Claim Boundary
 

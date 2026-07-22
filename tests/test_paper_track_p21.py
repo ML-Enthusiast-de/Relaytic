@@ -212,7 +212,7 @@ def test_paper_track_p21_committed_preflight_reports_are_ready() -> None:
     assert "## AI Assistance Disclosure" in draft
     assert (
         "Source commit:" in draft
-        or "final clean-release command injects and verifies the exact source revision" in draft
+        or "This review candidate does not claim an archival revision." in draft
     )
     assert "Public release tag: TODO before arXiv submission" not in draft
     assert "Table 2a" not in main_tex

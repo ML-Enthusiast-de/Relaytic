@@ -1,13 +1,13 @@
 {
   "artifact_hashes": {
-    "README.md": "08e3d5d6e7287db1679b21866b59faad149fbcf911fec14596dbc590a8bda8d4",
+    "README.md": "365aa72094db2982aefdbefa897a722180d5cacce3918125921bc043dbc47843",
     "docs/reports/paper_claim_lint_report.json": "9123d9521638cfb866171a4ebeee931b556f6b8a9d65735d0aa24ebb2ed25322",
     "docs/reports/paper_external_dry_run_report.json": "ba3b1a75ef7b5d5e045e89ea3cead280643e8a4ef7d4b86512e64ac340bf252d",
-    "docs/reports/paper_metric_cell_audit.json": "8d96165af5f1ec9aba4e352de49d203dae9315b556ef250ee2cbb8e6a6a9d2ca",
+    "docs/reports/paper_metric_cell_audit.json": "f5d23e38d6b5465bf4ed5a4bb0321f0e912c7a4775f937b6105e102053c001c0",
     "docs/reports/paper_publishability_matrix.json": "74ad1e835b8ef994f2ea26ebebef43757ec362e596194e298d5289f52f2efc80",
     "docs/reports/paper_release_go_no_go.json": "51aa6561f57abaa2794e2e26f213ed8a21ca8378bd7a2b27896fe106bf796710",
     "docs/reports/paper_reproduction_failure_report.json": "d3a72c7448abd993743f3f2542e3031364240247dca2d59d6cb2829bf3b7db3a",
-    "docs/reports/paper_result_table_final.json": "e880c6131f3d618fae89d4c32f7b4d1b4372781192c4c2ba6531e318618d1eb8"
+    "docs/reports/paper_result_table_final.json": "9d3dcd4cc8b59dd896acbd1fcad8542eacb97695d96935640d08cbafcd851907"
   },
   "artifact_refs": [
     "docs/reports/paper_system_behavior_eval.json",

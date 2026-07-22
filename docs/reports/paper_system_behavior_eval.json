@@ -147,7 +147,7 @@
     },
     {
       "expected_behavior": "A reviewer should be able to trace the PaySim competitive PR-AUC cell to factual dataset, split, command, artifact, budget, leakage, calibration, and exposure fields, then resolve interpretation through a separate gate.",
-      "measured_signal": "audit_status=pass; required_fields_present=14/14",
+      "measured_signal": "audit_status=pass; required_fields_present=17/17",
       "passed": true,
       "required": true,
       "source_artifact": "docs/reports/paper_metric_cell_audit.json",
@@ -155,8 +155,8 @@
       "track": "reader_task"
     },
     {
-      "expected_behavior": "A reviewer should be able to compare the PaySim baseline and competitive budgets under the same metric and dataset contract.",
-      "measured_signal": "baseline=0.331345; competitive=0.638773; improved=True",
+      "expected_behavior": "A reviewer should be able to compare PaySim budget tiers under the same dataset, temporal split, and metric while seeing that the competitive route adds a separately audited feature contract.",
+      "measured_signal": "baseline=0.331345; competitive=0.638773; improved=True; feature_contract_same=False",
       "passed": true,
       "required": true,
       "source_artifact": "docs/reports/paper_metric_cell_audit.json",

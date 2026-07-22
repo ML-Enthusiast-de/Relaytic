@@ -579,6 +579,15 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-With Slice 15Z-R and Paper Track P0-P23 now landed, the next high-leverage frontier follow-ons are:
+With Slice 15Z-R and Paper Track P0-P27 now landed, the next high-leverage frontier follow-ons are:
 
 - Slice 16A capability registry and capability cards, with final arXiv upload treated as a human release action rather than another implementation slice
+
+### Paper Track P27
+
+- split factual paper evidence into typed metric and invariant cells with a shared provenance base and separate type-specific validators
+- generated one authoritative schema contract for 17 metric fields, 16 invariant fields, the 17-field disabled-component ablation, and the 14-field identity-preserving missing-field fixture
+- corrected the PaySim P6/P6-A comparison to disclose distinct feature contracts under the same dataset, temporal split, and metric
+- pinned the Elliptic2 published reference cell to its source scorecard and kept local context separate from external published provenance
+- made review-candidate builds revision-neutral and strengthened final mode with clean-tree, generated-surface, TeX-revision, and PDF-revision checks
+- regenerated the evidence pack, vector figures, manuscript, and release-integrity reports without changing benchmark numbers

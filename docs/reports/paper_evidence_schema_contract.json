@@ -1,0 +1,114 @@
+{
+  "cell_types": {
+    "invariant_evidence_cell": {
+      "cell_schema": "relaytic.paper_invariant_evidence_cell.v1",
+      "required_field_count": 16,
+      "required_fields": [
+        "cell_schema",
+        "cell_id",
+        "cell_type",
+        "dataset_id",
+        "split",
+        "command",
+        "artifact_ref",
+        "artifact_field",
+        "budget_tier",
+        "leakage_posture",
+        "invariant_name",
+        "invariant_state",
+        "observed_value",
+        "detector_performance_metric",
+        "operating_point_applicability",
+        "rowless_export_status"
+      ]
+    },
+    "metric_evidence_cell": {
+      "cell_schema": "relaytic.paper_metric_evidence_cell.v1",
+      "required_field_count": 17,
+      "required_fields": [
+        "cell_schema",
+        "cell_id",
+        "cell_type",
+        "dataset_id",
+        "split",
+        "command",
+        "artifact_ref",
+        "artifact_field",
+        "budget_tier",
+        "leakage_posture",
+        "metric",
+        "value",
+        "operating_point_applicability",
+        "operating_point_ref",
+        "calibration_status",
+        "exposure_status",
+        "model_identifier"
+      ]
+    }
+  },
+  "claim_gate": {
+    "required_field_count": 7,
+    "required_fields": [
+      "schema_version",
+      "gate_id",
+      "evidence_cell_ids",
+      "admissible_use",
+      "stronger_claim_status",
+      "gate_reasons",
+      "missing_evidence"
+    ],
+    "schema_version": "relaytic.paper_claim_gate.v2"
+  },
+  "fixtures": {
+    "disabled_required_fields_ablation": {
+      "cell_type": "metric_evidence_cell",
+      "removed_field_count": 17,
+      "removed_fields": [
+        "cell_schema",
+        "cell_id",
+        "cell_type",
+        "dataset_id",
+        "split",
+        "command",
+        "artifact_ref",
+        "artifact_field",
+        "budget_tier",
+        "leakage_posture",
+        "metric",
+        "value",
+        "operating_point_applicability",
+        "operating_point_ref",
+        "calibration_status",
+        "exposure_status",
+        "model_identifier"
+      ]
+    },
+    "missing_field_stress_fixture": {
+      "cell_type": "metric_evidence_cell",
+      "omitted_field_count": 14,
+      "omitted_fields": [
+        "dataset_id",
+        "split",
+        "command",
+        "artifact_ref",
+        "artifact_field",
+        "budget_tier",
+        "leakage_posture",
+        "metric",
+        "value",
+        "operating_point_applicability",
+        "operating_point_ref",
+        "calibration_status",
+        "exposure_status",
+        "model_identifier"
+      ],
+      "preserved_fields": [
+        "cell_schema",
+        "cell_id",
+        "cell_type"
+      ]
+    }
+  },
+  "schema_version": "relaytic.paper_evidence_type_system.v1",
+  "status": "pass"
+}

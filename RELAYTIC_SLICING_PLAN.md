@@ -5095,6 +5095,33 @@ Innovation hook:
 
 - this is the long-range slice where Relaytic can start absorbing frontier self-supervised world-model ideas without abandoning its deterministic judgment core
 
+## Paper Track P27 - Typed evidence and release-candidate consistency
+
+Status: implemented
+
+Goal:
+- separate detector measurements from deterministic system invariants at the schema level
+- reconcile evidence-field and stress-fixture counts from one generated authority
+- make candidate, archival, and public-verification release states explicit
+
+Required behavior:
+- use `metric_evidence_cell` for detector measurements and `invariant_evidence_cell` for factual governance or handoff states
+- keep all interpretation in separate claim-gate records
+- disclose that PaySim P6 and P6-A use distinct feature contracts under the same dataset, temporal split, and metric
+- preserve the Elliptic2 0.974 value as an external published reference with pinned provenance
+- keep candidate manuscripts revision-neutral and inject a full commit only from a clean archival build
+- verify that committed generated surfaces match their generators before building the archival PDF and source bundle
+
+Minimum proof:
+- typed negative schema tests
+- generated schema/count reconciliation audit
+- feature-contract and external-reference provenance audits
+- generated manuscript/figure consistency audit
+- candidate release-integrity pass and dirty-tree rejection in final mode
+
+Evidence boundary:
+- no benchmark value changes, detector retraining, parity claim, Git mutation, or arXiv upload
+
 ## Slice 18 - Endgame consolidation, legacy removal, and repo-quality hardening
 
 Goal:

@@ -17,17 +17,21 @@
     "Relaytic-AML can produce a rowless handoff summary for hosted detector-output governance."
   ],
   "auditable_record_snippet": {
-    "artifact_ref": "fixture:p19a_external_score_rowless_v1",
+    "artifact_field": "accepted",
+    "artifact_ref": "docs/reports/paper_external_score_schema.json",
     "cell_id": "p19a.external_score.hosted_metadata_completeness",
+    "cell_schema": "relaytic.paper_invariant_evidence_cell.v1",
+    "cell_type": "invariant_evidence_cell",
     "command": "relaytic release-safety paper-external-score-proof",
     "dataset_id": "p19a_hosted_score_fixture",
     "detector_performance_metric": false,
+    "invariant_name": "hosted_score_metadata_completeness",
     "invariant_state": "pass",
     "leakage_posture": "rowless_no_training_or_label_data_exported",
-    "metric": "hosted_score_metadata_completeness",
+    "observed_value": true,
+    "operating_point_applicability": "not_applicable",
     "rowless_export_status": "rowless",
-    "split": "fixture_holdout",
-    "value": 1.0
+    "split": "fixture_holdout"
   },
   "blocked_stronger_claims": [
     {
@@ -100,13 +104,13 @@
     "p19a.external_score.hosted_metadata_completeness"
   ],
   "interpretation": "This case study shows that Relaytic-AML can host a rowless detector-score artifact as governed evidence: the adapter records schema and content hashes, creates a factual evidence cell, redacts unsafe handoff fields, and emits a separate gate that blocks stronger detector or production claims. It is not a detector-performance result.",
-  "metric_policy": {
+  "invariant_policy": {
     "detector_performance_metric": false,
+    "invariant_name": "hosted_score_metadata_completeness",
     "invariant_state": "pass",
-    "metric": "hosted_score_metadata_completeness",
-    "metric_role": "governance_metric",
-    "reader_facing_result": "schema_completeness_invariant_pass",
-    "value": 1.0
+    "observed_value": true,
+    "operating_point_applicability": "not_applicable",
+    "reader_facing_result": "schema_completeness_invariant_pass"
   },
   "relaytic_checks": [
     {

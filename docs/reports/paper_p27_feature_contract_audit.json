@@ -1,0 +1,33 @@
+{
+  "checks": [
+    {
+      "check": "same dataset",
+      "observed": true,
+      "pass_criterion": true,
+      "passed": true
+    },
+    {
+      "check": "same temporal split contract",
+      "observed": true,
+      "pass_criterion": true,
+      "passed": true
+    },
+    {
+      "check": "distinct feature contracts disclosed",
+      "observed": true,
+      "pass_criterion": true,
+      "passed": true
+    },
+    {
+      "check": "manuscript avoids false same-feature claim",
+      "observed": false,
+      "pass_criterion": false,
+      "passed": true
+    }
+  ],
+  "p6_feature_contract_id": "p6_paysim_train_only_row_features_v1",
+  "p6a_feature_contract_id": "p6a_paysim_point_in_time_destination_history_v1",
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P27",
+  "status": "pass"
+}

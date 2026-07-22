@@ -139,7 +139,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "e36c7be655a7c4168f61d613e084c67848ed708a",
+  "git_commit": "02e055f25c26192169c68d8cd313653ebb66e180",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,

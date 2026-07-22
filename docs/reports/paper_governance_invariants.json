@@ -26,7 +26,7 @@
         {
           "artifact_ref": "docs/reports/paper_system_task_eval.json",
           "evidence_id": "metric_cell_provenance_available",
-          "observed_signal": "audit_status=pass; required_fields_present=14/14",
+          "observed_signal": "audit_status=pass; required_fields_present=17/17",
           "requirement": "reader task can trace the PaySim evidence cell"
         }
       ],
@@ -34,7 +34,7 @@
         {
           "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
           "evidence_id": "No evidence-cell required fields",
-          "observed_signal": "unsafe_claims=0; leakage=0; raw_fields=0; missing_provenance=10; recovery_actions=6; safe=False",
+          "observed_signal": "unsafe_claims=0; leakage=0; raw_fields=0; missing_provenance=17; recovery_actions=6; safe=False",
           "requirement": "disabled required-field gate exposes missing provenance"
         }
       ],

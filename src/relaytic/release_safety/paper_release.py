@@ -9,6 +9,10 @@ import subprocess
 from typing import Any, Callable
 
 from relaytic.core.json_utils import write_json
+from relaytic.release_safety.paper_evidence_contract import (
+    INVARIANT_EVIDENCE_CELL_REQUIRED_FIELDS,
+    METRIC_EVIDENCE_CELL_REQUIRED_FIELDS,
+)
 
 
 PAPER_RELEASE_SCHEMA_VERSION = "relaytic.paper_release.v1"
@@ -333,6 +337,7 @@ def _collect_inputs(root: Path) -> dict[str, Any]:
         ),
         "table_provenance": _read_artifact(reports / "paper_table_provenance.json"),
         "claim_gate_records": _read_artifact(reports / "paper_claim_gate_records.json"),
+        "evidence_schema_contract": _read_artifact(reports / "paper_evidence_schema_contract.json"),
         "external_score_evidence_cells": _read_artifact(reports / "paper_external_score_evidence_cells.json"),
         "external_score_claim_gate": _read_artifact(reports / "paper_external_score_claim_gate.json"),
         "paper_reproduction_commands": _read_text_artifact(reports / "paper_reproduction_commands.md"),
@@ -1032,7 +1037,7 @@ def _render_paysim_evidence_walkthrough(
         [
             "The PaySim row is the clearest example of the evidence-cell path. The source contract identifies a synthetic mobile-money transaction-fraud task. The split contract orders records by simulator step. The leakage contract excludes simulator balance fields that can reveal after-event information, then allows prior-step destination-history features. The model-search contract separates a baseline budget from a competitive budget. The threshold contract chooses operating points on validation evidence and applies them unchanged to the test partition.",
             "",
-            f"The competitive PaySim path changes the fixed-test PR-AUC from {pay_base_pr} in the baseline run to {pay_pr} in the competitive run. At the selected review budget, separate factual cells record precision {pay_precision} and recall {pay_recall}. The comparison uses the same dataset, split, feature, and metric contract with different declared modeling budgets. A separate gate limits the result to temporal proxy evidence because PaySim is synthetic.",
+            f"The competitive PaySim path changes the fixed-test PR-AUC from {pay_base_pr} in the baseline run to {pay_pr} in the competitive run. At the selected review budget, separate factual cells record precision {pay_precision} and recall {pay_recall}. The rows share the dataset, temporal split, and metric. The competitive route uses a distinct audited feature contract and a larger modeling budget. A separate gate limits the result to temporal proxy evidence because PaySim is synthetic.",
             "",
             "Relaytic is meant to enforce this pattern: useful evidence is preserved, the modeling work that created it is inspectable, and the stronger interpretation is blocked until the data and protocol justify it.",
         ]
@@ -1129,6 +1134,7 @@ def _render_final_paper_v2(
     paysim_finalist_table = _render_paysim_finalist_table(inputs)
     operating_point_table = _render_operating_point_table(inputs)
     validation_subsplit_table = _render_validation_subsplit_table()
+    evidence_schema_table = _render_evidence_schema_table(inputs)
     adjacent_systems_table = _render_adjacent_systems_comparison_table(inputs)
     paysim_ablation_table = _render_paysim_ablation_table(inputs, metrics)
     system_eval_table = _render_system_evaluation_summary_table(inputs)
@@ -1192,7 +1198,7 @@ def _render_final_paper_v2(
             "",
             "Relaytic-AML is built around one authority rule: truth-bearing records live in the local workspace, not in the conversation. Raw data, licensed benchmark files, run summaries, traces, evidence cells, model outputs, tables, figures, and release reports live on disk. Agents may explain, propose, and repair, but their proposals only become evidence when they are materialized as artifacts another human or agent can inspect.",
             "",
-            "The end-to-end control path is shown in Figure 1. Local inputs enter role-scoped execution, each stage writes typed run artifacts, evidence cells bind reported values to provenance, and release gates determine which interpretations can leave the workspace.",
+            "The end-to-end control path is shown in Figure 1. Local inputs enter role-scoped execution, each stage writes typed run artifacts, factual cells bind observations to provenance, and release gates determine which interpretations can leave the workspace.",
             "",
             architecture_figure,
             "",
@@ -1216,7 +1222,7 @@ def _render_final_paper_v2(
             "",
             "## 4. Evidence Cell and Claim-Gate Design",
             "",
-            "An evidence cell is the unit that makes a paper number auditable. Rather than storing a bare metric value, it records the dataset, split, command, artifact field, model or feature budget, leakage posture, and operating point. Interpretation is deliberately stored in a separate gate output: the cell says what happened, and the gate says how that fact may be used.",
+            "A typed evidence cell is the unit that makes an observation auditable. Metric cells record a measured value together with dataset, split, command, artifact field, model budget, leakage posture, calibration, exposure, and operating-point provenance. Invariant cells record a factual system state such as metadata completeness or rowless export, and cannot carry detector metrics. Interpretation is stored in a separate gate output. A cell records what was observed, while the gate determines how that observation may be used.",
             "",
             "The factual fields and their separation from interpretation can be seen in Figure 2.",
             "",
@@ -1230,34 +1236,33 @@ def _render_final_paper_v2(
             "",
             evidence_cell_snippet,
             "",
-            "Algorithm 1 defines the deterministic construction path from a split contract and bounded run to an auditable evidence cell.",
+            "Algorithm 1 defines the deterministic construction path from an artifact observation to one of the two factual cell types.",
             "",
             "```algorithm",
-            "Algorithm: Evidence-cell creation",
-            "Input: dataset registry D, split contract S, candidate budget B, run artifacts A",
-            "Output: evidence cell c with factual provenance",
-            "1. Freeze source posture, license posture, task target, and split contract.",
-            "2. Derive only features allowed by S and record excluded leakage fields.",
-            "3. Run baseline candidates under the declared baseline budget.",
-            "4. Run stronger candidates only within B and select on validation evidence.",
-            "5. After validation-only competitive selection and protocol freeze, evaluate the selected competitive finalist on the fixed test partition.",
-            "6. Record whether that partition had earlier reference or baseline exposure.",
-            "7. Write c = dataset, split, command, artifact field, metric, value, budget, leakage posture, operating point, and exposure status.",
-            "8. Hand c to the claim gate before it appears in tables, figures, or release text.",
+            "Algorithm: Typed evidence-cell creation",
+            "Input: observation o, artifact a, dataset registry D, split contract S, run contract R",
+            "Output: validated factual cell c",
+            "1. Resolve dataset, split, command, artifact reference, artifact field, budget, and leakage posture from D, S, R, and a.",
+            "2. If o is a detector measurement, create a metric_evidence_cell with metric, value, model, calibration, exposure, and operating-point provenance.",
+            "3. Otherwise create an invariant_evidence_cell with invariant name, observed value, invariant state, and rowless-export status.",
+            "4. Reject invariant cells that contain detector metric or value fields.",
+            "5. Reject metric cells missing any required metric provenance field.",
+            "6. Reject interpretive fields such as admissible use or claim strength in either factual cell type.",
+            "7. Persist c and pass only its identifier to a separate claim gate.",
             "```",
             "",
             "The claim gate is the second half of the design. If the evidence cell is incomplete, a split is leakage-prone, a metric is only a proxy, or a stronger interpretation needs a different dataset or study, the gate preserves the evidence and routes the stronger use to an evidence-needs record. The gate is implemented as a release mechanism, so it changes what the paper artifact pipeline and public release surfaces are allowed to say. Algorithm 2 specifies that validation path.",
             "",
             "```algorithm",
             "Algorithm: Claim-gate validation",
-            "Input: public claim q, evidence cells C, gates G, limitations L",
+            "Input: proposed claim q, typed factual cells C, benchmark policy P, limitations L",
             "Output: admissible wording and evidence-needs record",
-            "1. Resolve every evidence cell named by q and require dataset, split, command, artifact, budget, and leakage fields.",
-            "2. Compare the strength of q with source posture, split validity, metric scope, and benchmark role.",
-            "3. If q is exactly supported, emit the admissible wording and the evidence-cell identifiers.",
-            "4. If q is stronger than C and G permit, record the stronger-claim status and gate reason.",
-            "5. Attach the missing evidence needed to make q testable in future work.",
-            "6. Route current evidence to its admissible paper use and keep stronger uses out of headline wording.",
+            "1. Resolve every cell identifier named by q and validate each cell against its declared type schema.",
+            "2. Verify source posture, split validity, leakage status, benchmark role, and any applicable operating-point provenance under P.",
+            "3. Compare the semantic strength of q with the factual scope supported by C and the limitations in L.",
+            "4. If q is supported, emit bounded wording and the exact supporting cell identifiers.",
+            "5. Otherwise emit a blocked gate record containing the proposed claim, gate reason, and missing evidence.",
+            "6. Permit tables, figures, handoff packets, and release text to consume only the gate output.",
             "```",
             "",
             "The resulting routes from current evidence to admissible and stronger future uses are shown in Figure 3.",
@@ -1310,11 +1315,11 @@ def _render_final_paper_v2(
             "",
             "Across the tested fixtures, Relaytic-AML changes what the release pipeline may promote: a number with missing provenance, a prohibited feature path, a test-selected finalist, an unsafe handoff packet, or an over-strong claim produces a blocked record instead of reader-facing text. These are deterministic infrastructure checks. They are not human usability evidence, privacy certification, or production AML validation.",
             "",
-            "The hosted external-score fixture shows the intended integration point for stronger third-party detectors. A rowless detector-score artifact enters Relaytic with schema and content hashes, not raw rows. Relaytic emits one governance evidence cell, redacts unsafe handoff fields, and routes the result as hosted detector-output governance evidence. Future detector outputs can therefore pass through the same local release boundary without being mistaken for a new detector contribution.",
+            "The hosted external-score fixture shows the intended integration point for stronger third-party detectors. A rowless detector-score artifact enters Relaytic with schema and content hashes, not raw rows. Relaytic emits one invariant cell for metadata completeness, redacts unsafe handoff fields, and routes the result as hosted detector-output governance evidence. Future detector outputs can therefore pass through the same local release boundary without being mistaken for a new detector contribution.",
             "",
             "## 8. Limitations and Threats to Validity",
             "",
-            "PaySim is synthetic. It is useful for controlled temporal fraud experiments, but it is not evidence of bank-scale AML superiority. The simulator has known simplifications, and the current result is a leakage-audited proxy result. The same fixed test partition had already been observed through the P4 reference and P6 baseline before the competitive run. Competitive finalist selection, calibration, and threshold choice remained validation-only, and only one competitive finalist was tested after protocol freeze. Prior exposure nevertheless weakens any untouched-holdout interpretation. A future study should reserve a genuinely unseen chronological or external holdout. The destination-history feature contract is present, but its isolated contribution is not in the current evidence pack.",
+            "PaySim is synthetic. It is useful for controlled temporal fraud experiments, but it is not evidence of bank-scale AML superiority. The simulator has known simplifications, and the current result is a leakage-audited proxy result. The same fixed test partition had already been observed through the P4 reference and P6 baseline before the competitive run. Competitive finalist selection, calibration, and threshold choice remained validation-only, and only one competitive finalist was tested after protocol freeze. Prior exposure nevertheless weakens any untouched-holdout interpretation. Within validation, model selection used the complete partition and therefore overlaps the two chronological subwindows later used for calibration fitting and threshold choice. This reuse can make validation-based selection evidence optimistic, but it does not expose test labels or constitute test leakage. A stronger future protocol should reserve three disjoint chronological surfaces for model selection, calibration, and threshold selection, followed by a genuinely unseen test or external holdout. The destination-history feature contract is present, but its isolated contribution is not in the current evidence pack.",
             "",
             "Public blockchain data is also not the same as bank AML. Elliptic provides a valuable temporal graph task, but unknown labels, anonymized source features, source-supplied neighbor aggregates, and public-chain behavior limit direct operational interpretation. The dataset documentation establishes the one-hop aggregate feature definitions and absence of cross-time-step edges, but Relaytic does not reconstruct the source feature pipeline independently. Elliptic2 is modern and highly relevant, but the current local evidence does not satisfy the reference-parity conditions needed for a performance contribution against RevClassifyDS.",
             "",
@@ -1342,7 +1347,7 @@ def _render_final_paper_v2(
             "python -m relaytic.ui.cli release-safety paper-release --format json",
             "python -m relaytic.ui.cli release-safety paper-narrative-polish --format json",
             "python -m relaytic.ui.cli release-safety paper-novelty-positioning --format json",
-            "python -m relaytic.ui.cli release-safety paper-release-integrity --format json",
+            "python -m relaytic.ui.cli release-safety paper-release-integrity --candidate --format json",
             "python -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
             "python -m relaytic.ui.cli release-safety paper-final-preflight --format json",
             "```",
@@ -1385,25 +1390,31 @@ def _render_final_paper_v2(
             "",
             "The calibration and threshold-selection subwindows are disjoint. They are not independent of model selection because the complete validation partition was used to rank finalists or feature views.",
             "",
-            "The injected risks and observed release behavior can be seen in Table 12.",
+            "The generated type contract and its authoritative required-field counts are summarized in Table 12.",
+            "",
+            evidence_schema_table,
+            "",
+            "Metric and invariant records share a factual provenance base, then diverge into type-specific fields. The schema validators reject untyped records, missing required fields, invariant records carrying detector metrics, and factual records containing interpretive claim fields.",
+            "",
+            "The injected risks and observed release behavior can be seen in Table 13.",
             "",
             failure_case_table,
             "",
             "The failure-case fixtures exercise whether the release path refuses leakage features, test-set model selection, over-strong claims, unsafe handoff, and lost-run states. They do not add detector benchmark rows.",
             "",
-            "Table 13 compares the complete governance path with fixtures in which one control is disabled.",
+            "Table 14 compares the complete governance path with fixtures in which one control is disabled.",
             "",
             governance_ablation_table,
             "",
             "These ablations do not rerun detector training. They change the available governance controls and measure the resulting artifact, handoff, recovery, release, and claim states.",
             "",
-            "The mechanism, stress signal, and boundary associated with each invariant are collected in Table 14.",
+            "The mechanism, stress signal, and boundary associated with each invariant are collected in Table 15.",
             "",
             governance_invariant_table,
             "",
             "The invariant map records release-time rules rather than prose preferences. Each invariant pairs a mechanism with an observed stress signal and an explicit boundary.",
             "",
-            "The hosted external-score path is illustrated by the rowless fixture in Table 15.",
+            "The hosted external-score path is illustrated by the rowless fixture in Table 16.",
             "",
             hosted_score_case_study_table,
             "",
@@ -1411,13 +1422,13 @@ def _render_final_paper_v2(
             "",
             "The hosted-score record is metadata governance only. On the tested fixture, a rowless score artifact is wrapped by a factual schema-and-hash record, a redaction report, and a separate interpretation gate. Its completeness result is not detector accuracy or ranking performance.",
             "",
-            "Table 16 connects stronger future claims to current admissible uses and to the additional evidence each claim would require.",
+            "Table 17 connects stronger future claims to current admissible uses and to the additional evidence each claim would require.",
             "",
             blocked_claim_table,
             "",
             "The blocked-claim rows show how stronger future uses are handled. The gate records current admissible use and the evidence needed before a stronger interpretation could be made.",
             "",
-            "Concrete external-agent handoff and interrupted-run recovery records are shown in Table 17.",
+            "Concrete external-agent handoff and interrupted-run recovery records are shown in Table 18.",
             "",
             handoff_recovery_table,
             "",
@@ -1435,12 +1446,12 @@ def _render_final_paper_v2(
             "py -3.11 -m relaytic.ui.cli release-safety paper-release --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json",
-            "py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --format json",
+            "py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --candidate --format json",
             "py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
             "py -3.11 -m pytest -m prepush -q",
             "```",
             "",
-            "After compiling `docs/paper/arxiv_src/main.tex` and copying the compiled PDF to the final paper location, run `paper-final-preflight`. The README includes the exact compile and verification commands.",
+            "After compiling the arXiv source and copying the PDF to the review location, run `paper-final-preflight`. The README includes the exact compile and verification commands.",
             "",
             "macOS/Linux:",
             "",
@@ -1450,7 +1461,7 @@ def _render_final_paper_v2(
             "python3 -m relaytic.ui.cli release-safety paper-release --format json",
             "python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json",
             "python3 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json",
-            "python3 -m relaytic.ui.cli release-safety paper-release-integrity --format json",
+            "python3 -m relaytic.ui.cli release-safety paper-release-integrity --candidate --format json",
             "python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json",
             "python3 -m pytest -m prepush -q",
             "```",
@@ -1646,7 +1657,7 @@ def _render_operating_point_table(inputs: dict[str, Any]) -> str:
                 fallback_total=paysim_calibration.get("operating_point_row_count"),
             ),
             _format_operating_queue(dict(paysim.get("test_operating_point") or {}), fallback_total=123580),
-            "score $\\geq$ threshold; equality included",
+            "inclusive threshold",
         ],
         [
             "Elliptic",
@@ -1658,7 +1669,7 @@ def _render_operating_point_table(inputs: dict[str, Any]) -> str:
                 fallback_total=graph.get("validation_operating_partition_row_count"),
             ),
             _format_operating_queue(dict(graph.get("test_operating_point") or {}), fallback_total=11184),
-            "score $\\geq$ threshold; equality included",
+            "inclusive threshold",
         ],
     ]
     return _markdown_table(
@@ -1682,6 +1693,64 @@ def _render_validation_subsplit_table() -> str:
         ["Dataset", "Purpose", "Boundary", "Evaluated units", "Positives", "Overlap and use"],
         rows,
     )
+
+
+def _render_evidence_schema_table(inputs: dict[str, Any]) -> str:
+    contract = _payload(inputs["evidence_schema_contract"])
+    cell_types = dict(contract.get("cell_types") or {})
+    metric = dict(cell_types.get("metric_evidence_cell") or {})
+    invariant = dict(cell_types.get("invariant_evidence_cell") or {})
+    fixtures = dict(contract.get("fixtures") or {})
+    disabled = dict(fixtures.get("disabled_required_fields_ablation") or {})
+    missing = dict(fixtures.get("missing_field_stress_fixture") or {})
+    rows = [
+        [
+            "Metric observation",
+            "metric-cell v1",
+            metric.get("required_field_count") or len(METRIC_EVIDENCE_CELL_REQUIRED_FIELDS),
+            "metric, value, model, calibration, exposure, operating point",
+            "detector ranking or review-budget measurement",
+        ],
+        [
+            "System invariant",
+            "invariant-cell v1",
+            invariant.get("required_field_count") or len(INVARIANT_EVIDENCE_CELL_REQUIRED_FIELDS),
+            "invariant name, observed value, state, rowless-export status",
+            "factual governance or handoff state; detector metrics prohibited",
+        ],
+        [
+            "Disabled-field ablation",
+            "metric contract",
+            disabled.get("removed_field_count") or len(METRIC_EVIDENCE_CELL_REQUIRED_FIELDS),
+            "all required metric fields removed",
+            "release must block",
+        ],
+        [
+            "Missing-field stress",
+            "typed metric fixture",
+            missing.get("omitted_field_count") or 0,
+            "schema, cell ID, and type retained; remaining fields omitted",
+            "schema validation must fail",
+        ],
+    ]
+    return _markdown_table(
+        "Appendix table. Typed factual evidence contract",
+        ["Cell type", "Schema", "Required fields", "Type-specific content", "Permitted role"],
+        rows,
+    )
+
+
+def _compact_gate_use(value: str) -> str:
+    normalized = " ".join(str(value or "").replace("_", " ").split())
+    replacements = {
+        "bounded paysim temporal proxy demonstration": "PaySim temporal-proxy evidence",
+        "bounded paysim temporal-proxy demonstration": "PaySim temporal-proxy evidence",
+        "bounded elliptic temporal graph feature demonstration": "Elliptic graph-feature evidence",
+        "bounded elliptic temporal graph-feature demonstration": "Elliptic graph-feature evidence",
+        "elliptic2 modern benchmark context only": "Elliptic2 local context",
+        "elliptic2 published reference context only": "external published reference",
+    }
+    return replacements.get(normalized.lower(), normalized)
 
 
 def _compact_model_configuration(configuration: dict[str, Any]) -> str:
@@ -1788,7 +1857,7 @@ def _render_evidence_cell_table_v2(
             _format_metric(cell.get("value")),
             _compact_cell_split(cell_id, str(cell.get("split") or "not recorded")),
             _compact_command_artifact(cell),
-            str(gates.get(cell_id, {}).get("admissible_use") or "gate record unavailable"),
+            _compact_gate_use(str(gates.get(cell_id, {}).get("admissible_use") or "gate record unavailable")),
         ])
     return _markdown_table(
         "Table 2. Representative evidence cells and gate-derived publication roles",
@@ -1815,6 +1884,7 @@ def _render_evidence_cell_snippet(
         if key in exposure
     }
     evidence = {
+        "cell_type": cell.get("cell_type") or "metric_evidence_cell",
         "cell_id": "PS-PR",
         "dataset_id": cell.get("dataset_id") or "paysim_temporal_transaction_fraud",
         "split": _compact_cell_split(cell_id, str(cell.get("split") or "temporal fixed test")),
@@ -1825,6 +1895,8 @@ def _render_evidence_cell_snippet(
         "budget_tier": cell.get("budget_tier") or "competitive",
         "leakage_posture": "balance fields and raw identifiers excluded",
         "calibration_status": _calibration_label(str(cell.get("calibration_status") or "not recorded")),
+        "operating_point_ref": "competitive manifest: selected model test operating point",
+        "exposure_status": cell.get("exposure_status") or "fixed test previously exposed",
         "test_exposure_contract": test_exposure,
     }
     gate = dict(_claim_gate_by_cell(inputs).get(cell_id) or {})
@@ -1871,12 +1943,19 @@ def _render_paysim_ablation_table(inputs: dict[str, Any], metrics: dict[str, dic
 def _render_system_evaluation_summary_table(inputs: dict[str, Any]) -> str:
     tasks = _task_by_id(_payload(inputs["system_task_eval"]))
     external_panel = _payload(inputs["external_score_paper_panel"])
+    schema_contract = _payload(inputs["evidence_schema_contract"])
+    schema_cell_types = dict(schema_contract.get("cell_types") or {})
+    metric_schema = dict(schema_cell_types.get("metric_evidence_cell") or {})
+    metric_count = int(
+        metric_schema.get("required_field_count")
+        or len(METRIC_EVIDENCE_CELL_REQUIRED_FIELDS)
+    )
 
     def signal(task_id: str) -> str:
         measured_signal = str(tasks.get(task_id, {}).get("measured_signal") or "not observed")
         reader_signals = {
-            "audit_status=pass; required_fields_present=14/14": "14/14 factual fields present; evidence/gate separation audit passed.",
-            "baseline=0.331345; competitive=0.638773; improved=True": "PaySim PR-AUC changed from 0.3313 to 0.6388 under the same dataset, split, feature, and metric contract, with different declared modeling budgets.",
+            f"audit_status=pass; required_fields_present={metric_count}/{metric_count}": f"{metric_count}/{metric_count} required metric fields present; evidence/gate separation audit passed.",
+            "baseline=0.331345; competitive=0.638773; improved=True; feature_contract_same=False": "PaySim PR-AUC changed from 0.3313 to 0.6388 under the same dataset, temporal split, and metric. The competitive route uses a distinct audited feature contract and a larger modeling budget.",
             "claim_cases_status=pass; go_no_go=True": "Six stronger-claim cases tested; hard and headline claims blocked.",
             "rowless=True; next_action=True; tools=True": "Rowless handoff preserved next action and allowed tools.",
             "onboarding=True; partial=True; shortlist=True": "Recovery guide, partial-run state, and artifact shortlist were emitted.",
@@ -2037,14 +2116,18 @@ def _render_hosted_score_record_snippet(inputs: dict[str, Any]) -> str:
     case_study = _payload(inputs["external_score_case_study"])
     snippet = dict(case_study.get("auditable_record_snippet", {}))
     ordered = {
+        "cell_type": snippet.get("cell_type") or "invariant_evidence_cell",
         "cell_id": snippet.get("cell_id") or "not_available",
         "dataset_id": snippet.get("dataset_id") or "not_available",
         "split": snippet.get("split") or "not_available",
         "command": snippet.get("command") or "not_available",
-        "artifact_ref": snippet.get("artifact_ref") or "not_available",
-        "metric": snippet.get("metric") or "not_available",
-        "invariant_state": snippet.get("invariant_state") or ("pass" if snippet.get("value") == 1.0 else "not_available"),
-        "detector_performance_metric": False,
+        "artifact_ref": _short_report_ref(str(snippet.get("artifact_ref") or "not_available")),
+        "artifact_field": snippet.get("artifact_field") or "not_available",
+        "invariant_name": snippet.get("invariant_name") or "not_available",
+        "observed_value": snippet.get("observed_value"),
+        "invariant_state": snippet.get("invariant_state") or "not_available",
+        "detector_performance_metric": bool(snippet.get("detector_performance_metric")),
+        "operating_point_applicability": snippet.get("operating_point_applicability") or "not_applicable",
         "leakage_posture": snippet.get("leakage_posture") or "not_available",
         "rowless_export_status": snippet.get("rowless_export_status") or "rowless",
     }
@@ -2174,7 +2257,7 @@ def _evidence_table_signal(value: Any, evidence_id: str) -> str:
         "partial_run_state_recovery": "partial run recovered; 8 missing items; 6 actions exposed",
         "supporting_table_allowed": "5 supporting rows allowed; hard/headline claims blocked",
         "wording_lint": "pass",
-        "No evidence-cell required fields": "11 factual provenance fields missing; release blocked",
+        "No evidence-cell required fields": f"{len(METRIC_EVIDENCE_CELL_REQUIRED_FIELDS)} required metric fields missing; release blocked",
         "overstrong_claim_attempt": "6 unsupported claims blocked",
         "leakage_column_injection": "4 leakage fields offered and excluded; 0 used",
         "rowless_handoff_redaction": "6 unsafe fields blocked; raw rows excluded",
@@ -3420,7 +3503,6 @@ def _metric_value(metrics: dict[str, dict[str, Any]], cell_id: str) -> Any:
 
 def _source_candidate_release_line(inputs: dict[str, Any]) -> str:
     commit = str(inputs.get("git", {}).get("commit") or "").strip()
-    short_commit = commit[:12] if commit else "unavailable"
     release_tag = str(inputs.get("release_tag") or "").strip()
     if inputs.get("git", {}).get("release_injected") and release_tag:
         return (
@@ -3439,8 +3521,8 @@ def _source_candidate_release_line(inputs: dict[str, Any]) -> str:
         )
     return (
         "Repository: https://github.com/ML-Enthusiast-de/Relaytic. "
-        f"Source commit: {short_commit}. "
-        "Exact release metadata is injected by the clean immutable-revision build."
+        "This review candidate does not claim an archival revision. "
+        "The clean immutable-revision build injects the source commit into the manuscript and release manifests."
     )
 
 

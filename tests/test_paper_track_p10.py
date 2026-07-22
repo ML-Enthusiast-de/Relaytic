@@ -170,6 +170,16 @@ def _write_p10_input_reports(root: Path) -> None:
         },
     )
     _write_json(
+        reports / "elliptic2_revclassify_reference_scorecard.json",
+        {
+            "status": "reported_reference_with_local_path_audit",
+            "reference": {
+                "RevClassify_DS": {"pr_auc": 0.974},
+                "source": "Song et al. (2024), Table 1, RevClassifyDS row, full-shot PR-AUC column",
+            },
+        },
+    )
+    _write_json(
         reports / "elliptic2_reference_parity_gate.json",
         {
             "status": "blocked_supporting_only_thesis_narrowing_required",

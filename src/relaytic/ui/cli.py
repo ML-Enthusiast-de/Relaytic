@@ -1724,10 +1724,21 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional output directory for P24 reports. Defaults to docs/reports/.",
     )
-    release_safety_p24.add_argument(
+    release_mode = release_safety_p24.add_mutually_exclusive_group()
+    release_mode.add_argument(
+        "--candidate",
+        action="store_true",
+        help="Run revision-neutral review-candidate checks. This is the default when --final is omitted.",
+    )
+    release_mode.add_argument(
         "--final",
         action="store_true",
-        help="Build an out-of-tree exact-revision PDF and source bundle; requires a clean worktree.",
+        help="Build an out-of-tree exact-revision PDF and source bundle from a clean committed worktree.",
+    )
+    release_safety_p24.add_argument(
+        "--verify-public",
+        action="store_true",
+        help="With --final, also require the exact source commit to exist on the origin remote.",
     )
     release_safety_p24.add_argument(
         "--release-tag",
@@ -3841,7 +3852,9 @@ def main(argv: list[str] | None = None) -> int:
             elif args.release_safety_command == "paper-release-integrity":
                 payload = _run_paper_release_integrity_surface(
                     output_dir=args.output_dir,
+                    candidate=args.candidate,
                     final=args.final,
+                    verify_public=args.verify_public,
                     release_tag=args.release_tag,
                 )
             else:
@@ -8433,7 +8446,9 @@ def _run_paper_novelty_positioning_surface(
 def _run_paper_release_integrity_surface(
     *,
     output_dir: str | None,
+    candidate: bool,
     final: bool,
+    verify_public: bool,
     release_tag: str | None,
 ) -> dict[str, Any]:
     from relaytic.release_safety import (
@@ -8443,14 +8458,23 @@ def _run_paper_release_integrity_surface(
     )
 
     root = Path.cwd()
+    if verify_public and not final:
+        raise ValueError("--verify-public is valid only with --final.")
+    if release_tag and not final:
+        raise ValueError("--release-tag is valid only with --final.")
     if final:
-        manifest = build_exact_revision_release(root, release_tag=release_tag)
+        manifest = build_exact_revision_release(
+            root,
+            release_tag=release_tag,
+            require_public=verify_public,
+        )
         return {
             "surface_payload": manifest,
             "human_output": "# Paper P24 Exact-Revision Release\n\n"
             f"- Status: `{manifest.get('status')}`\n"
             f"- Source commit: `{manifest.get('source_commit')}`\n",
         }
+    del candidate
     written = sync_paper_release_integrity_pack(root, output_dir=output_dir)
     pack = {key: json.loads(path.read_text(encoding="utf-8")) for key, path in written.items()}
     manifest = dict(pack["paper_p24_release_manifest"])

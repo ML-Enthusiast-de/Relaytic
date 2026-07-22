@@ -98,7 +98,7 @@ More context:
 
 The current paper draft presents Relaytic-AML as a local-first evaluation lab for financial-crime ML. It is an architecture and evidence-discipline paper, not a hard AML superiority result. Relaytic remains the general package and CLI. Relaytic-AML is the current flagship edition and the focus of the draft because AML makes privacy, temporal validity, graph context, human review, and claim discipline visible in one domain.
 
-The repo includes the Markdown manuscript, compiled PDF, arXiv source candidate, references, figures, tables, and underlying public evidence artifacts. The exact-revision release command requires a clean source commit that exists on the public remote, then records that immutable commit in the PDF and source bundle. A tag is optional and may be cited only when the command verifies it locally and remotely.
+The repo includes the Markdown manuscript, compiled PDF, arXiv source candidate, references, figures, tables, and underlying public evidence artifacts. Candidate builds are explicitly revision-neutral. The exact-revision release command requires a clean source commit, verifies generated surfaces, and records that immutable commit in the PDF and source bundle. Public-remote verification is a separate post-push check. A tag is optional and may be cited only when the command verifies it locally and remotely.
 
 Repository publication guidance: keep this repository as the auditable source of record and cite the exact public commit stored in the final release manifest. A separate paper-only repository is unnecessary because the immutable snapshot preserves both a concise reader path and the deeper audit trail.
 
@@ -119,16 +119,18 @@ Regenerate:
 Windows PowerShell:
 
 ```powershell
-py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
-py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-external-score-proof --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-external-score-integration --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-tables --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-system-eval --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-failure-eval --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-governance-ablation --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-draft --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
-py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --format json
+py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --candidate --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 Set-Location docs\paper\arxiv_src
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
@@ -138,22 +140,24 @@ pdflatex -interaction=nonstopmode -halt-on-error main.tex
 Set-Location ..\..\..
 Copy-Item -LiteralPath docs\paper\arxiv_src\main.pdf -Destination docs\paper\relaytic_aml_arxiv_draft.pdf -Force
 py -3.11 -m relaytic.ui.cli release-safety paper-final-preflight --format json
-py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py tests/test_paper_track_p24.py -q
+py -3.11 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py tests/test_paper_track_p24.py tests/test_paper_track_p26.py tests/test_paper_track_p27.py -q
 ```
 
 macOS/Linux:
 
 ```bash
-python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
-python3 -m relaytic.ui.cli release-safety paper-invariants --format json
 python3 -m relaytic.ui.cli release-safety paper-external-score-proof --format json
 python3 -m relaytic.ui.cli release-safety paper-external-score-integration --format json
 python3 -m relaytic.ui.cli release-safety paper-tables --format json
+python3 -m relaytic.ui.cli release-safety paper-system-eval --format json
+python3 -m relaytic.ui.cli release-safety paper-failure-eval --format json
+python3 -m relaytic.ui.cli release-safety paper-governance-ablation --format json
+python3 -m relaytic.ui.cli release-safety paper-invariants --format json
 python3 -m relaytic.ui.cli release-safety paper-draft --format json
 python3 -m relaytic.ui.cli release-safety paper-release --format json
 python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
 python3 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
-python3 -m relaytic.ui.cli release-safety paper-release-integrity --format json
+python3 -m relaytic.ui.cli release-safety paper-release-integrity --candidate --format json
 python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 cd docs/paper/arxiv_src
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
@@ -163,10 +167,10 @@ pdflatex -interaction=nonstopmode -halt-on-error main.tex
 cd ../../..
 cp docs/paper/arxiv_src/main.pdf docs/paper/relaytic_aml_arxiv_draft.pdf
 python3 -m relaytic.ui.cli release-safety paper-final-preflight --format json
-python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py tests/test_paper_track_p24.py -q
+python3 -m pytest tests/test_paper_track_p15.py tests/test_paper_track_p20.py tests/test_paper_track_p21.py tests/test_paper_track_p23.py tests/test_paper_track_p24.py tests/test_paper_track_p26.py tests/test_paper_track_p27.py -q
 ```
 
-After the final source changes are committed, pushed to the public remote, and `git status --short` is empty, build the upload artifacts with `py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --final --format json` on Windows or the equivalent `python3` command on macOS/Linux. The command refuses a dirty worktree or a source commit absent from the public remote, then writes the PDF, source archive, hashes, and revision manifest under `dist/paper-release/<commit>/`. A tag may be supplied with `--release-tag` only after it exists locally and remotely at the same commit.
+After the final source changes are committed and `git status --short` is empty, build the exact local bundle with `py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --final --format json` on Windows or the equivalent `python3` command on macOS/Linux. The command refuses a dirty worktree, verifies that committed manuscript and figures match their generators, injects the full source commit, and checks the same revision in TeX and PDF. It writes the PDF, source archive, hashes, and revision manifest under `dist/paper-release/<commit>/`. Inspect that bundle before pushing. After the commit is public, rerun with `--final --verify-public` to require the exact revision on `origin`. A tag may be supplied with `--release-tag` only after it exists locally and remotely at the same commit.
 
 Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked until later gates explicitly allow them.
 
