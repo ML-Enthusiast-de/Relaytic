@@ -202,14 +202,14 @@ For the repository as it exists today, the next major leverage points are not "m
 
 They are:
 
-- a **release-safety and build-attestation layer** so packaged Relaytic artifacts can be handed to recruiters, labs, and external agents without machine-path leaks, source-map leaks, or accidental debug payloads
+- a **release-safety and build-attestation layer** so packaged Relaytic artifacts can be handed to reviewers, labs, and external agents without machine-path leaks, source-map leaks, or accidental debug payloads
 - an **evented runtime and visible permission model** so every later background, remote, or approval-based feature is built on one typed event bus and one explicit authority contract
 - a **bounded daemon and resumable-job layer** so pulse, search, memory maintenance, and long experiments can continue safely over time without becoming hidden background activity
 - a stronger **workspace-first continuity layer** that becomes permission-aware, daemon-aware, and remote-supervision-aware rather than only run-to-run aware
 - stronger **machine-stable result contracts** that stay aligned across local, remote, background, and post-run surfaces even as supervision becomes richer
 - stronger **governed learnings** that upgrade the shipped workspace learnings into typed, confidence-bearing, reaffirmable, invalidatable, and optionally expirable records instead of drifting into an untyped memory blob
 - an **iteration planner** that remains explicit as Relaytic adds remote approvals, feasibility gates, and daemon-managed continuation rather than falling back to implicit next-step choices
-- **release-safety and build attestation** so packaged Relaytic artifacts can be handed to recruiters, labs, and external agents without machine-path leaks, source-map leaks, or accidental debug payloads
+- **release-safety and build attestation** so packaged Relaytic artifacts can be handed to reviewers, labs, and external agents without machine-path leaks, source-map leaks, or accidental debug payloads
 - an **evented runtime and visible permission model** so every later background, remote, or approval-based feature is built on one typed event bus and one explicit authority contract
 - a **bounded daemon and resumable-job layer** so pulse, search, memory maintenance, and long experiments can continue safely over time without becoming hidden background activity
 - a **canonical product-spec pack** that freezes schemas, UX flows, and proof burden so later slices can optimize implementation quality without improvising core product behavior

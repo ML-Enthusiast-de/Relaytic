@@ -150,6 +150,12 @@ def test_paper_track_p14_committed_source_bundle_is_ready() -> None:
     assert "ML-Enthusiast" in main_tex
     assert ("TODO" + "_EVIDENCE") not in main_tex
     assert r"TODO\_EVIDENCE" not in main_tex
+    assert (
+        r"\author{Tobias Gehra\\Independent Researcher\\"
+        r"\href{mailto:t.gehra.ai@gmail.com}{\texttt{t.gehra.ai@gmail.com}}}"
+        in main_tex
+    )
+    assert r"GitHub: \texttt{ML-Enthusiast-de}" not in main_tex
 
     cited_keys = set()
     for citation in re.findall(r"\\citep?\{([^}]+)\}", main_tex):

@@ -1,6 +1,6 @@
-# Paper P14 Release-Candidate Checklist
+# Paper P14 Release Checklist
 
-- Source release-candidate ready: `True`
+- Source package validation ready: `True`
 - arXiv upload ready now: `False`
 - Source tree: `docs/paper/arxiv_src`
 - Package audit: `pass`
@@ -26,4 +26,4 @@
 
 ## Claim boundary
 
-The source package remains an evaluation-environment release candidate. It still must not claim hard AML superiority, SOTA or leaderboard-winning performance, claimed equivalence to RevClassify, graph-neural superiority, production readiness, or hard business value.
+The source package remains bounded to the evaluation-environment contribution. It must not claim hard AML superiority, SOTA or leaderboard-winning performance, claimed equivalence to RevClassify, graph-neural superiority, production readiness, or hard business value.

@@ -268,8 +268,18 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
             "release_identifier_visible",
             "Repository: https://github.com/ML-Enthusiast-de/Relaytic" in draft
             and (
-                "Source commit:" in draft
-                or "This review candidate does not claim an archival revision." in draft
+                bool(
+                    re.search(
+                        r"This manuscript was generated from source revision [0-9a-f]{40}, "
+                        r"which is recorded in the release manifest and arXiv source bundle\.",
+                        draft,
+                    )
+                )
+                or (
+                    "The immutable release process records the full source revision in the release manifest "
+                    "and arXiv source bundle."
+                    in draft
+                )
             )
             and "Public release tag: TODO before arXiv submission" not in draft,
             "Reproducibility must identify the repository and either a clean source commit or the exact-revision final-build mechanism.",
@@ -277,7 +287,7 @@ def _build_source_preflight(inputs: dict[str, Any]) -> dict[str, Any]:
         _check(
             "source_manifest_ready",
             _payload(inputs["paper_arxiv_source_manifest"]).get("status") == "ready_for_source_release_candidate",
-            "P21 requires a ready P14 source release candidate.",
+            "P21 requires a ready P14 source package.",
         ),
         _check(
             "p20_polish_ready",

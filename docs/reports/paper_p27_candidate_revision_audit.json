@@ -8,9 +8,15 @@
       "passed": true
     },
     {
-      "check": "candidate mode is explicit",
+      "check": "development build explains exact-revision release mechanism",
       "observed": true,
       "pass_criterion": true,
+      "passed": true
+    },
+    {
+      "check": "reader-facing review-candidate wording is absent",
+      "observed": false,
+      "pass_criterion": false,
       "passed": true
     }
   ],

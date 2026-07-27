@@ -449,7 +449,7 @@ def _build_public_claims_allowed(
     ]
     lint = _lint_public_surfaces(surfaces)
     readme_release_section_present = (
-        "Relaytic-AML Paper Draft" in readme_text or "Paper P13 Claim-Safe Release Status" in readme_text
+        "Relaytic-AML Paper" in readme_text or "Paper P13 Claim-Safe Release Status" in readme_text
     )
     checks = [
         _check(
@@ -1451,7 +1451,7 @@ def _render_final_paper_v2(
             "py -3.11 -m pytest -m prepush -q",
             "```",
             "",
-            "After compiling the arXiv source and copying the PDF to the review location, run `paper-final-preflight`. The README includes the exact compile and verification commands.",
+            "After compiling the arXiv source and copying the PDF into the release bundle, run `paper-final-preflight`. The README includes the exact compile and verification commands.",
             "",
             "macOS/Linux:",
             "",
@@ -2753,7 +2753,7 @@ def _render_attention_pack(
             "",
             "## Release Facts",
             "",
-            "- Paper draft: `docs/paper/relaytic_aml_arxiv_draft.md`",
+            "- Paper manuscript: `docs/paper/relaytic_aml_arxiv_draft.md`",
             "- arXiv source tree: `docs/paper/arxiv_src/`",
             "- Public claims whitelist: `docs/reports/paper_public_claims_allowed.json`",
         ]
@@ -3507,22 +3507,22 @@ def _source_candidate_release_line(inputs: dict[str, Any]) -> str:
     if inputs.get("git", {}).get("release_injected") and release_tag:
         return (
             "Repository: https://github.com/ML-Enthusiast-de/Relaytic. "
-            f"Release tag: {release_tag}. Source commit: {commit}. "
+            f"This manuscript was generated from source revision {commit}, which is recorded in the release manifest and arXiv source bundle. "
+            f"Release tag: {release_tag}. "
             f"Revision archive: https://github.com/ML-Enthusiast-de/Relaytic/archive/refs/tags/{release_tag}.tar.gz. "
             "The PDF and arXiv source-bundle manifests are generated together and record hashes for this revision."
         )
     if inputs.get("git", {}).get("release_injected") and commit:
         return (
             "Repository: https://github.com/ML-Enthusiast-de/Relaytic. "
-            f"Source commit: {commit}. "
+            f"This manuscript was generated from source revision {commit}, which is recorded in the release manifest and arXiv source bundle. "
             f"Commit record: https://github.com/ML-Enthusiast-de/Relaytic/commit/{commit}. "
             f"Revision archive: https://github.com/ML-Enthusiast-de/Relaytic/archive/{commit}.tar.gz. "
             "The PDF and arXiv source-bundle manifests are generated together and record hashes for this revision."
         )
     return (
         "Repository: https://github.com/ML-Enthusiast-de/Relaytic. "
-        "This review candidate does not claim an archival revision. "
-        "The clean immutable-revision build injects the source commit into the manuscript and release manifests."
+        "The immutable release process records the full source revision in the release manifest and arXiv source bundle."
     )
 
 

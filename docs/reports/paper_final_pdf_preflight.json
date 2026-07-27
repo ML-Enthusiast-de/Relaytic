@@ -3,7 +3,7 @@
     {
       "check_id": "compiled_pdf_present",
       "detail": {
-        "byte_count": 548885
+        "byte_count": 546988
       },
       "message": "arXiv source PDF must exist and have nontrivial size.",
       "passed": true
@@ -11,8 +11,8 @@
     {
       "check_id": "compiled_pdf_matches_current_source",
       "detail": {
-        "pdf_modified_unix": 1784707062.57117,
-        "source_modified_unix": 1784707026.2091637
+        "pdf_modified_unix": 1785132859.6963873,
+        "source_modified_unix": 1785132814.502256
       },
       "message": "Compiled PDF should be newer than or as new as the generated TeX source.",
       "passed": true
@@ -20,8 +20,8 @@
     {
       "check_id": "review_pdf_synchronized",
       "detail": {
-        "review_pdf_bytes": 548885,
-        "source_pdf_bytes": 548885
+        "review_pdf_bytes": 546988,
+        "source_pdf_bytes": 546988
       },
       "message": "Human review PDF should match the compiled source PDF size.",
       "passed": true

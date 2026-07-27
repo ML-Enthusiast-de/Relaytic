@@ -61,7 +61,7 @@
     },
     {
       "check_id": "source_manifest_ready",
-      "message": "P21 requires a ready P14 source release candidate.",
+      "message": "P21 requires a ready P14 source package.",
       "passed": true
     },
     {

@@ -36,6 +36,6 @@ relaytic scan-git-safety
 
 ## Release Facts
 
-- Paper draft: `docs/paper/relaytic_aml_arxiv_draft.md`
+- Paper manuscript: `docs/paper/relaytic_aml_arxiv_draft.md`
 - arXiv source tree: `docs/paper/arxiv_src/`
 - Public claims whitelist: `docs/reports/paper_public_claims_allowed.json`

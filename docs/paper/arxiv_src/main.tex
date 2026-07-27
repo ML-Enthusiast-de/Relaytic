@@ -23,7 +23,7 @@
 \hypersetup{pdftitle={Relaytic-AML: A Local-First, Agent-Assisted Evaluation Lab for Financial-Crime Machine Learning},pdfauthor={Tobias Gehra},pdfsubject={Local-first AML evaluation lab},pdfkeywords={anti-money laundering, financial crime, reproducibility, AI evaluation, agent-assisted systems}}
 
 \title{Relaytic-AML: A Local-First, Agent-Assisted Evaluation Lab for Financial-Crime Machine Learning}
-\author{Tobias Gehra\\Independent Researcher\\GitHub: \texttt{ML-Enthusiast-de}\\\href{mailto:t.gehra.ai@gmail.com}{\texttt{t.gehra.ai@gmail.com}}}
+\author{Tobias Gehra\\Independent Researcher\\\href{mailto:t.gehra.ai@gmail.com}{\texttt{t.gehra.ai@gmail.com}}}
 \date{July 2026}
 
 \begin{document}
@@ -425,7 +425,7 @@ The system is intentionally local-first, which creates a tradeoff. Privacy and p
 
 The repository is larger than this AML paper. Relaytic is the general local-first inference lab and public package. Relaytic-AML is the focused AML edition used here for the manuscript. A reader should start with the README and this paper. Development-control files record the build history, but they are not required to understand the paper claims. Public citation should use the immutable source commit recorded in the release bundle, or a separately verified public tag, because the main branch can continue to evolve after the paper is posted.
 
-Repository: https://github.com/ML-Enthusiast-de/Relaytic. This review candidate does not claim an archival revision. The clean immutable-revision build injects the source commit into the manuscript and release manifests.
+Repository: https://github.com/ML-Enthusiast-de/Relaytic. The immutable release process records the full source revision in the release manifest and arXiv source bundle.
 
 Table 7 separates what a clean clone can reproduce immediately from what requires local benchmark access. The README contains the full regeneration script, while the paper keeps the main path short enough to try without reading the generated audit files first.
 
@@ -828,7 +828,7 @@ py -3.11 -m pytest -m prepush -q
 \end{Verbatim}
 
 
-After compiling the arXiv source and copying the PDF to the review location, run \nolinkurl{paper-final-preflight}. The README includes the exact compile and verification commands.
+After compiling the arXiv source and copying the PDF into the release bundle, run \nolinkurl{paper-final-preflight}. The README includes the exact compile and verification commands.
 
 \Needspace{16\baselineskip}
 macOS/Linux:

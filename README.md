@@ -94,17 +94,17 @@ More context:
 - [Paper Benchmark Runbook](docs/paper_benchmark_runbook.md)
 - [UI Frontier Review](docs/relaytic_ui_frontier_review.md)
 
-## Relaytic-AML Paper Draft
+## Relaytic-AML Paper
 
-The current paper draft presents Relaytic-AML as a local-first evaluation lab for financial-crime ML. It is an architecture and evidence-discipline paper, not a hard AML superiority result. Relaytic remains the general package and CLI. Relaytic-AML is the current flagship edition and the focus of the draft because AML makes privacy, temporal validity, graph context, human review, and claim discipline visible in one domain.
+The paper presents Relaytic-AML as a local-first evaluation lab for financial-crime ML. It is an architecture and evidence-discipline paper, not a hard AML superiority result. Relaytic remains the general package and CLI. Relaytic-AML is the current flagship edition and the focus of the paper because AML makes privacy, temporal validity, graph context, human review, and claim discipline visible in one domain.
 
-The repo includes the Markdown manuscript, compiled PDF, arXiv source candidate, references, figures, tables, and underlying public evidence artifacts. Candidate builds are explicitly revision-neutral. The exact-revision release command requires a clean source commit, verifies generated surfaces, and records that immutable commit in the PDF and source bundle. Public-remote verification is a separate post-push check. A tag is optional and may be cited only when the command verifies it locally and remotely.
+The repo includes the Markdown manuscript, compiled PDF, arXiv source package, references, figures, tables, and underlying public evidence artifacts. The technical `--candidate` mode is revision-neutral. The exact-revision release command requires a clean source commit, verifies generated surfaces, and records that immutable commit in the PDF and source bundle. Public-remote verification is a separate post-push check. A tag is optional and may be cited only when the command verifies it locally and remotely.
 
 Repository publication guidance: keep this repository as the auditable source of record and cite the exact public commit stored in the final release manifest. A separate paper-only repository is unnecessary because the immutable snapshot preserves both a concise reader path and the deeper audit trail.
 
 Inspect:
 
-- `docs/paper/relaytic_aml_arxiv_draft.md` for the claim-safe paper draft.
+- `docs/paper/relaytic_aml_arxiv_draft.md` for the claim-bounded paper.
 - `docs/paper/README.md` for the compact paper-artifact map.
 - `docs/paper/arxiv_src/` for the arXiv source bundle.
 - `docs/paper/references.bib` for citable sources.
@@ -243,7 +243,7 @@ The repository already supports a working early product baseline. Treat the list
 - a paper/release freeze surface through `relaytic release-safety paper-freeze`, with relevant benchmark catalog, multidimensional result table, claim-boundary report, reproducibility attestation, and a safe attention-pack manifest that blocks hard AML performance claims until holdout evidence is frozen
 - a claim-safe paper surface through `relaytic release-safety paper-release`, with Markdown draft, citable references, paper tables, public attention text, arXiv submission notes, and allowed-public-claims report
 - a novelty-positioning surface through `relaytic release-safety paper-novelty-positioning`, with adjacent-system distinction checks and claim-boundary regression evidence for the paper
-- a final paper-source surface through `relaytic release-safety paper-arxiv-source`, with deterministic LaTeX source, converted PDF figures, citation/figure audits, source-package scanning, and a release-candidate checklist
+- a final paper-source surface through `relaytic release-safety paper-arxiv-source`, with deterministic LaTeX source, converted PDF figures, citation/figure audits, source-package scanning, and a release checklist
 - copy-only data handling that stages immutable working copies inside each run directory and avoids persisting original source paths
 
 Relaytic has a longer internal build history, but the public story is now simpler: Relaytic is the local-first inference lab, and Relaytic-AML is the flagship edition used to prove the architecture in a demanding domain. Detailed build history lives in `RELAYTIC_SLICING_PLAN.md` and `IMPLEMENTATION_STATUS.md`. The next product work is capability-card and academy-style hardening, while the paper work is human-facing: inspect the compiled PDF, confirm the exact public source revision, and submit only claim-safe wording.

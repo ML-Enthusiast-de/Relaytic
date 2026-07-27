@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
-import tarfile
+import zipfile
 from typing import Any
 
 from relaytic.core.json_utils import write_json
@@ -366,6 +366,10 @@ def build_exact_revision_release(
     paper_dir = release_root / "paper"
     source_dir = release_root / "source"
     reports_dir = release_root / "reports"
+    expected_release_parent = (root / "dist" / "paper-release").resolve()
+    resolved_release_root = release_root.resolve()
+    if resolved_release_root.parent != expected_release_parent or resolved_release_root.name != commit:
+        raise ValueError("Final paper release resolved outside the expected commit-scoped release directory.")
     if release_root.exists():
         shutil.rmtree(release_root)
     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -392,7 +396,8 @@ def build_exact_revision_release(
         if tag
         else (commit, f"/commit/{commit}", f"/archive/{commit}.tar.gz")
     )
-    if not all(token in source_text for token in required_release_tokens):
+    source_identity_text = re.sub(r"\\nolinkurl\{([^{}]*)\}", r"\1", source_text)
+    if not all(token in source_identity_text for token in required_release_tokens):
         raise ValueError("Final source does not contain the required immutable release metadata.")
     forbidden_release_tokens = ("dirty", "under review", "pending release")
     if any(token in source_text.lower() for token in forbidden_release_tokens):
@@ -402,11 +407,23 @@ def build_exact_revision_release(
         raise ValueError("Final PDF does not expose the same full source commit as the generated TeX source.")
     pdf_path = release_root / "relaytic_aml_arxiv.pdf"
     shutil.copy2(built_pdf, pdf_path)
-    source_archive = release_root / "relaytic_aml_arxiv_source.tar.gz"
-    with tarfile.open(source_archive, "w:gz") as archive:
-        for path in sorted(source_dir.rglob("*")):
-            if path.is_file() and path.suffix not in {".aux", ".bbl", ".blg", ".log", ".out"} and path.name != "main.pdf":
-                archive.add(path, arcname=path.relative_to(source_dir))
+    source_archive = release_root / "relaytic_aml_arxiv_source.zip"
+    source_members = [
+        source_dir / "main.tex",
+        source_dir / "references.bib",
+        *sorted((source_dir / "figures").glob("*.pdf")),
+    ]
+    if not all(path.is_file() for path in source_members):
+        raise ValueError("Final paper release could not collect the complete arXiv source package.")
+    with zipfile.ZipFile(source_archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+        for path in source_members:
+            archive_info = zipfile.ZipInfo(
+                path.relative_to(source_dir).as_posix(),
+                date_time=(1980, 1, 1, 0, 0, 0),
+            )
+            archive_info.compress_type = zipfile.ZIP_DEFLATED
+            archive_info.external_attr = 0o644 << 16
+            archive.writestr(archive_info, path.read_bytes(), compresslevel=9)
 
     integrity = build_paper_release_integrity_pack(root)
     integrity_ok = integrity["paper_p24_release_manifest"]["status"] == "release_candidate_ready_for_human_upload"
@@ -427,6 +444,7 @@ def build_exact_revision_release(
         "paper_integrity_status": integrity["paper_p24_release_manifest"]["status"],
     }
     preflight_path = write_json(release_root / "final_preflight.json", preflight, indent=2, sort_keys=True)
+    bibliography_sha256 = _sha256(source_dir / "references.bib")
     manifest = {
         "schema_version": PAPER_RELEASE_INTEGRITY_SCHEMA_VERSION,
         "status": "exact_revision_bundle_ready" if integrity_ok else "blocked",
@@ -449,12 +467,23 @@ def build_exact_revision_release(
         ),
         "artifacts": {
             "pdf": {"path": pdf_path.relative_to(root).as_posix(), "sha256": _sha256(pdf_path)},
-            "source_bundle": {"path": source_archive.relative_to(root).as_posix(), "sha256": _sha256(source_archive)},
-            "bibliography": {"path": (source_dir / "references.bib").relative_to(root).as_posix(), "sha256": _sha256(source_dir / "references.bib")},
+            "source_bundle": {
+                "path": source_archive.relative_to(root).as_posix(),
+                "sha256": _sha256(source_archive),
+                "members": [path.relative_to(source_dir).as_posix() for path in source_members],
+            },
+            "bibliography": {
+                "archive_member": "references.bib",
+                "sha256": bibliography_sha256,
+            },
             "final_preflight": {"path": preflight_path.relative_to(root).as_posix(), "sha256": _sha256(preflight_path)},
         },
     }
     write_json(release_root / "release_revision_manifest.json", manifest, indent=2, sort_keys=True)
+    for intermediate_dir in (paper_dir, source_dir, reports_dir):
+        if intermediate_dir.parent != release_root:
+            raise ValueError("Final paper release intermediate directory escaped the release root.")
+        shutil.rmtree(intermediate_dir)
     return manifest
 
 
@@ -1058,8 +1087,15 @@ def _generated_surface_audit(root: Path, markdown: str) -> dict[str, Any]:
 
 
 def _candidate_revision_audit(markdown: str, git: dict[str, Any]) -> dict[str, Any]:
-    stale_revision = bool(re.search(r"Source commit:\s*[0-9a-f]{7,40}", markdown))
-    candidate_marker = "This review candidate does not claim an archival revision." in markdown
+    stale_revision = bool(
+        re.search(r"Source commit:\s*[0-9a-f]{7,40}", markdown)
+        or re.search(r"generated from source revision [0-9a-f]{40}", markdown)
+    )
+    development_marker = (
+        "The immutable release process records the full source revision in the release manifest and arXiv source bundle."
+        in markdown
+    )
+    forbidden_reader_phrase = "This review candidate does not claim an archival revision." in markdown
     checks = [
         {
             "check": "candidate has no source-commit claim",
@@ -1068,10 +1104,16 @@ def _candidate_revision_audit(markdown: str, git: dict[str, Any]) -> dict[str, A
             "passed": not stale_revision,
         },
         {
-            "check": "candidate mode is explicit",
-            "observed": candidate_marker,
+            "check": "development build explains exact-revision release mechanism",
+            "observed": development_marker,
             "pass_criterion": True,
-            "passed": candidate_marker,
+            "passed": development_marker,
+        },
+        {
+            "check": "reader-facing review-candidate wording is absent",
+            "observed": forbidden_reader_phrase,
+            "pass_criterion": False,
+            "passed": not forbidden_reader_phrase,
         },
     ]
     return _report(
@@ -1095,22 +1137,35 @@ def _release_reference_audit(root: Path, markdown: str) -> dict[str, Any]:
     }
     named_tag = "relaytic-aml-arxiv-v1"
     paper_claims_tag = named_tag in markdown or "archive/refs/tags" in markdown
-    paper_claims_commit = bool(re.search(r"Source commit:\s*[0-9a-f]{7,40}", markdown))
-    candidate_marker = "This review candidate does not claim an archival revision." in markdown
-    pass_state = not paper_claims_tag and not paper_claims_commit and candidate_marker
+    paper_claims_commit = bool(
+        re.search(r"Source commit:\s*[0-9a-f]{7,40}", markdown)
+        or re.search(r"generated from source revision [0-9a-f]{40}", markdown)
+    )
+    development_marker = (
+        "The immutable release process records the full source revision in the release manifest and arXiv source bundle."
+        in markdown
+    )
+    forbidden_reader_phrase = "This review candidate does not claim an archival revision." in markdown
+    pass_state = (
+        not paper_claims_tag
+        and not paper_claims_commit
+        and development_marker
+        and not forbidden_reader_phrase
+    )
     return _report(
         "pass" if pass_state else "fail",
         slice="Paper Track P26",
         release_identity_mode="immutable_commit",
         paper_claims_release_tag=paper_claims_tag,
         paper_claims_source_commit=paper_claims_commit,
-        candidate_marker_present=candidate_marker,
+        development_release_marker_present=development_marker,
+        forbidden_reader_phrase_present=forbidden_reader_phrase,
         examined_tag=named_tag,
         local_tag_exists=named_tag in local_tags,
         remote_checked=bool(remote_output),
         remote_tag_exists=named_tag in remote_tags,
         public_tag_archive_claim_allowed=named_tag in remote_tags,
-        decision="The review candidate claims no archival revision. Final mode injects the immutable commit.",
+        decision="Development builds remain revision-neutral. Final mode injects the immutable commit.",
     )
 
 

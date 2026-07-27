@@ -54,7 +54,8 @@ def _seed_p21_fixture(root: Path, *, include_local_build: bool = True) -> None:
                 "Appendix table. Rowless handoff and interrupted-run recovery examples",
                 "",
                 "Repository: https://github.com/ML-Enthusiast-de/Relaytic. "
-                "Source commit: 79108af70254.",
+                "The immutable release process records the full source revision in the release manifest "
+                "and arXiv source bundle.",
                 "",
                 "```powershell",
                 "py -3.11 -m relaytic.ui.cli release-safety paper-final-preflight --format json",
@@ -211,9 +212,11 @@ def test_paper_track_p21_committed_preflight_reports_are_ready() -> None:
     assert "Appendix table. Hosted external-score case study" in draft
     assert "## AI Assistance Disclosure" in draft
     assert (
-        "Source commit:" in draft
-        or "This review candidate does not claim an archival revision." in draft
+        "The immutable release process records the full source revision in the release manifest "
+        "and arXiv source bundle."
+        in draft
     )
+    assert "This review candidate does not claim an archival revision." not in draft
     assert "Public release tag: TODO before arXiv submission" not in draft
     assert "Table 2a" not in main_tex
     assert "\\textbf{Table" not in main_tex

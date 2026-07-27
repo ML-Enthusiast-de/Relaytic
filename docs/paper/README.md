@@ -1,19 +1,19 @@
 # Relaytic-AML Paper
 
-Start with [`relaytic_aml_arxiv_draft.pdf`](relaytic_aml_arxiv_draft.pdf). The generated Markdown manuscript is [`relaytic_aml_arxiv_draft.md`](relaytic_aml_arxiv_draft.md), and [`arxiv_src/`](arxiv_src/) contains the self-contained LaTeX candidate. The rest of this directory is the audit trail behind those reader-facing files.
+Start with [`relaytic_aml_arxiv_draft.pdf`](relaytic_aml_arxiv_draft.pdf). The generated Markdown manuscript is [`relaytic_aml_arxiv_draft.md`](relaytic_aml_arxiv_draft.md), and [`arxiv_src/`](arxiv_src/) contains the self-contained LaTeX source package. The rest of this directory is the audit trail behind those reader-facing files.
 
 Relaytic-AML is a systems and evaluation paper. Keeping the generator, bibliography, vector figures, and rowless evidence reports in the repository is therefore part of the reproducibility claim. Raw or licensed benchmark rows are not redistributed.
 
 ## Requirements
 
-- Python 3.10 or 3.11; the release candidate is tested with Python 3.11.
+- Python 3.10 or 3.11. The paper pipeline is tested with Python 3.11.
 - Install the full profile from the repository root with `py -3.11 -m pip install -e ".[full]"` on Windows or `python3 -m pip install -e ".[full]"` on macOS/Linux.
 - A TeX installation providing `pdflatex` and `bibtex` to rebuild the PDF. MiKTeX and TeX Live are suitable.
 - No benchmark data is needed to verify committed evidence, rerun deterministic fixtures, regenerate the manuscript, or rebuild the PDF.
 
 ## Reproduce And Verify
 
-After installation, the public `relaytic` command is the same on Windows, macOS, and Linux. Run this verification sequence from the repository root. The platform-specific blocks in the root [`README.md`](../../README.md#relaytic-aml-paper-draft) add the LaTeX and PDF-copy steps.
+After installation, the public `relaytic` command is the same on Windows, macOS, and Linux. Run this verification sequence from the repository root. The platform-specific blocks in the root [`README.md`](../../README.md#relaytic-aml-paper) add the LaTeX and PDF-copy steps.
 
 ```text
 relaytic release-safety paper-invariants --format json
@@ -24,7 +24,7 @@ relaytic release-safety paper-draft --format json
 relaytic release-safety paper-release --format json
 relaytic release-safety paper-narrative-polish --format json
 relaytic release-safety paper-novelty-positioning --format json
-relaytic release-safety paper-release-integrity --format json
+relaytic release-safety paper-release-integrity --candidate --format json
 relaytic release-safety paper-arxiv-source --format json
 relaytic release-safety paper-final-preflight --format json
 ```
@@ -35,13 +35,13 @@ A successful source build reports:
 - `ready_for_source_release_candidate` in `../reports/paper_arxiv_source_manifest.json`;
 - `ready_for_author_review_not_tagged` in `../reports/paper_final_preflight_manifest.json`.
 
-After the final changes are committed, pushed to the public remote, and `git status --short` is empty, build the upload artifacts from that exact revision:
+After the final changes are committed and `git status --short` is empty, build the local upload artifacts from that exact revision:
 
 ```text
 relaytic release-safety paper-release-integrity --final --format json
 ```
 
-Final mode refuses a dirty worktree or a source commit absent from the public remote. It writes the PDF, arXiv source archive, source revision, and SHA-256 hashes under `dist/paper-release/<commit>/`. A release tag is optional. When supplied, it must exist locally and remotely and resolve to the same commit.
+Final mode refuses a dirty worktree. It writes the PDF, arXiv source ZIP, source revision, and SHA-256 hashes under `dist/paper-release/<commit>/`. After pushing, add `--verify-public` to require the same commit on the public remote. A release tag is optional. When supplied, it must exist locally and remotely and resolve to the same commit.
 
 ## Benchmark Data
 

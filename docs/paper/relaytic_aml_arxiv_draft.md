@@ -278,7 +278,7 @@ The system is intentionally local-first, which creates a tradeoff. Privacy and p
 
 The repository is larger than this AML paper. Relaytic is the general local-first inference lab and public package. Relaytic-AML is the focused AML edition used here for the manuscript. A reader should start with the README and this paper. Development-control files record the build history, but they are not required to understand the paper claims. Public citation should use the immutable source commit recorded in the release bundle, or a separately verified public tag, because the main branch can continue to evolve after the paper is posted.
 
-Repository: https://github.com/ML-Enthusiast-de/Relaytic. This review candidate does not claim an archival revision. The clean immutable-revision build injects the source commit into the manuscript and release manifests.
+Repository: https://github.com/ML-Enthusiast-de/Relaytic. The immutable release process records the full source revision in the release manifest and arXiv source bundle.
 
 Table 7 separates what a clean clone can reproduce immediately from what requires local benchmark access. The README contains the full regeneration script, while the paper keeps the main path short enough to try without reading the generated audit files first.
 
@@ -525,7 +525,7 @@ py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 py -3.11 -m pytest -m prepush -q
 ```
 
-After compiling the arXiv source and copying the PDF to the review location, run `paper-final-preflight`. The README includes the exact compile and verification commands.
+After compiling the arXiv source and copying the PDF into the release bundle, run `paper-final-preflight`. The README includes the exact compile and verification commands.
 
 macOS/Linux:
 

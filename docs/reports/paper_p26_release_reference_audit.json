@@ -1,7 +1,8 @@
 {
-  "candidate_marker_present": true,
-  "decision": "The review candidate claims no archival revision. Final mode injects the immutable commit.",
+  "decision": "Development builds remain revision-neutral. Final mode injects the immutable commit.",
+  "development_release_marker_present": true,
   "examined_tag": "relaytic-aml-arxiv-v1",
+  "forbidden_reader_phrase_present": false,
   "local_tag_exists": true,
   "paper_claims_release_tag": false,
   "paper_claims_source_commit": false,

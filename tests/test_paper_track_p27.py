@@ -15,6 +15,7 @@ from relaytic.release_safety.paper_evidence_contract import (
     build_evidence_schema_contract,
     evidence_cell_violations,
 )
+from relaytic.release_safety.paper_arxiv_source import _latex_inline
 from relaytic.release_safety.paper_release import build_paper_release_pack
 
 
@@ -122,6 +123,34 @@ def test_p27_paysim_contracts_and_elliptic2_reference_are_truthful() -> None:
 def test_p27_candidate_manuscript_does_not_claim_a_source_revision() -> None:
     draft = build_paper_release_pack(PROJECT_ROOT)["paper_final_draft"]
 
-    assert "This review candidate does not claim an archival revision." in draft
+    assert (
+        "The immutable release process records the full source revision in the release manifest "
+        "and arXiv source bundle."
+        in draft
+    )
+    assert "This review candidate does not claim an archival revision." not in draft
     assert "Source commit:" not in draft
     assert "same dataset, split, feature, and metric contract" not in draft
+
+
+def test_p27_final_manuscript_injects_exact_source_revision() -> None:
+    commit = "a" * 40
+    draft = build_paper_release_pack(PROJECT_ROOT, source_commit=commit)["paper_final_draft"]
+
+    assert (
+        f"This manuscript was generated from source revision {commit}, which is recorded in "
+        "the release manifest and arXiv source bundle."
+        in draft
+    )
+    assert f"https://github.com/ML-Enthusiast-de/Relaytic/commit/{commit}" in draft
+    assert "This review candidate does not claim an archival revision." not in draft
+
+
+def test_p27_full_commit_hashes_are_breakable_in_latex() -> None:
+    commit = "a" * 40
+    rendered = _latex_inline(
+        f"source revision {commit}; "
+        f"https://github.com/ML-Enthusiast-de/Relaytic/commit/{commit}"
+    )
+
+    assert rendered.count(rf"\nolinkurl{{{commit}}}") == 2

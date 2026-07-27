@@ -264,7 +264,7 @@ def render_paper_arxiv_source_markdown(pack: dict[str, Any]) -> str:
             "# Paper P14 arXiv Source Bundle",
             "",
             f"- Source status: `{manifest.get('status') or 'unknown'}`",
-            f"- Source release candidate ready: `{manifest.get('source_release_candidate_ready')}`",
+            f"- Source package validation ready: `{manifest.get('source_release_candidate_ready')}`",
             f"- arXiv upload ready: `{manifest.get('arxiv_upload_ready')}`",
             f"- Source tree: `{manifest.get('source_tree', {}).get('source_dir') or 'unknown'}`",
             f"- Citation audit: `{manifest.get('citation_audit', {}).get('status') or 'unknown'}`",
@@ -391,7 +391,7 @@ def _build_source_manifest(
         "release_tag_plan": {
             "tag": PAPER_ARXIV_RELEASE_TAG,
             "tag_created_by_this_slice": False,
-            "creation_command": f"git tag -a {PAPER_ARXIV_RELEASE_TAG} -m \"Relaytic-AML arXiv source release candidate\"",
+            "creation_command": f"git tag -a {PAPER_ARXIV_RELEASE_TAG} -m \"Relaytic-AML arXiv source package\"",
             "requires_clean_status_command": "git status --short",
             "artifact_refs": source_refs
             + [
@@ -436,7 +436,7 @@ def _source_checks(
             "p13_public_wording_lint_passed",
             public_claims.get("status") == "claim_safe_public_wording_allowed"
             and public_claims.get("wording_lint", {}).get("status") == "pass",
-            "P13 public wording lint must pass before P14 source can be a release candidate.",
+            "P13 public wording lint must pass before P14 can produce the source package.",
             source_artifact="docs/reports/paper_public_claims_allowed.json",
         ),
         _check(
@@ -555,7 +555,7 @@ def _render_latex_source(*, inputs: dict[str, Any]) -> str:
         r"\hypersetup{pdftitle={Relaytic-AML: A Local-First, Agent-Assisted Evaluation Lab for Financial-Crime Machine Learning},pdfauthor={Tobias Gehra},pdfsubject={Local-first AML evaluation lab},pdfkeywords={anti-money laundering, financial crime, reproducibility, AI evaluation, agent-assisted systems}}",
         "",
         f"\\title{{{_latex_inline(title)}}}",
-        r"\author{Tobias Gehra\\Independent Researcher\\GitHub: \texttt{ML-Enthusiast-de}\\\href{mailto:t.gehra.ai@gmail.com}{\texttt{t.gehra.ai@gmail.com}}}",
+        r"\author{Tobias Gehra\\Independent Researcher\\\href{mailto:t.gehra.ai@gmail.com}{\texttt{t.gehra.ai@gmail.com}}}",
         r"\date{July 2026}",
         "",
         r"\begin{document}",
@@ -1034,6 +1034,7 @@ def _latex_inline(text: str) -> str:
     converted = _rewrite_source_svg_refs(_rewrite_paper_source_text(text))
     converted = _convert_markdown_citations(converted)
     converted = _convert_inline_code(converted)
+    converted = _convert_commit_hashes(converted)
     converted = _convert_bold(converted)
     converted = converted.replace(r"$\pm$", r"\ensuremath{\pm}")
     return _escape_latex(converted)
@@ -1065,6 +1066,14 @@ def _convert_markdown_citations(text: str) -> str:
 
 def _convert_inline_code(text: str) -> str:
     return re.sub(r"`([^`]+)`", lambda match: r"\nolinkurl{" + match.group(1) + "}", text)
+
+
+def _convert_commit_hashes(text: str) -> str:
+    return re.sub(
+        r"(?<![0-9a-f])([0-9a-f]{40})(?![0-9a-f])",
+        lambda match: r"\nolinkurl{" + match.group(1) + "}",
+        text,
+    )
 
 
 def _convert_bold(text: str) -> str:
@@ -1633,9 +1642,9 @@ def _render_release_candidate_checklist(*, manifest: dict[str, Any], package_aud
     ready = bool(manifest.get("source_release_candidate_ready"))
     return "\n".join(
         [
-            "# Paper P14 Release-Candidate Checklist",
+            "# Paper P14 Release Checklist",
             "",
-            f"- Source release-candidate ready: `{ready}`",
+            f"- Source package validation ready: `{ready}`",
             f"- arXiv upload ready now: `{manifest.get('arxiv_upload_ready')}`",
             f"- Source tree: `{manifest.get('source_tree', {}).get('source_dir')}`",
             f"- Package audit: `{package_audit.get('status')}`",
@@ -1661,7 +1670,7 @@ def _render_release_candidate_checklist(*, manifest: dict[str, Any], package_aud
             "",
             "## Claim boundary",
             "",
-            "The source package remains an evaluation-environment release candidate. It still must not claim hard AML superiority, SOTA or leaderboard-winning performance, claimed equivalence to RevClassify, graph-neural superiority, production readiness, or hard business value.",
+            "The source package remains bounded to the evaluation-environment contribution. It must not claim hard AML superiority, SOTA or leaderboard-winning performance, claimed equivalence to RevClassify, graph-neural superiority, production readiness, or hard business value.",
             "",
         ]
     )
