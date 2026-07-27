@@ -107,11 +107,9 @@
     }
   ],
   "release_revision": {
-    "commit": "c9110410b004936ed261c58064b9fdbad79ca67d",
-    "dirty": true,
-    "status_short": [
-      "?? docs/"
-    ]
+    "commit": "6b16ce9e4930a9493386c7184408a965850b9f3e",
+    "dirty": false,
+    "status_short": []
   },
   "schema_version": "relaytic.paper_release_integrity.v1",
   "slice": "Paper Track P24",

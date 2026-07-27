@@ -24,5 +24,5 @@
   "schema_version": "relaytic.paper_release_integrity.v1",
   "slice": "Paper Track P27",
   "status": "pass",
-  "worktree_dirty": true
+  "worktree_dirty": false
 }
