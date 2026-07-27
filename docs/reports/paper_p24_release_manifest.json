@@ -121,23 +121,18 @@
   ],
   "exact_revision_release_required": true,
   "git": {
-    "commit": "8c660e38323c202291886ae131b8bc3f553b08dd",
+    "commit": "468a72a5f4e28df72345fe65a79e2e32275886ca",
     "dirty": true,
     "status_short": [
-      " M IMPLEMENTATION_STATUS.md",
-      " M README.md",
-      " M docs/paper/README.md",
-      " M docs/paper/relaytic_aml_arxiv_draft.md",
+      " M docs/paper/arxiv_src/figures/figure_1_claim_gate_flow.pdf",
+      " M docs/paper/arxiv_src/figures/figure_2_supporting_pr_auc.pdf",
+      " M docs/paper/arxiv_src/figures/figure_3_review_budget.pdf",
+      " M docs/paper/arxiv_src/figures/figure_4_publishability_matrix.pdf",
+      " M docs/paper/relaytic_aml_arxiv_draft.pdf",
+      " M docs/reports/paper_arxiv_source_manifest.json",
       " M docs/reports/paper_arxiv_submission_checklist.md",
-      " M docs/reports/paper_attention_pack.md",
-      " M docs/reports/paper_release_manifest.json",
-      " M src/relaytic/release_safety/paper_arxiv_source.py",
-      " M src/relaytic/release_safety/paper_final_preflight.py",
-      " M src/relaytic/release_safety/paper_release.py",
-      " M src/relaytic/release_safety/paper_release_integrity.py",
-      " M tests/test_paper_track_p14.py",
-      " M tests/test_paper_track_p21.py",
-      " M tests/test_paper_track_p27.py"
+      " M docs/reports/paper_final_pdf_preflight.json",
+      " M docs/reports/paper_release_manifest.json"
     ]
   },
   "human_owned_actions": [

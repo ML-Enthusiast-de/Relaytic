@@ -254,10 +254,10 @@
   "source_hashes": {
     "main_tex_sha256": "7cd3dcecc84dbc5876c75ed1c8ec670e3c73645f3b2bccd4523bd66d0d521048",
     "pdf_figure_sha256": {
-      "figure_1_claim_gate_flow.pdf": "0336ede5a93a98996f59f30b6f174253927b7542b0a2b488dcfe981bdd59d4bb",
-      "figure_2_supporting_pr_auc.pdf": "c2e48ff3243ef0fb1db95d6505e62c8cdbde280aa099f5b135d0fbc4f4e17766",
-      "figure_3_review_budget.pdf": "b7d32027c05e4aa39a1b0f35bbf55128332eecd233636506ef28b14d71476cf2",
-      "figure_4_publishability_matrix.pdf": "c4e3e397b2614e06e8dcc3bbb4773ea3d6db2c18b71e95de0bb131439dd6a81f"
+      "figure_1_claim_gate_flow.pdf": "c9eb80cc37951581e387b4255d0db0dc453b230e12c51e21c07c74123b2efd61",
+      "figure_2_supporting_pr_auc.pdf": "810bafdb27d243754f63a85d457e5e36949bbb520f4fb6e88b206091f1b6dd9d",
+      "figure_3_review_budget.pdf": "0a6ce9270aeb626ba39fcf0723aa4af92eac5415094b1ef8bc58373cf387dbb6",
+      "figure_4_publishability_matrix.pdf": "e216d13e60376649585f1431f32b6e9c6b4a63cf9b7096a1bbc27ed362a7c577"
     },
     "references_bib_sha256": "5c25b5f4ee912a1f927b439ede65e0fa2beb3ed06fd957350d7415e00f1e4a8b"
   },

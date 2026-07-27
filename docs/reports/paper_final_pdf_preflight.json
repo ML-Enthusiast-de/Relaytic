@@ -11,8 +11,8 @@
     {
       "check_id": "compiled_pdf_matches_current_source",
       "detail": {
-        "pdf_modified_unix": 1785132859.6963873,
-        "source_modified_unix": 1785132814.502256
+        "pdf_modified_unix": 1785142250.835812,
+        "source_modified_unix": 1785142142.1091537
       },
       "message": "Compiled PDF should be newer than or as new as the generated TeX source.",
       "passed": true
