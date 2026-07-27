@@ -1,0 +1,201 @@
+{
+  "checks": [
+    {
+      "check_id": "required_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [
+          "docs/reports/paper_metric_cell_audit.json",
+          "docs/reports/paper_public_claims_allowed.json",
+          "docs/reports/paper_publishability_matrix.json",
+          "docs/reports/paper_claim_lint_report.json",
+          "docs/reports/paper_release_go_no_go.json",
+          "docs/reports/paper_system_task_eval.json",
+          "docs/reports/paper_agent_handoff_eval.json",
+          "docs/reports/paper_no_lost_user_eval.json",
+          "docs/reports/paper_failure_case_eval.json",
+          "docs/reports/paper_governance_ablation_eval.json",
+          "docs/reports/paper_governance_ablation_manifest.json",
+          "docs/reports/paysim_leakage_safe_feature_report.json",
+          "docs/reports/paysim_competitive_benchmark_manifest.json",
+          "docs/paper/references.bib"
+        ],
+        "present_artifact_refs": []
+      },
+      "message": "P18 requires the P10-P17 governance, failure, and evidence-cell artifacts.",
+      "passed": false
+    },
+    {
+      "check_id": "invariant_proof_obligation_passed",
+      "message": "Every named current invariant must map to evidence refs, a failure or ablation signal, or a limitation boundary.",
+      "passed": false
+    },
+    {
+      "check_id": "adjacent_systems_comparison_passed",
+      "message": "Adjacent systems comparison must cover the required families with resolved citations where sources are named.",
+      "passed": false
+    },
+    {
+      "check_id": "detector_claim_boundary_preserved",
+      "message": "P18 must not strengthen detector claims.",
+      "passed": true
+    },
+    {
+      "check_id": "generated_reports_redacted",
+      "detail": {
+        "private_path_patterns": [],
+        "raw_row_markers": []
+      },
+      "message": "P18 reports must not expose local machine paths or raw-row markers.",
+      "passed": true
+    }
+  ],
+  "claim_boundary": "governance architecture only; detector superiority, production AML readiness, graph-neural novelty, and RevClassifyDS parity remain blocked",
+  "failed_checks": [
+    {
+      "check_id": "required_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [
+          "docs/reports/paper_metric_cell_audit.json",
+          "docs/reports/paper_public_claims_allowed.json",
+          "docs/reports/paper_publishability_matrix.json",
+          "docs/reports/paper_claim_lint_report.json",
+          "docs/reports/paper_release_go_no_go.json",
+          "docs/reports/paper_system_task_eval.json",
+          "docs/reports/paper_agent_handoff_eval.json",
+          "docs/reports/paper_no_lost_user_eval.json",
+          "docs/reports/paper_failure_case_eval.json",
+          "docs/reports/paper_governance_ablation_eval.json",
+          "docs/reports/paper_governance_ablation_manifest.json",
+          "docs/reports/paysim_leakage_safe_feature_report.json",
+          "docs/reports/paysim_competitive_benchmark_manifest.json",
+          "docs/paper/references.bib"
+        ],
+        "present_artifact_refs": []
+      },
+      "message": "P18 requires the P10-P17 governance, failure, and evidence-cell artifacts.",
+      "passed": false
+    },
+    {
+      "check_id": "invariant_proof_obligation_passed",
+      "message": "Every named current invariant must map to evidence refs, a failure or ablation signal, or a limitation boundary.",
+      "passed": false
+    },
+    {
+      "check_id": "adjacent_systems_comparison_passed",
+      "message": "Adjacent systems comparison must cover the required families with resolved citations where sources are named.",
+      "passed": false
+    }
+  ],
+  "input_artifacts": [
+    {
+      "artifact_ref": "docs/reports/paper_metric_cell_audit.json",
+      "exists": false,
+      "input_id": "metric_cell_audit",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
+      "exists": false,
+      "input_id": "public_claims_allowed",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_publishability_matrix.json",
+      "exists": false,
+      "input_id": "publishability_matrix",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_claim_lint_report.json",
+      "exists": false,
+      "input_id": "claim_lint",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_release_go_no_go.json",
+      "exists": false,
+      "input_id": "release_go_no_go",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_system_task_eval.json",
+      "exists": false,
+      "input_id": "system_task_eval",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_agent_handoff_eval.json",
+      "exists": false,
+      "input_id": "agent_handoff_eval",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_no_lost_user_eval.json",
+      "exists": false,
+      "input_id": "no_lost_user_eval",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_failure_case_eval.json",
+      "exists": false,
+      "input_id": "failure_case_eval",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
+      "exists": false,
+      "input_id": "governance_ablation_eval",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paper_governance_ablation_manifest.json",
+      "exists": false,
+      "input_id": "governance_ablation_manifest",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paysim_leakage_safe_feature_report.json",
+      "exists": false,
+      "input_id": "paysim_feature_report",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "exists": false,
+      "input_id": "paysim_competitive_manifest",
+      "sha256_prefix": null
+    },
+    {
+      "artifact_ref": "docs/paper/references.bib",
+      "exists": false,
+      "input_id": "references",
+      "sha256_prefix": null
+    }
+  ],
+  "next_slice": "Paper Track P18 repair",
+  "report_refs": [
+    "docs/reports/paper_governance_invariants.json",
+    "docs/reports/paper_adjacent_systems_comparison.json",
+    "docs/reports/paper_invariant_manifest.json",
+    "docs/reports/paper_invariant_summary.md"
+  ],
+  "required_input_artifact_refs": [
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_public_claims_allowed.json",
+    "docs/reports/paper_publishability_matrix.json",
+    "docs/reports/paper_claim_lint_report.json",
+    "docs/reports/paper_release_go_no_go.json",
+    "docs/reports/paper_system_task_eval.json",
+    "docs/reports/paper_agent_handoff_eval.json",
+    "docs/reports/paper_no_lost_user_eval.json",
+    "docs/reports/paper_failure_case_eval.json",
+    "docs/reports/paper_governance_ablation_eval.json",
+    "docs/reports/paper_governance_ablation_manifest.json",
+    "docs/reports/paysim_leakage_safe_feature_report.json",
+    "docs/reports/paysim_competitive_benchmark_manifest.json",
+    "docs/paper/references.bib"
+  ],
+  "schema_version": "relaytic.paper_invariants.v1",
+  "slice": "Paper Track P18",
+  "status": "blocked_pending_p18_repairs"
+}

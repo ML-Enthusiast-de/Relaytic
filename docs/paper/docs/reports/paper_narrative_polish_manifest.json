@@ -1,0 +1,152 @@
+{
+  "arxiv_upload_ready": false,
+  "checks": [
+    {
+      "check_id": "required_p20_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [
+          "docs/paper/README.md",
+          "docs/paper/figures/figure_manifest.json",
+          "docs/reports/paper_metric_cell_audit.json",
+          "docs/reports/paper_publishability_matrix.json",
+          "docs/reports/paper_system_task_eval.json",
+          "docs/reports/paysim_competitive_baseline_table.json",
+          "docs/reports/paysim_competitive_search_trace.json",
+          "docs/reports/paysim_leakage_safe_feature_report.json"
+        ],
+        "present_artifact_refs": [
+          "README.md",
+          "docs/paper/relaytic_aml_arxiv_draft.md",
+          "docs/paper/references.bib",
+          "docs/reports/paper_release_manifest.json",
+          "docs/reports/paper_public_claims_allowed.json"
+        ]
+      },
+      "message": "P20 requires the generated paper, README, P13 public-claims gate, system-eval, and PaySim evidence reports.",
+      "passed": false,
+      "source_artifact": "docs/reports"
+    },
+    {
+      "check_id": "p13_release_ready",
+      "message": "P20 runs after a ready P13 paper release pack.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_release_manifest.json"
+    },
+    {
+      "check_id": "public_claims_still_claim_safe",
+      "message": "Polish must not relax the paper claim boundary.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_public_claims_allowed.json"
+    },
+    {
+      "check_id": "paysim_selection_story_passed",
+      "message": "PaySim selection-story audit must pass.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_paysim_selection_story_review.json"
+    },
+    {
+      "check_id": "reader_guidance_audit_passed",
+      "message": "Reader guidance from paper to repo must be simple and backed by deterministic tasks.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_reader_guidance_audit.json"
+    },
+    {
+      "check_id": "visual_table_polish_audit_passed",
+      "message": "Visual/table polish checks must pass before final source/PDF preflight.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_visual_table_polish_audit.json"
+    }
+  ],
+  "failed_checks": [
+    {
+      "check_id": "required_p20_inputs_present",
+      "detail": {
+        "missing_artifact_refs": [
+          "docs/paper/README.md",
+          "docs/paper/figures/figure_manifest.json",
+          "docs/reports/paper_metric_cell_audit.json",
+          "docs/reports/paper_publishability_matrix.json",
+          "docs/reports/paper_system_task_eval.json",
+          "docs/reports/paysim_competitive_baseline_table.json",
+          "docs/reports/paysim_competitive_search_trace.json",
+          "docs/reports/paysim_leakage_safe_feature_report.json"
+        ],
+        "present_artifact_refs": [
+          "README.md",
+          "docs/paper/relaytic_aml_arxiv_draft.md",
+          "docs/paper/references.bib",
+          "docs/reports/paper_release_manifest.json",
+          "docs/reports/paper_public_claims_allowed.json"
+        ]
+      },
+      "message": "P20 requires the generated paper, README, P13 public-claims gate, system-eval, and PaySim evidence reports.",
+      "passed": false,
+      "source_artifact": "docs/reports"
+    },
+    {
+      "check_id": "p13_release_ready",
+      "message": "P20 runs after a ready P13 paper release pack.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_release_manifest.json"
+    },
+    {
+      "check_id": "public_claims_still_claim_safe",
+      "message": "Polish must not relax the paper claim boundary.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_public_claims_allowed.json"
+    },
+    {
+      "check_id": "paysim_selection_story_passed",
+      "message": "PaySim selection-story audit must pass.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_paysim_selection_story_review.json"
+    },
+    {
+      "check_id": "reader_guidance_audit_passed",
+      "message": "Reader guidance from paper to repo must be simple and backed by deterministic tasks.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_reader_guidance_audit.json"
+    },
+    {
+      "check_id": "visual_table_polish_audit_passed",
+      "message": "Visual/table polish checks must pass before final source/PDF preflight.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_visual_table_polish_audit.json"
+    }
+  ],
+  "hard_claims_allowed": false,
+  "headline_claims_allowed": false,
+  "next_slice": "Paper Track P20 repair",
+  "paper_content_ready_for_p21_preflight": false,
+  "release_mode": "blocked",
+  "report_artifact_refs": [
+    "docs/reports/paper_paysim_selection_story_review.json",
+    "docs/reports/paper_reader_guidance_audit.json",
+    "docs/reports/paper_visual_table_polish_audit.json",
+    "docs/reports/paper_narrative_polish_manifest.json",
+    "docs/reports/paper_polish_readiness.md"
+  ],
+  "required_source_artifacts": [
+    "README.md",
+    "docs/paper/README.md",
+    "docs/paper/relaytic_aml_arxiv_draft.md",
+    "docs/paper/references.bib",
+    "docs/paper/figures/figure_manifest.json",
+    "docs/reports/paper_release_manifest.json",
+    "docs/reports/paper_public_claims_allowed.json",
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_publishability_matrix.json",
+    "docs/reports/paper_system_task_eval.json",
+    "docs/reports/paysim_competitive_baseline_table.json",
+    "docs/reports/paysim_competitive_search_trace.json",
+    "docs/reports/paysim_leakage_safe_feature_report.json"
+  ],
+  "schema_version": "relaytic.paper_narrative_polish.v1",
+  "slice": "Paper Track P20",
+  "status": "blocked_pending_paper_polish_repairs",
+  "upload_blockers_remaining": [
+    "compile and inspect the final PDF from the regenerated source bundle",
+    "run LaTeX warning, font-embedding, metadata, and rendered-page checks",
+    "confirm a clean immutable source revision before any public upload"
+  ]
+}

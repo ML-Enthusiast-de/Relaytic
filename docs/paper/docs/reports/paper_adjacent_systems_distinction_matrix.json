@@ -1,0 +1,151 @@
+{
+  "claim_boundary": {
+    "detector_replacement_claimed": false,
+    "detector_superiority_claimed": false,
+    "generic_agent_governance_claimed": false,
+    "production_aml_readiness_claimed": false,
+    "sar_generation_claimed": false
+  },
+  "covered_category_count": 9,
+  "distinction_rows": [
+    {
+      "adjacent_system_type": "AML detector and benchmark papers",
+      "citation_status": "pass",
+      "distinct_relaytic_aml_role": "wrap detector runs and outputs with local provenance, leakage posture, budget context, review-budget interpretation, and claim gates",
+      "missing_bib_keys": [],
+      "optimizes_for": "higher-performing detector architectures, graph features, datasets, and benchmark rows",
+      "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
+      "relaytic_aml_does_not_claim": "detector superiority, graph-neural novelty, or RevClassifyDS parity",
+      "representative_sources": [
+        "weber2019elliptic",
+        "bellei2024elliptic2",
+        "song2024revtrack"
+      ],
+      "source_artifact": "docs/reports/paper_adjacent_systems_comparison.json"
+    },
+    {
+      "adjacent_system_type": "AML LLM graph reasoning and triage systems",
+      "citation_status": "pass",
+      "distinct_relaytic_aml_role": "keep LLM and external-agent assistance downstream of rowless local evidence cells and admissible-claim checks",
+      "missing_bib_keys": [],
+      "optimizes_for": "LLM reasoning over AML graph context, risk-factor extraction, serving throughput, and quality gates",
+      "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
+      "relaytic_aml_does_not_claim": "an LLM detector, a compliance LLM-serving stack, or raw-row export to external models",
+      "representative_sources": [
+        "pirmorad2025amlgraphllm",
+        "naik2026llmopsaml"
+      ],
+      "source_artifact": "docs/reports/paper_adjacent_systems_comparison.json"
+    },
+    {
+      "adjacent_system_type": "Agentic SAR and compliance narrative assistants",
+      "citation_status": "pass",
+      "distinct_relaytic_aml_role": "make the experimental evidence and claim boundary that downstream narratives should cite auditable before writing begins",
+      "missing_bib_keys": [],
+      "optimizes_for": "human-in-the-loop SAR narrative generation, compliance validation, and investigator-facing writing support",
+      "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
+      "relaytic_aml_does_not_claim": "SAR drafting, regulatory filing validation, or analyst-productivity measurement",
+      "representative_sources": [
+        "naik2025coinvestigator"
+      ],
+      "source_artifact": "docs/reports/paper_adjacent_systems_comparison.json"
+    },
+    {
+      "adjacent_system_type": "Agent governance and runtime trust layers",
+      "citation_status": "pass",
+      "distinct_relaytic_aml_role": "specialize governance to AML evidence cells, rowless handoff, benchmark-context routing, and public paper/release wording",
+      "missing_bib_keys": [],
+      "optimizes_for": "general runtime policy enforcement, trust scoring, path-dependent controls, and agent action logs",
+      "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
+      "relaytic_aml_does_not_claim": "a general-purpose agent-governance platform or broad organizational risk layer",
+      "representative_sources": [
+        "gaurav2025governanceaas",
+        "kaptein2026runtimegovernance"
+      ],
+      "source_artifact": "docs/reports/paper_adjacent_systems_comparison.json"
+    },
+    {
+      "adjacent_system_type": "MLOps experiment tracking",
+      "citation_status": "pass",
+      "distinct_relaytic_aml_role": "add local AML-specific interpretation gates that decide which tracked results may become public scientific claims",
+      "missing_bib_keys": [],
+      "optimizes_for": "run history, artifacts, metrics, parameters, model versions, and lifecycle memory",
+      "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
+      "relaytic_aml_does_not_claim": "a hosted tracking server or production model registry",
+      "representative_sources": [
+        "zaharia2018mlflow"
+      ],
+      "source_artifact": "docs/reports/paper_adjacent_systems_comparison.json"
+    },
+    {
+      "adjacent_system_type": "Model cards and model reporting",
+      "citation_status": "pass",
+      "distinct_relaytic_aml_role": "materialize factual provenance and separate interpretation records that a defensible model report can cite",
+      "missing_bib_keys": [],
+      "optimizes_for": "model documentation, intended use, evaluation summaries, and caveats",
+      "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
+      "relaytic_aml_does_not_claim": "a replacement for final model reporting",
+      "representative_sources": [
+        "mitchell2019modelcards"
+      ],
+      "source_artifact": "docs/reports/paper_adjacent_systems_comparison.json"
+    },
+    {
+      "adjacent_system_type": "Datasheets and dataset documentation",
+      "citation_status": "pass",
+      "distinct_relaytic_aml_role": "connect dataset posture to split contracts, leakage controls, benchmark rows, and admissible interpretations",
+      "missing_bib_keys": [],
+      "optimizes_for": "dataset composition, collection process, stewardship, and recommended use",
+      "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
+      "relaytic_aml_does_not_claim": "a replacement for source-dataset governance",
+      "representative_sources": [
+        "gebru2021datasheets"
+      ],
+      "source_artifact": "docs/reports/paper_adjacent_systems_comparison.json"
+    },
+    {
+      "adjacent_system_type": "ML reproducibility checklists",
+      "citation_status": "pass",
+      "distinct_relaytic_aml_role": "turn checklist obligations into executable local artifact generation, failure cases, and release preflight gates",
+      "missing_bib_keys": [],
+      "optimizes_for": "static reporting requirements that make ML results easier to reproduce",
+      "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
+      "relaytic_aml_does_not_claim": "full independent reproduction of licensed or private AML data",
+      "representative_sources": [
+        "pineau2021reproducibility"
+      ],
+      "source_artifact": "docs/reports/paper_adjacent_systems_comparison.json"
+    },
+    {
+      "adjacent_system_type": "Agent benchmarks and research-agent evaluations",
+      "citation_status": "pass",
+      "distinct_relaytic_aml_role": "use role-scoped agents inside an AML evaluation lab and test whether their outputs stay attached to evidence",
+      "missing_bib_keys": [],
+      "optimizes_for": "measuring whether agents can complete research, coding, or tool-use tasks",
+      "paper_use": "category positioning only; no benchmark number or stronger detector claim added",
+      "relaytic_aml_does_not_claim": "a benchmark of a general-purpose agent",
+      "representative_sources": [
+        "chen2025mlrbench",
+        "starace2025paperbench",
+        "wijk2025rebench"
+      ],
+      "source_artifact": "docs/reports/paper_adjacent_systems_comparison.json"
+    }
+  ],
+  "missing_required_categories": [],
+  "required_categories": [
+    "AML detector and benchmark papers",
+    "AML LLM graph reasoning and triage systems",
+    "Agentic SAR and compliance narrative assistants",
+    "Agent governance and runtime trust layers",
+    "MLOps experiment tracking",
+    "Model cards and model reporting",
+    "Datasheets and dataset documentation",
+    "ML reproducibility checklists",
+    "Agent benchmarks and research-agent evaluations"
+  ],
+  "schema_version": "relaytic.paper_novelty_positioning.v1",
+  "scope": "reader_facing_novelty_and_adjacent_systems_distinction",
+  "slice": "Paper Track P23",
+  "status": "pass"
+}

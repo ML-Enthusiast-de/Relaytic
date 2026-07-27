@@ -1,0 +1,108 @@
+{
+  "checks": [
+    {
+      "check_id": "figures_declared_and_present",
+      "detail": {
+        "figure_count": 0,
+        "missing_figures": []
+      },
+      "message": "Figures 1-4 must be declared in the manifest and present as source SVGs.",
+      "passed": false,
+      "source_artifact": "docs/paper/figures/figure_manifest.json"
+    },
+    {
+      "check_id": "figure_four_metric_grouping_explained",
+      "message": "Figure 4 must not mix PR-AUC and review-budget metrics without interpretation.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "table_four_selection_story_clean",
+      "message": "Table 5 must not imply the probe winner was the final model-selection decision.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "publication_table_count_present",
+      "detail": {
+        "appendix_table_count": 11,
+        "main_table_count": 7,
+        "system_summary_table_present": true,
+        "table_count": 18
+      },
+      "message": "The generated manuscript should contain compact main tables and detailed appendix audit tables.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "impersonal_scientific_voice_and_punctuation",
+      "detail": {
+        "first_person_hits": [],
+        "reader_visible_semicolons": 0
+      },
+      "message": "Reader-facing prose must avoid first-person narration and reader-visible semicolons.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "tables_and_figures_introduced_in_prose",
+      "message": "Every main table and figure must be introduced by the surrounding scientific argument.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "no_unresolved_public_markers",
+      "message": "Reader-facing paper must not contain unresolved TODO, pending, or reference markers.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "reader_tone_lint_passed",
+      "message": "Paper wording should stay calm and professional.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "ambiguous_referent_lint_passed",
+      "detail": {
+        "forbidden_phrases": [
+          "A useful score is not enough",
+          "In this setting, the score",
+          "the score only becomes useful",
+          "which score",
+          "This is the part",
+          "That is a useful operating result",
+          "The result supports",
+          "This is the pattern",
+          "That is the point"
+        ]
+      },
+      "message": "Reader-facing prose must name the metric, artifact, or system object before interpreting it.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "paper_body_avoids_private_or_internal_paths",
+      "message": "Paper body should not expose private paths or make readers chase internal report paths.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    }
+  ],
+  "failed_checks": [
+    {
+      "check_id": "figures_declared_and_present",
+      "detail": {
+        "figure_count": 0,
+        "missing_figures": []
+      },
+      "message": "Figures 1-4 must be declared in the manifest and present as source SVGs.",
+      "passed": false,
+      "source_artifact": "docs/paper/figures/figure_manifest.json"
+    }
+  ],
+  "figure_count": 0,
+  "schema_version": "relaytic.paper_narrative_polish.v1",
+  "slice": "Paper Track P20",
+  "status": "fail",
+  "table_count": 18
+}

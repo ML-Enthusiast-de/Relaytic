@@ -1,0 +1,234 @@
+{
+  "citation_checks": [
+    {
+      "adjacent_family": "Model cards and model reporting",
+      "missing_bib_keys": [
+        "mitchell2019modelcards"
+      ],
+      "passed": false,
+      "representative_sources": [
+        "mitchell2019modelcards"
+      ]
+    },
+    {
+      "adjacent_family": "Datasheets and dataset documentation",
+      "missing_bib_keys": [
+        "gebru2021datasheets"
+      ],
+      "passed": false,
+      "representative_sources": [
+        "gebru2021datasheets"
+      ]
+    },
+    {
+      "adjacent_family": "ML reproducibility checklists",
+      "missing_bib_keys": [
+        "pineau2021reproducibility"
+      ],
+      "passed": false,
+      "representative_sources": [
+        "pineau2021reproducibility"
+      ]
+    },
+    {
+      "adjacent_family": "MLOps experiment tracking",
+      "missing_bib_keys": [
+        "zaharia2018mlflow"
+      ],
+      "passed": false,
+      "representative_sources": [
+        "zaharia2018mlflow"
+      ]
+    },
+    {
+      "adjacent_family": "Agent benchmarks and research-agent evaluations",
+      "missing_bib_keys": [
+        "chen2025mlrbench",
+        "starace2025paperbench",
+        "wijk2025rebench",
+        "yang2026skillopt"
+      ],
+      "passed": false,
+      "representative_sources": [
+        "chen2025mlrbench",
+        "starace2025paperbench",
+        "wijk2025rebench",
+        "yang2026skillopt"
+      ]
+    },
+    {
+      "adjacent_family": "AML detector and benchmark papers",
+      "missing_bib_keys": [
+        "weber2019elliptic",
+        "bellei2024elliptic2",
+        "song2024revtrack",
+        "chen2026transxion",
+        "poon2025linemvgnn",
+        "ye2026blazingaml"
+      ],
+      "passed": false,
+      "representative_sources": [
+        "weber2019elliptic",
+        "bellei2024elliptic2",
+        "song2024revtrack",
+        "chen2026transxion",
+        "poon2025linemvgnn",
+        "ye2026blazingaml"
+      ]
+    },
+    {
+      "adjacent_family": "AML LLM graph reasoning and triage systems",
+      "missing_bib_keys": [
+        "pirmorad2025amlgraphllm",
+        "naik2026llmopsaml"
+      ],
+      "passed": false,
+      "representative_sources": [
+        "pirmorad2025amlgraphllm",
+        "naik2026llmopsaml"
+      ]
+    },
+    {
+      "adjacent_family": "Agentic SAR and compliance narrative assistants",
+      "missing_bib_keys": [
+        "naik2025coinvestigator"
+      ],
+      "passed": false,
+      "representative_sources": [
+        "naik2025coinvestigator"
+      ]
+    },
+    {
+      "adjacent_family": "Agent governance and runtime trust layers",
+      "missing_bib_keys": [
+        "gaurav2025governanceaas",
+        "kaptein2026runtimegovernance"
+      ],
+      "passed": false,
+      "representative_sources": [
+        "gaurav2025governanceaas",
+        "kaptein2026runtimegovernance"
+      ]
+    }
+  ],
+  "claim_boundary": "This comparison positions Relaytic-AML as an evaluation-lab and governance system, not as a detector-superiority paper.",
+  "comparison_rows": [
+    {
+      "adjacent_family": "Model cards and model reporting",
+      "primary_object": "trained model and intended-use report",
+      "relaytic_aml_boundary": "does not replace model reporting",
+      "relaytic_aml_position": "adds command-level metric provenance, release gating, and stronger-claim blocking around AML experiments",
+      "representative_sources": [
+        "mitchell2019modelcards"
+      ],
+      "what_it_covers": "model purpose, evaluation, caveats, and intended users"
+    },
+    {
+      "adjacent_family": "Datasheets and dataset documentation",
+      "primary_object": "dataset creation, composition, collection, and recommended use",
+      "relaytic_aml_boundary": "does not replace source-dataset governance",
+      "relaytic_aml_position": "connects dataset posture to split contracts, leakage controls, benchmark rows, and admissible claims",
+      "representative_sources": [
+        "gebru2021datasheets"
+      ],
+      "what_it_covers": "data provenance and stewardship questions"
+    },
+    {
+      "adjacent_family": "ML reproducibility checklists",
+      "primary_object": "reporting checklist and reproducibility discipline",
+      "relaytic_aml_boundary": "does not claim full independent reproduction for licensed data",
+      "relaytic_aml_position": "turns checklist-like obligations into executable artifact-generation and release gates",
+      "representative_sources": [
+        "pineau2021reproducibility"
+      ],
+      "what_it_covers": "static items needed to make results easier to reproduce"
+    },
+    {
+      "adjacent_family": "MLOps experiment tracking",
+      "primary_object": "runs, metrics, parameters, artifacts, lineage, and model versions",
+      "relaytic_aml_boundary": "is not a hosted tracker or production model registry",
+      "relaytic_aml_position": "focuses on local AML evidence, privacy posture, rowless handoff, and public scientific claim admissibility",
+      "representative_sources": [
+        "zaharia2018mlflow"
+      ],
+      "what_it_covers": "operational memory of experiments"
+    },
+    {
+      "adjacent_family": "Agent benchmarks and research-agent evaluations",
+      "primary_object": "agent performance on research, coding, or skill-use tasks",
+      "relaytic_aml_boundary": "does not benchmark a general-purpose agent",
+      "relaytic_aml_position": "uses agents inside a governed local evaluation lab and then tests whether their outputs stay artifact-attached",
+      "representative_sources": [
+        "chen2025mlrbench",
+        "starace2025paperbench",
+        "wijk2025rebench",
+        "yang2026skillopt"
+      ],
+      "what_it_covers": "whether agents can complete tasks or produce research artifacts"
+    },
+    {
+      "adjacent_family": "AML detector and benchmark papers",
+      "primary_object": "detector architecture, benchmark result, graph construction, or financial-crime dataset",
+      "relaytic_aml_boundary": "is not a new graph-neural detector and does not claim detector SOTA",
+      "relaytic_aml_position": "provides the local evidence and claim-governance substrate that such detector studies can run through",
+      "representative_sources": [
+        "weber2019elliptic",
+        "bellei2024elliptic2",
+        "song2024revtrack",
+        "chen2026transxion",
+        "poon2025linemvgnn",
+        "ye2026blazingaml"
+      ],
+      "what_it_covers": "modeling frontier for temporal and graph AML detection"
+    },
+    {
+      "adjacent_family": "AML LLM graph reasoning and triage systems",
+      "primary_object": "LLM reasoning, triage, serving, and evidence-rich prompts for AML workflows",
+      "relaytic_aml_boundary": "does not claim an LLM detector or AML LLM-serving stack",
+      "relaytic_aml_position": "keeps LLM or external-agent help downstream of rowless local evidence, artifact provenance, and claim gates",
+      "representative_sources": [
+        "pirmorad2025amlgraphllm",
+        "naik2026llmopsaml"
+      ],
+      "what_it_covers": "language-model assistance for suspiciousness reasoning, risk-factor extraction, and compliance-oriented outputs"
+    },
+    {
+      "adjacent_family": "Agentic SAR and compliance narrative assistants",
+      "primary_object": "human-in-the-loop SAR or compliance narrative drafting",
+      "relaytic_aml_boundary": "does not generate or validate regulatory SAR submissions",
+      "relaytic_aml_position": "governs the local experimental evidence and admissible claims that such narrative workflows should cite",
+      "representative_sources": [
+        "naik2025coinvestigator"
+      ],
+      "what_it_covers": "case narrative generation, compliance validation, investigator collaboration, and report-writing support"
+    },
+    {
+      "adjacent_family": "Agent governance and runtime trust layers",
+      "primary_object": "runtime policies, enforcement, logging, trust scoring, and path-dependent agent governance",
+      "relaytic_aml_boundary": "does not claim to be a general-purpose agent-governance product",
+      "relaytic_aml_position": "specializes governance to local AML evidence cells, rowless handoff, benchmark context, and paper/public claim admissibility",
+      "representative_sources": [
+        "gaurav2025governanceaas",
+        "kaptein2026runtimegovernance"
+      ],
+      "what_it_covers": "general agent action control across domains and heterogeneous agent stacks"
+    }
+  ],
+  "covered_families": [
+    "AML LLM graph reasoning and triage systems",
+    "AML detector and benchmark papers",
+    "Agent benchmarks and research-agent evaluations",
+    "Agent governance and runtime trust layers",
+    "Agentic SAR and compliance narrative assistants",
+    "Datasheets and dataset documentation",
+    "ML reproducibility checklists",
+    "MLOps experiment tracking",
+    "Model cards and model reporting"
+  ],
+  "family_count": 9,
+  "missing_required_families": [],
+  "next_slice": "Paper Track P18 repair",
+  "schema_version": "relaytic.paper_invariants.v1",
+  "slice": "Paper Track P18",
+  "status": "blocked"
+}

@@ -1,0 +1,35 @@
+{
+  "checks": [
+    {
+      "benchmark": "PaySim",
+      "blocked_reason_codes": [],
+      "observed_status": null,
+      "pass_criterion": "a machine-readable execution status and blocked reasons are emitted",
+      "passed": false
+    },
+    {
+      "benchmark": "Elliptic",
+      "blocked_reason_codes": [],
+      "observed_status": null,
+      "pass_criterion": "a machine-readable execution status and blocked reasons are emitted",
+      "passed": false
+    },
+    {
+      "benchmark": "Elliptic2",
+      "blocked_reason_codes": [],
+      "observed_status": null,
+      "pass_criterion": "a machine-readable execution status and blocked reasons are emitted",
+      "passed": false
+    },
+    {
+      "benchmark": "reproduction instructions",
+      "blocked_reason_codes": [],
+      "observed_status": "require-full-rerun command documented",
+      "pass_criterion": "full-rerun commands reject skipped benchmark execution",
+      "passed": true
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "fail"
+}

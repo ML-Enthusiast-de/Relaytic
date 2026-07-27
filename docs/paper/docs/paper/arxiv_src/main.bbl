@@ -1,0 +1,263 @@
+\begin{thebibliography}{30}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bellei et~al.(2024)Bellei, Xu, Phillips, Robinson, Weber, Kaler,
+  Leiserson, Arvind, and Chen]{bellei2024elliptic2}
+Claudio Bellei, Muhua Xu, Ross Phillips, Tom Robinson, Mark Weber, Tim Kaler,
+  Charles~E. Leiserson, Arvind, and Jie Chen.
+\newblock {The Shape of Money Laundering: Subgraph Representation Learning on
+  the Blockchain with the Elliptic2 Dataset}, 2024.
+\newblock URL \url{https://arxiv.org/abs/2404.19109}.
+
+\bibitem[Chen et~al.(2025)Chen, Xiong, Lu, Han, Deng, He, Wu, Li, Liu, and
+  Hooi]{chen2025mlrbench}
+Hui Chen, Miao Xiong, Yujie Lu, Wei Han, Ailin Deng, Yufei He, Jiaying Wu, Yibo
+  Li, Yue Liu, and Bryan Hooi.
+\newblock {MLR-Bench: Evaluating AI Agents on Open-Ended Machine Learning
+  Research}, 2025.
+\newblock URL \url{https://arxiv.org/abs/2505.19955}.
+
+\bibitem[Chen et~al.(2026)Chen, Jiang, Zhao, Li, Chen, Luo, Li, Liu, Jing, Ye,
+  Wu, and Chai]{chen2026transxion}
+Keyang Chen, Mingxuan Jiang, Yongsheng Zhao, Zeping Li, Zaiyuan Chen, Weiqi
+  Luo, Zhixin Li, Sen Liu, Yinan Jing, Guangnan Ye, Xihong Wu, and Hongfeng
+  Chai.
+\newblock {TransXion: A High-Fidelity Graph Benchmark for Realistic Anti-Money
+  Laundering}, 2026.
+\newblock URL \url{https://arxiv.org/abs/2604.17420}.
+
+\bibitem[Chen and Guestrin(2016)]{chen2016xgboost}
+Tianqi Chen and Carlos Guestrin.
+\newblock {XGBoost: A Scalable Tree Boosting System}.
+\newblock In \emph{Proceedings of the 22nd ACM SIGKDD International Conference
+  on Knowledge Discovery and Data Mining}, pages 785--794, 2016.
+\newblock \doi{10.1145/2939672.2939785}.
+\newblock URL \url{https://doi.org/10.1145/2939672.2939785}.
+
+\bibitem[Deprez et~al.(2025)Deprez, Wei, Verbeke, Baesens, Mets, and
+  Verdonck]{deprez2025continualaml}
+Bruno Deprez, Wei Wei, Wouter Verbeke, Bart Baesens, Kevin Mets, and Tim
+  Verdonck.
+\newblock {Advances in Continual Graph Learning for Anti-Money Laundering
+  Systems: A Comprehensive Review}.
+\newblock \emph{WIREs Computational Statistics}, 17\penalty0 (3):\penalty0
+  e70040, 2025.
+\newblock \doi{10.1002/wics.70040}.
+\newblock URL \url{https://doi.org/10.1002/wics.70040}.
+
+\bibitem[{Federal Financial Institutions Examination
+  Council}(2014)]{ffiecRedFlags}
+{Federal Financial Institutions Examination Council}.
+\newblock {BSA/AML Examination Manual: Appendix F, Money Laundering and
+  Terrorist Financing Red Flags}, 2014.
+\newblock URL \url{https://bsaaml.ffiec.gov/manual/Appendices/07}.
+\newblock Accessed 2026-07-14.
+
+\bibitem[{Financial Action Task Force}(2020)]{fatf2020virtualassets}
+{Financial Action Task Force}.
+\newblock {Virtual Assets Red Flag Indicators of Money Laundering and Terrorist
+  Financing}, 2020.
+\newblock URL
+  \url{https://www.fatf-gafi.org/en/publications/Methodsandtrends/Virtual-assets-red-flag-indicators.html}.
+\newblock Accessed 2026-07-14.
+
+\bibitem[Gaurav et~al.(2025)Gaurav, Heikkonen, and
+  Chaudhary]{gaurav2025governanceaas}
+Suyash Gaurav, Jukka Heikkonen, and Jatin Chaudhary.
+\newblock {Governance-as-a-Service: A Multi-Agent Framework for AI System
+  Compliance and Policy Enforcement}, 2025.
+\newblock URL \url{https://arxiv.org/abs/2508.18765}.
+
+\bibitem[Gebru et~al.(2021)Gebru, Morgenstern, Vecchione, Vaughan, Wallach,
+  Daume~III, and Crawford]{gebru2021datasheets}
+Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer~Wortman Vaughan,
+  Hanna Wallach, Hal Daume~III, and Kate Crawford.
+\newblock {Datasheets for Datasets}.
+\newblock \emph{Communications of the ACM}, 64\penalty0 (12):\penalty0 86--92,
+  2021.
+\newblock \doi{10.1145/3458723}.
+\newblock URL \url{https://arxiv.org/abs/1803.09010}.
+
+\bibitem[Geurts et~al.(2006)Geurts, Ernst, and Wehenkel]{geurts2006extratrees}
+Pierre Geurts, Damien Ernst, and Louis Wehenkel.
+\newblock {Extremely Randomized Trees}.
+\newblock \emph{Machine Learning}, 63\penalty0 (1):\penalty0 3--42, 2006.
+\newblock \doi{10.1007/s10994-006-6226-1}.
+\newblock URL \url{https://doi.org/10.1007/s10994-006-6226-1}.
+
+\bibitem[Kaptein et~al.(2026)Kaptein, Khan, and
+  Podstavnychy]{kaptein2026runtimegovernance}
+Maurits Kaptein, Vassilis-Javed Khan, and Andriy Podstavnychy.
+\newblock {Runtime Governance for AI Agents: Policies on Paths}, 2026.
+\newblock URL \url{https://arxiv.org/abs/2603.16586}.
+
+\bibitem[Ke et~al.(2017)Ke, Meng, Finley, Wang, Chen, Ma, Ye, and
+  Liu]{ke2017lightgbm}
+Guolin Ke, Qi~Meng, Thomas Finley, Taifeng Wang, Wei Chen, Weidong Ma, Qiwei
+  Ye, and Tie-Yan Liu.
+\newblock {LightGBM: A Highly Efficient Gradient Boosting Decision Tree}.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~30, 2017.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html}.
+
+\bibitem[Kleppmann et~al.(2019)Kleppmann, Wiggins, van Hardenberg, and
+  McGranaghan]{kleppmann2019localfirst}
+Martin Kleppmann, Adam Wiggins, Peter van Hardenberg, and Mark McGranaghan.
+\newblock {Local-First Software: You Own Your Data, in Spite of the Cloud}.
+\newblock In \emph{Proceedings of the 2019 ACM SIGPLAN International Symposium
+  on New Ideas, New Paradigms, and Reflections on Programming and Software},
+  pages 154--178, 2019.
+\newblock \doi{10.1145/3359591.3359737}.
+\newblock URL \url{https://doi.org/10.1145/3359591.3359737}.
+
+\bibitem[Lopez-Rojas et~al.(2016)Lopez-Rojas, Elmir, and
+  Axelsson]{lopezrojas2016paysim}
+Edgar~Alonso Lopez-Rojas, Ahmad Elmir, and Stefan Axelsson.
+\newblock {PaySim: A Financial Mobile Money Simulator for Fraud Detection}.
+\newblock In \emph{Proceedings of the 28th European Modeling and Simulation
+  Symposium}, 2016.
+\newblock URL
+  \url{https://www.msc-les.org/proceedings/emss/2016/EMSS2016_249.pdf}.
+
+\bibitem[Mitchell et~al.(2019)Mitchell, Wu, Zaldivar, Barnes, Vasserman,
+  Hutchinson, Spitzer, Raji, and Gebru]{mitchell2019modelcards}
+Margaret Mitchell, Simone Wu, Andrew Zaldivar, Parker Barnes, Lucy Vasserman,
+  Ben Hutchinson, Elena Spitzer, Inioluwa~Deborah Raji, and Timnit Gebru.
+\newblock {Model Cards for Model Reporting}.
+\newblock In \emph{Proceedings of the Conference on Fairness, Accountability,
+  and Transparency}, pages 220--229, 2019.
+\newblock \doi{10.1145/3287560.3287596}.
+\newblock URL \url{https://arxiv.org/abs/1810.03993}.
+
+\bibitem[Naik et~al.(2025)Naik, Dintakurthi, Hu, Wang, and
+  Qiu]{naik2025coinvestigator}
+Prathamesh~Vasudeo Naik, Naresh~Kumar Dintakurthi, Zhanghao Hu, Yue Wang, and
+  Robby Qiu.
+\newblock {Co-Investigator AI: The Rise of Agentic AI for Smarter, Trustworthy
+  AML Compliance Narratives}, 2025.
+\newblock URL \url{https://arxiv.org/abs/2509.08380}.
+
+\bibitem[Naik et~al.(2026)Naik, Dintakurthi, and Wang]{naik2026llmopsaml}
+Prathamesh~Vasudeo Naik, Naresh Dintakurthi, and Yue Wang.
+\newblock {Rethinking LLMOps for Fraud and AML: Building a Compliance-Grade LLM
+  Serving Stack}, 2026.
+\newblock URL \url{https://arxiv.org/abs/2605.11232}.
+
+\bibitem[Pineau et~al.(2021)Pineau, Vincent-Lamarre, Sinha, Lariviere,
+  Beygelzimer, d'Alche Buc, Fox, and Larochelle]{pineau2021reproducibility}
+Joelle Pineau, Philippe Vincent-Lamarre, Koustuv Sinha, Vincent Lariviere,
+  Alina Beygelzimer, Florence d'Alche Buc, Emily Fox, and Hugo Larochelle.
+\newblock {Improving Reproducibility in Machine Learning Research}.
+\newblock \emph{Journal of Machine Learning Research}, 22\penalty0
+  (164):\penalty0 1--20, 2021.
+\newblock URL \url{https://www.jmlr.org/papers/v22/20-303.html}.
+
+\bibitem[Pirmorad(2025)]{pirmorad2025amlgraphllm}
+Erfan Pirmorad.
+\newblock {Exploring the In-Context Learning Capabilities of LLMs for Money
+  Laundering Detection in Financial Graphs}, 2025.
+\newblock URL \url{https://arxiv.org/abs/2507.14785}.
+
+\bibitem[Platt(1999)]{platt1999probabilistic}
+John~C. Platt.
+\newblock {Probabilistic Outputs for Support Vector Machines and Comparisons to
+  Regularized Likelihood Methods}.
+\newblock In \emph{Advances in Large Margin Classifiers}, pages 61--74. MIT
+  Press, 1999.
+
+\bibitem[Poon et~al.(2025)Poon, Kwok, Chow, and Choi]{poon2025linemvgnn}
+Chung-Hoo Poon, James Tin~Yau Kwok, Calvin Chow, and Jang-Hyeon Choi.
+\newblock {LineMVGNN: Anti-Money Laundering with Line-Graph-Assisted Multi-View
+  Graph Neural Networks}.
+\newblock \emph{AI}, 6\penalty0 (4):\penalty0 69, 2025.
+\newblock \doi{10.3390/ai6040069}.
+\newblock URL \url{https://doi.org/10.3390/ai6040069}.
+
+\bibitem[Saito and Rehmsmeier(2015)]{saito2015precisionrecall}
+Takaya Saito and Marc Rehmsmeier.
+\newblock {The Precision-Recall Plot Is More Informative than the ROC Plot When
+  Evaluating Binary Classifiers on Imbalanced Datasets}.
+\newblock \emph{PLOS ONE}, 10\penalty0 (3):\penalty0 e0118432, 2015.
+\newblock \doi{10.1371/journal.pone.0118432}.
+\newblock URL \url{https://doi.org/10.1371/journal.pone.0118432}.
+
+\bibitem[Song et~al.(2024)Song, Dhraief, Xu, Cai, Chen, Arvind, and
+  Chen]{song2024revtrack}
+Kiwhan Song, Mohamed~Ali Dhraief, Muhua Xu, Locke Cai, Xuhao Chen, Arvind, and
+  Jie Chen.
+\newblock {Identifying Money Laundering Subgraphs on the Blockchain}.
+\newblock In \emph{Proceedings of the 5th ACM International Conference on AI in
+  Finance}, 2024.
+\newblock \doi{10.1145/3677052.3698635}.
+\newblock URL \url{https://arxiv.org/abs/2410.08394}.
+
+\bibitem[Starace et~al.(2025)Starace, Jaffe, Sherburn, Aung, Chan, Maksin,
+  Dias, Mays, Kinsella, Thompson, Heidecke, Glaese, and
+  Patwardhan]{starace2025paperbench}
+Giulio Starace, Oliver Jaffe, Dane Sherburn, James Aung, Jun~Shern Chan, Leon
+  Maksin, Rachel Dias, Evan Mays, Benjamin Kinsella, Wyatt Thompson, Johannes
+  Heidecke, Amelia Glaese, and Tejal Patwardhan.
+\newblock {PaperBench: Evaluating AI's Ability to Replicate AI Research}, 2025.
+\newblock URL \url{https://arxiv.org/abs/2504.01848}.
+
+\bibitem[Tariq and Hassani(2026)]{tariq2026extraqt}
+Haseeb Tariq and Marwan Hassani.
+\newblock {Extracting Money Laundering Transactions from Quasi-Temporal Graph
+  Representation}, 2026.
+\newblock URL \url{https://arxiv.org/abs/2604.02899}.
+
+\bibitem[Weber et~al.(2019)Weber, Domeniconi, Chen, Weidele, Bellei, Robinson,
+  and Leiserson]{weber2019elliptic}
+Mark Weber, Giacomo Domeniconi, Jie Chen, Daniel Karl~I. Weidele, Claudio
+  Bellei, Tom Robinson, and Charles~E. Leiserson.
+\newblock {Anti-Money Laundering in Bitcoin: Experimenting with Graph
+  Convolutional Networks for Financial Forensics}, 2019.
+\newblock URL \url{https://arxiv.org/abs/1908.02591}.
+
+\bibitem[Wijk et~al.(2025)Wijk, Lin, Becker, Jawhar, Parikh, Broadley, Chan,
+  Chen, Clymer, Dhyani, Ericheva, Garcia, Goodrich, Jurkovic, Kinniment, Lajko,
+  Nix, Koba~Sato, Saunders, Taran, West, and Barnes]{wijk2025rebench}
+Hjalmar Wijk, Tao~Roa Lin, Joel Becker, Sami Jawhar, Neev Parikh, Thomas
+  Broadley, Lawrence Chan, Michael Chen, Joshua~M. Clymer, Jai Dhyani, Elena
+  Ericheva, Katharyn Garcia, Brian Goodrich, Nikola Jurkovic, Megan Kinniment,
+  Aron Lajko, Seraphina Nix, Lucas~Jun Koba~Sato, William Saunders, Maksym
+  Taran, Ben West, and Elizabeth Barnes.
+\newblock {RE-Bench: Evaluating Frontier AI R\&D Capabilities of Language Model
+  Agents against Human Experts}.
+\newblock In \emph{Proceedings of the 42nd International Conference on Machine
+  Learning}, volume 267 of \emph{Proceedings of Machine Learning Research},
+  pages 66772--66832, 2025.
+\newblock URL \url{https://proceedings.mlr.press/v267/wijk25a.html}.
+
+\bibitem[Yang et~al.(2026)Yang, Gong, Huang, Yang, Zhou, Huang, Li, Gao, Dai,
+  Liu, Qiu, Yang, Chen, Yang, and Luo]{yang2026skillopt}
+Yifan Yang, Ziyang Gong, Weiquan Huang, Qihao Yang, Ziwei Zhou, Zisu Huang, Yan
+  Li, Xuemei Gao, Qi~Dai, Bei Liu, Kai Qiu, Yuqing Yang, Dongdong Chen, Xue
+  Yang, and Chong Luo.
+\newblock {SkillOpt: Executive Strategy for Self-Evolving Agent Skills}, 2026.
+\newblock URL \url{https://arxiv.org/abs/2605.23904}.
+
+\bibitem[Ye et~al.(2026)Ye, Laxman, Yuan, Flautner, and
+  Talati]{ye2026blazingaml}
+Haojie Ye, Arjun Laxman, Yichao Yuan, Krisztian Flautner, and Nishil Talati.
+\newblock {BlazingAML: High-Throughput Anti-Money Laundering (AML) via
+  Multi-Stage Graph Mining}, 2026.
+\newblock URL \url{https://arxiv.org/abs/2604.12241}.
+
+\bibitem[Zaharia et~al.(2018)Zaharia, Chen, Davidson, Ghodsi, Hong, Konwinski,
+  Murching, Nykodym, Ogilvie, Parkhe, Xie, and Zumar]{zaharia2018mlflow}
+Matei Zaharia, Andrew Chen, Aaron Davidson, Ali Ghodsi, Sue~Ann Hong, Andy
+  Konwinski, Siddharth Murching, Tomas Nykodym, Paul Ogilvie, Mani Parkhe, Fen
+  Xie, and Corey Zumar.
+\newblock {Accelerating the Machine Learning Lifecycle with MLflow}.
+\newblock \emph{IEEE Data Engineering Bulletin}, 41\penalty0 (4):\penalty0
+  39--45, 2018.
+\newblock URL
+  \url{https://people.eecs.berkeley.edu/~matei/papers/2018/ieee_mlflow.pdf}.
+
+\end{thebibliography}

@@ -1,0 +1,90 @@
+{
+  "checks": [
+    {
+      "check_id": "reader_enters_through_readme_and_paper",
+      "message": "The paper should route readers to the README and manuscript, not to internal build plans.",
+      "passed": false,
+      "source_artifact": "README.md"
+    },
+    {
+      "check_id": "relaytic_vs_relaytic_aml_distinction_visible",
+      "message": "Readers must understand why the repo is larger than the AML paper.",
+      "passed": false,
+      "source_artifact": "README.md"
+    },
+    {
+      "check_id": "cross_platform_paper_commands_visible",
+      "message": "README and paper must expose copy-paste-safe Windows and macOS/Linux paper commands.",
+      "passed": false,
+      "source_artifact": "README.md"
+    },
+    {
+      "check_id": "release_snapshot_guidance_visible",
+      "message": "Paper readers should cite a fixed release snapshot while the main branch remains allowed to evolve.",
+      "passed": false,
+      "source_artifact": "docs/paper/README.md"
+    },
+    {
+      "check_id": "paper_avoids_internal_planning_guidance",
+      "message": "The paper should not point readers at internal planning files or slice names.",
+      "passed": true,
+      "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
+    },
+    {
+      "check_id": "reader_task_eval_covers_navigation",
+      "message": "The reader guidance should be backed by deterministic reader/agent tasks.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_system_task_eval.json"
+    },
+    {
+      "check_id": "deep_audit_path_available_without_required_artifact_literacy",
+      "message": "README may expose audit artifacts, but the first path must stay simple.",
+      "passed": false,
+      "source_artifact": "README.md"
+    }
+  ],
+  "cross_platform_commands_visible": false,
+  "failed_checks": [
+    {
+      "check_id": "reader_enters_through_readme_and_paper",
+      "message": "The paper should route readers to the README and manuscript, not to internal build plans.",
+      "passed": false,
+      "source_artifact": "README.md"
+    },
+    {
+      "check_id": "relaytic_vs_relaytic_aml_distinction_visible",
+      "message": "Readers must understand why the repo is larger than the AML paper.",
+      "passed": false,
+      "source_artifact": "README.md"
+    },
+    {
+      "check_id": "cross_platform_paper_commands_visible",
+      "message": "README and paper must expose copy-paste-safe Windows and macOS/Linux paper commands.",
+      "passed": false,
+      "source_artifact": "README.md"
+    },
+    {
+      "check_id": "release_snapshot_guidance_visible",
+      "message": "Paper readers should cite a fixed release snapshot while the main branch remains allowed to evolve.",
+      "passed": false,
+      "source_artifact": "docs/paper/README.md"
+    },
+    {
+      "check_id": "reader_task_eval_covers_navigation",
+      "message": "The reader guidance should be backed by deterministic reader/agent tasks.",
+      "passed": false,
+      "source_artifact": "docs/reports/paper_system_task_eval.json"
+    },
+    {
+      "check_id": "deep_audit_path_available_without_required_artifact_literacy",
+      "message": "README may expose audit artifacts, but the first path must stay simple.",
+      "passed": false,
+      "source_artifact": "README.md"
+    }
+  ],
+  "paper_avoids_internal_planning_guidance": true,
+  "reader_path_ready": false,
+  "schema_version": "relaytic.paper_narrative_polish.v1",
+  "slice": "Paper Track P20",
+  "status": "fail"
+}

@@ -1,0 +1,277 @@
+{
+  "checks": {
+    "all_current_invariants_have_evidence_refs": true,
+    "all_current_invariants_have_failure_or_ablation_or_boundary": true,
+    "all_evidence_refs_exist": false,
+    "aspirational_invariants_in_current_section": []
+  },
+  "claim_boundary": {
+    "detector_superiority_claimed": false,
+    "graph_neural_detector_novelty_claimed": false,
+    "hard_real_bank_aml_superiority_claimed": false,
+    "revclassify_parity_claimed": false
+  },
+  "current_invariant_count": 7,
+  "invariants": [
+    {
+      "current_status": "current_checked",
+      "enforcement_mechanism": "evidence-cell audit plus required-field gate",
+      "evidence_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_metric_cell_audit.json",
+          "evidence_id": "all_numeric_cells_have_required_provenance",
+          "observed_signal": "not observed",
+          "requirement": "numeric evidence cells contain the required provenance fields"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_system_task_eval.json",
+          "evidence_id": "metric_cell_provenance_available",
+          "observed_signal": "not observed",
+          "requirement": "reader task can trace the PaySim evidence cell"
+        }
+      ],
+      "failure_or_ablation_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
+          "evidence_id": "No evidence-cell required fields",
+          "observed_signal": "not observed",
+          "requirement": "disabled required-field gate exposes missing provenance"
+        }
+      ],
+      "invariant_id": "I1_metric_cell_provenance",
+      "limitation_or_boundary": "The invariant checks artifact completeness. It does not establish detector optimality.",
+      "name": "Evidence-cell provenance",
+      "paper_claim_allowed": "The paper may claim audited provenance for reported metrics.",
+      "statement": "Every reader-facing number must resolve to factual dataset, split, command, artifact, metric, budget, leakage, operating-point, and exposure fields, while interpretation resolves through a separate claim gate.",
+      "stronger_claim_blocked": "Metric provenance alone does not justify detector superiority or production AML readiness."
+    },
+    {
+      "current_status": "current_checked",
+      "enforcement_mechanism": "claim lint, allowed-claims report, publishability matrix, and overclaim failure case",
+      "evidence_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
+          "evidence_id": "claim_safe_public_wording_allowed",
+          "observed_signal": "",
+          "requirement": "hard and headline claims remain blocked"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_publishability_matrix.json",
+          "evidence_id": "hard_headline_claims_blocked",
+          "observed_signal": "hard=None; headline=None; rows=0",
+          "requirement": "benchmark rows carry bounded evidence roles"
+        }
+      ],
+      "failure_or_ablation_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_failure_case_eval.json",
+          "evidence_id": "overstrong_claim_attempt",
+          "observed_signal": "not observed",
+          "requirement": "over-strong claim fixture is blocked"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
+          "evidence_id": "No claim gate",
+          "observed_signal": "not observed",
+          "requirement": "disabled claim gate releases unsupported claims"
+        }
+      ],
+      "invariant_id": "I2_claim_strength_monotonicity",
+      "limitation_or_boundary": "The gate is a deterministic release check; it is not an external peer review.",
+      "name": "Claim-strength monotonicity",
+      "paper_claim_allowed": "The paper may claim bounded public interpretation routing.",
+      "statement": "Public wording cannot become stronger than the evidence role, gate status, and missing-evidence record allow.",
+      "stronger_claim_blocked": "Hard real-bank AML superiority, graph-neural superiority, and RevClassifyDS parity stay blocked."
+    },
+    {
+      "current_status": "current_checked",
+      "enforcement_mechanism": "feature policy report, split contract, failure fixtures, and leakage ablation",
+      "evidence_refs": [
+        {
+          "artifact_ref": "docs/reports/paysim_leakage_safe_feature_report.json",
+          "evidence_id": "forbidden_balance_columns_used",
+          "observed_signal": "used=0; labels_for_features=None",
+          "requirement": "forbidden balance fields and validation/test labels are absent from features"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_failure_case_eval.json",
+          "evidence_id": "test_set_selection_violation",
+          "observed_signal": "not observed",
+          "requirement": "test-selection fixture is blocked"
+        },
+        {
+          "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+          "evidence_id": "test_exposure_contract",
+          "observed_signal": "{}",
+          "requirement": "validation-only competitive selection is recorded while earlier P4/P6 test exposure remains disclosed"
+        }
+      ],
+      "failure_or_ablation_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_failure_case_eval.json",
+          "evidence_id": "leakage_column_injection",
+          "observed_signal": "not observed",
+          "requirement": "leakage-column fixture is blocked"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
+          "evidence_id": "No leakage policy",
+          "observed_signal": "not observed",
+          "requirement": "disabled leakage policy exposes forbidden fields"
+        }
+      ],
+      "invariant_id": "I3_leakage_and_selection_firewall",
+      "limitation_or_boundary": "The current firewall is benchmark-specific; future datasets need their own leakage taxonomy.",
+      "name": "Leakage and selection firewall",
+      "paper_claim_allowed": "The paper may claim leakage-audited PaySim feature construction and validation-only competitive selection with disclosed prior test exposure.",
+      "statement": "Leakage-prone fields and test-selection paths are checked before benchmark evidence is released.",
+      "stronger_claim_blocked": "No untouched-holdout, separate destination-history ablation, or real-bank deployment claim is supported."
+    },
+    {
+      "current_status": "current_checked",
+      "enforcement_mechanism": "handoff evaluator plus redaction failure case",
+      "evidence_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_agent_handoff_eval.json",
+          "evidence_id": "external_context_rowless_and_redacted",
+          "observed_signal": "not observed",
+          "requirement": "handoff is rowless and redacted"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_system_task_eval.json",
+          "evidence_id": "rowless_external_agent_handoff_recoverable",
+          "observed_signal": "not observed",
+          "requirement": "external-agent task sees safe next actions and tool contracts"
+        }
+      ],
+      "failure_or_ablation_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_failure_case_eval.json",
+          "evidence_id": "rowless_handoff_redaction",
+          "observed_signal": "not observed",
+          "requirement": "raw-row handoff fixture is redacted"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
+          "evidence_id": "No rowless handoff redaction",
+          "observed_signal": "not observed",
+          "requirement": "disabled redaction exposes blocked fields"
+        }
+      ],
+      "invariant_id": "I4_rowless_external_handoff",
+      "limitation_or_boundary": "The check evaluates deterministic redaction on fixtures. It is not a broad privacy certification.",
+      "name": "Rowless external-agent handoff",
+      "paper_claim_allowed": "The paper may claim rowless local-first handoff for the tested external-agent surfaces.",
+      "statement": "External handoff exposes state, safe actions, and artifact references without raw rows, secrets, or private paths.",
+      "stronger_claim_blocked": "It cannot claim production-grade privacy certification without separate review."
+    },
+    {
+      "current_status": "current_checked",
+      "enforcement_mechanism": "no-lost-user guide and partial-run recovery fixtures",
+      "evidence_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_no_lost_user_eval.json",
+          "evidence_id": "partial_run_state_recovery",
+          "observed_signal": "not observed",
+          "requirement": "partial-run recovery exposes stage, missing evidence, and actions"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_system_task_eval.json",
+          "evidence_id": "partial_run_recovery_without_artifact_literacy",
+          "observed_signal": "not observed",
+          "requirement": "inexperienced-user task can recover without artifact literacy"
+        }
+      ],
+      "failure_or_ablation_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_failure_case_eval.json",
+          "evidence_id": "interrupted_run_recovery",
+          "observed_signal": "not observed",
+          "requirement": "interrupted-run fixture emits recovery guidance"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_governance_ablation_eval.json",
+          "evidence_id": "No interrupted-run recovery guide",
+          "observed_signal": "not observed",
+          "requirement": "disabled recovery guide removes next actions"
+        }
+      ],
+      "invariant_id": "I5_interrupted_run_recoverability",
+      "limitation_or_boundary": "The check is deterministic; it does not measure human time-to-recovery.",
+      "name": "Interrupted-run recoverability",
+      "paper_claim_allowed": "The paper may claim tested recovery surfaces for partial AML runs.",
+      "statement": "A user or agent returning to a partial run must receive current state, missing evidence, safe next actions, and artifact shortlist.",
+      "stronger_claim_blocked": "No human-subject usability or analyst-productivity claim is made."
+    },
+    {
+      "current_status": "current_checked",
+      "enforcement_mechanism": "publishability matrix and allowed-claims report",
+      "evidence_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_publishability_matrix.json",
+          "evidence_id": "supporting_table_allowed",
+          "observed_signal": "rows=0; supporting=0; hard_blocked=True; headline_blocked=True",
+          "requirement": "rows separate supporting evidence from blocked stronger claims"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_system_task_eval.json",
+          "evidence_id": "elliptic2_supporting_context_and_firewall_visible",
+          "observed_signal": "not observed",
+          "requirement": "Elliptic2 remains context rather than parity contribution"
+        }
+      ],
+      "failure_or_ablation_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
+          "evidence_id": "blocked_public_claims",
+          "observed_signal": "blocked=0",
+          "requirement": "hard/headline detector claims remain absent"
+        }
+      ],
+      "invariant_id": "I6_benchmark_role_separation",
+      "limitation_or_boundary": "Rows with external or proxy roles cannot be treated as unified leaderboard evidence.",
+      "name": "Benchmark role separation",
+      "paper_claim_allowed": "The paper may compare evidence roles, not claim detector leadership.",
+      "statement": "Benchmark rows must preserve their evidence role: demonstration, graph-feature evidence, external context, limitation, or future unlock.",
+      "stronger_claim_blocked": "RevClassifyDS parity and graph-neural detector novelty remain out of scope."
+    },
+    {
+      "current_status": "current_checked",
+      "enforcement_mechanism": "release go/no-go, claim lint, and public-claim whitelist",
+      "evidence_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_claim_lint_report.json",
+          "evidence_id": "wording_lint",
+          "observed_signal": "",
+          "requirement": "paper-facing wording passes blocked-claim lint"
+        },
+        {
+          "artifact_ref": "docs/reports/paper_release_go_no_go.json",
+          "evidence_id": "go_for_p13_claim_safe_release_pack",
+          "observed_signal": "",
+          "requirement": "claim-safe release is allowed only with hard/headline claims blocked"
+        }
+      ],
+      "failure_or_ablation_refs": [
+        {
+          "artifact_ref": "docs/reports/paper_governance_ablation_manifest.json",
+          "evidence_id": "detector_claim_boundary",
+          "observed_signal": "hard/headline blocked",
+          "requirement": "governance evidence records detector-claim boundary"
+        }
+      ],
+      "invariant_id": "I7_local_first_release_safety",
+      "limitation_or_boundary": "Licensed benchmark files are not redistributed; reproduction depends on local access.",
+      "name": "Local-first release safety",
+      "paper_claim_allowed": "The paper may claim a local-first, claim-safe release path for the published artifact pack.",
+      "statement": "Release artifacts must be generated from local evidence and pass lint for private paths, missing evidence, and unsupported public wording.",
+      "stronger_claim_blocked": "It cannot claim independent rerun of private or licensed data without dataset access."
+    }
+  ],
+  "next_slice": "Paper Track P18 repair",
+  "proof_obligation_passed": false,
+  "schema_version": "relaytic.paper_invariants.v1",
+  "scope": "governance_invariants_for_current_relaytic_aml_paper_claims",
+  "slice": "Paper Track P18",
+  "status": "blocked"
+}

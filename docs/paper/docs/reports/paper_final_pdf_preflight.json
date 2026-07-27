@@ -1,0 +1,97 @@
+{
+  "checks": [
+    {
+      "check_id": "compiled_pdf_present",
+      "detail": {
+        "byte_count": 441413
+      },
+      "message": "arXiv source PDF must exist and have nontrivial size.",
+      "passed": true
+    },
+    {
+      "check_id": "compiled_pdf_matches_current_source",
+      "detail": {
+        "pdf_modified_unix": 1785141473.4797995,
+        "source_modified_unix": 1785141371.167935
+      },
+      "message": "Compiled PDF should be newer than or as new as the generated TeX source.",
+      "passed": true
+    },
+    {
+      "check_id": "review_pdf_synchronized",
+      "detail": {
+        "review_pdf_bytes": 0,
+        "source_pdf_bytes": 441413
+      },
+      "message": "Human review PDF should match the compiled source PDF size.",
+      "passed": false
+    },
+    {
+      "check_id": "latex_log_clean",
+      "detail": {
+        "status": "fail",
+        "violation_count": 2,
+        "violations": [
+          {
+            "line": 663,
+            "message": "Overfull \\hbox (37.63808pt too wide) in paragraph at lines 600--600"
+          },
+          {
+            "line": 668,
+            "message": "Overfull \\hbox (87.59172pt too wide) in paragraph at lines 672--672"
+          }
+        ]
+      },
+      "message": "LaTeX log must not contain unresolved references, citation warnings, or overfull boxes.",
+      "passed": false
+    },
+    {
+      "check_id": "fonts_embedded_no_type3",
+      "detail": {
+        "status": "pass",
+        "violation_count": 0,
+        "violations": []
+      },
+      "message": "PDF fonts should be embedded and avoid Type 3 fonts.",
+      "passed": true
+    },
+    {
+      "check_id": "pdf_metadata_present_in_source",
+      "message": "PDF metadata must be present in the generated TeX source.",
+      "passed": true
+    }
+  ],
+  "failed_checks": [
+    {
+      "check_id": "review_pdf_synchronized",
+      "detail": {
+        "review_pdf_bytes": 0,
+        "source_pdf_bytes": 441413
+      },
+      "message": "Human review PDF should match the compiled source PDF size.",
+      "passed": false
+    },
+    {
+      "check_id": "latex_log_clean",
+      "detail": {
+        "status": "fail",
+        "violation_count": 2,
+        "violations": [
+          {
+            "line": 663,
+            "message": "Overfull \\hbox (37.63808pt too wide) in paragraph at lines 600--600"
+          },
+          {
+            "line": 668,
+            "message": "Overfull \\hbox (87.59172pt too wide) in paragraph at lines 672--672"
+          }
+        ]
+      },
+      "message": "LaTeX log must not contain unresolved references, citation warnings, or overfull boxes.",
+      "passed": false
+    }
+  ],
+  "schema_version": "relaytic.paper_final_preflight.v1",
+  "slice": "Paper Track P21",
+  "status": "fail"
+}

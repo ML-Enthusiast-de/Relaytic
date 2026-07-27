@@ -1,0 +1,128 @@
+{
+  "checks": [
+    {
+      "check_id": "reader_public_markers_clean",
+      "detail": {
+        "status": "pass",
+        "violations": []
+      },
+      "message": "Reader-facing paper/source surfaces must be free of unresolved markers and release-tag placeholders.",
+      "passed": true
+    },
+    {
+      "check_id": "long_reproduction_commands_wrapped",
+      "detail": {
+        "status": "pass",
+        "violations": []
+      },
+      "message": "Reproduction command blocks should not contain margin-breaking command lines.",
+      "passed": true
+    },
+    {
+      "check_id": "main_body_system_evaluation_compressed",
+      "detail": {
+        "appendix_missing_detail_titles": [],
+        "main_body_dense_table_violations": [],
+        "main_summary_present": true,
+        "status": "pass"
+      },
+      "message": "Main-body system evaluation should use one synthesis table and move dense audit logs to the appendix.",
+      "passed": true
+    },
+    {
+      "check_id": "latex_tables_use_real_captions",
+      "detail": {
+        "captionof_table_count": 17,
+        "status": "pass",
+        "violations": []
+      },
+      "message": "Generated LaTeX should use numbered table captions, not bold pseudo-caption text.",
+      "passed": true
+    },
+    {
+      "check_id": "section_headings_have_needspace_guards",
+      "detail": {
+        "section_count": 12,
+        "status": "pass",
+        "violations": []
+      },
+      "message": "Section headings should be guarded against orphan placement at page bottoms.",
+      "passed": true
+    },
+    {
+      "check_id": "ai_disclosure_named_professionally",
+      "message": "AI assistance disclosure should be short, professional, and consistently named.",
+      "passed": true
+    },
+    {
+      "check_id": "release_identifier_visible",
+      "message": "Reproducibility must identify the repository and either a clean source commit or the exact-revision final-build mechanism.",
+      "passed": true
+    },
+    {
+      "check_id": "source_manifest_ready",
+      "message": "P21 requires a ready P14 source package.",
+      "passed": false
+    },
+    {
+      "check_id": "p20_polish_ready",
+      "message": "P21 requires the P20 paper-polish gate to pass.",
+      "passed": false
+    },
+    {
+      "check_id": "p23_novelty_positioning_ready",
+      "message": "Final preflight requires P23 novelty and adjacent-systems distinction checks.",
+      "passed": false
+    },
+    {
+      "check_id": "p24_release_integrity_ready",
+      "message": "Final preflight requires all P24 evidence, protocol, metric, split, citation, semantic, and visual checks.",
+      "passed": false
+    },
+    {
+      "check_id": "p26_release_corrections_ready",
+      "message": "Final preflight requires factual evidence cells, separate gates, documented validation sub-splits, and a supported release identity.",
+      "passed": false
+    },
+    {
+      "check_id": "source_package_audit_passed",
+      "message": "P21 requires the source/package audit to pass.",
+      "passed": false
+    }
+  ],
+  "failed_checks": [
+    {
+      "check_id": "source_manifest_ready",
+      "message": "P21 requires a ready P14 source package.",
+      "passed": false
+    },
+    {
+      "check_id": "p20_polish_ready",
+      "message": "P21 requires the P20 paper-polish gate to pass.",
+      "passed": false
+    },
+    {
+      "check_id": "p23_novelty_positioning_ready",
+      "message": "Final preflight requires P23 novelty and adjacent-systems distinction checks.",
+      "passed": false
+    },
+    {
+      "check_id": "p24_release_integrity_ready",
+      "message": "Final preflight requires all P24 evidence, protocol, metric, split, citation, semantic, and visual checks.",
+      "passed": false
+    },
+    {
+      "check_id": "p26_release_corrections_ready",
+      "message": "Final preflight requires factual evidence cells, separate gates, documented validation sub-splits, and a supported release identity.",
+      "passed": false
+    },
+    {
+      "check_id": "source_package_audit_passed",
+      "message": "P21 requires the source/package audit to pass.",
+      "passed": false
+    }
+  ],
+  "schema_version": "relaytic.paper_final_preflight.v1",
+  "slice": "Paper Track P21",
+  "status": "fail"
+}

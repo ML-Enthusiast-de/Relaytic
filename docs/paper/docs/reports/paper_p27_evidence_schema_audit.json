@@ -1,0 +1,33 @@
+{
+  "checks": [
+    {
+      "check": "generated schema contract matches code",
+      "observed": null,
+      "pass_criterion": "relaytic.paper_evidence_type_system.v1",
+      "passed": false
+    },
+    {
+      "check": "metric audit uses authoritative field count",
+      "observed": null,
+      "pass_criterion": 17,
+      "passed": false
+    },
+    {
+      "check": "disabled-field ablation uses full metric contract",
+      "observed": null,
+      "pass_criterion": 17,
+      "passed": false
+    },
+    {
+      "check": "reader disclosure includes both fixture counts",
+      "observed": "metric=17; omitted=14",
+      "pass_criterion": "authoritative counts appear in typed-contract table",
+      "passed": false
+    }
+  ],
+  "metric_required_field_count": 17,
+  "missing_field_stress_omitted_count": 14,
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P27",
+  "status": "fail"
+}

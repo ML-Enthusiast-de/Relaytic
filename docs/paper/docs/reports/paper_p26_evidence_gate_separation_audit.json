@@ -1,0 +1,29 @@
+{
+  "checks": {
+    "all_cells_typed": true,
+    "every_public_cell_has_gate": true,
+    "gate_references_resolve": true,
+    "interpretive_fields_absent_from_cells": true
+  },
+  "claim_gate_count": 0,
+  "evidence_cell_count": 0,
+  "evidence_cell_type_counts": {
+    "invariant_evidence_cell": 0,
+    "metric_evidence_cell": 0
+  },
+  "evidence_type_system_schema": "relaytic.paper_evidence_type_system.v1",
+  "interpretive_gate_schema": "relaytic.paper_claim_gate.v2",
+  "invariant_evidence_cell_schema": "relaytic.paper_invariant_evidence_cell.v1",
+  "metric_evidence_cell_schema": "relaytic.paper_metric_evidence_cell.v1",
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P27",
+  "source_artifacts": [
+    "docs/reports/paper_metric_cell_audit.json",
+    "docs/reports/paper_claim_gate_records.json",
+    "docs/reports/paper_external_score_evidence_cells.json",
+    "docs/reports/paper_external_score_claim_gate.json",
+    "docs/reports/paper_evidence_schema_contract.json"
+  ],
+  "status": "fail",
+  "violations": []
+}

@@ -1,0 +1,46 @@
+{
+  "checks": [
+    {
+      "check": "selection surface",
+      "observed": null,
+      "pass_criterion": "validation_pr_auc_only_before_test_evaluation",
+      "passed": false
+    },
+    {
+      "check": "previous exposure disclosure",
+      "observed": {},
+      "pass_criterion": "fixed partition, P4/P6 exposure recorded, and no untouched-holdout claim",
+      "passed": false
+    },
+    {
+      "check": "post-freeze evaluation budget",
+      "observed": null,
+      "pass_criterion": "one validation-selected competitive finalist after protocol freeze",
+      "passed": false
+    },
+    {
+      "check": "full-training finalist disclosure",
+      "observed": {
+        "count": 0,
+        "selected": null
+      },
+      "pass_criterion": "five full-training finalists with one selected final model",
+      "passed": false
+    },
+    {
+      "check": "reader-facing disclosure",
+      "observed": "P4/P6 exposure and non-untouched status appear in the manuscript",
+      "pass_criterion": "the paper does not present PaySim test evidence as untouched",
+      "passed": true
+    },
+    {
+      "check": "claim gate",
+      "observed": null,
+      "pass_criterion": "untouched and one-time-inspection claims are blocked",
+      "passed": false
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "fail"
+}

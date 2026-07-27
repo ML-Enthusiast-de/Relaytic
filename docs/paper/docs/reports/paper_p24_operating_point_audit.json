@@ -1,0 +1,35 @@
+{
+  "checks": [
+    {
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "benchmark": "PaySim",
+      "observed_test_queue": null,
+      "pass_criterion": "validation threshold is transferred unchanged and counts reproduce the stated precision, recall, and queue fraction",
+      "passed": false,
+      "reader_display_present": false,
+      "test_count_recomputed": false,
+      "test_partition_rows": 0,
+      "threshold": null,
+      "threshold_transfer_recorded": false,
+      "validation_count_recomputed": false,
+      "validation_operating_partition_rows": 0
+    },
+    {
+      "artifact_ref": "docs/reports/paper_graph_feature_table.json",
+      "benchmark": "Elliptic",
+      "observed_test_queue": null,
+      "pass_criterion": "validation threshold is transferred unchanged and counts reproduce the stated precision, recall, and queue fraction",
+      "passed": false,
+      "reader_display_present": false,
+      "test_count_recomputed": false,
+      "test_partition_rows": 0,
+      "threshold": null,
+      "threshold_transfer_recorded": false,
+      "validation_count_recomputed": false,
+      "validation_operating_partition_rows": 0
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "fail"
+}

@@ -1,0 +1,141 @@
+{
+  "archival_revision_claimed": false,
+  "arxiv_upload_ready": false,
+  "benchmark_values_changed": false,
+  "checks": [
+    {
+      "passed": false,
+      "report": "paper_p24_evidence_authority",
+      "status": "fail"
+    },
+    {
+      "passed": false,
+      "report": "paper_p24_baseline_metric_snapshot",
+      "status": "fail"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_artifact_conflict_audit",
+      "status": "pass"
+    },
+    {
+      "passed": false,
+      "report": "paper_p24_protocol_disclosure_audit",
+      "status": "fail"
+    },
+    {
+      "passed": false,
+      "report": "paper_p24_paysim_protocol_audit",
+      "status": "fail"
+    },
+    {
+      "passed": false,
+      "report": "paper_p24_operating_point_audit",
+      "status": "fail"
+    },
+    {
+      "passed": false,
+      "report": "paper_p24_reference_provenance_audit",
+      "status": "fail"
+    },
+    {
+      "passed": false,
+      "report": "paper_p24_execution_status_audit",
+      "status": "fail"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_bibliography_verification",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_claim_citation_map",
+      "status": "pass"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_statistical_reporting_decision",
+      "status": "pass"
+    },
+    {
+      "passed": false,
+      "report": "paper_p24_visual_layout_audit",
+      "status": "fail"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_reproduction_semantics",
+      "status": "pass"
+    },
+    {
+      "passed": false,
+      "report": "paper_p24_metric_consistency_audit",
+      "status": "fail"
+    },
+    {
+      "passed": false,
+      "report": "paper_p24_split_consistency_audit",
+      "status": "fail"
+    },
+    {
+      "passed": true,
+      "report": "paper_p24_semantic_source_audit",
+      "status": "pass"
+    },
+    {
+      "passed": false,
+      "report": "paper_p26_evidence_gate_separation_audit",
+      "status": "fail"
+    },
+    {
+      "passed": false,
+      "report": "paper_p26_validation_subsplit_audit",
+      "status": "fail"
+    },
+    {
+      "passed": true,
+      "report": "paper_p26_release_reference_audit",
+      "status": "pass"
+    },
+    {
+      "passed": false,
+      "report": "paper_p27_evidence_schema_audit",
+      "status": "fail"
+    },
+    {
+      "passed": false,
+      "report": "paper_p27_feature_contract_audit",
+      "status": "fail"
+    },
+    {
+      "passed": false,
+      "report": "paper_p27_generated_surface_audit",
+      "status": "fail"
+    },
+    {
+      "passed": true,
+      "report": "paper_p27_candidate_revision_audit",
+      "status": "pass"
+    }
+  ],
+  "exact_revision_release_required": true,
+  "git": {
+    "commit": "c9110410b004936ed261c58064b9fdbad79ca67d",
+    "dirty": true,
+    "status_short": [
+      "?? docs/"
+    ]
+  },
+  "human_owned_actions": [
+    "commit the reviewed source",
+    "run final mode from the clean commit",
+    "inspect the exact-revision artifacts",
+    "push the reviewed commit",
+    "verify public revision availability"
+  ],
+  "release_mode": "review_candidate",
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24 with P27 release-candidate corrections",
+  "status": "blocked_pending_p24_repairs"
+}

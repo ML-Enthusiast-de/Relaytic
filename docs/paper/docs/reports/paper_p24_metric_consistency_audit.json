@@ -1,0 +1,172 @@
+{
+  "checks": [
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "display_present": true,
+      "expected": 0.568725,
+      "field": "validation_selected_competitive_model.validation_pr_auc",
+      "metric": "PaySim validation PR-AUC",
+      "passed": false,
+      "reader_display": "0.5687",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "display_present": false,
+      "expected": 0.638773,
+      "field": "validation_selected_competitive_model.test_pr_auc",
+      "metric": "PaySim test PR-AUC",
+      "passed": false,
+      "reader_display": "0.6388",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "display_present": false,
+      "expected": 0.968282,
+      "field": "validation_selected_competitive_model.test_roc_auc",
+      "metric": "PaySim test ROC-AUC",
+      "passed": false,
+      "reader_display": "0.9683",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "display_present": false,
+      "expected": 0.703336,
+      "field": "validation_selected_competitive_model.test_operating_point.precision_at_k",
+      "metric": "PaySim precision",
+      "passed": false,
+      "reader_display": "0.7033",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "display_present": false,
+      "expected": 0.471584,
+      "field": "validation_selected_competitive_model.test_operating_point.recall_at_review_budget",
+      "metric": "PaySim recall",
+      "passed": false,
+      "reader_display": "0.4716",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paysim_competitive_benchmark_manifest.json",
+      "display_present": true,
+      "expected": 0.008974,
+      "field": "validation_selected_competitive_model.test_operating_point.review_fraction",
+      "metric": "PaySim realized queue",
+      "passed": false,
+      "reader_display": "0.8974%",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paper_graph_feature_table.json",
+      "display_present": true,
+      "expected": 0.976654,
+      "field": "validation_selected_competitive_baseline.validation_pr_auc",
+      "metric": "Elliptic validation PR-AUC",
+      "passed": false,
+      "reader_display": "0.9767",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paper_graph_feature_table.json",
+      "display_present": false,
+      "expected": 0.668756,
+      "field": "validation_selected_competitive_baseline.test_pr_auc",
+      "metric": "Elliptic test PR-AUC",
+      "passed": false,
+      "reader_display": "0.6688",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paper_graph_feature_table.json",
+      "display_present": false,
+      "expected": 1.0,
+      "field": "validation_selected_competitive_baseline.test_operating_point.precision_at_k",
+      "metric": "Elliptic precision",
+      "passed": false,
+      "reader_display": "1.0000",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paper_graph_feature_table.json",
+      "display_present": false,
+      "expected": 0.056604,
+      "field": "validation_selected_competitive_baseline.test_operating_point.recall_at_review_budget",
+      "metric": "Elliptic recall",
+      "passed": false,
+      "reader_display": "0.0566",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paper_graph_feature_table.json",
+      "display_present": true,
+      "expected": 0.003219,
+      "field": "validation_selected_competitive_baseline.test_operating_point.review_fraction",
+      "metric": "Elliptic realized queue",
+      "passed": false,
+      "reader_display": "0.3219%",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/elliptic2_repeated_seed_scorecard.json",
+      "display_present": false,
+      "expected": 0.94324,
+      "field": "official_partition.test_pr_auc_mean",
+      "metric": "Elliptic2 repeated PR-AUC",
+      "passed": false,
+      "reader_display": "0.9432",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/elliptic2_repeated_seed_scorecard.json",
+      "display_present": false,
+      "expected": 0.000882,
+      "field": "official_partition.test_pr_auc_std",
+      "metric": "Elliptic2 repeated std",
+      "passed": false,
+      "reader_display": "0.0009",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/elliptic2_repeated_seed_scorecard.json",
+      "display_present": false,
+      "expected": 0.929669,
+      "field": "robustness_partition.test_pr_auc_mean",
+      "metric": "Elliptic2 hash robustness",
+      "passed": false,
+      "reader_display": "0.9297",
+      "source_matches": false
+    },
+    {
+      "actual": null,
+      "artifact_ref": "docs/reports/paper_metric_cell_audit.json",
+      "display_present": false,
+      "expected": 0.974,
+      "field": "cell:elliptic2_p8b_modern_context.published_reference_pr_auc",
+      "metric": "RevClassifyDS reference",
+      "passed": false,
+      "reader_display": "0.9740",
+      "source_matches": false
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "fail"
+}

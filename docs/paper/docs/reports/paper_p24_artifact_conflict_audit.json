@@ -1,0 +1,25 @@
+{
+  "conflicts": [
+    {
+      "authoritative_current_core": {
+        "positives": 2763,
+        "subgraphs": 121810
+      },
+      "authoritative_evaluable_cohort": {
+        "positives": 2578,
+        "rows": 110902
+      },
+      "passed": true,
+      "resolution": "report both populations. Benchmark metrics apply only to the pinned RevTrack-evaluable cohort.",
+      "topic": "Elliptic2 cohort"
+    },
+    {
+      "passed": true,
+      "resolution": "describe the repeated RevTrack TST estimate as confirmatory, with prior test exposure disclosed",
+      "topic": "Elliptic2 test exposure"
+    }
+  ],
+  "schema_version": "relaytic.paper_release_integrity.v1",
+  "slice": "Paper Track P24",
+  "status": "pass"
+}
