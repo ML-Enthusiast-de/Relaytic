@@ -184,7 +184,7 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
         for key, url in VERIFIED_CITATIONS.items()
     ]
     author_repairs = {
-        "gaurav2025governanceaas": "Gaurav, Suyash and Heikkonen, Jukka and Chaudhary, Jatin",
+        "gaurav2025governanceaas": "Pervez, Helen and Gaurav, Suyash and Heikkonen, Jukka and Chaudhary, Jatin",
         "kaptein2026runtimegovernance": "Kaptein, Maurits and Khan, Vassilis-Javed and Podstavnychy, Andriy",
         "naik2026llmopsaml": "Naik, Prathamesh Vasudeo and Dintakurthi, Naresh and Wang, Yue",
     }

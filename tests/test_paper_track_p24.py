@@ -32,6 +32,14 @@ def test_p24_integrity_pack_passes_authoritative_evidence_checks() -> None:
     assert pack["paper_p24_metric_consistency_audit"]["status"] == "pass"
     assert pack["paper_p24_split_consistency_audit"]["status"] == "pass"
     assert pack["paper_p24_semantic_source_audit"]["status"] == "pass"
+    bibliography_checks = pack["paper_p24_bibliography_verification"]["corrected_author_checks"]
+    governance_check = next(
+        row for row in bibliography_checks if row["citation_key"] == "gaurav2025governanceaas"
+    )
+    assert governance_check["expected_author_field"] == (
+        "Pervez, Helen and Gaurav, Suyash and Heikkonen, Jukka and Chaudhary, Jatin"
+    )
+    assert governance_check["passed"] is True
 
 
 def test_p24_reader_surfaces_disclose_protocol_and_statistical_boundaries() -> None:

@@ -62,6 +62,19 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Elliptic is a different evidence contract" in draft
     assert "That is a useful operating result" not in draft
     assert "@yang2026skillopt" in draft
+    assert (
+        "Skill- and tool-using agents expand the set of actions such systems can perform "
+        "[@yang2026skillopt]. This broadens the governance surface."
+        in draft
+    )
+    assert (
+        "including Extra Trees and XGBoost candidates "
+        "[@geurts2006extratrees; @chen2016xgboost]"
+        in draft
+    )
+    assert "Platt sigmoid calibration [@platt1999probabilistic]" in draft
+    assert "fixed test partition [@geurts2006extratrees" not in draft
+    assert "The selected configuration uses LightGBM [@ke2017lightgbm] with seed 42." in draft
     assert "evaluation, governance, and reproducibility architecture" in draft
     assert "RQ1" in draft and "RQ4" in draft
     assert "### Specialist Roles and State" in draft
@@ -107,6 +120,10 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "@misc{chen2026transxion" in references
     assert "@article{deprez2025continualaml" in references
     assert "@misc{yang2026skillopt" in references
+    assert (
+        "author = {Pervez, Helen and Gaurav, Suyash and Heikkonen, Jukka and Chaudhary, Jatin},"
+        in references
+    )
     assert any(item["citation_key"] == "song2024revtrack" for item in manifest["source_verification"])
     assert any(
         check["check_id"] == "p19b_hosted_score_case_study_passed" and check["passed"]
