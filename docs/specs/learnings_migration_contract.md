@@ -2,7 +2,8 @@
 
 ## Purpose
 
-This document freezes how the already-shipped Slice 12C learnings surfaces should evolve into the governed learnings model defined for Slice 12D and later slices.
+This document records how the Slice 12C learnings surfaces evolved into the
+governed learnings model implemented by Slice 12D.
 
 The goal is to preserve continuity without preserving ambiguity.
 
@@ -12,9 +13,9 @@ The goal is to preserve continuity without preserving ambiguity.
 - `lab_memory/learnings.md`
 - `lab_learnings_snapshot.json`
 
-## Future governed-learnings expectations
+## Governed-learnings contract
 
-Later learnings should become:
+Governed learnings are:
 
 - typed
 - confidence-bearing
@@ -31,7 +32,7 @@ This document defines how to get there without breaking current surfaces.
 
 ## Migration rule
 
-After Slice 12D lands:
+Current migration state:
 
 - `learnings_state.json` remains public
 - `learnings.md` remains public
@@ -45,7 +46,7 @@ But:
 
 ## Required additive fields
 
-Future `learnings_state.json` entries should add, at minimum:
+`learnings_state.json` entries include, at minimum:
 
 - `source_type`
 - `scope`
@@ -74,9 +75,9 @@ Recommended conservative defaults:
 
 ## Reset compatibility
 
-Current reset behavior should continue to work, but future resets should become more explicit.
+Reset behavior remains compatible and exposes explicit reset scope.
 
-Later implementation should preserve support for:
+The implementation preserves support for:
 
 - `relaytic learnings reset`
 - `relaytic_reset_learnings`

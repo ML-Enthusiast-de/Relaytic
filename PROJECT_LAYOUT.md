@@ -7,11 +7,13 @@ This document describes the current repository structure and ownership boundarie
 Public-facing docs:
 
 1. `README.md`
-2. `ARCHITECTURE.md`
-3. `INTEROPERABILITY.md`
-4. `RUNTIME.md`
-5. `OPEN_SOURCE_STACK.md`
-6. `SECURITY.md`
+2. `docs/README.md`
+3. `ARCHITECTURE.md`
+4. `INTEROPERABILITY.md`
+5. `RUNTIME.md`
+6. `OPEN_SOURCE_STACK.md`
+7. `SECURITY.md`
+8. `docs/paper/README.md`
 
 Implementation control docs:
 

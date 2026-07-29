@@ -1,8 +1,10 @@
 # Relaytic Runtime
 
-Relaytic now has a local lab runtime that acts as the shared control plane for CLI, MCP, and later UI work.
+Relaytic has a local runtime that acts as the shared control plane for CLI,
+MCP, mission control, supervision, and background work.
 
-The runtime is local-first, append-only where it matters, and designed to make specialist behavior inspectable rather than mystical.
+The runtime is local-first, append-only where ordering matters, and designed to
+make specialist behavior inspectable.
 
 ## What It Owns
 
@@ -12,6 +14,10 @@ The runtime is local-first, append-only where it matters, and designed to make s
 - specialist capability profiles
 - data-access audit
 - context-influence tracking
+- permission and approval decisions
+- resumable background-job state
+- workspace and result-contract projections
+- supervision handoff and freshness state
 
 Canonical runtime artifacts:
 
@@ -21,11 +27,18 @@ Canonical runtime artifacts:
 - `capability_profiles.json`
 - `data_access_audit.json`
 - `context_influence_report.json`
+- `permission_mode.json`
+- `permission_decision_log.jsonl`
+- `background_job_state.json`
+- `workspace_state.json`
+- `result_contract.json`
 
 ## Safety Model
 
 - local-first by default
 - no remote daemon required
+- background execution is bounded and explicit
+- approval-requiring work cannot silently cross permission modes
 - read-only hooks by default
 - write hooks blocked unless policy explicitly enables them
 - semantic work rowless by default
@@ -47,6 +60,14 @@ relaytic runtime events --run-dir artifacts/run_example --limit 12
 relaytic runtime events --run-dir artifacts/run_example --limit 12 --format json
 ```
 
+Inspect permission and background state:
+
+```bash
+relaytic permissions show --run-dir artifacts/run_example --format json
+relaytic daemon show --run-dir artifacts/run_example --format json
+relaytic remote show --run-dir artifacts/run_example --format json
+```
+
 `relaytic show` also surfaces a compact runtime summary so humans and agents do not need to read the raw event log first.
 
 ## What Humans Get
@@ -56,6 +77,8 @@ relaytic runtime events --run-dir artifacts/run_example --limit 12 --format json
 - visible denied-access counts
 - visible hook behavior
 - explicit specialist-capability inventory on disk
+- visible permission, approval, and resumable-job posture
+- one current workspace result and next-run plan
 
 ## What Agents Get
 
@@ -63,6 +86,7 @@ relaytic runtime events --run-dir artifacts/run_example --limit 12 --format json
 - stable runtime JSON artifacts
 - the same runtime state from CLI and MCP
 - a deterministic fallback path when hooks are absent or blocked
+- rowless workspace and handoff contracts for safe continuation
 
 ## Design Rule
 

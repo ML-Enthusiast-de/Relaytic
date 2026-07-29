@@ -312,7 +312,7 @@ def _render_paper_draft(
         [
             f"# {title}",
             "",
-            "Source-draft status: generated evidence draft used by the release pipeline. For reader-facing review, use `docs/paper/relaytic_aml_arxiv_draft.md`.",
+            "Historical pipeline status: generated Paper Track P11 evidence draft retained for deterministic release-pipeline input. Its stage-local blockers record the P11 state and may have been resolved by later stages. Paper Track P0-P27 is implemented. For reader-facing review, use `docs/paper/relaytic_aml_arxiv_draft.md`.",
             "",
             "## Abstract",
             "",

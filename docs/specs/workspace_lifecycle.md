@@ -2,7 +2,8 @@
 
 ## Purpose
 
-This document defines how Relaytic should treat a workspace once Slice 12D lands.
+This document defines how Relaytic treats a workspace. Slice 12D implemented
+the canonical lifecycle described here.
 
 The goal is to stop relying on implied continuity from directory structure, chat history, or operator memory. A workspace is the canonical continuity unit for multi-run investigations.
 
@@ -27,7 +28,7 @@ Compatibility and migration for already-shipped handoff and learnings surfaces a
 
 ## Canonical objects
 
-Slice 12D should introduce these canonical workspace artifacts:
+Relaytic writes these canonical workspace artifacts:
 
 - `workspace_state.json`
 - `workspace_lineage.json`
@@ -186,7 +187,7 @@ Relaytic must not silently convert any of those into a full destructive reset.
 
 ## Compatibility rules
 
-When Slice 12D lands:
+Current compatibility rules:
 
 - `relaytic handoff show` remains public
 - `relaytic handoff focus` remains public

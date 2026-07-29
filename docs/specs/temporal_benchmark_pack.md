@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the future time-aware benchmark pack for Relaytic.
+This document defines Relaytic's time-aware benchmark pack.
 
 It exists because Relaytic already has:
 
@@ -12,22 +12,19 @@ It exists because Relaytic already has:
 - sensor diagnostics
 - time-aware investigation logic
 
-But it does not yet have:
+The remaining gap is:
 
-- a dedicated temporal benchmark suite
-- a paper-grade temporal evaluation story
 - a serious sequence-model comparison path
 
 ## Current honest status
 
-Relaytic has **time-aware architecture hooks**, but not yet a **time-aware benchmark program**.
+Relaytic has a shipped timestamp-aware benchmark and evaluation path through
+Slices 15J and 15W. It includes event-preserving splits, lagged baselines,
+temporal fold-health checks, delayed-label posture, threshold drift, and
+time-window scorecards.
 
-That means:
-
-- we did not lose temporal support completely
-- we did deprioritize it in the benchmark and competitiveness story
-
-This pack fixes that.
+Sequence-native model competition remains a shadow or future extension until
+it can beat strong lagged tabular baselines under the same contract.
 
 ## Benchmark doctrine
 
@@ -35,7 +32,7 @@ Temporal evaluation should happen in two tiers.
 
 ### Tier 1. Timestamped tabular temporal benchmarks
 
-These are the first datasets Relaytic should support because they match the current product shape best:
+These datasets match the current product shape:
 
 - tabular rows
 - explicit timestamp or ordered structure
@@ -44,7 +41,8 @@ These are the first datasets Relaytic should support because they match the curr
 
 ### Tier 2. Sequence-native benchmarks
 
-These should come later, once Relaytic has real LSTM, TCN, or temporal-transformer candidate families.
+These remain later work until Relaytic has production-quality LSTM, TCN, or
+temporal-transformer candidate families.
 
 These datasets are still valuable, but they should not be forced into the current lagged-tabular route family before the model registry is ready.
 
@@ -156,7 +154,7 @@ Relaytic should not assume:
 
 - `time column` -> `LSTM`
 
-## Required future artifacts
+## Canonical and planned artifacts
 
 - `temporal_benchmark_manifest.json`
 - `temporal_route_comparison.json`
@@ -165,7 +163,7 @@ Relaytic should not assume:
 - `sequence_shadow_scorecard.json`
 - `temporal_generalization_report.json`
 
-## Required future proof
+## Proof requirements
 
 The temporal track is only credible if Relaytic can prove:
 
@@ -177,7 +175,7 @@ The temporal track is only credible if Relaytic can prove:
 
 ## Relationship to the model-competitiveness track
 
-This temporal benchmark pack should be consumed by:
+This temporal benchmark pack is consumed by:
 
 - Slice 15B for temporal architecture routing
 - Slice 15C for temporal HPO depth and stop logic

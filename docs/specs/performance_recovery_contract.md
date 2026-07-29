@@ -2,24 +2,27 @@
 
 ## Purpose
 
-This document freezes the post-Slice-15F performance recovery and paper-competitiveness track that must land before Relaytic starts the AML pivot and then the academy work.
+This document records the performance-recovery and paper-competitiveness
+contract implemented by Slices 15G through 15M before the AML product track.
 
-It exists because the initial model-competitiveness track improved semantics, routing breadth, HPO structure, benchmark surfaces, artifact reuse, and research-imported shadow trials, but it did not yet produce the level of raw modeling strength and paper-safe benchmark truth that Relaytic needs.
+The contract was introduced because the initial model-competitiveness track
+improved semantics, routing breadth, search structure, benchmark surfaces,
+artifact reuse, and imported-candidate shadow trials without yet providing
+strong enough model competition and benchmark-truth controls.
 
 ## Why this track exists
 
-Recent benchmark comparison work exposed a clear pattern:
+The benchmark comparison at the start of the track exposed a clear pattern:
 
 - architecture diversity improved
 - task semantics improved
 - raw performance gains were mixed rather than decisive
-- multiclass performance is still not good enough
-- temporal benchmarks are not yet paper-safe
+- multiclass family competition was too narrow
+- temporal benchmarks were not paper-safe
 - protocol/security eval drift can still invalidate paper claims
 
-That means the next work must not be "more surface area" or "more autonomy."
-
-It must be a direct attack on the modeling ceiling.
+The resulting work focused on the modeling and evaluation ceiling rather than
+adding unrelated surface area.
 
 ## Core thesis
 
@@ -43,7 +46,7 @@ If Relaytic skips any of those and simply adds more loops or more imported model
 This track must not:
 
 - start the broader academy or generic capability-evolution work
-- add more agent theater without stronger model outcomes
+- add agent roles without stronger model outcomes or clearer responsibility
 - make optional adapters mandatory
 - promote sequence models because timestamps exist
 - let benchmark wins silently become deployment approval
@@ -145,7 +148,9 @@ Relaytic must also be able to prove that:
 - family selection does not branch on benchmark dataset identity
 - threshold or calibration logic does not branch on benchmark dataset identity
 
-If a slice makes Relaytic better only on the currently visible benchmark pack and cannot show the same architectural reason on holdout or non-benchmark runs, that is benchmark optimization theater, not real progress.
+If a slice improves only the visible benchmark pack and cannot show the same
+architectural effect on holdout or non-benchmark runs, it is benchmark-specific
+optimization rather than a general product improvement.
 
 ## Required invariants
 
@@ -180,7 +185,7 @@ If a slice makes Relaytic better only on the currently visible benchmark pack an
 - benchmark tables must separate competitiveness from deployment posture
 - paper-safe claims must be emitted only through an explicit gate artifact
 
-## Required future artifacts
+## Canonical artifacts
 
 - `optimization_objective_contract.json`
 - `objective_alignment_report.json`
@@ -235,7 +240,8 @@ This recovery track is only complete if Relaytic can prove all of the following:
 
 ## Relationship to the AML and academy tracks
 
-The AML pivot and the academy track must stay after this recovery track.
+The AML product track followed this recovery work. The capability-academy
+track remains later.
 
 Reason:
 

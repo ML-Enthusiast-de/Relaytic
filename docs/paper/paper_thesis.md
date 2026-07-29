@@ -1,5 +1,7 @@
 # Relaytic-AML: Claim-Gated Evaluation Environments for Temporal Graph Financial-Crime ML
 
+Historical pipeline status: this document records the Paper Track P2 thesis freeze. Paper Track P0-P27 is now implemented. Use `relaytic_aml_arxiv_draft.md` for the current manuscript.
+
 ## Thesis
 
 Relaytic-AML is a local-first, claim-gated evaluation environment for financial-crime ML. Its paper claim is not that a single model wins a leaderboard, but that AML evaluation becomes more credible when model metrics, temporal correctness, graph provenance, analyst-review utility, reproducibility, and public-claim boundaries are evaluated together.
@@ -56,6 +58,6 @@ Can Relaytic-AML make temporal graph financial-crime evaluation more reproducibl
 - The paper must not claim hard AML superiority without numeric holdout evidence and passing gates.
 - The paper must not treat synthetic, proxy, flattened, raw-graph, and subgraph evidence as interchangeable.
 
-## Next Slice
+## Next Slice At The P2 Freeze
 
 Paper Track P3 must freeze dataset registry, access posture, split posture, hashes, and blocked reasons before any benchmark runner is treated as paper evidence.

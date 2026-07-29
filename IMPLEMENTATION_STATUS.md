@@ -2,7 +2,29 @@
 
 This document tracks the operational state of the repository. It is an implementation control file, not product marketing copy.
 
-## Current Baseline
+## Current Status
+
+- Product slices `00` through `15Z-R` are implemented.
+- Paper Track `P0` through `P27` is implemented.
+- Relaytic remains the general local-first inference system. Relaytic-AML is
+  its flagship financial-crime evaluation and governance application.
+- The paper source, vector figures, evidence pack, and release-integrity
+  checks are generated and validated. Publishing an exact public revision and
+  submitting it to arXiv are human release actions.
+- Slice `16A`, capability registry and capability cards, is the next planned
+  product slice.
+- The public package and CLI are both `relaytic`.
+- The repository documentation is classified into reader guidance, current
+  contracts, historical slice records, and generated evidence. Shipped
+  workspace specifications use current-tense contracts, public architecture
+  documentation covers the Relaytic-AML and release layers, and automated
+  checks reject career-oriented public framing.
+
+## Detailed Implementation Ledger
+
+The following ledger preserves the accumulated implementation record. Slice
+specifications under `docs/build_slices/` provide the detailed acceptance
+history.
 
 - completed slices: 00 through 15Z-R, plus Slice 10A decision-lab world modeling, method compilation, and data-acquisition reasoning, Slice 10B explicit quality-budget-profile contracts, Slice 10C behavioral control contracts with skeptical steering and causal intervention memory, Slice 11E role-specific handbook onboarding, Slice 11F demo-grade onboarding plus stuck recovery, Slice 11G adaptive human onboarding with lightweight local semantic guidance, Slice 12B first-class tracing, deterministic claim adjudication, protocol conformance, and runtime security evaluation, Slice 12C differentiated result handoff plus durable learnings, Slice 12D workspace-first continuity plus result contracts and iteration planning, Slice 13 search-controller depth, bounded HPO, explicit value-of-search decisions, and execution-strategy reporting, Slice 13A release safety, build attestation, and packaging discipline, Slice 13B event bus, runtime hooks, and visible permission modes, Slice 13C bounded daemon, resumable jobs, stale-job reporting, approval-aware background execution, and memory maintenance, Slice 14 real-world feasibility, domain constraints, action boundaries, and auditability reasoning, Slice 14A remote supervision, approvals, and supervision handoff, Slice 15 mission-control expansion, demo packs, release-health posture, and human-factors proof, Slice 15A canonical task contracts, rare-event taxonomy cleanup, benchmark-vs-deploy separation, and temporal benchmark scaffolding, Slice 15B adaptive architecture routing, widened trainable family support, and canonical architecture artifacts, Slice 15C budgeted HPO, early stopping, warm-start reuse, threshold tuning, and deeper portfolio loops, Slice 15D paper-grade benchmark harness, rerun variance reporting, ablation matrices, temporal benchmark posture, explicit benchmark claim boundaries, Slice 15E execution DAG, freshness contracts, runtime recompute planning, and artifact reuse, Slice 15F research-imported architecture candidates, governed shadow trials, candidate quarantine, and promotion-readiness reporting, Slice 15G objective contracts, split correctness, metric-materialization auditing, temporal fold-health gating, and benchmark-truth prechecks, Slice 15H first-class competitive family stack, adapter readiness/version reporting, categorical strategy selection, and family eligibility/probe artifacts, Slice 15I staged portfolio search, budget-profile separation, finalist planning, pruning reasons, and explicit search stop doctrine, Slice 15J temporal engine, event-preserving time-series evaluation, richer lagged feature ladders, honest temporal baselines, and sequence-shadow scorecards, Slice 15K calibration strategy selection, operating-point contracts, threshold-search artifacts, review-budget optimization, abstention posture, decision-quality explanations, Slice 15L benchmark truth hardening, trace-identity conformance, eval-surface parity, leakage audits, paper-claim gates, Slice 15M competitive specialization, adapter-activation reporting, temporal benchmark recovery, dev-vs-holdout claim partitioning, benchmark-generalization guards, Slice 15N AML domain contracts, case ontology, review-budget posture, AML claim-scope reporting, Slice 15O deterministic entity graphs, typology detection, suspicious-subgraph scoring, entity-case expansion, Slice 15P analyst-review queue policy, review-budget ranking, case packets, review-capacity sensitivity, Slice 15Q stream-risk posture, weak-label posture, delayed-outcome alignment, drift-triggered recalibration signals, rolling alert-quality reporting, Slice 15R-A AML proof-pack alignment across PaySim-style and flattened Elliptic-style workloads, benchmark CLI/show, run summary, assist, mission control, and public-claim gates, Slice 15S flagship AML review-queue demo packaging with one-command fixture creation, demo bundle artifacts, artifact-index integrity, and mission-control AML investigation board visibility, Slice 15T AML business-value metrics with analyst-hour savings, false-positive reduction, review-capacity metrics, incumbent tradeoffs, and an operational metric guard, Slice 15U strong AML baselines, capability ablations, adapter fallback reporting, contribution reporting, and benchmark relevance scorecards, Slice 15V raw graph and subgraph ingestion with graph-loader provenance, subgraph task manifests, graph claim scope, and public graph benchmark cataloging, Slice 15V-A no-lost guide, status fallback, optional local-LLM guide phrasing, and redacted external context-pack export, Slice 15W AML temporal weak-label upgrade with delayed-label evaluation, positive-unlabeled posture, threshold-drift reporting, time-window scorecards, and temporal benchmark claim gates, Slice 15X AML evaluation-environment reframe with model/environment score separation, workflow task matrices, benchmark-environment scorecards, unsafe-steering evidence, and failure reports, Slice 15Y demo-first documentation with AML story docs, proof paths, handbooks, and paper benchmark runbook, Slice 15Z pre-Academy repo credibility cleanup with module-split evidence, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt, and Slice 15Z-R paper/release freeze with relevant benchmark catalog, claim-boundary report, reproducibility attestation, release attention pack, and hard-performance-claim blocking
 - completed paper-track slices: Paper Track P0 baseline freeze through Paper Track P27 canonical artifact identity and release-integrity checks
@@ -83,20 +105,33 @@ This document tracks the operational state of the repository. It is an implement
 - latest paper-final-guardrail pass: aligned the paper-track regression tests with the cleaner systems-paper wording, reran the P13-P15 paper tests, verified the rebuilt PDF metadata/fonts/LaTeX log/public-wording scans, and visually checked Figure 1 in the canonical PDF.
 - latest paper-strengthening slice: Stage 8 implemented Paper Track P22 author-review layout hardening, regenerated the strengthened Markdown/LaTeX/PDF package, verified source/public-marker checks, LaTeX log, font embedding, PDF metadata, synchronized review PDF output, focused paper regression tests, rendered-page checks, and kept arXiv upload blocked on human page review and a clean public immutable revision.
 - latest paper-hosted-score slice: Stage 4B implemented Paper Track P19-B external score case-study and paper integration, consuming the P19-A rowless hosted-score proof into a compact case study, paper panel, claim map, and reproduction card while preserving all hard/headline detector-claim blockers.
-- latest paper-quality review: added `docs/reports/paper_cto_quality_gap_review.md`, comparing Relaytic-AML against recent visible arXiv agent-evaluation and AML graph/detector papers from an AML ML CTO perspective. Verdict: credible independent systems/evaluation paper now, strengthened by P19-A/P19-B hosted score-workflow governance evidence, P20 narrative/guidance polish, P21 source/PDF preflight, and P22 author-review layout hardening.
+- latest paper-quality review: added a senior technical quality review comparing Relaytic-AML with adjacent agent-evaluation and AML graph/detector work. The review led to the P19-A/P19-B hosted score-workflow evidence, P20 narrative and guidance polish, P21 source/PDF preflight, and P22 layout hardening.
 - latest paper-thesis slice: P2, claim-gated AML evaluation-environment thesis, research questions, contributions, metric doctrine, blocked-claim taxonomy, and related-work seed
 - latest paper-dataset slice: P3, deterministic dataset source/access registry, local file hash checks, split contracts, blocked reasons, and no-auto-download policy
 - latest paper-surface cleanup slice: P1, `paper_public_surface_hygiene_report.json`, `legacy_compatibility_retention_report.json`, `paper_repo_cleanup_scorecard.json`, and modern Relaytic aliases for legacy API/tool names
 - latest MVP hardening pass: bootstrap wrappers, repo-local interpreter delegation, explicit unsafe-incumbent trust gating, broader human-chaos coverage, and a prepared paper-grade benchmark/eval pack
-- next paper action: commit and push the reviewed P26 source, run `paper-release-integrity --final`, inspect the exact-revision PDF and source bundle, and perform the arXiv upload action. Supply `--release-tag <tag>` only for a tag verified on the public remote.
+- next paper action: publish the reviewed P27 revision, run
+  `paper-release-integrity --final` from that clean public commit, inspect the
+  exact-revision PDF and source bundle, and complete the human arXiv upload.
+  Supply `--release-tag <tag>` only for a tag verified on the public remote.
 - next planned academy follow-on: 16A, capability registry and capability cards, after the paper release decision
 - final planned cleanup follow-on after Slice 17: 18, endgame consolidation, legacy removal, and repo-quality hardening
 - current public package: `relaytic`
 - current public CLI: `relaytic`
-- canonical future product-contract pack written under `docs/specs/` for workspace lifecycle, result contracts, governed learnings, mission-control behavior, compatibility migration, testing/proof burden, and flagship demos
-- canonical future model-competitiveness contract written under `docs/specs/model_competitiveness_contract.md` for task semantics, architecture routing, HPO budgets, benchmark mode, and shadow-tested imported model families
-- canonical future performance-recovery contract written under `docs/specs/performance_recovery_contract.md` for objective alignment, serious search budgets, temporal competitiveness, calibration/decision optimization, and paper-claim truth gates
-- canonical future temporal benchmark contract written under `docs/specs/temporal_benchmark_pack.md` for timestamped tabular datasets, sequence-native later expansion, and temporal shadow-trial proof
+- current product-contract pack under `docs/specs/` covers workspace lifecycle,
+  result contracts, governed learnings, mission-control behavior,
+  compatibility migration, testing obligations, and flagship demos
+- current model-competitiveness contract under
+  `docs/specs/model_competitiveness_contract.md` covers task semantics,
+  architecture routing, search budgets, benchmark mode, and shadow-tested
+  imported model families
+- current performance-recovery contract under
+  `docs/specs/performance_recovery_contract.md` covers objective alignment,
+  search budgets, temporal competitiveness, calibration, decision
+  optimization, and paper-claim gates
+- current temporal benchmark contract under
+  `docs/specs/temporal_benchmark_pack.md` covers timestamped tabular datasets,
+  sequence-native expansion, and temporal shadow-trial evidence
 
 ## Operational Capabilities
 
@@ -218,21 +253,25 @@ The most important not-yet-implemented shifts after the current baseline are:
 
 - deeper event-bus and permission-mode adoption so later feasibility, remote supervision, and mission-control slices consume the shipped canonical runtime substrate instead of reconstructing state ad hoc
 - richer daemon orchestration that goes beyond the shipped Slice 13C background continuity layer into remote supervision, tighter feasibility coupling, and deeper long-horizon campaign control
-- a stronger governed-learnings upgrade that migrates the shipped workspace learnings into typed, confidence-bearing, reaffirmable, invalidatable, and optionally expirable records instead of mostly durable snapshots plus markdown guidance
+- broader governed-learning adoption across planners and lifecycle surfaces,
+  building on the shipped typed, confidence-bearing, invalidatable, resettable,
+  and expirable records
 - a stronger workspace and iteration layer that becomes permission-aware, daemon-aware, and remote-supervision-aware rather than only run-to-run aware
 - richer remote transports, notification delivery, and supervision freshness logic on top of the shipped Slice 14A remote-supervision layer
 - richer long-term memory with retention, compaction, pinning, and replay rules so durable lessons survive beyond analog similarity
 - stronger dynamic controller logic that decides who should act next, how deep to branch, and when review is worth it under explicit contracts
 - stronger search/HPO/controller logic that goes beyond the shipped Slice 13 bounded search controller into deeper portfolio ecology, better stop-search proofs, and tighter daemon/resume integration
-- a second pre-academy performance-recovery track that fixes objective drift, strengthens first-class family coverage, enforces serious search-budget doctrine, makes temporal modeling genuinely competitive, improves calibration/decision quality, and turns benchmark truth into an explicit paper-claim gate before generic capability evolution begins
+- capability-registry and replay work that builds on the completed
+  pre-Academy performance-recovery track
 - broader protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth as the surface area grows
-- deeper packaging, release, and long-session regression packs that test the product the way a real frontier operator runtime is used rather than only as a fast CLI
+- deeper packaging, release, and long-session regression packs that exercise
+  realistic operator workflows rather than only fast CLI paths
 - broader flagship demo packs and harder scorecards so Relaytic can be judged by repeatable proof scenarios instead of ad hoc walkthroughs
 - broader human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy across more datasets and host paths
 - later academy-aware mission-control surfaces that explain capability promotion, shadow trials, hunt campaigns, and roster changes to both humans and external agents
-- a completed pre-Academy AML productization and paper-freeze track through Slice 15Z-R, with hard performance claims still blocked until a true paper/holdout benchmark row is frozen
-- the completed Paper Track P0 through P26, including P24/P25 release integrity and P26 evidence/gate separation, validation-subsplit, finalist-consistency, and immutable-revision closure
-- a Slice 16A+ capability-academy track with capability registries, replay and shadow trials, arena promotion scorecards, hunt campaigns, seeded exploration, provider feedback, and non-core specialist recruitment or retirement after the Paper Track completes or explicitly blocks release
+- a Slice 16A+ capability-academy track with capability registries, replay and
+  shadow trials, promotion scorecards, hunt campaigns, seeded exploration,
+  provider feedback, and governed non-core specialist lifecycle
 - a later optional representation engine for large unlabeled local corpora, streams, and entity histories, with JEPA-style latent predictive learning as one candidate backend family after the academy track
 
 ## Implemented Slices
@@ -581,7 +620,7 @@ The repository is not yet at the final product state. The main remaining gaps ar
 
 ## Immediate Next Work
 
-With Slice 15Z-R and Paper Track P0-P27 now landed, the next high-leverage frontier follow-ons are:
+With Slice 15Z-R and Paper Track P0-P27 landed, the next planned product work is:
 
 - Slice 16A capability registry and capability cards, with final arXiv upload treated as a human release action rather than another implementation slice
 

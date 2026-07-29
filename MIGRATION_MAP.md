@@ -266,7 +266,9 @@ Avoid introducing new references to:
 - introduced `src/relaytic/release_safety/repo_credibility.py` for deterministic pre-Academy repo credibility reports
 - introduced repo-level report artifacts under `docs/reports/`: `pre_academy_repo_audit.json`, `module_extraction_plan.json`, `public_surface_inventory.json`, `module_split_report.json`, and `benchmark_surface_cleanup_report.json`
 - preserved the public `relaytic aml environment` command while documenting retained oversized modules and the next extraction boundaries
-- future Slice 15Z-R paper-freeze work should consume the public-surface inventory and benchmark cleanup debt report rather than rediscovering repo credibility risks from scratch
+- Slice 15Z-R paper-freeze work consumed the public-surface inventory and
+  benchmark cleanup debt report rather than rediscovering repository risks
+  from scratch
 
 ### Slice 15Z-R
 

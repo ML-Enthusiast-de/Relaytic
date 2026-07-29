@@ -1,9 +1,0 @@
-{
-  "confidence_interval_decision": "not_reported",
-  "paper_disclosure_present": true,
-  "prediction_level_candidates": [],
-  "reason": "No committed prediction-level PaySim or Elliptic labels-and-scores artifact supports a predeclared bootstrap.",
-  "schema_version": "relaytic.paper_release_integrity.v1",
-  "slice": "Paper Track P24",
-  "status": "pass"
-}

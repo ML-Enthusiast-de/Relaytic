@@ -473,7 +473,7 @@ def _build_public_claims_allowed(
         _check(
             "public_wording_lint_passed",
             lint["status"] == "pass",
-            "Draft, attention pack, and README wording must not contain unguarded blocked claims.",
+            "Draft, public communication pack, and README wording must not contain unguarded blocked claims.",
             source_artifact="docs/reports/paper_public_claims_allowed.json",
             detail={"violation_count": len(lint["violations"])},
         ),
@@ -2714,7 +2714,7 @@ def _render_attention_pack(
     ell_pr = _format_metric(_metric_value(metrics, "elliptic_p7_selected_graph_feature_baseline.test_pr_auc"))
     return "\n".join(
         [
-            "# Relaytic-AML Paper Attention Pack",
+            "# Relaytic-AML Public Communication Pack",
             "",
             "Use this wording for public posts until a later benchmark gate unlocks stronger claims.",
             "",

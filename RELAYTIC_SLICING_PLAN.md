@@ -276,13 +276,13 @@ Stable slice numbering stays the same, but the preferred execution order after S
 71. Paper Track P10 - reproducible paper table generator
 72. Paper Track P11 - paper draft and figure pack
 73. Paper Track P12 - external dry run and clean-clone proof
-74. Paper Track P13 - claim-safe paper release and attention pack
+74. Paper Track P13 - claim-safe paper release and public communication pack
 74A. Paper Track P14 - final arXiv source bundle and clean release candidate
 74B. Paper Track P15 - measured system-evaluation proof pack
 74C. Paper Track P16 - failure-case evaluation pack
 74D. Paper Track P17 - governance machinery ablation pack
 74E. Paper Track P18 - governance invariants and adjacent-systems positioning
-74F. Paper Track P19 - CTO/arXiv quality gate and hosted detector workflow demonstration, if selected
+74F. Paper Track P19 - senior technical quality review and hosted detector workflow demonstration, if selected
 74F-A. Paper Track P19-A - external score-file adapter proof pack, if selected
 74F-B. Paper Track P19-B - external score case-study and paper integration, if selected
 74G. Paper Track P20 - PaySim selection-story cleanup and paper visual/narrative polish
@@ -361,7 +361,10 @@ Why:
 - Slice 15Y is now implemented and makes first contact demo-led with an AML thesis page, product story, paper benchmark runbook, README proof path, and handbook demo commands
 - Slice 15Z is now implemented and adds module-split evidence, deterministic repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before the paper freeze
 - Slice 15Z-R is now implemented and freezes relevant benchmark/release evidence into a rerunnable pack with claim boundaries, reproducibility attestation, and hard-performance-claim blocking until real paper evidence exists
-- Paper Track P0 through P26 are implemented before Academy work; P26 separates factual evidence cells from interpretive claim gates, documents validation sub-splits, corrects finalist-tie wording, and supports an immutable public-commit release when no verified tag exists.
+- Paper Track P0 through P27 is implemented before Academy work. P26
+  separates factual evidence cells from interpretive claim gates, documents
+  validation sub-splits, and supports immutable public-commit releases. P27
+  adds canonical artifact identity and final release-consistency checks.
 - Paper Track P22 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P22 preserves the evaluation-lab claim boundary, repairs final PDF/source layout roughness, marks the source/PDF bundle ready for author review, and keeps public upload blocked on human PDF review and a clean public immutable revision. P26 makes release tags optional and verifies them locally and remotely when supplied.
 - Paper Track P23 is implemented in `docs/build_slices/phase_paper_strengthening.md`: P23 makes the novelty lane explicit by distinguishing Relaytic-AML from detector papers, AML LLM triage, agentic SAR/compliance assistants, agent-governance layers, experiment tracking, model cards, datasheets, reproducibility checklists, and agent benchmarks. It preserves the claim that Relaytic-AML is a local-first AML evaluation-evidence governance layer around detectors and agents, not a detector replacement or generic MLOps tool.
 - Paper Track P24 is implemented in `docs/build_slices/phase_paper_release_integrity.md`: it provides factual and bibliographic correction, exact split/queue disclosure, Elliptic shift interpretation, Elliptic2 evidence-role precision, honest single-seed reporting, non-misleading Figure 4 design, semantic consistency checks, and an out-of-tree release command tied to one clean Git revision.
@@ -387,8 +390,10 @@ Why:
 
 ## Current execution state
 
-- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0 through P26. P26 closes factual evidence/gate separation, validation-subsplit disclosure, finalist-story consistency, and immutable public-revision release identity.
-- next execution target: human review, clean public commit, and P26 exact-revision final build; then Slice 16A if the paper release decision is complete
+- implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0
+  through P27
+- next release action: human review, clean public commit, exact-revision final
+  build, and arXiv submission. Slice 16A follows the paper release decision.
 - latest pulse slice: Slice 12A
 - latest trace-and-safety follow-on: Slice 12B
 - latest handoff-and-learnings follow-on: Slice 12D
@@ -1269,7 +1274,8 @@ Minimum proof:
 
 Innovation hook:
 
-- this is the slice that turns Relaytic from a steerable lab into a skeptical collaborator that can be directed without becoming compliant theater
+- this slice makes steering explicit and reviewable without reducing control
+  decisions to automatic compliance
 
 ## Slice 10A - Decision lab, method compiler, and data-acquisition reasoning
 
@@ -1923,7 +1929,7 @@ First implementation moves:
 3. Add innovation-watch gathering over research memory, benchmark gaps, and redacted external method retrieval.
 4. Add challenge watchlists for stale champions, unclosed benchmark gaps, and untested incumbent beat-targets.
 5. Add memory-maintenance and queue-refresh actions as the first bounded pulse actions.
-6. Add skip-report and throttle logic so pulse avoids busy-loop theater.
+6. Add skip-report and throttle logic so pulse avoids unproductive busy loops.
 
 Minimum proof:
 
@@ -4216,10 +4222,11 @@ P12 added:
 
 P12 proves the external paper-smoke path without overclaiming full benchmark reruns. The dry-run pack documents a clean-clone checklist, verifies the install contract, optionally runs a temp isolated full-profile install probe, regenerates the P10 table pack and P11 draft pack, records release-safety leak-scan status, and writes a deterministic release go/no-go decision. P13 is unblocked only in claim-safe evaluation-environment mode; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard business-value claims remain blocked.
 
-### Paper Track P13 - arXiv release and attention pack
+### Paper Track P13 - arXiv release and public communication pack
 
 Goal:
-- prepare the claim-safe paper, benchmark pack, tag plan, and public attention materials only after gates pass
+- prepare the claim-safe paper, benchmark pack, tag plan, and public
+  communication materials only after gates pass
 
 Load-bearing improvement:
 - Relaytic converts technical benchmark proof into a credible public artifact without overclaiming
@@ -4231,7 +4238,8 @@ Agent surface:
 - external agents can verify release tag plan, paper version, benchmark artifacts, and allowed public wording
 
 Intelligence source:
-- final paper table, dry-run report, claim lint, release-safety scan, and attention-pack manifest
+- final paper table, dry-run report, claim lint, release-safety scan, and
+  public-communication manifest
 
 Fallback rule:
 - if gates fail, P13 becomes a release-blocker report and schedules the next repair slice instead of publishing
@@ -4419,7 +4427,7 @@ Proof obligation:
 Fallback rule:
 - if an invariant is aspirational rather than checked, move it to future work instead of presenting it as current behavior
 
-## Paper Track P19 - CTO/arXiv quality gate and hosted detector workflow demonstration
+## Paper Track P19 - Senior Technical Quality Review And Hosted Detector Workflow Demonstration
 
 Goal:
 - demonstrate that Relaytic-AML can host and govern stronger detector workflows without claiming detector novelty or superiority
@@ -4457,7 +4465,8 @@ Goal:
 - implement the preferred P19 route by proving Relaytic-AML can host a detector-output score artifact while preserving rowless local-first governance and claim gates
 
 Load-bearing improvement:
-- gives CTO and reviewer readers concrete evidence that Relaytic can wrap a realistic detector workflow without claiming model novelty
+- gives senior technical reviewers concrete evidence that Relaytic can wrap a
+  realistic detector workflow without claiming model novelty
 
 Human surface:
 - a compact paper-safe summary or table with artifact type, schema hash, metric policy, redaction posture, claim state, and blocked stronger claims
@@ -4594,7 +4603,11 @@ Goal:
 - preserve the cautious claim that Relaytic-AML is a local-first AML evaluation-evidence governance layer around detectors and agents, not a detector replacement
 
 Load-bearing improvement:
-- a skeptical AML ML CTO or AI systems reviewer should understand that the paper is not claiming "better detector" or "MLflow plus agents"; it claims an artifact-backed governance substrate for local AML experimentation, rowless external-agent handoff, and public claim admissibility
+- a skeptical AML or AI-systems reviewer should understand that the paper is
+  not claiming a better detector or generic experiment tracking with agents.
+  It claims an artifact-backed governance substrate for local AML
+  experimentation, rowless external-agent handoff, and public claim
+  admissibility.
 
 Human surface:
 - a short "what is new" paragraph/table in the manuscript that tells a reader what Relaytic-AML is, what it is not, and why a company would use it around existing detectors and agent-assisted workflows
@@ -5161,7 +5174,8 @@ Required outputs:
 Required behavior:
 
 - remove or rename misleading top-level structures that no longer represent the real architecture
-- split oversized `agents.py` or similarly overloaded modules when the split improves clarity without inventing new abstraction theater
+- split oversized `agents.py` or similarly overloaded modules when the split
+  improves ownership and clarity without adding unnecessary abstractions
 - eliminate stale prototype or compatibility language from public docs, CLI help, and host bundles unless the history is intentionally documented
 - remove dead code, duplicate helpers, and thin wrappers that no longer carry real product value
 - preserve working public surfaces intentionally; no cleanup rewrite is allowed to silently break supported CLI, artifact, or integration contracts

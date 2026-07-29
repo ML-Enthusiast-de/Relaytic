@@ -2,7 +2,9 @@
 
 ## Purpose
 
-This document freezes how the already-shipped Slice 12C handoff surfaces should evolve once Slice 12D introduces canonical result contracts and workspace-backed continuity.
+This document records how the Slice 12C handoff surfaces were retained when
+Slice 12D introduced canonical result contracts and workspace-backed
+continuity.
 
 The goal is to preserve compatibility while making later product behavior much more explicit.
 
@@ -16,7 +18,7 @@ The goal is to preserve compatibility while making later product behavior much m
 
 These are already shipped and should not be treated as disposable prototypes.
 
-## Future canonical Slice 12D artifacts
+## Canonical Slice 12D artifacts
 
 - `result_contract.json`
 - `confidence_posture.json`
@@ -26,7 +28,7 @@ These are already shipped and should not be treated as disposable prototypes.
 
 ## Migration rule
 
-After Slice 12D lands:
+Current migration state:
 
 - `result_contract.json` becomes the canonical machine-stable post-run truth
 - the Slice 12C handoff artifacts remain public compatibility surfaces
@@ -36,7 +38,7 @@ After Slice 12D lands:
 
 ### `run_handoff.json`
 
-Future role:
+Current role:
 
 - compatibility-preserving summary artifact
 
@@ -49,7 +51,7 @@ Expected source mapping:
 
 ### `next_run_options.json`
 
-Future role:
+Current role:
 
 - compatibility-preserving option view
 
@@ -61,7 +63,7 @@ Expected source mapping:
 
 ### `next_run_focus.json`
 
-Future role:
+Current role:
 
 - compatibility-preserving record of selected continuation focus
 
@@ -72,7 +74,7 @@ Expected source mapping:
 
 ### `reports/user_result_report.md`
 
-Future role:
+Current role:
 
 - human-optimized rendering of the current result contract
 
@@ -86,7 +88,7 @@ Must emphasize:
 
 ### `reports/agent_result_report.md`
 
-Future role:
+Current role:
 
 - agent-optimized rendering of the current result contract
 
@@ -100,7 +102,7 @@ Must emphasize:
 
 ## Compatibility promises
 
-When Slice 12D lands:
+Current compatibility promises:
 
 - existing commands must keep working
 - existing MCP surfaces must keep working

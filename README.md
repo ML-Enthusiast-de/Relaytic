@@ -92,7 +92,7 @@ More context:
 - [Why Relaytic-AML](docs/why_relaytic_aml.md)
 - [Product Story](docs/product_story.md)
 - [Paper Benchmark Runbook](docs/paper_benchmark_runbook.md)
-- [UI Frontier Review](docs/relaytic_ui_frontier_review.md)
+- [Historical UI Design Review](docs/relaytic_ui_frontier_review.md)
 
 ## Relaytic-AML Paper
 
@@ -176,10 +176,12 @@ Hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, and hard
 
 ## Current Product Baseline
 
-The repository already supports a working early product baseline. Treat the list below as a capability inventory for reviewers and contributors, not as a paper claim ladder or proof of deployment readiness:
+The repository supports the following product baseline. Treat this as a
+capability inventory for users and contributors, not as a paper claim ladder
+or proof of production deployment:
 
 - installable `relaytic` package and CLI
-- one-shot `relaytic run` orchestration for a first usable MVP surface
+- one-shot `relaytic run` orchestration for the primary governed workflow
 - resolved policy writing and manifest creation
 - mandate and context foundation artifacts
 - free-form intake translation from human or external-agent input
@@ -264,7 +266,8 @@ The normative product-contract pack that now governs the shipped workspace layer
 - richer remote transports, notification freshness, and connector-aware supervision flows on top of the shipped remote-supervision surface
 - academy-aware operating surfaces that turn the shipped canonical trace and scorecards into polished replay, promotion, and change-attribution experiences
 - broader protocol-conformance harnesses that prove CLI, MCP, mission control, and later richer UI shells stay aligned on the same run truth as the surface area grows
-- packaging, release, and long-session regression packs that test the product the way a real frontier operator runtime gets used rather than only as a fast CLI
+- packaging, release, and long-session regression packs that exercise
+  realistic operator workflows rather than only fast CLI paths
 - flagship demo packs with explicit scorecards so Relaytic can be judged by repeatable proof cases rather than ad hoc walkthroughs
 - human-supervision and onboarding-success evaluation so first-time operators can be shown to succeed without repo literacy
 - deeper academy and remote-operating surfaces that build on the shipped Slice 15 control-center foundation to show capability growth, supervision history, and change attribution to humans and external agents
@@ -368,11 +371,16 @@ The current wired surfaces are:
 
 The current adoption policy is documented in `OPEN_SOURCE_STACK.md`.
 
-## Frontier Models
+## Optional External Models
 
-Relaytic still keeps frontier models in the plan, but only as optional policy-gated amplifiers.
+Relaytic supports policy-gated external models as optional reasoning
+amplifiers.
 
-The default product path remains local-first and deterministic. Frontier or external high-end models may be used later for bounded reasoning, semantic interpretation, challenger design, synthesis, or route expansion when policy explicitly allows them. They are not the baseline dependency and they do not replace Relaytic's own artifact, policy, or judgment layers.
+The default product path remains local-first and deterministic. External models
+may support bounded reasoning, semantic interpretation, challenger design,
+synthesis, or route expansion when policy explicitly allows them. They are not
+a baseline dependency and do not replace Relaytic's artifact, policy, or
+judgment layers.
 
 ## Quick Start
 
@@ -497,15 +505,19 @@ See `INTEROPERABILITY.md` for the transport model, safety rules, and verificatio
 
 ## Example Workflow
 
-The primary MVP surface is now a single end-to-end run command:
+The primary workflow starts with one end-to-end run command:
 
 ```bash
 relaytic run --data-path path/to/data.csv --text "Do everything on your own. Predict off-spec batches early. Do not use post-inspection columns. Laptop CPU only."
 ```
 
-That command now carries the run through intake, investigation, cross-run memory retrieval, planning, execution, challenger pressure, ablation checks, semantic debate, audit, privacy-safe research retrieval, benchmark comparison, completion, lifecycle review, bounded autonomous follow-up, and summary materialization.
+That command carries the run through intake, investigation, cross-run memory
+retrieval, planning, execution, challenger pressure, ablation checks, semantic
+debate, audit, privacy-safe research retrieval, benchmark comparison,
+completion, lifecycle review, bounded autonomous follow-up, and summary
+materialization.
 
-The current one-run lab surface also includes explicit decision review:
+The run surface also includes explicit decision review:
 
 ```bash
 relaytic decision review --run-dir path/to/existing_run
@@ -615,6 +627,10 @@ That flow produces:
 - a human-readable `reports/summary.md`
 
 ## Documentation Map
+
+Start with [`docs/README.md`](docs/README.md) for the distinction between
+reader documentation, current engineering contracts, historical build records,
+and generated evidence.
 
 Public-facing technical docs:
 

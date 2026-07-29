@@ -181,7 +181,10 @@ These files are required and must stay current:
 - `docs/paper_benchmark_runbook.md`
 - `docs/relaytic_ui_frontier_review.md`
 
-The `docs/specs/` files are normative product-contract documents for future slices. If a later slice changes workspace continuity, result rendering, learnings behavior, mission-control flow, testing burden, or flagship demo expectations, those docs must be updated in the same change.
+The `docs/specs/` files are normative product-contract documents for shipped
+and planned behavior. If a later slice changes workspace continuity, result
+rendering, learnings behavior, mission-control flow, testing burden, or
+flagship demo expectations, those docs must be updated in the same change.
 
 ## Artifact Contract
 
@@ -667,7 +670,7 @@ Current paper-track release artifact names from Paper Track P13:
 - `docs/paper/tables/table_2_claim_gate_matrix.md`
 - `docs/paper/tables/table_3_release_artifact_set.md`
 
-Paper Track P13 extends `src/relaytic/release_safety/` with a deterministic paper-release generator. It consumes the P10-P12 gated artifact set, renders the final claim-safe arXiv Markdown draft, writes citable references and generated tables, lints public wording against blocked-claim rules, assembles the attention pack and arXiv checklist, and records a release tag plan. P13 does not create or push git tags automatically. It allows only claim-safe evaluation-environment public wording; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked.
+Paper Track P13 extends `src/relaytic/release_safety/` with a deterministic paper-release generator. It consumes the P10-P12 gated artifact set, renders the final claim-safe arXiv Markdown draft, writes citable references and generated tables, lints public wording against blocked-claim rules, assembles the public communication pack and arXiv checklist, and records a release tag plan. P13 does not create or push git tags automatically. It allows only claim-safe evaluation-environment public wording; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked.
 
 Current paper-track arXiv source artifact names from Paper Track P14:
 
@@ -681,7 +684,7 @@ Current paper-track arXiv source artifact names from Paper Track P14:
 - `docs/paper/arxiv_src/figures/figure_3_review_budget.pdf`
 - `docs/paper/arxiv_src/figures/figure_4_publishability_matrix.pdf`
 
-Paper Track P14 extends `src/relaytic/release_safety/` with a deterministic arXiv source-bundle generator. It consumes the P13 claim-safe paper pack, renders a top-level LaTeX source file, copies the bibliography, converts the generated SVG figure pack into PDF figures for the selected pdfLaTeX processor, audits citation resolution and figure references, scans the generated package for local paths, secrets, stale prototype wording, and unguarded hard claims, and records a release-candidate checklist. P14 keeps `arxiv_upload_ready` false until author metadata, local TeX/PDF inspection, and clean immutable-revision proof are completed.
+Paper Track P14 extends `src/relaytic/release_safety/` with a deterministic arXiv source-bundle generator. It consumes the P13 claim-safe paper pack, renders a top-level LaTeX source file, copies the bibliography, converts the generated SVG figure pack to PDF figures for the selected pdfLaTeX processor, audits citation resolution and figure references, scans the package for local paths, secrets, stale prototype wording, and unguarded hard claims, and records a release-candidate checklist. The original P14 gate kept `arxiv_upload_ready` false until author metadata, local TeX/PDF inspection, and clean immutable-revision proof were completed. Paper Tracks P21-P27 now enforce the current source, PDF, metadata, and exact-revision release checks.
 
 Current paper-track hosted-score artifact names from Paper Track P19-A/P19-B:
 

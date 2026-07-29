@@ -2,9 +2,15 @@
 
 Date: 2026-05-07
 
+Status: historical design review. The AML investigation board, demo flow,
+mission-control artifacts, and guidance surfaces described below have since
+landed. A richer live browser server and several interactive views remain
+planned. Use `IMPLEMENTATION_STATUS.md` for current status.
+
 ## Verdict
 
-Relaytic already has a serious control surface, but it is not yet the UI the product deserves.
+At the time of review, Relaytic had a useful artifact-backed control surface,
+but the operator experience was still incomplete.
 
 The current UI is artifact-rich and honest. It writes mission-control JSON artifacts plus a static local HTML report, and it exposes terminal chat for onboarding and guidance. That is a credible MVP control plane.
 
@@ -402,7 +408,7 @@ A dedicated screen that says:
 
 This is unusual and valuable.
 
-### 5. Shadow Candidate Theater With Teeth
+### 5. Shadow Candidate Review
 
 Show shadow-only models and tools as non-authoritative:
 

@@ -213,7 +213,7 @@ def render_claude_agent_markdown() -> str:
     """Render the Claude agent guidance for Relaytic."""
     return """---
 name: relaytic
-description: Use Relaytic when a task involves structured data triage, dataset investigation, model routing, lifecycle review, or prediction from an existing Relaytic run.
+description: Use Relaytic for local-first structured-data and AML investigation, model routing, governed workspace review, continuation, and inference.
 ---
 
 # Relaytic
@@ -234,7 +234,9 @@ Use Relaytic for local-first structured-data modeling, review, and inference.
 
 - End-to-end: `relaytic run --data-path <data.csv> --text "Do everything on your own. Predict <target>."`
 - Inspect: `relaytic show --run-dir <run_dir>`
+- Guidance: `relaytic guide --run-dir <run_dir> --format json`
 - Status: `relaytic status --run-dir <run_dir>`
+- Workspace: `relaytic workspace show --run-dir <run_dir> --format json`
 - Predict: `relaytic predict --run-dir <run_dir> --data-path <new_data.csv>`
 - Lifecycle: `relaytic lifecycle show --run-dir <run_dir>`
 
@@ -242,6 +244,8 @@ Use Relaytic for local-first structured-data modeling, review, and inference.
 
 - Do not invent targets or forbidden columns when the dataset or artifacts can answer the question.
 - Prefer Relaytic's structured artifacts over narrative summaries when handing results to other tools or agents.
+- Treat `workspace_state.json`, `result_contract.json`, and
+  `next_run_plan.json` as canonical continuity contracts.
 - Keep secrets out of prompts, saved notes, and exported configs.
 - For remote MCP exposure, require trusted HTTPS/auth infrastructure instead of exposing a local development server directly.
 """
@@ -277,8 +281,14 @@ Relaytic is the local inference-engineering system in this workspace.
 ## Core commands
 
 - `relaytic run --data-path <data.csv> --text "<intent>"`
+- `relaytic guide --format json`
+- `relaytic guide --run-dir <run_dir> --format json`
+- `relaytic guide ask --run-dir <run_dir> --message "<question>" --format json`
+- `relaytic guide export-context --run-dir <run_dir> --audience external-llm --format json`
 - `relaytic show --run-dir <run_dir> --format json`
 - `relaytic status --run-dir <run_dir> --format json`
+- `relaytic aml temporal --run-dir <run_dir> --format json`
+- `relaytic aml environment --run-dir <run_dir> --format json`
 - `relaytic assist show --run-dir <run_dir> --format json`
 - `relaytic assist turn --run-dir <run_dir> --message "<message>" --format json`
 - `relaytic predict --run-dir <run_dir> --data-path <new_data.csv> --format json`
@@ -288,7 +298,13 @@ Relaytic is the local inference-engineering system in this workspace.
 
 - Keep Relaytic local-first by default.
 - Do not expose `/mcp` publicly without trusted HTTPS and auth controls.
-- Treat `run_summary.json`, `completion_decision.json`, and lifecycle artifacts as the machine-facing source of truth.
+- Treat `workspace_state.json`, `result_contract.json`, and
+  `next_run_plan.json` as the canonical continuity and post-run contracts.
+  `run_summary.json`, handoff reports, mission control, and lifecycle reports
+  are reader-specific views over the same local artifact state.
+- Use `relaytic guide` first when the user or agent is unsure where the run is,
+  which artifact matters, what action is safe, or what context can be handed
+  to another LLM.
 - Use the assist surface when a human or external agent needs explanations, stage navigation, or safe takeover rather than inventing ad hoc chat behavior.
 """
 
@@ -297,19 +313,22 @@ def render_openclaw_skill_markdown() -> str:
     """Render the OpenClaw skill guidance for Relaytic."""
     return """---
 name: relaytic
-description: Structured-data investigation, modeling, evidence review, lifecycle decisions, and prediction through Relaytic.
+description: Local-first structured-data investigation, AML evaluation, modeling, evidence review, lifecycle decisions, and prediction through Relaytic.
 ---
 
 # Relaytic
 
-Use Relaytic when the task involves structured datasets, model generation, or reviewing an existing Relaytic run.
+Use Relaytic when the task involves structured datasets, AML evaluation, model
+generation, or review and continuation of an existing Relaytic workspace.
 
 ## Default workflow
 
 1. Run `relaytic run --data-path <data.csv> --text "<intent>"`.
 2. Inspect with `relaytic show --run-dir <run_dir>`.
-3. Use `relaytic status --run-dir <run_dir>` for the governed state.
-4. Use `relaytic predict --run-dir <run_dir> --data-path <new_data.csv>` for inference.
+3. Use `relaytic guide --run-dir <run_dir> --format json` when the next action
+   or relevant artifact is unclear.
+4. Use `relaytic status --run-dir <run_dir>` for the governed state.
+5. Use `relaytic predict --run-dir <run_dir> --data-path <new_data.csv>` for inference.
 
 ## Read First
 
@@ -319,6 +338,8 @@ Use Relaytic when the task involves structured datasets, model generation, or re
 
 - Relaytic is autonomous by default and will proceed with explicit assumptions when non-critical answers are missing.
 - Prefer Relaytic JSON outputs when passing results to other tools or agents.
+- Treat `workspace_state.json`, `result_contract.json`, and
+  `next_run_plan.json` as the canonical continuity and post-run contracts.
 - Keep remote exposure behind trusted HTTPS/auth layers when using the MCP server outside local development.
 """
 

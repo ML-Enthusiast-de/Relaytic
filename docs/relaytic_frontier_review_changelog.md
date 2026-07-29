@@ -2,19 +2,24 @@
 
 Date: 2026-05-06
 
-Status: Adopted into the master slicing plan, build master, status docs, architecture contract, migration map, and AML specs.
+Status: historical design review. Its recommendations were adopted into the
+master plan and implemented through Slice 15Z-R. Paper Track P0-P27 is also
+implemented. Use `IMPLEMENTATION_STATUS.md` for current status.
 
 ## Executive Verdict
 
 Relaytic is more interesting after the Relaytic-AML pivot than it was as a broad structured-data automation system.
 
-The strongest story is no longer "AutoML with agents." That story is crowded and not frontier enough. The stronger story is:
+The review recommended moving beyond a generic "AutoML with agents" framing:
 
 > Relaytic is an artifact-first evaluation and decision environment for high-stakes structured-data agents, instantiated as Relaytic-AML for fraud and financial-crime workflows where graph structure, temporal drift, weak labels, review budgets, and auditability matter.
 
-That can become a serious technical product. It is not there yet. The repo still reads partly like a very ambitious construction site: many slices, many surfaces, many artifacts, but not yet enough undeniable public proof that the system beats strong baselines or solves a hard production-shaped problem better than narrower tools.
+At the time of review, that direction was technically credible but the public
+proof path, benchmark evidence, and repository presentation were incomplete.
+The subsequent `15R-A` through `15Z-R` and `P0` through `P27` work addressed
+the documented release and paper gaps. The detector claim boundaries remain.
 
-## Current State
+## State At Review Time
 
 - The control docs say the repo is implemented through Slice 15Q and still points to Slice 15R as next.
 - The latest commit says "Added up to (but not finished) 15R."
@@ -22,11 +27,11 @@ That can become a serious technical product. It is not there yet. The repo still
 - The 15R slice doc still says `Planned`, and there is no obvious `tests/test_cli_slice15r.py`.
 - The working tree was clean during this review, so the state appears committed but strategically inconsistent: some 15R implementation exists, while roadmap/status docs and targeted tests lag behind.
 
-## Does The Vision Still Feel Frontier?
+## Technical Differentiation At Review Time
 
 Partially.
 
-Frontier-worthy parts:
+Promising parts:
 
 - local-first, artifact-first execution is a real differentiator for sensitive data
 - explicit traces, adjudication, protocol conformance, release-safety gates, and skeptical steering fit the frontier-evals mindset
@@ -34,7 +39,7 @@ Frontier-worthy parts:
 - the product has a credible agent-facing contract rather than only a human-readable report layer
 - the benchmark-truth and public-claim gates are exactly the right instinct
 
-Not yet frontier-worthy:
+Open issues at the time:
 
 - the repo still contains too much orchestration breadth relative to hard proof
 - the public narrative is too long and diffuse for first contact
@@ -69,9 +74,10 @@ The AML product is the concrete proving ground. The broader technical story is e
 4. Benchmark story can still look benchmark-shaped unless holdouts, ablations, and failure reports are aggressively separated.
 5. Current repo structure makes some mature claims feel less credible because core files are very large.
 6. The AML story is not yet production-shaped enough: it needs incumbent comparison, analyst-hour value, false-positive reduction, delayed labels, graph expansion, and drift recovery in one coherent walkthrough.
-7. The "academy" and later representation plans should stay parked until the AML proof path is undeniable.
+7. The capability-academy and representation plans should remain deferred
+   until the AML proof path is reproducible and release-ready.
 
-## Implementation Changelog To Execute Later
+## Recommended Implementation Changelog
 
 ### 15R-A. Finish The AML Proof Pack
 
@@ -179,9 +185,12 @@ The AML product is the concrete proving ground. The broader technical story is e
 
 Relaytic-AML should become the local-first eval and decision environment for financial-crime AI: it turns messy transaction data into traceable model choices, review-budget-aware alert queues, graph-backed case evidence, drift-aware recalibration decisions, and public-safe proof reports that a skeptical engineer can rerun.
 
-## External Signals Used
+## External Signals Consulted
 
-- OpenAI Frontier Evals & Environments career page: evaluation environments, self-improvement loops, red-teaming, scalable evaluation systems.
-- OpenAI Data Infrastructure career page: reliable, secure, efficient data access, streaming platforms, and ML feature engineering infrastructure.
-- Google DeepMind careers page: research engineers as ML-fluent software engineers who design, build, scale, test, and evaluate new ideas.
-- PayPal fraud analytics article: fraud work needs analytics, machine learning, real-time anomaly detection, scoring, reduced false declines, and layered continuous monitoring.
+- public descriptions of evaluation environments, red-team testing, scalable
+  evaluation systems, secure data infrastructure, and ML feature engineering
+- public financial-fraud engineering material covering anomaly detection,
+  scoring, false-decline control, and continuous monitoring
+
+These sources informed the dated product review. They are not evidence for the
+Relaytic-AML paper and are not part of the current related-work bibliography.

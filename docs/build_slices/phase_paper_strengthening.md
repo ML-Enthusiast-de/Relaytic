@@ -2,7 +2,7 @@
 
 ## Status
 
-Stage 9/9 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, P19-A produces the external score-file governance proof pack, P19-B turns that proof into a reader-facing hosted-score case study, P20 cleans the PaySim selection story plus reader-facing polish, P21 produces the final source/PDF preflight reports plus release changelog, P22 hardens author-review layout/readability over the final source/PDF bundle, and P23 hardens the paper's novelty and adjacent-systems distinction. The separate planned P24 release-integrity slice is defined in `phase_paper_release_integrity.md`; Slice 16A resumes after P24. Final tag creation and arXiv upload remain human actions.
+Stage 9/9 is implemented. P16 produces deterministic failure-case evidence, P17 produces deterministic governance-ablation evidence, P18 produces formal governance-invariant plus adjacent-systems positioning evidence, P19-A produces the external score-file governance proof pack, P19-B turns that proof into a reader-facing hosted-score case study, P20 cleans the PaySim selection story plus reader-facing polish, P21 produces the final source/PDF preflight reports plus release changelog, P22 hardens author-review layout/readability over the final source/PDF bundle, and P23 hardens the paper's novelty and adjacent-systems distinction. Subsequent release-integrity work through P27 is also implemented. Slice 16A is the next planned product stage. Final publication and arXiv upload remain human actions.
 
 ## Intent
 
@@ -24,7 +24,7 @@ Use these user-facing triggers to advance one bounded stage at a time:
 | `start Stage 1` | P16 | Failure-case evaluation pack |
 | `start Stage 2` | P17 | Governance machinery ablation pack |
 | `start Stage 3` | P18 | Governance invariants and adjacent-systems positioning |
-| `start Stage 4` | P19 | CTO/arXiv quality gate and hosted detector workflow demonstration, if selected |
+| `start Stage 4` | P19 | Senior technical quality review and hosted detector workflow demonstration, if selected |
 | `start Stage 4A` | P19-A | External score-file adapter proof pack, if selected |
 | `start Stage 4B` | P19-B | External score case-study and paper integration, if P19-A lands |
 | `start Stage 5` | P20 | PaySim selection-story cleanup and evaluation-narrative tightening |
@@ -46,8 +46,8 @@ Stage 4 requires a short decision before implementation: prefer an external-scor
 3. **Paper Track P18 - governance invariants and adjacent-systems positioning** - implemented
    Adds formal release/governance invariants and connects them to P16/P17 checks. Adds a compact related-work comparison against model cards, datasheets, reproducibility checklists, MLOps experiment tracking, agent benchmarks, and AML detector papers.
 
-4. **Paper Track P19 - CTO/arXiv quality gate and hosted detector workflow demonstration**
-   Use the CTO/arXiv quality review to choose whether to implement a hosted detector workflow. Preferred route: external score-file adapter. If feasible, demonstrate that Relaytic-AML can host a stronger detector workflow through an external score-file adapter, a lightweight graph-native fixture, or a RevClassifyDS-style external scorecard adapter. The claim is substrate hosting, evidence routing, redaction, and claim governance, not detector superiority.
+4. **Paper Track P19 - senior technical quality review and hosted detector workflow demonstration**
+   Use the senior technical review to choose whether to implement a hosted detector workflow. Preferred route: external score-file adapter. If feasible, demonstrate that Relaytic-AML can host a stronger detector workflow through an external score-file adapter, a lightweight graph-native fixture, or a RevClassifyDS-style external scorecard adapter. The claim is substrate hosting, evidence routing, redaction, and claim governance, not detector superiority.
 
 5. **Paper Track P19-A - external score-file adapter proof pack** - implemented
    Implements the preferred P19 route. Ingests a rowless external detector-score artifact with schema, hash, dataset, split, metric, leakage, and claim-state metadata; emits evidence cells, a score manifest, a publishability gate, a handoff redaction report, a route decision, and a paper-safe summary. The claim remains hosted detector-output governance, not detector superiority.
@@ -92,7 +92,7 @@ P16 through P23 introduce committed, machine-readable reports under `docs/report
 - interrupted-run recovery report
 - governance-invariant proof map
 - adjacent-systems positioning comparison
-- CTO/arXiv quality-gap review
+- senior technical quality-gap review
 - hosted detector or score-workflow route decision
 - `paper_external_score_route_decision.json`
 - `paper_external_score_schema.json`
@@ -153,7 +153,8 @@ Stage 3 is complete when:
 Stage 4 is complete when:
 
 1. `docs/reports/paper_cto_quality_gap_review.md` exists and compares Relaytic-AML against recent visible arXiv patterns in agent evaluation, ML research-agent reliability, and AML graph/detector papers.
-2. The review states whether the current paper is a good independent systems/evaluation paper and whether it meets a top visible arXiv / AML CTO bar.
+2. The review states whether the paper meets the evidentiary and technical bar
+   for an independent systems/evaluation paper.
 3. A route decision chooses one of: external score-file adapter, lightweight graph-native fixture, RevClassifyDS-style scorecard adapter, or skip P19 and move to P20.
 4. If a hosted detector workflow is implemented, every score artifact must carry hash, schema, dataset role, split role, metric policy, leakage posture, and allowed claim state.
 5. The generated paper may claim hosted detector-output governance only if the new artifact pack passes. It must not claim detector superiority, production AML readiness, graph-neural novelty, or RevClassifyDS parity.

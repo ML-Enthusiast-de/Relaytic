@@ -6,19 +6,20 @@ This handbook is the shortest safe path for an external agent or host wrapper th
 
 If you are a human operator, start with [relaytic_user_handbook.md](./relaytic_user_handbook.md).
 
-## Read In This Order
+## Read Before Operating
 
-1. `AGENTS.md`
-2. `RELAYTIC_VISION_MASTER.md`
-3. `RELAYTIC_BUILD_MASTER.md`
-4. `ARCHITECTURE_CONTRACT.md`
-5. `IMPLEMENTATION_STATUS.md`
-6. `MIGRATION_MAP.md`
-7. `RELAYTIC_SLICING_PLAN.md`
+1. `README.md` for installation and the primary workflows
+2. `ARCHITECTURE.md` for the system and agent-role model
+3. `docs/why_relaytic_aml.md` for the flagship AML path and claim boundaries
+
+The implementation-control documents are only required when changing Relaytic
+itself. Their order is defined in `AGENTS.md`.
 
 ## Core Operating Rule
 
-Treat Relaytic artifacts as the source of truth. Do not replace them with ad hoc prose when structured state already exists.
+Treat Relaytic artifacts as the source of truth. For continuity and post-run
+decisions, start with `workspace_state.json`, `result_contract.json`, and
+`next_run_plan.json`. Do not replace structured state with ad hoc prose.
 
 ## First Session Workflow
 
@@ -141,12 +142,13 @@ When the user knows little:
 
 When the user already has a run:
 
-1. read `run_summary.json`
-2. read the human-facing or agent-facing result handoff
-3. inspect durable learnings if the next step is ambiguous
-4. inspect mission control
-5. use assist for explanation or bounded rerun
-6. only then propose stronger changes
+1. read `result_contract.json`
+2. read `workspace_state.json` and `next_run_plan.json`
+3. read the agent-facing result handoff and `run_summary.json`
+4. inspect durable learnings if the next step is ambiguous
+5. inspect mission control
+6. use assist for explanation or bounded rerun
+7. only then propose stronger changes
 
 Use these commands:
 

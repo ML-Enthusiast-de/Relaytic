@@ -1,6 +1,7 @@
 # Slice 14 - Real-world feasibility, domain constraints, and action boundaries
 
-Status: shipped. Slice 14A is the next target.
+Historical status: shipped. Slice 14A was the next target when this
+specification was written and is now also implemented.
 
 ## Status
 

@@ -1,21 +1,24 @@
-# Relaytic Harness Baseline Contract
+# Relaytic Legacy Harness Contract
 
-This file captures the current pre-transformation harness baseline that still exists inside the repository while Relaytic is being built out.
+This file documents the early two-role harness that remains in the repository
+for compatibility and regression coverage. It is not the current Relaytic
+agent architecture.
 
-It is not the long-term architecture contract. For forward-looking implementation rules, use `ARCHITECTURE_CONTRACT.md`.
+For the current specialist, runtime, workspace, AML, and release contracts, use
+`ARCHITECTURE_CONTRACT.md` and `ARCHITECTURE.md`.
 
 ## Purpose
 
-The baseline harness remains useful for:
+The retained harness remains useful for:
 
 - deterministic CLI smoke checks
 - local LLM setup validation
-- compatibility during the package rename
-- regression coverage while larger Relaytic slices are implemented
+- compatibility across the completed package migration
+- regression coverage for early orchestration paths
 
-## Current Baseline Modules
+## Retained Modules
 
-The baseline harness currently lives under:
+The retained harness lives under:
 
 - `src/relaytic/orchestration/workflow.py`
 - `src/relaytic/orchestration/handoff_contract.py`
@@ -30,14 +33,14 @@ The baseline harness currently lives under:
 - `src/relaytic/orchestration/default_tools.py`
 - `src/relaytic/orchestration/harness_runner.py`
 
-Prompt assets currently live under:
+Retained prompt assets live under:
 
 - `src/relaytic/agents/prompts/analyst_system.txt`
 - `src/relaytic/agents/prompts/modeler_system.txt`
 
 ## Migration Rule
 
-This harness is transitional. It should be used to preserve repo coherence while Relaytic slices replace it with:
+The main Relaytic pipeline has replaced this harness with:
 
 - mandate-aware execution
 - context-aware planning
@@ -46,4 +49,6 @@ This harness is transitional. It should be used to preserve repo coherence while
 - completion judgment
 - lifecycle decisions
 
-Any new work that touches the baseline harness should keep the public surface branded as Relaytic and should update `MIGRATION_MAP.md` if a compatibility promise changes.
+New product behavior must not expand this legacy harness. Changes should be
+limited to compatibility, security, or regression maintenance and must update
+`MIGRATION_MAP.md` if a compatibility promise changes.

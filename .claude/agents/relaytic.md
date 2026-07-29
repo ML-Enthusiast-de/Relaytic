@@ -1,6 +1,6 @@
 ---
 name: relaytic
-description: Use Relaytic when a task involves structured data triage, dataset investigation, model routing, lifecycle review, or prediction from an existing Relaytic run.
+description: Use Relaytic for local-first structured-data and AML investigation, model routing, governed workspace review, continuation, and inference.
 ---
 
 # Relaytic
@@ -21,7 +21,9 @@ Use Relaytic for local-first structured-data modeling, review, and inference.
 
 - End-to-end: `relaytic run --data-path <data.csv> --text "Do everything on your own. Predict <target>."`
 - Inspect: `relaytic show --run-dir <run_dir>`
+- Guidance: `relaytic guide --run-dir <run_dir> --format json`
 - Status: `relaytic status --run-dir <run_dir>`
+- Workspace: `relaytic workspace show --run-dir <run_dir> --format json`
 - Predict: `relaytic predict --run-dir <run_dir> --data-path <new_data.csv>`
 - Lifecycle: `relaytic lifecycle show --run-dir <run_dir>`
 
@@ -29,5 +31,7 @@ Use Relaytic for local-first structured-data modeling, review, and inference.
 
 - Do not invent targets or forbidden columns when the dataset or artifacts can answer the question.
 - Prefer Relaytic's structured artifacts over narrative summaries when handing results to other tools or agents.
+- Treat `workspace_state.json`, `result_contract.json`, and
+  `next_run_plan.json` as canonical continuity contracts.
 - Keep secrets out of prompts, saved notes, and exported configs.
 - For remote MCP exposure, require trusted HTTPS/auth infrastructure instead of exposing a local development server directly.

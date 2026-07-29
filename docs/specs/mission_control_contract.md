@@ -2,11 +2,13 @@
 
 ## Purpose
 
-This document freezes the current mission-control contract shipped across Slices 11B through 11G so later slices can extend it without quietly redefining the operator experience.
+This document defines the mission-control contract established by Slices 11B
+through 11G and extended by Slice 15 and the Relaytic-AML product track.
 
 The goal is to make the already-coded mission-control layer a stable foundation rather than a moving target.
 
-For the current roadmap direction, that foundation should increasingly render **Relaytic-AML** work clearly for fraud and AML operators, not just generic experiment runners.
+The current surface renders **Relaytic-AML** work for fraud and AML operators
+while retaining the general structured-data workflow.
 
 ## Scope
 
@@ -16,7 +18,7 @@ This contract governs:
 - onboarding and launch artifacts
 - role-aware visibility expectations
 - current chat and guidance affordances
-- compatibility rules for later workspace and trace-native expansion
+- workspace, trace, approval, background-job, and AML investigation views
 
 This document complements, but does not replace:
 
@@ -41,6 +43,13 @@ The current mission-control contract should preserve these artifact families:
 - `stage_navigator.json`
 - `question_starters.json`
 - `onboarding_chat_session_state.json`
+- `branch_dag.json`
+- `confidence_map.json`
+- `trace_explorer_state.json`
+- `approval_timeline.json`
+- `background_job_view.json`
+- `release_health_report.json`
+- `aml_investigation_board.json`
 - `reports/mission_control.html`
 
 ## Core rule
@@ -136,7 +145,7 @@ Later slices, especially 12D and 15, must:
 - preserve the current artifacts unless an explicit migration contract says otherwise
 - treat `mission_control_state.json` as current truth even when richer workspace and trace-native surfaces are added
 
-Slice 15 may add:
+Slice 15 added:
 
 - branch DAG
 - confidence map
@@ -145,7 +154,7 @@ Slice 15 may add:
 
 But it must not break the operator legibility already established in Slices 11B through 11G.
 
-The AML pivot slices should further add:
+The AML product slices add:
 
 - review-budget posture
 - alert or casework queue visibility
@@ -156,13 +165,17 @@ without turning mission control into a domain-specific fork that loses the canon
 
 ## Adopted UI Direction
 
-The current mission-control implementation is a static local HTML report plus terminal chat and JSON-first artifacts.
+The guaranteed mission-control implementation is a static local HTML report
+plus terminal chat and JSON-first artifacts.
 
-That remains the fallback, but the next UI direction is defined in [relaytic_ui_frontier_review.md](../relaytic_ui_frontier_review.md):
+The dated [UI design review](../relaytic_ui_frontier_review.md) records the
+broader interaction direction. Current rules are:
 
 - keep static HTML as the guaranteed local-first fallback
-- add an AML investigation board for alert queues, case packets, typology evidence, drift posture, benchmark gates, and public-claim guards
-- add a separate agent console view for canonical artifacts, next commands, action affordances, MCP status, and blocked reasons
+- maintain the shipped AML investigation board for alert queues, case packets,
+  typology evidence, drift posture, benchmark gates, and public-claim guards
+- maintain agent-oriented views for canonical artifacts, next commands, action
+  affordances, MCP status, and blocked reasons
 - add live browser serving only after the information architecture is correct
 - expose belief deltas, "what would change my mind", review-budget simulation, public-claim firewall, and trace replay as product primitives
 

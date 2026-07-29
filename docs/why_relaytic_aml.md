@@ -54,14 +54,15 @@ The demo and AML run surfaces should point reviewers to these rowless artifacts:
 
 The public-safe demo is demo-only. It can show the workflow and artifact contract, but it does not prove paper-grade AML benchmark superiority.
 
-Paper-ready claims require the later release-freeze pack:
+The implemented release-freeze and paper evidence packs require:
 
-- named AML benchmark family coverage
-- reproducible command sequence
-- benchmark truth and leakage gates
+- named AML benchmark-family coverage
+- a reproducible command sequence
+- benchmark-truth and leakage gates
 - operational business-value guard
 - AML environment scorecard
 - public claim-boundary report
 - release-safety scan
 
-Until those agree, Relaytic-AML should make supporting claims only.
+Those gates agree for the current supporting claims. Publishing the reviewed
+commit and submitting its exact-revision bundle remain human release actions.

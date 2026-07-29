@@ -310,6 +310,9 @@ def render_paper_thesis_markdown(
     lines = [
         f"# {contract['paper_title']}",
         "",
+        "Historical pipeline status: this document records the Paper Track P2 thesis freeze. "
+        "Paper Track P0-P27 is now implemented. Use `relaytic_aml_arxiv_draft.md` for the current manuscript.",
+        "",
         "## Thesis",
         "",
         str(contract["thesis"]),
@@ -344,7 +347,7 @@ def render_paper_thesis_markdown(
             "- The paper must not claim hard AML superiority without numeric holdout evidence and passing gates.",
             "- The paper must not treat synthetic, proxy, flattened, raw-graph, and subgraph evidence as interchangeable.",
             "",
-            "## Next Slice",
+            "## Next Slice At The P2 Freeze",
             "",
             "Paper Track P3 must freeze dataset registry, access posture, split posture, hashes, and blocked reasons before any benchmark runner is treated as paper evidence.",
             "",

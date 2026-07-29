@@ -2,7 +2,8 @@
 
 ## Purpose
 
-This document defines the canonical machine-stable result contract that every serious Relaytic run should emit once Slice 12D lands.
+This document defines the canonical machine-stable result contract emitted by
+governed Relaytic runs. Slice 12D implemented this contract.
 
 Human and agent reports may render this contract differently, but they must not replace it as the authoritative post-run conclusion.
 
@@ -270,9 +271,8 @@ Neither rendering may introduce a belief or recommendation that is absent from `
 
 ## Backward compatibility
 
-Before Slice 12D lands, Relaytic may still rely on the current Slice 12C handoff surfaces.
-
-After Slice 12D lands:
+Slice 12D retained the Slice 12C handoff surfaces for compatibility while
+making the result contract authoritative:
 
 - `run_handoff.json` may remain as a convenience artifact
 - `result_contract.json` becomes the canonical post-run truth

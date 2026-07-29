@@ -3,7 +3,12 @@
 Place sensitive datasets in `data/private/`.
 Anything in `data/private/` is ignored by git and stays local.
 Do not put private data in other folders unless you also add ignore rules.
-Supported input formats include `.csv`, `.xlsx`, and `.xls`.
+Supported snapshot formats include `.csv`, `.tsv`, `.xlsx`, `.xls`,
+`.parquet`, `.pq`, `.feather`, `.json`, `.jsonl`, and `.ndjson`.
+
+Paper benchmark source files belong under `data/paper_benchmarks/` and remain
+local unless the corresponding dataset license permits redistribution. See
+`data/paper_benchmarks/README.md` for the exact expected layout.
 
 Public safe sample data can be stored in `data/public/`.
 `data/public/public_testbench_dataset_20k_minmax.csv` is anonymized:

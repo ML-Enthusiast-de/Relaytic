@@ -35,7 +35,7 @@ def test_paper_strengthening_track_records_stage_9_as_implemented() -> None:
     assert "Paper P23" in build
     assert "Stage 9/9 is implemented." in plan
     assert "P23 hardens the paper's novelty and adjacent-systems distinction" in plan
-    assert "separate planned P24 release-integrity slice" in plan
+    assert "release-integrity work through P27 is also implemented" in plan
     assert "Paper Track P24" in release_integrity
     assert "P19-A produces the external score-file governance proof pack" in plan
     assert "P19-B turns that proof into a reader-facing hosted-score case study" in plan
@@ -60,7 +60,8 @@ def test_paper_strengthening_track_records_stage_9_as_implemented() -> None:
     assert "latest paper-strengthening slice" in status
     assert "Paper Track P22 author-review layout hardening" in status
     assert "latest paper-integrity slice: P24 corrected factual" in status
-    assert "next recommended action: commit and push the reviewed P26 source candidate" in status
+    assert "Paper Track `P0` through `P27` is implemented." in status
+    assert "next paper action: publish the reviewed P27 revision" in status
     assert "latest paper-novelty-positioning slice" in status
 
 
@@ -108,7 +109,7 @@ def test_paper_strengthening_plan_preserves_evidence_first_scope() -> None:
 
     assert "No invented benchmark result" in plan
     assert "Stage work stops at the requested trigger" in plan
-    assert "CTO/arXiv quality gate" in plan
+    assert "senior technical quality review" in plan
     assert "paper_cto_quality_gap_review.md" in plan
     assert "external score-file adapter" in plan
     assert "paper-external-score-proof" in plan
@@ -136,7 +137,7 @@ def test_paper_strengthening_plan_preserves_evidence_first_scope() -> None:
     assert "not a detector replacement" in plan
 
 
-def test_paper_strengthening_plan_records_cto_quality_review() -> None:
+def test_paper_strengthening_plan_records_senior_quality_review() -> None:
     review = _read("docs/reports/paper_cto_quality_gap_review.md")
 
     for source_marker in (
@@ -150,8 +151,8 @@ def test_paper_strengthening_plan_records_cto_quality_review() -> None:
         assert source_marker in review
 
     assert "Good independent arXiv systems/evaluation paper: yes." in review
-    assert "Top visible arXiv paper" in review
-    assert "not yet" in review
+    assert "Senior Technical Quality Review" in review
+    assert "Comparable in scope to large benchmark or detector papers" in review
     assert "Hosted detector or score-stream demonstration" in review
     assert "Preferred route: external score-file adapter." in review
     assert "The paper should not try to compete" in review

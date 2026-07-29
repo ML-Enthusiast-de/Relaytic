@@ -4,6 +4,16 @@ Start with [`relaytic_aml_arxiv_draft.pdf`](relaytic_aml_arxiv_draft.pdf). The g
 
 Relaytic-AML is a systems and evaluation paper. Keeping the generator, bibliography, vector figures, and rowless evidence reports in the repository is therefore part of the reproducibility claim. Raw or licensed benchmark rows are not redistributed.
 
+## File Roles
+
+- `relaytic_aml_arxiv_draft.pdf`, `relaytic_aml_arxiv_draft.md`, and
+  `arxiv_src/` are the current reader-facing manuscript artifacts.
+- `paper_thesis.md` records the P2 thesis freeze.
+- `relaytic_aml_draft.md` records the P11 evidence-draft stage used by the
+  deterministic generation pipeline.
+- `../reports/` contains stage-scoped evidence. A report's local next-step or
+  blocked status does not override the current release manifests.
+
 ## Requirements
 
 - Python 3.10 or 3.11. The paper pipeline is tested with Python 3.11.

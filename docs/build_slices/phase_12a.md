@@ -77,7 +77,9 @@ This slice is successful only if Relaytic can:
 
 ## Proof Obligation
 
-- Relaytic must prove it can remain alive without becoming noisy theater, and that memory maintenance changes later behavior only through explicit, auditable artifacts
+- Relaytic must prove it can remain active without generating unproductive
+  noise, and that memory maintenance changes later behavior only through
+  explicit, auditable artifacts
 
 ## Acceptance Criteria
 

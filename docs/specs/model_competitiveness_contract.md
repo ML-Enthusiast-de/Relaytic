@@ -2,11 +2,13 @@
 
 ## Purpose
 
-This document freezes the product contract for the model-competitiveness track that follows Slice 15 and precedes the broader academy work.
+This document defines the model-competitiveness contract implemented across
+Slices 15A through 15M before the broader capability-academy work.
 
-The shipped Slice 15A through Slice 15F path established the first half of that track.
-
-The remaining performance-recovery and paper-competitiveness hardening work is now specified in [performance_recovery_contract.md](performance_recovery_contract.md). Slice 15G has landed as the objective/split/metric-truth foundation, and Slice 15H through Slice 15L should land before the academy begins.
+Slices 15A through 15F established task, routing, search, benchmark, reuse, and
+shadow-trial foundations. Slices 15G through 15M implemented the recovery and
+paper-competitiveness work specified in
+[performance_recovery_contract.md](performance_recovery_contract.md).
 
 Relaytic should remain:
 
@@ -170,7 +172,7 @@ That means:
 - `timestamp column` is not enough to justify LSTM or temporal-transformer routing
 - sequence families should become live candidates only after a temporal benchmark pack exists and the shadow-trial path is operational
 
-## Required future artifacts
+## Canonical artifacts
 
 - `task_profile_contract.json`
 - `target_semantics_report.json`

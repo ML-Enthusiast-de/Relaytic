@@ -76,7 +76,8 @@ relaytic interoperability export --host all --output-dir artifacts/interop_expor
 
 ## Tool surface
 
-The MCP server exposes Relaytic-owned tools over the current MVP and specialist phases, including:
+The MCP server exposes Relaytic-owned tools over the current run, workspace,
+guidance, specialist, AML, and lifecycle surfaces, including:
 
 - `relaytic_run`
 - `relaytic_show_run`

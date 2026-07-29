@@ -1,6 +1,8 @@
 # Relaytic-AML Paper Benchmark Runbook
 
-This runbook defines the public benchmark path reviewers should expect before Relaytic-AML makes paper-facing claims.
+This runbook defines the benchmark path behind Relaytic-AML paper evidence.
+Paper Track P0-P27 is implemented. Use `docs/paper/README.md` for the current
+manuscript regeneration and exact-revision release sequence.
 
 The current public-safe AML review-queue demo is demo-only. Slice 15Z-R now emits the release-freeze pack, and P9 emits the operational metric pack. Hard AML performance and business-value claims remain blocked until true paper/holdout evidence, complete operational assumptions, passing environment scorecards, passing claim gates, and clean release safety all exist.
 

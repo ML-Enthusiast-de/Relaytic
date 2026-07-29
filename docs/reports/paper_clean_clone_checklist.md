@@ -1,6 +1,6 @@
 # Paper P12 Clean-Clone Checklist
 
-Run these commands from a fresh clone before arXiv or public attention release.
+Run these commands from a fresh clone before arXiv or public release.
 
 ## Install
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document fixes the real-world benchmark doctrine for Relaytic-AML.
+This document defines the financial-crime benchmark doctrine for Relaytic-AML.
 
 Relaytic-AML should be judged on workloads that look like production financial-crime and payment-risk work, not only on generic tabular benchmarks.
 
@@ -12,9 +12,11 @@ Relaytic-AML is more credible when it can support the workload shapes that real 
 
 - PaySim-style temporal transaction fraud
 - Elliptic-style temporal graph AML
-- later, Elliptic2-style subgraph AML
+- Elliptic2-style subgraph AML as supporting context
 
-Those workload families are closer to the user's existing fraud projects and to the kinds of problems a PayPal-style risk team would care about.
+Those workload families reflect common financial-crime modeling constraints:
+rare events, temporal validity, entity structure, alert review, and
+auditability.
 
 ## Current public support boundary
 
@@ -30,7 +32,7 @@ That means:
 - P10 turns those artifacts into reproducible tables with per-cell provenance and a publishability matrix. Passing P10 means the paper can be drafted; it does not mean hard AML, SOTA, headline, or business-value claims are allowed
 - P11 turns the P10 evidence into a claim-linted paper draft and deterministic figure pack. Passing P11 means the draft is internally consistent with the artifact contract; it still does not allow hard AML, SOTA, headline, RevClassify parity, graph-neural superiority, or hard business-value claims before P12/P13 gates
 - P12 turns the P10/P11 evidence into an external dry-run proof. Passing P12 means the clean-clone checklist, optional isolated full-profile install probe, paper-smoke regeneration, leak scan, reproduction failure report, and go/no-go gate agree; it still allows only claim-safe evaluation-environment release language before P13
-- P13 turns the P10-P12 evidence into a claim-safe arXiv release pack: final generated draft, citable references, generated tables, attention pack, checklist, release manifest, and allowed-public-claims report. Passing P13 allows only evaluation-environment public wording; hard AML, SOTA, headline, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked
+- P13 turns the P10-P12 evidence into a claim-safe arXiv release pack: final generated draft, citable references, generated tables, public communication pack, checklist, release manifest, and allowed-public-claims report. Passing P13 allows only evaluation-environment public wording; hard AML, SOTA, headline, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked
 - P8 records AMLSim as blocked until a seeded generated bundle, generator revision, output hashes, generated-data license, and typology audit exist; once verified it remains synthetic `proxy` evidence only
 
 Relaytic-AML must be honest about that boundary. Raw Elliptic support is now real, but it does not imply Elliptic2-scale subgraph support or graph-neural superiority.
@@ -150,7 +152,10 @@ The benchmark pack is now part of a broader AML proof/productization sequence. T
 8. **15Y**: rewrote first-contact docs around the flagship path and added the paper benchmark runbook.
 9. **15Z**: cleaned repo credibility risks with module-split evidence, public-surface inventory, and retained benchmark cleanup debt.
 10. **15Z-R**: froze the relevant benchmark and release evidence with a rerunnable paper-freeze command, claim boundaries, reproducibility attestation, and hard-performance-claim blocking.
-11. **Paper Track P0-P13, with P8-C/P8-D inserted after P8-B**: completed the frozen but claim-blocked release pack into a paper-ready path: commit the baseline, clean public surfaces, freeze the paper thesis, register datasets, run PaySim-style and Elliptic-style evidence, add strong tabular and graph baselines, recover and challenge modern Elliptic2 evidence, explicitly narrow its neural-reference/cohort gap for the first paper, add guarded operational evidence, generate reproducible per-cell-provenance tables, draft and lint the paper, dry-run from a clean clone, and release to arXiv only if gates pass.
+11. **Paper Track P0-P27, with P8-C/P8-D inserted after P8-B**:
+    completed the claim-bounded release pack, paper evidence, source/PDF
+    preflight, novelty distinction, factual correction, typed evidence/gate
+    separation, and exact-revision integrity checks.
 
 Benchmark success must stay separated from:
 
@@ -162,7 +167,8 @@ Benchmark success must stay separated from:
 
 ## Paper-track relevance gate
 
-The final pre-Academy paper track must not rely on one easy or repeatedly inspected dataset.
+The paper evidence pack must not rely on one easy or repeatedly inspected
+dataset.
 
 The relevant benchmark catalog should include:
 

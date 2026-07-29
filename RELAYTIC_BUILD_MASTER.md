@@ -18,8 +18,10 @@ Codex should read these in order:
 Current strategic doctrine:
 
 - Relaytic remains the public product and package
-- Relaytic-AML is the flagship frontier direction for all pre-academy work from now on
-- Paper Track P0 through P26 is implemented; P26 supplies strict factual evidence/gate separation, exact validation-subsplit disclosure, finalist-tie consistency, and truthful immutable-commit release identity before the human arXiv decision
+- Relaytic-AML is the flagship application and public proof path
+- Paper Track P0 through P27 is implemented; P27 adds canonical artifact
+  identity and final consistency checks over the P26 evidence and
+  release-integrity contracts
 - the implemented strengthening history remains in `docs/build_slices/phase_paper_strengthening.md`; the P24 release-integrity contract lives in `docs/build_slices/phase_paper_release_integrity.md`, and the P26 correction contract lives in `docs/build_slices/phase_paper_evidence_separation.md`
 - paper benchmark work must separate smoke, baseline, competitive, and release budgets; weak first-pass numbers can be retained as honest baselines but must not become headline paper claims without leakage-safe competitive reruns, HPO/search-budget accounting, and publishability gates
 - the paper-track execution brief lives at `docs/build_slices/phase_paper_track.md` and the normative slice contract lives in `RELAYTIC_SLICING_PLAN.md`
@@ -35,7 +37,7 @@ Codex must:
 - keep optional systems optional
 - update tests and status docs after each slice
 - keep external integrations optional
-- avoid novelty theater
+- require technical claims to map to concrete evidence
 - keep a golden proof path alive while building
 - keep artifacts stable and inspectable
 - keep local artifacts as the canonical source of truth
@@ -72,7 +74,10 @@ The remaining high-assurance proof tracks that later slices must make explicit a
 - relevant public benchmark and paper-release freezes that cannot be satisfied by one easy or proxy dataset
 - human-supervision and onboarding-success evaluation for first-time users
 
-## Current intended build order
+## Canonical Build Order
+
+Entries through Slice 15Z-R and Paper Track P27 are implemented history.
+Slice 16A is the next planned implementation stage.
 
 Start with:
 0. normalization and contract freeze
@@ -159,13 +164,13 @@ Paper P9. operational AML evaluation layer
 Paper P10. reproducible paper table generator
 Paper P11. paper draft and figure pack
 Paper P12. external dry run and clean-clone proof
-Paper P13. arXiv release and attention pack
+Paper P13. arXiv release and public communication pack
 Paper P14. final arXiv source bundle and clean release candidate
 Paper P15. measured system-evaluation proof pack
 Paper P16. failure-case evaluation pack
 Paper P17. governance machinery ablation pack
 Paper P18. governance invariants and adjacent-systems positioning
-Paper P19. CTO/arXiv quality gate and hosted detector workflow demonstration, if selected
+Paper P19. senior technical quality review and hosted detector workflow demonstration, if selected
 Paper P19-A. external score-file adapter proof pack, if selected
 Paper P19-B. external score case-study and paper integration, if selected
 Paper P20. PaySim selection-story cleanup and paper visual/narrative polish
@@ -351,7 +356,10 @@ Reason:
 - Slice 15Y is now implemented and moves first contact to the flagship AML demo path with proof artifacts, claim-boundary labels, handbooks, and a paper benchmark runbook before repo cleanup and release freezing
 - Slice 15Z is now implemented and adds module-split evidence, repo credibility reports, public-surface inventory, retained extraction boundaries, and benchmark cleanup debt before paper-freeze work
 - Slice 15Z-R is now implemented and freezes the relevant benchmark/release pack with catalog coverage, multidimensional result-table schema, explicit claim boundaries, reproducibility attestation, and blocked hard-performance claims until real holdout evidence exists
-- Paper Track P0 through P26 are implemented before Academy work. P26 closes the evidence/gate schema, validation-subsplit, finalist-consistency, and release-identity corrections; only the clean public-commit final build and human release decision remain.
+- Paper Track P0 through P27 is implemented before Academy work. P27 closes
+  canonical artifact-identity and release-consistency checks over the P26
+  evidence contract. Only the exact-revision public build and human release
+  decision remain.
 - Paper Track P0 is now implemented and freezes the 15Z-R baseline into explicit baseline and verification reports; Paper Track P1 should clean the public surface next
 - Paper Track P1 is now implemented and cleans paper-facing public surfaces, records retained compatibility boundaries, and adds Relaytic API/tool aliases
 - Paper Track P2 is now implemented and freezes the claim-gated AML evaluation-environment thesis, research questions, contribution story, metric doctrine, related-work seed, and claim taxonomy
@@ -387,8 +395,10 @@ Reason:
 
 Current repo state:
 
-- implemented through Slice 15Z-R plus Paper Track P0 through P26; P26 adds factual evidence/gate separation, validation-subsplit audits, corrected finalist wording, and immutable public-commit release tooling
-- next execution target: commit and push the P26 candidate, run the exact-revision final build from that public commit, and complete the human paper release decision
+- implemented through Slice 15Z-R plus Paper Track P0 through P27
+- next release action: review and publish the exact paper revision, run the
+  final release-integrity check from that clean public commit, and complete the
+  human arXiv submission
 - latest landed pulse slice: Slice 12A
 - latest trace-and-safety slice: Slice 12B
 - latest handoff-and-learnings slice: Slice 12D
@@ -401,7 +411,18 @@ Current repo state:
 - next planned academy follow-on: Slice 16A, after P26 closes the final paper correction pass
 - final planned cleanup follow-on after Slice 17: Slice 18
 - after Slice 13, every later slice that changes operator-visible behavior, install/dependency posture, or long-running runtime behavior must extend the same mission-control, onboarding, dojo-visibility, pulse-visibility, trace/eval visibility, differentiated handoff, durable-learnings, workspace-continuity, result-contract, iteration-planning, search-controller, release-safety, permission-mode, and background-job surfaces rather than leaving the UI stale until late polish
-- the canonical future product-contract pack for that work now lives under `docs/specs/` and should be treated as normative during later implementation, including [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md), [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md), [aml_frontier_contract.md](docs/specs/aml_frontier_contract.md), [aml_benchmark_pack.md](docs/specs/aml_benchmark_pack.md), [capability_academy_contract.md](docs/specs/capability_academy_contract.md), [mission_control_contract.md](docs/specs/mission_control_contract.md), [handoff_result_migration.md](docs/specs/handoff_result_migration.md), [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md), and [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md) for already-shipped and future mission control, model competitiveness, performance recovery, AML proof/productization, academy, handoff, learnings, and external-agent continuation surfaces
+- the canonical product-contract pack lives under `docs/specs/` and is
+  normative for shipped and future behavior, including
+  [model_competitiveness_contract.md](docs/specs/model_competitiveness_contract.md),
+  [performance_recovery_contract.md](docs/specs/performance_recovery_contract.md),
+  [aml_frontier_contract.md](docs/specs/aml_frontier_contract.md),
+  [aml_benchmark_pack.md](docs/specs/aml_benchmark_pack.md),
+  [capability_academy_contract.md](docs/specs/capability_academy_contract.md),
+  [mission_control_contract.md](docs/specs/mission_control_contract.md),
+  [handoff_result_migration.md](docs/specs/handoff_result_migration.md),
+  [learnings_migration_contract.md](docs/specs/learnings_migration_contract.md),
+  and
+  [external_agent_continuation_contract.md](docs/specs/external_agent_continuation_contract.md)
 - mission-control and browser-facing work should also follow [relaytic_ui_frontier_review.md](docs/relaytic_ui_frontier_review.md): static HTML remains the fallback, but the product direction is an AML investigation board, agent console, belief-delta/claim-firewall views, review-budget simulation, trace replay, and eventually a local live UI server backed by canonical artifacts
 
 ## MVP boundary
@@ -439,7 +460,7 @@ Do **not** try to implement:
 - full local cluster orchestration
 - every optional integration
 
-before the MVP is undeniable.
+before the MVP is treated as release-ready.
 
 ## Current leverage points
 
@@ -468,8 +489,8 @@ If the goal is to turn the current implementation into something that looks genu
 - a governed capability-academy track that can scout, shadow-test, promote, demote, and retire tools or non-core specialists through deterministic proof instead of ad hoc growth
 - an optional representation engine that can learn from large unlabeled local corpora and improve retrieval, anomaly support, and temporal state understanding without replacing deterministic adjudication
 
-Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 are the major groundwork novelty unlocks.
-Slices 10, 10B, 10C, and 10A are the current category-shift unlocks that turned Relaytic from a governed inference lab into a more explicit decision-and-discovery system with skeptical steering. Slice 11A added real incumbent pressure, Slice 11B completed the first adoption unlock because humans and external agents can now launch, inspect, and demo the system from one coherent control surface, and Slice 11C made that surface legible enough to act as a real MVP cockpit instead of only a technical dashboard.
+Slices 07, 09A, 09B, 09C, 09D, 09F, and 11 established the core investigation, evidence, and governance contracts.
+Slices 10, 10A, 10B, and 10C extended those contracts into explicit decision and discovery workflows with skeptical steering. Slice 11A added incumbent comparison, Slice 11B unified launch, inspection, and demonstration workflows for humans and external agents, and Slice 11C made those workflows available through Mission Control.
 Paper Track P0 through P27 is the completed mandatory pre-Academy arXiv engineering path. P27 adds typed metric/invariant evidence, authoritative schema counts, truthful PaySim feature-contract comparison, generated-surface consistency, and separate candidate, archival, and public-verification release states. Slices 16A through 16F remain the later governed capability-evolution track.
 
 ## Source of truth precedence

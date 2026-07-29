@@ -1,4 +1,4 @@
-# Relaytic-AML Paper Attention Pack
+# Relaytic-AML Public Communication Pack
 
 Use this wording for public posts until a later benchmark gate unlocks stronger claims.
 

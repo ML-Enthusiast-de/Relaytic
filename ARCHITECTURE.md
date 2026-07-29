@@ -35,7 +35,28 @@ Relaytic is organized as a staged artifact pipeline.
 13. Runtime gateway
    The local runtime owns append-only event emission, checkpoints, hook audit, and capability-scoped specialist visibility so CLI and MCP share one control plane.
 14. Interoperability and host adapters
-   Relaytic exposes the same MVP and slice-level surfaces through a host-neutral MCP server plus thin host wrappers for common agent ecosystems.
+   Relaytic exposes the same run, workspace, guidance, AML, and lifecycle
+   surfaces through a host-neutral MCP server plus thin host wrappers.
+15. Workspace continuity and supervision
+   Workspace state, result contracts, next-run plans, permission decisions,
+   resumable jobs, approvals, and remote-supervision artifacts preserve one
+   control truth across runs and interfaces.
+16. Model and evaluation control
+   Task contracts, architecture routing, bounded search, temporal evaluation,
+   calibration, operating-point selection, leakage checks, and benchmark
+   claim gates keep model selection separate from test evidence.
+17. Relaytic-AML
+   AML specialists materialize graph provenance, typology evidence, ranked
+   review queues, case packets, delayed-label and drift posture, operational
+   metrics, and public-claim limits.
+18. Guidance and mission control
+   Humans and external agents can inspect current state, relevant artifacts,
+   available actions, safe continuation paths, and rowless context exports
+   without reconstructing the run from raw files.
+19. Release and paper evidence
+   Build attestation, repository safety checks, evidence cells, claim gates,
+   generated manuscript artifacts, and exact-revision checks connect public
+   statements to reproducible local evidence.
 
 ## Current Data Ingestion Boundary
 
@@ -60,7 +81,8 @@ Supported local source modes:
 - append-only local stream files materialized into bounded micro-batch snapshots
 - local lakehouse-style sources materialized into bounded run-local snapshots
 
-The current MVP does not yet expose remote streaming, warehouse, or cloud lakehouse connectors. Those remain future adapter tracks.
+The public runtime does not expose remote streaming, warehouse, or cloud
+lakehouse connectors. Those remain explicit adapter tracks.
 
 For safety, Relaytic stages immutable working copies inside the run directory before major run and inference operations. The source of truth for execution is therefore the staged copy under `data_copies/`, not the original file path.
 
@@ -72,7 +94,7 @@ For safety, Relaytic stages immutable working copies inside the run directory be
 - Artifact-first behavior: important decisions are written as inspectable artifacts, not hidden in transient agent state.
 - Specialist decomposition: focused agents handle bounded responsibilities rather than collapsing everything into a single planner.
 
-## Role Of Local And Frontier Models
+## Role Of Local And External Models
 
 Local LLMs are optional advisory components, not a hard dependency for the product contract.
 
@@ -84,7 +106,9 @@ They can improve:
 - bounded advisory support inside planning and route selection
 - bounded advisory support inside evidence review and memo refinement
 
-Policy-gated frontier models remain part of the long-term design as optional high-end reasoning or challenger backends. They should only be used when explicitly allowed, and they must enrich Relaytic's artifact graph rather than replace the deterministic floor.
+Policy-gated external models may serve as optional reasoning or challenger
+backends. They are used only when explicitly allowed and must enrich Relaytic's
+artifact graph rather than replace the deterministic floor.
 
 They must not replace:
 
@@ -110,7 +134,12 @@ They get their working knowledge from:
 
 So the main intelligence path is artifact-grounded reasoning, not hidden pretrained authority. Local LLMs can improve interpretation and synthesis, but they do not replace the deterministic floor or the auditable evidence chain.
 
-At the current baseline, that means Relaytic can already reason over and route common structured-data work such as regression, binary classification, multiclass classification, fraud-style rare-event detection, and anomaly-style detection. The specialist layer is still not equivalent to a fully pretrained PhD-level domain expert; the roadmap for that is stronger memory, reference-doc grounding, privacy-safe external research retrieval from redacted run signatures, and optional intelligence amplification, not opaque magic.
+Relaytic can route common structured-data work such as regression, binary and
+multiclass classification, fraud-style rare-event detection, anomaly
+detection, and time-aware evaluation. Its specialists remain bounded software
+roles rather than a substitute for domain experts. Optional semantic models,
+reference documents, and redacted research retrieval can extend their context
+without becoming authoritative.
 
 ## Reuse Mature Libraries Through Adapters
 
@@ -128,33 +157,26 @@ The repository's current adoption policy lives in `OPEN_SOURCE_STACK.md`.
 
 ## Current Implemented Layers
 
-The repository currently implements the following product layers:
+The repository implements product slices `00` through `15Z-R`. The major
+shipped layers are:
 
-- Slice 01: manifest and policy scaffolding
-- Slice 02: mandate and context foundation
-- Slice 03: investigation baseline with Scout, Scientist, and Focus Council
-- Slice 04: intake and translation with autonomy, clarification, and assumption artifacts
-- Slice 05: Strategist planning, Builder handoff, and the first deterministic route from data to model
-- Slice 05A: MVP-access orchestration with `relaytic run`, `relaytic show`, `relaytic predict`, and persisted run summaries
-- Slice 06: challenger, ablation, provisional audit, leaderboard, and decision-memo evidence around the first built route
-- Slice 07: completion-governor judgment with visible run state, blocking analysis, mandate-evidence review, and next-action queue
-- Slice 08: lifecycle-governor judgment with champion/candidate comparison and explicit keep, recalibrate, retrain, promote, and rollback actions
-- Slice 08A: host-neutral MCP interoperability with checked-in Claude, Codex/OpenAI, OpenClaw, and ChatGPT-facing wrapper surfaces
-- Slice 08B: host activation and discovery state with repo/workspace auto-discovery where the host permits it
-- Slice 09A: run memory and analog retrieval with route priors, challenger priors, reflection memory, and pre-close memory flush artifacts
-- Slice 09B: local runtime gateway with append-only event traces, capability profiles, hook audit, and shared CLI/MCP run-state coordination
-- Slice 09: structured semantic tasks, document grounding, semantic debate/counterposition artifacts, and bounded intelligence amplification
-- Slice 09F: routed intelligence profiles, backend capability matrices, verifier-specific artifacts, and semantic-proof reporting
-- Slice 09C: bounded autonomous second-pass execution with challenger queues, executable recalibration/retrain requests, loop budgets, and champion lineage
-- Slice 09D: privacy-safe external research retrieval with redacted query planning, typed source inventory, method-transfer distillation, benchmark-reference capture, and explicit no-leak audit
-- Slice 09E: communicative assist surfaces with deterministic explanation, stage navigation, bounded takeover, optional local semantic lift, and host-connection guidance
-- Slice 11: benchmark parity, explicit reference-approach comparison, and parity-gap reporting under the same split and metric contract
-- Slice 10: feedback assimilation with validated intake, reversible effect reporting, rollback-ready casebook state, and later-run route-prior influence
-- Slice 10B: explicit quality contracts, quality-gate reports, visible budget contracts, budget-consumption reporting, and bounded operator/lab profile overlays via `relaytic profiles`
-- Slice 10C: behavioral contracts, skeptical steering, causal steering memory, and replayable override checkpoints
-- Slice 10A: decision-world modeling, controller-policy writing, value-of-more-data reasoning, local source-graph and join-candidate analysis, and executable method compilation via `relaytic decision`
+- local policy, mandate, context, intake, investigation, planning, execution,
+  challenger, ablation, and audit paths
+- completion and lifecycle governance, incumbent challenge, decision-world
+  modeling, feedback assimilation, and bounded autonomous follow-up
+- workspace continuity, governed learnings, result contracts, iteration plans,
+  traces, protocol evaluation, permissions, resumable jobs, and supervision
+- task, architecture, search, temporal, calibration, operating-point,
+  benchmark-truth, leakage, and claim-scope contracts
+- Relaytic-AML graph, typology, alert-queue, case-packet, stream-risk,
+  delayed-label, business-value, benchmark, demo, and environment surfaces
+- mission control, no-lost guidance, rowless external context export, MCP, and
+  checked-in host integrations
+- release safety, repository credibility checks, benchmark evidence, paper
+  generation, and exact-revision release integrity
 
-The next planned layer is Slice 12: dojo mode and guarded self-improvement.
+Paper Track `P0` through `P27` is implemented. Slice `16A`, capability cards
+and registry truth, is the next planned product stage.
 
 ## Current Artifact Baseline
 
@@ -279,6 +301,22 @@ Relaytic already standardizes several load-bearing artifacts:
 - `champion_lineage.json`
 - `loop_budget_report.json`
 
+Later implemented layers add canonical artifacts including:
+
+- `workspace_state.json`, `workspace_lineage.json`, `result_contract.json`,
+  `confidence_posture.json`, and `next_run_plan.json`
+- `canonical_trace.json`, `adjudication_scorecard.json`,
+  `permission_mode.json`, and `background_job_state.json`
+- `task_profile_contract.json`, `optimization_objective_contract.json`,
+  `architecture_registry.json`, `search_strategy_report.json`,
+  `temporal_metric_contract.json`, and `operating_point_contract.json`
+- `entity_graph_profile.json`, `typology_detection_report.json`,
+  `alert_queue_rankings.json`, `case_packet.json`,
+  `delayed_outcome_alignment.json`, and `aml_public_claim_guard.json`
+- `aml_benchmark_environment_scorecard.json`,
+  `paper_metric_evidence_cells.json`, `paper_claim_gates.json`, and the
+  exact-revision paper release manifests
+
 When staged copies exist, the run directory also contains:
 
 - `data_copies/`
@@ -287,7 +325,7 @@ When staged copies exist, the run directory also contains:
 
 The public CLI command is `relaytic`.
 
-The currently guaranteed product-facing surfaces include:
+Representative product-facing surfaces include:
 
 - `relaytic manifest init`
 - `relaytic policy resolve`
@@ -325,6 +363,22 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic assist chat`
 - `relaytic autonomy run`
 - `relaytic autonomy show`
+- `relaytic guide`
+- `relaytic guide ask`
+- `relaytic guide export-context`
+- `relaytic workspace show`
+- `relaytic workspace continue`
+- `relaytic handoff show`
+- `relaytic learnings show`
+- `relaytic trace show`
+- `relaytic permissions show`
+- `relaytic daemon show`
+- `relaytic mission-control launch`
+- `relaytic aml baselines`
+- `relaytic aml graph-loader`
+- `relaytic aml temporal`
+- `relaytic aml environment`
+- `relaytic release-safety paper-final-preflight`
 - `relaytic run`
 - `relaytic show`
 - `relaytic predict`
@@ -338,7 +392,9 @@ The currently guaranteed product-facing surfaces include:
 - `relaytic integrations show`
 - `relaytic integrations self-check`
 
-Additional runtime commands from earlier repository layers still exist while later slices replace deeper internal paths. Those commands are not the long-term architectural center of the product.
+Run `relaytic --help` for the complete current command tree. Lower-level
+phase commands remain supported for inspection, testing, and controlled
+re-entry.
 
 ## Interoperability Baseline
 

@@ -4,11 +4,12 @@
 
 This document defines the first paper-grade benchmark and eval pack for Relaytic.
 
-After the Relaytic-AML pivot, this pack should be treated as the **generic supporting benchmark pack**, not the flagship domain proof pack.
+This pack is the **generic supporting benchmark pack**, not the flagship domain
+proof pack.
 
 The final AML paper/release freeze is defined by the AML benchmark pack and Slice 15Z-R. This generic pack should support breadth claims, sanity checks, and structured-data robustness, but it should not carry the main AML/fraud relevance claim by itself.
 
-The pack is designed to answer two different questions:
+The pack answers two different questions:
 
 - can Relaytic operate credibly across the main structured-data task families?
 - can the same system story survive later paper writing, benchmark reporting, and ablation work?
@@ -26,7 +27,7 @@ Datasets in this pack should be:
 - free of login-gated download paths
 - clear enough that a paper reader can understand why each one is present
 
-The first version of the pack intentionally favors:
+The pack intentionally favors:
 
 - UCI-hosted datasets for citable primary-source stability
 - scikit-learn bundled datasets for deterministic local sanity checks
@@ -49,18 +50,23 @@ Reason:
 
 - the current pack is public, citable, diverse, and reproducible
 - but many datasets are still small to medium classical benchmarks rather than a broad modern benchmark suite
-- it does not yet include a larger OpenML-style benchmark suite, a dedicated time-aware suite, or a stronger public fraud benchmark
+- it does not provide a broad OpenML-style modeling benchmark or a real-bank
+  financial-crime holdout
 
 So the correct scientific claim today is:
 
 - the pack is legitimate and paper-acceptable
 - it is strong enough for a credible first benchmark section
-- it should later be expanded or subordinated to the AML-specific paper pack before making stronger domain or modeling-dominance claims
+- it remains subordinate to the AML-specific paper pack for domain claims
 
-The dedicated future time-aware benchmark track is specified separately in [temporal_benchmark_pack.md](temporal_benchmark_pack.md).
-The future flagship AML benchmark doctrine is specified separately in [aml_frontier_contract.md](aml_frontier_contract.md).
+The time-aware benchmark contract is specified separately in
+[temporal_benchmark_pack.md](temporal_benchmark_pack.md).
+The flagship AML benchmark doctrine is specified separately in
+[aml_frontier_contract.md](aml_frontier_contract.md).
 
-The future paper/release freeze must combine this generic pack with the AML-specific relevant benchmark catalog, public-claim boundary report, and reproducibility attestation.
+The implemented paper/release freeze combines this generic pack with the
+AML-specific benchmark catalog, public-claim boundary report, and
+reproducibility attestation.
 
 ## Dataset matrix
 

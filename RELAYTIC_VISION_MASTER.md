@@ -1,6 +1,8 @@
-# RELAYTIC_TRANSFORMATION_PLAN_COMPLETE.md
+# Relaytic Vision
 
-# Relaytic Transformation Plan
+This is the long-form product and architecture vision. It defines direction,
+not implementation status. See `IMPLEMENTATION_STATUS.md` for the current
+boundary and `RELAYTIC_SLICING_PLAN.md` for scheduled work.
 
 ## Branding and naming
 
@@ -11,14 +13,20 @@
 **The Relay Inference Lab**
 
 ### Positioning line
-**Relaytic is now pivoting toward Relaytic-AML, a local-first AML and financial-crime investigation system built around specialist agents that investigate data, form competing hypotheses, run challenger science, preserve mandate-aware user intent, optionally ground themselves in expert context, optionally perform privacy-safe external method and benchmark retrieval from redacted run signatures, amplify their judgment when a powerful LLM is available, optionally use a minimum local LLM baseline when users want semantic help on-device, debate what the run should optimize for, keep core subsystems replaceable, carry bounded evidence between specialists, and expose their judgment as reusable tools.**
+
+**Relaytic is a local-first inference and evaluation lab. Relaytic-AML applies
+that architecture to anti-money laundering and financial-crime machine
+learning through specialist agents, auditable artifacts, bounded model search,
+review-aware evaluation, privacy-preserving handoff, and explicit claim
+governance. Optional language models can assist semantic work, but deterministic
+contracts remain authoritative.**
 
 ### Naming strategy
 Use a two-layer naming system throughout the repository and docs:
 
 - **Brand:** Relaytic
 - **Descriptor:** The Relay Inference Lab
-- **Flagship frontier edition:** Relaytic-AML
+- **Flagship edition:** Relaytic-AML
 
 ### Documentation rule
 All top-level docs should present the project as:
@@ -29,7 +37,8 @@ All top-level docs should present the project as:
 
 ## Goal
 
-Transform this repository from a “data -> surrogate model” framework into a **local-first AML and financial-crime inference engineering system** that:
+Relaytic is a **local-first inference engineering system** with Relaytic-AML as
+its flagship financial-crime evaluation path. The target system:
 
 - runs fully locally by default
 - treats “local” broadly: personal computer, workstation, local server, local instance, or local cluster under the user’s control
@@ -89,11 +98,12 @@ Transform this repository from a “data -> surrogate model” framework into a 
 
 ---
 
-## Frontier sharpness doctrine
+## Technical Contribution Doctrine
 
-Relaytic is not frontier because it contains agents, many artifacts, or optional LLMs.
+Relaytic is not technically differentiated merely because it contains agents,
+many artifacts, or optional language models.
 
-Relaytic is frontier only if it materially expands what a local inference system can:
+Its contribution must materially expand what a local inference system can:
 
 - discover about an unfamiliar dataset
 - justify with auditable evidence
@@ -101,7 +111,7 @@ Relaytic is frontier only if it materially expands what a local inference system
 - control under real mandate and policy constraints
 - expose as a reusable judgment surface for humans and other agents
 
-The frontier thesis is therefore not "more orchestration."
+The technical thesis is therefore not "more orchestration."
 It is:
 
 - **problem-formulation search**, not just model-family search
@@ -111,7 +121,8 @@ It is:
 - **private world-knowledge import without private-data export**, not just local heuristics or naive web calls
 - **validated self-improvement**, not just prompt churn or hidden heuristic drift
 
-Any slice that does not strengthen at least one of those axes is polish, not frontier progress.
+Any slice that does not strengthen at least one of those axes is product polish,
+not a core technical advance.
 
 ## High-Assurance Proof Doctrine
 
@@ -140,22 +151,17 @@ Future slices that add autonomy, new host surfaces, or new operator-facing behav
 
 Those future slices should also be constrained by explicit product-contract documents for workspace lifecycle, result contracts, governed learnings, mission-control flows, testing burden, and flagship demos. Relaytic should not rely on implementation taste alone for those areas once the spec pack exists.
 
-## Anti-mediocrity guardrails
+## Quality Guardrails
 
-Relaytic must not degrade into:
+Relaytic must avoid:
 
-- **planner theater**
-  many agent names but one real decision path
-- **artifact theater**
-  more JSON without stronger judgment or controllability
-- **benchmark theater**
-  polished benchmark claims without hard reference comparisons and failure reports
-- **LLM theater**
-  vague semantic authority replacing deterministic evidence
-- **paper theater**
-  buzzword-heavy paper retrieval or SOTA name-dropping without redaction audits, method-transfer artifacts, contradiction handling, or local proof
-- **UI theater**
-  a polished shell over weak model-search and weak challenge loops
+- agent roles that do not correspond to distinct decisions or responsibilities
+- artifacts that add volume without improving judgment or controllability
+- benchmark claims without strong reference comparisons and failure reports
+- semantic-model output that displaces deterministic evidence
+- literature references that do not produce auditable method transfer or
+  benchmark context
+- polished interfaces over weak model search or challenge loops
 
 If a proposed feature mostly increases surface area without increasing search power, evidence quality, autonomy, operator leverage, or benchmark strength, it should be deprioritized.
 
@@ -196,49 +202,27 @@ All major performance claims should always be separated into:
 
 This separation is mandatory. Otherwise the repo will drift into confusing or inflated claims.
 
-## Current leverage points
+## Current Leverage Points
 
-For the repository as it exists today, the next major leverage points are not "more agents" or "more reports."
+The repository has implemented the local runtime, workspace continuity,
+specialist-agent control surfaces, AML proof path, paper evidence pipeline, and
+release checks described by Slices `00` through `15Z-R` and Paper Track `P0`
+through `P27`.
 
-They are:
+The next product work is deliberately narrower:
 
-- a **release-safety and build-attestation layer** so packaged Relaytic artifacts can be handed to reviewers, labs, and external agents without machine-path leaks, source-map leaks, or accidental debug payloads
-- an **evented runtime and visible permission model** so every later background, remote, or approval-based feature is built on one typed event bus and one explicit authority contract
-- a **bounded daemon and resumable-job layer** so pulse, search, memory maintenance, and long experiments can continue safely over time without becoming hidden background activity
-- a stronger **workspace-first continuity layer** that becomes permission-aware, daemon-aware, and remote-supervision-aware rather than only run-to-run aware
-- stronger **machine-stable result contracts** that stay aligned across local, remote, background, and post-run surfaces even as supervision becomes richer
-- stronger **governed learnings** that upgrade the shipped workspace learnings into typed, confidence-bearing, reaffirmable, invalidatable, and optionally expirable records instead of drifting into an untyped memory blob
-- an **iteration planner** that remains explicit as Relaytic adds remote approvals, feasibility gates, and daemon-managed continuation rather than falling back to implicit next-step choices
-- **release-safety and build attestation** so packaged Relaytic artifacts can be handed to reviewers, labs, and external agents without machine-path leaks, source-map leaks, or accidental debug payloads
-- an **evented runtime and visible permission model** so every later background, remote, or approval-based feature is built on one typed event bus and one explicit authority contract
-- a **bounded daemon and resumable-job layer** so pulse, search, memory maintenance, and long experiments can continue safely over time without becoming hidden background activity
-- a **canonical product-spec pack** that freezes schemas, UX flows, and proof burden so later slices can optimize implementation quality without improvising core product behavior
-- **behavioral contracts** that let humans and external agents steer Relaytic without turning Relaytic into a compliant shell
-- **causal multi-layer memory** that preserves interventions, method outcomes, downstream consequences, and why previous guidance proved right or wrong
-- a **first-class trace model** that records specialist turns, tool calls, intervention handling, branch expansion, and later decisions as one replayable execution truth rather than scattered logs
-- **dynamic controller logic** that can change handoff depth, branch width, reviewer involvement, and challenge pressure based on observed uncertainty, budget, and downstream decision value
-- a **decision-system world model** that understands what action follows prediction, what errors cost, which cases should defer to humans, and whether more search is actually worth it
-- a **method compiler** that turns papers, benchmark references, memory, and operator notes into executable challenger templates, feature hypotheses, split/evaluation adjustments, and data-collection suggestions
-- **imported incumbent challenge tracks** so Relaytic can beat real existing models instead of only generic baselines
-- a **richer search controller** that goes beyond the shipped bounded search controller and chooses broader challenger ecology, HPO depth, calibration breadth, daemon-backed resume strategy, and abstention policy under explicit budgets rather than fixed narrow search
-- **outcome learning**, not just run learning, so Relaytic improves from interventions taken, overrides, downstream results, and false-positive/false-negative consequences
-- a **richer long-term memory stack** with episodic, intervention, outcome, and method memory plus explicit retention, compaction, pinning, and replay rules so specialists do not keep relearning the same lesson
-- **agent evaluator and security harnesses** that continuously test override skepticism, tool-safety boundaries, branch-controller behavior, and prompt/result injection resistance rather than assuming the runtime is safe because it is local
-- a **lab pulse** that can periodically inspect runtime state, benchmark debt, research freshness, and memory health, then queue bounded safe follow-up without unsupervised drift
-- a **richer data-understanding fabric** that can reason about nearby sources, join candidates, entity histories, and what additional data would reduce uncertainty most
-- a **remote supervision surface** that lets humans and external agents inspect, approve, deny, and hand off running workspaces without creating a second source of truth
-- a **mission-control surface** that shows branch structure, confidence map, intervention history, incumbent-versus-Relaytic state, what changed because of memory, intelligence, research, or feedback, and what Relaytic would do next
-- a **performance-recovery track** that fixes objective drift, strengthens first-class model families, enforces serious search-budget doctrine, restores temporal competitiveness, improves calibration and threshold decisions, and blocks unsafe paper claims before the academy begins
-- a **governed capability academy** that can discover, shadow-test, promote, demote, and retire tools or non-core specialists through seeded exploration, replayable proof, and explicit provider feedback instead of ad hoc capability growth
-- a **protocol-conformance harness** that proves CLI, MCP, mission control, and later richer UI shells expose the same control truth rather than drifting by surface
-- long-session, resume, and packaging regression packs that test the product the way a real frontier operator runtime gets used rather than only as a fast CLI
-- a **flagship demo pack** with explicit scorecards so Relaytic can be judged by repeatable proof cases rather than one-off founder narration
-- a **human-supervision evaluation track** that measures first-run success, stuck recovery, explanation quality, and whether operators can tell what Relaytic expects next
-- benchmark-separated proof that Relaytic is strongest when evidence, mandate, reliability, lifecycle constraints, and decision usefulness actually matter
+- complete the human-controlled public paper release from an exact revision
+- begin Slice `16A` with capability cards and registry truth
+- extend capability evaluation through replay, shadow testing, promotion, and
+  quarantine before granting new authority
+- keep optional representation-learning work behind the same evidence and
+  promotion contracts
+- finish with the planned consolidation slice that removes obsolete
+  compatibility and build-era structure
 
-These are the places where the project most needs to become stronger if it wants to look like the next big thing rather than a well-structured research product.
-
-Before the academy begins, Relaytic needs one explicit **performance-recovery track** that raises the modeling ceiling directly: stronger objective contracts, stronger family coverage, deeper portfolio search with real budgets, a real temporal engine, calibration and decision optimization, and paper-claim truth gates. Only after that should Relaytic move into a **governed capability academy** where it can scout, shadow-test, promote, demote, and retire new tools or non-core specialists through replayable proof rather than ad hoc growth. That academy could later coexist with a **representation engine** for large unlabeled local corpora, event histories, and time-aware streams. JEPA-style latent predictive models are promising there because they could strengthen analog retrieval, anomaly precursors, temporal state understanding, and data-acquisition reasoning without becoming the authority path for metrics, calibration, or lifecycle decisions.
+`IMPLEMENTATION_STATUS.md` is authoritative for this boundary. Historical
+sections later in this document describe the target architecture and should
+not be read as a list of missing current features.
 
 ## 1. Product definition
 
@@ -2783,7 +2767,8 @@ configure mandate -> configure optional context -> intake and translate user/age
 - every loop round must record why it was chosen, what budget it consumed, what changed, and whether the current champion survived
 - challenger science should expand into a small portfolio when route narrowness or challenger pressure is detected
 - autonomous loops must be bounded by explicit budgets, plateau rules, and policy boundaries
-- if the next round is not expected to pay for itself, Relaytic should stop honestly rather than perform search theater
+- if the next round is not expected to justify its cost, Relaytic should stop
+  and record the decision
 
 ---
 
@@ -4844,7 +4829,7 @@ The transformation is complete when all of the following are true:
 
 ## 40A. Codex execution protocol and context-window-aware implementation
 
-The transformation plan must be implementable by Codex incrementally.
+The vision must be implementable through bounded, incremental changes.
 
 Relaytic is too large for a safe one-shot rewrite. The implementation protocol must explicitly respect limited context windows and reduce integration risk.
 
@@ -5030,10 +5015,15 @@ The goal is not cosmetic polishing. The goal is to ensure the finished repositor
 
 ---
 
-## 41. Codex prompt to paste
+## 41. Historical Transformation Brief
+
+The following brief initiated the incremental transformation and is retained
+for design provenance. Its numbered requests are not current status or current
+instructions. Implemented and planned work is recorded in
+`IMPLEMENTATION_STATUS.md` and `RELAYTIC_SLICING_PLAN.md`.
 
 ```text
-Read RELAYTIC_TRANSFORMATION_PLAN_COMPLETE.md and implement it incrementally.
+Read the Relaytic vision and implement it incrementally.
 
 Constraints:
 - Keep local-first defaults and existing runtime policy.

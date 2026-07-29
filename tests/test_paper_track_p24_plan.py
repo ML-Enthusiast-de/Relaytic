@@ -24,10 +24,8 @@ def test_p24_release_integrity_slice_is_planned_before_academy() -> None:
     assert "Trigger: `implement P24`" in plan
     assert "Paper Track P24" in slicing
     assert "Paper P24" in build
-    assert (
-        "next execution target: human review, clean public commit, and P26 exact-revision final build"
-        in slicing
-    )
+    assert "implemented baseline: Slice 00 through Slice 15Z-R plus Paper Track P0" in slicing
+    assert "next release action: human review, clean public commit" in slicing
     assert "latest paper-integrity slice: P24" in status
     assert "Slice 16A" in slicing and "paper release decision" in slicing
 

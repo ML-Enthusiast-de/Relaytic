@@ -45,10 +45,10 @@ Start here:
 
 - [Why Relaytic-AML](why_relaytic_aml.md)
 - [Paper Benchmark Runbook](paper_benchmark_runbook.md)
-- [Relaytic UI Frontier Review](relaytic_ui_frontier_review.md)
+- [Historical UI Design Review](relaytic_ui_frontier_review.md)
 - [User Handbook](handbooks/relaytic_user_handbook.md)
 - [Agent Handbook](handbooks/relaytic_agent_handbook.md)
-- [AML Frontier Contract](specs/aml_frontier_contract.md)
+- [AML Technical Contract](specs/aml_frontier_contract.md)
 - [AML Benchmark Pack](specs/aml_benchmark_pack.md)
 
 Run evidence to inspect:
@@ -75,7 +75,8 @@ Run evidence to inspect:
 - **Workflow demo:** the AML review-queue demo shows the user experience, artifacts, and proof path on public-safe fixture data.
 - **Engineering benchmark:** dev-benchmark and proxy runs can improve the system and reveal failures.
 - **Holdout benchmark:** held-out benchmark runs can support stronger technical claims when leakage, claim, and environment gates pass.
-- **Paper-ready release:** the Slice 15Z-R release-freeze pack is the first place where attention-seeking public claims should be treated as stable.
+- **Paper release:** the Slice 15Z-R release-freeze pack and Paper Track
+  P0-P27 checks define which public claims are supported at an exact revision.
 
 ## What A Reviewer Should Notice
 

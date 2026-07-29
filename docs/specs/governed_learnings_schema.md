@@ -2,7 +2,8 @@
 
 ## Purpose
 
-This document defines how durable learnings should behave once Slice 12D lands.
+This document defines how durable learnings behave. Slice 12D implemented the
+governed learning fields and lifecycle described here.
 
 The goal is to preserve useful continuity without letting prior guesses, user preferences, or stale conditions silently become hidden truth.
 
@@ -16,7 +17,7 @@ Compatibility for the already-shipped Slice 12C learnings surfaces is frozen sep
 - `learnings.md`
 - `lab_learnings_snapshot.json`
 
-Future workspace-aware supporting artifacts:
+Workspace-aware supporting artifact:
 
 - `workspace_memory_policy.json`
 
@@ -185,7 +186,7 @@ Planning and memory retrieval should:
 
 ## Testing expectations
 
-Future tests should prove:
+Tests must prove:
 
 - active learnings influence later planning
 - invalidated learnings stop influencing planning

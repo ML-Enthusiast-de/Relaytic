@@ -38,7 +38,7 @@
       "detail": {
         "violation_count": 0
       },
-      "message": "Draft, attention pack, and README wording must not contain unguarded blocked claims.",
+      "message": "Draft, public communication pack, and README wording must not contain unguarded blocked claims.",
       "passed": true,
       "source_artifact": "docs/reports/paper_public_claims_allowed.json"
     }

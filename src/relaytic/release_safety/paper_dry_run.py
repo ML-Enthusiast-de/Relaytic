@@ -343,7 +343,7 @@ def _build_external_dry_run_report(
             "P12 does not rerun every heavy benchmark by default. It proves the declared paper-smoke subset and records "
             "the full benchmark commands that remain outside this dry run."
         ),
-        "next_slice": "Paper Track P13 - arXiv release and attention pack" if not failed else "Paper Track P12 repair",
+        "next_slice": "Paper Track P13 - arXiv release and public communication pack" if not failed else "Paper Track P12 repair",
     }
 
 
@@ -412,7 +412,7 @@ def _build_go_no_go_report(
             "docs/reports/paper_reproduction_failure_report.json",
         ],
         "unresolved_failure_count": failure_report.get("unresolved_failure_count", 0),
-        "next_slice": "Paper Track P13 - arXiv release and attention pack" if can_continue else "Paper Track P12 repair",
+        "next_slice": "Paper Track P13 - arXiv release and public communication pack" if can_continue else "Paper Track P12 repair",
     }
 
 
@@ -420,7 +420,7 @@ def _render_clean_clone_checklist(*, go_no_go: dict[str, Any]) -> str:
     lines = [
         "# Paper P12 Clean-Clone Checklist",
         "",
-        "Run these commands from a fresh clone before arXiv or public attention release.",
+        "Run these commands from a fresh clone before arXiv or public release.",
         "",
         "## Install",
         "",

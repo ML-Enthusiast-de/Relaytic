@@ -64,7 +64,7 @@ The paper should focus on the evaluation environment, not a leaderboard-only cla
     Draft the arXiv paper and generate figures from artifacts or clearly mark schematic figures.
 18. **P12 - External dry run and clean-clone proof** - implemented
     Reproduce the install, paper-smoke benchmark, table generation, claim lint, and leak scan from a clean clone.
-19. **P13 - arXiv release and attention pack** - implemented
+19. **P13 - arXiv release and public communication pack** - implemented
     Release only after P10 through P12 pass; otherwise emit a release blocker and schedule repair.
 20. **P14 - final arXiv source bundle and clean release candidate** - implemented
     Convert the claim-safe Markdown paper pack into a LaTeX source tree, convert figures into accepted arXiv graphic formats, audit citations and package hygiene, and leave upload blocked until human TeX/PDF inspection and clean release gates are complete.
@@ -99,7 +99,9 @@ Every paper benchmark must run through a staged evidence ladder:
 3. **Competitive budget**
    Full dataset, strong feature generation, strong tabular or graph baselines, train-only imbalance handling, calibration, threshold optimization on validation only, and budgeted HPO/search. This is the minimum candidate for a paper performance table.
 4. **Release budget**
-   Frozen configs, clean-clone reproduction, rerun variance where practical, exact version capture, and claim linting. This is required before arXiv or public attention materials.
+   Frozen configs, clean-clone reproduction, rerun variance where practical,
+   exact version capture, and claim linting. This is required before arXiv or
+   other public release materials.
 
 If a benchmark looks weak after the baseline budget, Relaytic must treat that as a challenge signal: widen the candidate family, improve leakage-safe feature engineering, raise the search budget, or mark the track as non-competitive. It must not rationalize weak numbers into a headline claim.
 
@@ -350,7 +352,13 @@ P13 added:
 - `relaytic release-safety paper-release --format json`
 - `tests/test_paper_track_p13.py`
 
-P13 produces the claim-safe Markdown draft, citable references, generated paper tables, release manifest, public attention pack, submission checklist, and allowed-public-claims report from the P10-P12 gated artifact set. It writes a release tag plan but does not create or push tags automatically. Public wording is allowed only in evaluation-environment mode; hard AML, headline, SOTA, RevClassify parity, graph-neural superiority, production-ready, and hard business-value claims remain blocked.
+P13 produces the claim-safe Markdown draft, citable references, generated
+paper tables, release manifest, public communication pack, submission
+checklist, and allowed-public-claims report from the P10-P12 gated artifact
+set. It writes a release tag plan but does not create or push tags
+automatically. Public wording is allowed only in evaluation-environment mode;
+hard AML, headline, SOTA, RevClassify parity, graph-neural superiority,
+production-ready, and hard business-value claims remain blocked.
 
 ## Completed Source and System Evidence
 

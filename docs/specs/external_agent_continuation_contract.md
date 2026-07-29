@@ -2,7 +2,8 @@
 
 ## Purpose
 
-This document freezes how external agents should continue work with Relaytic, both on the current shipped surfaces and after the future workspace-first continuity layer lands.
+This document defines how external agents continue work with Relaytic through
+the shipped handoff and workspace-first continuity surfaces.
 
 The goal is to keep agent integration explicit, machine-usable, and professional.
 
@@ -22,9 +23,9 @@ External agents should currently rely on:
 - `relaytic learnings reset`
 - corresponding MCP surfaces
 
-## Future agent continuity surfaces
+## Workspace continuity surfaces
 
-After Slice 12D lands, external agents should additionally rely on:
+External agents should also rely on:
 
 - `workspace_state.json`
 - `workspace_lineage.json`
@@ -62,9 +63,9 @@ After a serious run, an external agent should be able to determine:
 - whether continuity should stay on the same data, add data, or move to a new dataset
 - what learnings are currently active
 
-## Transition rule for Slice 12D
+## Slice 12D compatibility rule
 
-When Slice 12D lands:
+The shipped compatibility behavior is:
 
 - current handoff and learnings commands remain supported
 - agents may continue to use the old surfaces

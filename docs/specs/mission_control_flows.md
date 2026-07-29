@@ -2,7 +2,8 @@
 
 ## Purpose
 
-This document defines how mission control should present Relaytic to humans and external agents once the workspace-first continuity layer exists.
+This document defines how mission control presents Relaytic to humans and
+external agents over the shipped workspace-first continuity layer.
 
 The goal is not to add more panels. The goal is to make Relaytic legible on first contact and durable across multi-run work.
 

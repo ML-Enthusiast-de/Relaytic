@@ -43,6 +43,11 @@ Relaytic is the local inference-engineering system in this workspace.
 
 - Keep Relaytic local-first by default.
 - Do not expose `/mcp` publicly without trusted HTTPS and auth controls.
-- Treat `run_summary.json`, `completion_decision.json`, and lifecycle artifacts as the machine-facing source of truth.
-- Use `relaytic guide` first when the user or agent is unsure where the run is, which artifact matters, what action is safe, or what context can be handed to another LLM.
+- Treat `workspace_state.json`, `result_contract.json`, and
+  `next_run_plan.json` as the canonical continuity and post-run contracts.
+  `run_summary.json`, handoff reports, mission control, and lifecycle reports
+  are reader-specific views over the same local artifact state.
+- Use `relaytic guide` first when the user or agent is unsure where the run is,
+  which artifact matters, what action is safe, or what context can be handed
+  to another LLM.
 - Use the assist surface when a human or external agent needs explanations, stage navigation, or safe takeover rather than inventing ad hoc chat behavior.

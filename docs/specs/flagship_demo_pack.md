@@ -1,10 +1,12 @@
 # Flagship Demo Pack Contract
 
-The future flagship domain story for these demos is **Relaytic-AML**. The generic demo structure still applies, but the highest-value public product version of the pack should be AML-first.
+The flagship domain story for these demos is **Relaytic-AML**. The generic
+demo structure still applies, but the primary public proof path is AML-first.
 
 ## Purpose
 
-This document defines the public-safe and lab-safe flagship demos Relaytic should maintain once the later mission-control slices land.
+This document defines the public-safe and lab-safe flagship demos Relaytic
+maintains on the shipped mission-control surface.
 
 The goal is to demonstrate Relaytic through repeatable proof rather than narration.
 
@@ -41,7 +43,7 @@ A user or external agent brings an incumbent ruleset, alert engine, model, or pr
 - fair comparison
 - explicit beat-target contract
 - clear parity reasoning
-- no benchmark theater
+- no benchmark claims without corresponding evidence
 
 ### Required proof artifacts
 
@@ -83,7 +85,7 @@ Relaytic finishes one AML run, carries the investigation into a second run, pres
 - result-contract parity across reports
 - governed learnings
 - next-run planning
-- no continuity theater
+- continuity is backed by workspace artifacts rather than narrative state
 
 ### Required proof artifacts
 
@@ -104,11 +106,9 @@ Each demo should be judged at least on:
 - agent usability
 - replayability
 
-Those judgments should later feed `flagship_demo_scorecard.json`.
+Those judgments feed `flagship_demo_scorecard.json`.
 
 ## Slice 15S flagship path
-
-The next demo implementation should not create another generic tour.
 
 Slice 15S produced one `relaytic-aml-review-queue` bundle, strengthened by Slice 15T business-value guards, Slice 15U baseline/ablation artifacts, and Slice 15V graph-loader claim-scope artifacts, that proves:
 

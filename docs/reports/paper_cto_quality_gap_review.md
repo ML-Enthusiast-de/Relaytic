@@ -1,10 +1,13 @@
-# Relaytic-AML CTO / arXiv Quality Gap Review
+# Relaytic-AML Senior Technical Quality Review
 
 Date: 2026-07-01
 
 ## Perspective
 
-This review asks whether the current Relaytic-AML paper would read as a strong modern arXiv systems/evaluation paper to a senior ML leader at an AML-heavy company such as PayPal. The review does not change any detector claim. It checks whether the current story, evidence, and paper shape are likely to earn attention from strong technical readers.
+This historical review assessed whether the Relaytic-AML manuscript met the
+technical and evidentiary expectations of senior machine-learning systems and
+financial-crime practitioners. It did not alter detector claims. The
+recommendations led to the P19-A through P23 strengthening work.
 
 arXiv does not provide an official "high-ranked paper" standard. The comparison here uses recent visible patterns from strong arXiv papers in adjacent areas: agent evaluation, ML research-agent reliability, and modern AML graph/detector work.
 
@@ -39,21 +42,25 @@ The current paper has a credible and useful systems thesis:
 
 This is enough for a serious independent arXiv systems paper. It does not by itself establish broad production AML validation.
 
-## CTO Read
+## Senior Technical Read
 
-A PayPal-style AML ML CTO would probably find the architecture interesting, especially the local-first handoff and claim governance. The likely positive reaction is:
+A senior financial-crime ML reviewer would likely value the local-first
+handoff and claim-governance architecture. The strongest aspects were:
 
 - "This could reduce experiment-governance chaos."
 - "This could help teams use coding agents without leaking rows or overstating results."
 - "The evidence-cell model is a useful bridge between research, model risk, and compliance review."
 
-The likely skeptical reaction is:
+The main technical questions were:
 
-- "Show me this around a realistic AML detector or score stream."
-- "Show me it handles the shape of our work: entity graphs, alert queues, model versions, redaction, review capacity, and audit questions."
-- "Show me a comparison against a normal experiment tracker plus a normal model-card/checklist workflow."
-- "Show me what breaks when an agent tries to overclaim, touch private data, or use a test set."
-- "Do not sell me PaySim as an AML breakthrough."
+- whether the system could govern a realistic AML detector or score stream
+- whether it covered entity graphs, alert queues, model versions, redaction,
+  review capacity, and audit questions
+- how its behavior differed from experiment tracking plus model-card or
+  checklist workflows
+- what happened when an agent attempted to overclaim, expose private data, or
+  use a test partition during selection
+- whether PaySim remained correctly bounded as synthetic proxy evidence
 
 The current paper answers the overclaim/privacy/governance questions reasonably well. It does not yet answer the realistic-hosted-detector workflow question strongly enough.
 
@@ -63,12 +70,13 @@ Current quality level:
 
 - Good independent arXiv systems/evaluation paper: yes.
 - Credible AML governance/evaluation-lab paper: yes.
-- Top visible arXiv paper in the style of major agent-evaluation or AML benchmark papers: not yet.
+- Comparable in scope to large benchmark or detector papers: no, because the
+  contribution and evidence object are different.
 - External technical-review signal: the paper would benefit from one more concrete enterprise-relevant demonstration.
 
 The paper should not try to compete with TransXion, BlazingAML, LineMVGNN, or Elliptic2 as a detector or dataset paper. Its best route is to show that Relaytic-AML is the local-first governance substrate those kinds of detector workflows should run through.
 
-## Missing Pieces Before "Top Paper" Positioning
+## Missing Evidence Identified By The Review
 
 1. Hosted detector or score-stream demonstration.
    Relaytic should ingest a realistic external detector score file or benchmark output, attach evidence cells, enforce leakage/redaction rules, route claims, and export rowless context. This can be done without claiming detector novelty.
@@ -76,7 +84,7 @@ The paper should not try to compete with TransXion, BlazingAML, LineMVGNN, or El
 2. Adjacent-systems comparison with observed behavior.
    The current comparison is conceptual. A stronger paper would run the same miniature AML experiment through Relaytic-style artifacts versus a tracker/checklist-only workflow and report concrete differences: missing provenance fields, claim-blocking behavior, rowless handoff fields, and recovery state.
 
-3. CTO-grade operational story.
+3. Operational adoption story.
    The paper should more directly explain how a company would use Relaytic: experiment intake, local data posture, detector score attachment, analyst review budget, model-risk review, external-agent help, release claim gating, and audit handoff.
 
 4. Stronger system-evaluation scale.
@@ -85,7 +93,7 @@ The paper should not try to compete with TransXion, BlazingAML, LineMVGNN, or El
 5. Cleaner "why now" framing.
    The strongest modern hook is not "AML benchmark result"; it is "agentic ML workflows are becoming capable enough to create scientific-looking outputs, so high-stakes local domains need artifact-backed claim governance."
 
-## Recommended Next Stage
+## Recommended Stage At Review Time
 
 The next stage should not immediately chase a bigger detector score. It should choose and implement a hosted-detector workflow demonstration:
 

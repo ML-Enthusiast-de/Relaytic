@@ -38,7 +38,7 @@ P13 permits only a claim-safe evaluation-environment release.
 - [ ] Confirm `git status --short` is empty at the final commit.
 - [ ] Verify the final commit exists on the public remote before citing its commit URL.
 - [ ] Confirm the PDF, source archive, and revision manifest report the same full commit.
-- [ ] Confirm the release pack was regenerated after source commit `e083978c0b4a6f58ca127a464d0a6da9357986ec` if the evidence changed.
+- [ ] Confirm the release pack was regenerated after source commit `ce19a7dc63d834ba931b8022ee614f78f2464f25` if the evidence changed.
 - [ ] Attach or link the paper PDF, release manifest, public claims JSON, and benchmark artifacts.
 
 ## Fallback

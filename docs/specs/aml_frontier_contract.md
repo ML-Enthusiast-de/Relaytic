@@ -1,10 +1,11 @@
-# Relaytic-AML Frontier Contract
+# Relaytic-AML Technical Contract
 
 ## Purpose
 
 This document freezes the flagship domain pivot for Relaytic.
 
-Relaytic remains the public product name, package, and CLI. The new flagship story is **Relaytic-AML**: the AML and financial-crime frontier edition of Relaytic.
+Relaytic remains the public product name, package, and CLI. **Relaytic-AML** is
+the flagship AML and financial-crime application of Relaytic.
 
 The goal is to stop presenting Relaytic as a broad structured-data system with an unclear wedge and instead make it a serious local-first investigation system for high-stakes anti-money-laundering, fraud, and analyst-review workflows.
 
@@ -212,15 +213,16 @@ The AML proof path is accepted only after these slices are complete:
 - **15T** added guarded business-value metrics such as analyst-hours saved, false-positive reduction at fixed recall, recall at review capacity, precision at top-k, case-packet completeness, and operational overclaim blocking.
 - **15U** added strong AML baselines, capability ablations, adapter fallback reporting, contribution summaries, and benchmark relevance scorecards so graph, temporal, calibration, threshold, and review-budget contributions are measured.
 - **15V** added raw graph and subgraph ingestion, graph provenance, graph claim scope, and public graph benchmark cataloging so public graph AML work is not limited to flattened snapshots.
-- **15W** strengthens delayed-label, positive-unlabeled, threshold-drift, and time-window evaluation.
+- **15W** strengthened delayed-label, positive-unlabeled, threshold-drift, and time-window evaluation.
 - **15X** frames Relaytic runs as evaluation environments with explicit workflow scorecards, benchmark-environment readiness, unsafe-steering evidence, and model/environment score separation.
 - **15Y** rewrote first-contact docs around the flagship AML path, including the thesis page, product story, and paper benchmark runbook.
-- **15Z** cleans credibility-damaging repo structure before broader capability growth resumes.
-- **15Z-R** freezes the relevant benchmark and release evidence so public paper/demo claims are tied to reproducible artifacts instead of aspirational roadmap language.
+- **15Z** cleaned repository structure before broader capability growth.
+- **15Z-R** froze the relevant benchmark and release evidence so public paper
+  and demo claims are tied to reproducible artifacts.
 
 If any of these slices discovers that Relaytic-AML loses, the correct output is a failure report and next experiment, not a broader claim.
 
-## Required future artifacts
+## Canonical artifacts
 
 - `aml_domain_contract.json`
 - `aml_case_ontology.json`
@@ -261,9 +263,9 @@ If any of these slices discovers that Relaytic-AML loses, the correct output is 
 
 ## Success criterion
 
-Relaytic-AML is successful only if a strong technical reviewer can say:
+The Relaytic-AML proof path is accepted only when:
 
-- this is clearly built for a hard AML / fraud problem
+- the workflow addresses a documented AML or fraud problem
 - the architecture matches the problem
 - the benchmark story is honest
 - the review-budget and human-analyst economics are first-class
