@@ -153,17 +153,6 @@
       "passed": true,
       "reader_display": "0.9297",
       "source_matches": true
-    },
-    {
-      "actual": 0.974,
-      "artifact_ref": "docs/reports/paper_metric_cell_audit.json",
-      "display_present": true,
-      "expected": 0.974,
-      "field": "cell:elliptic2_p8b_modern_context.published_reference_pr_auc",
-      "metric": "RevClassifyDS reference",
-      "passed": true,
-      "reader_display": "0.9740",
-      "source_matches": true
     }
   ],
   "schema_version": "relaytic.paper_release_integrity.v1",

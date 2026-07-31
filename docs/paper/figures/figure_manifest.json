@@ -11,7 +11,7 @@
         "docs/reports/paper_publishability_matrix.json"
       ],
       "source_type": "schematic_explicit",
-      "title": "Relaytic-AML local-first architecture: local data and artifacts flow through role-scoped agents into evidence cells, interpretation gates, and paper/release/handoff surfaces."
+      "title": "Relaytic-AML local-first architecture: local data and artifacts flow through functional evaluation stages into evidence cells, interpretation gates, and release surfaces."
     },
     {
       "figure_id": "supporting_pr_auc",
@@ -33,7 +33,7 @@
         "docs/reports/paper_metric_cell_audit.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Benchmark evidence by task contract: local ranking estimates, Elliptic2 external-reference context, and validation-threshold review queues are shown in separate panels."
+      "title": "Evaluation evidence by task contract: local ranking estimates and validation-threshold review queues are shown in separate panels."
     },
     {
       "figure_id": "publishability_matrix",
@@ -43,7 +43,7 @@
         "docs/reports/paper_publishability_matrix.json"
       ],
       "source_type": "artifact_generated",
-      "title": "Claim routing summary: current cells map to admissible paper uses and to evidence needed for stronger future interpretations."
+      "title": "Claim routing summary: current cells map to admissible paper uses and to evidence requirements for stronger future interpretations."
     }
   ],
   "schema_version": "relaytic.paper_draft.v1",

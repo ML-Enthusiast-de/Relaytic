@@ -96,7 +96,7 @@
   "headline_claims_allowed": false,
   "known_metric_cell_count": 44,
   "limitation_count": 5,
-  "metric_cell_ref_count": 8,
+  "metric_cell_ref_count": 7,
   "next_slice": "Paper Track P12 - external dry run and clean-clone proof",
   "paper_can_continue_to_p12": true,
   "schema_version": "relaytic.paper_draft.v1",

@@ -22,6 +22,7 @@ from relaytic.release_safety.paper_evidence_contract import (
 
 PAPER_RELEASE_INTEGRITY_SCHEMA_VERSION = "relaytic.paper_release_integrity.v1"
 PAPER_RELEASE_INTEGRITY_REPORT_DIR = Path("docs") / "reports"
+ELLIPTIC2_PINNED_DATA_DF_SHA256 = "2baa712b67382aeade8d5e72dd07ddbffb1029b359a048c80a2300a3e3abc220"
 PAPER_RELEASE_INTEGRITY_FILENAMES = {
     "paper_p24_evidence_authority": "paper_p24_evidence_authority.json",
     "paper_p24_baseline_metric_snapshot": "paper_p24_baseline_metric_snapshot.json",
@@ -64,7 +65,6 @@ METRIC_AUTHORITIES = [
     ("Elliptic2 repeated PR-AUC", "elliptic2_repeated_seed_scorecard.json", "official_partition.test_pr_auc_mean", 0.943240, "0.9432"),
     ("Elliptic2 repeated std", "elliptic2_repeated_seed_scorecard.json", "official_partition.test_pr_auc_std", 0.000882, "0.0009"),
     ("Elliptic2 hash robustness", "elliptic2_repeated_seed_scorecard.json", "robustness_partition.test_pr_auc_mean", 0.929669, "0.9297"),
-    ("RevClassifyDS reference", "paper_metric_cell_audit.json", "cell:elliptic2_p8b_modern_context.published_reference_pr_auc", 0.974, "0.9740"),
 ]
 
 VERIFIED_CITATIONS = {
@@ -83,6 +83,9 @@ VERIFIED_CITATIONS = {
     "gaurav2025governanceaas": "https://arxiv.org/abs/2508.18765",
     "kaptein2026runtimegovernance": "https://arxiv.org/abs/2603.16586",
     "naik2026llmopsaml": "https://arxiv.org/abs/2605.11232",
+    "xia2026researchloop": "https://arxiv.org/abs/2605.28282",
+    "yue2026factreview": "https://arxiv.org/abs/2604.04074v1",
+    "iscan2026safetygatedmcp": "https://arxiv.org/abs/2605.01567",
 }
 
 
@@ -141,16 +144,31 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
 
     conflicts = [
         {
-            "topic": "Elliptic2 cohort",
-            "authoritative_current_core": {"subgraphs": 121810, "positives": 2763},
-            "authoritative_evaluable_cohort": {"rows": 110902, "positives": 2578},
-            "resolution": "report both populations. Benchmark metrics apply only to the pinned RevTrack-evaluable cohort.",
-            "passed": all(token in markdown for token in ("121,810", "110,902", "2,763", "2,578")),
+            "topic": "Elliptic2 count states and provenance",
+            "locally_audited_current_core": {"subgraphs": 121810, "positives": 2763},
+            "revtrack_paper_state": {"subgraphs": 121810, "positives": 2718},
+            "pinned_external_artifact": {"rows": 110902, "positives": 2578},
+            "resolution": (
+                "report all three states separately. Local metrics apply only to the pinned external artifact. "
+                "The repository does not explain the count or label differences."
+            ),
+            "passed": all(
+                token in markdown
+                for token in (
+                    "121,810",
+                    "2,763",
+                    "2,718",
+                    "110,902",
+                    "2,578",
+                    ELLIPTIC2_PINNED_DATA_DF_SHA256,
+                    "does not explain these count or label differences",
+                )
+            ),
         },
         {
             "topic": "Elliptic2 test exposure",
-            "resolution": "describe the repeated RevTrack TST estimate as confirmatory, with prior test exposure disclosed",
-            "passed": "confirmatory rather than blind or untouched evidence" in markdown,
+            "resolution": "describe the repeated local TST estimate as neither a blind holdout result nor a reproduction or parity claim",
+            "passed": "neither a blind holdout result nor a reproduction or parity claim" in markdown,
         },
     ]
     conflict_audit = _report("pass" if all(row["passed"] for row in conflicts) else "fail", conflicts=conflicts)
@@ -163,7 +181,14 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
         "Elliptic unknown-label policy": ["Unknown-label nodes", "never targets or metric rows"],
         "Elliptic validation-test gap": ["validation PR-AUC 0.9767", "test PR-AUC 0.6688"],
         "Review-threshold transfer": ["applying that threshold unchanged to test", "scores equal to the threshold are included"],
-        "Elliptic2 partition provenance": ["TRN", "VAL", "TST", "provided RevTrack"],
+        "Elliptic2 artifact provenance": [
+            "data_df.pkl",
+            ELLIPTIC2_PINNED_DATA_DF_SHA256,
+            "TRN",
+            "VAL",
+            "TST",
+            "supplied by the pinned external RevTrack-format artifact",
+        ],
         "Single-seed disclosure": ["single-seed point estimates"],
         "Calibration boundary": ["Raw and calibrated test PR-AUC are both"],
     }
@@ -226,7 +251,8 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
     )
 
     visual_checks = [
-        {"check": "three distinct panels", "passed": all(label in figure4 for label in ("A. Local test ranking evidence", "B. Elliptic2 reference context", "C. Validation-threshold review queues"))},
+        {"check": "two distinct panels", "passed": all(label in figure4 for label in ("A. Local test ranking evidence", "B. Validation-threshold review queues")) and "C." not in figure4},
+        {"check": "external-artifact values omitted from figure", "passed": all(token not in figure4 for token in ("0.9740", "0.9432", "0.9297", "RevClassifyDS", "Elliptic2", "Pinned external-artifact context"))},
         {"check": "non-comparability sentence inside figure", "passed": "Values across datasets and task contracts are not directly comparable." in figure4},
         {"check": "vector source", "passed": figure4.lstrip().startswith("<svg")},
         {"check": "realized queue context", "passed": all(token in figure4 for token in ("1,109 / 123,580", "36 / 11,184"))},
@@ -239,7 +265,14 @@ def build_paper_release_integrity_pack(project_root: str | Path) -> dict[str, An
         {"mode": "deterministic fixtures", "passed": "Deterministic fixtures" in markdown},
         {"mode": "artifact verification", "passed": "Artifact verification" in markdown},
         {"mode": "raw-data rerun", "passed": "raw-data rerun" in markdown.lower()},
-        {"mode": "optional execution semantics", "passed": "--require-full-rerun" in markdown and "prior test exposure remains disclosed" in markdown},
+        {
+            "mode": "Elliptic2 pinned-artifact requirement",
+            "passed": (
+                "--require-full-rerun" in markdown
+                and "local pinned data_df.pkl" in markdown
+                and "cannot construct the pinned artifact" in markdown
+            ),
+        },
     ]
     reproduction_semantics = _report("pass" if all(row["passed"] for row in reproduction_checks) else "fail", checks=reproduction_checks)
 
@@ -628,6 +661,23 @@ def _reference_provenance_audit(reports: Path, markdown: str) -> dict[str, Any]:
     scorecard = _read_json(reports / "elliptic2_revclassify_reference_scorecard.json")
     reference = dict(scorecard.get("reference", {}) or {})
     expected_hash = "b253d97531a0da6fd16a46bb54904437d4373984dfb2559e69c2104faaa08728"
+    abstract = markdown.split("## 1. Introduction", 1)[0]
+    blocks = re.split(r"\n\s*\n", markdown)
+    protocol_blocks = [block for block in blocks if "Three documented count states remain distinct" in block]
+    elliptic2_result_blocks = [block for block in blocks if "Elliptic2 is reported only as a pinned external-artifact context case" in block]
+    forbidden_transformation_phrases = (
+        "after preprocessing",
+        "after filtering",
+        "filtered subset",
+        "derived from the current core",
+        "cleaned cohort",
+        "matched cohort",
+        "cohort parity",
+        "reference parity established",
+        "full-core equivalence",
+    )
+    limitation_report = reports / "elliptic2_cohort_provenance_limitation.md"
+    limitation_report_ref = "docs/reports/elliptic2_cohort_provenance_limitation.md"
     checks = [
         {
             "check": "versioned RevTrack source",
@@ -648,10 +698,76 @@ def _reference_provenance_audit(reports: Path, markdown: str) -> dict[str, Any]:
             "passed": reference.get("versioned_pdf_sha256") == expected_hash,
         },
         {
-            "check": "reader-facing cohort boundary",
-            "observed": "published reference is described as context, not parity",
-            "pass_criterion": "paper identifies the reference as a published context metric",
-            "passed": "RevClassifyDS" in markdown and "shown only as an external reference" in markdown,
+            "check": "published RevClassifyDS value omitted",
+            "observed": markdown.count("0.9740"),
+            "pass_criterion": "0.9740 is absent from the complete manuscript",
+            "passed": "0.9740" not in markdown,
+        },
+        {
+            "check": "abstract centers the architecture and tested fixtures",
+            "observed": abstract,
+            "pass_criterion": "Elliptic2 and its metrics are absent while tested system outcomes remain qualified",
+            "passed": (
+                all(token not in abstract for token in ("Elliptic2", "0.9432", "0.9297", "0.9740"))
+                and "Across the tested system fixtures" in abstract
+                and "all six injected unsupported-claim cases were blocked" in abstract
+                and "raw records were excluded from rowless handoff" in abstract
+            ),
+        },
+        {
+            "check": "pinned artifact hash appears once",
+            "observed": markdown.count(ELLIPTIC2_PINNED_DATA_DF_SHA256),
+            "pass_criterion": "the full data_df.pkl hash appears exactly once in Reproducibility",
+            "passed": (
+                markdown.count(ELLIPTIC2_PINNED_DATA_DF_SHA256) == 1
+                and "## 9. Reproducibility" in markdown
+                and markdown.index(ELLIPTIC2_PINNED_DATA_DF_SHA256) > markdown.index("## 9. Reproducibility")
+            ),
+        },
+        {
+            "check": "three count states are centralized in Experimental Protocol",
+            "observed": {
+                "current_local_audit": "121,810 / 2,763",
+                "revtrack_paper": "121,810 / 2,718",
+                "pinned_artifact": "110,902 / 2,578",
+                "protocol_block_count": len(protocol_blocks),
+            },
+            "pass_criterion": "one protocol paragraph states all three states, cites Song, and leaves differences unexplained",
+            "passed": (
+                len(protocol_blocks) == 1
+                and "## 5. Experimental Protocol" in markdown
+                and markdown.index(protocol_blocks[0]) > markdown.index("## 5. Experimental Protocol")
+                and "a local audit of the current core records 121,810 subgraphs and 2,763 positives" in protocol_blocks[0]
+                and "RevTrack paper reports 121,810 subgraphs and 2,718 positives [@song2024revtrack]" in protocol_blocks[0]
+                and "pinned artifact contains 110,902 rows and 2,578 positives" in protocol_blocks[0]
+                and "does not explain these count or label differences" in protocol_blocks[0]
+            ),
+        },
+        {
+            "check": "Elliptic2 result is concise and non-comparative",
+            "observed": elliptic2_result_blocks,
+            "pass_criterion": "one Results paragraph contains local estimates, prior exposure, and no numerical external comparison",
+            "passed": (
+                len(elliptic2_result_blocks) == 1
+                and all(token in elliptic2_result_blocks[0] for token in ("0.9432", "0.0009", "0.9297", "neither a blind holdout result", "No numerical comparison with published RevClassifyDS performance is made"))
+                and all(token not in elliptic2_result_blocks[0] for token in ("121,810", "110,902", "2,763", "2,718", "2,578", "0.9740"))
+            ),
+        },
+        {
+            "check": "misleading transformation language absent",
+            "observed": [
+                phrase
+                for phrase in forbidden_transformation_phrases
+                if phrase in markdown.lower()
+            ],
+            "pass_criterion": "no unsupported transformation, subset, or established-parity phrase",
+            "passed": not any(phrase in markdown.lower() for phrase in forbidden_transformation_phrases),
+        },
+        {
+            "check": "durable provenance limitation present",
+            "observed": limitation_report_ref,
+            "pass_criterion": "repository keeps the unresolved upstream gap as a permanent limitations report",
+            "passed": limitation_report.is_file(),
         },
     ]
     return _report("pass" if all(row["passed"] for row in checks) else "fail", checks=checks)
@@ -752,6 +868,13 @@ def _semantic_findings(markdown: str, bibliography: str) -> list[dict[str, str]]
         "incorrect single-seed grammar": r"\bseeds 42\b",
         "incorrect finalist distinction": r"all finalist scores are distinct|finalist scores were distinct|unique XGBoost runner-up",
         "development-build wording": r"review draft|review build|uncommitted review build",
+        "unsupported Elliptic2 transformation wording": (
+            r"\b(?:after preprocessing|after filtering|filtered subset|derived from the current core|"
+            r"cleaned cohort|matched cohort)\b"
+        ),
+        "unsupported Elliptic2 equivalence wording": (
+            r"\b(?:cohort parity|reference parity established|full-core equivalence)\b"
+        ),
     }
     combined = markdown + "\n" + bibliography
     for rule, pattern in patterns.items():

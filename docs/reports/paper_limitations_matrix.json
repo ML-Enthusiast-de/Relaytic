@@ -79,9 +79,9 @@
         "docs/reports/paper_p8d_thesis_decision.json"
       ],
       "limitation_id": "LIM-03-elliptic2-context-only",
-      "limitation_text": "Elliptic2 is retained as modern context and limitation evidence only. It is not a Relaytic performance contribution in this paper.",
+      "limitation_text": "Elliptic2 is retained only as non-comparable context on a pinned external artifact. Its upstream construction and row-level relationship to the current core are unavailable.",
       "paper_section": "Limitations",
-      "required_repair": "Reproduce the RevClassify reference setup faithfully or define a new leakage-resistant subgraph protocol with viable cohort proof."
+      "required_repair": "Recover upstream artifact provenance and row-level mapping before defining any matched comparison or reference-method study."
     },
     {
       "affected_claims": [
@@ -129,7 +129,7 @@
     "No hard real-world AML superiority claim is allowed in the first draft.",
     "No SOTA, claimed equivalence to RevClassify, graph-neural superiority, or business-value headline claim is allowed.",
     "PaySim and Elliptic numbers may be used as supporting evidence only.",
-    "Elliptic2 numbers may be used only as modern context and limitation evidence.",
+    "Elliptic2 numbers may be used only as pinned external-artifact context and limitation evidence.",
     "P12 clean-clone proof remains required before public release."
   ],
   "schema_version": "relaytic.paper_draft.v1",

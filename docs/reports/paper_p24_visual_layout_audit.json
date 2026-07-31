@@ -1,7 +1,11 @@
 {
   "checks": [
     {
-      "check": "three distinct panels",
+      "check": "two distinct panels",
+      "passed": true
+    },
+    {
+      "check": "external-artifact values omitted from figure",
       "passed": true
     },
     {

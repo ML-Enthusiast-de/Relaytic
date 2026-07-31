@@ -129,7 +129,7 @@ def test_paper_track_p20_committed_artifacts_and_reader_path_are_ready() -> None
     assert "A small-sample XGBoost probe reached" in draft
     assert "Competitive search | XGBoost probe" not in draft
     assert "README contains the full regeneration script" in draft
-    assert "immutable source commit recorded in the release bundle" in draft
+    assert "release bundle records the exact source commit and tag used for the arXiv submission" in draft
     assert "Deep audit, after the first read" in readme
     assert "docs/paper/README.md" in readme
     assert "paper artifact-generation pipeline" in readme

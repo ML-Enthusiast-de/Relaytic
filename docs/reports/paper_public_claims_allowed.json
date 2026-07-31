@@ -3,7 +3,7 @@
     "Relaytic-AML is a local-first, claim-gated evaluation environment for temporal, graph, and operational financial-crime machine learning.",
     "The current paper pack presents Relaytic as a local-first anti-money-laundering evaluation lab with local artifacts, specialist roles, redacted context export, and explicit claim boundaries.",
     "PaySim and Elliptic rows may be described as supporting evidence only under their documented proxy and graph-feature boundaries.",
-    "Elliptic2 may be described as modern context and limitation evidence only, not as a Relaytic performance contribution.",
+    "Elliptic2 may be described only as pinned external-artifact context and limitation evidence, not as a Relaytic performance contribution.",
     "The public source package and paper assets may be regenerated from the repository commands documented in the paper."
   ],
   "blocked_public_claims": [
@@ -47,7 +47,7 @@
   "hard_claims_allowed": false,
   "headline_claims_allowed": false,
   "metric_wording_boundaries": {
-    "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean": "May be cited as modern context only, below the recorded RevClassifyDS reference and not a parity claim.",
+    "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean": "May be cited only as a repeated local estimate on the pinned external artifact. The upstream transformation and cohort relationship are not established, so no comparison or parity claim is allowed.",
     "elliptic_p7_selected_graph_feature_baseline.test_pr_auc": "May be cited as supporting temporal graph-feature evidence only.",
     "paysim_p6a_competitive_selected.test_pr_auc": "May be cited as supporting synthetic temporal-fraud evidence only."
   },

@@ -60,6 +60,8 @@ def test_paper_track_p14_builds_arxiv_source_release_candidate() -> None:
     assert "t.gehra.ai@gmail.com" in main_tex
     assert "pdftitle=" in main_tex and "pdfauthor={Tobias Gehra}" in main_tex
     assert r"\begin{algorithm}" in main_tex
+    assert r"\mbox{ResearchLoop}" in main_tex
+    assert r"\mbox{Elliptic2}" in main_tex
     assert ("TODO" + "_EVIDENCE") not in main_tex
     assert r"TODO\_EVIDENCE" not in main_tex
     assert "\\documentclass" in main_tex
@@ -156,12 +158,15 @@ def test_paper_track_p14_committed_source_bundle_is_ready() -> None:
         in main_tex
     )
     assert r"GitHub: \texttt{ML-Enthusiast-de}" not in main_tex
+    assert r"\mbox{ResearchLoop}" in main_tex
+    assert r"\mbox{Elliptic2}" in main_tex
 
     cited_keys = set()
-    for citation in re.findall(r"\\citep?\{([^}]+)\}", main_tex):
+    for citation in re.findall(r"\\cite[pt]?\{([^}]+)\}", main_tex):
         cited_keys.update(part.strip() for part in citation.split(","))
     bib_keys = set(re.findall(r"@\w+\{([^,\s]+)", references))
     assert cited_keys <= bib_keys
+    assert r"\citep{song2024revtrack}" in main_tex
 
     figure_refs = manifest["source_tree"]["artifact_refs"]
     pdf_refs = [ref for ref in figure_refs if ref.endswith(".pdf")]

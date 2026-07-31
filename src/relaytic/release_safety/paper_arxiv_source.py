@@ -695,7 +695,10 @@ def _markdown_lines_to_latex(lines: list[str]) -> list[str]:
                     out.append(r"\Needspace{22\baselineskip}")
                 elif code_lang in {"powershell", "bash", "text"}:
                     out.append(r"\Needspace{14\baselineskip}")
-                out.append(r"\begin{Verbatim}[frame=single,framesep=6pt,fontsize=\footnotesize,breaklines=true,breakanywhere=true]")
+                options = r"frame=single,framesep=6pt,fontsize=\footnotesize,breaklines=true,breakanywhere=true"
+                if code_lang == "json":
+                    options += r",breaksymbolleft={}"
+                out.append(r"\begin{Verbatim}[" + options + "]")
             previous_blank = False
             continue
 
@@ -852,7 +855,8 @@ def _render_latex_table(
     if page_float:
         rendered.extend(
             [
-                r"\begin{table}[p]",
+                r"\Needspace{30\baselineskip}",
+                r"\begin{table}[H]",
                 r"\centering",
                 f"\\caption{{{_latex_inline(caption)}}}",
                 r"\begin{minipage}{\linewidth}",
@@ -1036,8 +1040,14 @@ def _latex_inline(text: str) -> str:
     converted = _convert_inline_code(converted)
     converted = _convert_commit_hashes(converted)
     converted = _convert_bold(converted)
+    converted = _convert_italics(converted)
+    converted = _protect_proper_names(converted)
     converted = converted.replace(r"$\pm$", r"\ensuremath{\pm}")
-    return _escape_latex(converted)
+    escaped = _escape_latex(converted)
+    return escaped.replace(
+        r"\nolinkurl{paper-final-preflight}",
+        r"\mbox{\nolinkurl{paper-final-preflight}}",
+    )
 
 
 def _rewrite_paper_source_text(text: str) -> str:
@@ -1061,7 +1071,12 @@ def _convert_markdown_citations(text: str) -> str:
         ]
         return r"\citep{" + ",".join(keys) + "}"
 
-    return re.sub(r"\[@([^\]]+)\]", repl, text)
+    converted = re.sub(r"\[@([^\]]+)\]", repl, text)
+    return re.sub(
+        r"(?<![\w@])@([A-Za-z0-9_.:-]+)",
+        lambda match: r"\citet{" + match.group(1) + "}",
+        converted,
+    )
 
 
 def _convert_inline_code(text: str) -> str:
@@ -1080,6 +1095,22 @@ def _convert_bold(text: str) -> str:
     return re.sub(r"\*\*([^*]+)\*\*", lambda match: r"\textbf{" + match.group(1) + "}", text)
 
 
+def _convert_italics(text: str) -> str:
+    return re.sub(
+        r"(?<!\*)\*([^*\n]+)\*(?!\*)",
+        lambda match: r"\emph{" + match.group(1) + "}",
+        text,
+    )
+
+
+def _protect_proper_names(text: str) -> str:
+    return re.sub(
+        r"(?<![A-Za-z0-9_/{])(ResearchLoop|Elliptic2)(?![A-Za-z0-9_])",
+        lambda match: r"\mbox{" + match.group(1) + "}",
+        text,
+    )
+
+
 def _escape_latex(text: str) -> str:
     placeholders: dict[str, str] = {}
 
@@ -1088,10 +1119,12 @@ def _escape_latex(text: str) -> str:
         placeholders[key] = value
         return key
 
-    text = re.sub(r"\\citep?\{[^}]+\}", lambda match: hold("cite", match.group(0)), text)
+    text = re.sub(r"\\cite[pt]?\{[^}]+\}", lambda match: hold("cite", match.group(0)), text)
     text = re.sub(r"\\texttt\{[^}]*\}", lambda match: hold("texttt", match.group(0)), text)
     text = re.sub(r"\\nolinkurl\{[^}]*\}", lambda match: hold("nolinkurl", match.group(0)), text)
     text = re.sub(r"\\textbf\{[^}]*\}", lambda match: hold("textbf", match.group(0)), text)
+    text = re.sub(r"\\emph\{[^}]*\}", lambda match: hold("emph", match.group(0)), text)
+    text = re.sub(r"\\mbox\{[^}]*\}", lambda match: hold("mbox", match.group(0)), text)
     text = re.sub(r"\\ensuremath\{\\pm\}", lambda match: hold("math", match.group(0)), text)
     replacements = {
         "\\": r"\textbackslash{}",
@@ -1110,7 +1143,7 @@ def _escape_latex(text: str) -> str:
         if value.startswith(r"\nolinkurl{"):
             inner = value[value.index("{") + 1 : -1]
             value = r"\nolinkurl{" + inner.replace("{", "").replace("}", "") + "}"
-        elif value.startswith(r"\texttt{") or value.startswith(r"\textbf{"):
+        elif value.startswith(r"\texttt{") or value.startswith(r"\textbf{") or value.startswith(r"\emph{") or value.startswith(r"\mbox{"):
             inner = value[value.index("{") + 1 : -1]
             value = value[: value.index("{") + 1] + _escape_latex(inner) + "}"
         escaped = escaped.replace(key, value)
@@ -1458,7 +1491,7 @@ def _pdf_escape_text(text: str) -> str:
 
 def _audit_citations(*, tex_source: str, bibliography: str) -> dict[str, Any]:
     cited = []
-    for raw in re.findall(r"\\citep?\{([^}]+)\}", tex_source):
+    for raw in re.findall(r"\\cite[pt]?\{([^}]+)\}", tex_source):
         cited.extend(part.strip() for part in raw.split(",") if part.strip())
     cited_keys = sorted(set(cited))
     bib_keys = sorted(set(re.findall(r"@\w+\{([^,\s]+)", bibliography)))

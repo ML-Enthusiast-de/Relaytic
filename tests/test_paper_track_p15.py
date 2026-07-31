@@ -138,6 +138,7 @@ def test_paper_track_p15_committed_system_eval_artifacts_are_ready() -> None:
     assert "The system claim is evaluated through deterministic reader and agent tasks." in draft
     assert "Rowless handoff" in draft
     assert "Table 6. Deterministic artifact and release-gate checks" in draft
-    assert "Across the tested fixtures, Relaytic-AML changes what the release pipeline may promote" in draft
+    assert "Across the tested fixtures, a number with missing provenance" in draft
+    assert "All six injected unsupported-claim cases were blocked" in draft
     assert "raw rows remain redacted" in draft
     assert "The handoff and recovery rows give the practical external-agent story." in draft

@@ -139,7 +139,7 @@
   ],
   "claim_safe_public_release_allowed": true,
   "failed_checks": [],
-  "git_commit": "ce19a7dc63d834ba931b8022ee614f78f2464f25",
+  "git_commit": "06d9af1209fb3dd9bdd10cdecfa4935b1211c74f",
   "git_dirty": true,
   "git_state_semantics": "generation_base_commit_not_manifest_self_hash",
   "hard_claims_allowed": false,
@@ -433,6 +433,24 @@
       "citation_key": "yang2026skillopt",
       "source_url": "https://arxiv.org/abs/2605.23904",
       "verified_role": "Recent agentic-ML context for treating external agent state and validation-gated updates as first-class research objects."
+    },
+    {
+      "accessed_date": "2026-07-31",
+      "citation_key": "xia2026researchloop",
+      "source_url": "https://arxiv.org/abs/2605.28282",
+      "verified_role": "Repository-backed research-control state and evidence-gated claim-admission context."
+    },
+    {
+      "accessed_date": "2026-07-31",
+      "citation_key": "yue2026factreview",
+      "source_url": "https://arxiv.org/abs/2604.04074v1",
+      "verified_role": "Version-1 reviewer-side literature positioning and execution-based claim-verification context."
+    },
+    {
+      "accessed_date": "2026-07-31",
+      "citation_key": "iscan2026safetygatedmcp",
+      "source_url": "https://arxiv.org/abs/2605.01567",
+      "verified_role": "Safety-gated local developer-memory architecture separating deterministic and learned assistance."
     },
     {
       "accessed_date": "2026-07-14",

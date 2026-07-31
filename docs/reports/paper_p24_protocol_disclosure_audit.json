@@ -61,13 +61,15 @@
       ]
     },
     {
-      "check": "Elliptic2 partition provenance",
+      "check": "Elliptic2 artifact provenance",
       "passed": true,
       "required_phrases": [
+        "data_df.pkl",
+        "2baa712b67382aeade8d5e72dd07ddbffb1029b359a048c80a2300a3e3abc220",
         "TRN",
         "VAL",
         "TST",
-        "provided RevTrack"
+        "supplied by the pinned external RevTrack-format artifact"
       ]
     },
     {

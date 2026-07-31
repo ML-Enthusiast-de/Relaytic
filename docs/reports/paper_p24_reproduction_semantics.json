@@ -21,7 +21,7 @@
       "passed": true
     },
     {
-      "mode": "optional execution semantics",
+      "mode": "Elliptic2 pinned-artifact requirement",
       "passed": true
     }
   ],

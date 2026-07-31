@@ -330,16 +330,16 @@ def _build_paysim_selection_story_review(inputs: dict[str, Any]) -> dict[str, An
             and _result_has_context(
                 draft,
                 "PR-AUC 0.9432",
-                ["RevClassifyDS", "external reference", "confirmatory"],
+                ["pinned external-artifact context case", "neither a blind holdout result", "No numerical comparison with published RevClassifyDS performance is made"],
             ),
             "Every main result needs nearby interpretation rather than a bare number.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
         _check(
             "detector_superiority_boundary_intact",
-            "not evidence of bank-scale AML superiority" in draft
+            "rather than real-bank AML inference" in draft
             and "rather than a new detector or detector-superiority result" in draft
-            and "not a detector contribution" in draft
+            and "not detector superiority, privacy certification, or production effectiveness" in draft
             and "hard aml, headline, sota" in _text_payload(inputs["readme"]).lower(),
             "The detector-superiority boundary must remain visible in the paper and README.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
@@ -370,8 +370,9 @@ def _build_reader_guidance_audit(inputs: dict[str, Any]) -> dict[str, Any]:
     checks = [
         _check(
             "reader_enters_through_readme_and_paper",
-            "A reader should start with the README and this paper" in draft
-            and "For a paper review, use this path" in readme,
+            "For a paper review, use this path" in readme
+            and "docs/paper/relaytic_aml_arxiv_draft.pdf" in readme
+            and "Repository: https://github.com/ML-Enthusiast-de/Relaytic" in draft,
             "The paper should route readers to the README and manuscript, not to internal build plans.",
             source_artifact="README.md",
         ),
@@ -387,7 +388,11 @@ def _build_reader_guidance_audit(inputs: dict[str, Any]) -> dict[str, Any]:
             "cross_platform_paper_commands_visible",
             "Windows PowerShell" in readme
             and "macOS/Linux" in readme
-            and "paper-narrative-polish --format json" in readme
+            and "paper-invariants --format json" in readme
+            and "paper-release-integrity --candidate --format json" in readme
+            and "paper-final-preflight --format json" in readme
+            and "paper-narrative-polish --format json" not in readme
+            and "paper-novelty-positioning --format json" not in readme
             and "README contains the full regeneration script" in draft
             and "Appendix reproduction shortcut" in draft,
             "README and paper must expose copy-paste-safe Windows and macOS/Linux paper commands.",
@@ -458,10 +463,15 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
     appendix_table_count = len(re.findall(r"\*\*Appendix table\.", draft))
     table_count = main_table_count + appendix_table_count
     manuscript_body = draft.split("## References", 1)[0]
-    prose_without_citations = re.sub(r"\[@[^\]]+\]", "", manuscript_body)
+    # The release abstract intentionally uses the conventional "We evaluate"
+    # construction. The remaining manuscript keeps the established impersonal
+    # voice contract.
+    _, introduction_marker, post_abstract_body = manuscript_body.partition("## 1. Introduction")
+    impersonal_body = post_abstract_body if introduction_marker else manuscript_body
+    prose_without_citations = re.sub(r"\[@[^\]]+\]", "", impersonal_body)
     first_person_hits = re.findall(r"\b(?:I|we|our|ours|us)\b", prose_without_citations, flags=re.IGNORECASE)
     introduced_surfaces = (
-        "Table 1 distinguishes" in draft
+        "Table 1 locates" in draft
         and "Table 2 presents" in draft
         and "can be seen in Table 3" in draft
         and "shown in Table 4" in draft
@@ -483,7 +493,7 @@ def _build_visual_table_polish_audit(inputs: dict[str, Any]) -> dict[str, Any]:
         ),
         _check(
             "figure_four_metric_grouping_explained",
-            "Figure 4 separates local ranking evidence, external reference context, and realized review queues" in draft
+            "Figure 4 separates within-task ranking estimates from validation-threshold review queues" in draft
             and "must not be read as a cross-dataset leaderboard" in draft,
             "Figure 4 must not mix PR-AUC and review-budget metrics without interpretation.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",

@@ -2,7 +2,7 @@
   "checks": [
     {
       "check_id": "what_is_new_section_present",
-      "message": "The manuscript must contain a concise reader-facing distinction section after related work.",
+      "message": "The manuscript must state its system distinction concisely in Related Work and Table 1.",
       "passed": true,
       "source_artifact": "docs/paper/relaytic_aml_arxiv_draft.md"
     },

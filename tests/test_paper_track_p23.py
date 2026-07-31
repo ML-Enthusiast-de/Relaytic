@@ -109,8 +109,8 @@ def test_paper_track_p23_committed_artifacts_are_ready() -> None:
     assert audit["status"] == "pass"
     assert matrix["status"] == "pass"
     assert "Paper P23 Novelty And Adjacent-Systems Distinction" in summary
-    assert "System distinction" in draft
+    assert "Table 1 locates this responsibility" in draft
     assert "executable provenance record and a separate interpretation gate" in draft
-    assert "local evidence and claim-governance substrate" in draft
-    assert "governance substrate for detector studies rather than a replacement" in draft
-    assert "not a SAR drafting system" in draft
+    assert "evaluation and claim governance around detector runs" in draft
+    assert "auditable experimental evidence before downstream writing" in draft
+    assert "AML measurement, handoff, and claim controls" in draft

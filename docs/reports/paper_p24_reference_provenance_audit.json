@@ -19,9 +19,52 @@
       "passed": true
     },
     {
-      "check": "reader-facing cohort boundary",
-      "observed": "published reference is described as context, not parity",
-      "pass_criterion": "paper identifies the reference as a published context metric",
+      "check": "published RevClassifyDS value omitted",
+      "observed": 0,
+      "pass_criterion": "0.9740 is absent from the complete manuscript",
+      "passed": true
+    },
+    {
+      "check": "abstract centers the architecture and tested fixtures",
+      "observed": "# Relaytic-AML: A Local-First, Agent-Assisted Evaluation Lab for Financial-Crime Machine Learning\n\n## Abstract\n\nAnti-money laundering (AML) machine-learning experiments are difficult to audit when data residency, temporal validity, graph provenance, agent assistance, review capacity, and public reporting are managed separately. Relaytic-AML is a local-first evaluation lab in which capability-scoped agents and deterministic harnesses convert local runs into provenance-bearing measurements and evidence-bounded release decisions. The architecture is evaluated with temporal PaySim and Elliptic workflows, an external-artifact governance case, and deterministic failure, handoff, and release-gate fixtures. The selected PaySim and Elliptic test PR-AUC point estimates are 0.6388 and 0.6688. Each is reported together with its split, feature, budget, calibration, and test-exposure contract. Across the tested system fixtures, required metric provenance was preserved, raw records were excluded from rowless handoff, and all six injected unsupported-claim cases were blocked. Relaytic-AML contributes an auditable evaluation, governance, and reproducibility architecture for agent-assisted AML experimentation rather than a new detector or detector-superiority result.\n\n",
+      "pass_criterion": "Elliptic2 and its metrics are absent while tested system outcomes remain qualified",
+      "passed": true
+    },
+    {
+      "check": "pinned artifact hash appears once",
+      "observed": 1,
+      "pass_criterion": "the full data_df.pkl hash appears exactly once in Reproducibility",
+      "passed": true
+    },
+    {
+      "check": "three count states are centralized in Experimental Protocol",
+      "observed": {
+        "current_local_audit": "121,810 / 2,763",
+        "pinned_artifact": "110,902 / 2,578",
+        "protocol_block_count": 1,
+        "revtrack_paper": "121,810 / 2,718"
+      },
+      "pass_criterion": "one protocol paragraph states all three states, cites Song, and leaves differences unexplained",
+      "passed": true
+    },
+    {
+      "check": "Elliptic2 result is concise and non-comparative",
+      "observed": [
+        "Elliptic2 is reported only as a pinned external-artifact context case. On the supplied `TST` partition, the three-seed local estimate is PR-AUC 0.9432 $\\pm$ 0.0009. A separately defined content-hash partition yields 0.9297. Because the upstream construction and row-level mapping are unavailable and the supplied `TST` partition had been inspected during an earlier recovery run, the repeated estimate is neither a blind holdout result nor a reproduction or parity claim. No numerical comparison with published RevClassifyDS performance is made because cohort equivalence, upstream table construction, and method reproduction are not established."
+      ],
+      "pass_criterion": "one Results paragraph contains local estimates, prior exposure, and no numerical external comparison",
+      "passed": true
+    },
+    {
+      "check": "misleading transformation language absent",
+      "observed": [],
+      "pass_criterion": "no unsupported transformation, subset, or established-parity phrase",
+      "passed": true
+    },
+    {
+      "check": "durable provenance limitation present",
+      "observed": "docs/reports/elliptic2_cohort_provenance_limitation.md",
+      "pass_criterion": "repository keeps the unresolved upstream gap as a permanent limitations report",
       "passed": true
     }
   ],

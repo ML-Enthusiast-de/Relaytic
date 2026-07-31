@@ -199,14 +199,14 @@ def _build_novelty_audit(*, inputs: dict[str, Any], matrix: dict[str, Any]) -> d
     checks = [
         _check(
             "what_is_new_section_present",
-            "system distinction" in normalized
+            "table 1 locates this responsibility" in normalized
             and "executable provenance record and a separate interpretation gate" in normalized,
-            "The manuscript must contain a concise reader-facing distinction section after related work.",
+            "The manuscript must state its system distinction concisely in Related Work and Table 1.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
         _check(
             "around_detectors_and_agents_framing_present",
-            "one layer around that work" in normalized
+            "addresses the surrounding evaluation process" in normalized
             and "between a detector run and every outward-facing table" in normalized
             and "rowless handoff" in normalized
             and "claim gates" in normalized,
@@ -217,20 +217,20 @@ def _build_novelty_audit(*, inputs: dict[str, Any], matrix: dict[str, Any]) -> d
             "aml_llm_and_sar_distinctions_present",
             "aml llm graph reasoning" in normalized
             and "agentic sar and compliance narrative assistants" in normalized
-            and "not a sar drafting system" in normalized,
+            and "auditable experimental evidence before downstream writing" in normalized,
             "The manuscript must distinguish Relaytic-AML from AML LLM triage and SAR-writing assistants.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
         _check(
             "agent_governance_distinction_present",
             "agent governance and runtime trust layers" in normalized
-            and "not a general-purpose agent-governance product" in normalized,
+            and "aml measurement, handoff, and claim controls" in normalized,
             "The manuscript must distinguish Relaytic-AML from general runtime agent-governance systems.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",
         ),
         _check(
             "not_detector_replacement_boundary_present",
-            "governs detector evidence rather than introducing a graph-neural model" in normalized
+            "evaluation and claim governance around detector runs" in normalized
             and "rather than a new detector or detector-superiority result" in normalized,
             "The paper must say Relaytic-AML wraps detector workflows rather than replacing detectors.",
             source_artifact="docs/paper/relaytic_aml_arxiv_draft.md",

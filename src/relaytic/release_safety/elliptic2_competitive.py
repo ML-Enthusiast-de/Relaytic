@@ -219,12 +219,13 @@ def refresh_elliptic2_reference_metadata(
     }
     budget = payloads["elliptic2_competitive_budget_contract"]
     budget["test_exposure_disclosure"] = (
-        "P8-A exposed the provided RevTrack TST metrics before this competitive suite. "
+        "P8-A exposed the supplied TST metrics from the pinned external artifact before this competitive suite. "
         "The alternate content-hash partition supplies additional robustness evidence, not a pristine benchmark replacement."
     )
     trace = payloads["elliptic2_relaytic_candidate_search_trace"]
     trace["prior_test_exposure_disclosure"] = (
-        "The provided RevTrack TST partition was exposed during P8-A. Candidate selection in P8-B remained validation-only."
+        "The supplied TST partition from the pinned external artifact was exposed during P8-A. "
+        "Candidate selection in P8-B remained validation-only."
     )
     gate = payloads["elliptic2_publishability_gate"]
     gate["execution_status"] = {
@@ -237,11 +238,17 @@ def refresh_elliptic2_reference_metadata(
         "blocked_reason_codes": [],
     }
     gate["blocked_reason_codes"] = [
-        "official_revtrack_preprocessing_and_embeddings_consumed" if code == "official_revtrack_preprocessing_and_embeddings_consumed" else code
+        "pinned_external_artifact_and_embeddings_consumed"
+        if code == "official_revtrack_preprocessing_and_embeddings_consumed"
+        else code
         for code in list(gate.get("blocked_reason_codes", []))
     ]
     gate["allowed_wording"] = str(gate.get("allowed_wording", "")).replace(
-        "official preprocessing boundary", "provided RevTrack preprocessing boundary"
+        "official preprocessing boundary",
+        "pinned external-artifact boundary and unresolved upstream provenance",
+    ).replace(
+        "provided RevTrack preprocessing boundary",
+        "pinned external-artifact boundary and unresolved upstream provenance",
     )
 
     written = {
@@ -710,12 +717,12 @@ def _build_publishability_gate(
         "hard_aml_claim_allowed": False,
         "blocked_reason_codes": blockers
         + [
-            "official_revtrack_preprocessing_and_embeddings_consumed",
+            "pinned_external_artifact_and_embeddings_consumed",
             "official_test_partition_was_exposed_during_p8a",
             "entity_disjoint_generalization_not_yet_proven",
         ],
         "allowed_wording": (
-            "Relaytic executed a repeated-seed, alternate-split modern-context baseline on the pinned RevTrack-evaluable Elliptic2 cohort. Results may be reported as supporting evidence with the official preprocessing boundary explicit; no SOTA, full-core, or end-to-end superiority claim is allowed."
+            "Relaytic executed a repeated-seed, alternate-split context workflow on a pinned external RevTrack-format artifact. Results may be reported only as non-comparable context with the artifact boundary, prior test exposure, and unresolved upstream provenance explicit. No SOTA, full-core, parity, or end-to-end superiority claim is allowed."
             if supporting
             else "Relaytic recovered modern Elliptic2 execution, but the competitive and robustness gate did not support a paper performance row."
         ),

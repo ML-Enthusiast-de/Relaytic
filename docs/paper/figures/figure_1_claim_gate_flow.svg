@@ -1,51 +1,59 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1220" height="640" viewBox="0 0 1220 640" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
 <rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>
-<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Relaytic-AML evidence loop</text>
-<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Local artifacts are authoritative. Agents propose, execute, review, and gate claims through files.</text>
-<rect x="64" y="148" width="205" height="214" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.3"/>
-<text x="166.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Local inputs</text>
-<line x1="86" y1="214" x2="247" y2="214" stroke="#c8d0dc" stroke-width="1"/>
-<text x="166.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">dataset_registry.json</text>
-<text x="166.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">split_contracts.json</text>
-<text x="166.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">source hashes</text>
-<line x1="273" y1="255" x2="287" y2="255" stroke="#1f2937" stroke-width="1.8"/>
-<polygon points="287,255 278,248 278,262" fill="#1f2937"/>
-<rect x="291" y="148" width="205" height="214" rx="6" fill="#eef6f3" stroke="#1f2937" stroke-width="1.3"/>
-<text x="393.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Role loops</text>
-<line x1="313" y1="214" x2="474" y2="214" stroke="#c8d0dc" stroke-width="1"/>
-<text x="393.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">guide -&gt; scout</text>
-<text x="393.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">strategist -&gt; scientist</text>
-<text x="393.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">builder -&gt; reviewers</text>
-<line x1="500" y1="255" x2="514" y2="255" stroke="#1f2937" stroke-width="1.8"/>
-<polygon points="514,255 505,248 505,262" fill="#1f2937"/>
-<rect x="518" y="148" width="205" height="214" rx="6" fill="#fff8e5" stroke="#1f2937" stroke-width="1.3"/>
-<text x="620.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Run artifacts</text>
-<line x1="540" y1="214" x2="701" y2="214" stroke="#c8d0dc" stroke-width="1"/>
-<text x="620.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">benchmark_manifest.json</text>
-<text x="620.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">feature_report.json</text>
-<text x="620.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">search_trace.json</text>
-<line x1="727" y1="255" x2="741" y2="255" stroke="#1f2937" stroke-width="1.8"/>
-<polygon points="741,255 732,248 732,262" fill="#1f2937"/>
-<rect x="745" y="148" width="205" height="214" rx="6" fill="#f3f0fb" stroke="#1f2937" stroke-width="1.3"/>
-<text x="847.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Typed cells</text>
-<line x1="767" y1="214" x2="928" y2="214" stroke="#c8d0dc" stroke-width="1"/>
-<text x="847.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">cell_id + cell_type</text>
-<text x="847.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">factual observation</text>
-<text x="847.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">artifact field</text>
-<line x1="954" y1="255" x2="968" y2="255" stroke="#1f2937" stroke-width="1.8"/>
-<polygon points="968,255 959,248 959,262" fill="#1f2937"/>
-<rect x="972" y="148" width="205" height="214" rx="6" fill="#fdeeee" stroke="#1f2937" stroke-width="1.3"/>
-<text x="1074.5" y="185.0" text-anchor="middle" font-size="19" fill="#293241">Release gates</text>
-<line x1="994" y1="214" x2="1155" y2="214" stroke="#c8d0dc" stroke-width="1"/>
-<text x="1074.5" y="250.0" text-anchor="middle" font-size="15" fill="#374151">admissible use</text>
-<text x="1074.5" y="272.0" text-anchor="middle" font-size="15" fill="#374151">missing evidence</text>
-<text x="1074.5" y="294.0" text-anchor="middle" font-size="15" fill="#374151">release wording</text>
+<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Relaytic-AML artifact-centered evaluation path</text>
+<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Authoritative artifacts connect local data, controlled execution, review, and release decisions.</text>
+<rect x="56" y="148" width="168" height="214" rx="6" fill="#f5f7fa" stroke="#1f2937" stroke-width="1.3"/>
+<text x="140.0" y="184.0" text-anchor="middle" font-size="17" fill="#293241">Local inputs</text>
+<line x1="74" y1="214" x2="206" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="140.0" y="250.0" text-anchor="middle" font-size="14" fill="#374151">dataset registry</text>
+<text x="140.0" y="271.0" text-anchor="middle" font-size="14" fill="#374151">source hashes</text>
+<text x="140.0" y="292.0" text-anchor="middle" font-size="14" fill="#374151">local data</text>
+<line x1="228" y1="255" x2="240" y2="255" stroke="#1f2937" stroke-width="1.8"/>
+<polygon points="240,255 231,248 231,262" fill="#1f2937"/>
+<rect x="244" y="148" width="168" height="214" rx="6" fill="#eef6f3" stroke="#1f2937" stroke-width="1.3"/>
+<text x="328.0" y="184.0" text-anchor="middle" font-size="17" fill="#293241">Source audit</text>
+<line x1="262" y1="214" x2="394" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="328.0" y="250.0" text-anchor="middle" font-size="14" fill="#374151">schema posture</text>
+<text x="328.0" y="271.0" text-anchor="middle" font-size="14" fill="#374151">split feasibility</text>
+<text x="328.0" y="292.0" text-anchor="middle" font-size="14" fill="#374151">leakage risks</text>
+<line x1="416" y1="255" x2="428" y2="255" stroke="#1f2937" stroke-width="1.8"/>
+<polygon points="428,255 419,248 419,262" fill="#1f2937"/>
+<rect x="432" y="148" width="168" height="214" rx="6" fill="#eef4ff" stroke="#1f2937" stroke-width="1.3"/>
+<text x="516.0" y="184.0" text-anchor="middle" font-size="17" fill="#293241">Experiment design</text>
+<line x1="450" y1="214" x2="582" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="516.0" y="250.0" text-anchor="middle" font-size="14" fill="#374151">task + feature contract</text>
+<text x="516.0" y="271.0" text-anchor="middle" font-size="14" fill="#374151">model budget</text>
+<text x="516.0" y="292.0" text-anchor="middle" font-size="14" fill="#374151">operating point</text>
+<line x1="604" y1="255" x2="616" y2="255" stroke="#1f2937" stroke-width="1.8"/>
+<polygon points="616,255 607,248 607,262" fill="#1f2937"/>
+<rect x="620" y="148" width="168" height="214" rx="6" fill="#fff8e5" stroke="#1f2937" stroke-width="1.3"/>
+<text x="704.0" y="184.0" text-anchor="middle" font-size="17" fill="#293241">Bounded execution</text>
+<line x1="638" y1="214" x2="770" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="704.0" y="250.0" text-anchor="middle" font-size="14" fill="#374151">run manifest</text>
+<text x="704.0" y="271.0" text-anchor="middle" font-size="14" fill="#374151">feature report</text>
+<text x="704.0" y="292.0" text-anchor="middle" font-size="14" fill="#374151">search trace</text>
+<line x1="792" y1="255" x2="804" y2="255" stroke="#1f2937" stroke-width="1.8"/>
+<polygon points="804,255 795,248 795,262" fill="#1f2937"/>
+<rect x="808" y="148" width="168" height="214" rx="6" fill="#f3f0fb" stroke="#1f2937" stroke-width="1.3"/>
+<text x="892.0" y="184.0" text-anchor="middle" font-size="17" fill="#293241">Review</text>
+<line x1="826" y1="214" x2="958" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="892.0" y="250.0" text-anchor="middle" font-size="14" fill="#374151">typed evidence cells</text>
+<text x="892.0" y="271.0" text-anchor="middle" font-size="14" fill="#374151">exposure record</text>
+<text x="892.0" y="292.0" text-anchor="middle" font-size="14" fill="#374151">trace audit</text>
+<line x1="980" y1="255" x2="992" y2="255" stroke="#1f2937" stroke-width="1.8"/>
+<polygon points="992,255 983,248 983,262" fill="#1f2937"/>
+<rect x="996" y="148" width="168" height="214" rx="6" fill="#fdeeee" stroke="#1f2937" stroke-width="1.3"/>
+<text x="1080.0" y="184.0" text-anchor="middle" font-size="17" fill="#293241">Release governance</text>
+<line x1="1014" y1="214" x2="1146" y2="214" stroke="#c8d0dc" stroke-width="1"/>
+<text x="1080.0" y="250.0" text-anchor="middle" font-size="14" fill="#374151">admissible use</text>
+<text x="1080.0" y="271.0" text-anchor="middle" font-size="14" fill="#374151">missing evidence</text>
+<text x="1080.0" y="292.0" text-anchor="middle" font-size="14" fill="#374151">release wording</text>
 <rect x="90" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
-<text x="235.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">private rows stay local</text>
+<text x="235.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">raw records remain local</text>
 <rect x="465" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
-<text x="610.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">validation choices precede test scoring</text>
+<text x="610.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">validation decisions precede test scoring</text>
 <rect x="840" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>
-<text x="985.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">external agents receive redacted state</text>
+<text x="985.0" y="442.0" text-anchor="middle" font-size="14" fill="#293241">external handoff excludes raw rows</text>
 <rect x="96" y="506" width="1028" height="44" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>
-<text x="610" y="534" text-anchor="middle" font-size="15" fill="#4b5563">The same artifact graph feeds CLI, skills, MCP adapters, paper tables, vector figures, and release checks.</text>
+<text x="610" y="534" text-anchor="middle" font-size="15" fill="#4b5563">The same records feed command-line and MCP adapters, project skills, paper assets, and release checks.</text>
 </svg>

@@ -8,6 +8,8 @@ The public product name, package, and CLI stay `Relaytic` / `relaytic` / `relayt
 
 Relaytic-AML is not presented as a production AML detector or a leaderboard-winning model. It is an evidence environment: local data custody, specialist-agent roles, reproducible artifacts, review-queue context, redacted handoff, and claim gates before public or paper-facing statements.
 
+The Relaytic-AML manuscript is an independent arXiv preprint and open-source research project. It has not been peer reviewed, and the repository does not imply institutional or employer endorsement.
+
 ## How To Read This Repository
 
 This repository is larger than the AML paper. Relaytic is the general local-first inference lab and command-line interface. Relaytic-AML is the current flagship edition, chosen because anti-money-laundering work forces privacy, temporal validity, graph context, human review, and public-claim discipline into one demanding setting.
@@ -128,8 +130,6 @@ py -3.11 -m relaytic.ui.cli release-safety paper-governance-ablation --format js
 py -3.11 -m relaytic.ui.cli release-safety paper-invariants --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-draft --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release --format json
-py -3.11 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
-py -3.11 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-release-integrity --candidate --format json
 py -3.11 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 Set-Location docs\paper\arxiv_src
@@ -155,8 +155,6 @@ python3 -m relaytic.ui.cli release-safety paper-governance-ablation --format jso
 python3 -m relaytic.ui.cli release-safety paper-invariants --format json
 python3 -m relaytic.ui.cli release-safety paper-draft --format json
 python3 -m relaytic.ui.cli release-safety paper-release --format json
-python3 -m relaytic.ui.cli release-safety paper-narrative-polish --format json
-python3 -m relaytic.ui.cli release-safety paper-novelty-positioning --format json
 python3 -m relaytic.ui.cli release-safety paper-release-integrity --candidate --format json
 python3 -m relaytic.ui.cli release-safety paper-arxiv-source --format json
 cd docs/paper/arxiv_src

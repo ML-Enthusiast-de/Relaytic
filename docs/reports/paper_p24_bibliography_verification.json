@@ -91,6 +91,21 @@
       "citation_key": "naik2026llmopsaml",
       "present": true,
       "primary_url": "https://arxiv.org/abs/2605.11232"
+    },
+    {
+      "citation_key": "xia2026researchloop",
+      "present": true,
+      "primary_url": "https://arxiv.org/abs/2605.28282"
+    },
+    {
+      "citation_key": "yue2026factreview",
+      "present": true,
+      "primary_url": "https://arxiv.org/abs/2604.04074v1"
+    },
+    {
+      "citation_key": "iscan2026safetygatedmcp",
+      "present": true,
+      "primary_url": "https://arxiv.org/abs/2605.01567"
     }
   ],
   "schema_version": "relaytic.paper_release_integrity.v1",

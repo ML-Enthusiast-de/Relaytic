@@ -4,7 +4,7 @@ Historical pipeline status: generated Paper Track P11 evidence draft retained fo
 
 ## Abstract
 
-Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC 0.6388 and the Elliptic graph-feature row reports test PR-AUC 0.6688. Both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates are not established. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.
+Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC 0.6388 and the Elliptic graph-feature row reports test PR-AUC 0.6688. Both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained only as non-comparable context on a pinned external artifact whose upstream construction and row-level relationship to the current core are unavailable. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.
 
 ## Introduction
 
@@ -40,13 +40,13 @@ The method has four claim-control rules:
 3. Numeric paper cells must cite machine-readable provenance rather than handwritten notes.
 4. Blocked tracks stay visible as limitations instead of being replaced by easier evidence.
 
-![Relaytic-AML local-first architecture: local data and artifacts flow through role-scoped agents into evidence cells, interpretation gates, and paper/release/handoff surfaces.](figures/figure_1_claim_gate_flow.svg)
+![Relaytic-AML local-first architecture: local data and artifacts flow through functional evaluation stages into evidence cells, interpretation gates, and release surfaces.](figures/figure_1_claim_gate_flow.svg)
 
 ![Evidence-cell schema: every reported number carries dataset, split, command, artifact, budget, leakage posture, operating point, metric, and value. Interpretation is stored separately.](figures/figure_2_supporting_pr_auc.svg)
 
-![Benchmark evidence by task contract: local ranking estimates, Elliptic2 external-reference context, and validation-threshold review queues are shown in separate panels.](figures/figure_3_review_budget.svg)
+![Evaluation evidence by task contract: local ranking estimates and validation-threshold review queues are shown in separate panels.](figures/figure_3_review_budget.svg)
 
-![Claim routing summary: current cells map to admissible paper uses and to evidence needed for stronger future interpretations.](figures/figure_4_publishability_matrix.svg)
+![Claim routing summary: current cells map to admissible paper uses and to evidence requirements for stronger future interpretations.](figures/figure_4_publishability_matrix.svg)
 
 ## Benchmarks
 
@@ -73,16 +73,15 @@ The current result table is intentionally supporting-only. It is useful because 
 | PaySim competitive | recall at review budget | 0.4716 | supporting-only | `paper-cell:paysim_p6a_competitive_selected.recall_at_review_budget` |
 | Elliptic graph-feature | test PR-AUC | 0.6688 | supporting-only | `paper-cell:elliptic_p7_selected_graph_feature_baseline.test_pr_auc` |
 | Elliptic graph-feature | precision at review budget | 1.0000 | supporting-only | `paper-cell:elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget` |
-| Elliptic2 context | provided RevTrack TST PR-AUC mean | 0.9432 | modern context only | `paper-cell:elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean` |
-| Elliptic2 context | published RevClassifyDS PR-AUC | 0.9740 | reference context | `paper-cell:elliptic2_p8b_modern_context.published_reference_pr_auc` |
+| Elliptic2 context | local repeated context PR-AUC mean | 0.9432 | pinned external-artifact context only | `paper-cell:elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean` |
 
-The PaySim competitive result improved over the PaySim baseline under the recorded temporal proxy contract, but PaySim remains synthetic. The Elliptic graph-feature result is credible supporting graph evidence, but it does not promote a graph-neural claim. The Elliptic2 context row shows a strong reproduced local candidate relative to many ordinary baselines, yet it remains below the recorded RevClassifyDS reference and cannot support a parity or headline detector claim in this source draft.
+The PaySim competitive result improved over the PaySim baseline under the recorded temporal proxy contract, but PaySim remains synthetic. The Elliptic graph-feature result is credible supporting graph evidence, but it does not promote a graph-neural claim. The Elliptic2 row is a repeated local estimate on a pinned external artifact whose upstream transformation and cohort relationship are not reconstructable from this repository. It is retained only as non-comparable context.
 
 ## Limitations
 
 - **LIM-01-paysim-proxy**: PaySim is synthetic mobile-money fraud evidence. It is useful for a temporal proxy workflow, but it is not real-bank AML superiority evidence. Required repair: Add a real financial-crime holdout or partner-approved private evaluation before making hard AML claims.
 - **LIM-02-elliptic-supporting-graph**: The Elliptic row is a supporting temporal graph-feature result. It does not prove graph-neural or graph benchmark superiority. Required repair: Run repeated-seed graph baselines and promote a graph-native candidate only if it beats strong feature baselines under the same split.
-- **LIM-03-elliptic2-context-only**: Elliptic2 is retained as modern context and limitation evidence only. It is not a Relaytic performance contribution in this paper. Required repair: Reproduce the RevClassify reference setup faithfully or define a new leakage-resistant subgraph protocol with viable cohort proof.
+- **LIM-03-elliptic2-context-only**: Elliptic2 is retained only as non-comparable context on a pinned external artifact. Its upstream construction and row-level relationship to the current core are unavailable. Required repair: Recover upstream artifact provenance and row-level mapping before defining any matched comparison or reference-method study.
 - **LIM-04-operational-assumptions**: Operational review-budget rows are supporting estimates because aggregate case packets, same-queue incumbent comparisons, and analyst-hour assumptions are not fully frozen. Required repair: Freeze case-packet completeness and compare against the same review queue or an approved incumbent baseline.
 - **LIM-05-clean-clone-pending**: The first draft is generated from committed evidence, but P12 must still prove clean-clone install, paper-smoke reproduction, leak scan, and claim lint. Required repair: Run Paper Track P12 from a clean clone and record the external dry-run report before arXiv release.
 

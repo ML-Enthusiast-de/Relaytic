@@ -62,19 +62,19 @@
       "artifact_ref": "docs/reports/paper_public_claims_allowed.json",
       "exists": true,
       "input_id": "public_claims_allowed",
-      "sha256_prefix": "a84d9784381b"
+      "sha256_prefix": "2e8255da1e66"
     },
     {
       "artifact_ref": "docs/reports/paper_publishability_matrix.json",
       "exists": true,
       "input_id": "publishability_matrix",
-      "sha256_prefix": "74ad1e835b8e"
+      "sha256_prefix": "e9d5ac3a8a9d"
     },
     {
       "artifact_ref": "docs/reports/paper_claim_lint_report.json",
       "exists": true,
       "input_id": "claim_lint",
-      "sha256_prefix": "9123d9521638"
+      "sha256_prefix": "7cebc00bf80d"
     },
     {
       "artifact_ref": "docs/reports/paper_release_go_no_go.json",
@@ -116,7 +116,7 @@
       "artifact_ref": "docs/reports/paper_governance_ablation_manifest.json",
       "exists": true,
       "input_id": "governance_ablation_manifest",
-      "sha256_prefix": "d71e0c36578b"
+      "sha256_prefix": "84bc3c873973"
     },
     {
       "artifact_ref": "docs/reports/paysim_leakage_safe_feature_report.json",
@@ -134,7 +134,7 @@
       "artifact_ref": "docs/paper/references.bib",
       "exists": true,
       "input_id": "references",
-      "sha256_prefix": "d0d56d9a1bf2"
+      "sha256_prefix": "f6bbeac4de93"
     }
   ],
   "next_slice": "Paper Track P19 - hosted detector workflow demonstration, if selected",

@@ -150,7 +150,7 @@ def _build_limitations_matrix(inputs: dict[str, Any]) -> dict[str, Any]:
         ),
         _limitation(
             "LIM-03-elliptic2-context-only",
-            "Elliptic2 is retained as modern context and limitation evidence only. It is not a Relaytic performance contribution in this paper.",
+            "Elliptic2 is retained only as non-comparable context on a pinned external artifact. Its upstream construction and row-level relationship to the current core are unavailable.",
             dataset_id="elliptic2_subgraph_aml",
             affected_claims=["claim_subgraph_or_synthetic_bank_graph", "claim_sota_or_hard_aml_superiority"],
             evidence_refs=[
@@ -162,7 +162,7 @@ def _build_limitations_matrix(inputs: dict[str, Any]) -> dict[str, Any]:
                 row_by_dataset.get("elliptic2_subgraph_aml", {}),
                 _payload(inputs["elliptic2_reference_parity"]),
             ),
-            required_repair="Reproduce the RevClassify reference setup faithfully or define a new leakage-resistant subgraph protocol with viable cohort proof.",
+            required_repair="Recover upstream artifact provenance and row-level mapping before defining any matched comparison or reference-method study.",
         ),
         _limitation(
             "LIM-04-operational-assumptions",
@@ -197,7 +197,7 @@ def _build_limitations_matrix(inputs: dict[str, Any]) -> dict[str, Any]:
             "No hard real-world AML superiority claim is allowed in the first draft.",
             "No SOTA, claimed equivalence to RevClassify, graph-neural superiority, or business-value headline claim is allowed.",
             "PaySim and Elliptic numbers may be used as supporting evidence only.",
-            "Elliptic2 numbers may be used only as modern context and limitation evidence.",
+            "Elliptic2 numbers may be used only as pinned external-artifact context and limitation evidence.",
             "P12 clean-clone proof remains required before public release.",
         ],
         "next_slice": "Paper Track P12 - external dry run and clean-clone proof",
@@ -212,7 +212,7 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
             "filename": PAPER_FIGURE_FILENAMES["claim_gate_flow"],
             "title": (
                 "Relaytic-AML local-first architecture: local data and artifacts flow through "
-                "role-scoped agents into evidence cells, interpretation gates, and paper/release/handoff surfaces."
+                "functional evaluation stages into evidence cells, interpretation gates, and release surfaces."
             ),
             "source_type": "schematic_explicit",
             "source_refs": [
@@ -237,8 +237,8 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
             "figure_id": "review_budget",
             "filename": PAPER_FIGURE_FILENAMES["review_budget"],
             "title": (
-                "Benchmark evidence by task contract: local ranking estimates, Elliptic2 external-reference "
-                "context, and validation-threshold review queues are shown in separate panels."
+                "Evaluation evidence by task contract: local ranking estimates and validation-threshold "
+                "review queues are shown in separate panels."
             ),
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_operational_metric_table.json", "docs/reports/paper_metric_cell_audit.json"],
@@ -249,7 +249,7 @@ def _build_figure_pack(inputs: dict[str, Any]) -> dict[str, Any]:
             "filename": PAPER_FIGURE_FILENAMES["publishability_matrix"],
             "title": (
                 "Claim routing summary: current cells map to admissible paper uses and to evidence "
-                "needed for stronger future interpretations."
+                "requirements for stronger future interpretations."
             ),
             "source_type": "artifact_generated",
             "source_refs": ["docs/reports/paper_publishability_matrix.json"],
@@ -318,7 +318,7 @@ def _render_paper_draft(
             "",
             "Financial-crime machine learning is often evaluated through isolated model scores, while the operational question involves temporal validity, graph provenance, review capacity, case evidence, and public claim discipline. Relaytic-AML is a local-first evaluation environment that binds each benchmark row to a dataset registry, split contract, command, artifact path, leakage posture, budget tier, and publishability gate. In the current evidence pack, PaySim synthetic temporal-fraud and Elliptic temporal graph results are supporting rows, not headline superiority claims. The PaySim competitive row reports test PR-AUC "
             f"{_metric_value(key, 'paysim_p6a_competitive_selected.test_pr_auc')} and the Elliptic graph-feature row reports test PR-AUC "
-            f"{_metric_value(key, 'elliptic_p7_selected_graph_feature_baseline.test_pr_auc')}. Both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained as modern context and limitation evidence only because reference-parity and cohort gates are not established. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.",
+            f"{_metric_value(key, 'elliptic_p7_selected_graph_feature_baseline.test_pr_auc')}. Both are explicitly claim-guarded. Elliptic2 subgraph evidence is retained only as non-comparable context on a pinned external artifact whose upstream construction and row-level relationship to the current core are unavailable. The contribution is an auditable environment for claim-safe AML evaluation, not a detector-superiority claim.",
             "",
             "## Introduction",
             "",
@@ -357,7 +357,7 @@ def _render_paper_draft(
             "",
             results_table,
             "",
-            "The PaySim competitive result improved over the PaySim baseline under the recorded temporal proxy contract, but PaySim remains synthetic. The Elliptic graph-feature result is credible supporting graph evidence, but it does not promote a graph-neural claim. The Elliptic2 context row shows a strong reproduced local candidate relative to many ordinary baselines, yet it remains below the recorded RevClassifyDS reference and cannot support a parity or headline detector claim in this source draft.",
+            "The PaySim competitive result improved over the PaySim baseline under the recorded temporal proxy contract, but PaySim remains synthetic. The Elliptic graph-feature result is credible supporting graph evidence, but it does not promote a graph-neural claim. The Elliptic2 row is a repeated local estimate on a pinned external artifact whose upstream transformation and cohort relationship are not reconstructable from this repository. It is retained only as non-comparable context.",
             "",
             "## Limitations",
             "",
@@ -581,8 +581,7 @@ def _render_results_table(key: dict[str, dict[str, Any]]) -> str:
         ("PaySim competitive", "paysim_p6a_competitive_selected.recall_at_review_budget", "recall at review budget", "supporting-only"),
         ("Elliptic graph-feature", "elliptic_p7_selected_graph_feature_baseline.test_pr_auc", "test PR-AUC", "supporting-only"),
         ("Elliptic graph-feature", "elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget", "precision at review budget", "supporting-only"),
-        ("Elliptic2 context", "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean", "provided RevTrack TST PR-AUC mean", "modern context only"),
-        ("Elliptic2 context", "elliptic2_p8b_modern_context.published_reference_pr_auc", "published RevClassifyDS PR-AUC", "reference context"),
+        ("Elliptic2 context", "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean", "local repeated context PR-AUC mean", "pinned external-artifact context only"),
     ]
     lines = ["| Evidence row | Metric | Value | Claim posture | Provenance |", "|---|---:|---:|---|---|"]
     for label, cell_id, metric, claim in rows:
@@ -850,27 +849,28 @@ def _architecture_flow_svg_v2() -> str:
     width = 1220
     height = 640
     columns = [
-        ("Local inputs", "dataset_registry.json\nsplit_contracts.json\nsource hashes", "#f5f7fa"),
-        ("Role loops", "guide -> scout\nstrategist -> scientist\nbuilder -> reviewers", "#eef6f3"),
-        ("Run artifacts", "benchmark_manifest.json\nfeature_report.json\nsearch_trace.json", "#fff8e5"),
-        ("Typed cells", "cell_id + cell_type\nfactual observation\nartifact field", "#f3f0fb"),
-        ("Release gates", "admissible use\nmissing evidence\nrelease wording", "#fdeeee"),
+        ("Local inputs", "dataset registry\nsource hashes\nlocal data", "#f5f7fa"),
+        ("Source audit", "schema posture\nsplit feasibility\nleakage risks", "#eef6f3"),
+        ("Experiment design", "task + feature contract\nmodel budget\noperating point", "#eef4ff"),
+        ("Bounded execution", "run manifest\nfeature report\nsearch trace", "#fff8e5"),
+        ("Review", "typed evidence cells\nexposure record\ntrace audit", "#f3f0fb"),
+        ("Release governance", "admissible use\nmissing evidence\nrelease wording", "#fdeeee"),
     ]
     parts = [
         _svg_header(width, height),
         '<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
-        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Relaytic-AML evidence loop</text>',
-        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Local artifacts are authoritative. Agents propose, execute, review, and gate claims through files.</text>',
+        '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Relaytic-AML artifact-centered evaluation path</text>',
+        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">Authoritative artifacts connect local data, controlled execution, review, and release decisions.</text>',
     ]
-    box_w = 205
-    gap = 22
-    start_x = 64
+    box_w = 168
+    gap = 20
+    start_x = 56
     for index, (title, detail, fill) in enumerate(columns):
         x = start_x + index * (box_w + gap)
         parts.append(f'<rect x="{x}" y="148" width="{box_w}" height="214" rx="6" fill="{fill}" stroke="#1f2937" stroke-width="1.3"/>')
-        parts.extend(_svg_text_lines(title, x + box_w / 2, 185, font_size=19, anchor="middle", line_height=22))
-        parts.append(f'<line x1="{x + 22}" y1="214" x2="{x + box_w - 22}" y2="214" stroke="#c8d0dc" stroke-width="1"/>')
-        parts.extend(_svg_text_lines(detail, x + box_w / 2, 250, font_size=15, anchor="middle", line_height=22, fill="#374151"))
+        parts.extend(_svg_text_lines(title, x + box_w / 2, 184, font_size=17, anchor="middle", line_height=20))
+        parts.append(f'<line x1="{x + 18}" y1="214" x2="{x + box_w - 18}" y2="214" stroke="#c8d0dc" stroke-width="1"/>')
+        parts.extend(_svg_text_lines(detail, x + box_w / 2, 250, font_size=14, anchor="middle", line_height=21, fill="#374151"))
         if index < len(columns) - 1:
             y = 255
             x1 = x + box_w + 4
@@ -878,15 +878,15 @@ def _architecture_flow_svg_v2() -> str:
             parts.append(f'<line x1="{x1}" y1="{y}" x2="{x2}" y2="{y}" stroke="#1f2937" stroke-width="1.8"/>')
             parts.append(f'<polygon points="{x2},{y} {x2 - 9},{y - 7} {x2 - 9},{y + 7}" fill="#1f2937"/>')
     lower = [
-        ("private rows stay local", 90),
-        ("validation choices precede test scoring", 465),
-        ("external agents receive redacted state", 840),
+        ("raw records remain local", 90),
+        ("validation decisions precede test scoring", 465),
+        ("external handoff excludes raw rows", 840),
     ]
     for label, x in lower:
         parts.append(f'<rect x="{x}" y="410" width="290" height="54" rx="6" fill="#ffffff" stroke="#9ca3af" stroke-width="1"/>')
         parts.extend(_svg_text_lines(label, x + 145, 442, font_size=14, anchor="middle", line_height=17))
     parts.append('<rect x="96" y="506" width="1028" height="44" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1"/>')
-    parts.append('<text x="610" y="534" text-anchor="middle" font-size="15" fill="#4b5563">The same artifact graph feeds CLI, skills, MCP adapters, paper tables, vector figures, and release checks.</text>')
+    parts.append('<text x="610" y="534" text-anchor="middle" font-size="15" fill="#4b5563">The same records feed command-line and MCP adapters, project skills, paper assets, and release checks.</text>')
     parts.append('</svg>')
     return "\n".join(parts)
 
@@ -930,19 +930,17 @@ def _evidence_cell_schema_svg_v2() -> str:
 def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
     paysim_pr = _cell_value(cells, "paysim_p6a_competitive_selected.test_pr_auc")
     elliptic_pr = _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.test_pr_auc")
-    elliptic2_pr = _cell_value(cells, "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean")
-    revclassify_ref = _cell_value(cells, "elliptic2_p8b_modern_context.published_reference_pr_auc")
     pay_precision = _cell_value(cells, "paysim_p6a_competitive_selected.precision_at_review_budget")
     pay_recall = _cell_value(cells, "paysim_p6a_competitive_selected.recall_at_review_budget")
     ell_precision = _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.precision_at_review_budget")
     ell_recall = _cell_value(cells, "elliptic_p7_selected_graph_feature_baseline.recall_at_review_budget")
     width = 1500
-    height = 900
+    height = 780
     parts = [
         _svg_header(width, height),
-        '<rect x="38" y="28" width="1424" height="824" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
-        '<text x="750" y="70" text-anchor="middle" font-size="26" font-weight="700" fill="#1f2937">Benchmark evidence by task contract</text>',
-        '<text x="750" y="104" text-anchor="middle" font-size="17" fill="#4b5563">Ranking evidence, external context, and realized review queues are reported in separate panels.</text>',
+        '<rect x="38" y="28" width="1424" height="704" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
+        '<text x="750" y="70" text-anchor="middle" font-size="26" font-weight="700" fill="#1f2937">Evaluation evidence by task contract</text>',
+        '<text x="750" y="104" text-anchor="middle" font-size="17" fill="#4b5563">Within-task ranking estimates and validation-threshold review queues are reported separately.</text>',
     ]
 
     def metric_bar(x: int, y: int, label: str, detail: str, value: Any, color: str, width_px: int = 320) -> None:
@@ -953,29 +951,21 @@ def _benchmark_review_budget_svg_v2(cells: list[dict[str, Any]]) -> str:
         parts.append(f'<rect x="{x + 190}" y="{y - 17}" width="{numeric * width_px:.1f}" height="25" rx="3" fill="{color}"/>')
         parts.append(f'<text x="{x + 190 + width_px + 18}" y="{y + 2}" font-size="18" font-weight="700" fill="#1f2937">{_format_metric(value)}</text>')
 
-    # Panel A deliberately gives each local dataset its own labeled contract block.
-    parts.append('<rect x="70" y="142" width="660" height="310" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
+    parts.append('<rect x="70" y="142" width="1360" height="240" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
     parts.append('<text x="96" y="181" font-size="19" font-weight="700" fill="#1f2937">A. Local test ranking evidence</text>')
-    metric_bar(100, 240, "PaySim", "synthetic temporal proxy, seed 42", paysim_pr, "#2a9d8f")
-    metric_bar(100, 333, "Elliptic", "later graph window, seed 42", elliptic_pr, "#457b9d")
-    parts.append('<text x="100" y="410" font-size="16" fill="#4b5563">Single-seed point estimates. Bars summarize within-task ranking only.</text>')
+    metric_bar(100, 245, "PaySim", "synthetic temporal proxy, seed 42", paysim_pr, "#2a9d8f", 350)
+    metric_bar(800, 245, "Elliptic", "later graph window, seed 42", elliptic_pr, "#457b9d", 350)
+    parts.append('<text x="100" y="340" font-size="16" fill="#4b5563">Single-seed point estimates. Bars summarize ranking within each declared task.</text>')
 
-    parts.append('<rect x="770" y="142" width="660" height="310" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
-    parts.append('<text x="796" y="181" font-size="19" font-weight="700" fill="#1f2937">B. Elliptic2 reference context</text>')
-    metric_bar(800, 240, "Local context", "RevTrack-evaluable cohort, 3 seeds", elliptic2_pr, "#d6a83a")
-    metric_bar(800, 333, "RevClassifyDS", "published external reference", revclassify_ref, "#4b5563")
-    parts.append('<text x="800" y="393" font-size="15" fill="#4b5563">Cohort equivalence and parity are not established.</text>')
-    parts.append('<text x="800" y="416" font-size="15" fill="#4b5563">Prior exposure to the provided RevTrack TST split is disclosed.</text>')
+    parts.append('<rect x="70" y="410" width="1360" height="230" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
+    parts.append('<text x="96" y="449" font-size="19" font-weight="700" fill="#1f2937">B. Validation-threshold review queues</text>')
+    metric_bar(100, 515, "PaySim precision", "realized 1,109 / 123,580 (0.8974%)", pay_precision, "#2a9d8f", 270)
+    metric_bar(100, 595, "PaySim recall", "requested queue fraction 0.5000%", pay_recall, "#6f9f18", 270)
+    metric_bar(800, 515, "Elliptic precision", "realized 36 / 11,184 (0.3219%)", ell_precision, "#457b9d", 270)
+    metric_bar(800, 595, "Elliptic recall", "requested queue fraction 0.5000%", ell_recall, "#f4a261", 270)
 
-    parts.append('<rect x="70" y="486" width="1360" height="242" rx="6" fill="#ffffff" stroke="#cfd7e3" stroke-width="1.1"/>')
-    parts.append('<text x="96" y="525" font-size="19" font-weight="700" fill="#1f2937">C. Validation-threshold review queues</text>')
-    metric_bar(100, 582, "PaySim precision", "realized 1,109 / 123,580 (0.8974%)", pay_precision, "#2a9d8f", 270)
-    metric_bar(100, 662, "PaySim recall", "requested queue fraction 0.5000%", pay_recall, "#6f9f18", 270)
-    metric_bar(800, 582, "Elliptic precision", "realized 36 / 11,184 (0.3219%)", ell_precision, "#457b9d", 270)
-    metric_bar(800, 662, "Elliptic recall", "requested queue fraction 0.5000%", ell_recall, "#f4a261", 270)
-
-    parts.append('<rect x="170" y="762" width="1160" height="48" rx="5" fill="#f5f7fa" stroke="#9ca3af" stroke-width="1"/>')
-    parts.append('<text x="750" y="792" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">Values across datasets and task contracts are not directly comparable.</text>')
+    parts.append('<rect x="170" y="674" width="1160" height="42" rx="5" fill="#f5f7fa" stroke="#9ca3af" stroke-width="1"/>')
+    parts.append('<text x="750" y="701" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">Values across datasets and task contracts are not directly comparable.</text>')
     parts.append('</svg>')
     return "\n".join(parts)
 
@@ -985,16 +975,16 @@ def _claim_gate_examples_svg_v2() -> str:
     rows = [
         ("PaySim", "PS-PR evidence\ncell", "bounded temporal-\nproxy result", "partner holdout +\nincumbent queue study"),
         ("Elliptic", "EL-PR graph-\nfeature cell", "graph-aware\nevidence audit", "graph-native budget +\nneural baselines"),
-        ("Elliptic2", "E2 reference\nrow", "modern benchmark\ncontext", "faithful reference run +\ncohort reconciliation"),
+        ("Elliptic2", "E2 pinned-artifact\ncell", "external-artifact\ncontext", "upstream provenance +\nrow-level mapping"),
     ]
     parts = [
         _svg_header(width, height),
         '<rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>',
         '<text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Claim routing summary</text>',
-        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">The release path promotes admissible interpretations and records evidence needed for stronger future use.</text>',
+        '<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">The release path promotes admissible interpretations and records requirements for stronger future use.</text>',
         '<text x="255" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence cell</text>',
         '<text x="610" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">admissible paper use</text>',
-        '<text x="965" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence for stronger use</text>',
+        '<text x="965" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">requirements for stronger use</text>',
     ]
     for index, (track, evidence, admissible, needed) in enumerate(rows):
         y = 178 + index * 118

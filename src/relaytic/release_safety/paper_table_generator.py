@@ -1309,8 +1309,8 @@ def _admissible_use(publication_role: str) -> str:
         "supporting_temporal_proxy_numeric_candidate": "bounded PaySim temporal-proxy demonstration",
         "supporting_temporal_graph_numeric_candidate": "bounded Elliptic temporal graph-feature demonstration",
         "supporting_burden_proxy_not_business_value_claim": "review-burden proxy under the recorded queue contract",
-        "supporting_modern_context_only": "Elliptic2 modern benchmark context",
-        "limitation_and_claim_firewall": "cohort and reference-parity limitation evidence",
+        "supporting_modern_context_only": "Elliptic2 pinned external-artifact context only",
+        "limitation_and_claim_firewall": "upstream-provenance and comparison-scope limitation evidence",
         "blocked_pending_reproducible_generation": "blocked benchmark placeholder with no numeric claim",
     }
     return roles.get(publication_role, publication_role.replace("_", " "))
@@ -1341,15 +1341,15 @@ def _gate_explanation(*, row_id: str, spec: dict[str, Any]) -> tuple[list[str], 
     if row_id.startswith("elliptic2_p8b"):
         return (
             [
-                "the RevTrack TST partition had prior exposure",
-                "the local cohort is not established as equivalent to the published RevClassifyDS cohort",
+                "the supplied TST partition had prior exposure",
+                "the external artifact's upstream construction and row-level relationship to other Elliptic2 states are unavailable",
             ],
-            ["faithful reference replay", "cohort-equivalence proof", "blind or external holdout"],
+            ["upstream artifact provenance", "row-level mapping", "blind or external holdout"],
         )
     if row_id.startswith("elliptic2_p8c"):
         return (
-            ["reference parity and cohort equivalence are not established"],
-            ["executable reference method", "accepted parity protocol", "resource-complete rerun"],
+            ["method reproduction and cohort equivalence are not established"],
+            ["upstream provenance", "row-level mapping", "executable reference method", "resource-complete rerun"],
         )
     if row_id.startswith("amlsim"):
         return (

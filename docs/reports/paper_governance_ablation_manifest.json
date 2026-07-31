@@ -2,11 +2,11 @@
   "artifact_hashes": {
     "docs/reports/paper_agent_handoff_eval.json": "3b228b1d99b4f2a6d0ae22a3fdfe6451fc8f2383d88066edecee93fa4bd2d290",
     "docs/reports/paper_failure_case_eval.json": "74acf7e87fa5f0a70eec142b11ff89000174297d7633625207c10342ca2af2f6",
-    "docs/reports/paper_failure_case_manifest.json": "70cd5996c029c57f3dc5ad146241d75bd850038e3e8a7358eb3d49d0ffedc824",
+    "docs/reports/paper_failure_case_manifest.json": "bb091ebe0793d9370dec7b610397474fd67f58e1c196873a82d73117fc689ed1",
     "docs/reports/paper_metric_cell_audit.json": "f5d23e38d6b5465bf4ed5a4bb0321f0e912c7a4775f937b6105e102053c001c0",
     "docs/reports/paper_no_lost_user_eval.json": "6a68a1c96069a3b39524f281352ad72c60db344e501a432804693923411477d0",
-    "docs/reports/paper_public_claims_allowed.json": "a84d9784381b3464015bd5cc84a177d776cb5f2b5735e68f1ffe484bac23e3f5",
-    "docs/reports/paper_publishability_matrix.json": "74ad1e835b8ef994f2ea26ebebef43757ec362e596194e298d5289f52f2efc80",
+    "docs/reports/paper_public_claims_allowed.json": "2e8255da1e669e6c58c7d5111242bee4876c2679a623fecf369ed05fcfa078ed",
+    "docs/reports/paper_publishability_matrix.json": "e9d5ac3a8a9dba4b2a4edab11f23c5ca0dbc4a9460e58b9ef195d3d226734175",
     "docs/reports/paper_result_table_final.json": "9d3dcd4cc8b59dd896acbd1fcad8542eacb97695d96935640d08cbafcd851907",
     "docs/reports/paysim_leakage_safe_feature_report.json": "5929bba645118009267ea68cfd6ad806377589ba933fed4f44500c7a1c405d12"
   },

@@ -4,6 +4,8 @@ Start with [`relaytic_aml_arxiv_draft.pdf`](relaytic_aml_arxiv_draft.pdf). The g
 
 Relaytic-AML is a systems and evaluation paper. Keeping the generator, bibliography, vector figures, and rowless evidence reports in the repository is therefore part of the reproducibility claim. Raw or licensed benchmark rows are not redistributed.
 
+The manuscript is an independent arXiv preprint, not a peer-reviewed publication. It represents an open-source research project without institutional or employer endorsement.
+
 ## File Roles
 
 - `relaytic_aml_arxiv_draft.pdf`, `relaytic_aml_arxiv_draft.md`, and
@@ -32,8 +34,6 @@ relaytic release-safety paper-external-score-integration --format json
 relaytic release-safety paper-tables --format json
 relaytic release-safety paper-draft --format json
 relaytic release-safety paper-release --format json
-relaytic release-safety paper-narrative-polish --format json
-relaytic release-safety paper-novelty-positioning --format json
 relaytic release-safety paper-release-integrity --candidate --format json
 relaytic release-safety paper-arxiv-source --format json
 relaytic release-safety paper-final-preflight --format json
@@ -59,7 +59,7 @@ Full model reruns require local source data:
 
 - PaySim: `data/paper_benchmarks/paysim/PS_20174392719_1491204439457_log.csv`
 - Elliptic: `data/paper_benchmarks/elliptic/`
-- Elliptic2/RevTrack: external local directories supplied to the relevant CLI commands
+- Elliptic2/RevTrack: the pinned external artifact and companion files supplied to the relevant CLI commands. Its unresolved upstream construction and row-level mapping are documented in [`../reports/elliptic2_cohort_provenance_limitation.md`](../reports/elliptic2_cohort_provenance_limitation.md).
 
 The paper states which results are raw-data reruns, committed-artifact verification, deterministic fixture reruns, or external benchmark context. Dataset hashes, split contracts, seeds, and expected output artifacts are recorded in `../reports/`; detailed benchmark commands are in [`../paper_benchmark_runbook.md`](../paper_benchmark_runbook.md).
 

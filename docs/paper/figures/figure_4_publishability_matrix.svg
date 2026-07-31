@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1220" height="640" viewBox="0 0 1220 640" role="img"><style>text{font-family:Arial,Helvetica,sans-serif;letter-spacing:0}</style><rect width="100%" height="100%" fill="#ffffff"/>
 <rect x="34" y="30" width="1152" height="548" rx="6" fill="#fbfcfe" stroke="#cfd7e3" stroke-width="1.6"/>
 <text x="610" y="70" text-anchor="middle" font-size="24" font-weight="700" fill="#1f2937">Claim routing summary</text>
-<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">The release path promotes admissible interpretations and records evidence needed for stronger future use.</text>
+<text x="610" y="102" text-anchor="middle" font-size="17" fill="#4b5563">The release path promotes admissible interpretations and records requirements for stronger future use.</text>
 <text x="255" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence cell</text>
 <text x="610" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">admissible paper use</text>
-<text x="965" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">evidence for stronger use</text>
+<text x="965" y="142" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">requirements for stronger use</text>
 <text x="132" y="222" text-anchor="end" font-size="17" font-weight="700" fill="#1f2937">PaySim</text>
 <rect x="150" y="178" width="210" height="84" rx="6" fill="#eef6f3" stroke="#91c7b1" stroke-width="1.2"/>
 <text x="255.0" y="212.0" text-anchor="middle" font-size="15" fill="#1f2937">PS-PR evidence</text>
@@ -35,14 +35,14 @@
 <polygon points="846,338 836,331 836,345" fill="#6b7280"/>
 <text x="132" y="458" text-anchor="end" font-size="17" font-weight="700" fill="#1f2937">Elliptic2</text>
 <rect x="150" y="414" width="210" height="84" rx="6" fill="#eef6f3" stroke="#91c7b1" stroke-width="1.2"/>
-<text x="255.0" y="448.0" text-anchor="middle" font-size="15" fill="#1f2937">E2 reference</text>
-<text x="255.0" y="467.0" text-anchor="middle" font-size="15" fill="#1f2937">row</text>
+<text x="255.0" y="448.0" text-anchor="middle" font-size="15" fill="#1f2937">E2 pinned-artifact</text>
+<text x="255.0" y="467.0" text-anchor="middle" font-size="15" fill="#1f2937">cell</text>
 <rect x="505" y="414" width="210" height="84" rx="6" fill="#eef4ff" stroke="#9db7e5" stroke-width="1.2"/>
-<text x="610.0" y="448.0" text-anchor="middle" font-size="15" fill="#1f2937">modern benchmark</text>
+<text x="610.0" y="448.0" text-anchor="middle" font-size="15" fill="#1f2937">external-artifact</text>
 <text x="610.0" y="467.0" text-anchor="middle" font-size="15" fill="#1f2937">context</text>
 <rect x="860" y="414" width="210" height="84" rx="6" fill="#f5f7fa" stroke="#aab4c3" stroke-width="1.2"/>
-<text x="965.0" y="448.0" text-anchor="middle" font-size="15" fill="#1f2937">faithful reference run +</text>
-<text x="965.0" y="467.0" text-anchor="middle" font-size="15" fill="#1f2937">cohort reconciliation</text>
+<text x="965.0" y="448.0" text-anchor="middle" font-size="15" fill="#1f2937">upstream provenance +</text>
+<text x="965.0" y="467.0" text-anchor="middle" font-size="15" fill="#1f2937">row-level mapping</text>
 <line x1="374" y1="456" x2="490" y2="456" stroke="#6b7280" stroke-width="1.6"/>
 <polygon points="490,456 480,449 480,463" fill="#6b7280"/>
 <line x1="730" y1="456" x2="846" y2="456" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="6 6"/>

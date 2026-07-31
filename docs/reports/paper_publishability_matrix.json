@@ -39,7 +39,7 @@
         "within_declared_reference_parity_margin",
         "official_reference_locally_reproduced",
         "full_official_core_cohort_equivalence_proven",
-        "official_revtrack_preprocessing_and_embeddings_consumed",
+        "pinned_external_artifact_and_embeddings_consumed",
         "official_test_partition_was_exposed_during_p8a",
         "entity_disjoint_generalization_not_yet_proven"
       ],

@@ -130,7 +130,7 @@
       "stronger_claim_status": "blocked"
     },
     {
-      "admissible_use": "Elliptic2 modern benchmark context",
+      "admissible_use": "Elliptic2 pinned external-artifact context only",
       "evidence_cell_ids": [
         "elliptic2_p8b_modern_context.official_partition_test_pr_auc_mean",
         "elliptic2_p8b_modern_context.official_partition_test_pr_auc_std",
@@ -140,12 +140,12 @@
       ],
       "gate_id": "elliptic2_p8b_modern_context.publication_gate",
       "gate_reasons": [
-        "the RevTrack TST partition had prior exposure",
-        "the local cohort is not established as equivalent to the published RevClassifyDS cohort"
+        "the supplied TST partition had prior exposure",
+        "the external artifact's upstream construction and row-level relationship to other Elliptic2 states are unavailable"
       ],
       "missing_evidence": [
-        "faithful reference replay",
-        "cohort-equivalence proof",
+        "upstream artifact provenance",
+        "row-level mapping",
         "blind or external holdout"
       ],
       "publication_role": "supporting_modern_context_only",
@@ -155,7 +155,7 @@
       "stronger_claim_status": "blocked"
     },
     {
-      "admissible_use": "cohort and reference-parity limitation evidence",
+      "admissible_use": "upstream-provenance and comparison-scope limitation evidence",
       "evidence_cell_ids": [
         "elliptic2_p8c_claim_firewall.largest_component_row_fraction",
         "elliptic2_p8c_claim_firewall.revtrack_evaluable_row_count",
@@ -163,11 +163,12 @@
       ],
       "gate_id": "elliptic2_p8c_claim_firewall.publication_gate",
       "gate_reasons": [
-        "reference parity and cohort equivalence are not established"
+        "method reproduction and cohort equivalence are not established"
       ],
       "missing_evidence": [
+        "upstream provenance",
+        "row-level mapping",
         "executable reference method",
-        "accepted parity protocol",
         "resource-complete rerun"
       ],
       "publication_role": "limitation_and_claim_firewall",

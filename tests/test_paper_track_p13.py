@@ -62,6 +62,9 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Elliptic is a different evidence contract" in draft
     assert "That is a useful operating result" not in draft
     assert "@yang2026skillopt" in draft
+    assert "@xia2026researchloop" in draft
+    assert "@yue2026factreview" in draft
+    assert "@iscan2026safetygatedmcp" in draft
     assert (
         "Skill- and tool-using agents expand the set of actions such systems can perform "
         "[@yang2026skillopt]. This broadens the governance surface."
@@ -75,6 +78,20 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Platt sigmoid calibration [@platt1999probabilistic]" in draft
     assert "fixed test partition [@geurts2006extratrees" not in draft
     assert "The selected configuration uses LightGBM [@ke2017lightgbm] with seed 42." in draft
+    abstract = draft.split("## 1. Introduction", 1)[0]
+    assert all(value not in abstract for value in ("Elliptic2", "0.9432", "0.9297", "0.9740"))
+    assert "Across the tested system fixtures" in abstract
+    assert "raw records were excluded from rowless handoff" in abstract
+    assert "all six injected unsupported-claim cases were blocked" in abstract
+    assert "0.9740" not in draft
+    assert "No numerical comparison with published RevClassifyDS performance is made" in draft
+    full_hash = "2baa712b67382aeade8d5e72dd07ddbffb1029b359a048c80a2300a3e3abc220"
+    assert draft.count(full_hash) == 1
+    assert "Three documented count states remain distinct" in draft
+    assert "overclaim stress test: 6 unsupported claims blocked" in draft
+    assert "claim-boundary stress test: 6 public claims blocked" in draft
+    assert "stress overclaim stress" not in draft
+    assert "stress claim stress" not in draft
     assert "evaluation, governance, and reproducibility architecture" in draft
     assert "RQ1" in draft and "RQ4" in draft
     assert "### Specialist Roles and State" in draft
@@ -83,7 +100,7 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "append-only event stream" in draft
     assert "Three control loops operate at different levels" in draft
     manuscript_body = draft.split("## References", 1)[0]
-    prose_without_citations = re.sub(r"\[@[^\]]+\]", "", manuscript_body)
+    prose_without_citations = re.sub(r"\[@[^\]]+\]", "", manuscript_body.split("## 1. Introduction", 1)[1])
     assert not re.search(r"\b(?:I|we|our|ours|us)\b", prose_without_citations, flags=re.IGNORECASE)
     assert ";" not in prose_without_citations
     assert "Table 1. Adjacent systems comparison" in draft
@@ -106,6 +123,13 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "Appendix table. Evidence routing examples" in draft
     assert "Appendix table. Rowless handoff and interrupted-run recovery examples" in draft
     assert "Table 7. Reproduction modes and dependencies" in draft
+    main_body = draft.split("## Appendix: Detailed Audit and Reproducibility Records", 1)[0]
+    assert "```json" not in main_body
+    assert draft.split("## Appendix: Detailed Audit and Reproducibility Records", 1)[1].count("```json") >= 4
+    for vendor in ("OpenClaw", "Claude", "Codex"):
+        assert vendor not in manuscript_body
+    assert "paper-narrative-polish" not in manuscript_body
+    assert "paper-novelty-positioning" not in manuscript_body
     assert ("TODO" + "_EVIDENCE") not in draft
     assert "TODO before arXiv" not in draft
     assert "pending isolated" + " test" not in draft
@@ -120,11 +144,21 @@ def test_paper_track_p13_builds_claim_safe_release_pack() -> None:
     assert "@misc{chen2026transxion" in references
     assert "@article{deprez2025continualaml" in references
     assert "@misc{yang2026skillopt" in references
+    assert "@misc{xia2026researchloop" in references
+    assert "@misc{yue2026factreview" in references
+    assert "@misc{iscan2026safetygatedmcp" in references
+    assert (
+        "author = {Xu, Hang and Yue, Ling and Ouyang, Chaoqian and Zheng, Libin "
+        "and Pan, Shaowu and Di, Shimin and Zhang, Min-Ling},"
+        in references
+    )
     assert (
         "author = {Pervez, Helen and Gaurav, Suyash and Heikkonen, Jukka and Chaudhary, Jatin},"
         in references
     )
     assert any(item["citation_key"] == "song2024revtrack" for item in manifest["source_verification"])
+    for citation_key in ("xia2026researchloop", "yue2026factreview", "iscan2026safetygatedmcp"):
+        assert any(item["citation_key"] == citation_key for item in manifest["source_verification"])
     assert any(
         check["check_id"] == "p19b_hosted_score_case_study_passed" and check["passed"]
         for check in manifest["checks"]
@@ -210,11 +244,11 @@ def test_paper_track_p13_committed_release_artifacts_are_ready() -> None:
     assert "A precision-recall area under the curve (PR-AUC) estimate" in draft
     assert "In this setting, the score" not in draft
     assert "realized test queue of 1,109 of 123,580 transactions" in draft
-    assert "modern benchmark context" in draft
+    assert "pinned external-artifact context" in draft
     assert "Probe screen" in draft
     assert "Full finalist selection" in draft
     assert "README contains the full regeneration script" in draft
-    assert "immutable source commit recorded in the release bundle" in draft
+    assert "release bundle records the exact source commit and tag used for the arXiv submission" in draft
     assert "Table 6. Deterministic artifact and release-gate checks" in draft
     assert "Appendix table. Detailed failure-case fixtures" in draft
     assert "arXiv-ready draft" not in draft

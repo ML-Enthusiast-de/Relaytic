@@ -145,7 +145,10 @@ def test_p26_finalist_release_and_reader_language_are_consistent() -> None:
     assert "review build" not in lower
     assert "platt_sigmoid" not in paper
     assert "beside a published RevClassifyDS reference" not in paper
-    assert "alongside a published RevClassifyDS reference" in paper
+    abstract = paper.split("## 1. Introduction", 1)[0]
+    assert "alongside a published RevClassifyDS reference" not in paper
+    assert all(value not in abstract for value in ("Elliptic2", "0.9432", "0.9297", "0.9740"))
+    assert "Across the tested system fixtures" in abstract
     assert "PaySim test partition was an untouched holdout" not in paper
     assert "fixed but not an untouched holdout" in paper
-    assert "confirmatory rather than blind or untouched evidence" in paper
+    assert "neither a blind holdout result nor a reproduction or parity claim" in paper

@@ -50,7 +50,7 @@ def test_p24_reader_surfaces_disclose_protocol_and_statistical_boundaries() -> N
         "single-seed point estimates",
         "same-step events do not see one another",
         "validation PR-AUC 0.9767",
-        "confirmatory rather than blind or untouched evidence",
+        "neither a blind holdout result nor a reproduction or parity claim",
         "scores equal to the threshold are included",
         "Deterministic Artifact and Release-Gate Evaluation",
     ):
@@ -59,6 +59,9 @@ def test_p24_reader_surfaces_disclose_protocol_and_statistical_boundaries() -> N
     assert "+/-" not in draft
     assert "rows/nodes" not in draft
     assert "Values across datasets and task contracts are not directly comparable." in figure
+    assert "B. Validation-threshold review queues" in figure
+    for token in ("Elliptic2", "0.9432", "0.9297", "0.9740", "RevClassifyDS"):
+        assert token not in figure
 
 
 def test_p24_cli_writes_all_reports(tmp_path: Path, capsys: Any, monkeypatch: pytest.MonkeyPatch) -> None:
